@@ -24,20 +24,24 @@ entry.**
 
 ## 1 · State of play
 
-*Updated 2026-10-18.* The work system is set up; no feature work has started.
+*Updated 2026-10-18.* The work system is set up and law L2 (dependency
+licences) is filed; no feature work has started.
 **Ground it before you edit it** — `git log`, the queue, the code.
 
 ## 2 · In flight, and the immediate next step
 
-Nothing in flight. Next: the decider (`git config user.name`) installs `scripts/sr-guard.sh` as the
+Nothing in flight. When the first manifest lands, promote B-008 (L2's licence
+check) to a `W-nn` in the same change. Next: the decider (`git config user.name`) installs `scripts/sr-guard.sh` as the
 `commit-msg` hook; the first item is filed from the first real ask.
 
 ## 3 · Standing constraints
 
 - The laws: L0 (records are the only source; links, never restatements), L1
-  (retired records are archived). See `records/0001_LAWS.md`.
+  (retired records are archived), L2 (every dependency is free, open source and
+  permissive — no paid, no copyleft, dev tooling included). See
+  `records/0001_LAWS.md`.
 - The queue is the list; a blocker is a file; nothing closed is deleted.
-- Tests are not yet in place (`BACKLOG.md` B-001–B-005); the hooks and the
+- Tests are not yet in place (`BACKLOG.md` B-001–B-005, B-008); the hooks and the
   commit guard are the only mechanical enforcement.
 
 ## 4 · Lessons learned

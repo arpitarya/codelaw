@@ -36,6 +36,7 @@ it, and do not read it top-down as a priority order.
 | B-003 | The registry's decisions 5–8 are enforced by nothing | [SR-WORK-REGISTRY](../records/0060_WORK-registry.md) Consequences | a test over §3, as a `W-nn` |
 | B-004 | A `W-nn` that resolves to neither `work/open/` nor `archive/open/` is caught by nobody | [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) Consequences | a test, as a `W-nn` |
 | B-005 | A second `archive/` directory anywhere is caught by nobody | [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md) decision 1 | a test, as a `W-nn` |
+| B-008 | L2 is checked by nothing: no licence check runs over any manifest or lockfile | [SR-LAW-2](../records/0004_LAW-2-foss-dependencies.md) Consequences | a licence check over every manifest (Cargo, npm, PyPI) that refuses paid, non-OSI and copyleft licences, run by the guard or CI — as a `W-nn` when the first manifest lands |
 
 ---
 

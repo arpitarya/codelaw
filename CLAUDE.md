@@ -58,6 +58,7 @@ Each law is stated in exactly one record and is **not restated here**:
 
 - **L0** — SRs are the only source of truth; Law records outrank every other record — [SR-LAW-0](records/0002_LAW-0-authority.md)
 - **L1** — a retired record is archived, never deleted — [SR-LAW-1](records/0003_LAW-1-retired-records-archived.md)
+- **L2** — every dependency is free, open source and permissive; nothing paid, nothing copyleft — [SR-LAW-2](records/0004_LAW-2-foss-dependencies.md)
 
 [SR-LAWS](records/0001_LAWS.md) assigns the handles and routes each to its
 record; that is all it does. Add a law by adding a record in the law range and

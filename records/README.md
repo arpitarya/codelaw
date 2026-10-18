@@ -48,7 +48,7 @@ record to become wrong?*
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002` SR-LAW-0, `0003` SR-LAW-1 | the next free number after the highest law |
+| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002` SR-LAW-0, `0003` SR-LAW-1, `0004` SR-LAW-2 | the next free number after the highest law |
 | `0051`–`0100` | the **WORK** records only — how work is done | the next free number after the highest |
 | `0101`– | every other record | the next free number after the highest |
 
@@ -104,6 +104,7 @@ Start from `TEMPLATE.md`.
 | [0001](0001_LAWS.md) | **SR-LAWS** | The laws have exactly one home each; this record routes the handles | accepted | yes |
 | [0002](0002_LAW-0-authority.md) | **SR-LAW-0** | **L0** — records are the only source of truth; Law records outrank every other record | accepted | yes |
 | [0003](0003_LAW-1-retired-records-archived.md) | **SR-LAW-1** | **L1** — a retired record is archived, never deleted | accepted | yes |
+| [0004](0004_LAW-2-foss-dependencies.md) | **SR-LAW-2** | **L2** — every dependency is free, open source and permissive | accepted | no |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — the queue discipline in eight groups | accepted | yes |
 | [0052](0052_WORK-backlog.md) | **SR-WORK-BACKLOG** | How `BACKLOG.md` works — the named-but-unclaimed in five classes | accepted | yes |
 | [0053](0053_WORK-lifecycle.md) | **SR-WORK-LIFECYCLE** | How a feature travels — compare, proposal, handoff in the item file, the model line, one record | accepted | yes |

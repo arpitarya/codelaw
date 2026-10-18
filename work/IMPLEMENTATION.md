@@ -11,4 +11,5 @@ against this file before an item may be closed
 
 | date | item | what landed | outcome | evidence |
 |---|---|---|---|---|
+| 2026-10-18 | — | law L2: every dependency free, open source and permissive (SR-LAW-2) | accepted on the decider's ruling | `records/0004_LAW-2-foss-dependencies.md` |
 | 2026-10-18 | — | the work system: records 0001–0003, 0051–0060; `work/`; `archive/`; hooks; the commit guard | set up | the setup commit |
