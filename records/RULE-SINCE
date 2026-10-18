@@ -2,4 +2,4 @@
 # owned component without touching its owning record". Written at setup;
 # moved forward only after a bulk review, and each move is noted here with
 # its reason — the cost is that commits before it are no longer re-auditable.
-<sha of the setup commit — fill in after the first commit>
+c6b9f03cf008778afec3f0598c47ee03d1266957
