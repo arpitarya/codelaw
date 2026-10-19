@@ -2,46 +2,13 @@
 //! must not return one (`js/no-setter-return`). Both need the paths through
 //! the body, which a pattern can't follow.
 
-use crate::util::{descendants, has_token, is_function, named_children};
+use crate::util::{descendants, has_token, is_function, returns_value};
 use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::Language;
 use codelaw_lang::SyntaxNode;
 use tree_sitter::Node;
 
 const JS: &[Language] = &[Language::Javascript, Language::Jsx, Language::Typescript, Language::Tsx];
-
-/// Whether a statement returns a value (or throws) on every path.
-fn returns_value(n: &Node<'_>) -> bool {
-    match n.kind() {
-        "return_statement" => n.named_child_count() > 0,
-        "throw_statement" => true,
-        "statement_block" => named_children(*n).iter().any(returns_value),
-        "if_statement" => {
-            let c = n.child_by_field_name("consequence");
-            let a = n.child_by_field_name("alternative").and_then(|a| a.named_child(0));
-            matches!((c, a), (Some(c), Some(a)) if returns_value(&c) && returns_value(&a))
-        }
-        "try_statement" => {
-            let fin = n.child_by_field_name("finalizer").and_then(|f| f.child_by_field_name("body"));
-            if fin.is_some_and(|f| returns_value(&f)) {
-                return true;
-            }
-            let body = n.child_by_field_name("body");
-            let handler = n.child_by_field_name("handler").and_then(|h| h.child_by_field_name("body"));
-            body.is_some_and(|b| returns_value(&b)) && handler.is_none_or(|h| returns_value(&h))
-        }
-        "switch_statement" => {
-            let Some(body) = n.child_by_field_name("body") else { return false };
-            let cases = named_children(body);
-            cases.iter().any(|c| c.kind() == "switch_default")
-                && cases.iter().all(|c| {
-                    let stmts: Vec<Node> = named_children(*c).into_iter().filter(|s| Some(*s) != c.child_by_field_name("value")).collect();
-                    stmts.is_empty() || stmts.iter().any(returns_value)
-                })
-        }
-        _ => false,
-    }
-}
 
 fn accessor_body<'t>(n: Node<'t>, token: &str) -> Option<(Node<'t>, Node<'t>)> {
     if n.kind() != "method_definition" || !has_token(n, token) {

@@ -14,6 +14,7 @@ mod expressions;
 mod literals;
 mod no_undef;
 mod no_unreachable;
+mod react;
 mod regexp;
 mod typescript;
 mod unused_vars;
@@ -97,6 +98,11 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &useless_escape::NoUselessEscape,
     &typescript::NoVar,
     &typescript::PreferConst,
+    &react::ExhaustiveDeps,
+    &react::JsxNoDuplicateProps,
+    &react::NoUnknownProperty,
+    &react::RequireRenderReturn,
+    &react::RulesOfHooks,
     &typescript::NoDuplicateEnumValues,
     &typescript::NoUnsafeDeclarationMerging,
     &TS_NO_UNUSED_EXPRESSIONS,

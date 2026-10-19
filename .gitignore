@@ -2,3 +2,4 @@
 .claude/.stop-attempts
 .claude/.progress-nudged
 /target/
+.claude/worktrees/

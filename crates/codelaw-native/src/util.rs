@@ -145,3 +145,36 @@ pub fn whole_lines(src: &str, start: usize, end: usize) -> (usize, usize) {
     let line_end = rest.find('\n').map(|i| end + i + 1).unwrap_or(src.len());
     if src[end..line_end].trim().is_empty() { (line_start, line_end) } else { (start, end) }
 }
+
+/// Whether a statement returns a value (or throws) on every path.
+pub fn returns_value(n: &Node<'_>) -> bool {
+    match n.kind() {
+        "return_statement" => n.named_child_count() > 0,
+        "throw_statement" => true,
+        "statement_block" => named_children(*n).iter().any(returns_value),
+        "if_statement" => {
+            let c = n.child_by_field_name("consequence");
+            let a = n.child_by_field_name("alternative").and_then(|a| a.named_child(0));
+            matches!((c, a), (Some(c), Some(a)) if returns_value(&c) && returns_value(&a))
+        }
+        "try_statement" => {
+            let fin = n.child_by_field_name("finalizer").and_then(|f| f.child_by_field_name("body"));
+            if fin.is_some_and(|f| returns_value(&f)) {
+                return true;
+            }
+            let body = n.child_by_field_name("body");
+            let handler = n.child_by_field_name("handler").and_then(|h| h.child_by_field_name("body"));
+            body.is_some_and(|b| returns_value(&b)) && handler.is_none_or(|h| returns_value(&h))
+        }
+        "switch_statement" => {
+            let Some(body) = n.child_by_field_name("body") else { return false };
+            let cases = named_children(body);
+            cases.iter().any(|c| c.kind() == "switch_default")
+                && cases.iter().all(|c| {
+                    let stmts: Vec<Node> = named_children(*c).into_iter().filter(|s| Some(*s) != c.child_by_field_name("value")).collect();
+                    stmts.is_empty() || stmts.iter().any(returns_value)
+                })
+        }
+        _ => false,
+    }
+}

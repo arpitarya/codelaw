@@ -17,6 +17,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 |---|---|---|
 | `js/recommended` | 64 | ESLint `js.configs.recommended`, `@eslint/js` 10.0.1 — all 64 rules |
 | `ts/recommended` | 24 | typescript-eslint `recommended` 8.71.2 (not type-checked) — all 20 rules — plus the four core rules its `eslint-recommended` switches on for TypeScript: `js/no-var`, `js/prefer-const`, `js/prefer-rest-params`, `js/prefer-spread` |
+| `react/recommended` | 19 | eslint-plugin-react 7.37.5 `recommended` + `jsx-runtime` (17 of its 20 active rules), and eslint-plugin-react-hooks 7.1.1's `rules-of-hooks` and `exhaustive-deps` |
 
 Rules that typescript-eslint's `eslint-recommended` switches off for TypeScript
 (`no-undef`, `no-redeclare`, `no-dupe-class-members` and the rest, which the
@@ -45,14 +46,28 @@ section says so. The larger ones:
 | `ts/no-unused-expressions` | `x satisfies T;` is a compile-time type test and is allowed |
 | `js/prefer-spread` | only `f.apply(null, args)` on a plain function name |
 | `js/no-var` | `suggest`, not `auto`: `let` is block-scoped, so the swap can change meaning |
+| `react/jsx-key` | elements returned from a `.map()` callback's block body are not checked yet |
+| `react/no-unknown-property` | renames HTML spellings (`class`, `onclick`, `tabindex`); in `.js`/`.jsx` the JavaScript grammar can't parse `class=` and `for=` |
+| `react/exhaustive-deps` | dependencies compared by root name; setters, dispatchers and refs are stable |
+| `react/rules-of-hooks` | an early `return` anywhere before a hook counts as making it conditional |
 
 ## Not ported, and why
+
+| rule | why |
+|---|---|
+| `react/prop-types` | needs the component's declared prop types matched to its uses; TypeScript types do this job |
+| `react/jsx-uses-vars` | marks JSX names as used for `no-unused-vars`; codelaw's semantic model already counts them |
+| `react/react-in-jsx-scope`, `react/jsx-uses-react` | turned off by `jsx-runtime` |
+| eslint-plugin-react-hooks' 14 React Compiler rules | need the React Compiler's analysis |
 
 Nothing from `js.configs.recommended` or typescript-eslint's non-type-checked
 `recommended` is left out. Every `*-type-checked` typescript-eslint config is
 out of scope: those rules need type information (L3).
 
 ## Data
+
+`data/react/dom-property-aliases.json` — HTML attribute names and the React prop names that replace them, written for this pack.
+
 
 `data/globals/*.json` — the globals of each environment `js/no-undef`'s `env`
 option names, from the `globals` package 17.13.0 (MIT). See `NOTICE`.
