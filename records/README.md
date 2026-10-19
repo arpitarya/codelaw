@@ -108,7 +108,7 @@ Start from `TEMPLATE.md`.
 | [0005](0005_LAW-3-languages.md) | **SR-LAW-3** | **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, HTML — each alone or in any combination | accepted | no |
 | [0006](0006_LAW-4-every-rule-has-a-fix.md) | **SR-LAW-4** | **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix | accepted | no |
 | [0007](0007_LAW-5-no-model-in-the-engine.md) | **SR-LAW-5** | **L5** — no model in the engine; works the same with or without an agent | accepted | no |
-| [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each complete, identical output; npm sub-packages only as `@codelaw/*` | accepted | no |
+| [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as five packs on both (`@codelaw/rules-*`, `codelaw-rules-*`); npm sub-packages only as `@codelaw/*` | accepted | no |
 | [0009](0009_LAW-7-linter-and-formatter.md) | **SR-LAW-7** | **L7** — always both a linter and a formatter, for every L3 language | accepted | no |
 | [0010](0010_LAW-8-performance-budgets.md) | **SR-LAW-8** | **L8** — performance budgets — set from measurement, never exceeded, never loosened | accepted | no |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — the queue discipline in eight groups | accepted | yes |
@@ -121,13 +121,13 @@ Start from `TEMPLATE.md`.
 | [0058](0058_WORK-ownership.md) | **SR-WORK-OWNERSHIP** | `owns` and `describes`, and the commit guard | accepted | yes |
 | [0059](0059_WORK-governance.md) | **SR-WORK-GOVERNANCE** | The governance map — which file governs what; no counts | accepted | yes |
 | [0060](0060_WORK-registry.md) | **SR-WORK-REGISTRY** | The doc registry — rules in §2, the table in §3 | accepted | yes |
-| [0101](0101_rule-packs.md) | **SR-RULE-PACKS** | Presets, packs and local rules — built-in presets in the binary, team rules as packs, project rules in `.codelaw/rules` | proposed | no |
+| [0101](0101_rule-packs.md) | **SR-RULE-PACKS** | Five first-party rule packs on npm and PyPI apart from the engine; team packs; project rules in `.codelaw/rules` | accepted | no |
 | [0102](0102_agent-surfaces.md) | **SR-AGENT-SURFACES** | Skills, steering, instructions, agent files and hooks, generated from one source | accepted | no |
 | [0103](0103_project-graph.md) | **SR-PROJECT-GRAPH** | A whole-repo symbol graph for cross-file rules — unused exports first | accepted | no |
 | [0104](0104_baseline-and-deprecations.md) | **SR-BASELINE** | Grandfather violations with a deadline and a touch policy; the deprecations registry | accepted | no |
 | [0105](0105_formatter.md) | **SR-FORMATTER** | codelaw is a linter and a formatter — embedded engines, layout owned by the formatter | accepted | no |
 | [0106](0106_linter.md) | **SR-LINTER** | The linter — nine languages, file/project/adapter rules, embedded code, one diagnostic stream | accepted | no |
-| [0107](0107_packages.md) | **SR-PACKAGES** | What goes into which package — 19 internal crates; npm `codelaw` + 8 `@codelaw/cli-*`; PyPI `codelaw`; the editor extension | accepted | no |
+| [0107](0107_packages.md) | **SR-PACKAGES** | What goes into which package — 20 internal crates; npm `codelaw` + 8 `@codelaw/cli-*`; PyPI `codelaw`; five rule packs on both; the editor extension | accepted | no |
 | [0108](0108_architecture.md) | **SR-ARCHITECTURE** | The design of record — layers, pipelines, file I/O rules, contracts for fixers and adapters, warm processes, failure handling | accepted | no |
 | [0109](0109_cache.md) | **SR-CACHE** | Content-addressed caches — safe to delete, never change output | accepted | no |
 | [0110](0110_config.md) | **SR-CONFIG** | The configuration file — three homes, sections and owners, precedence, strict validation | accepted | no |

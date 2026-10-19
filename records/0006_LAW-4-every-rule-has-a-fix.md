@@ -100,7 +100,7 @@ A diagnostic without a fix is a chore for a person and an invitation to guess fo
 #### How L4 is enforced
 
 - Rule loader: decisions 1–3.
-- `codelaw test`: decisions 3 and 7, run in CI over every built-in and local rule.
+- `codelaw test`: decisions 3 and 7, run in CI over every rule in the first-party packs and every local rule.
 - Fix verifier: decisions 5 and 6. It runs on every fix, not just in tests.
 - Output schema test: every diagnostic in every format carries the fields in decision 4.
 

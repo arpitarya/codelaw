@@ -2,7 +2,7 @@
 type: Standing Record
 kind: component
 name: SR-PACKAGES
-title: "SR-PACKAGES (0107) — what goes into which package: 19 internal crates, one npm package with eight @codelaw binaries, one PyPI package, one editor extension"
+title: "SR-PACKAGES (0107) — what goes into which package: 20 internal crates, one engine on npm (with eight @codelaw binaries) and PyPI, five rule packs on both, one editor extension"
 description: "Defines every package codelaw builds and publishes, and exactly what each one contains, so nothing is shipped twice or left out."
 status: accepted
 date: 2026-10-18
@@ -13,34 +13,40 @@ timestamp: 2026-10-18T18:00:00Z
 content_sha: ""
 ---
 
-# SR-PACKAGES — what goes into which package: 19 internal crates, one npm package with eight @codelaw binaries, one PyPI package, one editor extension
+# SR-PACKAGES — what goes into which package: 20 internal crates, one engine on npm (with eight @codelaw binaries) and PyPI, five rule packs on both, one editor extension
 
 ## §1 — For humans
 
-**The decision in one line.** The engine is **one Rust workspace of 19 internal crates** compiled into **one binary**. That binary is published as **`codelaw` on npm** (with eight `@codelaw/cli-<os>-<arch>` binary packages) and **`codelaw` on PyPI** (eight platform wheels), plus **one editor extension**. Nothing else is published ([L6](0008_LAW-6-python-and-node-packages.md)).
+**The decision in one line.** The engine is **one Rust workspace of 20 internal crates** compiled into **one binary**. That binary is published as **`codelaw` on npm** (with eight `@codelaw/cli-<os>-<arch>` binary packages) and **`codelaw` on PyPI** (eight platform wheels). The rules ship as **five rule packs on both registries**, built from `packs/<name>/` ([SR-RULE-PACKS](0101_rule-packs.md)). There's also **one editor extension**. Nothing else is published ([L6](0008_LAW-6-python-and-node-packages.md)).
 
 | Published as | Name | Contains |
 |---|---|---|
 | npm | `codelaw` | launcher, JS API, TypeScript types, config JSON Schema; zero dependencies |
 | npm | `@codelaw/cli-<os>-<arch>` × 8 | the native binary for one platform; nothing else |
 | PyPI | `codelaw` | 8 platform wheels: the native binary + Python API |
+| npm | `@codelaw/rules-<name>` × 5 | a rule pack (`js`, `html`, `css`, `python`, `data`): rules, presets, data tables; no code, no dependencies |
+| PyPI | `codelaw-rules-<name>` × 5 | the same pack as one pure `py3-none-any` wheel, holding the same files as on npm |
 | VS Code Marketplace + Open VSX | `codelaw.codelaw` | LSP client ([SR-EDITOR](0114_editor.md)) |
 
 ```mermaid
 flowchart LR
-    W["19 crates"] --> B["one binary"]
+    W["20 crates"] --> B["one binary"]
     B --> N["npm: codelaw<br/>+ @codelaw/cli-* x8"]
     B --> P["PyPI: codelaw<br/>(8 wheels)"]
     B --> V["VS Code: codelaw.codelaw"]
+    R["packs/ (5)"] --> NR["npm: @codelaw/rules-* x5"]
+    R --> PR["PyPI: codelaw-rules-* x5"]
 ```
 
 <details>
 <summary><b>ASCII twin</b></summary>
 
 ```text
-   19 crates --> one binary --+--> npm  codelaw + @codelaw/cli-* (x8)
+   20 crates --> one binary --+--> npm  codelaw + @codelaw/cli-* (x8)
                               +--> PyPI codelaw (8 wheels)
                               +--> VS Code / Open VSX extension
+   packs/ (5) ----------------+--> npm  @codelaw/rules-* (x5)
+                              +--> PyPI codelaw-rules-* (x5)
 ```
 
 </details>
@@ -63,9 +69,10 @@ The decider asked for a record of what goes into which package, under the naming
    | foundation | `codelaw-cache` | [SR-CACHE](0109_cache.md) |
    | inputs | `codelaw-config` | [SR-CONFIG](0110_config.md) |
    | inputs | `codelaw-lang` | the [L3](0005_LAW-3-languages.md) grammars, language detection, embedded regions ([SR-LINTER](0106_linter.md) decision 3) |
-   | inputs | `codelaw-rules` | the rule-file parser and loader ([SR-RULE-FORMAT](0112_rule-format.md)); load-time checks for [L4](0006_LAW-4-every-rule-has-a-fix.md) |
-   | inputs | `codelaw-rules-builtin` | the built-in presets: `rules/**/*.md`, embedded at build time ([SR-RULE-PACKS](0101_rule-packs.md)) |
-   | engines | `codelaw-match` | file-scope rules on `ast-grep-core` |
+   | inputs | `codelaw-rules` | the rule-file parser and loader ([SR-RULE-FORMAT](0112_rule-format.md)); pack resolution and manifests ([SR-RULE-PACKS](0101_rule-packs.md) decision 4); load-time checks for [L4](0006_LAW-4-every-rule-has-a-fix.md); the engine's own `graph/no-deprecated-usage`, embedded |
+   | engines | `codelaw-semantic` | the per-file semantic model: scopes, bindings, references, imports and exports for JS/TS and Python ([SR-ARCHITECTURE](0108_architecture.md) decision 15a) |
+   | engines | `codelaw-match` | file-scope rules on `ast-grep-core`, with the semantic-model predicates |
+   | engines | `codelaw-native` | the Rust implementations behind `native:` rules ([SR-ARCHITECTURE](0108_architecture.md) decision 15b) |
    | engines | `codelaw-fix` | edit primitives, the apply loop, the verifier |
    | engines | `codelaw-format` | the formatter engines ([SR-FORMATTER](0105_formatter.md)) |
    | engines | `codelaw-graph` | [SR-PROJECT-GRAPH](0103_project-graph.md) |
@@ -96,7 +103,7 @@ The decider asked for a record of what goes into which package, under the naming
    - each wheel holds the binary, a `codelaw` Python module (`check`, `fix`, `format`, `rules_for`) and `py.typed`;
    - no sdist ([L6](0008_LAW-6-python-and-node-packages.md) decision 7).
 6. **The editor extension `codelaw.codelaw`** is published as platform-specific packages. It runs the project's own codelaw first (`node_modules/.bin`, then `.venv/bin`) and falls back to a bundled binary ([SR-EDITOR](0114_editor.md)).
-7. **One version for everything:** every crate, both registries' packages and the extension carry the same version from one file ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
+7. **One version for everything:** every crate, both registries' engine packages, the five rule packs and the extension carry the same version from one file ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
 8. **Not in any package:**
    - adapters (external tools);
    - third-party rule packs;
@@ -104,20 +111,25 @@ The decider asked for a record of what goes into which package, under the naming
    - anything downloaded at runtime.
 
    codelaw never fetches code after install ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
+9. **The five rule packs:** npm `@codelaw/rules-<name>` and PyPI `codelaw-rules-<name>`, for `js`, `html`, `css`, `python` and `data`.
+   - **Built** from `packs/<name>/` in the source repo by the release job. The npm tarball and the wheel's `codelaw_rules_<name>/` package data hold the same files.
+   - **No dependencies,** and neither `codelaw` package depends on a pack. `codelaw init` adds them to the consumer ([SR-RULE-PACKS](0101_rule-packs.md) decisions 3 and 6).
 
 ### Consequences
 
 - **One binary is larger than a modular install,** but there's nothing to mismatch and nothing to download later.
-- **Nineteen crates add some build-graph overhead,** but they make the layering checkable and keep compile times incremental.
+- **Twenty crates add some build-graph overhead,** but they make the layering checkable and keep compile times incremental.
+- **Ten pack packages publish with every release,** built by one job from `packs/`.
 
 ### Alternatives considered
 
 - **Separate npm/PyPI packages per feature** (`codelaw-mcp`, `codelaw-lsp`): rejected. Version skew, and L6 allows only `codelaw` unscoped.
+- **Built-in rules embedded in the binary** (crate `codelaw-rules-builtin`): superseded by the decider's ruling of 2026-10-19 ([SR-RULE-PACKS](0101_rule-packs.md)).
 - **A few large crates:** rejected. Layer violations can't be checked, and incremental builds are slower.
 
 ### Reference (required)
 
-- [L6](0008_LAW-6-python-and-node-packages.md) decisions 2, 7, 9 and 10: registries, naming, one version.
+- [L6](0008_LAW-6-python-and-node-packages.md) decisions 2, 7, 9, 10 and 11: registries, naming, one version, the rule packs.
 - [`docs/DESIGN.md`](../docs/DESIGN.md) §3.1: why one Rust binary.
 
 ### Veto condition

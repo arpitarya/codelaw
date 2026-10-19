@@ -37,17 +37,17 @@ A `codelaw` binary that loads rule packs from either registry and runs file rule
 | 2 · languages | All nine L3 languages parse, including TOML as a custom ast-grep language, and HTML/Markdown embedded regions. | ⏳ |
 | 3 · semantic model | Per file: scopes, bindings, references, imports and exports for JS/TS (incl. JSX/TSX) and Python. Exposed to rules as predicates (`unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`). | ⏳ |
 | 4 · native rules | A rule file whose `codelaw` block is `native: <id>` runs a Rust implementation registered in the engine; the Markdown still carries docs, fix class and examples. | ⏳ |
-| 5 · packs | `extends = ["codelaw:<pack>/<preset>"]` resolves from `node_modules/@codelaw/rules-<pack>` or the active Python environment's `codelaw_rules_<pack>`; a missing pack is a clear error naming both install commands. | ⏳ |
+| 5 · packs | `extends = ["codelaw:<namespace>/<preset>"]` resolves per [SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 4 (`node_modules/@codelaw/rules-<pack>`, then the Python environment's `codelaw_rules_<pack>`); a missing pack is a clear error naming both install commands; an unmet `min_codelaw` or an unknown `native:` id is a load error. `codelaw init` installs the detected packs (decision 6). | ⏳ |
 | 6 · test | `codelaw test` runs examples, `.cases.md` and invariants (SR-RULE-AUTHORING levels 1–3). | ⏳ |
 | 7 · laws | L4 loader checks, L5 parity/determinism tests and the L3 single-language fixtures pass. | ⏳ |
 
 ## Blockers
 
-**Waiting on W-01.** The engine records (SR-ARCHITECTURE, SR-PACKAGES, SR-RULE-FORMAT, SR-LINTER, …) were accepted on 2026-10-19; W-01 amends them for the separate packs, and the build follows the amended text.
+None. The engine records were accepted on 2026-10-19 and amended for the rule packs by W-01 the same day.
 
 ## Record affected
 
-SR-ARCHITECTURE (semantic model, native rules, pack loading, after W-01) · SR-PACKAGES decision 1 · SR-LINTER decision 2 · `work/IMPLEMENTATION.md` on landing.
+SR-ARCHITECTURE decisions 15a–15c (semantic model, native rules, pack loading) · SR-RULE-PACKS decisions 4–6 · SR-PACKAGES decision 1 · SR-LINTER decision 2 · `work/IMPLEMENTATION.md` on landing.
 
 ## Hazards
 
@@ -58,4 +58,4 @@ SR-ARCHITECTURE (semantic model, native rules, pack loading, after W-01) · SR-P
 ## Reference
 
 - [SR-ARCHITECTURE](../../records/0108_architecture.md), [SR-PACKAGES](../../records/0107_packages.md), [SR-RULE-AUTHORING](../../records/0113_rule-authoring.md).
-- [W-01](W-01-rule-pack-records.md): the records this build follows. [W-03](W-03-rule-packs.md): what runs on it.
+- [W-01](../../archive/open/W-01-rule-pack-records.md): the records this build follows. [W-03](W-03-rule-packs.md): what runs on it.

@@ -80,7 +80,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | Markdown | `tree-sitter-markdown` (block + inline) | yes |
 
 2. **Three rule scopes**, all in the same Markdown rule format ([SR-RULE-PACKS](0101_rule-packs.md)) and all bound by [L4](0006_LAW-4-every-rule-has-a-fix.md):
-   - **`scope: file`** (the default): an ast-grep pattern or YAML rule with relational clauses (`inside`, `has`, `precedes`, `follows`), with fixes from the edit primitives;
+   - **`scope: file`** (the default): an ast-grep pattern or YAML rule with relational clauses (`inside`, `has`, `precedes`, `follows`) and the semantic-model predicates ([SR-ARCHITECTURE](0108_architecture.md) decision 15a), or a `native:` rule (decision 15b) for checks a pattern can't express; fixes come from the edit primitives;
    - **`scope: project`**: a `graph:` query ([SR-PROJECT-GRAPH](0103_project-graph.md));
    - **adapters**: oxlint and Ruff by default when installed; stylelint (CSS) and html-validate (HTML) available. Each one is run only if installed, its output is mapped to the three fix classes, and none of them is bundled ([L6](0008_LAW-6-python-and-node-packages.md) completeness never depends on an adapter).
 
@@ -132,7 +132,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    - warm-cache `check` on 10,000 files: under 2 s;
    - hook mode on one file: under 100 ms.
 
-9. **Built-in rules per language** live in the presets of [SR-RULE-PACKS](0101_rule-packs.md), including `codelaw:css` and `codelaw:html`.
+9. **Rules per language** live in the five rule packs of [SR-RULE-PACKS](0101_rule-packs.md), `rules-css` and `rules-html` included. The engine carries none.
 
 ### Consequences
 
@@ -165,6 +165,6 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md)
+**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-ARCHITECTURE](0108_architecture.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

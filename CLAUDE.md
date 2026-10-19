@@ -62,7 +62,7 @@ Each law is stated in exactly one record and is **not restated here**:
 - **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, HTML — each alone or in any combination — [SR-LAW-3](records/0005_LAW-3-languages.md)
 - **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix — [SR-LAW-4](records/0006_LAW-4-every-rule-has-a-fix.md)
 - **L5** — no model in the engine; works the same with or without an agent — [SR-LAW-5](records/0007_LAW-5-no-model-in-the-engine.md)
-- **L6** — one release — `codelaw` on PyPI and on npm — each complete, identical output; npm sub-packages only as `@codelaw/*` — [SR-LAW-6](records/0008_LAW-6-python-and-node-packages.md)
+- **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as five packs on both (`@codelaw/rules-*`, `codelaw-rules-*`); npm sub-packages only as `@codelaw/*` — [SR-LAW-6](records/0008_LAW-6-python-and-node-packages.md)
 - **L7** — always both a linter and a formatter, for every L3 language — [SR-LAW-7](records/0009_LAW-7-linter-and-formatter.md)
 - **L8** — performance budgets — set from measurement, never exceeded, never loosened — [SR-LAW-8](records/0010_LAW-8-performance-budgets.md)
 

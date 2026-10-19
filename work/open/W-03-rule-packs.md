@@ -40,6 +40,7 @@ Five packs whose `recommended` presets cover the correctness core of each ecosys
 | 3 · no types | Rules needing type information or the React Compiler are excluded and listed in each pack's README as "not ported, and why". | ⏳ |
 | 4 · L4 | Every rule has a fix class; `auto` wherever safe. | ⏳ |
 | 5 · tests | `codelaw test` green for every rule; the pack README states its rule count per preset and the ported/not-ported table. | ⏳ |
+| 7 · starter catalogue | The 34 v0 starter rules ([SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 8) placed: in `recommended` with `ported_from:` where they match a source rule, otherwise in the pack's `conventions` preset. | ⏳ |
 | 6 · publish | Ten packages (5 × npm + PyPI) released with the engine, same version (W-01 DoD 2). | ⏳ |
 
 ## Research: what each pack ports (2026-10-19)
@@ -96,7 +97,7 @@ Five packs whose `recommended` presets cover the correctness core of each ecosys
 | markdownlint (all rules on by default, ~53) | **Port** the non-layout rules into `md/recommended` (heading increment, single H1, fenced-code language, link fragments, empty links, alt text). Layout rules (`MD009`, `MD010`, `MD012`, `MD022`, `MD030`, `MD031`, `MD032`, `MD047`, …) belong to the formatter: **never**. |
 | yamllint | **Ideas only, from the YAML 1.2 spec** (duplicate keys, truthy values, anchors). yamllint is GPL-3.0, so no code or docs are copied. |
 | taplo (MIT) | Cross-check TOML validity rules. |
-| sort-package-json conventions | `package-json` preset (`auto` fix). |
+| sort-package-json conventions | `data/package-json` preset (`auto` fix). |
 
 ### Prettier → the formatter's defaults, not rules
 
@@ -123,7 +124,7 @@ Prettier has no lint rules. Its option defaults become SR-FORMATTER's `[format]`
 
 ## Record affected
 
-SR-RULE-PACKS (the packs' contents and presets, after W-01) · SR-FORMATTER decision 5 (Prettier-derived defaults) · `work/IMPLEMENTATION.md` per pack on landing.
+SR-RULE-PACKS (the packs' contents and presets) · SR-FORMATTER decision 5 (Prettier-derived defaults) · `work/IMPLEMENTATION.md` per pack on landing.
 
 ## Hazards
 
@@ -139,4 +140,4 @@ SR-RULE-PACKS (the packs' contents and presets, after W-01) · SR-FORMATTER deci
 - [stylelint-config-recommended](https://cdn.jsdelivr.net/npm/stylelint-config-recommended/index.js) · [stylelint-config-standard](https://fastly.jsdelivr.net/npm/stylelint-config-standard@40.0.0/README.md)
 - [html-validate presets](https://html-validate.org/rules/presets.html) · [HTMLHint rules](https://htmlhint.com/docs/user-guide/list-rules)
 - [markdownlint](https://github.com/DavidAnson/markdownlint) · [Prettier options](https://prettier.io/docs/options)
-- [W-01](W-01-rule-pack-records.md) · [W-02](W-02-engine-p0.md)
+- [W-01](../../archive/open/W-01-rule-pack-records.md) · [W-02](W-02-engine-p0.md)

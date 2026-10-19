@@ -15,8 +15,8 @@ description: "Recurring terms, defined once."
 | blocker | `work/BLOCKED.json` with a decision other than `PROCEED` |
 | veto condition | the checkable condition under which a decision reopens |
 | fix class | what a rule's fix is: `auto` (applied), `suggest` (a diff to accept) or `manual` (written steps); SR-LAW-4 |
-| preset | a named group of built-in rules, e.g. `codelaw:recommended`; SR-RULE-PACKS |
-| pack | a folder of rule files published outside codelaw (npm, PyPI or a path); SR-RULE-PACKS |
+| preset | a named group of rules inside a rule pack, e.g. `codelaw:js/recommended`; SR-RULE-PACKS |
+| pack | a rule pack: a folder of rule files, presets and data tables with a `codelaw-pack.toml` manifest, on npm, PyPI or a path; codelaw's own five are `@codelaw/rules-*` / `codelaw-rules-*`; SR-RULE-PACKS |
 | project graph | the whole-repo map of modules, exports, imports and references that cross-file rules query; SR-PROJECT-GRAPH |
 | baseline | the committed per-file, per-rule counts of violations allowed to remain, with a deadline and a touch policy; SR-BASELINE |
 | as-of date | the date deadline rules evaluate against — the `HEAD` commit date unless `--as-of` says otherwise; SR-BASELINE |
@@ -27,6 +27,6 @@ description: "Recurring terms, defined once."
 | warm process | a long-lived `codelaw lsp`, `mcp` or `daemon` that keeps trees, rules and the graph in memory (SR-ARCHITECTURE) |
 | project root | the topmost config, or a nested config with `root = true`; one graph and one baseline per project root (SR-ARCHITECTURE) |
 | warm socket | the `.codelaw/cache/run/<pid>.sock` a running lsp, mcp or daemon registers so one-shot runs can reuse it (SR-ARCHITECTURE) |
-| semantic model | the per-file map of scopes, bindings and references that rules like `no-unused-vars` query (W-02) |
-| native rule | a rule whose matcher is implemented in the engine in Rust; its Markdown file still carries docs, fix class and examples (W-01) |
+| semantic model | the per-file map of scopes, bindings and references that rules like `no-unused-vars` query (SR-ARCHITECTURE decision 15a) |
+| native rule | a rule whose matcher is implemented in the engine in Rust; its Markdown file still carries docs, fix class and examples (SR-ARCHITECTURE decision 15b) |
 | change set | the files counted as touched: from `--changed-since`, `--staged` or the agent hook, never inferred; SR-BASELINE |

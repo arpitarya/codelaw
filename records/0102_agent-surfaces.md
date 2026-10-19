@@ -128,8 +128,8 @@ Each agent reads a different set of files from a different place. Maintaining th
 | **P1** | `codelaw-fix` | "fix lint errors", "codelaw is failing", a hook or CI reported violations | `codelaw fix`; shows `suggest` diffs and applies them on accept; works through `manual` steps; re-checks until clean | Code only |
 | **P1** | `codelaw-explain` | "why did this fire", "what does rule X want", "is this allowed" | `explain_rule` + the Do/Don't examples + which preset or pack enabled it (`rules --why`) | No |
 | **P1** | `codelaw-author-rule` | "make a rule that…", "enforce X", "we always do Y" | Turns a convention into a rule file:<br>1. Inspects the syntax tree of a real example.<br>2. Writes the matcher.<br>3. Picks the fix class ([L4](0006_LAW-4-every-rule-has-a-fix.md)).<br>4. Writes Do/Don't for every declared language ([L3](0005_LAW-3-languages.md)).<br>5. Runs `codelaw test` until green. | `.codelaw/rules/` |
-| **P2** | `codelaw-setup` | "set up codelaw", "add a linter that agents follow" | Detects languages and package manager, installs from npm or PyPI ([L6](0008_LAW-6-python-and-node-packages.md)), picks presets, wires pre-commit and CI, and adds agents only if asked | Config + CI |
-| **P2** | `codelaw-migrate` | "move from ESLint / Ruff / markdownlint", "turn our style guide into rules" | Maps existing configs to presets and adapters, turns prose conventions (CONTRIBUTING.md, ADRs) into draft rules, and writes a mapping report of what was covered, dropped or needs a human | Rules + report |
+| **P2** | `codelaw-setup` | "set up codelaw", "add a linter that agents follow" | Detects languages and package manager, installs the engine and the matching rule packs from npm or PyPI ([L6](0008_LAW-6-python-and-node-packages.md), [SR-RULE-PACKS](0101_rule-packs.md) decision 6), picks presets, wires pre-commit and CI, and adds agents only if asked | Config + CI |
+| **P2** | `codelaw-migrate` | "move from ESLint / Ruff / markdownlint", "turn our style guide into rules" | Maps existing ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint configs rule by rule through `ported_from:` ([SR-RULE-FORMAT](0112_rule-format.md) decision 2), then to presets and adapters, turns prose conventions (CONTRIBUTING.md, ADRs) into draft rules, and writes a mapping report of what was covered, dropped or needs a human | Rules + report |
 | **P2** | `codelaw-debug-rule` | "false positive", "rule didn't catch this", "rule test failing" | Reproduces the case as a failing example **first**, inspects the tree, adjusts the matcher, and keeps every existing example green | `.codelaw/rules/` |
 | **P2** | `codelaw-ci-triage` | A CI codelaw job failed, or a SARIF file or log is pasted | Reads SARIF, reproduces locally with the same flags, fixes or routes to `codelaw-fix` / `codelaw-debug-rule` | Code only |
 | **P3** | `codelaw-review` | "review this diff/PR against our rules" | Runs `check` on the changed files only and writes review comments that quote each violation's fix (diff or steps); adds no verdicts of its own | No |
@@ -178,6 +178,6 @@ Each agent reads a different set of files from a different place. Maintaining th
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-RULE-PACKS](0101_rule-packs.md)
+**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-RULE-FORMAT](0112_rule-format.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

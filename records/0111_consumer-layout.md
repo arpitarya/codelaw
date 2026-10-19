@@ -17,7 +17,7 @@ content_sha: ""
 
 ## §1 — For humans
 
-**The decision in one line.** A consumer writes **two things**: the config ([SR-CONFIG](0110_config.md)) and `.codelaw/` content (rules, fixers, baselines, deprecations). Everything agent-facing is **generated** by `codelaw sync-agents` and never edited by hand. The binary is **installed** by npm or pip. The only thing gitignored is `.codelaw/cache/`.
+**The decision in one line.** A consumer writes **two things**: the config ([SR-CONFIG](0110_config.md)) and `.codelaw/` content (rules, fixers, baselines, deprecations). Everything agent-facing is **generated** by `codelaw sync-agents` and never edited by hand. The engine and the rule packs are **installed** by npm or pip. The only thing gitignored is `.codelaw/cache/`.
 
 ```text
 my-app/
@@ -32,7 +32,9 @@ my-app/
 ├─ AGENTS.md · CLAUDE.md             generated    marker blocks only (SR-AGENT-SURFACES)
 ├─ .claude/ .kiro/ .github/ .mcp.json generated   agent files (SR-AGENT-SURFACES)
 ├─ .vscode/extensions.json           generated    recommends the codelaw extension (SR-EDITOR)
-├─ node_modules/codelaw  or  .venv/  installed    (SR-PACKAGES)
+├─ node_modules/codelaw  or  .venv/  installed    the engine (SR-PACKAGES)
+├─ node_modules/@codelaw/rules-*  or  .venv/…/codelaw_rules_*
+│                                    installed    the rule packs init added (SR-RULE-PACKS)
 └─ src/ …                            your code    linted and formatted
 ```
 
@@ -73,7 +75,7 @@ The decider asked for a record of what the consumer directory looks like. It was
 5. **No agents, no agent files.** With no `[agents] targets`, none of the generated agent paths exist ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 4).
 6. **Local rules live under `rules_dir`** (default `.codelaw/rules/`). The subfolders are namespaces for ids (`.codelaw/rules/acme/no-moment.md` → `acme/no-moment`); a rule's `languages:` field, not its folder, decides where it applies ([SR-RULE-FORMAT](0112_rule-format.md)).
 7. **Monorepos:** one `.codelaw/` at the root. A package may add its own `codelaw.toml` and `.codelaw/rules/`, which inherit from the root ([SR-CONFIG](0110_config.md) decision 2).
-8. **`codelaw init`** creates `codelaw.toml`, `.codelaw/rules/` (empty, with a README pointing at `codelaw new-rule`) and the `.gitignore` line. With `--agents`, it also writes the agent files.
+8. **`codelaw init`** adds the rule packs for the detected languages as dev dependencies ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and creates `codelaw.toml`, `.codelaw/rules/` (empty, with a README pointing at `codelaw new-rule`) and the `.gitignore` line. With `--agents`, it also writes the agent files.
 
 ### Consequences
 
@@ -103,6 +105,6 @@ The decider asked for a record of what the consumer directory looks like. It was
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md)
+**Records** — [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md) · [SR-RULE-PACKS](0101_rule-packs.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

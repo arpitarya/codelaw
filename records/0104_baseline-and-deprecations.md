@@ -26,7 +26,7 @@ content_sha: ""
 **The decision.** It's two pieces, and the first is general:
 
 1. **The baseline** works for *any* rule, not just deprecations. A committed list records how many violations of a rule each file is allowed to keep, until when, and what happens when the file is touched. New violations always fail. The list can only shrink without review.
-2. **The deprecations registry** is a file listing deprecated symbols, their replacements and deadlines. The built-in rule `graph/no-deprecated-usage` uses the [project graph](0103_project-graph.md) to find real uses (including aliased and re-exported imports), and the baseline to grandfather the existing ones.
+2. **The deprecations registry** is a file listing deprecated symbols, their replacements and deadlines. The engine's own rule `graph/no-deprecated-usage` (it ships with the engine, not in a pack; [SR-RULE-PACKS](0101_rule-packs.md) decision 1) uses the [project graph](0103_project-graph.md) to find real uses (including aliased and re-exported imports), and the baseline to grandfather the existing ones.
 
 The same baseline also lets you switch on any new rule in a legacy repo: freeze today's violations, block new ones, and burn the old ones down.
 
@@ -224,6 +224,6 @@ $ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-AGENT-SURFACES](0102_agent-surfaces.md)
+**Records** — [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-RULE-PACKS](0101_rule-packs.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

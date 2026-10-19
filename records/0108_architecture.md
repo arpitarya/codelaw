@@ -21,15 +21,15 @@ content_sha: ""
 
 **Speed is designed in ([L8](0010_LAW-8-performance-budgets.md)):** skip before reading, hash before parsing, parse once, compile rules once, dispatch by node kind, cache everything pure ([SR-CACHE](0109_cache.md)), and never start cold when a warm process is up.
 
-**What this record settles that no other record did:** file encoding and line endings, generated and oversized files, symlinks, how git is read, safe writes, position encodings, the external-fixer contract, the adapter contract, the daemon's lifecycle, memory bounds in the editor, and what happens when a rule panics.
+**What this record settles that no other record did:** file encoding and line endings, generated and oversized files, symlinks, how git is read, safe writes, position encodings, the external-fixer contract, the adapter contract, the daemon's lifecycle, memory bounds in the editor, what happens when a rule panics, and the semantic model, native rules and pack data that porting real presets needs.
 
 ```mermaid
 flowchart TB
-    F["foundation: core · cache"] --> I["inputs: config · lang · rules · rules-builtin"]
-    I --> E["engines: match · fix · format · graph · baseline · adapters"]
+    F["foundation: core · cache"] --> I["inputs: config · lang · rules"]
+    I --> E["engines: match · semantic · native · fix · format · graph · baseline · adapters"]
     E --> O["orchestration: engine · report · test"]
     O --> S["surfaces: cli · mcp · lsp · agents"]
-    S --> D["distribution: npm · PyPI · editor"]
+    S --> D["distribution: npm · PyPI · editor · rule packs"]
 ```
 
 <details>
@@ -37,8 +37,10 @@ flowchart TB
 
 ```text
    foundation --> inputs --> engines --> orchestration --> surfaces --> distribution
-   (core,cache)   (config,    (match,fix,  (engine,report,  (cli,mcp,    (npm, PyPI,
-                   lang,rules) format,graph, test)           lsp,agents)  editor)
+   (core,cache)   (config,    (match,      (engine,report,  (cli,mcp,    (npm, PyPI,
+                   lang,rules) semantic,    test)            lsp,agents)  editor,
+                               native,fix,                                rule packs)
+                               format,graph,
                                baseline,adapters)
 ```
 
@@ -63,9 +65,9 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 #### B. The pipelines
 
 4. **`check`:**
-   1. Load config ([SR-CONFIG](0110_config.md)) and the compiled rule set (cached).
+   1. Load config ([SR-CONFIG](0110_config.md)), resolve the rule packs ([SR-RULE-PACKS](0101_rule-packs.md) decision 4) and load the compiled rule set (cached).
    2. Discover files (decision 7).
-   3. In parallel, per file: read once, hash, and on a cache hit reuse the results; otherwise parse once, split embedded regions, run file rules and the format check, and extract graph facts.
+   3. In parallel, per file: read once, hash, and on a cache hit reuse the results; otherwise parse once, split embedded regions, build the semantic model if an active rule needs it (decision 15a), run file rules (`native:` ones included, decision 15b) and the format check, and extract graph facts.
    4. Link the graph and run project rules ([SR-PROJECT-GRAPH](0103_project-graph.md)).
    5. Run adapters (decision 19).
    6. Apply suppressions ([SR-LINTER](0106_linter.md) decision 6) and the baseline ([SR-BASELINE](0104_baseline-and-deprecations.md)).
@@ -90,13 +92,33 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 #### D. Rules and regions
 
 15. **Compile once, dispatch by kind.** Rule files are compiled at load into matchers whose kind filters are indexed. Each file is walked once, and every node is handed only to the rules whose filter matches it. The compiled set is cached by the hash of every active rule file plus the config ([SR-CACHE](0109_cache.md)).
+
+15a. **Semantic model.** For JS/TS (JSX and TSX included) and Python, each file gets scopes, bindings, references, imports and exports.
+  - **How it's built:** from the same syntax tree, in one pass after parsing (crate `codelaw-semantic`), and only when at least one active rule needs it.
+  - **How rules use it:** `match:` rules query it through predicates (`unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`); native rules read it directly.
+  - **Shared with the graph:** its imports and exports are the per-file facts the project graph links, so they're computed once ([SR-PROJECT-GRAPH](0103_project-graph.md)).
+  - **No type information** ([L3](0005_LAW-3-languages.md)).
+  - **Where the approach comes from:** `oxc_semantic` (MIT) for JS/TS and Ruff's semantic model (MIT) for Python. Taking either as a dependency needs its own record.
+  - **Cached** with the file's results ([SR-CACHE](0109_cache.md)).
+
+15b. **Native rules.** A rule whose `codelaw` block is `native: <id>` runs a Rust implementation registered under that id in `codelaw-native`. It's for checks a pattern can't express: control flow (`no-unreachable`), hook order (`rules-of-hooks`), dependency lists (`exhaustive-deps`).
+  - **The Markdown file is still the rule.** It carries the docs, fix class, options and examples, and `codelaw test` runs them unchanged.
+  - **An unknown id refuses the rule at load,** naming the pack's `min_codelaw`.
+  - **Same discipline as every rule:** a native rule declares the node kinds it needs (decision 15), is isolated on panic (decision 25) and is deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)).
+  - **Only first-party packs** and ejected copies of their rules may use `native:` ([SR-RULE-PACKS](0101_rule-packs.md) decision 10).
+
+15c. **Rule packs and data tables.** Rules come from the packs resolved by [SR-RULE-PACKS](0101_rule-packs.md) decision 4, plus local rules. The engine embeds only its own (`codelaw/*` diagnostics and `graph/no-deprecated-usage`).
+  - **Data tables:** a pack's `data/` tables (CSS properties, HTML elements and attributes, JSON Schemas) are read at load, parsed once, and shared read-only by every rule that names them.
+  - **Caching:** their hashes join the compiled rule set's cache key (decision 15).
+  - **Nothing is fetched** (decision 27).
+
 16. **Embedded regions** ([SR-LINTER](0106_linter.md) decision 3) are parsed lazily: a `<script>` is parsed only if JavaScript or TypeScript is enabled and at least one rule or the format check applies to it. A language switched off in `languages` is off inside host files too.
 17. **Monorepo scope.** One graph and one baseline per **project root**: the topmost config, or a nested config with `root = true` ([SR-CONFIG](0110_config.md) decision 2). A `root = true` package is a separate project with its own graph; cross-root imports are resolved as external.
 
 #### E. Contracts with code codelaw doesn't own
 
 18. **External fixers** (`fix: { external: "<command>" }`, [SR-RULE-FORMAT](0112_rule-format.md) decision 3).
-    - Run only for local rules, or for packs listed in `allow_pack_fixers` ([SR-RULE-PACKS](0101_rule-packs.md) decision 7).
+    - Run only for local rules, or for packs listed in `allow_pack_fixers` ([SR-RULE-PACKS](0101_rule-packs.md) decision 12).
     - Input on stdin, one JSON object: `{ "schema": 1, "rule", "file", "language", "source", "matches": [{ "range", "captures" }] }`.
     - Output on stdout: `{ "edits": [{ "range", "text" }] }`, byte offsets into `source`.
     - Timeout 5 s per file (`[fix] external_timeout`), no network expected, run with the repo root as the working directory.
@@ -134,6 +156,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 - **Shelling out to `git`** keeps the binary small and matches what every CI image has, at the cost of three features being absent without it.
 - **Adapters are excluded from hook and LSP mode,** so an agent sees adapter findings only in CI. Deliberate, for `fix_one_file`.
 - **Warm-process discovery adds a socket file under the cache;** stale-socket cleanup is tested (`B-026`).
+- **The semantic model is in the hot path** for every JS/TS and Python file that a scope-aware rule touches; it's built lazily and measured by `check_warm_10k` ([L8](0010_LAW-8-performance-budgets.md)).
 - **Not decided yet, by design:** a JavaScript rule API (DESIGN P4), type-aware rules, and SCSS/Vue/Svelte. Each needs its own record before any work.
 
 ### Alternatives considered
@@ -151,6 +174,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 - [tree-sitter](https://tree-sitter.github.io/tree-sitter/): incremental re-parsing on edit.
 - [`ignore` crate](https://docs.rs/ignore): gitignore-aware parallel walking (from ripgrep).
 - [`rayon`](https://docs.rs/rayon): the work-stealing pool.
+- [`oxc_semantic`](https://docs.rs/oxc_semantic) and [Ruff's semantic model](https://github.com/astral-sh/ruff/tree/main/crates/ruff_python_semantic): the approaches decision 15a ports.
 
 ### Veto condition
 

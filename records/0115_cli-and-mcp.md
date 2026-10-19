@@ -65,7 +65,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | everyday | `check` · `fix` · `format` · `explain` |
    | rules | `rules [--for <path>] [--why <id>]` · `new-rule` · `rules eject` · `rules lint` · `test` |
    | debug | `tree` · `match --explain` · `fix --trace` · `graph refs` · `graph why-unused` |
-   | project | `init [--agents …]` · `sync-agents [--check]` · `config --print` · `config --schema` |
+   | project | `init [--agents …] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print` · `config --schema` |
    | baseline | `baseline add` · `baseline prune` · `baseline check` · `deprecate` |
    | servers | `lsp` · `mcp` · `daemon start/stop/status` · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
@@ -125,6 +125,6 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-PACKAGES](0107_packages.md) · [SR-ARCHITECTURE](0108_architecture.md)
+**Records** — [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-PACKAGES](0107_packages.md) · [SR-ARCHITECTURE](0108_architecture.md) · [SR-RULE-PACKS](0101_rule-packs.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

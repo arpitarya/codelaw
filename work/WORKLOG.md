@@ -24,6 +24,28 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-19 — W-01: the records rewritten for five separately published rule packs; SR-RULE-PACKS accepted  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"go with the recommendations for all of them"*: run W-01, then accept SR-RULE-PACKS.
+- **Done:**
+  - **SR-RULE-PACKS** rewritten: five first-party packs (`js`, `html`, `css`, `python`, `data`) on npm `@codelaw/rules-*` and PyPI `codelaw-rules-*`, with layout, resolution, `init` install, ported-rule policy and data tables. The embedded-in-binary choice is moved to Alternatives. Accepted.
+  - **SR-LAW-6:** law text and decisions 3, 4, 9 and 10 amended; decision 11 added.
+  - **SR-PACKAGES:** 20 crates (`codelaw-rules-builtin` out; `codelaw-semantic` and `codelaw-native` in); decision 9 covers the packs.
+  - **SR-ARCHITECTURE:** decisions 15a–15c (semantic model, native rules, pack data).
+  - **Smaller amendments:** SR-CONFIG, SR-CONSUMER-LAYOUT, SR-RULE-FORMAT (`ported_from:`, `native:`), SR-LINTER, SR-AGENT-SURFACES, SR-BASELINE, SR-CLI-MCP (`init --no-install --registry`), L3 decision 2, L4.
+  - **Routing:** `CLAUDE.md` L6 line, SR-LAWS, the register, DESIGN.md and the glossary.
+  - **Queue:** W-01 closed and archived; W-02 🟢.
+- **Decided / left open:** this session's calls, for the decider to correct:
+  - the `rules-data` presets are namespaced `data/…`;
+  - an opt-in `conventions` preset per pack;
+  - `native:` only in first-party packs;
+  - the npm copy of a pack is found before the Python copy;
+  - SR-ARCHITECTURE's new decisions are lettered (15a–15c) so that nothing is renumbered.
+- **Mistakes:** SR-RULE-PACKS's decisions were renumbered by the rewrite; four citations in other records were found by grep and repointed in the same change.
+- **Next:** W-02 (the engine).
+
+---
+
 ## 2026-10-19 — the decider rules on the whole inbox: L5 and fourteen records accepted; L6 floors 3.11 / 22  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"go with the recommendations for all of them."* (the blocker list with a recommendation per row)

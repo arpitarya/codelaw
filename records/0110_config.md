@@ -21,7 +21,7 @@ content_sha: ""
 
 ```toml
 #:schema ./node_modules/codelaw/codelaw.schema.json
-extends   = ["codelaw:recommended", "codelaw:typescript", "codelaw:python"]
+extends   = ["codelaw:js/recommended", "codelaw:ts/recommended", "codelaw:py/recommended"]
 languages = ["javascript", "jsx", "typescript", "tsx", "python", "json", "yaml", "toml", "css", "html", "markdown"]
 include   = ["src/**", "packages/*/src/**"]
 exclude   = ["dist/**", "**/*.generated.*"]
@@ -81,6 +81,8 @@ Configuration keys were scattered across six records. The decider asked for one 
    - `[rules]` and `[[overrides]]`;
    - `root`, `requires`.
 
+   `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11).
+
    Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change.
 4. **Precedence, last wins:**
    1. Built-in defaults.
@@ -91,14 +93,14 @@ Configuration keys were scattered across six records. The decider asked for one 
    6. Environment (`CODELAW_AS_OF`, `CODELAW_CACHE_DIR`, `CODELAW_LOG`).
    7. Command-line flags.
 
-   Rule sources resolve as in [SR-RULE-PACKS](0101_rule-packs.md) decision 9.
+   Rule sources resolve as in [SR-RULE-PACKS](0101_rule-packs.md) decision 14.
 5. **Validation is strict.**
    - An unknown key, a wrong type or an unknown rule id stops the run with exit 2, naming the file, the key and the nearest valid key ("did you mean `line_width`?").
    - `requires = ">=0.4"` refuses to run with an older codelaw.
 6. **The schema ships with codelaw.** `codelaw.schema.json` is in the npm package and available as `codelaw config --schema`, so TOML and JSON editors offer completion and validation.
 7. **Traceable.** `codelaw config --print [--for <file>]` prints the resolved configuration for a file, with the source of each value (default, `.editorconfig`, file:line, override #n, env or flag).
 8. **Creating it.**
-   - `codelaw init` writes a minimal `codelaw.toml`: `extends` with the presets for the languages it detects, and nothing else.
+   - `codelaw init` writes a minimal `codelaw.toml`: `extends` with the `recommended` presets of the rule packs it installs for the languages it detects ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and nothing else.
    - `codelaw format --import-config` converts Prettier, Ruff or Black configs ([SR-FORMATTER](0105_formatter.md) decision 5).
 9. **Deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)):** the resolved config is a pure function of the files, environment and flags. Its hash is part of every cache key ([SR-CACHE](0109_cache.md)).
 
@@ -115,7 +117,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
 ### Reference (required)
 
-- [SR-RULE-PACKS](0101_rule-packs.md) decision 9: rule-source precedence.
+- [SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 14: pack resolution and rule-source precedence.
 - [SR-FORMATTER](0105_formatter.md) decision 5: the `[format]` keys.
 - [Taplo `#:schema` directive](https://taplo.tamasfe.dev/configuration/directives.html): schema-driven TOML completion.
 

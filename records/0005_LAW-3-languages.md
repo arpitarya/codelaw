@@ -72,7 +72,7 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
    | CSS | | `.css` |
    | HTML | inline `<script>`, `<style>` and `style=""` are linted and formatted as JS/TS and CSS ([SR-LINTER](0106_linter.md) decision 3) | `.html` `.htm` |
 
-2. **Independently.** A repo containing only one language needs no configuration about the other eight. It also needs no runtime for them: `pip install codelaw` in a Python-only repo pulls no Node, and `npm i -D codelaw` in a JS-only repo pulls no Python.
+2. **Independently.** A repo containing only one language needs no configuration about the other eight. It also needs no runtime for them: `pip install codelaw` in a Python-only repo pulls no Node, and `npm i -D codelaw` in a JS-only repo pulls no Python. The same holds for rules: a Python-only repo gets its rule packs from PyPI (`codelaw-rules-python`, `codelaw-rules-data`) and a JS-only repo gets them from npm ([L6](0008_LAW-6-python-and-node-packages.md) decision 11).
 3. **Together.** A repo with any mix is checked in **one invocation**, with one config, one report and one exit code.
 4. **Selectable.** Any language can be switched off per repo (`languages = [...]` in `codelaw.toml`) or per run (`--lang python`, `--lang js,ts`). A language that's off costs nothing: its grammar isn't loaded and its rules aren't parsed.
 5. **Isolation.** A file's diagnostics and fixed bytes are identical whether it's checked alone, inside a single-language repo, or inside the all-languages repo.
@@ -121,6 +121,6 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-LINTER](0106_linter.md)
+**Records** — [SR-LINTER](0106_linter.md) · [SR-LAW-6](0008_LAW-6-python-and-node-packages.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

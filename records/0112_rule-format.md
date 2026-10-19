@@ -35,6 +35,7 @@ stability: stable                      # stable | preview      (default preview)
 host: html                             # optional: only inside regions embedded in this host
 invariant: exports-unchanged           # optional; checked by codelaw test
 options: { internal: { type: "string[]", default: [] } }   # optional, typed
+ported_from: [eslint/no-dupe-keys]     # optional; the source rules this one reimplements
 tags: [modules]
 since: 0.1.0
 ---
@@ -47,6 +48,7 @@ One paragraph: what the rule requires.
 match: …            # scope: file  → an ast-grep rule
 # graph: …          # scope: project → a graph query (SR-PROJECT-GRAPH)
 # target/assert: …  # structured files → path assertions
+# native: <id>      # first-party packs only → a Rust implementation in the engine
 message: "…$NAME…"
 fix: [ … ]          # edit primitives, or { external: "…" }
 ```
@@ -96,14 +98,16 @@ The decider asked for a record of the rule-file template. The format so far exis
 
 ### Decision
 
-1. **Path and id.** The file is `<rules_dir>/<namespace>/<name>.md`, and its `id` must equal `<namespace>/<name>`. Built-in namespaces (`js`, `ts`, `react`, `stencil`, `py`, `json`, `yaml`, `toml`, `md`, `css`, `html`, `graph`, `format`) are reserved for codelaw's own rules.
+1. **Path and id.** The file is `<rules_dir>/<namespace>/<name>.md`, and its `id` must equal `<namespace>/<name>`. First-party namespaces (`js`, `ts`, `react`, `node`, `stencil`, `py`, `json`, `yaml`, `toml`, `md`, `data`, `css`, `html`, `graph`, `format`, `codelaw`) are reserved for the first-party rule packs and the engine ([SR-RULE-PACKS](0101_rule-packs.md)).
 2. **Frontmatter schema** is §1's template, every field typed.
    - **Required:** `id`, `title`, `languages`, `fix`, plus `fix_reason` unless `fix: auto` ([L4](0006_LAW-4-every-rule-has-a-fix.md)).
+   - **`ported_from:`** (optional) lists `<tool>/<rule>` ids, for example `[eslint/no-dupe-keys, ruff/F601]`: the source rules this one reimplements ([SR-RULE-PACKS](0101_rule-packs.md) decision 7). `codelaw-migrate` maps existing configs through it ([SR-AGENT-SURFACES](0102_agent-surfaces.md)).
    - **Unknown fields are a load error.**
-3. **The `codelaw` block takes exactly one of three forms:**
-   - `match:` (an ast-grep rule with relational clauses; `scope: file`);
+3. **The `codelaw` block takes exactly one of four forms:**
+   - `match:` (an ast-grep rule with relational clauses and the semantic-model predicates of [SR-ARCHITECTURE](0108_architecture.md) decision 15a; `scope: file`);
    - `graph:` ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 6; `scope: project`);
-   - `target:` + `assert:` (path assertions on JSON, YAML or TOML).
+   - `target:` + `assert:` (path assertions on JSON, YAML or TOML);
+   - `native: <id>` (a Rust implementation in the engine, [SR-ARCHITECTURE](0108_architecture.md) decision 15b; accepted only in first-party packs and in an ejected copy of one of their rules).
 
    Then `message:` (with `$CAPTURE` interpolation) and `fix:` (edit primitives, conditional `when`/`else` branches, or `{ external: "<command>" }`, whose stdin/stdout contract is [SR-ARCHITECTURE](0108_architecture.md) decision 18).
 4. **Body sections, in this order:**
@@ -116,9 +120,9 @@ The decider asked for a record of the rule-file template. The format so far exis
    Any other section is allowed after `## Examples` and ignored by the engine.
 5. **Examples.** Under `## Examples` there's one `### <Language>` per declared language, each with at least one `#### Don't` and one `#### Do`, and an optional `#### Fixed` when the fixed output differs from the Do. Multi-file examples use a `files` fence (`// path` sections; [SR-PROJECT-GRAPH](0103_project-graph.md) decision 6).
 6. **The sidecar `<name>.cases.md`** holds edge cases. Each `### case: <title>` has an input fence, an `expect` fence (`line:col rule-id` lines, or `(none)`) and an optional `fixed` fence ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 4).
-7. **Self-check.** `codelaw rules lint` validates every rule file against this template (the schema, the section order, an example for each language, the id matching the path). It runs inside `codelaw test` and on every built-in rule in CI.
+7. **Self-check.** `codelaw rules lint` validates every rule file against this template (the schema, the section order, an example for each language, the id matching the path). It runs inside `codelaw test` and on every first-party pack rule in CI.
 8. **Scaffold.** `codelaw new-rule <id> --lang <list> [--scope project] [--fix manual]` writes this template with every required field filled and empty examples.
-9. **Determinism ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A rule file is data. Nothing in it executes, except an `external` fixer, which runs only under [SR-RULE-PACKS](0101_rule-packs.md) decision 7's rules.
+9. **Determinism ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A rule file is data. A `native:` rule names engine code; it doesn't carry it. Nothing in a rule file executes, except an `external` fixer, which runs only under [SR-RULE-PACKS](0101_rule-packs.md) decision 12's rules.
 
 ### Consequences
 
@@ -149,6 +153,6 @@ The decider asked for a record of the rule-file template. The format so far exis
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-RULE-AUTHORING](0113_rule-authoring.md)
+**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-RULE-AUTHORING](0113_rule-authoring.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-ARCHITECTURE](0108_architecture.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)
