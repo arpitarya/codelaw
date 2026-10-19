@@ -89,15 +89,15 @@ pub struct NoUnusedExpressions {
 }
 
 /// Whether an expression statement's expression does something.
-fn has_effect(n: Node<'_>, src: &str) -> bool {
+fn has_effect(n: Node<'_>) -> bool {
     match n.kind() {
         "call_expression" | "new_expression" | "assignment_expression" | "augmented_assignment_expression" | "update_expression" | "await_expression"
         | "yield_expression" | "import" => true,
         "unary_expression" => matches!(n.child(0).map(|o| o.kind()), Some("delete") | Some("void")),
         // `x satisfies T;` is a compile-time type test.
         "satisfies_expression" => true,
-        "parenthesized_expression" | "non_null_expression" | "as_expression" => n.named_child(0).is_some_and(|c| has_effect(c, src)),
-        "sequence_expression" => named_children(n).last().is_some_and(|c| has_effect(*c, src)),
+        "parenthesized_expression" | "non_null_expression" | "as_expression" => n.named_child(0).is_some_and(|c| has_effect(c)),
+        "sequence_expression" => named_children(n).last().is_some_and(|c| has_effect(*c)),
         _ => false,
     }
 }
@@ -136,10 +136,10 @@ impl NativeRule for NoUnusedExpressions {
     fn kinds(&self) -> &'static [&'static str] {
         &["expression_statement"]
     }
-    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+    fn check(&self, node: SyntaxNode<'_>, _ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
         let stmt = node.get_inner_node();
         let Some(e) = stmt.named_child(0) else { return };
-        if has_effect(e, ctx.source) || directive(stmt) || stmt.has_error() {
+        if has_effect(e) || directive(stmt) || stmt.has_error() {
             return;
         }
         out.push(finding(e, "This expression's value is unused, so the statement does nothing", Vec::new()));
