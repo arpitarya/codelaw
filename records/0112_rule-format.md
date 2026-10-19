@@ -7,9 +7,10 @@ description: "Defines the exact template of a codelaw rule file — frontmatter 
 status: accepted
 date: 2026-10-18
 feature: "the rule file"
-owns: []
+owns:
+  - crates/codelaw-rules
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 
@@ -110,6 +111,20 @@ The decider asked for a record of the rule-file template. The format so far exis
    - `native: <id>` (a Rust implementation in the engine, [SR-ARCHITECTURE](0108_architecture.md) decision 15b; accepted only in first-party packs and in an ejected copy of one of their rules).
 
    Then `message:` (with `$CAPTURE` interpolation) and `fix:` (edit primitives, conditional `when`/`else` branches, or `{ external: "<command>" }`, whose stdin/stdout contract is [SR-ARCHITECTURE](0108_architecture.md) decision 18).
+3a. **What goes with `match:`.** Only beside `match:`: ast-grep's own `constraints:` and `utils:`, and `where:`, the semantic-model predicates.
+   - **`where:` maps a capture to a predicate.** The key is a capture (`$NAME`) or the matched node itself (`$$MATCH`); a key `match:` doesn't capture is a load error.
+   - **The predicates:** `unused`; `undeclared` (optionally `{ globals: [<name>…], tables: [<data table>…] }`); `shadowed` (optionally `{ builtins: true }`); `reassigned`; `imported-from` (a module, a list of modules, or `{ module, name }`).
+   - **Combining them:** a list means all of them; `not`, `all` and `any` take predicates.
+3b. **Interpolation.** A message or template replaces `$NAME` with the capture's text, `$$$NAME` with the source a multi-capture spans, and `$$MATCH` with the matched text.
+3c. **The edit primitives.** `fix:` is a template that replaces the match, or a list of primitives, each acting on the match or on a capture (`target:`):
+   - `replace`, `insert-before`, `insert-after`;
+   - `remove`: takes a separating comma with the node, and the whole line when the node is alone on it;
+   - `strip-export-keyword`;
+   - `collect-into-block`: `block` with `$$$NAMES`, `type_block` with `$$$TYPE_NAMES`, and `position`; computed once over every match in the file, so each diagnostic carries the whole edit set;
+   - `move-to`: `end-of-file`, `start-of-file` or `after-imports`;
+   - `rename-symbol-local`: renames a symbol and its references in the file, and is refused for an exported symbol;
+   - `sort-keys` and `ensure-key` (for `target:` rules) and `when`/`else` branches.
+3d. **YAML 1.2.** The frontmatter and the `codelaw` block are read as YAML 1.2, as ast-grep reads its rules: `on`, `n` and `yes` are strings.
 4. **Body sections, in this order:**
    1. One summary paragraph.
    2. `**Why:**`
@@ -119,6 +134,7 @@ The decider asked for a record of the rule-file template. The format so far exis
 
    Any other section is allowed after `## Examples` and ignored by the engine.
 5. **Examples.** Under `## Examples` there's one `### <Language>` per declared language, each with at least one `#### Don't` and one `#### Do`, and an optional `#### Fixed` when the fixed output differs from the Do. Multi-file examples use a `files` fence (`// path` sections; [SR-PROJECT-GRAPH](0103_project-graph.md) decision 6).
+   - **A fence's info string is `<tag> [path=<file>]`.** With `path=`, the example is checked as that file, so the rule's `files:` and `exclude:` apply. Without it the file is `example.<ext>` and they don't.
 6. **The sidecar `<name>.cases.md`** holds edge cases. Each `### case: <title>` has an input fence, an `expect` fence (`line:col rule-id` lines, or `(none)`) and an optional `fixed` fence ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 4).
 7. **Self-check.** `codelaw rules lint` validates every rule file against this template (the schema, the section order, an example for each language, the id matching the path). It runs inside `codelaw test` and on every first-party pack rule in CI.
 8. **Scaffold.** `codelaw new-rule <id> --lang <list> [--scope project] [--fix manual]` writes this template with every required field filled and empty examples.

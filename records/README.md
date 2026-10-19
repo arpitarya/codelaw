@@ -99,15 +99,17 @@ Start from `TEMPLATE.md`.
 
 ## The register
 
+`built` says whether code implements the record's decisions — `yes`, `partly` or `no`; [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) says what landed.
+
 | # | name | title | status | built |
 |---|------|-------|--------|-------|
 | [0001](0001_LAWS.md) | **SR-LAWS** | The laws have exactly one home each; this record routes the handles | accepted | yes |
 | [0002](0002_LAW-0-authority.md) | **SR-LAW-0** | **L0** — records are the only source of truth; Law records outrank every other record | accepted | yes |
 | [0003](0003_LAW-1-retired-records-archived.md) | **SR-LAW-1** | **L1** — a retired record is archived, never deleted | accepted | yes |
-| [0004](0004_LAW-2-foss-dependencies.md) | **SR-LAW-2** | **L2** — every dependency is free, open source and permissive | accepted | no |
-| [0005](0005_LAW-3-languages.md) | **SR-LAW-3** | **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, HTML — each alone or in any combination | accepted | no |
-| [0006](0006_LAW-4-every-rule-has-a-fix.md) | **SR-LAW-4** | **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix | accepted | no |
-| [0007](0007_LAW-5-no-model-in-the-engine.md) | **SR-LAW-5** | **L5** — no model in the engine; works the same with or without an agent | accepted | no |
+| [0004](0004_LAW-2-foss-dependencies.md) | **SR-LAW-2** | **L2** — every dependency is free, open source and permissive | accepted | partly |
+| [0005](0005_LAW-3-languages.md) | **SR-LAW-3** | **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, HTML — each alone or in any combination | accepted | partly |
+| [0006](0006_LAW-4-every-rule-has-a-fix.md) | **SR-LAW-4** | **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix | accepted | partly |
+| [0007](0007_LAW-5-no-model-in-the-engine.md) | **SR-LAW-5** | **L5** — no model in the engine; works the same with or without an agent | accepted | partly |
 | [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as five packs on both (`@codelaw/rules-*`, `codelaw-rules-*`); npm sub-packages only as `@codelaw/*` | accepted | no |
 | [0009](0009_LAW-7-linter-and-formatter.md) | **SR-LAW-7** | **L7** — always both a linter and a formatter, for every L3 language | accepted | no |
 | [0010](0010_LAW-8-performance-budgets.md) | **SR-LAW-8** | **L8** — performance budgets — set from measurement, never exceeded, never loosened | accepted | no |
@@ -121,28 +123,29 @@ Start from `TEMPLATE.md`.
 | [0058](0058_WORK-ownership.md) | **SR-WORK-OWNERSHIP** | `owns` and `describes`, and the commit guard | accepted | yes |
 | [0059](0059_WORK-governance.md) | **SR-WORK-GOVERNANCE** | The governance map — which file governs what; no counts | accepted | yes |
 | [0060](0060_WORK-registry.md) | **SR-WORK-REGISTRY** | The doc registry — rules in §2, the table in §3 | accepted | yes |
-| [0101](0101_rule-packs.md) | **SR-RULE-PACKS** | Five first-party rule packs on npm and PyPI apart from the engine; team packs; project rules in `.codelaw/rules` | accepted | no |
+| [0101](0101_rule-packs.md) | **SR-RULE-PACKS** | Five first-party rule packs on npm and PyPI apart from the engine; team packs; project rules in `.codelaw/rules` | accepted | partly |
 | [0102](0102_agent-surfaces.md) | **SR-AGENT-SURFACES** | Skills, steering, instructions, agent files and hooks, generated from one source | accepted | no |
 | [0103](0103_project-graph.md) | **SR-PROJECT-GRAPH** | A whole-repo symbol graph for cross-file rules — unused exports first | accepted | no |
 | [0104](0104_baseline-and-deprecations.md) | **SR-BASELINE** | Grandfather violations with a deadline and a touch policy; the deprecations registry | accepted | no |
 | [0105](0105_formatter.md) | **SR-FORMATTER** | codelaw is a linter and a formatter — embedded engines, layout owned by the formatter | accepted | no |
-| [0106](0106_linter.md) | **SR-LINTER** | The linter — nine languages, file/project/adapter rules, embedded code, one diagnostic stream | accepted | no |
-| [0107](0107_packages.md) | **SR-PACKAGES** | What goes into which package — 20 internal crates; npm `codelaw` + 8 `@codelaw/cli-*`; PyPI `codelaw`; five rule packs on both; the editor extension | accepted | no |
-| [0108](0108_architecture.md) | **SR-ARCHITECTURE** | The design of record — layers, pipelines, file I/O rules, contracts for fixers and adapters, warm processes, failure handling | accepted | no |
-| [0109](0109_cache.md) | **SR-CACHE** | Content-addressed caches — safe to delete, never change output | accepted | no |
-| [0110](0110_config.md) | **SR-CONFIG** | The configuration file — three homes, sections and owners, precedence, strict validation | accepted | no |
+| [0106](0106_linter.md) | **SR-LINTER** | The linter — nine languages, file/project/adapter rules, embedded code, one diagnostic stream | accepted | partly |
+| [0107](0107_packages.md) | **SR-PACKAGES** | What goes into which package — 20 internal crates; npm `codelaw` + 8 `@codelaw/cli-*`; PyPI `codelaw`; five rule packs on both; the editor extension | accepted | partly |
+| [0108](0108_architecture.md) | **SR-ARCHITECTURE** | The design of record — layers, pipelines, file I/O rules, contracts for fixers and adapters, warm processes, failure handling | accepted | partly |
+| [0109](0109_cache.md) | **SR-CACHE** | Content-addressed caches — safe to delete, never change output | accepted | partly |
+| [0110](0110_config.md) | **SR-CONFIG** | The configuration file — three homes, sections and owners, precedence, strict validation | accepted | partly |
 | [0111](0111_consumer-layout.md) | **SR-CONSUMER-LAYOUT** | What codelaw adds to a consumer repo — written, generated, derived, installed | accepted | no |
-| [0112](0112_rule-format.md) | **SR-RULE-FORMAT** | The rule-file template — frontmatter schema, codelaw block, body order, examples, cases sidecar | accepted | no |
-| [0113](0113_rule-authoring.md) | **SR-RULE-AUTHORING** | Writing rules by hand or with an agent skill; the debug tools; four test levels | accepted | no |
+| [0112](0112_rule-format.md) | **SR-RULE-FORMAT** | The rule-file template — frontmatter schema, codelaw block, body order, examples, cases sidecar | accepted | partly |
+| [0113](0113_rule-authoring.md) | **SR-RULE-AUTHORING** | Writing rules by hand or with an agent skill; the debug tools; four test levels | accepted | partly |
 | [0114](0114_editor.md) | **SR-EDITOR** | The LSP server in the binary and the thin VS Code extension | accepted | no |
-| [0115](0115_cli-and-mcp.md) | **SR-CLI-MCP** | The CLI and the MCP server — one engine, two doors, same answers | accepted | no |
+| [0115](0115_cli-and-mcp.md) | **SR-CLI-MCP** | The CLI and the MCP server — one engine, two doors, same answers | accepted | partly |
 
 ---
 
 ## Ownership — which record owns which component
 
 **This table is the answer, not a judgement call.** Every component under
-`scripts/` and `.claude/hooks/` appears here exactly once. Most specific wins; a carve-out is
+`scripts/`, `.claude/hooks/`, `crates/` and `fixtures/`, and the workspace
+`Cargo.toml`, appears here exactly once. Most specific wins; a carve-out is
 justified by a *different decision*. A component with no decision yet is owned
 by an open `W-nn`. A record's `owns:` key and this table agree in both
 directions.
@@ -158,6 +161,24 @@ directions.
 | `.claude/hooks/stop-if-blocked.sh` | SR-WORK-BLOCKERS | decision 7 |
 | `.claude/hooks/session-lock.sh` | SR-WORK-BLOCKERS | decision 7 |
 | `.claude/hooks/require-progress.sh` | SR-WORK-SESSION | decision 5 |
+| `Cargo.toml` | SR-PACKAGES | decision 1: the workspace and its one version |
+| `crates/codelaw-core` | SR-ARCHITECTURE | decision 13: offsets and positions; the shared types |
+| `crates/codelaw-cache` | SR-CACHE | decisions 1–6 |
+| `crates/codelaw-config` | SR-CONFIG | decisions 1–5 and 9 |
+| `crates/codelaw-lang` | SR-LINTER | decisions 1 and 3: grammars and embedded regions |
+| `crates/codelaw-rules` | SR-RULE-FORMAT | decisions 1–7: the rule-file parser and its load checks |
+| `crates/codelaw-semantic` | SR-ARCHITECTURE | decision 15a |
+| `crates/codelaw-match` | SR-LINTER | decision 2: file-scope `match:` rules |
+| `crates/codelaw-native` | SR-ARCHITECTURE | decision 15b |
+| `crates/codelaw-fix` | SR-ARCHITECTURE | decisions 5 and 18: the apply loop, verifier and external fixers |
+| `crates/codelaw-engine` | SR-ARCHITECTURE | decisions 4–28: the pipelines |
+| `crates/codelaw-report` | SR-CLI-MCP | decisions 3 and 4 |
+| `crates/codelaw-test` | SR-RULE-AUTHORING | decision 4 |
+| `crates/codelaw-cli` | SR-CLI-MCP | decisions 1–3 |
+| `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
+| `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced, for the Cargo manifest |
+| `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
+| `fixtures/l3` | SR-LAW-3 | the fixture matrix |
 
 <!-- OWNERSHIP-TABLE-END -->
 
@@ -171,5 +192,8 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 
 | component | describer | why |
 |---|---|---|
+| `crates/codelaw-rules` | SR-RULE-PACKS | pack layout, resolution, presets and precedence (decisions 3–5, 10–14) are the loader's |
+| `crates/codelaw-cli/src/init.rs` | SR-RULE-PACKS | decision 6 is what `codelaw init` does |
+| `crates/codelaw-engine/src/suppress.rs` | SR-LINTER | decision 6: the suppression syntax and what it covers |
 
 <!-- DESCRIBES-TABLE-END -->

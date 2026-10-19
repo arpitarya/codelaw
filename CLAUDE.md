@@ -114,6 +114,8 @@ work/        THE SHARED MEMORY between sessions — start at work/README.md
 records/     THE STANDING RECORDS — the register, the template, the laws, the WORK records
 docs/        WHAT THE PROJECT IS — the glossary
 archive/     THE ONE ARCHIVE — everything retired, mirroring the live tree
+crates/      THE ENGINE — one Cargo workspace (Cargo.toml); each crate's owner is in the register
+fixtures/    test repos the law checks run on
 scripts/     the commit guard and the inbox check
 .claude/     hooks and their wiring
 ```

@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "predefined rules and rule packs"
 owns: []
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-19T12:00:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 
@@ -95,7 +95,10 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
    - **On npm,** the package *is* this folder.
    - **On PyPI,** it is one pure `py3-none-any` wheel whose `codelaw_rules_<name>` package holds this folder as package data.
    - **Both forms hold the same files, byte for byte.** A pack has no code to execute and no dependencies.
+   - **A preset** is `presets/<namespace>/<name>.toml`: an optional `description` and a `[rules]` table, a severity or `{ severity, options }` per rule. Every rule it names is in the pack.
+   - **A data table** is `data/**/*.json`, named by its path under `data/` without `.json` (`data/globals/browser.json` is `globals/browser`).
 4. **Resolution.** First-party presets are named `codelaw:<namespace>/<preset>` in `extends`, for example `codelaw:js/recommended`.
+   - **A pack is first-party** when its manifest `name` is one of the five npm names in §1.
    - **Namespace to pack** is a fixed map in the engine:
      - `js`, `ts`, `react`, `node`, `stencil` → `rules-js`;
      - `html` → `rules-html`;
@@ -113,7 +116,7 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
    - `codelaw rules --why <id>` and the JSON output name the pack and version each rule came from.
 6. **`codelaw init` installs what it detects.**
    - **Languages to packs:** JS/JSX/TS/TSX → `js`; HTML → `html`; CSS → `css`; Python → `python`; JSON/YAML/TOML/Markdown → `data`.
-   - **How it installs:** it adds those packs as dev dependencies with the package manager the repo already uses: npm, pnpm, yarn or bun for a `package.json` repo; uv, pip or poetry for a `pyproject.toml` repo. A repo with both uses both, unless `--registry npm|pypi` picks one.
+   - **How it installs:** it adds those packs as dev dependencies with the package manager the repo already uses: npm, pnpm, yarn or bun for a `package.json` repo; uv, pip or poetry for a `pyproject.toml` repo. A repo with both uses both — `rules-python` from PyPI, the other packs from npm — unless `--registry npm|pypi` picks one.
    - **What it writes:** `extends` with each pack's `recommended` presets ([SR-CONFIG](0110_config.md) decision 8).
    - **`--no-install`** prints the install commands instead of running them.
    - **With no pack and no local rule,** `codelaw check` reports one `codelaw/no-rules` info diagnostic naming `codelaw init`. The formatter works regardless ([L7](0009_LAW-7-linter-and-formatter.md)).
@@ -129,7 +132,7 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
 8. **The v0 starter catalogue is kept** (below). Each starter rule goes to the pack named by its namespace.
    - A starter rule that matches a ported source rule carries it in `ported_from:` and sits in `recommended`.
    - The rest are house conventions (`js/exports-at-end`, `py/no-print`, …) and form each pack's opt-in `conventions` preset.
-9. **Stability.** Each rule is `stable` or `preview`. Preview rules run only with `preview = true`. A stable rule that starts finding new violations, or changes its fix, is a minor release and is listed in the changelog.
+9. **Stability.** Each rule is `stable` or `preview`. Preview pack rules run only with `preview = true`; a local rule runs whatever its stability. A stable rule that starts finding new violations, or changes its fix, is a minor release and is listed in the changelog.
 10. **Eject to customise.** `codelaw rules eject <id>` copies a pack rule into `.codelaw/rules/`, and a local rule with the same id shadows it. `codelaw rules --why <id>` shows which copy is active.
     - An ejected `native:` rule keeps its `native:` id: the copy can change the docs, severity, options and examples, but the matcher stays in the engine.
     - **`native:` is accepted only in first-party packs and in an ejected copy of one of their rules** ([SR-ARCHITECTURE](0108_architecture.md) decision 15b).
@@ -142,7 +145,7 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
       "path:../shared/codelaw-rules"  # monorepo or vendored
     ]
     ```
-    A team pack may publish to npm, PyPI or both. The first-party namespaces are reserved ([SR-RULE-FORMAT](0112_rule-format.md) decision 1).
+    A team pack may publish to npm, PyPI or both. The first-party namespaces are reserved ([SR-RULE-FORMAT](0112_rule-format.md) decision 1). An `npm:`, `pypi:` or `path:` entry enables every rule its pack holds, at the rule's own severity.
 12. **Packs contain no code by default.** A pack's external fixers (any `fix: { external: … }`) are disabled unless the consumer sets `allow_pack_fixers = ["@acme/codelaw-rules"]`. Installing a rule pack must never mean running someone else's code by surprise. First-party packs ship no external fixers.
 13. **Every rule, in any pack, obeys [L4](0006_LAW-4-every-rule-has-a-fix.md).** Every rule goes through the same load-time checks and `codelaw test`. A pack whose rules fail to load is refused as a whole, with the failing rule named.
 14. **Precedence, highest first:**

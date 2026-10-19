@@ -7,7 +7,9 @@ description: "codelaw lints and formats JavaScript, TypeScript, Python, JSON, YA
 status: accepted
 date: 2026-10-18
 feature: "the languages codelaw lints"
-owns: []
+owns:
+  - fixtures/l3
+  - crates/codelaw-cli/tests/laws.rs
 laws: [L0, L3]
 timestamp: 2026-10-18T16:45:00Z
 content_sha: ""

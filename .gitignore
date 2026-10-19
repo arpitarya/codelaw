@@ -1,3 +1,4 @@
 .claude/.locks/
 .claude/.stop-attempts
 .claude/.progress-nudged
+/target/

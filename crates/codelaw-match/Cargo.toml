@@ -1,0 +1,15 @@
+[package]
+name = "codelaw-match"
+description = "File-scope `match:` rules on ast-grep-core, with the semantic-model predicates (SR-PACKAGES decision 1; SR-ARCHITECTURE decision 15a)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+codelaw-core.workspace = true
+codelaw-lang.workspace = true
+codelaw-rules.workspace = true
+codelaw-semantic.workspace = true
+ast-grep-core.workspace = true
+ast-grep-config.workspace = true
+serde_json.workspace = true

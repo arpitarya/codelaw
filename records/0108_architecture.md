@@ -7,9 +7,14 @@ description: "The design of record for the engine: layering, the check/fix/forma
 status: accepted
 date: 2026-10-18
 feature: "engine architecture"
-owns: []
+owns:
+  - crates/codelaw-core
+  - crates/codelaw-semantic
+  - crates/codelaw-native
+  - crates/codelaw-fix
+  - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 
@@ -79,6 +84,9 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 #### C. Files and I/O
 
 7. **Discovery.** The walk uses the `ignore` crate (MIT / Unlicense): `.gitignore`, `.ignore`, then `include` and `exclude` from config. Files are skipped **by extension and ignore rules before they are read**. Symlinks are not followed unless `[files] follow_symlinks = true`. Paths are normalised to forward slashes in every output and cache key, so Windows and Unix runs agree.
+   - **Never entered, before any config:** `.git/`, `node_modules/`, `.venv/` and `.codelaw/cache/`.
+   - **The user's global gitignore is not read**, so two machines checking one commit agree ([L5](0007_LAW-5-no-model-in-the-engine.md)).
+   - **A file named on the command line** skips the ignore files, but not `include` and `exclude`.
 8. **Encoding.** Files are read as UTF-8. A UTF-8 BOM is preserved on write. A file that isn't valid UTF-8 gets one `codelaw/not-utf8` info diagnostic and is skipped; it's never rewritten.
 9. **Line endings.** The dominant line ending of a file (`\n` or `\r\n`) is detected once and preserved by every fix. Only the formatter changes it, and only when `[format] end_of_line` is set.
 10. **Generated and oversized files.**
@@ -95,7 +103,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 15a. **Semantic model.** For JS/TS (JSX and TSX included) and Python, each file gets scopes, bindings, references, imports and exports.
   - **How it's built:** from the same syntax tree, in one pass after parsing (crate `codelaw-semantic`), and only when at least one active rule needs it.
-  - **How rules use it:** `match:` rules query it through predicates (`unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`); native rules read it directly.
+  - **How rules use it:** `match:` rules query it through predicates (`unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`), written under `where:` ([SR-RULE-FORMAT](0112_rule-format.md) decision 3a); native rules read it directly.
   - **Shared with the graph:** its imports and exports are the per-file facts the project graph links, so they're computed once ([SR-PROJECT-GRAPH](0103_project-graph.md)).
   - **No type information** ([L3](0005_LAW-3-languages.md)).
   - **Where the approach comes from:** `oxc_semantic` (MIT) for JS/TS and Ruff's semantic model (MIT) for Python. Taking either as a dependency needs its own record.
@@ -120,7 +128,8 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 18. **External fixers** (`fix: { external: "<command>" }`, [SR-RULE-FORMAT](0112_rule-format.md) decision 3).
     - Run only for local rules, or for packs listed in `allow_pack_fixers` ([SR-RULE-PACKS](0101_rule-packs.md) decision 12).
     - Input on stdin, one JSON object: `{ "schema": 1, "rule", "file", "language", "source", "matches": [{ "range", "captures" }] }`.
-    - Output on stdout: `{ "edits": [{ "range", "text" }] }`, byte offsets into `source`.
+    - Output on stdout: `{ "edits": [{ "range", "text" }] }`, byte offsets into `source`. A range is `{ "start", "end" }` in the request; the answer may give `{ "start", "end" }` or `[start, end]`.
+    - The command runs through `sh -c` (`cmd /C` on Windows).
     - Timeout 5 s per file (`[fix] external_timeout`), no network expected, run with the repo root as the working directory.
     - The result goes through the same verifier as a built-in fix (decision 5). A fixer that fails or times out reports the instance as `manual` with the rule's steps.
 19. **Adapters** ([SR-LINTER](0106_linter.md) decision 2).
@@ -143,7 +152,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 25. **A rule failure is isolated.** A panic or error inside one rule on one file is caught, reported as `codelaw/internal-error` naming the rule and file, and the run continues. Internal errors make the exit code 2 at the end, after every other result is printed.
 26. **Partial results are never silently partial.** If any file was skipped (encoding, size, read error) or any rule failed, the summary line says so and `--format json` carries a `skipped[]` list.
 27. **No network, no model, no clock, no telemetry.** The engine makes no network calls, calls no model, reads no wall clock ([L5](0007_LAW-5-no-model-in-the-engine.md)) and sends no usage data anywhere, ever. Nothing is downloaded after install ([L6](0008_LAW-6-python-and-node-packages.md) decision 3).
-28. **What may execute.** codelaw runs only: itself, the `git` binary (decision 14), adapters named in config (decision 19), external fixers under the allowlist (decision 18), and `[format] format_after` commands the user wrote. Nothing in a rule file, pack or cache is ever executed.
+28. **What may execute.** codelaw runs only: itself, the `git` binary (decision 14), adapters named in config (decision 19), external fixers under the allowlist (decision 18), `[format] format_after` commands the user wrote, and the package manager `codelaw init` runs to install rule packs ([SR-RULE-PACKS](0101_rule-packs.md) decision 6). Nothing in a rule file, pack or cache is ever executed.
 
 #### H. Targets until [L8](0010_LAW-8-performance-budgets.md)'s budgets are set
 

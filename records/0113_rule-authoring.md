@@ -7,9 +7,10 @@ description: "Defines the two ways a rule is written — by hand with scaffold a
 status: accepted
 date: 2026-10-18
 feature: "rule authoring, debugging and testing"
-owns: []
+owns:
+  - crates/codelaw-test
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 

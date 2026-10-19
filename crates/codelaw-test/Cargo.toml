@@ -1,0 +1,15 @@
+[package]
+name = "codelaw-test"
+description = "The rule tester: examples, cases and invariants (SR-RULE-AUTHORING decision 4; L4 decision 7)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+codelaw-core.workspace = true
+codelaw-cache.workspace = true
+codelaw-config.workspace = true
+codelaw-lang.workspace = true
+codelaw-rules.workspace = true
+codelaw-semantic.workspace = true
+codelaw-engine.workspace = true

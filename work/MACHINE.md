@@ -10,3 +10,5 @@ is added when something fails for a reason the code did not cause.
 
 | surface | symptom | cause | what to type instead |
 |---|---|---|---|
+| macOS laptop (zsh) | `timeout: command not found` | GNU coreutils is not installed | leave `timeout` out; use the tool's own timeout |
+| macOS laptop (zsh) | a script using 3.10+ syntax fails | `python3` is 3.9.6 here (the L6 floor of 3.11 is for consumers) | keep repo scripts to Python 3.9 syntax |

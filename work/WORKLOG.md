@@ -24,6 +24,30 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-19 — W-02: the engine — 13 crates, the `codelaw` binary, the law checks  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement open work items"* — the queue's 🟢 pick was W-02 (W-03 waited on it).
+- **Done:**
+  - **The engine** in `crates/`: core, cache, config, lang, rules, semantic, match, native, fix, engine, report, test, cli. `cargo test --workspace` green; clippy clean.
+  - **Languages:** all nine parse; TOML registered by codelaw; Markdown's inline grammar runs on `inline` nodes; HTML and Markdown regions map back to host positions.
+  - **Rules:** the Markdown rule parser with every template and L4 check at load; `where:` predicates over the semantic model; eight fix primitives; the apply loop with the verifier; `native:` rules (`js/no-unreachable` first); pack resolution from `node_modules` and the Python environment.
+  - **Checks:** layers (B-020), L2 licences over every Cargo dependency (B-008, Cargo part), the L3 fixture matrix and isolation diff (`fixtures/l3/`), L4 fix fields and loader, L5 determinism, CLI/library parity and the no-model fence, cold/warm/partial cache.
+  - **Records:** SR-RULE-FORMAT 3a–3d and 5, SR-ARCHITECTURE 7, 15a, 18 and 28, SR-LINTER 3 and 6, SR-RULE-PACKS 3, 4, 6, 9 and 11, SR-CONFIG 2 and 3, SR-CACHE 5, SR-CLI-MCP 4; every crate owned in the register; `built` column defined.
+  - **Work files:** W-02 closed and archived; W-03 🟢; backlog B-028–B-039 added, B-010 and B-021 closed, five rows narrowed; two lessons, two MACHINE rows, five glossary terms.
+  - **`CLAUDE.md` changed:** the layout block names `crates/`, `fixtures/` and `Cargo.toml` (a fact; SR-WORK-DOCS decision 7).
+- **Decided / left open:** this session's calls, for the decider to correct:
+  - the `where:` syntax, with `$$MATCH` for the matched node and `not`/`all`/`any`;
+  - **root-only config keys** (`extends`, `rules_dir`, `preview`, the `[files]`-style sections): a nested config may set only languages, include/exclude, `[rules]` and overrides;
+  - never entered: `.git`, `node_modules`, `.venv`, `.codelaw/cache`; the global gitignore isn't read;
+  - `init` in a repo with both manifests: `rules-python` from PyPI, the rest from npm;
+  - preview gating applies to pack rules only; `npm:`/`pypi:`/`path:` packs enable all their rules;
+  - SR-ARCHITECTURE decision 28 now lists `init`'s package manager, which SR-RULE-PACKS decision 6 already required;
+  - **the law records SR-LAW-2 and SR-LAW-3 were touched in `owns:` frontmatter only**, to own their checks; no law text changed.
+- **Mistakes:** several test expectations were wrong on first run (line numbers, module-level Python names, a vacuous assertion) and were corrected against the code's behaviour, which was right. Two real bugs were caught by tests: YAML 1.1 booleans, and a missing `fix:` cascading into three misleading errors.
+- **Next:** W-03 — the five rule packs, starting with `rules-js`.
+
+---
+
 ## 2026-10-19 — W-01: the records rewritten for five separately published rule packs; SR-RULE-PACKS accepted  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"go with the recommendations for all of them"*: run W-01, then accept SR-RULE-PACKS.

@@ -1,0 +1,9 @@
+[package]
+name = "codelaw-core"
+description = "Foundation types: Language, Diagnostic, TextEdit, FixClass, Severity, positions (SR-PACKAGES decision 1)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+serde.workspace = true

@@ -7,9 +7,10 @@ description: "Defines where codelaw's configuration lives, how it's found in sin
 status: accepted
 date: 2026-10-18
 feature: "configuration"
-owns: []
+owns:
+  - crates/codelaw-config
 laws: [L0, L3, L5, L7]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 
@@ -76,10 +77,16 @@ Configuration keys were scattered across six records. The decider asked for one 
 2. **Finding it:** walk up from each file to the nearest folder with a home.
    - **Monorepos:** the topmost config is the root. A nested config (for example in `packages/web/`) **inherits** the root and overrides it, unless it sets `root = true`, which makes that folder a separate project with its own graph and baseline ([SR-ARCHITECTURE](0108_architecture.md) decision 17).
    - **Globs** in `include`, `exclude` and `[[overrides]]` are relative to the directory of the config file that declares them ([SR-ARCHITECTURE](0108_architecture.md) decision 11).
+   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]` and `[markdown]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
+   - **A nested `root = true` project** is checked by running codelaw in its folder; a run from the parent skips its files and says so.
 3. **Sections and owners.** The top-level keys belong to this record:
    - `extends`, `languages`, `include`, `exclude`, `rules_dir`;
    - `[rules]` and `[[overrides]]`;
-   - `root`, `requires`.
+   - `root`, `requires`;
+   - `preview` and `allow_pack_fixers`, whose meaning is [SR-RULE-PACKS](0101_rule-packs.md) decisions 9 and 12;
+   - `[markdown]`, whose one key `lint_code_blocks` is [L3](0005_LAW-3-languages.md) decision 8's.
+
+   Sizes are bytes or a string such as `"1 MiB"` or `"512MB"`; durations are seconds or a string such as `"5s"` or `"500ms"`.
 
    `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11).
 

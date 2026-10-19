@@ -88,20 +88,20 @@ into a scan anyone can do at task end.
 
 | Document | Update trigger | Last verified | Notes |
 |---|---|---|---|
-| `CLAUDE.md` | any rule or pointer changes | 2026-10-19 | 2026-10-19 — L5 line: *(proposed)* dropped; L6 line names the rule packs |
+| `CLAUDE.md` | any rule or pointer changes | 2026-10-19 | 2026-10-19 — layout names `crates/`, `fixtures/` and `Cargo.toml` |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-19 | 2026-10-19 — inbox emptied; W-01 closed; W-02 🟢 |
-| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-19 | 2026-10-19 — B-026, B-027 |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-19 | 2026-10-19 — W-02 closed; W-03 🟢 |
+| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-19 | 2026-10-19 — B-028–B-039 unbuilt; B-010, B-021 closed; B-008, B-009, B-011, B-020, B-024 narrowed |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-19 | 2026-10-19 — W-01 closed; W-02 next |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-19 | 2026-10-19 — W-01; L5 and fourteen records accepted |
-| `work/LESSONS.md` | a failure teaches something durable | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-18 | 2026-10-18 — created at setup |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-19 | 2026-10-19 — W-02 closed; W-03 next |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-19 | 2026-10-19 — W-02, the engine |
+| `work/LESSONS.md` | a failure teaches something durable | 2026-10-19 | 2026-10-19 — the first two lessons |
+| `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-19 | 2026-10-19 — macOS: no `timeout`; Python 3.9 |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
-| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-19 | 2026-10-19 — preset, pack redefined for the rule packs |
+| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-19 | 2026-10-19 — predicate, data table, fixpoint, group fix, first-party pack |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-19 | 2026-10-19 — L6 and SR-RULE-PACKS rows; rule packs in the distribution sketch and the config example |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-19 | 2026-10-19 — SR-RULE-PACKS accepted and retitled; SR-PACKAGES, SR-LAW-6 rows |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-19 | 2026-10-19 — crates owned; describes rows; `built` defined, 13 records `partly` |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
 
 ---

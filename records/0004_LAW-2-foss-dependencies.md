@@ -7,7 +7,8 @@ description: "Nothing codelaw depends on is paid, proprietary or source-availabl
 status: accepted
 date: 2026-10-18
 feature: the licence and cost of every dependency
-owns: []
+owns:
+  - crates/codelaw-cli/tests/licences.rs
 laws: [L0, L2]
 timestamp: 2026-10-18T13:30:00Z
 content_sha: ""

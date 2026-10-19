@@ -1,0 +1,21 @@
+[package]
+name = "codelaw-engine"
+description = "The check and fix pipelines (SR-ARCHITECTURE decisions 4–28)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+codelaw-core.workspace = true
+codelaw-cache.workspace = true
+codelaw-config.workspace = true
+codelaw-lang.workspace = true
+codelaw-rules.workspace = true
+codelaw-semantic.workspace = true
+codelaw-match.workspace = true
+codelaw-native.workspace = true
+codelaw-fix.workspace = true
+globset.workspace = true
+ignore.workspace = true
+rayon.workspace = true
+serde_json.workspace = true

@@ -7,9 +7,11 @@ description: "codelaw's linter parses all nine languages with tree-sitter, runs 
 status: accepted
 date: 2026-10-18
 feature: "linting"
-owns: []
+owns:
+  - crates/codelaw-lang
+  - crates/codelaw-match
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-18T17:40:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 
@@ -94,6 +96,8 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | HTML | `<style>` | CSS |
    | HTML | `style="…"` attribute | CSS declarations |
    | Markdown | fenced block with a known language tag | that language, only when `markdown.lint_code_blocks = true` ([L3](0005_LAW-3-languages.md) decision 8) |
+   | Markdown | YAML frontmatter | YAML |
+   | Markdown | inline content (links, emphasis, code spans) | Markdown, with the inline grammar; a Markdown rule runs on whichever of the two grammars its kinds belong to |
    | JS/TS | `` css`…` `` / `` html`…` `` tagged templates | CSS / HTML, only when `[lint] tagged_templates = true` |
 
    - **Locations map back to the host:** diagnostics report host-file line and column.
@@ -122,7 +126,8 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
 
 6. **Inline suppression always needs a reason.**
    - Written in the host language's comment syntax: `// codelaw-ignore <rule>: <reason>`, `# …`, `/* … */`, `<!-- … -->`.
-   - A suppression with no reason is an error.
+   - **What it covers:** a comment alone on its line covers the next line with code; a trailing comment covers its own line. Several rules are comma-separated before the colon.
+   - A suppression with no reason is an error, and so is one naming a rule that doesn't exist (`codelaw/unknown-suppression`).
    - A suppression that suppresses nothing is reported as `info` with an `auto` fix that removes it.
    - Bulk freezing of existing violations is [SR-BASELINE](0104_baseline-and-deprecations.md)'s job, never a wall of inline ignores.
 

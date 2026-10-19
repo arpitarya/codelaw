@@ -1,0 +1,230 @@
+//! The check and fix pipelines (SR-ARCHITECTURE §B). Everything is a
+//! library: the CLI and every other surface only translate between their
+//! protocol and these functions (decision 2).
+
+mod compile;
+mod discover;
+mod fix;
+mod lint;
+mod suppress;
+
+pub use compile::{CompiledRule, Matcher};
+pub use discover::FileEntry;
+pub use fix::{FileFix, FixOptions, FixReport};
+pub use lint::FileResult;
+
+use codelaw_cache::DiskCache;
+use codelaw_config::{Config, ConfigError};
+use codelaw_core::{Diagnostic, Language, Skipped};
+use codelaw_rules::{LoadError, LoadOptions, PackSearch, RuleSet};
+use rayon::prelude::*;
+use std::collections::BTreeSet;
+use std::fmt;
+use std::path::{Path, PathBuf};
+
+/// Everything a run takes from outside the files: environment and flags
+/// (SR-CONFIG decision 4). Nothing else is read — no clock, no network.
+#[derive(Clone, Debug, Default)]
+pub struct EngineOptions {
+    /// `--lang`: only these languages, intersected with config.
+    pub languages: Option<BTreeSet<Language>>,
+    /// `--rule`: only these rules.
+    pub rules: Option<Vec<String>>,
+    /// `--threads`; `None` is the CPU count.
+    pub threads: Option<usize>,
+    /// `--no-cache`.
+    pub no_cache: bool,
+    /// `CODELAW_CACHE_DIR`.
+    pub cache_dir_env: Option<String>,
+    /// `CODELAW_SITE_PACKAGES`, set by the Python launcher.
+    pub site_packages_env: Option<String>,
+    /// `VIRTUAL_ENV`.
+    pub virtual_env: Option<String>,
+}
+
+impl EngineOptions {
+    /// The options the environment gives, before any flag.
+    pub fn from_env() -> Self {
+        let var = |k: &str| std::env::var(k).ok().filter(|v| !v.is_empty());
+        EngineOptions {
+            cache_dir_env: var("CODELAW_CACHE_DIR"),
+            site_packages_env: var("CODELAW_SITE_PACKAGES"),
+            virtual_env: var("VIRTUAL_ENV"),
+            ..Default::default()
+        }
+    }
+}
+
+/// Why a run could not start: exit 2.
+#[derive(Debug)]
+pub enum EngineError {
+    Config(ConfigError),
+    Load(Vec<LoadError>),
+    Usage(String),
+}
+
+impl fmt::Display for EngineError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            EngineError::Config(e) => write!(f, "{e}"),
+            EngineError::Load(errors) => {
+                for (i, e) in errors.iter().enumerate() {
+                    if i > 0 {
+                        writeln!(f)?;
+                    }
+                    write!(f, "{e}")?;
+                }
+                Ok(())
+            }
+            EngineError::Usage(m) => f.write_str(m),
+        }
+    }
+}
+
+impl std::error::Error for EngineError {}
+
+impl From<ConfigError> for EngineError {
+    fn from(e: ConfigError) -> Self {
+        EngineError::Config(e)
+    }
+}
+
+/// The outcome of `check`.
+#[derive(Clone, Debug, Default)]
+pub struct CheckReport {
+    /// Sorted by path, line, column, rule (L5 decision 2).
+    pub diagnostics: Vec<Diagnostic>,
+    pub skipped: Vec<Skipped>,
+    pub files_checked: usize,
+    pub warnings: Vec<String>,
+}
+
+impl CheckReport {
+    /// Rule failures (`codelaw/internal-error`) make the exit code 2.
+    pub fn internal_errors(&self) -> usize {
+        self.diagnostics.iter().filter(|d| d.rule == "codelaw/internal-error").count()
+    }
+}
+
+/// A loaded project: config, rule set and compiled rules.
+pub struct Project {
+    pub config: Config,
+    pub rules: RuleSet,
+    pub compiled: Vec<CompiledRule>,
+    pub options: EngineOptions,
+    pub cache: DiskCache,
+    pub warnings: Vec<String>,
+    pool: rayon::ThreadPool,
+}
+
+fn pool(threads: Option<usize>) -> rayon::ThreadPool {
+    // Deeply nested code recurses deeply; give workers room.
+    let mut b = rayon::ThreadPoolBuilder::new().stack_size(64 << 20);
+    if let Some(n) = threads.filter(|n| *n > 0) {
+        b = b.num_threads(n);
+    }
+    b.build().expect("a thread pool")
+}
+
+impl Project {
+    /// Load the project that governs `start` (a folder or a file).
+    pub fn load(start: &Path, options: EngineOptions) -> Result<Project, EngineError> {
+        let config = codelaw_config::find_config(start)?;
+        Project::from_config(config, options)
+    }
+
+    pub fn from_config(config: Config, options: EngineOptions) -> Result<Project, EngineError> {
+        let search = PackSearch::new(
+            config.config_dir(),
+            &config.root_dir,
+            options.site_packages_env.as_deref(),
+            options.virtual_env.as_deref(),
+        );
+        let known = |id: &str| codelaw_native::lookup(id).is_some();
+        let rules = RuleSet::load(&config, &LoadOptions { search, known_native: &known }).map_err(EngineError::Load)?;
+        Project::from_parts(config, rules, options)
+    }
+
+    /// A project from a rule set built elsewhere (the rule tester).
+    pub fn from_parts(mut config: Config, rules: RuleSet, options: EngineOptions) -> Result<Project, EngineError> {
+        if let Some(only) = &options.rules {
+            for id in only {
+                if rules.get(id).is_none() && codelaw_rules::engine_rule(id).is_none() {
+                    let near = codelaw_config::did_you_mean(id, rules.rules.iter().map(|r| r.rule.id.as_str()))
+                        .map(|n| format!("; did you mean `{n}`?"))
+                        .unwrap_or_default();
+                    return Err(EngineError::Usage(format!("unknown rule `{id}`{near}")));
+                }
+            }
+        }
+        let (compiled, mut warnings) = compile::compile_all(&rules, &config).map_err(EngineError::Load)?;
+        warnings.append(&mut config.warnings);
+        warnings.extend(rules.warnings.iter().cloned());
+        let cache = if options.no_cache || !config.cache_enabled() {
+            DiskCache::disabled()
+        } else {
+            DiskCache::new(Some(config.cache_dir(options.cache_dir_env.as_deref())))
+        };
+        let pool = pool(options.threads);
+        Ok(Project { config, rules, compiled, options, cache, warnings, pool })
+    }
+
+    pub fn root(&self) -> &Path {
+        &self.config.root_dir
+    }
+
+    /// Check files and folders (the project root when `paths` is empty).
+    pub fn check(&mut self, paths: &[PathBuf]) -> Result<CheckReport, EngineError> {
+        let (files, mut skipped, warnings) = discover::discover(self, paths)?;
+        let mut report = CheckReport { warnings: self.warnings.clone(), ..Default::default() };
+        report.warnings.extend(warnings);
+        let this = &*self;
+        let results: Vec<FileResult> = self.pool.install(|| files.par_iter().map(|f| this.check_file(f)).collect());
+        for r in results {
+            report.diagnostics.extend(r.diagnostics);
+            if let Some(s) = r.skipped {
+                skipped.push(s);
+            } else {
+                report.files_checked += 1;
+            }
+        }
+        if !self.rules.has_rules() {
+            report.diagnostics.push(lint::no_rules(self));
+        }
+        report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+        report.diagnostics.dedup_by(|a, b| a.file == b.file && a.start_byte == b.start_byte && a.end_byte == b.end_byte && a.rule == b.rule);
+        skipped.sort();
+        report.skipped = skipped;
+        self.cache.prune(self.config.cache_max_size());
+        Ok(report)
+    }
+
+    /// Check one file's text as if it were at `rel_path` (MCP
+    /// `check_snippet`, the rule tester).
+    pub fn check_source(&self, rel_path: &str, language: Language, source: &str) -> Vec<Diagnostic> {
+        let entry = FileEntry { abs: self.config.root_dir.join(rel_path), rel: rel_path.to_owned(), language };
+        let mut d = lint::lint_text(self, &entry, source, &lint::RunMode::check()).diagnostics;
+        if !self.rules.has_rules() {
+            d.push(lint::no_rules(self));
+        }
+        d.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+        d
+    }
+
+    /// Fix one file's text in memory; nothing is written.
+    pub fn fix_source(&self, rel_path: &str, language: Language, source: &str, unsafe_fixes: bool) -> FileFix {
+        let entry = FileEntry { abs: self.config.root_dir.join(rel_path), rel: rel_path.to_owned(), language };
+        fix::fix_text(self, &entry, source, &FixOptions { unsafe_fixes, dry_run: true })
+    }
+
+    /// Fix files and folders and write the results (SR-ARCHITECTURE
+    /// decisions 5 and 12).
+    pub fn fix(&mut self, paths: &[PathBuf], options: &FixOptions) -> Result<FixReport, EngineError> {
+        fix::fix_paths(self, paths, options)
+    }
+
+    /// The files a run would check, in order.
+    pub fn files(&mut self, paths: &[PathBuf]) -> Result<Vec<FileEntry>, EngineError> {
+        Ok(discover::discover(self, paths)?.0)
+    }
+}

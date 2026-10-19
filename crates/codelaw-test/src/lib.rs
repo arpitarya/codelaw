@@ -1,0 +1,292 @@
+//! The rule tester (SR-RULE-AUTHORING decision 4). A rule is accepted by
+//! this runner, never by anyone's judgement (L5 decision 6):
+//!
+//! - **examples:** every `Don't` fires, every `Do` passes, the fix of a
+//!   `Don't` equals its `Do` (or `Fixed`) and is a fixpoint — for every
+//!   declared language (L4 decision 7);
+//! - **cases:** each `<name>.cases.md` case gives exactly its `expect`
+//!   diagnostics and its `fixed` output;
+//! - **invariants:** a fix still parses and is deterministic, plus the
+//!   rule's own `invariant:` (`exports-unchanged`).
+
+use codelaw_cache::Key;
+use codelaw_config::{Config, RuleConfig};
+use codelaw_core::{FixClass, Language};
+use codelaw_engine::{EngineOptions, Project};
+use codelaw_rules::{LoadedRule, RuleSet, Snippet};
+use std::collections::BTreeSet;
+use std::path::PathBuf;
+use std::sync::Arc;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Level {
+    Examples,
+    Cases,
+    Invariants,
+}
+
+impl Level {
+    pub fn name(self) -> &'static str {
+        match self {
+            Level::Examples => "examples",
+            Level::Cases => "cases",
+            Level::Invariants => "invariants",
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Failure {
+    pub level: Level,
+    /// Where in the rule file or its sidecar.
+    pub at: String,
+    pub message: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct RuleReport {
+    pub id: String,
+    pub source: String,
+    pub path: PathBuf,
+    pub checks: usize,
+    pub failures: Vec<Failure>,
+}
+
+impl RuleReport {
+    pub fn passed(&self) -> bool {
+        self.failures.is_empty()
+    }
+}
+
+/// The built-in invariants every fix is held to; `invariant:` adds to them.
+pub const RULE_INVARIANTS: &[&str] = &["exports-unchanged"];
+
+/// A project holding only `rule`, with no config and no disk access.
+fn project_for(loaded: &LoadedRule, keep_globs: bool) -> Project {
+    let mut rule = (*loaded.rule).clone();
+    if !keep_globs {
+        rule.files.clear();
+        rule.exclude.clear();
+    }
+    let default = RuleConfig { severity: Some(rule.severity), options: rule.default_options() };
+    let lr = LoadedRule {
+        rule: Arc::new(rule),
+        default: Some(default),
+        preview_blocked: false,
+        external_allowed: true,
+        ..loaded.clone()
+    };
+    let rules = RuleSet { rules: vec![lr], packs: Vec::new(), warnings: Vec::new(), fingerprint: Key([0; 32]) };
+    let config = Config::defaults(PathBuf::from("/codelaw-test"));
+    Project::from_parts(config, rules, EngineOptions { no_cache: true, threads: Some(1), ..Default::default() })
+        .expect("a single loaded rule compiles: it already passed load")
+}
+
+struct Tester<'a> {
+    loaded: &'a LoadedRule,
+    plain: Project,
+    with_globs: Option<Project>,
+    report: RuleReport,
+}
+
+fn first_difference(expected: &str, got: &str) -> String {
+    for (i, (e, g)) in expected.lines().zip(got.lines()).enumerate() {
+        if e != g {
+            return format!("line {}: expected `{e}`, got `{g}`", i + 1);
+        }
+    }
+    let (el, gl) = (expected.lines().count(), got.lines().count());
+    if el != gl {
+        return format!("expected {el} lines, got {gl}");
+    }
+    "the line endings or the final newline differ".into()
+}
+
+impl<'a> Tester<'a> {
+    fn project(&mut self, snippet: &Snippet) -> &Project {
+        if snippet.path.is_some() {
+            if self.with_globs.is_none() {
+                self.with_globs = Some(project_for(self.loaded, true));
+            }
+            self.with_globs.as_ref().expect("just set")
+        } else {
+            &self.plain
+        }
+    }
+
+    fn fail(&mut self, level: Level, at: String, message: String) {
+        self.report.failures.push(Failure { level, at, message });
+    }
+
+    fn path(language: Language, snippet: &Snippet) -> String {
+        snippet.path.clone().unwrap_or_else(|| format!("example.{}", language.extension()))
+    }
+
+    /// This rule's diagnostics on a snippet, as `line:col rule` lines.
+    fn fires(&mut self, language: Language, snippet: &Snippet, code: &str) -> Vec<String> {
+        let id = self.loaded.rule.id.clone();
+        let path = Self::path(language, snippet);
+        let p = self.project(snippet);
+        p.check_source(&path, language, code)
+            .into_iter()
+            .filter(|d| d.rule == id)
+            .map(|d| format!("{}:{} {}", d.start.line, d.start.column, d.rule))
+            .collect()
+    }
+
+    fn fix(&mut self, language: Language, snippet: &Snippet, code: &str) -> String {
+        let path = Self::path(language, snippet);
+        self.project(snippet).fix_source(&path, language, code, true).fixed
+    }
+
+    fn exports(language: Language, code: &str) -> Option<BTreeSet<String>> {
+        let root = codelaw_lang::parse(language, code);
+        codelaw_semantic::build(language, &root, code).map(|m| m.exported_names())
+    }
+
+    fn fix_checks(&mut self, language: Language, snippet: &Snippet, expected: Option<&Snippet>, at: &str, level: Level) {
+        let fixed = self.fix(language, snippet, &snippet.code);
+        self.report.checks += 1;
+        if let Some(exp) = expected
+            && fixed != exp.code
+        {
+            let diff = first_difference(&exp.code, &fixed);
+            self.fail(level, at.to_owned(), format!("the fix does not give the expected output (line {}): {diff}\n--- got ---\n{fixed}", exp.line));
+        }
+        // Fixpoint (L4 decision 7).
+        self.report.checks += 1;
+        let again = self.fix(language, snippet, &fixed);
+        let still = self.fires(language, snippet, &fixed);
+        if again != fixed || !still.is_empty() {
+            self.fail(Level::Invariants, at.to_owned(), format!("the fixed output is not a fixpoint{}", if still.is_empty() { String::new() } else { format!(": the rule still fires at {}", still.join(", ")) }));
+        }
+        // Still parses.
+        self.report.checks += 1;
+        let before = codelaw_lang::syntax_error_count(&codelaw_lang::parse(language, &snippet.code));
+        let after = codelaw_lang::syntax_error_count(&codelaw_lang::parse(language, &fixed));
+        if after > before {
+            self.fail(Level::Invariants, at.to_owned(), "the fix adds a syntax error".into());
+        }
+        if self.loaded.rule.invariants.iter().any(|i| i == "exports-unchanged") {
+            self.report.checks += 1;
+            if Self::exports(language, &snippet.code) != Self::exports(language, &fixed) {
+                self.fail(Level::Invariants, at.to_owned(), "`exports-unchanged`: the fix changes what the module exports".into());
+            }
+        }
+    }
+
+    fn examples(&mut self) {
+        let rule = self.loaded.rule.clone();
+        let fixable = rule.fix != FixClass::Manual;
+        for ex in &rule.examples {
+            let l = ex.language;
+            for (i, dont) in ex.donts.iter().enumerate() {
+                let at = format!("{} Don't (line {})", l.display(), dont.line);
+                self.report.checks += 1;
+                let hits = self.fires(l, dont, &dont.code);
+                if hits.is_empty() {
+                    self.fail(Level::Examples, at.clone(), "does not fire".into());
+                    continue;
+                }
+                // Deterministic.
+                self.report.checks += 1;
+                if self.fires(l, dont, &dont.code) != hits {
+                    self.fail(Level::Invariants, at.clone(), "two runs disagree".into());
+                }
+                if fixable {
+                    let expected = if !ex.fixed.is_empty() {
+                        ex.fixed.get(i).or(ex.fixed.last())
+                    } else if ex.dos.len() == ex.donts.len() {
+                        ex.dos.get(i)
+                    } else {
+                        ex.dos.first()
+                    };
+                    self.fix_checks(l, dont, expected, &at, Level::Examples);
+                }
+            }
+            for do_ in &ex.dos {
+                let at = format!("{} Do (line {})", l.display(), do_.line);
+                self.report.checks += 1;
+                let hits = self.fires(l, do_, &do_.code);
+                if !hits.is_empty() {
+                    self.fail(Level::Examples, at, format!("fires at {}", hits.join(", ")));
+                }
+            }
+        }
+    }
+
+    fn cases(&mut self, filter: Option<&str>) {
+        let rule = self.loaded.rule.clone();
+        for case in &rule.cases {
+            if filter.is_some_and(|f| f != case.title) {
+                continue;
+            }
+            let at = format!("case `{}` (line {})", case.title, case.input.line);
+            self.report.checks += 1;
+            let mut got = self.fires(case.language, &case.input, &case.input.code);
+            got.sort();
+            let mut want = case.expect.clone();
+            want.sort();
+            if got != want {
+                let show = |v: &[String]| if v.is_empty() { "(none)".to_owned() } else { v.join(", ") };
+                self.fail(Level::Cases, at.clone(), format!("expected {}, got {}", show(&want), show(&got)));
+            }
+            if let Some(fixed) = &case.fixed {
+                let expected = Snippet { code: fixed.clone(), path: case.input.path.clone(), line: case.input.line };
+                self.fix_checks(case.language, &case.input, Some(&expected), &at, Level::Cases);
+            }
+        }
+    }
+}
+
+/// Test one rule.
+pub fn test_rule(loaded: &LoadedRule, case: Option<&str>) -> RuleReport {
+    let report = RuleReport {
+        id: loaded.rule.id.clone(),
+        source: loaded.source.label(),
+        path: loaded.rule.path.clone(),
+        checks: 0,
+        failures: Vec::new(),
+    };
+    let mut t = Tester { loaded, plain: project_for(loaded, false), with_globs: None, report };
+    for inv in &loaded.rule.invariants {
+        if !RULE_INVARIANTS.contains(&inv.as_str()) {
+            t.fail(Level::Invariants, "frontmatter".into(), format!("unknown invariant `{inv}` (one of {})", RULE_INVARIANTS.join(", ")));
+        }
+    }
+    if case.is_none() {
+        t.examples();
+    }
+    t.cases(case);
+    t.report
+}
+
+/// Test rules in id order.
+pub fn test_rules<'a>(rules: impl IntoIterator<Item = &'a LoadedRule>, case: Option<&str>) -> Vec<RuleReport> {
+    let mut out: Vec<RuleReport> = rules.into_iter().map(|r| test_rule(r, case)).collect();
+    out.sort_by(|a, b| a.id.cmp(&b.id));
+    out
+}
+
+/// The `codelaw test` text output.
+pub fn render(reports: &[RuleReport], color: bool) -> String {
+    let paint = |code: &str, s: &str| if color { format!("\x1b[{code}m{s}\x1b[0m") } else { s.to_owned() };
+    let mut out = String::new();
+    for r in reports {
+        if r.passed() {
+            out.push_str(&format!("{} {}  {}\n", paint("32", "✔"), r.id, paint("2", &format!("{} checks · {}", r.checks, r.source))));
+        } else {
+            out.push_str(&format!("{} {}  {}\n", paint("31", "✖"), r.id, paint("2", &format!("{} · {}", codelaw_core::normalize_path(&r.path), r.source))));
+            for f in &r.failures {
+                out.push_str(&format!("    {} · {}: {}\n", f.level.name(), f.at, f.message));
+            }
+        }
+    }
+    let failed = reports.iter().filter(|r| !r.passed()).count();
+    let checks: usize = reports.iter().map(|r| r.checks).sum();
+    out.push_str(&format!("\n{} rules · {checks} checks · {failed} failed\n", reports.len()));
+    out
+}
+
+#[cfg(test)]
+mod tests;

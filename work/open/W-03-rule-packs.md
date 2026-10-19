@@ -6,7 +6,7 @@ item: W-03
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-19
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: agent
 ---
 
@@ -17,7 +17,7 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Research the presets of ESLint, typescript-eslint, TSLint, Ruff, Prettier, stylelint, html-validate, HTMLHint, markdownlint | what each pack ports, and what it must not | ✅ 2026-10-19 (below) |
-| 2 | Write `rules-js` `recommended` presets | JS/TS/JSX/TSX/Node/React/Stencil coverage | ⏳ waiting on W-02 |
+| 2 | Write `rules-js` `recommended` presets | JS/TS/JSX/TSX/Node/React/Stencil coverage | ⏳ |
 | 3 | Write `rules-python` `recommended` | Python coverage | ⏳ |
 | 4 | Write `rules-css` and `rules-html` `recommended` | stylesheet and markup coverage | ⏳ |
 | 5 | Write `rules-data` | package.json, tsconfig, pyproject, CI YAML, Markdown | ⏳ |
@@ -120,13 +120,18 @@ Prettier has no lint rules. Its option defaults become SR-FORMATTER's `[format]`
 
 ## Blockers
 
-**Waiting on W-02** (the engine, semantic model and pack loading), which waits on W-01.
+None for steps 2–5: W-02 landed the engine, the semantic model, `native:` rules and pack loading on 2026-10-19.
+
+- **Step 6 (publish)** needs the packaging the engine doesn't have yet (B-038, B-012), and publishing to npm and PyPI is outward-facing: the decider rules on it when the packs are ready.
+- **Engine features some ports need, not built yet:** `target:` + `assert:` rules and the `sort-keys`/`ensure-key` primitives (B-030) for `rules-data`'s schema and sorting rules; the project graph (B-029) for `graph/no-unused-exports`. Rules that need them wait in the pack README's "not ported yet" list; they are not approximated.
 
 ## Record affected
 
 SR-RULE-PACKS (the packs' contents and presets) · SR-FORMATTER decision 5 (Prettier-derived defaults) · `work/IMPLEMENTATION.md` per pack on landing.
 
 ## Hazards
+
+- **Test every rule with `codelaw test packs/<name>`** before it lands; a rule that needs a predicate or primitive the engine lacks is a W-02 follow-up, never a looser rule.
 
 - **Licences of the sources:** only ideas are ported. ESLint, typescript-eslint, Ruff, stylelint, html-validate, HTMLHint, markdownlint, Prettier and Biome are MIT; Pylint (GPL-2.0) and yamllint (GPL-3.0) contribute ideas only, never text or code (L2).
 - **Rule-for-rule parity is not the goal.** A ported rule matches its source's documented behaviour on the source's own examples; where codelaw differs (e.g. a better fix), the rule's docs say so.

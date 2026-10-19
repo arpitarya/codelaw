@@ -1,0 +1,11 @@
+[package]
+name = "codelaw-semantic"
+description = "The per-file semantic model for JS/TS and Python: scopes, bindings, references, imports, exports (SR-ARCHITECTURE decision 15a)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+codelaw-core.workspace = true
+codelaw-lang.workspace = true
+tree-sitter.workspace = true

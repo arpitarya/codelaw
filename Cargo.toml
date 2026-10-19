@@ -1,0 +1,62 @@
+# The codelaw engine: one Cargo workspace, one binary (SR-PACKAGES decision 1).
+# Every crate carries this version (L6 decision 9); the layer order is checked
+# by crates/codelaw-cli/tests/layers.rs (SR-ARCHITECTURE decision 1).
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+
+[workspace.dependencies]
+codelaw-core = { path = "crates/codelaw-core" }
+codelaw-cache = { path = "crates/codelaw-cache" }
+codelaw-config = { path = "crates/codelaw-config" }
+codelaw-lang = { path = "crates/codelaw-lang" }
+codelaw-rules = { path = "crates/codelaw-rules" }
+codelaw-semantic = { path = "crates/codelaw-semantic" }
+codelaw-match = { path = "crates/codelaw-match" }
+codelaw-native = { path = "crates/codelaw-native" }
+codelaw-fix = { path = "crates/codelaw-fix" }
+codelaw-engine = { path = "crates/codelaw-engine" }
+codelaw-report = { path = "crates/codelaw-report" }
+codelaw-test = { path = "crates/codelaw-test" }
+
+# Grammars and matcher: pinned (SR-ARCHITECTURE decision 3). All MIT.
+ast-grep-core = { version = "=0.51.0", features = ["tree-sitter"] }
+ast-grep-config = { version = "=0.51.0" }
+ast-grep-language = { version = "=0.51.0", default-features = false, features = [
+  "tree-sitter-javascript",
+  "tree-sitter-typescript",
+  "tree-sitter-python",
+  "tree-sitter-json",
+  "tree-sitter-yaml",
+  "tree-sitter-md",
+  "tree-sitter-css",
+  "tree-sitter-html",
+] }
+tree-sitter = "=0.27.0"
+tree-sitter-toml-ng = "=0.7.0"
+tree-sitter-md = "=0.5.3"
+
+bit-set = "0.11"
+blake3 = "1.8"
+clap = { version = "4.6", features = ["derive"] }
+globset = "0.4.20"
+ignore = "0.4.33"
+postcard = { version = "1.1", features = ["use-std"] }
+pulldown-cmark = { version = "0.13", default-features = false }
+rayon = "1.12"
+semver = "1.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+serde-saphyr = "2.0"
+strsim = "0.11"
+toml = "1.1"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

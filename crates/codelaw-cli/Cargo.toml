@@ -1,0 +1,30 @@
+[package]
+name = "codelaw-cli"
+description = "The `codelaw` binary: a thin translation from the command line to codelaw-engine (SR-CLI-MCP)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "codelaw"
+path = "src/main.rs"
+
+[dependencies]
+codelaw-core.workspace = true
+codelaw-cache.workspace = true
+codelaw-config.workspace = true
+codelaw-lang.workspace = true
+codelaw-rules.workspace = true
+codelaw-match.workspace = true
+codelaw-fix.workspace = true
+codelaw-engine.workspace = true
+codelaw-report.workspace = true
+codelaw-test.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+tree-sitter.workspace = true
+ignore.workspace = true
+
+[dev-dependencies]
+toml.workspace = true

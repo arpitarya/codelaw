@@ -23,7 +23,7 @@ here. Read that record before changing anything below it.
 | what the decider decides | filed | age |
 |---|---|---|
 
-*Empty since 2026-10-19 — every row ruled ("go with the recommendations"); the next gate is the first ruling W-02 raises.*
+*Empty since 2026-10-19 — every row ruled ("go with the recommendations"); the next gate is the ruling to publish the packs (W-03 step 6).*
 
 ---
 
@@ -31,8 +31,7 @@ here. Read that record before changing anything below it.
 
 ### build
 
-🟢 **W-02** `agent` Build the engine the rule packs run on — P0 crates, semantic model, native rules, pack loading. Filed by Arpit (Cowork). [detail](open/W-02-engine-p0.md)
-🟡 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets; waiting on W-02. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
+🟢 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets, on the W-02 engine. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
 
 ### testing
 

@@ -30,3 +30,8 @@ description: "Recurring terms, defined once."
 | semantic model | the per-file map of scopes, bindings and references that rules like `no-unused-vars` query (SR-ARCHITECTURE decision 15a) |
 | native rule | a rule whose matcher is implemented in the engine in Rust; its Markdown file still carries docs, fix class and examples (SR-ARCHITECTURE decision 15b) |
 | change set | the files counted as touched: from `--changed-since`, `--staged` or the agent hook, never inferred; SR-BASELINE |
+| predicate | a semantic-model condition on a capture, written under `where:` in a `match:` rule — `unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`; SR-RULE-FORMAT decision 3a |
+| data table | a JSON file in a pack's `data/` (CSS properties, HTML elements, globals), read once and shared by the rules that name it; SR-RULE-PACKS decision 3 |
+| fixpoint | a file the fixes no longer change: the apply loop runs until it reaches one, at most ten passes; SR-ARCHITECTURE decision 5 |
+| group fix | a fix computed once over every match in a file (`collect-into-block`); each diagnostic carries the whole edit set; SR-RULE-FORMAT decision 3c |
+| first-party pack | one of codelaw's five packs, recognised by its manifest name `@codelaw/rules-*`; only these may use `native:`; SR-RULE-PACKS decision 4 |

@@ -7,9 +7,10 @@ description: "Defines every cache codelaw keeps, the key that invalidates each, 
 status: accepted
 date: 2026-10-18
 feature: "caching"
-owns: []
+owns:
+  - crates/codelaw-cache
 laws: [L0, L2, L5, L8]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 
@@ -66,7 +67,8 @@ The decider made performance a law (L8) and asked for a caching record. Caches w
    - writes go to a temp file and are renamed into place (atomic);
    - readers never see half an entry;
    - concurrent runs may compute the same entry twice, and the result is identical either way;
-   - an unreadable or corrupt entry is ignored, recomputed and overwritten, and never fails a run.
+   - an unreadable or corrupt entry is ignored, recomputed and overwritten, and never fails a run;
+   - entries aren't fsynced: the rename makes an entry whole or absent, and a lost one is recomputed.
 6. **Size limit:** 512 MB by default (`[cache] max_size`). When a run ends over the limit, the least-recently-used entries are removed. `codelaw cache stats` and `codelaw cache clean` manage it by hand.
 7. **The cache never changes output ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A test runs every fixture cold, then warm, then after random entries are deleted, and requires byte-identical output each time.
 8. **In-memory tier.** The long-lived modes ([SR-ARCHITECTURE](0108_architecture.md) decisions 21–24) keep trees, compiled rules and the graph in memory. The disk cache is the floor, not the ceiling.

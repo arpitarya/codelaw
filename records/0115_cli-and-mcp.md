@@ -7,9 +7,11 @@ description: "Defines every codelaw command, its flags, output formats and exit 
 status: accepted
 date: 2026-10-18
 feature: "the CLI and the MCP server"
-owns: []
+owns:
+  - crates/codelaw-report
+  - crates/codelaw-cli
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 
@@ -79,7 +81,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
 3. **Exit codes:** `0` no errors · `1` errors remain · `2` config, rule or usage error.
 4. **Output formats:**
    - `text`: grouped, coloured on a TTY, plain otherwise.
-   - `json`: one versioned object (`schema_version`, `summary`, `diagnostics[]` with rule, severity, file, range, message, fix class and edits or steps, and `skipped[]` for files not checked and why).
+   - `json`: one versioned object (`schema_version`, `codelaw_version`, `summary`, `diagnostics[]` with rule, severity, file, range, message, fix class and edits or steps, `skipped[]` for files not checked and why, and `warnings[]`). A diagnostic's range carries line, column and byte offset; an edit's range is byte offsets. `fix` adds `fixed[]`: each changed file, the fixes applied per rule, and whether it was written.
    - `sarif`: SARIF 2.1.0 for code scanning.
    - `agent`: compact, token-budgeted lines for hooks.
 

@@ -7,9 +7,11 @@ description: "Defines every package codelaw builds and publishes, and exactly wh
 status: accepted
 date: 2026-10-18
 feature: "packages and their contents"
-owns: []
+owns:
+  - Cargo.toml
+  - crates/codelaw-cli/tests/layers.rs
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-19T14:19:21Z
 content_sha: ""
 ---
 
