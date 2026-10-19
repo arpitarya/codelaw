@@ -428,6 +428,7 @@ dependencies = [
  "codelaw-core",
  "codelaw-lang",
  "codelaw-semantic",
+ "regex",
  "serde_json",
  "tree-sitter",
 ]
