@@ -22,12 +22,34 @@ pub enum Predicate {
     /// A name bound by an import from one of `modules`, optionally of one
     /// imported `name`.
     ImportedFrom { modules: Vec<String>, name: Option<String> },
+    /// The identifier is assigned to here.
+    Write,
+    /// The identifier declares a symbol.
+    Declaration,
+    /// The identifier declares a symbol its scope already declared.
+    Redeclared,
+    /// The identifier names a symbol declared as one of `kinds` (`var`,
+    /// `let`, `const`, `function`, `class`, `param`, `import`,
+    /// `catch-param`, `interface`, `type-alias`, `enum`, `namespace`,
+    /// `type-param`, `variable`).
+    Binding { kinds: Vec<String> },
+    /// A reference to one of the language's own globals that the file does
+    /// not declare.
+    Builtin,
     Not(Box<Predicate>),
     All(Vec<Predicate>),
     Any(Vec<Predicate>),
 }
 
-const NAMES: &[&str] = &["unused", "undeclared", "shadowed", "reassigned", "imported-from", "not", "all", "any"];
+const NAMES: &[&str] = &[
+    "unused", "undeclared", "shadowed", "reassigned", "imported-from", "write", "declaration", "redeclared", "binding", "builtin", "not", "all",
+    "any",
+];
+
+const KINDS: &[&str] = &[
+    "var", "let", "const", "function", "class", "param", "import", "catch-param", "interface", "type-alias", "enum", "namespace",
+    "type-param", "variable",
+];
 
 fn unknown(name: &str) -> String {
     let near = NAMES
@@ -79,7 +101,12 @@ fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Predicate, St
             "undeclared" => Ok(Predicate::Undeclared { globals: BTreeSet::new() }),
             "shadowed" => Ok(Predicate::Shadowed { builtins: false }),
             "reassigned" => Ok(Predicate::Reassigned),
+            "write" => Ok(Predicate::Write),
+            "declaration" => Ok(Predicate::Declaration),
+            "redeclared" => Ok(Predicate::Redeclared),
+            "builtin" => Ok(Predicate::Builtin),
             "imported-from" => Err("`imported-from` names a module: `{ imported-from: react }`".into()),
+            "binding" => Err("`binding` names declaration kinds: `{ binding: [const, let] }`".into()),
             other => Err(unknown(other)),
         },
         Value::Array(items) => Ok(Predicate::All(items.iter().map(|i| parse(i, data)).collect::<Result<_, _>>()?)),
@@ -124,6 +151,15 @@ fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Predicate, St
                     }
                     Ok(Predicate::Undeclared { globals })
                 }
+                "binding" => {
+                    let kinds = strings(arg, "binding")?;
+                    for k in &kinds {
+                        if !KINDS.contains(&k.as_str()) {
+                            return Err(format!("`binding: {k}` is not a declaration kind (one of {})", KINDS.join(", ")));
+                        }
+                    }
+                    Ok(Predicate::Binding { kinds })
+                }
                 "shadowed" => {
                     let builtins = arg.get("builtins").and_then(Value::as_bool).ok_or("`shadowed` takes `{ builtins: true|false }`")?;
                     Ok(Predicate::Shadowed { builtins })
@@ -161,6 +197,11 @@ impl Predicate {
             Predicate::ImportedFrom { modules, name } => model
                 .symbol_at(start)
                 .is_some_and(|s| modules.iter().any(|m| model.imported_from(s, m, name.as_deref()))),
+            Predicate::Write => model.is_write_at(start),
+            Predicate::Declaration => model.is_declaration_at(start),
+            Predicate::Redeclared => model.is_redeclaration_at(start),
+            Predicate::Binding { kinds } => model.symbol_at(start).is_some_and(|s| kinds.iter().any(|k| k == model.symbol(s).kind.name())),
+            Predicate::Builtin => model.reference_at(start).is_some_and(|r| model.is_builtin_reference(r)),
             Predicate::Not(p) => !p.holds(model, start),
             Predicate::All(ps) => ps.iter().all(|p| p.holds(model, start)),
             Predicate::Any(ps) => ps.iter().any(|p| p.holds(model, start)),

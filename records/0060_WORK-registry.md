@@ -93,15 +93,15 @@ into a scan anyone can do at task end.
 | `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-19 | 2026-10-19 — W-02 closed; W-03 🟢 |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-19 | 2026-10-19 — B-028–B-039 unbuilt; B-010, B-021 closed; B-008, B-009, B-011, B-020, B-024 narrowed |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-19 | 2026-10-19 — W-02 closed; W-03 next |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-19 | 2026-10-19 — W-02, the engine |
-| `work/LESSONS.md` | a failure teaches something durable | 2026-10-19 | 2026-10-19 — the first two lessons |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-19 | 2026-10-19 — W-03 in flight |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-19 | 2026-10-19 — W-03 part: `js/recommended` |
+| `work/LESSONS.md` | a failure teaches something durable | 2026-10-19 | 2026-10-19 — corpus runs; duplicate YAML keys |
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-19 | 2026-10-19 — macOS: no `timeout`; Python 3.9 |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
 | `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-19 | 2026-10-19 — predicate, data table, fixpoint, group fix, first-party pack |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-19 | 2026-10-19 — L6 and SR-RULE-PACKS rows; rule packs in the distribution sketch and the config example |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-19 | 2026-10-19 — crates owned; describes rows; `built` defined, 13 records `partly` |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-19 | 2026-10-19 — `packs` owned by SR-RULE-PACKS |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
 
 ---

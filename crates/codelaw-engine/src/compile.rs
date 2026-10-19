@@ -86,6 +86,15 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
         let mut fail = |msg: String| errors.push(LoadError::new(path.clone(), format!("rule `{}`: {msg}", rule.id)));
         let matcher = match &rule.block.kind {
             BlockKind::Match { .. } => {
+                // A kind must exist in at least one of the rule's grammars;
+                // where it is missing it matches nothing.
+                let grammars: Vec<Grammar> = rule.languages.iter().flat_map(|l| Grammar::all_for_language(*l).iter().copied()).collect();
+                for k in codelaw_match::kinds_named(rule) {
+                    if !grammars.iter().any(|g| codelaw_match::grammar_has_kind(*g, &k)) {
+                        let langs: Vec<&str> = rule.languages.iter().map(|l| l.name()).collect();
+                        fail(format!("`kind: {k}` is not a node kind of {}; `codelaw tree` shows the kinds", langs.join(", ")));
+                    }
+                }
                 // Each declared language needs one grammar the rule compiles
                 // for; Markdown has two (block and inline), and a rule about
                 // links compiles only for the inline one.
@@ -156,5 +165,7 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
         } || matches!(&fix, Some(FixSpec::Steps(s)) if s.iter().any(|p| matches!(p, codelaw_fix::Primitive::RenameSymbolLocal { .. })));
         out.push(CompiledRule { loaded: loaded.clone(), matcher, fix, needs_semantic, files, exclude });
     }
+    // One message per problem, not one per language that shares a grammar.
+    errors.dedup_by(|a, b| a.message == b.message && a.file == b.file);
     if errors.is_empty() { Ok((out, warnings)) } else { Err(errors) }
 }

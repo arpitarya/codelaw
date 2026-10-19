@@ -144,8 +144,8 @@ Start from `TEMPLATE.md`.
 ## Ownership — which record owns which component
 
 **This table is the answer, not a judgement call.** Every component under
-`scripts/`, `.claude/hooks/`, `crates/` and `fixtures/`, and the workspace
-`Cargo.toml`, appears here exactly once. Most specific wins; a carve-out is
+`scripts/`, `.claude/hooks/`, `crates/`, `fixtures/` and `packs/`, and the
+workspace `Cargo.toml`, appears here exactly once. Most specific wins; a carve-out is
 justified by a *different decision*. A component with no decision yet is owned
 by an open `W-nn`. A record's `owns:` key and this table agree in both
 directions.
@@ -179,6 +179,7 @@ directions.
 | `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced, for the Cargo manifest |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
 | `fixtures/l3` | SR-LAW-3 | the fixture matrix |
+| `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the five first-party packs' rules, presets and data |
 
 <!-- OWNERSHIP-TABLE-END -->
 

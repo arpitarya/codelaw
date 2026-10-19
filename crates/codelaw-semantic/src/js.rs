@@ -86,6 +86,9 @@ impl<'s> Builder<'s> {
 
     fn visit(&mut self, n: Node<'_>, scope: ScopeId) {
         match n.kind() {
+            // `await` and `yield` are keywords where they mean anything; the
+            // grammar can't tell `await (x)(y)` in an async function from a call.
+            "identifier" if matches!(self.text(n), "await" | "yield") => {}
             "identifier" => {
                 self.reference(scope, n, true, false, false);
             }

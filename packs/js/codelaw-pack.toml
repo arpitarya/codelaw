@@ -1,0 +1,6 @@
+name = "@codelaw/rules-js"
+version = "0.1.0"
+min_codelaw = "0.1.0"
+languages = ["javascript", "jsx", "typescript", "tsx"]
+presets = ["js/recommended"]
+description = "codelaw's rules for JavaScript, TypeScript, JSX and TSX (SR-RULE-PACKS)"

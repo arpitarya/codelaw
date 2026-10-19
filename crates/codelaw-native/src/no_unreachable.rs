@@ -5,34 +5,9 @@
 use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
+use crate::util::{exits, whole_lines};
 
 pub struct NoUnreachable;
-
-/// Whether a statement always leaves the block it is in.
-fn exits(node: &tree_sitter::Node<'_>) -> bool {
-    match node.kind() {
-        "return_statement" | "throw_statement" | "break_statement" | "continue_statement" => true,
-        "statement_block" => {
-            let mut c = node.walk();
-            node.named_children(&mut c).any(|s| exits(&s))
-        }
-        "if_statement" => {
-            let consequence = node.child_by_field_name("consequence");
-            let alternative = node.child_by_field_name("alternative").and_then(|a| a.named_child(0));
-            matches!((consequence, alternative), (Some(c), Some(a)) if exits(&c) && exits(&a))
-        }
-        "try_statement" => {
-            let finally = node.child_by_field_name("finalizer").and_then(|f| f.child_by_field_name("body").or(Some(f)));
-            if finally.is_some_and(|f| exits(&f)) {
-                return true;
-            }
-            let body = node.child_by_field_name("body");
-            let handler = node.child_by_field_name("handler").and_then(|h| h.child_by_field_name("body"));
-            body.is_some_and(|b| exits(&b)) && handler.is_none_or(|h| exits(&h))
-        }
-        _ => false,
-    }
-}
 
 /// Hoisted declarations still take effect, so they are not unreachable.
 fn hoisted(node: &tree_sitter::Node<'_>) -> bool {
@@ -59,7 +34,8 @@ impl NativeRule for NoUnreachable {
         &["program", "statement_block", "switch_case", "switch_default"]
     }
 
-    fn check(&self, node: SyntaxNode<'_>, _ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let src = ctx.source;
         let ts = node.get_inner_node();
         let mut c = ts.walk();
         let statements: Vec<_> = ts.named_children(&mut c).filter(|n| !n.is_extra()).collect();
@@ -73,11 +49,12 @@ impl NativeRule for NoUnreachable {
         let mut run: Option<(usize, usize)> = None;
         let flush = |run: &mut Option<(usize, usize)>, out: &mut Vec<NativeFinding>| {
             if let Some((start, end)) = run.take() {
+                let (a, b) = whole_lines(src, start, end);
                 out.push(NativeFinding {
                     start,
                     end,
                     message: "Unreachable code: it comes after a `return`, `throw`, `break` or `continue`".into(),
-                    edits: vec![TextEdit::delete(start, end)],
+                    edits: vec![TextEdit::delete(a, b)],
                 });
             }
         };

@@ -10,7 +10,7 @@ feature: "the rule file"
 owns:
   - crates/codelaw-rules
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-19T14:51:23Z
 content_sha: ""
 ---
 
@@ -113,8 +113,9 @@ The decider asked for a record of the rule-file template. The format so far exis
    Then `message:` (with `$CAPTURE` interpolation) and `fix:` (edit primitives, conditional `when`/`else` branches, or `{ external: "<command>" }`, whose stdin/stdout contract is [SR-ARCHITECTURE](0108_architecture.md) decision 18).
 3a. **What goes with `match:`.** Only beside `match:`: ast-grep's own `constraints:` and `utils:`, and `where:`, the semantic-model predicates.
    - **`where:` maps a capture to a predicate.** The key is a capture (`$NAME`) or the matched node itself (`$$MATCH`); a key `match:` doesn't capture is a load error.
-   - **The predicates:** `unused`; `undeclared` (optionally `{ globals: [<name>…], tables: [<data table>…] }`); `shadowed` (optionally `{ builtins: true }`); `reassigned`; `imported-from` (a module, a list of modules, or `{ module, name }`).
+   - **The predicates:** `unused`; `undeclared` (optionally `{ globals: [<name>…], tables: [<data table>…] }`); `shadowed` (optionally `{ builtins: true }`); `reassigned`; `imported-from` (a module, a list of modules, or `{ module, name }`); `write` (assigned to here); `declaration` (declares a name); `redeclared` (declares a name its scope already declared); `binding` (names a symbol declared as one of the given kinds: `var`, `let`, `const`, `function`, `class`, `param`, `import`, `catch-param`, `interface`, `type-alias`, `enum`, `namespace`, `type-param`, `variable`); `builtin` (one of the language's own globals, undeclared in the file).
    - **Combining them:** a list means all of them; `not`, `all` and `any` take predicates.
+   - **Node kinds across languages:** a rule object whose `kind` a grammar doesn't have matches nothing in that grammar, so one rule can span JavaScript and TypeScript. A `kind` that none of the rule's grammars has is a load error.
 3b. **Interpolation.** A message or template replaces `$NAME` with the capture's text, `$$$NAME` with the source a multi-capture spans, and `$$MATCH` with the matched text.
 3c. **The edit primitives.** `fix:` is a template that replaces the match, or a list of primitives, each acting on the match or on a capture (`target:`):
    - `replace`, `insert-before`, `insert-after`;
@@ -124,7 +125,7 @@ The decider asked for a record of the rule-file template. The format so far exis
    - `move-to`: `end-of-file`, `start-of-file` or `after-imports`;
    - `rename-symbol-local`: renames a symbol and its references in the file, and is refused for an exported symbol;
    - `sort-keys` and `ensure-key` (for `target:` rules) and `when`/`else` branches.
-3d. **YAML 1.2.** The frontmatter and the `codelaw` block are read as YAML 1.2, as ast-grep reads its rules: `on`, `n` and `yes` are strings.
+3d. **YAML 1.2.** The frontmatter and the `codelaw` block are read as YAML 1.2, as ast-grep reads its rules: `on`, `n` and `yes` are strings. A key written twice in one mapping is a load error.
 4. **Body sections, in this order:**
    1. One summary paragraph.
    2. `**Why:**`

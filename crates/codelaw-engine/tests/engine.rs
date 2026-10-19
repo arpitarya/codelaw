@@ -182,7 +182,16 @@ fn native_rule_from_a_first_party_pack() {
     assert!(d[0].message.starts_with("Unreachable code"));
     let fixed = r.project().unwrap().fix(&[], &FixOptions { unsafe_fixes: true, dry_run: false }).unwrap();
     assert_eq!(fixed.files.len(), 1);
-    assert_eq!(r.read("a.js"), "function f() {\n  return 1;\n  \n}\n");
+    assert_eq!(r.read("a.js"), "function f() {\n  return 1;\n}\n");
+}
+
+#[test]
+fn a_kind_no_grammar_has_is_refused() {
+    let r = Repo::new("badkind");
+    let text = rule("acme/typo", &[Language::Javascript, Language::Typescript], "manual", "match:\n  kind: lexical_declaraton\nmessage: x", &[(Language::Javascript, "let a;", "a;"), (Language::Typescript, "let a;", "a;")]);
+    r.file(".codelaw/rules/acme/typo.md", &text);
+    let e = r.project().err().unwrap().to_string();
+    assert!(e.contains("`kind: lexical_declaraton` is not a node kind of javascript, typescript"), "{e}");
 }
 
 #[test]

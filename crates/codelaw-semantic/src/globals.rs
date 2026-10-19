@@ -4,7 +4,7 @@
 /// Environment globals (browser, Node) are not here: a rule names them
 /// from its pack's data tables.
 pub const ES_GLOBALS: &[&str] = &[
-    "AggregateError", "Array", "ArrayBuffer", "AsyncDisposableStack", "AsyncIterator", "Atomics",
+    "AggregateError", "Array", "ArrayBuffer", "AsyncDisposableStack", "Atomics",
     "BigInt", "BigInt64Array", "BigUint64Array", "Boolean", "DataView", "Date", "DisposableStack",
     "Error", "EvalError", "FinalizationRegistry", "Float16Array", "Float32Array", "Float64Array",
     "Function", "Infinity", "Int16Array", "Int32Array", "Int8Array", "Intl", "Iterator", "JSON",

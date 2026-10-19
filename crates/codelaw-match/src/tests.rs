@@ -68,6 +68,12 @@ fn imported_from_and_combinators() {
 }
 
 #[test]
+fn an_empty_multi_capture_interpolates_as_nothing() {
+    let block = "match:\n  pattern: new Symbol($$$ARGS)\nmessage: \"Symbol($$$ARGS)\"";
+    assert_eq!(matches(Language::Javascript, block, "new Symbol();\nnew Symbol('a', b);\n"), ["Symbol()", "Symbol('a', b)"]);
+}
+
+#[test]
 fn python_patterns_use_the_expando() {
     let block = "match:\n  pattern: print($$$ARGS)\nmessage: \"print of $$$ARGS\"";
     assert_eq!(matches(Language::Python, block, "print(a, b)\nlog(c)\n"), ["print of a, b"]);
@@ -91,8 +97,18 @@ fn bad_where_is_a_compile_error() {
     let r = rule(Language::Javascript, "match:\n  kind: identifier\nwhere:\n  $NAME: unused\nmessage: x");
     let e = compile(&r, Grammar::JavaScript, &BTreeMap::new()).err().unwrap();
     assert!(e.contains("does not capture"), "{e}");
+    // A kind no grammar has compiles to nothing here; the engine refuses it
+    // when no grammar of the rule has it.
     let r = rule(Language::Javascript, "match:\n  kind: no_such_kind\nmessage: x");
-    assert!(compile(&r, Grammar::JavaScript, &BTreeMap::new()).is_err());
+    assert!(compile(&r, Grammar::JavaScript, &BTreeMap::new()).is_ok());
+    assert_eq!(kinds_named(&r), ["no_such_kind"]);
+}
+
+#[test]
+fn a_kind_missing_from_a_grammar_matches_nothing_there() {
+    let block = "match:\n  kind: variable_declarator\n  not:\n    inside: { kind: ambient_declaration, stopBy: end }\nmessage: x";
+    assert_eq!(matches(Language::Javascript, block, "let a = 1;\n").len(), 1);
+    assert_eq!(matches(Language::Typescript, block, "let a = 1;\ndeclare const b: number;\n").len(), 1);
 }
 
 #[test]

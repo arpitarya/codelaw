@@ -7,9 +7,10 @@ description: "codelaw's own rules ship as five separately published packs — js
 status: accepted
 date: 2026-10-18
 feature: "predefined rules and rule packs"
-owns: []
+owns:
+  - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-19T14:51:23Z
 content_sha: ""
 ---
 

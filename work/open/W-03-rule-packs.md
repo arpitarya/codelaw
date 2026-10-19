@@ -17,7 +17,7 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Research the presets of ESLint, typescript-eslint, TSLint, Ruff, Prettier, stylelint, html-validate, HTMLHint, markdownlint | what each pack ports, and what it must not | ✅ 2026-10-19 (below) |
-| 2 | Write `rules-js` `recommended` presets | JS/TS/JSX/TSX/Node/React/Stencil coverage | ⏳ |
+| 2 | Write `rules-js` `recommended` presets | JS/TS/JSX/TSX/Node/React/Stencil coverage | ⏳ `js/recommended` ✅ (64 of 64 ESLint rules); `ts`, `react`, `node`, `stencil` next |
 | 3 | Write `rules-python` `recommended` | Python coverage | ⏳ |
 | 4 | Write `rules-css` and `rules-html` `recommended` | stylesheet and markup coverage | ⏳ |
 | 5 | Write `rules-data` | package.json, tsconfig, pyproject, CI YAML, Markdown | ⏳ |
@@ -117,6 +117,12 @@ Prettier has no lint rules. Its option defaults become SR-FORMATTER's `[format]`
 | proseWrap | preserve |
 | htmlWhitespaceSensitivity | css |
 | embeddedLanguageFormatting | auto |
+
+## Progress
+
+- **2026-10-19 — `js/recommended`:** all 64 rules of `@eslint/js` 10.0.1's `recommended`, in `packs/js/`; `codelaw test packs/js` green (796 checks). 26 need native rules, added to `codelaw-native`; the rest are `match:` rules. The engine gained five predicates (`write`, `declaration`, `redeclared`, `binding`, `builtin`), data tables for native rules, kinds that match nothing in grammars lacking them, and refusal of duplicate YAML keys.
+- **Corpus check:** run over npm's own source and dependencies (1,122 JS files). It found eight false-positive patterns in the first ports, each fixed with a test, and real defects in the corpus: a `clearTimeout` of a never-assigned timer in `@npmcli/agent`, and an operator-precedence bug in `node-gyp` (`a <= b ?? -1`).
+- **Every rule is `preview`** (SR-RULE-AUTHORING decision 6), so presets run only with `preview = true` until the corpus job (B-024) promotes them.
 
 ## Blockers
 

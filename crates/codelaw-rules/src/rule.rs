@@ -272,10 +272,12 @@ fn normalise_kind(heading: &str) -> Option<ExampleKind> {
 }
 
 /// Rule files are YAML 1.2, as ast-grep reads them: `n`, `on` and `yes`
-/// are strings, never booleans.
+/// are strings, never booleans. A key written twice in one mapping is an
+/// error: YAML would otherwise keep the last one silently.
 fn yaml_options() -> serde_saphyr::Options {
     let mut options = serde_saphyr::Options::default();
     options.strict_booleans = true;
+    options.duplicate_keys = serde_saphyr::DuplicateKeyPolicy::Error;
     options.merge_keys = serde_saphyr::MergeKeyPolicy::AsOrdinary;
     options.reject_unsupported_tags = true;
     options
@@ -830,6 +832,12 @@ let a: number = 1;
         assert_eq!(r.block.message.as_deref(), Some("n"));
         let e = errors(&GOOD.replace("message: \"Use let instead of var\"", "message: [1]"));
         assert_eq!(e, vec!["`message:` must be a string".to_string()], "one error, not a second about a missing block");
+    }
+
+    #[test]
+    fn a_key_written_twice_is_refused() {
+        let e = errors(&GOOD.replace("  kind: variable_declaration\n", "  kind: variable_declaration\n  kind: lexical_declaration\n"));
+        assert!(e.iter().any(|m| m.to_lowercase().contains("duplicate")), "{e:?}");
     }
 
     #[test]

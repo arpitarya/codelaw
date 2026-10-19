@@ -257,6 +257,29 @@ impl SemanticModel {
         !self.is_builtin(&reference.name, reference.type_only) && !extra_globals(&reference.name)
     }
 
+    /// The `write` predicate: the identifier at `start` is assigned to here.
+    pub fn is_write_at(&self, start: usize) -> bool {
+        self.reference_at(start).is_some_and(|r| r.write)
+    }
+
+    /// The `declaration` predicate: the identifier at `start` declares a
+    /// symbol.
+    pub fn is_declaration_at(&self, start: usize) -> bool {
+        self.declared_at(start).is_some()
+    }
+
+    /// The `redeclared` predicate: the identifier at `start` declares a
+    /// symbol its scope already declared.
+    pub fn is_redeclaration_at(&self, start: usize) -> bool {
+        self.declared_at(start).is_some_and(|id| self.symbols[id].decls.first().is_some_and(|d| d.0 != start))
+    }
+
+    /// The `builtin` predicate: a reference that resolves to nothing in the
+    /// file and names one of the language's own globals.
+    pub fn is_builtin_reference(&self, reference: &Reference) -> bool {
+        reference.symbol.is_none() && self.is_builtin(&reference.name, reference.type_only)
+    }
+
     /// The import a symbol was bound by, if any.
     pub fn import_of(&self, id: SymbolId) -> Option<&Import> {
         self.imports.iter().find(|i| i.local == Some(id))

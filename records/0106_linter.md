@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-lang
   - crates/codelaw-match
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-19T14:52:50Z
 content_sha: ""
 ---
 
@@ -82,7 +82,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | Markdown | `tree-sitter-markdown` (block + inline) | yes |
 
 2. **Three rule scopes**, all in the same Markdown rule format ([SR-RULE-PACKS](0101_rule-packs.md)) and all bound by [L4](0006_LAW-4-every-rule-has-a-fix.md):
-   - **`scope: file`** (the default): an ast-grep pattern or YAML rule with relational clauses (`inside`, `has`, `precedes`, `follows`) and the semantic-model predicates ([SR-ARCHITECTURE](0108_architecture.md) decision 15a), or a `native:` rule (decision 15b) for checks a pattern can't express; fixes come from the edit primitives;
+   - **`scope: file`** (the default): an ast-grep pattern or YAML rule with relational clauses (`inside`, `has`, `precedes`, `follows`) and the semantic-model predicates ([SR-RULE-FORMAT](0112_rule-format.md) decision 3a), or a `native:` rule ([SR-ARCHITECTURE](0108_architecture.md) decision 15b) for checks a pattern can't express; fixes come from the edit primitives;
    - **`scope: project`**: a `graph:` query ([SR-PROJECT-GRAPH](0103_project-graph.md));
    - **adapters**: oxlint and Ruff by default when installed; stylelint (CSS) and html-validate (HTML) available. Each one is run only if installed, its output is mapped to the three fix classes, and none of them is bundled ([L6](0008_LAW-6-python-and-node-packages.md) completeness never depends on an adapter).
 

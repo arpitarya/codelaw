@@ -30,7 +30,8 @@ rewrote the records for five rule packs; **W-02 built the engine**: a Cargo
 workspace of 13 crates under `crates/` and the `codelaw` binary (`check`,
 `fix`, `test`, `rules`, `explain`, `tree`, `new-rule`, `init`, `cache`), with
 the semantic model, `native:` rules and pack resolution. Every crate is owned in
-the register's Ownership table. **No rules ship yet** — that is W-03. Not built:
+the register's Ownership table. W-03 has begun: `packs/js` holds `js/recommended`, all 64 of ESLint 10.0.1's
+recommended rules, every one `preview`. Not built:
 the formatter (so L7 is unmet), graph, baseline, adapters, MCP, LSP, agent
 surfaces, packaging — backlog B-028–B-039. `cargo test --workspace` is green
 and clippy is clean. **Ground it before you edit it** — `git log`, the queue,
@@ -38,9 +39,11 @@ and clippy is clean. **Ground it before you edit it** — `git log`, the queue,
 
 ## 2 · In flight, and the immediate next step
 
-**W-03** (the five packs, 🟢) is the next agent pick: write
-`packs/<name>/` per SR-RULE-PACKS decision 3 and run `codelaw test
-packs/<name>` on every rule. Ports that need `target:` rules or the graph wait
+**W-03** (the five packs, 🟢) is in flight: `js/recommended` is done; next
+are `ts/recommended`, `react`, `node`, `stencil`, then the python, css, html and
+data packs. Write `packs/<name>/` per SR-RULE-PACKS decision 3, run `codelaw
+test packs/<name>`, then run the pack over real code (npm's own source works
+for JS) before trusting it. Ports that need `target:` rules or the graph wait
 in each pack's "not ported yet" list (B-029, B-030), never approximated. Step 6
 (publish) needs packaging (B-038, with B-012) and the decider's ruling. The
 standing instruction to promote B-008 and B-012 when the first manifest lands
@@ -68,6 +71,8 @@ B-012 waits for B-038. The decider (`git config user.name`) still installs
 
 ## 4 · Lessons learned
 
+- **Run a new rule over real code** — its own examples passed while eight
+  false-positive patterns hid; a corpus run found them (`work/LESSONS.md`).
 - **Write a benchmark's output outside the folder it checks** — otherwise the
   second run checks the first run's output (`work/LESSONS.md`, 2026-10-19).
 - **YAML 1.1 booleans** turned `message: n` into `false`; rule YAML is read as

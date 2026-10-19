@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-19T14:51:23Z
 content_sha: ""
 ---
 
@@ -103,7 +103,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 15a. **Semantic model.** For JS/TS (JSX and TSX included) and Python, each file gets scopes, bindings, references, imports and exports.
   - **How it's built:** from the same syntax tree, in one pass after parsing (crate `codelaw-semantic`), and only when at least one active rule needs it.
-  - **How rules use it:** `match:` rules query it through predicates (`unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`), written under `where:` ([SR-RULE-FORMAT](0112_rule-format.md) decision 3a); native rules read it directly.
+  - **How rules use it:** `match:` rules query it through the predicates of [SR-RULE-FORMAT](0112_rule-format.md) decision 3a, written under `where:`; native rules read it directly.
   - **Shared with the graph:** its imports and exports are the per-file facts the project graph links, so they're computed once ([SR-PROJECT-GRAPH](0103_project-graph.md)).
   - **No type information** ([L3](0005_LAW-3-languages.md)).
   - **Where the approach comes from:** `oxc_semantic` (MIT) for JS/TS and Ruff's semantic model (MIT) for Python. Taking either as a dependency needs its own record.
@@ -113,6 +113,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
   - **The Markdown file is still the rule.** It carries the docs, fix class, options and examples, and `codelaw test` runs them unchanged.
   - **An unknown id refuses the rule at load,** naming the pack's `min_codelaw`.
   - **Same discipline as every rule:** a native rule declares the node kinds it needs (decision 15), is isolated on panic (decision 25) and is deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)).
+  - **What it reads:** the file, its semantic model, the rule's options and the pack's data tables (decision 15c).
   - **Only first-party packs** and ejected copies of their rules may use `native:` ([SR-RULE-PACKS](0101_rule-packs.md) decision 10).
 
 15c. **Rule packs and data tables.** Rules come from the packs resolved by [SR-RULE-PACKS](0101_rule-packs.md) decision 4, plus local rules. The engine embeds only its own (`codelaw/*` diagnostics and `graph/no-deprecated-usage`).

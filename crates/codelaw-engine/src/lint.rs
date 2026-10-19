@@ -488,7 +488,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 }
                 Matcher::Native(nr) => {
                     let options = if cfg.options.is_empty() { &empty } else { &cfg.options };
-                    let ctx = NativeContext { source: &unit.text, language: unit.language, semantic: semantic.as_ref(), options };
+                    let ctx = NativeContext { source: &unit.text, language: unit.language, semantic: semantic.as_ref(), options, data: &rule.loaded.data };
                     let out = &mut native[slot];
                     if let Err(p) = catch_unwind(AssertUnwindSafe(|| nr.check(node.clone(), &ctx, out))) {
                         failed[slot] = Some(panic_message(p.as_ref()));

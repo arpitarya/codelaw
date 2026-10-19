@@ -11,6 +11,20 @@ named here only as the failure that produced it. A lesson whose remedy is
 
 ---
 
+## 2026-10-19 — a rule's own examples don't find its false positives; a corpus does
+
+All 58 first ports passed their examples, then a run over npm's source found
+eight false-positive patterns (`this` inside an arrow passed to `super()`,
+`[]` inside `[{[]`, ambient `declare` code, a tree-sitter misparse, `await`
+read as an identifier). **Run a new rule over real code before trusting it**;
+the examples only prove the cases the author thought of.
+
+## 2026-10-19 — YAML keeps the last of two equal keys, silently
+
+A rule written with two `has:` keys compiled with one of them gone, and its
+broken half was never noticed until the duplicate was removed. Rule YAML now
+refuses duplicate keys (SR-RULE-FORMAT decision 3d).
+
 ## 2026-10-19 — a benchmark that writes into the repo it checks measures itself
 
 Timing `codelaw check > cold.json` inside the generated repo made the second

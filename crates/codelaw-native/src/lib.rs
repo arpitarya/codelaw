@@ -7,12 +7,24 @@
 //! hands it only those (decision 15); it is deterministic (L5) and the
 //! engine isolates it on panic (decision 25).
 
+mod accessors;
+mod classes;
+mod duplicates;
+mod expressions;
+mod literals;
+mod no_undef;
 mod no_unreachable;
+mod regexp;
+mod unused_vars;
+mod useless_assignment;
+mod useless_escape;
+mod util;
 
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
 use codelaw_semantic::SemanticModel;
 use std::collections::BTreeMap;
+use std::sync::Arc;
 
 /// What a native rule sees of one file.
 pub struct NativeContext<'a> {
@@ -21,6 +33,8 @@ pub struct NativeContext<'a> {
     pub semantic: Option<&'a SemanticModel>,
     /// The rule's options, resolved for this file.
     pub options: &'a BTreeMap<String, serde_json::Value>,
+    /// The rule's pack's data tables (SR-ARCHITECTURE decision 15c).
+    pub data: &'a BTreeMap<String, Arc<serde_json::Value>>,
 }
 
 /// One finding of a native rule. `edits` are offered when the rule file's
@@ -44,7 +58,43 @@ pub trait NativeRule: Send + Sync {
     fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>);
 }
 
-static REGISTRY: &[&dyn NativeRule] = &[&no_unreachable::NoUnreachable];
+const JS_ONLY: &[Language] = &[Language::Javascript, Language::Jsx];
+const TS_ONLY: &[Language] = &[Language::Typescript, Language::Tsx];
+
+static JS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "js/no-unused-vars", languages: JS_ONLY };
+static TS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "ts/no-unused-vars", languages: TS_ONLY };
+
+/// Sorted by id.
+static REGISTRY: &[&dyn NativeRule] = &[
+    &classes::ConstructorSuper,
+    &accessors::GetterReturn,
+    &expressions::NoConstantBinaryExpression,
+    &duplicates::NoDupeArgs,
+    &duplicates::NoDupeClassMembers,
+    &duplicates::NoDupeElseIf,
+    &duplicates::NoDupeKeys,
+    &duplicates::NoDuplicateCase,
+    &literals::NoEmptyCharacterClass,
+    &literals::NoFallthrough,
+    &regexp::NoInvalidRegexp,
+    &literals::NoIrregularWhitespace,
+    &literals::NoLossOfPrecision,
+    &regexp::NoMisleadingCharacterClass,
+    &literals::NoRegexSpaces,
+    &accessors::NoSetterReturn,
+    &literals::NoSparseArrays,
+    &classes::NoThisBeforeSuper,
+    &no_undef::NoUndef,
+    &literals::NoUnexpectedMultiline,
+    &no_unreachable::NoUnreachable,
+    &expressions::NoUnsafeOptionalChaining,
+    &classes::NoUnusedPrivateClassMembers,
+    &JS_NO_UNUSED_VARS,
+    &useless_assignment::NoUselessAssignment,
+    &regexp::NoUselessBackreference,
+    &useless_escape::NoUselessEscape,
+    &TS_NO_UNUSED_VARS,
+];
 
 /// Every registered native rule, sorted by id.
 pub fn registry() -> &'static [&'static dyn NativeRule] {
@@ -60,7 +110,8 @@ pub(crate) fn run(rule: &dyn NativeRule, language: Language, src: &str) -> Vec<N
     let root = codelaw_lang::parse(language, src);
     let model = codelaw_semantic::build(language, &root, src);
     let options = BTreeMap::new();
-    let ctx = NativeContext { source: src, language, semantic: model.as_ref(), options: &options };
+    let data = BTreeMap::new();
+    let ctx = NativeContext { source: src, language, semantic: model.as_ref(), options: &options, data: &data };
     let mut out = Vec::new();
     for node in root.root().dfs() {
         if rule.kinds().contains(&node.kind().as_ref()) {
