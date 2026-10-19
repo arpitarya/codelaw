@@ -1,0 +1,229 @@
+---
+type: Standing Record
+kind: component
+name: SR-BASELINE
+title: "SR-BASELINE (0104) — grandfather existing violations with a deadline and a touch policy; deprecations are its first user"
+description: "A committed, count-based baseline lets existing violations of any rule stay until a date, turns them into errors the moment their file is edited, blocks every new one, and can only shrink; a deprecations registry uses it so a deprecated function errors on new use while old call sites run out their allowance."
+status: accepted
+date: 2026-10-18
+feature: "grandfathering violations and deprecations"
+owns: []
+laws: [L0, L4, L5]
+timestamp: 2026-10-18T16:45:00Z
+content_sha: ""
+---
+
+
+# SR-BASELINE — grandfather existing violations with a deadline and a touch policy; deprecations are its first user
+
+## §1 — For humans
+
+**The use case.** A function is deprecated. You want three things:
+- **No new uses anywhere:** an error immediately.
+- **Existing uses may stay until a date**, recorded in a file.
+- **If someone edits a file that still uses it, that file must migrate now:** an error in that file.
+
+**The decision.** It's two pieces, and the first is general:
+
+1. **The baseline** works for *any* rule, not just deprecations. A committed list records how many violations of a rule each file is allowed to keep, until when, and what happens when the file is touched. New violations always fail. The list can only shrink without review.
+2. **The deprecations registry** is a file listing deprecated symbols, their replacements and deadlines. The built-in rule `graph/no-deprecated-usage` uses the [project graph](0103_project-graph.md) to find real uses (including aliased and re-exported imports), and the baseline to grandfather the existing ones.
+
+The same baseline also lets you switch on any new rule in a legacy repo: freeze today's violations, block new ones, and burn the old ones down.
+
+**Prior art:**
+- **ESLint bulk suppressions:** a committed suppressions file; new violations still fail; a suppression that no longer occurs fails the run until it's pruned.
+- **Notion's ratchet:** counts per file and rule, not line numbers, so moving code doesn't break it; counts may only go down; raising one needs approval.
+- **Betterer:** snapshots that can't get worse.
+- **unicorn `expiring-todo-comments`:** deadlines in the code itself.
+- **PEP 702 `@deprecated`** and **JSDoc `@deprecated`** (typescript-eslint `no-deprecated`): in-code deprecation markers.
+
+```mermaid
+flowchart LR
+    U["a use of a deprecated symbol"] --> N{"in the baseline<br/>and within count?"}
+    N -->|no| E["error: new use"]
+    N -->|yes| T{"file touched?"}
+    T -->|yes| E2["error: migrate this file"]
+    T -->|no| D{"past until (as-of date)?"}
+    D -->|yes| E3["error: expired"]
+    D -->|no| I["info / warning: grandfathered"]
+```
+
+<details>
+<summary><b>ASCII twin</b></summary>
+
+```text
+   use --> in baseline & within count? --no--> error (new use)
+                 | yes
+                 v
+           file touched? --yes--> error (migrate now)
+                 | no
+                 v
+           past `until`? --yes--> error (expired)
+                 | no
+                 v
+           info / warning (grandfathered)
+```
+
+</details>
+
+---
+
+## §2 — For agents
+
+### Context
+
+Deprecating a function means three things: no new uses, old uses allowed until a date, and migration whenever a file using it is edited. Adopting any new rule in a legacy repo needs the same freeze.
+
+### Decision
+
+
+#### 1. The baseline file: one per rule, count-based
+
+`.codelaw/baseline/<rule-id>.toml`, written only by `codelaw baseline …` and reviewed in PRs:
+
+```toml
+# .codelaw/baseline/graph--no-deprecated-usage.toml
+[[allow]]
+file      = "packages/web/src/orders/list.tsx"
+symbol    = "@acme/utils#formatDate"      # omitted for rules that aren't symbol-based
+count     = 3                             # occurrences this file may keep
+until     = "2027-03-31"                  # inherited from the deprecation; may be set per entry
+on_touch  = "error"                       # error | warn | keep
+reason    = "ORD-1432 migration"
+```
+
+- **Counts per file, not line numbers.** Moving code around doesn't invalidate the baseline; adding a use does.
+- **One file per rule** keeps diffs small and merge conflicts rare. Entries are sorted by file, so the output is deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)).
+
+#### 2. What each occurrence becomes
+
+| Situation | Result |
+|---|---|
+| Use in a file with no baseline entry, or beyond the file's `count` | **error:** "new use of deprecated `formatDate`; use `formatISO`" |
+| Within allowance, before `warn_from` | **info:** "grandfathered until 2027-03-31 (3 left in this file)"; exit 0 |
+| Within allowance, after `warn_from`, before `until` | **warning:** "expires in 12 days" |
+| After `until` | **error**, everywhere |
+| Within allowance, but **the file is touched** and `on_touch = "error"` | **error for every occurrence in that file:** "you edited this file; migrate its 3 uses of `formatDate` now" |
+| Baseline allows 3, file now has 2 | **error: stale baseline.** `codelaw baseline prune` lowers it (auto, always safe) |
+
+#### 3. What "touched" means
+
+A file is touched when it's in the **change set**, and the change set always comes from an explicit source:
+
+| Where codelaw runs | Change set |
+|---|---|
+| CI on a PR | `--changed-since origin/main` (diff against the merge base) |
+| Pre-commit | `--staged` |
+| Agent hook | The file the agent just edited |
+| Plain `codelaw check` | **Empty:** nothing counts as touched |
+
+- `on_touch_scope = "file"` is the default. `"function"` narrows it to occurrences inside a function whose lines changed in the diff.
+
+#### 4. The clock is an input, never read implicitly ([L5](0007_LAW-5-no-model-in-the-engine.md))
+
+- Deadlines need "today", but reading the wall clock would let the same commit pass yesterday and fail today on two machines.
+- **The as-of date defaults to the commit date of `HEAD`.** The same commit gives the same verdict everywhere: on a laptop, in CI, or in an agent's hook.
+- **`--as-of 2027-04-01`** checks against any date. Use it to see what will break after a deadline before it arrives.
+- **No `git` binary or no repository** (for example, a tarball): `--as-of` or `CODELAW_AS_OF` is required for date-based results ([SR-ARCHITECTURE](0108_architecture.md) decision 14). Without it, deadlines aren't evaluated, and the report says so in its header.
+
+#### 5. The ratchet: counts only go down
+
+- **Lowering is automatic:** `codelaw fix` and the pre-commit hook run `baseline prune`. Fixing a use is never blocked by bookkeeping.
+- **Raising a count, adding an entry or extending an `until` takes one explicit command:** `codelaw baseline add --rule <id> [--file …] --reason "…"`.
+- **CI enforces it:** `codelaw baseline check --since origin/main` fails if any count rose, any entry was added, or any deadline moved later.
+- **Approval** comes from a `CODEOWNERS` entry on `.codelaw/baseline/`, the platform's own review, with nothing invented.
+- **Adopting a new rule in a legacy repo:**
+  1. `codelaw baseline add --rule js/exports-at-end --until 2027-06-30`
+  2. From then on, new violations fail and old ones count down.
+
+#### 6. The deprecations registry
+
+`.codelaw/deprecations.toml`:
+
+```toml
+[[deprecated]]
+symbol      = "@acme/utils#formatDate"         # JS/TS: <package or path>#<export>
+replacement = "@acme/utils#formatISO"
+until       = "2027-03-31"
+warn_from   = "2027-03-01"
+on_touch    = "error"
+reason      = "Timezone bugs — see ADR-0042"
+rewrite     = { from = "formatDate($D)", to = "formatISO($D)" }   # optional → `suggest` fix
+
+[[deprecated]]
+symbol      = "acme.billing.legacy:compute_tax"  # Python: <module>:<qualname>
+replacement = "acme.billing.tax:compute"
+until       = "2027-06-30"
+on_touch    = "error"
+reason      = "Replaced by the new tax engine"
+```
+
+- **In-code markers also count:**
+  - JSDoc `@deprecated` on an export;
+  - Python `@deprecated(...)` (PEP 702: `warnings.deprecated` from Python 3.13, `typing_extensions` before that).
+
+  A marked symbol with no registry entry gets the `[deprecation]` defaults from `codelaw.toml`. The registry adds deadlines and policy.
+- **Identity comes from the [project graph](0103_project-graph.md).** `import { formatDate as fd } from "@acme/utils"`, a barrel re-export, and `from acme.billing.legacy import compute_tax as ct` are all caught. A local function that happens to be named `formatDate` is not.
+- **Fix ([L4](0006_LAW-4-every-rule-has-a-fix.md)):** with a `rewrite`, the fix is `suggest` (a diff, because call semantics may differ). Without one, it's `manual`, and the steps name the replacement and quote `reason`.
+- **Seeding the baseline:** `codelaw deprecate @acme/utils#formatDate --replacement … --until …` does two things in one reviewed change:
+  1. writes the registry entry;
+  2. runs `baseline add` for every current use.
+
+#### 7. Running it
+
+```
+$ codelaw check --changed-since origin/main
+as-of 2026-10-18 (HEAD commit date)
+packages/web/src/cart/total.ts:8:10     error  graph/no-deprecated-usage  New use of deprecated `formatDate`; use `formatISO` (deadline 2027-03-31)  [suggest]
+packages/web/src/orders/list.tsx:22:7   error  graph/no-deprecated-usage  File edited: migrate its 3 uses of `formatDate` now (on_touch = error)  [suggest]
+packages/web/src/orders/list.tsx:40:7   error  graph/no-deprecated-usage  …
+packages/web/src/orders/list.tsx:61:12  error  graph/no-deprecated-usage  …
+packages/api/app/billing.py:31:12       info   graph/no-deprecated-usage  Grandfathered until 2027-06-30 (1 left in this file)
+
+4 errors, 1 info
+exit 1
+
+$ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
+… 47 errors: every remaining use of `formatDate` is past its 2027-03-31 deadline
+```
+
+#### 8. Agents get the same rules, earlier
+
+- **`rules_for_path`** (MCP) includes the deprecations that apply to the file. For example: "`formatDate` is deprecated, use `formatISO`; this file has 3 grandfathered uses that become errors as soon as you edit it." The agent migrates while it's already in the file, instead of being blocked after.
+- **The hook** treats the agent's edited file as touched, so it gets exactly the CI verdict ([L5](0007_LAW-5-no-model-in-the-engine.md) parity).
+- **No skill may raise a baseline count or extend a deadline** ([SR-AGENT-SURFACES](0102_agent-surfaces.md) §4). Only a person runs `baseline add`.
+
+### Consequences
+
+- **The baseline is committed and reviewed**, and CODEOWNERS approval on it is a process cost.
+- **As-of defaults to the `HEAD` commit date**, so a long-lived branch sees its own date. Accepted; `--as-of` overrides.
+- **Counts, not locations:** a use removed and another added in the same file net out. Accepted (Notion's trade-off); `B-014` watches it.
+
+### Alternatives considered
+
+- **Line-number baselines:** rejected. Every refactor breaks them.
+- **An inline ignore comment on each use:** rejected. Noise in the code, no deadline, no ratchet.
+- **Wall-clock "today":** rejected by [L5](0007_LAW-5-no-model-in-the-engine.md).
+
+### Reference (required)
+
+- [ESLint bulk suppressions](https://eslint.org/docs/v9.x/use/suppressions): a committed suppressions file, and unused suppressions fail the run.
+- [Notion's ratchet](https://www.notion.com/blog/how-we-evolved-our-code-notions-ratcheting-system-using-custom-eslint-rules): per-file counts that only go down, and raising one needs approval.
+- [PEP 702](https://peps.python.org/pep-0702/): `@deprecated` in the type system.
+- [unicorn `expiring-todo-comments`](https://github.com/sindresorhus/eslint-plugin-unicorn/blob/master/docs/rules/expiring-todo-comments.md): deadlines in code.
+
+### Veto condition
+
+**Reopen this decision if:** in practice, a count-based baseline lets a new use slip in by offsetting a removed one.
+
+**How to check it:** `CI history (`B-014`) shows a file whose count held steady while a new use appeared`
+
+---
+
+## References
+
+*Every source this record cites, gathered in one place. An archived document is never listed here.*
+
+**Records** — [SR-AGENT-SURFACES](0102_agent-surfaces.md)
+
+**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

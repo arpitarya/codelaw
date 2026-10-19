@@ -1,0 +1,169 @@
+---
+type: Standing Record
+kind: component
+name: SR-ARCHITECTURE
+title: "SR-ARCHITECTURE (0108) — the architecture: six layers, one parse per file, parallel per file, warm processes, and every cross-cutting rule the other records left open"
+description: "The design of record for the engine: layering, the check/fix/format pipelines, file discovery and I/O rules, concurrency, the warm-process model, error handling, the external-fixer and adapter contracts, and the design targets that apply until L8's budgets are set."
+status: accepted
+date: 2026-10-18
+feature: "engine architecture"
+owns: []
+laws: [L0, L2, L3, L4, L5, L6, L7, L8]
+timestamp: 2026-10-18T18:00:00Z
+content_sha: ""
+---
+
+# SR-ARCHITECTURE — the architecture: six layers, one parse per file, parallel per file, warm processes, and every cross-cutting rule the other records left open
+
+## §1 — For humans
+
+**The decision in one line.** Six layers, each depending only on the ones above it. **Every file is read and parsed once per run** and shared by every rule and the formatter. Work is **parallel per file**. Long-lived processes keep everything warm and advertise a socket that one-shot runs can use. Results are **merged and sorted deterministically** ([L5](0007_LAW-5-no-model-in-the-engine.md)), and **a crash in one rule never takes down a run**.
+
+**Speed is designed in ([L8](0010_LAW-8-performance-budgets.md)):** skip before reading, hash before parsing, parse once, compile rules once, dispatch by node kind, cache everything pure ([SR-CACHE](0109_cache.md)), and never start cold when a warm process is up.
+
+**What this record settles that no other record did:** file encoding and line endings, generated and oversized files, symlinks, how git is read, safe writes, position encodings, the external-fixer contract, the adapter contract, the daemon's lifecycle, memory bounds in the editor, and what happens when a rule panics.
+
+```mermaid
+flowchart TB
+    F["foundation: core · cache"] --> I["inputs: config · lang · rules · rules-builtin"]
+    I --> E["engines: match · fix · format · graph · baseline · adapters"]
+    E --> O["orchestration: engine · report · test"]
+    O --> S["surfaces: cli · mcp · lsp · agents"]
+    S --> D["distribution: npm · PyPI · editor"]
+```
+
+<details>
+<summary><b>ASCII twin</b></summary>
+
+```text
+   foundation --> inputs --> engines --> orchestration --> surfaces --> distribution
+   (core,cache)   (config,    (match,fix,  (engine,report,  (cli,mcp,    (npm, PyPI,
+                   lang,rules) format,graph, test)           lsp,agents)  editor)
+                               baseline,adapters)
+```
+
+</details>
+
+---
+
+## §2 — For agents
+
+### Context
+
+The decider asked for the architecture to be designed and its gaps filled. The feature records each described their own piece; the cross-cutting rules (I/O, errors, processes, contracts) belonged to none of them, and some of those gaps would have become inconsistencies the first week of building.
+
+### Decision
+
+#### A. Structure
+
+1. **Layers.** The six layers and their crates are [SR-PACKAGES](0107_packages.md) decision 1. A crate depends only on crates in layers above its own, with no cycles inside a layer. The layer order is checked in CI (`B-020`).
+2. **Everything is a library; surfaces are thin.** `codelaw-engine` exposes `check`, `fix`, `format`, `rules_for`, `explain` and the debug queries as functions over typed inputs. The CLI, MCP, LSP and hook crates only translate between their protocol and those functions ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 6, [SR-EDITOR](0114_editor.md) decision 3).
+3. **Pinned grammars and engines.** Every tree-sitter grammar and every formatter engine is vendored at a pinned version in `Cargo.lock`; the grammar and engine versions are part of every cache key ([SR-CACHE](0109_cache.md) decision 2).
+
+#### B. The pipelines
+
+4. **`check`:**
+   1. Load config ([SR-CONFIG](0110_config.md)) and the compiled rule set (cached).
+   2. Discover files (decision 7).
+   3. In parallel, per file: read once, hash, and on a cache hit reuse the results; otherwise parse once, split embedded regions, run file rules and the format check, and extract graph facts.
+   4. Link the graph and run project rules ([SR-PROJECT-GRAPH](0103_project-graph.md)).
+   5. Run adapters (decision 19).
+   6. Apply suppressions ([SR-LINTER](0106_linter.md) decision 6) and the baseline ([SR-BASELINE](0104_baseline-and-deprecations.md)).
+   7. Merge, dedupe (same file, range, rule) and sort by path, line, column, rule.
+   8. Report ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 4).
+5. **`fix`** per file: run all rules → collect `auto` edits (and `suggest` edits with `--unsafe`) → drop overlapping edits → apply → re-parse → repeat until no edits, at most 10 passes → format ([SR-FORMATTER](0105_formatter.md)) → verify (parses, idempotent, no new rule fires) → write (decision 12). Two rules whose fixes alternate are detected by a repeated file hash and both are reported as `manual` with a `fix-conflict` note.
+6. **`format`** is the fix pipeline with the rule steps skipped.
+
+#### C. Files and I/O
+
+7. **Discovery.** The walk uses the `ignore` crate (MIT / Unlicense): `.gitignore`, `.ignore`, then `include` and `exclude` from config. Files are skipped **by extension and ignore rules before they are read**. Symlinks are not followed unless `[files] follow_symlinks = true`. Paths are normalised to forward slashes in every output and cache key, so Windows and Unix runs agree.
+8. **Encoding.** Files are read as UTF-8. A UTF-8 BOM is preserved on write. A file that isn't valid UTF-8 gets one `codelaw/not-utf8` info diagnostic and is skipped; it's never rewritten.
+9. **Line endings.** The dominant line ending of a file (`\n` or `\r\n`) is detected once and preserved by every fix. Only the formatter changes it, and only when `[format] end_of_line` is set.
+10. **Generated and oversized files.**
+    - A file whose first 1,024 bytes contain `@generated` (or a `[files] generated_markers` entry) is skipped with an info diagnostic unless `[files] lint_generated = true`.
+    - A file above `[files] max_file_size` (default 1 MiB) is skipped with a `codelaw/file-too-large` info diagnostic. Formatting such a file is refused, never attempted.
+11. **Glob base.** Every glob in config and in rule frontmatter is relative to the directory of the file that declares it: the config file's directory for `include`, `exclude` and `[[overrides]]`; the repo root for a rule's `files`.
+12. **Safe writes.** A fixed or formatted file is written to a temp file in the same directory and renamed into place. Before the rename, the file's hash is compared with the hash read at the start of the run; if it changed, the write is skipped and reported (`codelaw/file-changed-during-run`). Permissions are preserved. The LSP never writes files itself; it returns `WorkspaceEdit`s and the editor writes ([SR-EDITOR](0114_editor.md)).
+13. **Positions.** Internally, offsets are bytes. Text and JSON output use 1-based line and column, in characters. The LSP crate converts to 0-based UTF-16 at the boundary. SARIF uses its own 1-based scheme. The conversion is tested on files with multi-byte and astral characters.
+14. **Git.** codelaw shells out to the `git` on `PATH` for exactly three things: the merge base and diff for `--changed-since`, the index for `--staged`, and the `HEAD` commit date for the as-of default ([SR-BASELINE](0104_baseline-and-deprecations.md) decision 4). It links no git library. With no `git`, those three features report their absence plainly and everything else runs.
+
+#### D. Rules and regions
+
+15. **Compile once, dispatch by kind.** Rule files are compiled at load into matchers whose kind filters are indexed. Each file is walked once, and every node is handed only to the rules whose filter matches it. The compiled set is cached by the hash of every active rule file plus the config ([SR-CACHE](0109_cache.md)).
+16. **Embedded regions** ([SR-LINTER](0106_linter.md) decision 3) are parsed lazily: a `<script>` is parsed only if JavaScript or TypeScript is enabled and at least one rule or the format check applies to it. A language switched off in `languages` is off inside host files too.
+17. **Monorepo scope.** One graph and one baseline per **project root**: the topmost config, or a nested config with `root = true` ([SR-CONFIG](0110_config.md) decision 2). A `root = true` package is a separate project with its own graph; cross-root imports are resolved as external.
+
+#### E. Contracts with code codelaw doesn't own
+
+18. **External fixers** (`fix: { external: "<command>" }`, [SR-RULE-FORMAT](0112_rule-format.md) decision 3).
+    - Run only for local rules, or for packs listed in `allow_pack_fixers` ([SR-RULE-PACKS](0101_rule-packs.md) decision 7).
+    - Input on stdin, one JSON object: `{ "schema": 1, "rule", "file", "language", "source", "matches": [{ "range", "captures" }] }`.
+    - Output on stdout: `{ "edits": [{ "range", "text" }] }`, byte offsets into `source`.
+    - Timeout 5 s per file (`[fix] external_timeout`), no network expected, run with the repo root as the working directory.
+    - The result goes through the same verifier as a built-in fix (decision 5). A fixer that fails or times out reports the instance as `manual` with the rule's steps.
+19. **Adapters** ([SR-LINTER](0106_linter.md) decision 2).
+    - Each adapter has a manifest in the codelaw source (`adapters/<name>.toml`): the binary name, the lookup order (`node_modules/.bin`, `.venv/bin`, `PATH`), the command line for JSON output, a tested version range, and the parser that maps its output to codelaw diagnostics and fix classes ([L4](0006_LAW-4-every-rule-has-a-fix.md) decision 9).
+    - Adapters run only in `check` and `fix` from the CLI and CI, **never in hook or LSP mode** ([L8](0010_LAW-8-performance-budgets.md) `fix_one_file`).
+    - An adapter outside its tested version range runs with a warning; a missing adapter named in config is a warning, not an error.
+    - Adapter results are cached like file results, keyed additionally by the adapter's reported version.
+    - Adapter rule ids are namespaced `adapter/<name>/<rule>` so they never collide with codelaw rules.
+
+#### F. Concurrency, processes and memory
+
+20. **Concurrency:** a work-stealing pool (`rayon`, MIT / Apache-2.0) across files, sized to the CPU count (`--threads`). Matching inside one file is single-threaded. Project linking runs after all files, in parallel by package. Results are collected per file and merged in sorted order, so scheduling never shows in the output ([L5](0007_LAW-5-no-model-in-the-engine.md)).
+21. **Warm processes.** Any long-lived codelaw process (`lsp`, `mcp`, `daemon`) registers a socket at `.codelaw/cache/run/<pid>.sock` with its version. `codelaw hook` and any command run with `--prefer-warm` connect to the newest live socket **whose version equals their own**; otherwise they run in-process. A stale socket (dead pid) is removed on discovery.
+22. **Daemon lifecycle.** `codelaw daemon start` is optional and never automatic. It exits after 30 minutes idle (`[daemon] idle_timeout`), on a version mismatch with the binary on disk, or on `daemon stop`. It watches the config, rules and baseline files and reloads them.
+23. **Incremental in warm processes.** An edit re-parses incrementally (tree-sitter's edit API), re-runs only that file's rules, and relinks only its graph edges ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 5). Project rules re-run on save or after 300 ms idle ([SR-EDITOR](0114_editor.md) decision 2).
+24. **Memory bounds.** A warm process keeps compiled rules and graph facts for every file, but syntax trees only for open files plus an LRU of the 256 most recently touched (`[lsp] tree_cache`). `peak_memory_10k` is an [L8](0010_LAW-8-performance-budgets.md) budget.
+
+#### G. Failure, safety and privacy
+
+25. **A rule failure is isolated.** A panic or error inside one rule on one file is caught, reported as `codelaw/internal-error` naming the rule and file, and the run continues. Internal errors make the exit code 2 at the end, after every other result is printed.
+26. **Partial results are never silently partial.** If any file was skipped (encoding, size, read error) or any rule failed, the summary line says so and `--format json` carries a `skipped[]` list.
+27. **No network, no model, no clock, no telemetry.** The engine makes no network calls, calls no model, reads no wall clock ([L5](0007_LAW-5-no-model-in-the-engine.md)) and sends no usage data anywhere, ever. Nothing is downloaded after install ([L6](0008_LAW-6-python-and-node-packages.md) decision 3).
+28. **What may execute.** codelaw runs only: itself, the `git` binary (decision 14), adapters named in config (decision 19), external fixers under the allowlist (decision 18), and `[format] format_after` commands the user wrote. Nothing in a rule file, pack or cache is ever executed.
+
+#### H. Targets until [L8](0010_LAW-8-performance-budgets.md)'s budgets are set
+
+29. Design targets, not law: `check_warm_10k` < 2 s · `check_cold_10k` < 20 s · `fix_one_file` < 100 ms warm, < 300 ms cold · `lsp_after_edit` < 50 ms · `startup` < 20 ms · `peak_memory_10k` < 1 GiB. `B-019` turns them into measurements.
+30. **Performance rules for contributors:** no rule may re-parse; no regex over a whole file when a kind filter exists; no allocation per node in a hot loop without a benchmark; every new step runs `codelaw bench` before merge.
+
+### Consequences
+
+- **The `[files]`, `[daemon]` and `[lsp]` config sections are this record's** and are added to the schema ([SR-CONFIG](0110_config.md) decision 3).
+- **Shelling out to `git`** keeps the binary small and matches what every CI image has, at the cost of three features being absent without it.
+- **Adapters are excluded from hook and LSP mode,** so an agent sees adapter findings only in CI. Deliberate, for `fix_one_file`.
+- **Warm-process discovery adds a socket file under the cache;** stale-socket cleanup is tested (`B-026`).
+- **Not decided yet, by design:** a JavaScript rule API (DESIGN P4), type-aware rules, and SCSS/Vue/Svelte. Each needs its own record before any work.
+
+### Alternatives considered
+
+- **One crate, one big module tree:** rejected. Layering can't be checked, and incremental compiles are slower.
+- **Parallelism per rule:** rejected. Each rule would walk the tree again; walking once and dispatching by kind is less work.
+- **An always-on background daemon:** rejected. A surprise process; it stays opt-in, and the LSP doubles as the warm process.
+- **A linked git library (`gix`):** rejected for now. More binary, more surface, for three features the `git` binary already provides.
+- **Following symlinks by default:** rejected. Cycles and duplicate findings in monorepos.
+
+### Reference (required)
+
+- [SR-PACKAGES](0107_packages.md): the crates in each layer.
+- [SR-CACHE](0109_cache.md): what the warm paths reuse.
+- [tree-sitter](https://tree-sitter.github.io/tree-sitter/): incremental re-parsing on edit.
+- [`ignore` crate](https://docs.rs/ignore): gitignore-aware parallel walking (from ripgrep).
+- [`rayon`](https://docs.rs/rayon): the work-stealing pool.
+
+### Veto condition
+
+**Reopen this decision if:** a crate depends on a crate in a lower layer, a rule re-parses a file, a rule failure aborts a run, or the engine performs any network, model, clock or telemetry call.
+
+**How to check it:** the layer check (`B-020`), `codelaw check --timings` showing one parse per file, the rule-panic fixture (`B-026`), and the network fence from SR-LAW-5.
+
+---
+
+## References
+
+*Every source this record cites, gathered in one place. An archived document is never listed here.*
+
+**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-LINTER](0106_linter.md) · [SR-PACKAGES](0107_packages.md) · [SR-CACHE](0109_cache.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md) · [SR-EDITOR](0114_editor.md) · [SR-CLI-MCP](0115_cli-and-mcp.md)
+
+**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

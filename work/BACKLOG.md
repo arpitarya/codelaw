@@ -36,6 +36,19 @@ it, and do not read it top-down as a priority order.
 | B-003 | The registry's decisions 5–8 are enforced by nothing | [SR-WORK-REGISTRY](../records/0060_WORK-registry.md) Consequences | a test over §3, as a `W-nn` |
 | B-004 | A `W-nn` that resolves to neither `work/open/` nor `archive/open/` is caught by nobody | [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) Consequences | a test, as a `W-nn` |
 | B-005 | A second `archive/` directory anywhere is caught by nobody | [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md) decision 1 | a test, as a `W-nn` |
+| B-009 | L3 is checked by nothing: no fixture matrix (nine single-language repos + one combined) and no isolation diff | [SR-LAW-3](../records/0005_LAW-3-languages.md) Consequences | the fixture matrix in CI, as a `W-nn` when the engine lands |
+| B-010 | L4 is checked by nothing: no loader refuses a rule without `fix:`, and no `codelaw test` fix check runs | [SR-LAW-4](../records/0006_LAW-4-every-rule-has-a-fix.md) Consequences | the rule loader and `codelaw test`, as a `W-nn` |
+| B-011 | L5 is checked by nothing: no hook/MCP/CLI parity test, determinism test or network fence | [SR-LAW-5](../records/0007_LAW-5-no-model-in-the-engine.md) Consequences | those three tests, as a `W-nn` |
+| B-012 | L6 is checked by nothing: no version-sync check across `package.json`, `pyproject.toml` and the binary, no install matrix | [SR-LAW-6](../records/0008_LAW-6-python-and-node-packages.md) Consequences | both checks in the release job, as a `W-nn` when the first manifest lands |
+| B-017 | L7 is checked by nothing: no test that every L3 language has a lint engine and a formatter | [SR-LAW-7](../records/0009_LAW-7-linter-and-formatter.md) Consequences | a fixture-matrix assertion, as a `W-nn` when the engine lands |
+| B-018 | L8 is checked by nothing: no `codelaw bench`, no `perf/budgets.toml`, no CI perf gate | [SR-LAW-8](../records/0010_LAW-8-performance-budgets.md) decision 7 | the bench command, the reference workload and the gate, as a `W-nn` when the engine lands |
+| B-020 | No check that crates respect the layer order or that only the SR-PACKAGES names are published | [SR-PACKAGES](../records/0107_packages.md) veto · [SR-ARCHITECTURE](../records/0108_architecture.md) decision 1 | a `cargo metadata` layer check and a release-manifest check, as a `W-nn` |
+| B-021 | No test that a warm or partly deleted cache gives byte-identical output to a cold run | [SR-CACHE](../records/0109_cache.md) decision 7 | the cold/warm/partial fixture test, as a `W-nn` |
+| B-022 | No test that every config key is defined in exactly one record and present in the schema | [SR-CONFIG](../records/0110_config.md) veto | a schema-vs-records test, as a `W-nn` |
+| B-023 | No test that `codelaw init` writes only the paths SR-CONSUMER-LAYOUT lists | [SR-CONSUMER-LAYOUT](../records/0111_consumer-layout.md) veto | an init fixture test, as a `W-nn` |
+| B-024 | No `codelaw rules lint`, and no CI job that promotes a rule to stable only after all four test levels | [SR-RULE-FORMAT](../records/0112_rule-format.md) decision 7 · [SR-RULE-AUTHORING](../records/0113_rule-authoring.md) decision 6 | both, as a `W-nn` |
+| B-026 | No fixture for a rule that panics (run continues, exit 2 at the end) and no stale-socket cleanup test | [SR-ARCHITECTURE](../records/0108_architecture.md) decisions 21 and 25 | both fixtures, as a `W-nn` once the engine exists |
+| B-025 | No parity test across CLI, MCP and LSP over every fixture | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 6 · [SR-EDITOR](../records/0114_editor.md) decision 3 | one parity test, as a `W-nn` |
 | B-008 | L2 is checked by nothing: no licence check runs over any manifest or lockfile | [SR-LAW-2](../records/0004_LAW-2-foss-dependencies.md) Consequences | a licence check over every manifest (Cargo, npm, PyPI) that refuses paid, non-OSI and copyleft licences, run by the guard or CI — as a `W-nn` when the first manifest lands |
 
 ---
@@ -44,6 +57,12 @@ it, and do not read it top-down as a priority order.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
+| B-013 | The project graph's false-positive rate on real repos is unmeasured | [SR-PROJECT-GRAPH](../records/0103_project-graph.md) veto condition | a corpus run over pinned real repos, as a `W-nn` once the graph exists |
+| B-027 | The cold targets (`check_cold_10k` < 20 s, `fix_one_file` < 300 ms cold, `peak_memory_10k` < 1 GiB) are unmeasured design targets | [SR-ARCHITECTURE](../records/0108_architecture.md) decision 29 | the first `codelaw bench` run (B-019) |
+| B-019 | Every L8 budget is `unset`: nothing has been measured to propose numbers from | [SR-LAW-8](../records/0010_LAW-8-performance-budgets.md) decisions 1 and 4 | a first `codelaw bench` run and a budget proposal for the decider to rule on |
+| B-016 | The linter's performance budget (10,000 files < 2 s warm; one file < 100 ms in hook mode) and injection location mapping are unmeasured | [SR-LINTER](../records/0106_linter.md) decision 8 and veto condition | a benchmark run and `codelaw test --injections`, as a `W-nn` once the engine exists |
+| B-015 | How close codelaw's formatting is to Prettier (JS/TS/JSON/YAML/Markdown) and Black (Python) on real code is unmeasured | [SR-FORMATTER](../records/0105_formatter.md) Consequences | a corpus run diffing codelaw against Prettier and Black output, as a `W-nn` once formatting exists |
+| B-014 | Whether count-based baselines let a new use slip in by offsetting a removed one is unmeasured | [SR-BASELINE](../records/0104_baseline-and-deprecations.md) veto condition | a check of CI history once baselines are in use |
 
 ---
 

@@ -24,6 +24,76 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-19 — the decider rules on the whole inbox: L5 and fourteen records accepted; L6 floors 3.11 / 22  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"go with the recommendations for all of them."* (the blocker list with a recommendation per row)
+- **Done:** accepted SR-LAW-5 (banner replaced by the ruling line) and SR-AGENT-SURFACES, SR-PROJECT-GRAPH, SR-BASELINE, SR-FORMATTER, SR-LINTER, SR-PACKAGES, SR-ARCHITECTURE, SR-CACHE, SR-CONFIG, SR-CONSUMER-LAYOUT, SR-RULE-FORMAT, SR-RULE-AUTHORING, SR-EDITOR, SR-CLI-MCP (frontmatter + register). SR-LAW-6 decision 8: host floors Python ≥ 3.11, Node ≥ 22. `CLAUDE.md` L5 line and `docs/DESIGN.md` law table no longer say *(proposed)*. Inbox emptied; W-02 and W-03 🔴 → 🟡; W-01 gains DoD 10 (accept SR-RULE-PACKS after the rewrite). Committed with everything filed since `9baa117`.
+- **Decided / left open:** SR-RULE-PACKS stays proposed until W-01 rewrites it for separately published packs (the ruling: accept after the rewrite). Installing `scripts/sr-guard.sh` as the `commit-msg` hook stays Arpit's step.
+- **Mistakes:** none.
+- **Next:** W-01.
+
+---
+
+## 2026-10-19 — preset research; W-01–W-03 filed to split rules into five packs  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"research the rules preset in ruff, eslint, tslint, prettier, and other and create as separate packages, like 1 for js/ts/node/jsx/tsx, 1 for html, 1 for css, 1 for python and engine will be separate create work item"*
+- **Done:** researched ESLint (`@eslint/js` recommended, 64 rules), typescript-eslint configs, TSLint (deprecated 2019), React hooks, Node, Stencil, oxlint and Biome; Ruff (old default 59 rules, v0.16.0 default 413); stylelint (recommended 41, standard); html-validate presets, HTMLHint, markuplint; markdownlint, SchemaStore, yamllint, taplo; Prettier option defaults. Filed **W-01** (record update, 🟢), **W-02** (engine, 🔴), **W-03** (the five packs + the research, 🔴); the nine-record and SR-LINTER inbox rows now block W-02 and W-03. Glossary: semantic model, native rule. Nothing committed.
+- **Decided / left open:** the decider ruled: **separately published**; mirror every pack on both registries (`@codelaw/rules-*` / `codelaw-rules-*`); a fifth pack `rules-data` for JSON/YAML/TOML/Markdown; `codelaw init` installs detected packs and the engine ships no rules. This session's calls inside the items: one version for engine and packs; reimplement, never vendor; drop layout rules (L7) and type-aware rules (L3); Pylint and yamllint contribute ideas only (GPL). Found a gap no record covered: porting real presets needs a per-file semantic model and `native:` rules — now W-02 DoD 3–4.
+- **Mistakes:** none.
+- **Next:** W-01.
+
+---
+
+## 2026-10-19 — SR-ARCHITECTURE rewritten as the design of record; cross-cutting gaps closed  ·  Cowork (Fable 5.1)
+
+- **Asked:** *"design the architecture fill/resolve the gaps if any."*
+- **Done:** audited the 21 records against each other and rewrote `records/0108_architecture.md` (proposed) to 30 decisions in eight groups. Gaps no record decided, now decided there: file encoding and BOM (8), line endings (9), generated and oversized files (10), glob base (11), safe writes and the LSP never writing (12), position encodings incl. UTF-16 at the LSP boundary (13), git via the `git` binary only (14), lazy embedded regions and the `languages` switch (16), `root = true` as a separate project (17), the external-fixer stdin/stdout contract (18), the adapter manifest and "never in hook/LSP" (19), warm-socket discovery with version equality (21), daemon lifecycle (22), tree-cache memory bound (24), rule-panic isolation (25), `skipped[]` honesty (26), no telemetry (27), what may execute (28), fix-conflict detection (5). Small pointer patches in SR-CONFIG, SR-LINTER, SR-RULE-FORMAT, SR-BASELINE, SR-CLI-MCP, SR-EDITOR, SR-CACHE; `docs/DESIGN.md` §3 now defers to the record. B-026, B-027; two glossary terms. Nothing committed.
+- **Decided / left open:** this session's calls, for the decider to correct: shell out to `git` rather than link a git library; adapters excluded from hook and LSP mode; symlinks not followed; 1 MiB file-size default; daemon stays opt-in. Still undecided by design: a JS rule API, type-aware rules, SCSS/Vue/Svelte. SR-ARCHITECTURE stays in the existing nine-record inbox row.
+- **Mistakes:** the rewrite renumbered decisions, which broke three cross-references in other records; found by grep and fixed in the same change.
+- **Next:** the decider rules on the inbox.
+
+---
+
+## 2026-10-18 — laws L7, L8 and nine records filed; L3, L4, L6 amended  ·  Cowork (Opus)
+
+- **Asked:** *SRs for packages, presets + local rules, VS Code extension + LSP, MCP + CLI, rule authoring (manual or agent skill; debuggable, testable), the rule template, caching, architecture, the config file, the consumer directory; laws for the eleven file types, linter + formatter, fixer-or-skill, one `codelaw` package per registry with `@codelaw/*` sub-packages, and performance budgets that are never broken.*
+- **Done:** SR-LAW-7 (linter + formatter), SR-LAW-8 (performance budgets, values unset); SR-PACKAGES, SR-ARCHITECTURE, SR-CACHE, SR-CONFIG, SR-CONSUMER-LAYOUT, SR-RULE-FORMAT, SR-RULE-AUTHORING, SR-EDITOR, SR-CLI-MCP (proposed). Amended in place by the decider's ruling: SR-LAW-3 (JSX and TSX named explicitly), SR-LAW-4 (a skill carries every manual fix; `fix_skill:`), SR-LAW-6 (naming: only `codelaw` unscoped on npm, `@codelaw/*` for the rest; only `codelaw` on PyPI). SR-RULE-PACKS retitled to cover local rules (no new record: it already owned presets, packs and local rules). Routed in SR-LAWS, the register and `CLAUDE.md` (L4/L6 lines changed, L7/L8 lines added). B-017–B-025; glossary. Nothing committed.
+- **Decided / left open:** the language law, the fixer law and the packages law already existed (L3, L4, L6), so they were amended rather than duplicated. L8 fixes the mechanism now and leaves every number `unset` until measured (B-019). The nine records are one inbox row.
+- **Mistakes:** none.
+- **Next:** the decider rules on the inbox.
+
+---
+
+## 2026-10-18 — SR-LINTER filed; L3 amended to nine languages  ·  Cowork (Opus)
+
+- **Asked:** *"create an SR for linter as well. The linter and formatter are going to work for JavaScript, TypeScript, JSON, Python, CSS, HTML."*
+- **Done:** SR-LINTER (`records/0106_linter.md`, proposed). SR-LAW-3 amended to nine languages (CSS, HTML added). CSS/HTML carried into SR-RULE-PACKS (presets + 8 starter rules), SR-FORMATTER (Biome CSS, `markup_fmt` for HTML), SR-PROJECT-GRAPH (`graph/no-unused-css-classes`, HTML link edges), SR-AGENT-SURFACES (skill trigger), `docs/DESIGN.md`, SR-LAWS, the register and `CLAUDE.md` (L3 pointer line changed). B-016; glossary "embedded region". Nothing committed.
+- **Decided / left open:** the ask named six languages without YAML/TOML/Markdown; the decider ruled **add CSS and HTML, keep all seven** (nine). SCSS/Sass/Less and Vue/Svelte/Angular templates stay out of scope. Ruling on SR-LINTER filed in the inbox.
+- **Mistakes:** none.
+- **Next:** the decider rules on the eight inbox rows.
+
+---
+
+## 2026-10-18 — SR-FORMATTER filed: codelaw is a linter and a formatter  ·  Cowork (Opus)
+
+- **Asked:** *"Create an SR that linter code law will be a linter as well as a prettier."*
+- **Done:** SR-FORMATTER (`records/0105_formatter.md`, proposed); register row, inbox row, B-015, glossary term "layout rule", `docs/DESIGN.md` link and config sample. Nothing committed.
+- **Decided / left open:** engines embedded, not shelled out (L3/L6): Biome for JS/TS/JSON (Prettier-compatible), Ruff for Python (Black-compatible), pretty_yaml, taplo, dprint-plugin-markdown — all permissive (L2). Biome and Ruff are git-pinned because their crates.io copies are stale or internal. Layout-only lint rules are refused. Ruling filed in the inbox.
+- **Mistakes:** none.
+- **Next:** the decider rules on the seven inbox rows.
+
+---
+
+## 2026-10-18 — laws L3–L6 and four design records filed  ·  Cowork (Opus)
+
+- **Asked:** *create laws (languages; every rule has a fix; Python and Node packages), decide how predefined rules ship, an SR for the skills (the whole agent-facing set), then the mechanisms for unused exports across a monorepo and deprecations with a grandfathering file.*
+- **Done:** SR-LAW-3 (languages), SR-LAW-4 (fix), SR-LAW-5 (no model in the engine, proposed), SR-LAW-6 (PyPI + npm); SR-RULE-PACKS, SR-AGENT-SURFACES, SR-PROJECT-GRAPH, SR-BASELINE (all proposed); routed in SR-LAWS, the register and `CLAUDE.md` §The laws (four pointer lines added — `CLAUDE.md` changed); `docs/DESIGN.md` links the laws; B-009–B-014; glossary terms. Nothing committed.
+- **Decided / left open:** predefined rules embedded in the binary as presets (the decider left the choice open); yamllint dropped as an adapter (GPL-3.0, refused by L2); host floors Python ≥ 3.9 / Node ≥ 18 are this session's reading. Six rulings filed in the inbox.
+- **Mistakes:** this session first wrote its laws as `0001`–`0004` / L1–L4 without seeing the work system set up minutes earlier, and overwrote the uncommitted-in-its-turn `records/README.md`. Caught by listing the folder before the next write; the register was restored from `HEAD`, the laws renumbered to `0005`–`0008` / L3–L6, and the four misnumbered files removed.
+- **Next:** the decider rules on the six inbox rows.
+
+---
+
 ## 2026-10-18 — law L2 filed  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"add a new law to not use paid and open source dependencies."*

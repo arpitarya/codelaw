@@ -23,7 +23,7 @@ here. Read that record before changing anything below it.
 | what the decider decides | filed | age |
 |---|---|---|
 
-*Empty since 2026-10-18 — nothing waits on a ruling; the next gate is the first item filed.*
+*Empty since 2026-10-19 — every row ruled ("go with the recommendations"); SR-RULE-PACKS is accepted once W-01 rewrites it.*
 
 ---
 
@@ -31,9 +31,14 @@ here. Read that record before changing anything below it.
 
 ### build
 
+🟡 **W-02** `agent` Build the engine the rule packs run on — P0 crates, semantic model, native rules, pack loading; waiting on W-01. Filed by Arpit (Cowork). [detail](open/W-02-engine-p0.md)
+🟡 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets; waiting on W-02. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
+
 ### testing
 
 ### record update
+
+🟢 **W-01** `agent` Rewrite L6 and seven records so rules ship as five separately published packs (npm `@codelaw/rules-*`, PyPI `codelaw-rules-*`) apart from the engine. Filed by Arpit (Cowork). [detail](open/W-01-rule-pack-records.md)
 
 ### research
 

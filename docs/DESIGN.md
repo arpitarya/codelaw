@@ -1,6 +1,6 @@
 # codelaw — Design Proposal
 
-> A rules-as-markdown linter for TS / React / Stencil / Python / JSON / YAML / TOML, with deterministic auto-fix, that AI coding agents can query *before* writing code and are forced through *after* writing it.
+> A rules-as-markdown linter and formatter for JS / TS / React / Stencil / Python / JSON / YAML / TOML / Markdown / CSS / HTML, with deterministic auto-fix. It runs on its own with no AI involved, and AI coding agents can also query it *before* writing code and are forced through it *after* writing.
 
 Status: proposal · Date: 2026-10-18 · Owner: Arpit
 
@@ -9,13 +9,48 @@ Status: proposal · Date: 2026-10-18 · Owner: Arpit
 ## 1. TL;DR
 
 - **One Rust core, two thin wrappers.** Ship a native binary to **npm** and **PyPI**, the way Ruff, Biome, oxlint and ast-grep do. Works in Python-only, Node-only and mixed repos with identical results, and needs neither runtime to be installed for the other.
-- **Don't write parsers.** Build on **tree-sitter + `ast-grep-core`**. One CST model covers TS, TSX (React and Stencil), Python, JSON and YAML. Add the tree-sitter TOML grammar yourself, since ast-grep doesn't ship TOML.
+- **Runs with or without AI.** The engine contains no model. The terminal, pre-commit, CI and the editor all work with no agent present. Agents are just one more way of calling the same engine, and they get the same answers.
+- **JS, TS and Python, combined or on their own.** A Python-only repo, a JS/TS-only repo and a mixed repo all run the same binary. Each language can be switched on or off independently. See [L3](../records/0005_LAW-3-languages.md).
+- **Don't write parsers.** Build on **tree-sitter + `ast-grep-core`**. One CST model covers JS, JSX, TS, TSX (React and Stencil), Python, JSON, YAML, Markdown, CSS and HTML. Add the tree-sitter TOML grammar yourself, since ast-grep doesn't ship TOML.
 - **A rule is one Markdown file.** Frontmatter holds the metadata, a fenced block holds the matcher and fix, and `Do` / `Don't` code blocks hold the examples. That one file is read by humans, read by agents and run by the engine. The examples double as the rule's test suite, so the docs can't drift from the behaviour.
 - **Fixes are declarative edit primitives.** Each fix is a list of LSP-style text edits on the CST: `replace`, `remove`, `insert`, `move-to-end`, `collect-into-block`, and so on. "Move exports to the end" is a built-in primitive, not custom code. For anything else there's an escape hatch: an external fixer, in any language, speaking JSON over stdin/stdout.
 - **Agents get two channels:**
   1. **Guidance (before writing):** an MCP server (`codelaw mcp`), a CLI (`codelaw rules --for <file>`), and generated instruction files (AGENTS.md, CLAUDE.md, Kiro steering, Copilot instructions).
   2. **Enforcement (after writing):** hooks in Claude Code, Copilot, Codex and Kiro that run `codelaw fix` on every file the agent touches and send any remaining violations back to the agent.
 - **Principle:** guidance is probabilistic and enforcement is deterministic. The agent querying rules first cuts churn; the hooks and auto-fix are what guarantee compliance.
+
+---
+
+## Laws and records
+
+The hard requirements are stated as **laws** in [`records/`](../records/README.md). This document links to them and doesn't restate them.
+
+| Law | One line |
+|---|---|
+| [L2](../records/0004_LAW-2-foss-dependencies.md) | Every dependency is free, open source and permissive (from the work-system setup) |
+| [L3](../records/0005_LAW-3-languages.md) | JS, TS, Python, JSON, YAML, TOML, Markdown, CSS and HTML, each alone or in any combination |
+| [L4](../records/0006_LAW-4-every-rule-has-a-fix.md) | Every rule has a fix: `auto` wherever safe, otherwise `suggest` (diff) or `manual` (written steps, carried by a skill) |
+| [L5](../records/0007_LAW-5-no-model-in-the-engine.md) | No model in the engine; works the same with or without an agent |
+| [L6](../records/0008_LAW-6-python-and-node-packages.md) | One release: `codelaw` on PyPI and npm, each complete, identical output; npm sub-packages only as `@codelaw/*` |
+| [L7](../records/0009_LAW-7-linter-and-formatter.md) | Always both a linter and a formatter, for every L3 language |
+| [L8](../records/0010_LAW-8-performance-budgets.md) | Performance budgets: set from measurement, never exceeded, never loosened |
+
+Feature decisions:
+- [SR-RULE-PACKS](../records/0101_rule-packs.md): built-in presets, team packs and local rules.
+- [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md): skills, steering, instructions, hooks.
+- [SR-PROJECT-GRAPH](../records/0103_project-graph.md): cross-file rules over a whole-repo symbol graph.
+- [SR-BASELINE](../records/0104_baseline-and-deprecations.md): grandfathering with deadlines, touch policy and deprecations.
+- [SR-LINTER](../records/0106_linter.md): the lint engine: nine languages, file/project/adapter rules, embedded code in HTML and Markdown.
+- [SR-FORMATTER](../records/0105_formatter.md): codelaw also formats (Prettier-style JS/TS/JSON, Black-style Python), with embedded engines.
+- [SR-PACKAGES](../records/0107_packages.md): every crate and published package, and what goes in each.
+- [SR-ARCHITECTURE](../records/0108_architecture.md): layers, parse-once data flow, concurrency, process model.
+- [SR-CACHE](../records/0109_cache.md): content-addressed caches that never change output.
+- [SR-CONFIG](../records/0110_config.md): the configuration file: homes, sections, precedence, validation.
+- [SR-CONSUMER-LAYOUT](../records/0111_consumer-layout.md): what codelaw adds to a consumer repo.
+- [SR-RULE-FORMAT](../records/0112_rule-format.md): the rule-file template.
+- [SR-RULE-AUTHORING](../records/0113_rule-authoring.md): writing rules by hand or with an agent; debugging and testing.
+- [SR-EDITOR](../records/0114_editor.md): the LSP server and the VS Code extension.
+- [SR-CLI-MCP](../records/0115_cli-and-mcp.md): the CLI and the MCP server.
 
 ---
 
@@ -32,7 +67,7 @@ Status: proposal · Date: 2026-10-18 · Owner: Arpit
 | **Fixit 2** (Meta) | Python | Python rules on LibCST, with in-repo local rules | Yes, preserves formatting | – | Good model for "rules live in the repo". Python only, slower. |
 | **ast-grep** | 25+ languages incl. TS, TSX, Python, JSON, YAML (**no TOML built in**) | YAML rules: pattern + relational (`inside`, `has`, `precedes`, `follows`) | `fix` templates + `transform` | **MCP server** (`find_code`, `find_code_by_rule`, `test_match_code_rule`, `dump_syntax_tree`) | **Closest fit for the engine.** Rust, tree-sitter, on npm and PyPI already. Its `fix` only rewrites the matched node, so it can't *move* code. That gap is codelaw's to fill. |
 | **Semgrep** | 30+ | YAML rules | `fix` / `fix-regex` | MCP server | Security-focused and heavy (OCaml + Python). Same single-node fix limit. |
-| **yamllint / taplo / tombi / markdownlint-cli2** | YAML / TOML / MD | Mostly config, not custom logic | Formatting only | – | Use as **adapters**, not rebuilds. |
+| **yamllint / taplo / tombi / markdownlint-cli2** | YAML / TOML / MD | Mostly config, not custom logic | Formatting only | – | taplo, tombi and markdownlint-cli2 can be **adapters**. yamllint is GPL-3.0, so [L2](../records/0004_LAW-2-foss-dependencies.md) rules it out; YAML checks are native. |
 | **@stencil/eslint-plugin** | Stencil TSX | ESLint rules | Some | – | Use as an adapter for the Stencil-specific best-practice rules. |
 
 ### 2.2 What to steal
@@ -54,6 +89,8 @@ Status: proposal · Date: 2026-10-18 · Owner: Arpit
 
 ## 3. Architecture
 
+> **The design of record is [SR-ARCHITECTURE](../records/0108_architecture.md).** This section is the original sketch; where they differ, the record wins.
+
 ```
                  ┌──────────────── .codelaw/rules/*.md ────────────────┐
                  │  frontmatter + matcher/fix block + Do/Don't examples │
@@ -66,7 +103,7 @@ Status: proposal · Date: 2026-10-18 · Owner: Arpit
 │             → Edit applier (non-overlapping, multi-pass to fixpoint)     │
 │             → Verifier (re-parse: no new syntax errors, idempotent)      │
 │  Structured-file engine: JSON/YAML/TOML via CST + path assertions/schema │
-│  Adapter host: oxlint/eslint, ruff, yamllint, taplo, markdownlint → normalise │
+│  Adapter host: oxlint/eslint, ruff, taplo, markdownlint → normalise            │
 │  Cache: content-hash per file × rule-set hash                            │
 └──────┬──────────────┬───────────────┬──────────────┬──────────────┬──────┘
        │ CLI          │ MCP (stdio)   │ LSP          │ hook mode    │ SARIF/JSON
@@ -101,11 +138,11 @@ Status: proposal · Date: 2026-10-18 · Owner: Arpit
 ---
 id: ts/exports-at-end
 title: Exports go at the end of the file
-languages: [typescript, tsx]
-files: ["src/**/*.{ts,tsx}"]
+languages: [javascript, jsx, typescript, tsx]
+files: ["src/**/*.{js,jsx,ts,tsx}"]
 exclude: ["**/*.stories.tsx"]
 severity: error            # error | warn | info
-fix: safe                  # safe | unsafe | none
+fix: auto                  # auto | suggest | manual  (L4)
 tags: [style, modules]
 ---
 
@@ -166,9 +203,9 @@ export interface Point { x: number }
   4. Re-parse.
   5. Repeat until a fixpoint, or stop after 10 passes.
 - **Verifier:** if a fix introduces a parse error, or a second run changes the file again, roll back that rule's fix and report it as a non-fixable diagnostic. The tool must never corrupt a file.
-- **Safety tiers:** `safe` fixes are applied by `codelaw fix`. `unsafe` fixes are applied only with `--unsafe`, or offered to agents as a *suggestion* with a diff.
+- **Fix classes** ([L4](../records/0006_LAW-4-every-rule-has-a-fix.md)): `auto` fixes are applied by `codelaw fix`; `suggest` fixes are applied only with `--unsafe` or offered to agents as a diff; `manual` rules carry written steps.
 - **Escape hatch:** `fix: { external: "node scripts/my-fixer.mjs" }`. The fixer gets JSON (file, matches, captures) on stdin and returns `TextEdit[]` on stdout. It can be written in any language, and the core still verifies the result.
-- **Formatting:** codelaw doesn't format. After fixing, it can optionally run the project's formatter (`prettier`, `ruff format`) via config.
+- **Formatting:** codelaw formats too ([SR-FORMATTER](../records/0105_formatter.md)): `codelaw fix` runs lint fixes, then the built-in formatter, then verifies.
 
 ### 3.4 Worked example: exports-at-end fix
 
@@ -177,7 +214,7 @@ export interface Point { x: number }
 | `export function f() {}` | `function f() {}` … `export { f };` |
 | `export const a = 1, b = 2;` | `const a = 1, b = 2;` … `export { a, b };` |
 | `export interface P {}` / `export type T = …` | declaration kept; `export type { P, T };` |
-| `export default function () {}` (anonymous) | **unsafe**: needs a generated name → suggestion only |
+| `export default function () {}` (anonymous) | **suggest**: needs a generated name, so it is a suggestion only |
 | `export default foo;` / `export * from './x'` / `export { a } from './x'` | left alone; re-exports are already "export statements", configurable |
 | An existing `export { x }` mid-file | merged into the end block |
 | JSDoc above `export function` | stays attached to the declaration (the edit only strips the `export ` token) |
@@ -206,7 +243,7 @@ fix:
 
 ### 3.6 Adapters (don't rebuild the world)
 
-- codelaw runs these if they're installed and **normalises** their output into one diagnostic stream: oxlint or ESLint, Ruff, `@stencil/eslint-plugin`, yamllint, taplo or tombi, markdownlint-cli2.
+- codelaw runs these if they're installed and **normalises** their output into one diagnostic stream: oxlint or ESLint, Ruff, `@stencil/eslint-plugin`, taplo or tombi, markdownlint-cli2. Every adapter must pass [L2](../records/0004_LAW-2-foss-dependencies.md) (permissive licence only).
 - Agents then query **one tool** for everything.
 - codelaw-native rules are for *your* conventions. Standard hygiene stays with the specialist tools.
 - Type-aware rules (for example, floating promises) need a type checker. Delegate them to typescript-eslint/oxlint type-aware mode and to pyright/mypy; tree-sitter has no types.
@@ -217,9 +254,10 @@ fix:
 
 ```toml
 rules_dir = ".codelaw/rules"
+languages = ["javascript", "jsx", "typescript", "tsx", "python"]   # omit = all detected
 extends = ["@acme/codelaw-rules"]          # shareable rule packs (npm or PyPI)
-adapters = ["oxlint", "ruff", "yamllint"]
-format_after_fix = ["prettier --write", "ruff format"]
+adapters = ["oxlint", "ruff", "markdownlint"]
+# formatting is built in — see [format] in SR-FORMATTER; no external tools
 
 [[overrides]]
 files = ["src/components/**/*.tsx"]       # Stencil components
@@ -264,7 +302,7 @@ disable = ["ts/exports-at-end"]
 codelaw hook --fix --changed <file(s) from hook payload> --format agent
 ```
 
-- Auto-applies **safe** fixes silently, so the agent's file is already correct.
+- Auto-applies **`auto`** fixes silently, so the agent's file is already correct.
 - If violations remain, it prints a compact report (rule id, line, message, Do example) and **exits non-zero**, so the agent sees it and corrects itself.
 - Target latency: **under 100 ms per file**. That means one file, a cached rule set and no adapter runs; adapters run only in `check` or CI.
 
@@ -290,7 +328,7 @@ codelaw hook --fix --changed <file(s) from hook payload> --format agent
 ## 5. CLI surface
 
 ```
-codelaw check [paths]   [--format text|json|sarif|agent]
+codelaw check [paths]   [--lang js,ts,python] [--format text|json|sarif|agent]
 codelaw fix   [paths]   [--unsafe] [--dry-run → unified diff]
 codelaw rules [--for <path>] [--format md|json]
 codelaw explain <rule-id>
@@ -311,9 +349,9 @@ Exit codes: `0` clean · `1` violations · `2` config or rule error.
 
 | Phase | Scope | Exit criteria |
 |---|---|---|
-| **P0 — Engine spike (1–2 wks)** | Rust core on `ast-grep-core`. Markdown rule loader. `check`, `fix`, `test`. TS, TSX and Python. Primitives: `replace`, `remove`, `strip-export-keyword`, `collect-into-block`. 3 rules incl. `ts/exports-at-end`. | All Do/Don't examples pass. Fix is idempotent on a real repo. |
+| **P0 — Engine spike (1–2 wks)** | Rust core on `ast-grep-core`. Markdown rule loader. `check`, `fix`, `test`. JS, JSX, TS, TSX and Python, each runnable alone. The no-AI CLI path ships first. Primitives: `replace`, `remove`, `strip-export-keyword`, `collect-into-block`. 3 rules incl. `ts/exports-at-end`. | All Do/Don't examples pass. Fix is idempotent on a real repo. |
 | **P1 — Agent layer** | `codelaw mcp`, `hook` mode, `init --agents`, `sync-agents`. Claude Code skill. | Claude Code writes a function in a fresh file and the export lands at the end, with or without a hook-triggered fix. |
-| **P2 — Configs + adapters** | JSON, YAML and TOML CST + path assertions. Adapters for oxlint, Ruff, yamllint, taplo, markdownlint. SARIF output. | One `codelaw check` covers a mixed repo. |
+| **P2 — Configs + adapters** | JSON, YAML and TOML CST + path assertions. Adapters for oxlint, Ruff, taplo, markdownlint. SARIF output. | One `codelaw check` covers a mixed repo. |
 | **P3 — Distribution + IDE** | npm (optionalDependencies per platform) + PyPI (maturin wheels). `codelaw lsp`. Caching. Shareable rule packs. | `npx codelaw` and `uvx codelaw` give byte-identical output. |
 | **P4 — Plugins** | External fixer protocol hardening. Optional ESLint-compatible JS rule API (oxlint-style). | Your team ships a rule pack without touching Rust. |
 
@@ -323,7 +361,7 @@ Exit codes: `0` clean · `1` violations · `2` config or rule error.
 
 | Risk | Mitigation |
 |---|---|
-| A fix corrupts code (moves comments, breaks semantics) | Re-parse + idempotency verifier, rollback per rule, safe/unsafe tiers, `--dry-run` diffs, golden tests from Do/Don't. |
+| A fix corrupts code (moves comments, breaks semantics) | Re-parse + idempotency verifier, rollback per rule, auto/suggest/manual classes, `--dry-run` diffs, golden tests from Do/Don't. |
 | Rule conflicts with frameworks (Stencil exports, Next.js `export default` pages, React Fast Refresh) | Per-glob overrides. Ship presets (`preset:stencil`, `preset:next`) that pre-disable conflicting rules. |
 | Agents ignore guidance | Don't depend on it. Hooks + auto-fix are the guarantee; guidance only reduces churn. |
 | Hook latency annoys users | Single-file mode, cached rule set, no adapters in hook mode, 100 ms budget tested in CI. |
