@@ -15,6 +15,7 @@ mod literals;
 mod no_undef;
 mod no_unreachable;
 mod regexp;
+mod typescript;
 mod unused_vars;
 mod useless_assignment;
 mod useless_escape;
@@ -63,6 +64,7 @@ const TS_ONLY: &[Language] = &[Language::Typescript, Language::Tsx];
 
 static JS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "js/no-unused-vars", languages: JS_ONLY };
 static TS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "ts/no-unused-vars", languages: TS_ONLY };
+static TS_NO_UNUSED_EXPRESSIONS: typescript::NoUnusedExpressions = typescript::NoUnusedExpressions { id: "ts/no-unused-expressions", languages: TS_ONLY };
 
 /// Sorted by id.
 static REGISTRY: &[&dyn NativeRule] = &[
@@ -93,7 +95,14 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &useless_assignment::NoUselessAssignment,
     &regexp::NoUselessBackreference,
     &useless_escape::NoUselessEscape,
+    &typescript::NoVar,
+    &typescript::PreferConst,
+    &typescript::NoDuplicateEnumValues,
+    &typescript::NoUnsafeDeclarationMerging,
+    &TS_NO_UNUSED_EXPRESSIONS,
     &TS_NO_UNUSED_VARS,
+    &typescript::NoWrapperObjectTypes,
+    &typescript::PreferAsConst,
 ];
 
 /// Every registered native rule, sorted by id.

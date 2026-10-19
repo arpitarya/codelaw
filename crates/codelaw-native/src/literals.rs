@@ -176,7 +176,9 @@ impl NativeRule for NoUnexpectedMultiline {
             "call_expression" => {
                 let (Some(f), Some(a)) = (n.child_by_field_name("function"), n.child_by_field_name("arguments")) else { return };
                 let what = if a.kind() == "template_string" { "a tagged template" } else { "a function call" };
-                (f, a, what)
+                // `f<{…}>()`: the call's head ends with its type arguments.
+                let head = n.child_by_field_name("type_arguments").unwrap_or(f);
+                (head, a, what)
             }
             _ => {
                 let Some(o) = n.child_by_field_name("object") else { return };
@@ -340,6 +342,7 @@ mod tests {
         let src = "let\u{00A0}x = 1; const s = \"a\u{00A0}b\";";
         assert_eq!(crate::run(&NoIrregularWhitespace, Language::Javascript, src).len(), 1);
         assert_eq!(found(&NoUnexpectedMultiline, "let a = b\n(c || d).go();\nlet e = f\n[1, 2].map(g);\nlet ok = h(\n  1);\n"), ["(", "["]);
+        assert!(crate::run(&NoUnexpectedMultiline, Language::Typescript, "check<{\n  a: string;\n}>();\n").is_empty());
     }
 
     #[test]

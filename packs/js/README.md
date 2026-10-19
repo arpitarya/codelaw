@@ -16,6 +16,13 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | preset | rules | ported from |
 |---|---|---|
 | `js/recommended` | 64 | ESLint `js.configs.recommended`, `@eslint/js` 10.0.1 — all 64 rules |
+| `ts/recommended` | 24 | typescript-eslint `recommended` 8.71.2 (not type-checked) — all 20 rules — plus the four core rules its `eslint-recommended` switches on for TypeScript: `js/no-var`, `js/prefer-const`, `js/prefer-rest-params`, `js/prefer-spread` |
+
+Rules that typescript-eslint's `eslint-recommended` switches off for TypeScript
+(`no-undef`, `no-redeclare`, `no-dupe-class-members` and the rest, which the
+compiler checks) declare only `javascript` and `jsx` here. The four core rules
+`ts/recommended` adds declare all four languages, so they also run on
+JavaScript files when that preset is on.
 
 Every rule is **reimplemented**, not vendored: the matchers, messages and docs
 are written fresh, and each rule's `ported_from:` names the source rule.
@@ -35,10 +42,15 @@ section says so. The larger ones:
 | `js/no-useless-assignment` | dead stores a straight-line reading proves; ESLint follows every code path |
 | `js/no-useless-escape` | strings and templates; escapes inside regular expressions are not checked yet |
 | `js/no-undef` | environments come from the `env` option (`shared-node-browser` by default), using the `globals` data tables |
+| `ts/no-unused-expressions` | `x satisfies T;` is a compile-time type test and is allowed |
+| `js/prefer-spread` | only `f.apply(null, args)` on a plain function name |
+| `js/no-var` | `suggest`, not `auto`: `let` is block-scoped, so the swap can change meaning |
 
 ## Not ported, and why
 
-Nothing from `js.configs.recommended` is left out.
+Nothing from `js.configs.recommended` or typescript-eslint's non-type-checked
+`recommended` is left out. Every `*-type-checked` typescript-eslint config is
+out of scope: those rules need type information (L3).
 
 ## Data
 
