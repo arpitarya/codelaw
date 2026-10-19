@@ -14,8 +14,10 @@ mod expressions;
 mod literals;
 mod no_undef;
 mod no_unreachable;
+mod node;
 mod react;
 mod regexp;
+mod stencil;
 mod typescript;
 mod unused_vars;
 mod useless_assignment;
@@ -98,11 +100,28 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &useless_escape::NoUselessEscape,
     &typescript::NoVar,
     &typescript::PreferConst,
+    &node::NoDeprecatedApi,
     &react::ExhaustiveDeps,
     &react::JsxNoDuplicateProps,
     &react::NoUnknownProperty,
     &react::RequireRenderReturn,
     &react::RulesOfHooks,
+    &stencil::BanDefaultTrue,
+    &stencil::BanExportedConstEnums,
+    &stencil::BanPrefix,
+    &stencil::DecoratorsContext,
+    &stencil::HostDataDeprecated,
+    &stencil::MethodsMustBePublic,
+    &stencil::NoUnusedWatch,
+    &stencil::OwnMethodsMustBePrivate,
+    &stencil::OwnPropsMustBePrivate,
+    &stencil::PreferVdomListener,
+    &stencil::PropReadonly,
+    &stencil::PropsMustBePublic,
+    &stencil::RequiredJsdoc,
+    &stencil::ReservedMemberNames,
+    &stencil::StrictMutable,
+    &stencil::TagPrefix,
     &typescript::NoDuplicateEnumValues,
     &typescript::NoUnsafeDeclarationMerging,
     &TS_NO_UNUSED_EXPRESSIONS,

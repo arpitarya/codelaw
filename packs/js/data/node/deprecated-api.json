@@ -1,0 +1,83 @@
+{
+ "buffer": {
+  "Buffer": "the global `Buffer` with `Buffer.from()` or `Buffer.alloc()`",
+  "SlowBuffer": "`Buffer.allocUnsafeSlow()`"
+ },
+ "constants": {
+  "*": "`fs.constants` or `os.constants`"
+ },
+ "crypto": {
+  "Credentials": "`tls.SecureContext`",
+  "DEFAULT_ENCODING": "an explicit encoding argument",
+  "createCipher": "`crypto.createCipheriv()`",
+  "createDecipher": "`crypto.createDecipheriv()`",
+  "fips": "`crypto.getFips()` / `crypto.setFips()`",
+  "prng": "`crypto.randomBytes()`",
+  "pseudoRandomBytes": "`crypto.randomBytes()`",
+  "rng": "`crypto.randomBytes()`"
+ },
+ "domain": {
+  "*": "`async_hooks` (`AsyncLocalStorage`) or explicit error handling"
+ },
+ "events": {
+  "listenerCount": "`emitter.listenerCount()`"
+ },
+ "fs": {
+  "SyncWriteStream": "a `fs.WriteStream`",
+  "exists": "`fs.stat()` or `fs.access()`",
+  "lchmod": "`fs.chmod()`",
+  "lchmodSync": "`fs.chmodSync()`"
+ },
+ "globals": {
+  "Buffer": "`Buffer.from()`, `Buffer.alloc()` or `Buffer.allocUnsafe()`"
+ },
+ "module": {
+  "_debug": "`util.debuglog()`",
+  "createRequireFromPath": "`module.createRequire()`"
+ },
+ "os": {
+  "getNetworkInterfaces": "`os.networkInterfaces()`",
+  "tmpDir": "`os.tmpdir()`"
+ },
+ "path": {
+  "_makeLong": "`path.toNamespacedPath()`"
+ },
+ "punycode": {
+  "*": "the `punycode` package from npm, or `url.domainToASCII()`"
+ },
+ "sys": {
+  "*": "`util`"
+ },
+ "tls": {
+  "SecurePair": "`tls.TLSSocket`",
+  "createSecurePair": "`tls.TLSSocket`"
+ },
+ "url": {
+  "parse": "the WHATWG `new URL()`",
+  "resolve": "`new URL(input, base)`"
+ },
+ "util": {
+  "_extend": "`Object.assign()`",
+  "debug": "`util.debuglog()`",
+  "error": "`console.error()`",
+  "isArray": "`Array.isArray()`",
+  "isBoolean": "`typeof value === \"boolean\"`",
+  "isBuffer": "`Buffer.isBuffer()`",
+  "isDate": "`value instanceof Date`",
+  "isError": "`value instanceof Error`",
+  "isFunction": "`typeof value === \"function\"`",
+  "isNull": "`value === null`",
+  "isNullOrUndefined": "`value == null`",
+  "isNumber": "`typeof value === \"number\"`",
+  "isObject": "`value !== null && typeof value === \"object\"`",
+  "isPrimitive": "a `typeof` check",
+  "isRegExp": "`value instanceof RegExp`",
+  "isString": "`typeof value === \"string\"`",
+  "isSymbol": "`typeof value === \"symbol\"`",
+  "isUndefined": "`value === undefined`",
+  "log": "`console.log()`",
+  "print": "`console.log()`",
+  "pump": "`stream.pipeline()`",
+  "puts": "`console.log()`"
+ }
+}

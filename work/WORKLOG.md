@@ -24,6 +24,20 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-19 — W-03 in part: js, ts and react presets; Stencil and Node natives; subagents on python and css  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement open work items"*, then *"continue"*, then *"commit everything and push"*.
+- **Done:**
+  - `packs/js`: `js/recommended` (all 64 of ESLint 10.0.1), `ts/recommended` (typescript-eslint 8.71.2's 20 plus four core rules), `react/recommended` (17 of eslint-plugin-react 7.37.5, plus `rules-of-hooks` and `exhaustive-deps`) — 107 rules, `codelaw test packs/js` green.
+  - Native rules for those, plus 16 Stencil rules and `node/no-deprecated-api` with a data table; their rule files are not written yet.
+  - Engine: five predicates, data tables for natives, kinds missing from a grammar match nothing, duplicate YAML keys refused, empty `$$$` captures.
+  - Corpus runs over npm's source, zod/ajv/TanStack sources and react-query: false-positive patterns found and fixed with tests; real defects found in `@npmcli/agent` and `node-gyp`.
+- **Decided / left open:** every pack rule is `preview` (SR-RULE-AUTHORING decision 6), so presets need `preview = true` until a corpus job promotes them — for the decider to confirm. The project's own licence is undecided, so packs have no `LICENSE`; it blocks only publishing (W-03 step 6).
+- **Mistakes:** I repeatedly wrote duplicate YAML keys in rule specs; the loader now refuses them. Both pack subagents stopped on a usage limit; the Python one is restarted, the CSS one resumed — both still running, in worktrees, uncommitted.
+- **Next:** the Stencil and Node rule files and presets; then review and merge the python and css branches.
+
+---
+
 ## 2026-10-19 — W-02: the engine — 13 crates, the `codelaw` binary, the law checks  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement open work items"* — the queue's 🟢 pick was W-02 (W-03 waited on it).
