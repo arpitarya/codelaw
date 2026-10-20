@@ -3,7 +3,7 @@
 
 use crate::LoadError;
 use crate::engine_rules::engine_rule;
-use crate::pack::{ExtendsSpec, PackSearch, RulePack, load_pack, load_rules_dir};
+use crate::pack::{ExtendsSpec, FIRST_PARTY_PACKS, PackSearch, RulePack, load_pack_from, load_rules_dir};
 use crate::rule::{RESERVED_NAMESPACES, RuleFile, Stability};
 use codelaw_cache::{Key, KeyBuilder};
 use codelaw_config::{Config, Layer, RuleConfig, RuleSetting};
@@ -130,9 +130,15 @@ impl RuleSet {
                 errors.push(LoadError::new(config_file.clone(), msg));
                 continue;
             };
+            let first_party_origin = match &spec {
+                ExtendsSpec::FirstParty { .. } => true,
+                ExtendsSpec::Npm(name) => FIRST_PARTY_PACKS.iter().any(|p| p.1 == name),
+                ExtendsSpec::Pypi(name) => FIRST_PARTY_PACKS.iter().any(|p| p.2 == name.to_ascii_lowercase().replace(['_', '.'], "-")),
+                ExtendsSpec::Path(_) => false,
+            };
             let pack = match loaded_packs.iter().find(|(d, _)| *d == dir) {
                 Some((_, p)) => p.clone(),
-                None => match load_pack(&dir) {
+                None => match load_pack_from(&dir, first_party_origin) {
                     Ok(p) => {
                         let p = Arc::new(p);
                         key.push(p.label());

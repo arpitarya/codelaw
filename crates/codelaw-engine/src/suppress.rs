@@ -19,12 +19,14 @@ pub struct Suppression {
     pub used: bool,
 }
 
-const MARKER: &str = "codelaw-ignore";
+pub(crate) const MARKER: &str = "codelaw-ignore";
 
-/// Parse one comment's text, if it carries the marker.
+/// Parse one comment's text, if it carries the marker. The marker opens
+/// the comment, after its delimiter (`//`, `#`, `/*`, `/**`, `*`, `<!--`):
+/// a comment that only mentions it (`// see codelaw-ignore docs`) is prose.
 fn parse(comment: &str) -> Option<(Vec<String>, Option<String>)> {
-    let at = comment.find(MARKER)?;
-    let rest = &comment[at + MARKER.len()..];
+    let body = comment.trim_start().trim_start_matches(['/', '#', '*', '<', '!', '-']).trim_start();
+    let rest = body.strip_prefix(MARKER)?;
     // `codelaw-ignore-file` and the like are not this marker.
     if rest.starts_with(|c: char| c.is_alphanumeric() || c == '-' || c == '_') {
         return None;
@@ -89,6 +91,11 @@ mod tests {
         assert_eq!(parse("<!-- codelaw-ignore html/x:   -->"), Some((vec!["html/x".into()], None)));
         assert_eq!(parse("# codelaw-ignore-file x: y"), None);
         assert_eq!(parse("# a note"), None);
+        // Only a comment that opens with the marker is a suppression.
+        assert_eq!(parse("// see codelaw-ignore docs"), None);
+        assert_eq!(parse("# TODO: drop the codelaw-ignore x/y: z"), None);
+        assert_eq!(parse("/** codelaw-ignore js/a: b */"), Some((vec!["js/a".into()], Some("b".into()))));
+        assert_eq!(parse("#codelaw-ignore py/a: b"), Some((vec!["py/a".into()], Some("b".into()))));
     }
 
     #[test]

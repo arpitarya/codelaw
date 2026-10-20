@@ -55,6 +55,13 @@ pub const ENGINE_RULES: &[EngineRule] = &[
         steps: &["Run `codelaw fix` again once the file is no longer being edited."],
     },
     EngineRule {
+        id: "codelaw/write-failed",
+        title: "The fixed file could not be written, so it is unchanged",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &["Make the file writable (its permissions, a read-only disk, a full disk), then run `codelaw fix` again."],
+    },
+    EngineRule {
         id: "codelaw/suppression-needs-reason",
         title: "A `codelaw-ignore` comment has no reason",
         severity: Severity::Error,

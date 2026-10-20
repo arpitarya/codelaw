@@ -10,9 +10,11 @@ use crate::lint::{FileResult, RunMode, lint_text, meta_diagnostic};
 use crate::{CheckReport, EngineError, Project};
 use codelaw_cache::hash_bytes;
 use codelaw_core::{Diagnostic, FixClass};
-use codelaw_fix::{Failure, fix_loop};
+use codelaw_core::Language;
+use codelaw_fix::{Failure, fix_loop_with};
+use codelaw_lang::{Grammar, RegionOptions};
 use rayon::prelude::*;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -45,22 +47,94 @@ impl FileFix {
 
 #[derive(Clone, Debug, Default)]
 pub struct FixReport {
-    /// Files whose text the fixes changed.
+    /// Files whose text the fixes changed; `written` says whether the disk
+    /// now holds the fixed text.
     pub files: Vec<FileFix>,
     pub check: CheckReport,
+    /// `--dry-run`: nothing was meant to be written.
+    pub dry_run: bool,
+}
+
+impl FixReport {
+    /// The files fixed on disk, or that would be with `--dry-run`.
+    pub fn fixed_count(&self) -> usize {
+        self.files.iter().filter(|f| f.written || self.dry_run).count()
+    }
+}
+
+/// Syntax errors in a file's host and in every embedded region a fix can
+/// reach, so a fix that breaks the JavaScript inside a `<script>` or a
+/// Markdown fence is refused like one that breaks the host (L4 decision 5).
+fn syntax_errors(project: &Project, entry: &FileEntry, text: &str) -> usize {
+    let root = codelaw_lang::parse(entry.language, text);
+    let mut n = codelaw_lang::syntax_error_count(&root);
+    if matches!(entry.language, Language::Html | Language::Markdown) {
+        let opts = RegionOptions { lint_code_blocks: project.config.lint_code_blocks() };
+        for region in codelaw_lang::regions(entry.language, &root, text, opts) {
+            if region.grammar == Grammar::for_language(region.language) {
+                n += codelaw_lang::syntax_error_count(&codelaw_lang::parse_grammar(region.grammar, &region.text));
+            }
+        }
+    }
+    n
+}
+
+/// The rules with a finding, engine diagnostics aside.
+fn firing(diagnostics: &[Diagnostic]) -> BTreeSet<String> {
+    diagnostics.iter().filter(|d| !d.rule.starts_with("codelaw/")).map(|d| d.rule.clone()).collect()
 }
 
 /// Fix one file's text.
 pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options: &FixOptions) -> FileFix {
-    let outcome = fix_loop(entry.language, text, |current, refused| {
-        lint_text(project, entry, current, &RunMode { external_fixers: true, refused: Some(refused) })
-            .candidates
-            .into_iter()
-            .filter(|(_, class)| *class == FixClass::Auto || (options.unsafe_fixes && *class == FixClass::Suggest))
-            .map(|(c, _)| c)
-            .collect()
-    });
+    let wanted = |class: FixClass| class == FixClass::Auto || (options.unsafe_fixes && class == FixClass::Suggest);
+    let mut before: Option<BTreeSet<String>> = None;
+    let run = |denied: &BTreeSet<String>, before: &mut Option<BTreeSet<String>>| {
+        fix_loop_with(
+            text,
+            |t| syntax_errors(project, entry, t),
+            |current, refused| {
+                let out = lint_text(project, entry, current, &RunMode { external_fixers: true, refused: Some(refused) });
+                if before.is_none() {
+                    *before = Some(firing(&out.diagnostics));
+                }
+                out.candidates.into_iter().filter(|(c, class)| wanted(*class) && !denied.contains(&c.rule)).map(|(c, _)| c).collect()
+            },
+        )
+    };
+    // Verify (decision 5): the result parses (the loop refuses any fix that
+    // adds a syntax error), is a fixpoint (the loop ends only when nothing
+    // more is offered), and no rule fires that did not fire on the original.
+    // A rule whose fixes make a new rule fire is refused, and the loop runs
+    // again without it.
+    let mut denied: BTreeSet<String> = BTreeSet::new();
+    let mut outcome = run(&denied, &mut before);
     let mut remaining = lint_text(project, entry, &outcome.text, &RunMode { external_fixers: false, refused: Some(&outcome.refused) }).diagnostics;
+    let before = before.unwrap_or_default();
+    let new_rules = |remaining: &[Diagnostic]| firing(remaining).difference(&before).next().is_some();
+    if new_rules(&remaining) {
+        let applied: Vec<String> = outcome.applied.keys().cloned().collect();
+        let mut found = false;
+        for culprit in &applied {
+            let mut d = denied.clone();
+            d.insert(culprit.clone());
+            let o = run(&d, &mut None);
+            let r = lint_text(project, entry, &o.text, &RunMode { external_fixers: false, refused: Some(&o.refused) }).diagnostics;
+            if !new_rules(&r) {
+                denied = d;
+                (outcome, remaining) = (o, r);
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            denied.extend(applied);
+            outcome = run(&denied, &mut None);
+            remaining = lint_text(project, entry, &outcome.text, &RunMode { external_fixers: false, refused: Some(&outcome.refused) }).diagnostics;
+        }
+        for rule in &denied {
+            outcome.failed.insert((rule.clone(), Failure::VerifyFailed));
+        }
+    }
     let failures: BTreeMap<&str, Failure> = outcome.failed.iter().map(|(r, f)| (r.as_str(), *f)).collect();
     for d in &mut remaining {
         if let Some(f) = failures.get(d.rule.as_str())
@@ -94,29 +168,57 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
     }
 }
 
+/// Why a fixed file was not written.
+#[derive(Debug)]
+enum WriteError {
+    /// The file changed on disk since it was read (decision 12).
+    Changed,
+    /// The write itself failed: permissions, a full disk, a missing folder.
+    Failed(String),
+}
+
 /// Write to a temp file beside the target and rename it into place, unless
-/// the file changed since it was read (SR-ARCHITECTURE decision 12).
-fn safe_write(path: &Path, read_bytes: &[u8], text: &str, bom: bool) -> Result<(), String> {
-    let now = std::fs::read(path).map_err(|e| e.to_string())?;
-    if hash_bytes(&now) != hash_bytes(read_bytes) {
-        return Err("changed".into());
-    }
-    let dir = path.parent().ok_or("no parent folder")?;
-    let name = path.file_name().ok_or("no file name")?.to_string_lossy();
+/// the file changed since it was read (SR-ARCHITECTURE decision 12). A
+/// symlink is written through: the file it points to is replaced, and the
+/// link stays a link.
+fn safe_write(path: &Path, read_bytes: &[u8], text: &str, bom: bool) -> Result<(), WriteError> {
+    use std::io::Write;
+    let failed = |e: std::io::Error| WriteError::Failed(e.to_string());
+    let target = std::fs::canonicalize(path).map_err(failed)?;
+    let dir = target.parent().ok_or_else(|| WriteError::Failed("no parent folder".into()))?;
+    let name = target.file_name().ok_or_else(|| WriteError::Failed("no file name".into()))?.to_string_lossy();
     let tmp = dir.join(format!(".{name}.codelaw-{}.tmp", std::process::id()));
     let mut bytes = Vec::with_capacity(text.len() + 3);
     if bom {
         bytes.extend_from_slice("\u{feff}".as_bytes());
     }
     bytes.extend_from_slice(text.as_bytes());
-    std::fs::write(&tmp, &bytes).map_err(|e| e.to_string())?;
-    if let Ok(meta) = std::fs::metadata(path) {
+    let cleanup = |e: WriteError| {
+        if !tmp.is_dir() {
+            let _ = std::fs::remove_file(&tmp);
+        }
+        e
+    };
+    let written = std::fs::File::create(&tmp).and_then(|mut f| {
+        f.write_all(&bytes)?;
+        f.sync_all()
+    });
+    written.map_err(failed).map_err(cleanup)?;
+    if let Ok(meta) = std::fs::metadata(&target) {
         let _ = std::fs::set_permissions(&tmp, meta.permissions());
     }
-    std::fs::rename(&tmp, path).map_err(|e| {
-        let _ = std::fs::remove_file(&tmp);
-        e.to_string()
-    })
+    // The hash re-check runs last, right before the rename, so the window
+    // in which an editor's save could be lost is as small as it can be.
+    let now = std::fs::read(&target).map_err(failed).map_err(cleanup)?;
+    if hash_bytes(&now) != hash_bytes(read_bytes) {
+        return Err(cleanup(WriteError::Changed));
+    }
+    std::fs::rename(&tmp, &target).map_err(failed).map_err(cleanup)?;
+    // The rename is durable once the folder entry is.
+    if let Ok(d) = std::fs::File::open(dir) {
+        let _ = d.sync_all();
+    }
+    Ok(())
 }
 
 pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixOptions) -> Result<FixReport, EngineError> {
@@ -136,22 +238,31 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
                     match safe_write(&entry.abs, &file.bytes, &fix.fixed, file.bom) {
                         Ok(()) => fix.written = true,
                         Err(why) => {
+                            // The disk still holds the original, so report what
+                            // the original has, not what the fixes would leave.
+                            diagnostics = lint_text(this, entry, &file.text, &RunMode::check()).diagnostics;
                             let layers = this.config.layers_for(&entry.abs);
-                            let message = if why == "changed" {
-                                "The file changed on disk during the run, so its fixes were not written".to_owned()
-                            } else {
-                                format!("The fixed file could not be written: {why}")
+                            let (id, message) = match why {
+                                WriteError::Changed => {
+                                    ("codelaw/file-changed-during-run", "The file changed on disk during the run, so its fixes were not written".to_owned())
+                                }
+                                WriteError::Failed(e) => ("codelaw/write-failed", format!("The fixed file could not be written, so it is unchanged: {e}")),
                             };
-                            diagnostics.extend(meta_diagnostic(&entry.rel, &layers, "codelaw/file-changed-during-run", message));
+                            diagnostics.extend(meta_diagnostic(&entry.rel, &layers, id, message));
+                            diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
                         }
                     }
+                }
+                if file.bom {
+                    crate::lint::shift_for_bom(&mut diagnostics);
                 }
                 fix.remaining = diagnostics.clone();
                 (Some(fix), FileResult { diagnostics, skipped: None })
             })
             .collect()
     });
-    let mut report = FixReport { check: CheckReport { warnings: project.warnings.clone(), ..Default::default() }, ..Default::default() };
+    let mut report =
+        FixReport { check: CheckReport { warnings: project.warnings.clone(), ..Default::default() }, dry_run: options.dry_run, ..Default::default() };
     report.check.warnings.extend(warnings);
     for (fix, result) in results {
         report.check.diagnostics.extend(result.diagnostics);
@@ -167,6 +278,8 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
         report.check.diagnostics.push(crate::lint::no_rules(project));
     }
     report.check.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+    // The same dedupe as `check`, so both report one diagnostic per finding.
+    crate::dedup_diagnostics(&mut report.check.diagnostics);
     skipped.sort();
     report.check.skipped = skipped;
     Ok(report)

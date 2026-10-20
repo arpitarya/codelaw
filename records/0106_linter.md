@@ -125,7 +125,8 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    - **Exit codes:** `0` no errors · `1` errors · `2` config, rule or usage error. Warnings fail only with `--max-warnings N`.
 
 6. **Inline suppression always needs a reason.**
-   - Written in the host language's comment syntax: `// codelaw-ignore <rule>: <reason>`, `# …`, `/* … */`, `<!-- … -->`.
+   - Written in the host language's comment syntax: `// codelaw-ignore <rule>: <reason>`, `# …`, `/* … */`, `<!-- … -->`. The marker opens the comment; a comment that only mentions it (`// see codelaw-ignore docs`) is not a suppression.
+   - A suppression is checked in every file, even one no rule runs on.
    - **What it covers:** a comment alone on its line covers the next line with code; a trailing comment covers its own line. Several rules are comma-separated before the colon.
    - A suppression with no reason is an error, and so is one naming a rule that doesn't exist (`codelaw/unknown-suppression`).
    - A suppression that suppresses nothing is reported as `info` with an `auto` fix that removes it.

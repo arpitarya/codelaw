@@ -63,21 +63,38 @@ impl NativeRule for ImportGroups {
         if src[start..end].contains("//") || src[start..end].contains("/*") {
             return;
         }
-        let mut keyed: Vec<(usize, usize, &str)> = imports
-            .iter()
-            .enumerate()
-            .map(|(i, imp)| {
-                let source = imp.child_by_field_name("source").map(|s| string_value(s, src)).unwrap_or_default();
-                (group(&source, &internal), i, text(*imp, src))
-            })
-            .collect();
-        keyed.sort_by_key(|(g, i, _)| (*g, *i));
+        // A side-effect import (`import './polyfills'`, a stylesheet) runs
+        // for what it does, so moving it changes what runs first: it stays
+        // where it is, and only the imports between two of them are sorted.
+        let side_effect = |imp: &Node| !named_children(*imp).iter().any(|c| matches!(c.kind(), "import_clause" | "import_require_clause"));
         let mut wanted = String::new();
-        for (k, (g, _, t)) in keyed.iter().enumerate() {
-            if k > 0 {
-                wanted.push_str(if keyed[k - 1].0 != *g { "\n\n" } else { "\n" });
+        let mut i = 0;
+        while i < imports.len() {
+            if i > 0 {
+                wanted.push_str(&src[imports[i - 1].end_byte()..imports[i].start_byte()]);
             }
-            wanted.push_str(t);
+            if side_effect(&imports[i]) {
+                wanted.push_str(text(imports[i], src));
+                i += 1;
+                continue;
+            }
+            let run_end = (i..imports.len()).find(|&j| side_effect(&imports[j])).unwrap_or(imports.len());
+            let mut keyed: Vec<(usize, usize, &str)> = imports[i..run_end]
+                .iter()
+                .enumerate()
+                .map(|(k, imp)| {
+                    let source = imp.child_by_field_name("source").map(|s| string_value(s, src)).unwrap_or_default();
+                    (group(&source, &internal), k, text(*imp, src))
+                })
+                .collect();
+            keyed.sort_by_key(|(g, k, _)| (*g, *k));
+            for (k, (g, _, t)) in keyed.iter().enumerate() {
+                if k > 0 {
+                    wanted.push_str(if keyed[k - 1].0 != *g { "\n\n" } else { "\n" });
+                }
+                wanted.push_str(t);
+            }
+            i = run_end;
         }
         if wanted != src[start..end] {
             out.push(NativeFinding {
@@ -197,6 +214,21 @@ mod tests {
         assert_eq!(f.len(), 1);
         assert_eq!(f[0].edits[0].text, "import fs from 'node:fs';\nimport path from 'path';\n\nimport react from 'react';\n\nimport util from '@/util';\n\nimport x from './x';");
         assert!(crate::run(&ImportGroups, Language::Javascript, "import fs from 'fs';\n\nimport x from './x';\n").is_empty());
+    }
+
+    #[test]
+    fn side_effect_imports_stay_put() {
+        // The polyfill and the stylesheet keep their place; each run between
+        // them is sorted on its own.
+        let src = "import './polyfills';\nimport x from './x';\nimport fs from 'fs';\nimport './app.css';\nimport b from './b';\nimport react from 'react';\n";
+        let f = crate::run(&ImportGroups, Language::Javascript, src);
+        assert_eq!(f.len(), 1);
+        assert_eq!(
+            f[0].edits[0].text,
+            "import './polyfills';\nimport fs from 'fs';\n\nimport x from './x';\nimport './app.css';\nimport react from 'react';\n\nimport b from './b';"
+        );
+        // Already sorted around a side-effect import: nothing to report.
+        assert!(crate::run(&ImportGroups, Language::Javascript, "import x from './x';\nimport 'reflect-metadata';\nimport fs from 'fs';\n").is_empty());
     }
 
     #[test]

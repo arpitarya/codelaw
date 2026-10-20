@@ -90,6 +90,16 @@ fn toml_and_yaml_and_css_match() {
 }
 
 #[test]
+fn where_on_a_list_capture_or_a_language_without_a_model_is_refused() {
+    let r = rule(Language::Javascript, "match:\n  pattern: f($$$ARGS)\nwhere:\n  $ARGS: unused\nmessage: x");
+    assert!(compile(&r, Grammar::JavaScript, &Default::default()).err().unwrap().contains("captures a list"));
+    let r = rule(Language::Javascript, "match:\n  pattern: f($$$ARGS)\nwhere:\n  $$$ARGS: unused\nmessage: x");
+    assert!(compile(&r, Grammar::JavaScript, &Default::default()).is_err());
+    let r = rule(Language::Css, "match:\n  kind: identifier\nwhere:\n  $$MATCH: unused\nmessage: x");
+    assert!(compile(&r, Grammar::Css, &Default::default()).err().unwrap().contains("semantic model"));
+}
+
+#[test]
 fn bad_where_is_a_compile_error() {
     let r = rule(Language::Javascript, "match:\n  kind: identifier\nwhere:\n  $NAME: unusd\nmessage: x");
     let e = compile(&r, Grammar::JavaScript, &BTreeMap::new()).err().unwrap();

@@ -19,3 +19,7 @@ globset.workspace = true
 ignore.workspace = true
 rayon.workspace = true
 serde_json.workspace = true
+
+[dev-dependencies]
+# The panic fixture of SR-ARCHITECTURE decision 25.
+codelaw-native = { workspace = true, features = ["fault-injection"] }

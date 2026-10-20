@@ -147,6 +147,7 @@ impl Project {
         };
         let key = KeyBuilder::new("file")
             .part(&entry.rel)
+            .part(if file.bom { "bom" } else { "" })
             .part(entry.language.name())
             .part(&file.text)
             .part(self.rules.fingerprint.0)
@@ -154,14 +155,38 @@ impl Project {
             .part(codelaw_lang::GRAMMARS_FINGERPRINT)
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
             .key();
-        if let Some(d) = self.cache.get::<Vec<Diagnostic>>(&key) {
-            return FileResult { diagnostics: d, skipped: None };
+        let mut diagnostics = match self.cache.get::<Vec<Diagnostic>>(&key) {
+            Some(d) => d,
+            None => {
+                let out = lint_text(self, entry, &file.text, &RunMode::check());
+                if !out.diagnostics.iter().any(|d| d.rule == "codelaw/internal-error") {
+                    self.cache.put(&key, &out.diagnostics);
+                }
+                out.diagnostics
+            }
+        };
+        if file.bom {
+            shift_for_bom(&mut diagnostics);
         }
-        let out = lint_text(self, entry, &file.text, &RunMode::check());
-        if !out.diagnostics.iter().any(|d| d.rule == "codelaw/internal-error") {
-            self.cache.put(&key, &out.diagnostics);
+        FileResult { diagnostics, skipped: None }
+    }
+}
+
+/// Rules see the text without its BOM; reported byte offsets are into the
+/// file as it is on disk, so they move past the BOM's three bytes. A
+/// whole-file engine diagnostic (no range, no edit) stays at 0.
+pub(crate) fn shift_for_bom(diagnostics: &mut [Diagnostic]) {
+    const BOM: usize = '\u{feff}'.len_utf8();
+    for d in diagnostics {
+        if d.start_byte == 0 && d.end_byte == 0 && d.edits.is_empty() && d.source == "engine" {
+            continue;
         }
-        FileResult { diagnostics: out.diagnostics, skipped: None }
+        d.start_byte += BOM;
+        d.end_byte += BOM;
+        for e in &mut d.edits {
+            e.start += BOM;
+            e.end += BOM;
+        }
     }
 }
 
@@ -226,7 +251,16 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
                 || (entry.language == Language::Markdown && r.applies_to_language(Language::Markdown) && r.kinds_for(Grammar::MarkdownInline).is_some())
         });
     if host_rules.is_empty() && !region_rules_exist {
-        return LintOutput { diagnostics: Vec::new(), candidates: Vec::new() };
+        // No rule runs here, but a suppression still has to name a rule and
+        // give a reason (SR-LINTER decision 6).
+        let mut diagnostics = Vec::new();
+        if text.contains(suppress::MARKER) {
+            let root = codelaw_lang::parse(entry.language, text);
+            let comments = comment_ranges(&root, text);
+            let index = LineIndex::new(text);
+            apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &[], &mut diagnostics);
+        }
+        return LintOutput { diagnostics, candidates: Vec::new() };
     }
 
     let host_root = codelaw_lang::parse(entry.language, text);
@@ -290,8 +324,24 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
 
     let index = LineIndex::new(text);
     let mut diagnostics = Vec::new();
+    // A rule that failed did not run, so a suppression of it is not unused.
+    let failed: BTreeSet<&str> =
+        findings.iter().filter(|f| f.note.as_deref() == Some(INTERNAL_ERROR)).map(|f| project.compiled[f.rule].id()).collect();
+    let ran: Vec<(usize, &CompiledRule, RuleConfig)> = active.iter().filter(|(_, r, _)| !failed.contains(r.id())).cloned().collect();
     for f in findings {
         let rule = &project.compiled[f.rule];
+        if f.note.as_deref() == Some(INTERNAL_ERROR) {
+            // Decision 25: a rule failure is the engine's own diagnostic,
+            // never the rule's, so no severity, suppression or cache hides it.
+            if let Some(mut d) = meta_diagnostic(&entry.rel, &layers, "codelaw/internal-error", f.message) {
+                d.start_byte = f.start;
+                d.end_byte = f.end;
+                d.start = index.position(f.start);
+                d.end = index.position(f.end);
+                diagnostics.push(d);
+            }
+            continue;
+        }
         let cfg = active.iter().find(|(i, _, _)| *i == f.rule).map(|(_, _, c)| c).expect("an active rule");
         let declared = rule.loaded.rule.fix;
         let external = matches!(rule.fix, Some(FixSpec::External(_)));
@@ -341,7 +391,7 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
         });
     }
 
-    apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &active, &mut diagnostics);
+    apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &ran, &mut diagnostics);
     let candidates = diagnostics
         .iter()
         .filter(|d| d.fix != FixClass::Manual && !d.edits.is_empty())
@@ -419,8 +469,11 @@ fn apply_suppressions(
     }
 }
 
+/// The note that marks a finding as a rule failure (decision 25).
+const INTERNAL_ERROR: &str = "internal-error";
+
 fn internal_error(rule: usize, start: usize, end: usize, id: &str, what: &str) -> Finding {
-    Finding { rule, start, end, message: format!("rule `{id}` failed on this file: {what}"), edits: None, note: Some("internal-error".into()) }
+    Finding { rule, start, end, message: format!("rule `{id}` failed on this file: {what}"), edits: None, note: Some(INTERNAL_ERROR.into()) }
 }
 
 fn panic_message(p: &(dyn std::any::Any + Send)) -> String {
@@ -434,8 +487,23 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
         return Vec::new();
     }
     let grammar = unit.grammar;
+    let n = unit.rules.len();
+    let mut failed: Vec<Option<String>> = vec![None; n];
     let semantic = if unit.rules.iter().any(|(_, r, _)| r.needs_semantic) {
-        catch_unwind(AssertUnwindSafe(|| codelaw_semantic::build(unit.language, &unit.root, &unit.text))).ok().flatten()
+        match catch_unwind(AssertUnwindSafe(|| codelaw_semantic::build(unit.language, &unit.root, &unit.text))) {
+            Ok(model) => model,
+            // A model that panics fails every rule that needs it (decision 25);
+            // the other rules still run.
+            Err(p) => {
+                let why = format!("the semantic model failed: {}", panic_message(p.as_ref()));
+                for (slot, (_, r, _)) in unit.rules.iter().enumerate() {
+                    if r.needs_semantic {
+                        failed[slot] = Some(why.clone());
+                    }
+                }
+                None
+            }
+        }
     } else {
         None
     };
@@ -456,10 +524,8 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
             }
         }
     }
-    let n = unit.rules.len();
     let mut matches: Vec<Vec<Match>> = vec![Vec::new(); n];
     let mut native: Vec<Vec<NativeFinding>> = vec![Vec::new(); n];
-    let mut failed: Vec<Option<String>> = vec![None; n];
     let empty = std::collections::BTreeMap::new();
     for node in unit.root.root().dfs() {
         let k = node.kind_id() as usize;

@@ -113,4 +113,5 @@ helper(fs, React);
 ## Differences from the source
 
 A block of imports with a comment inside is left alone, so no comment is moved away from the import
-it describes.
+it describes. A side-effect import (`import './polyfills'`, a stylesheet) stays where it is, since moving it
+changes what runs first; only the imports between two of them are ordered.

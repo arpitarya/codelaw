@@ -61,6 +61,72 @@ fn new_rule_scaffold_passes_rules_lint_and_fails_test() {
     assert!(out.contains("✔ acme/no-foo"), "{out}");
     let (code, _, err) = codelaw(&d, &["new-rule", "acme/no-foo", "--lang", "python"]);
     assert_eq!(code, 2, "{err}");
+    // W-17: an id cannot walk out of the rules folder.
+    for bad in ["../x", "acme/..", "../../etc/x"] {
+        let (code, _, err) = codelaw(&d, &["new-rule", bad, "--lang", "python"]);
+        assert_eq!(code, 2, "{bad}: {err}");
+    }
+    assert!(!d.join(".codelaw/x.md").exists() && !d.join("x").exists());
+    let _ = fs::remove_dir_all(&d);
+}
+
+fn copy_dir(from: &Path, to: &Path) {
+    fs::create_dir_all(to).unwrap();
+    for e in fs::read_dir(from).unwrap().flatten() {
+        let p = e.path();
+        if p.is_dir() {
+            copy_dir(&p, &to.join(e.file_name()));
+        } else {
+            fs::copy(&p, to.join(e.file_name())).unwrap();
+        }
+    }
+}
+
+/// W-17 row 3: with no `target_version`, `strict=` may not exist on the
+/// code's Python, so `codelaw fix` must not add it; `--unsafe` may.
+#[test]
+fn strict_keyword_fixes_are_suggestions() {
+    let d = temp("strict");
+    let packs = Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().join("packs/python");
+    copy_dir(&packs, &d.join("node_modules/@codelaw/rules-python"));
+    fs::write(d.join("codelaw.toml"), "extends = [\"codelaw:py/recommended\"]\npreview = true\n").unwrap();
+    let src = "def f(g, a, b):\n    return list(zip(a, b)), list(map(g, a, b))\n";
+    fs::write(d.join("a.py"), src).unwrap();
+    let rules = "py/zip-without-explicit-strict,py/map-without-explicit-strict";
+    let (_, out, err) = codelaw(&d, &["fix", "--rule", rules]);
+    assert_eq!(fs::read_to_string(d.join("a.py")).unwrap(), src, "{out}{err}");
+    assert!(out.contains("py/zip-without-explicit-strict") && out.contains("py/map-without-explicit-strict"), "still reported: {out}{err}");
+    let (_, out, err) = codelaw(&d, &["fix", "--unsafe", "--rule", rules]);
+    assert_eq!(fs::read_to_string(d.join("a.py")).unwrap(), "def f(g, a, b):\n    return list(zip(a, b, strict=False)), list(map(g, a, b, strict=False))\n", "{out}{err}");
+    let _ = fs::remove_dir_all(&d);
+}
+
+/// W-17 row 1, the panic fixture: a `warn` rule that panics still makes
+/// `check` and `fix` exit 2, after every other result is printed
+/// (SR-ARCHITECTURE decision 25).
+#[test]
+fn a_rule_panic_exits_2() {
+    let d = temp("panic");
+    let pack = d.join("node_modules/@codelaw/rules-js");
+    fs::create_dir_all(pack.join("rules/js")).unwrap();
+    fs::create_dir_all(pack.join("presets/js")).unwrap();
+    fs::write(pack.join("codelaw-pack.toml"), "name = \"@codelaw/rules-js\"\nversion = \"0.1.0\"\nmin_codelaw = \"0.1.0\"\nlanguages = [\"javascript\"]\npresets = [\"js/recommended\"]\n").unwrap();
+    fs::write(
+        pack.join("rules/js/test-panic.md"),
+        "---\nid: js/test-panic\ntitle: panics\nlanguages: [javascript]\nfix: manual\nfix_reason: test\nstability: stable\n---\n\nSummary.\n\n**Why:** test.\n\n```codelaw\nnative: test/panic\n```\n\n## How to fix\n\n1. Nothing.\n\n## Examples\n\n### JavaScript\n\n#### Don't\n\n```js\nx\n```\n\n#### Do\n\n```js\ny\n```\n",
+    )
+    .unwrap();
+    fs::write(pack.join("presets/js/recommended.toml"), "[rules]\n\"js/test-panic\" = \"warn\"\n").unwrap();
+    fs::write(d.join("codelaw.toml"), "extends = [\"codelaw:js/recommended\"]\n").unwrap();
+    fs::write(d.join("a.js"), "let a = 1;\n").unwrap();
+    for cmd in ["check", "fix"] {
+        let (code, out, err) = codelaw(&d, &[cmd]);
+        assert_eq!(code, 2, "{cmd}: {out}{err}");
+        assert!(out.contains("codelaw/internal-error") && out.contains("1 rule run failed"), "{cmd}: {out}");
+        let (code, out, _) = codelaw(&d, &[cmd, "--format", "json"]);
+        assert_eq!(code, 2);
+        assert!(out.contains("\"internal_errors\": 1"), "{out}");
+    }
     let _ = fs::remove_dir_all(&d);
 }
 

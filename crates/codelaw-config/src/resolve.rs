@@ -139,9 +139,15 @@ pub fn load_file(dir: &Path, warnings: &mut Vec<String>) -> Result<Option<Config
                 toml::from_str::<RawConfig>(&text)
                     .map_err(|e| ConfigError::new(Some(path.clone()), toml_error(&text, &e)))?,
             ),
+            // A `pyproject.toml` or `package.json` is a home only if it
+            // configures codelaw. One that doesn't parse is a config error
+            // only when it could: it mentions `codelaw` (SR-CONFIG decision 1).
             Home::Pyproject => {
-                let doc: toml::Table = toml::from_str(&text)
-                    .map_err(|e| ConfigError::new(Some(path.clone()), toml_error(&text, &e)))?;
+                let doc: toml::Table = match toml::from_str(&text) {
+                    Ok(d) => d,
+                    Err(_) if !text.contains("codelaw") => continue,
+                    Err(e) => return Err(ConfigError::new(Some(path.clone()), toml_error(&text, &e))),
+                };
                 match doc.get("tool").and_then(|t| t.get("codelaw")) {
                     Some(v) => Some(v.clone().try_into::<RawConfig>().map_err(|e| {
                         ConfigError::new(Some(path.clone()), format!("[tool.codelaw]: {}", explain_serde_error(&e.to_string())))
@@ -150,8 +156,11 @@ pub fn load_file(dir: &Path, warnings: &mut Vec<String>) -> Result<Option<Config
                 }
             }
             Home::PackageJson => {
-                let doc: serde_json::Value = serde_json::from_str(&text)
-                    .map_err(|e| ConfigError::new(Some(path.clone()), format!("invalid JSON: {e}")))?;
+                let doc: serde_json::Value = match serde_json::from_str(&text) {
+                    Ok(d) => d,
+                    Err(_) if !text.contains("\"codelaw\"") => continue,
+                    Err(e) => return Err(ConfigError::new(Some(path.clone()), format!("invalid JSON: {e}"))),
+                };
                 match doc.get("codelaw") {
                     Some(v) => Some(serde_json::from_value::<RawConfig>(v.clone()).map_err(|e| {
                         ConfigError::new(Some(path.clone()), format!("\"codelaw\": {}", explain_serde_error(&e.to_string())))
@@ -495,6 +504,20 @@ mod tests {
         let c = find_config(&d).unwrap();
         assert_eq!(c.extends(), ["codelaw:js/recommended"]);
         assert!(c.warnings.is_empty());
+    }
+
+    #[test]
+    fn a_broken_manifest_without_codelaw_is_not_a_home() {
+        let d = temp("broken");
+        fs::write(d.join("package.json"), "{ \"name\": \"fixture\", oops }").unwrap();
+        fs::write(d.join("pyproject.toml"), "[project\nname = 1").unwrap();
+        let c = find_config(&d).unwrap();
+        assert!(c.files.is_empty(), "neither file configures codelaw");
+        fs::write(d.join("package.json"), "{ \"codelaw\": { oops } }").unwrap();
+        assert!(find_config(&d).unwrap_err().message.contains("invalid JSON"));
+        fs::remove_file(d.join("package.json")).unwrap();
+        fs::write(d.join("pyproject.toml"), "[tool.codelaw\nextends = []").unwrap();
+        assert!(find_config(&d).is_err());
     }
 
     #[test]

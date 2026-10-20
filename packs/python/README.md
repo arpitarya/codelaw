@@ -122,9 +122,9 @@ are written fresh from Ruff's documented behaviour, and each rule's
 | `B035` | `py/static-key-dict-comprehension` | manual |
 | `B039` | `py/mutable-contextvar-default` | manual |
 | `B904` | `py/raise-without-from-inside-except` | manual |
-| `B905` | `py/zip-without-explicit-strict` | auto |
-| `B911` | `py/batched-without-explicit-strict` | auto |
-| `B912` | `py/map-without-explicit-strict` | auto |
+| `B905` | `py/zip-without-explicit-strict` | suggest |
+| `B911` | `py/batched-without-explicit-strict` | suggest |
+| `B912` | `py/map-without-explicit-strict` | suggest |
 | `I001` | `py/unsorted-imports` | auto |
 | `RUF022` | `py/all-sorted` | auto |
 
@@ -142,7 +142,7 @@ The ones that shape results most:
 | `py/unused-variable` | As in Ruff, unpacking is reported only from a tuple or list literal. Outside functions only an unused `except … as name` is reported. |
 | `py/unsorted-imports` | Checks order only. Blank lines after the import block and line wrapping are the formatter's; `from m import a, b as c` and `import a, b` are not reported for their shape. First-party modules come from the `known_first_party` option. |
 | `py/no-star-import` | Relative star imports (`from .sub import *`) are not reported: that is how a package re-exports its submodules. |
-| `py/zip-without-explicit-strict`, `py/batched-without-explicit-strict`, `py/map-without-explicit-strict` | The Python version comes from each rule's `target_version` option, not a project setting; unset, the rules run. The fix adds `strict=False`, which keeps today's behaviour (Ruff has no fix for `B911`). |
+| `py/zip-without-explicit-strict`, `py/batched-without-explicit-strict`, `py/map-without-explicit-strict` | The Python version comes from each rule's `target_version` option, not a project setting; unset, the rules run. The fix adds `strict=False`, which keeps today's behaviour (Ruff has no fix for `B911`); it is `suggest`, not `auto`, because with the version unknown the keyword may not exist and would raise `TypeError` (W-17). |
 | `py/no-mutable-default` | The fix is offered for unannotated parameters whose default doesn't read the parameter's own name. |
 | `# noqa` | Ruff's suppression comments are not read; codelaw has its own. |
 

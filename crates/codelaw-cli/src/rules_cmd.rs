@@ -329,9 +329,16 @@ pub fn template(id: &str, languages: &[Language], scope: &str, fix: FixClass) ->
     s
 }
 
+/// A namespace or name that is one plain path segment: letters, digits,
+/// `-`, `_` and `.`, not starting with `.`, so the file lands inside the
+/// rules folder (`../x` and `a\b` are refused).
+fn plain_segment(s: &str) -> bool {
+    !s.is_empty() && !s.starts_with('.') && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
+}
+
 pub fn new_rule(args: NewRuleArgs) -> ExitCode {
-    let Some((ns, name)) = args.id.split_once('/').filter(|(a, b)| !a.is_empty() && !b.is_empty() && !b.contains('/')) else {
-        return fail("a rule id is `<namespace>/<name>`");
+    let Some((ns, name)) = args.id.split_once('/').filter(|(a, b)| plain_segment(a) && plain_segment(b)) else {
+        return fail("a rule id is `<namespace>/<name>`, each letters, digits, `-`, `_` or `.`");
     };
     let mut languages = Vec::new();
     for l in &args.lang {
@@ -365,6 +372,16 @@ pub fn new_rule(args: NewRuleArgs) -> ExitCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rule_ids_stay_inside_the_rules_folder() {
+        for bad in ["..", "../x", "x/..", ".hidden", "a\\b", "a b", ""] {
+            assert!(!plain_segment(bad), "{bad}");
+        }
+        for good in ["acme", "no-foo", "v2_rule", "a.b"] {
+            assert!(plain_segment(good), "{good}");
+        }
+    }
 
     #[test]
     fn a_fresh_scaffold_passes_rules_lint() {

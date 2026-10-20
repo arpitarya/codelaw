@@ -189,7 +189,7 @@ pub fn check_text(report: &CheckReport, color: bool) -> String {
 }
 
 pub fn fix_text(report: &FixReport, color: bool) -> String {
-    text(&report.check, color, Some(report.files.len()))
+    text(&report.check, color, Some(report.fixed_count()))
 }
 
 fn text(report: &CheckReport, color: bool, fixed: Option<usize>) -> String {

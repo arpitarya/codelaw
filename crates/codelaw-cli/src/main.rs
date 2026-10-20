@@ -205,7 +205,15 @@ fn fix(args: FixArgs) -> ExitCode {
     match fmt {
         Format::Text => {
             for f in &report.files {
-                let verb = if args.dry_run { "would fix" } else { "fixed" };
+                // Only a file the disk now holds fixed is "fixed"; a failed
+                // write is reported as `codelaw/write-failed` below.
+                let verb = if args.dry_run {
+                    "would fix"
+                } else if f.written {
+                    "fixed"
+                } else {
+                    "not written"
+                };
                 let applied: Vec<String> = f.applied.iter().map(|(r, n)| format!("{r} ×{n}")).collect();
                 println!("{verb} {} ({})", f.file, applied.join(", "));
             }

@@ -28,3 +28,5 @@ ignore.workspace = true
 
 [dev-dependencies]
 toml.workspace = true
+# The panic fixture of SR-ARCHITECTURE decision 25 (test builds only).
+codelaw-native = { workspace = true, features = ["fault-injection"] }

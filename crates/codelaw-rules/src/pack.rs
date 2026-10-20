@@ -262,7 +262,13 @@ fn read_data(dir: &Path, errors: &mut Vec<LoadError>) -> (BTreeMap<String, Arc<s
     let mut key = KeyBuilder::new("data");
     let mut stack = vec![dir.to_path_buf()];
     let mut files = Vec::new();
+    // A folder is entered once, by its real path, so a symlink cycle in
+    // `data/` ends instead of looping forever.
+    let mut entered = std::collections::BTreeSet::new();
     while let Some(d) = stack.pop() {
+        if !entered.insert(fs::canonicalize(&d).unwrap_or_else(|_| d.clone())) {
+            continue;
+        }
         let Ok(entries) = fs::read_dir(&d) else { continue };
         for e in entries.flatten() {
             let p = e.path();
@@ -293,8 +299,18 @@ fn read_data(dir: &Path, errors: &mut Vec<LoadError>) -> (BTreeMap<String, Arc<s
 }
 
 /// Load a pack from its folder. A pack with any failing rule is refused
-/// as a whole (decision 13).
+/// as a whole (decision 13). It is first-party if its manifest names a
+/// first-party pack; [`load_pack_from`] also asks where it was found.
 pub fn load_pack(dir: &Path) -> Result<RulePack, Vec<LoadError>> {
+    load_pack_from(dir, true)
+}
+
+/// Load a pack found through `extends`. `first_party_origin` says whether
+/// the spec could only resolve to a first-party install (`codelaw:`, or
+/// `npm:`/`pypi:` naming a first-party package): a pack reached any other
+/// way is third-party even if its manifest copies a first-party name, so it
+/// cannot use `native:` or the reserved namespaces (decision 10).
+pub fn load_pack_from(dir: &Path, first_party_origin: bool) -> Result<RulePack, Vec<LoadError>> {
     let manifest_path = dir.join("codelaw-pack.toml");
     let text = fs::read_to_string(&manifest_path)
         .map_err(|e| vec![LoadError::new(Some(manifest_path.clone()), format!("cannot read the pack manifest: {e}"))])?;
@@ -321,7 +337,7 @@ pub fn load_pack(dir: &Path) -> Result<RulePack, Vec<LoadError>> {
             errors.push(LoadError::new(Some(manifest_path.clone()), format!("unknown language `{l}` in `languages`")));
         }
     }
-    let first_party = FIRST_PARTY_PACKS.iter().find(|p| p.1 == manifest.name).map(|p| p.0);
+    let first_party = FIRST_PARTY_PACKS.iter().find(|p| p.1 == manifest.name).map(|p| p.0).filter(|_| first_party_origin);
 
     let rules = read_rules(&dir.join("rules"), &mut errors);
     for rule in &rules {

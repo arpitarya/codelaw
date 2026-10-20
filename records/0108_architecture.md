@@ -79,21 +79,25 @@ The decider asked for the architecture to be designed and its gaps filled. The f
    7. Merge, dedupe (same file, range, rule) and sort by path, line, column, rule.
    8. Report ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 4).
 5. **`fix`** per file: run all rules → collect `auto` edits (and `suggest` edits with `--unsafe`) → drop overlapping edits → apply → re-parse → repeat until no edits, at most 10 passes → format ([SR-FORMATTER](0105_formatter.md)) → verify (parses, idempotent, no new rule fires) → write (decision 12). Two rules whose fixes alternate are detected by a repeated file hash and both are reported as `manual` with a `fix-conflict` note.
+   - **What verify checks:** *parses* counts syntax errors in the host and in every embedded region (a `<script>`, a Markdown fence), and a fix may not add one; *idempotent* is the fixpoint, since the loop ends only when the result offers no more fixes; *no new rule fires* compares the rules with a finding on the result against the original, engine diagnostics aside. A rule whose fixes make a new rule fire is refused (`manual`, note `fix-verify-failed`) and the loop runs again without it.
 6. **`format`** is the fix pipeline with the rule steps skipped.
 
 #### C. Files and I/O
 
 7. **Discovery.** The walk uses the `ignore` crate (MIT / Unlicense): `.gitignore`, `.ignore`, then `include` and `exclude` from config. Files are skipped **by extension and ignore rules before they are read**. Symlinks are not followed unless `[files] follow_symlinks = true`. Paths are normalised to forward slashes in every output and cache key, so Windows and Unix runs agree.
    - **Never entered, before any config:** `.git/`, `node_modules/`, `.venv/` and `.codelaw/cache/`.
-   - **The user's global gitignore is not read**, so two machines checking one commit agree ([L5](0007_LAW-5-no-model-in-the-engine.md)).
+   - **The user's global gitignore is not read**, so two machines checking one commit agree ([L5](0007_LAW-5-no-model-in-the-engine.md)). Nor is any ignore file above the project root, except the folders between it and the root of the git repository it sits in (that repository's `.gitignore`, `.ignore` and `.git/info/exclude`); with no repository, nothing above the project root is read. A requested sub-folder is walked from the project root, so the ignore files between them apply.
+   - **Nested configs** are found for every file checked, whether walked or named on the command line: the folders from the project root down to it are searched ([SR-CONFIG](0110_config.md) decision 2).
+   - **With `follow_symlinks`,** a file reached by several paths is checked and written once, under the first path in sort order.
+   - **Paths are relative to the project root,** a file outside it with `../`.
    - **A file named on the command line** skips the ignore files, but not `include` and `exclude`.
-8. **Encoding.** Files are read as UTF-8. A UTF-8 BOM is preserved on write. A file that isn't valid UTF-8 gets one `codelaw/not-utf8` info diagnostic and is skipped; it's never rewritten.
+8. **Encoding.** Files are read as UTF-8. A UTF-8 BOM is preserved on write, and the byte offsets a diagnostic or edit reports count it, so they are offsets into the file as it is on disk. A file that isn't valid UTF-8 gets one `codelaw/not-utf8` info diagnostic and is skipped; it's never rewritten.
 9. **Line endings.** The dominant line ending of a file (`\n` or `\r\n`) is detected once and preserved by every fix. Only the formatter changes it, and only when `[format] end_of_line` is set.
 10. **Generated and oversized files.**
     - A file whose first 1,024 bytes contain `@generated` (or a `[files] generated_markers` entry) is skipped with an info diagnostic unless `[files] lint_generated = true`.
     - A file above `[files] max_file_size` (default 1 MiB) is skipped with a `codelaw/file-too-large` info diagnostic. Formatting such a file is refused, never attempted.
 11. **Glob base.** Every glob in config and in rule frontmatter is relative to the directory of the file that declares it: the config file's directory for `include`, `exclude` and `[[overrides]]`; the repo root for a rule's `files`.
-12. **Safe writes.** A fixed or formatted file is written to a temp file in the same directory and renamed into place. Before the rename, the file's hash is compared with the hash read at the start of the run; if it changed, the write is skipped and reported (`codelaw/file-changed-during-run`). Permissions are preserved. The LSP never writes files itself; it returns `WorkspaceEdit`s and the editor writes ([SR-EDITOR](0114_editor.md)).
+12. **Safe writes.** A fixed or formatted file is written to a temp file in the same directory, synced, and renamed into place; a symlink is written through, so the file it points to is replaced and the link stays a link. Right before the rename, the file's hash is compared with the hash read at the start of the run; if it changed, the write is skipped and reported (`codelaw/file-changed-during-run`, `warn`). A write that fails (permissions, a read-only or full disk) is `codelaw/write-failed`, an `error`, so the run fails. Either way the file is reported as it is on disk — its original findings, never the post-fix ones — and it is not printed as fixed. Permissions are preserved. The LSP never writes files itself; it returns `WorkspaceEdit`s and the editor writes ([SR-EDITOR](0114_editor.md)).
 13. **Positions.** Internally, offsets are bytes. Text and JSON output use 1-based line and column, in characters. The LSP crate converts to 0-based UTF-16 at the boundary. SARIF uses its own 1-based scheme. The conversion is tested on files with multi-byte and astral characters.
 14. **Git.** codelaw shells out to the `git` on `PATH` for exactly three things: the merge base and diff for `--changed-since`, the index for `--staged`, and the `HEAD` commit date for the as-of default ([SR-BASELINE](0104_baseline-and-deprecations.md) decision 4). It links no git library. With no `git`, those three features report their absence plainly and everything else runs.
 
@@ -132,6 +136,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
     - Output on stdout: `{ "edits": [{ "range", "text" }] }`, byte offsets into `source`. A range is `{ "start", "end" }` in the request; the answer may give `{ "start", "end" }` or `[start, end]`.
     - The command runs through `sh -c` (`cmd /C` on Windows).
     - Timeout 5 s per file (`[fix] external_timeout`), no network expected, run with the repo root as the working directory.
+    - Both stdout and stderr are drained as it runs, so a chatty fixer never blocks; the last stderr line is quoted when it fails. On Unix the fixer leads its own process group, and the whole group is killed at the timeout and once the fixer exits, so a process it started can neither outlive it nor hold its output open (through `libc`, MIT / Apache-2.0).
     - The result goes through the same verifier as a built-in fix (decision 5). A fixer that fails or times out reports the instance as `manual` with the rule's steps.
 19. **Adapters** ([SR-LINTER](0106_linter.md) decision 2).
     - Each adapter has a manifest in the codelaw source (`adapters/<name>.toml`): the binary name, the lookup order (`node_modules/.bin`, `.venv/bin`, `PATH`), the command line for JSON output, a tested version range, and the parser that maps its output to codelaw diagnostics and fix classes ([L4](0006_LAW-4-every-rule-has-a-fix.md) decision 9).
@@ -151,7 +156,10 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 #### G. Failure, safety and privacy
 
 25. **A rule failure is isolated.** A panic or error inside one rule on one file is caught, reported as `codelaw/internal-error` naming the rule and file, and the run continues. Internal errors make the exit code 2 at the end, after every other result is printed.
-26. **Partial results are never silently partial.** If any file was skipped (encoding, size, read error) or any rule failed, the summary line says so and `--format json` carries a `skipped[]` list.
+    - The diagnostic is the engine's, never the failing rule's: the rule's severity, a `codelaw-ignore` of the rule and the cache cannot hide it, and a suppression of a rule that failed is not reported unused.
+    - A semantic model that panics fails every rule on that file that needs it; the other rules still run.
+    - The panic fixture is the `test/panic` native rule, compiled only with `codelaw-native`'s `fault-injection` feature, which only the engine's and the CLI's tests enable.
+26. **Partial results are never silently partial.** If any file was skipped (encoding, size, read error) or any rule failed, the summary line says so and `--format json` carries a `skipped[]` list. A folder the walk could not enter (permission denied, a symlink loop) is in `skipped[]` too.
 27. **No network, no model, no clock, no telemetry.** The engine makes no network calls, calls no model, reads no wall clock ([L5](0007_LAW-5-no-model-in-the-engine.md)) and sends no usage data anywhere, ever. Nothing is downloaded after install ([L6](0008_LAW-6-python-and-node-packages.md) decision 3).
 28. **What may execute.** codelaw runs only: itself, the `git` binary (decision 14), adapters named in config (decision 19), external fixers under the allowlist (decision 18), `[format] format_after` commands the user wrote, and the package manager `codelaw init` runs to install rule packs ([SR-RULE-PACKS](0101_rule-packs.md) decision 6). Nothing in a rule file, pack or cache is ever executed.
 

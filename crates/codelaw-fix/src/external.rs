@@ -8,7 +8,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::io::{Read, Write};
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
+use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
 #[derive(Serialize)]
@@ -86,6 +87,42 @@ pub fn request_json(call: &ExternalCall<'_>) -> String {
     serde_json::to_string(&req).expect("serialisable")
 }
 
+/// How long the fixer's output may stay open after it exits: a process it
+/// started and left running can hold the pipe.
+const CLOSE_GRACE: Duration = Duration::from_millis(500);
+
+/// Read a pipe to its end on a thread; the result arrives on the channel.
+fn drain(mut pipe: impl Read + Send + 'static) -> mpsc::Receiver<Vec<u8>> {
+    let (tx, rx) = mpsc::channel();
+    std::thread::spawn(move || {
+        let mut buf = Vec::new();
+        let _ = pipe.read_to_end(&mut buf);
+        let _ = tx.send(buf);
+    });
+    rx
+}
+
+/// Stop the fixer and everything it started. On Unix the fixer leads its
+/// own process group, so the group is killed, not just `sh`.
+fn kill_all(child: &mut Child) {
+    #[cfg(unix)]
+    if let Ok(pid) = libc::pid_t::try_from(child.id()) {
+        // SAFETY: `kill` takes plain integers and has no memory effects; a
+        // group that is already gone is ESRCH, which is ignored.
+        unsafe {
+            libc::kill(-pid, libc::SIGKILL);
+        }
+    }
+    let _ = child.kill();
+}
+
+/// The last line of what the fixer wrote to stderr, for the error message.
+fn stderr_tail(rx: &mpsc::Receiver<Vec<u8>>) -> String {
+    let bytes = rx.recv_timeout(CLOSE_GRACE).unwrap_or_default();
+    let text = String::from_utf8_lossy(&bytes);
+    text.lines().rev().find(|l| !l.trim().is_empty()).map(|l| format!(": {}", l.trim())).unwrap_or_default()
+}
+
 /// Run an external fixer. Any failure is an `Err`; the caller reports the
 /// instances as `manual` with the rule's steps.
 pub fn run_external(call: &ExternalCall<'_>) -> Result<Vec<TextEdit>, String> {
@@ -99,6 +136,11 @@ pub fn run_external(call: &ExternalCall<'_>) -> Result<Vec<TextEdit>, String> {
         c.arg("-c").arg(call.command);
         c
     };
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        cmd.process_group(0);
+    }
     let mut child = cmd
         .current_dir(call.cwd)
         .stdin(Stdio::piped())
@@ -107,32 +149,39 @@ pub fn run_external(call: &ExternalCall<'_>) -> Result<Vec<TextEdit>, String> {
         .spawn()
         .map_err(|e| format!("cannot start `{}`: {e}", call.command))?;
     let mut stdin = child.stdin.take().expect("piped");
-    let writer = std::thread::spawn(move || {
+    std::thread::spawn(move || {
         let _ = stdin.write_all(input.as_bytes());
     });
-    let mut stdout = child.stdout.take().expect("piped");
-    let reader = std::thread::spawn(move || {
-        let mut s = String::new();
-        let _ = stdout.read_to_string(&mut s);
-        s
-    });
+    // Both pipes are drained as the fixer runs, so a fixer that writes a
+    // lot to stderr never blocks on a full pipe.
+    let stdout = drain(child.stdout.take().expect("piped"));
+    let stderr = drain(child.stderr.take().expect("piped"));
     let started = Instant::now();
     let status = loop {
         match child.try_wait() {
             Ok(Some(status)) => break status,
             Ok(None) if started.elapsed() >= call.timeout => {
-                let _ = child.kill();
+                kill_all(&mut child);
                 let _ = child.wait();
                 return Err(format!("`{}` timed out after {:?}", call.command, call.timeout));
             }
             Ok(None) => std::thread::sleep(Duration::from_millis(2)),
-            Err(e) => return Err(format!("`{}` failed: {e}", call.command)),
+            Err(e) => {
+                kill_all(&mut child);
+                let _ = child.wait();
+                return Err(format!("`{}` failed: {e}", call.command));
+            }
         }
     };
-    let _ = writer.join();
-    let out = reader.join().unwrap_or_default();
+    // The fixer is done; whatever it left running goes with it, so its
+    // pipes close and nothing waits on them.
+    kill_all(&mut child);
+    let out = match stdout.recv_timeout(CLOSE_GRACE) {
+        Ok(bytes) => String::from_utf8_lossy(&bytes).into_owned(),
+        Err(_) => return Err(format!("`{}` exited but a process it started kept its output open", call.command)),
+    };
     if !status.success() {
-        return Err(format!("`{}` exited with {status}", call.command));
+        return Err(format!("`{}` exited with {status}{}", call.command, stderr_tail(&stderr)));
     }
     let resp: Response = serde_json::from_str(&out).map_err(|e| format!("`{}` printed invalid JSON: {e}", call.command))?;
     let mut edits = Vec::new();
@@ -146,6 +195,6 @@ pub fn run_external(call: &ExternalCall<'_>) -> Result<Vec<TextEdit>, String> {
         }
         edits.push(TextEdit::new(start, end, e.text));
     }
-    edits.sort_by(|a, b| (a.start, a.end).cmp(&(b.start, b.end)));
+    edits.sort_by_key(|e| (e.start, e.end));
     Ok(edits)
 }
