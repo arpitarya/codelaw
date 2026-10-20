@@ -1,0 +1,4 @@
+description = "Starter rules for GitHub Actions workflows and composite actions"
+
+[rules]
+"yaml/gha-pin-sha" = "warn"

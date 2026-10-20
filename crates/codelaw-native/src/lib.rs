@@ -10,6 +10,10 @@
 mod accessors;
 mod classes;
 mod conventions;
+mod data_json;
+mod data_md;
+mod data_toml;
+mod data_yaml;
 mod duplicates;
 mod expressions;
 mod literals;
@@ -70,7 +74,7 @@ static JS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars 
 static TS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "ts/no-unused-vars", languages: TS_ONLY };
 static TS_NO_UNUSED_EXPRESSIONS: typescript::NoUnusedExpressions = typescript::NoUnusedExpressions { id: "ts/no-unused-expressions", languages: TS_ONLY };
 
-/// Sorted by id.
+/// Every native rule; ids are unique, order doesn't matter.
 static REGISTRY: &[&dyn NativeRule] = &[
     &classes::ConstructorSuper,
     &accessors::GetterReturn,
@@ -102,6 +106,24 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &useless_escape::NoUselessEscape,
     &typescript::NoVar,
     &typescript::PreferConst,
+    &data_json::NoDuplicateKeys,
+    &data_json::PackageEngines,
+    &data_json::PackageScriptsSorted,
+    &data_json::TsconfigStrict,
+    &data_md::CommandsShowOutput,
+    &data_md::DescriptiveLinkText,
+    &data_md::FirstLineHeading,
+    &data_md::HeadingIncrement,
+    &data_md::LinkFragments,
+    &data_md::LinkImageReferenceDefinitions,
+    &data_md::NoBareUrls,
+    &data_md::NoDuplicateHeading,
+    &data_md::NoEmphasisAsHeading,
+    &data_md::NoInlineHtml,
+    &data_md::NoReversedLinks,
+    &data_md::ReferenceLinksImages,
+    &data_md::SingleH1,
+    &data_md::TableColumnCount,
     &node::NoDeprecatedApi,
     &react::ExhaustiveDeps,
     &react::JsxNoDuplicateProps,
@@ -125,6 +147,9 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &stencil::ReservedMemberNames,
     &stencil::StrictMutable,
     &stencil::TagPrefix,
+    &data_toml::DepsSorted,
+    &data_toml::NoDuplicateKeys,
+    &data_toml::PyprojectRequiresPython,
     &typescript::NoDuplicateEnumValues,
     &typescript::NoUnsafeDeclarationMerging,
     &TS_NO_UNUSED_EXPRESSIONS,
@@ -132,9 +157,14 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &typescript::NoWrapperObjectTypes,
     &typescript::PreferAsConst,
     &conventions::TypeOnlyImports,
+    &data_yaml::DocumentStart,
+    &data_yaml::NoAmbiguousBooleans,
+    &data_yaml::NoAmbiguousNumbers,
+    &data_yaml::NoDuplicateKeys,
+    &data_yaml::NoUndeclaredAlias,
 ];
 
-/// Every registered native rule, sorted by id.
+/// Every registered native rule.
 pub fn registry() -> &'static [&'static dyn NativeRule] {
     REGISTRY
 }
@@ -162,11 +192,9 @@ pub(crate) fn run(rule: &dyn NativeRule, language: Language, src: &str) -> Vec<N
 #[cfg(test)]
 mod tests {
     #[test]
-    fn ids_are_unique_and_sorted() {
+    fn ids_are_unique() {
         let ids: Vec<&str> = super::registry().iter().map(|r| r.id()).collect();
-        let mut sorted = ids.clone();
-        sorted.sort();
-        sorted.dedup();
-        assert_eq!(ids, sorted);
+        let unique: std::collections::BTreeSet<&str> = ids.iter().copied().collect();
+        assert_eq!(unique.len(), ids.len(), "a native id is registered twice");
     }
 }

@@ -1,0 +1,9 @@
+description = "Correctness for JSON, YAML and TOML: keys defined twice, aliases without an anchor, and the scalars YAML 1.1 and 1.2 read differently"
+
+[rules]
+"json/no-duplicate-keys" = "error"
+"toml/no-duplicate-keys" = "error"
+"yaml/no-ambiguous-booleans" = "warn"
+"yaml/no-ambiguous-numbers" = "warn"
+"yaml/no-duplicate-keys" = "error"
+"yaml/no-undeclared-alias" = "error"
