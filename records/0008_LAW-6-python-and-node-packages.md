@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "how codelaw is packaged and released"
 owns: []
 laws: [L0, L2, L3, L6]
-timestamp: 2026-10-20T06:30:00Z
+timestamp: 2026-10-20T20:00:00Z
 content_sha: ""
 ---
 
@@ -119,7 +119,7 @@ flowchart LR
 - **Every release builds a binary for each platform and publishes the engine and the five packs to both registries.** One failed publish fails the release.
 - **`codelaw` installed alone lints nothing:** rules come from packs, and `codelaw init` installs them ([SR-RULE-PACKS](0101_rule-packs.md) decision 6).
 - **The wrappers stay thin:** zero runtime dependencies, which also keeps them trivially within [L2](0004_LAW-2-foss-dependencies.md).
-- **Checked since 2026-10-20 by every `ci.yml` run:** the version check (`scripts/version.py --check`, with the binary on every platform), the dependency check and pack parity (`scripts/package.py check`), and the runtime fence and npm-vs-PyPI byte-equality (`scripts/smoke.sh`). **The install matrix runs on linux-x64 only** and installs from the built files, not a staging index: `W-18` in `work/BACKLOG.md`.
+- **Checked since 2026-10-20 by every `ci.yml` run:** the version check (`scripts/version.py --check`, with the binary on every platform), the dependency check and pack parity (`scripts/package.py check`), and the runtime fence and npm-vs-PyPI byte-equality (`scripts/smoke.sh`). **The install matrix and the runtime fence run on all eight platforms** (`ci.yml`'s `smoke` job, added by W-18 on 2026-10-20 and first proven by its first CI run; the musl two in a clean Alpine container), but **from the built files, not a staging index** — that part of the install matrix is still open.
 
 ### Alternatives considered
 

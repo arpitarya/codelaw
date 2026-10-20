@@ -7,8 +7,12 @@ JavaScript functions are rewritten as JSON conditions; the element, attribute
 and content-model data are otherwise unchanged.
 
 data/html/entities.json is the list of named character references shipped
-with html-validate 11.16.4 (MIT License, as above), which follows the WHATWG
-HTML Standard's named character reference table.
+with html-validate 11.16.4 (MIT License, as above). That list follows the
+named character reference table of the WHATWG HTML Living Standard,
+https://html.spec.whatwg.org/multipage/named-characters.html — Copyright (c)
+WHATWG (Apple, Google, Mozilla, Microsoft), published under the Creative
+Commons Attribution 4.0 International License; this pack takes it from
+html-validate, not from the Standard.
 
 data/html/input-attributes.json is derived from the table of html-validate
 11.16.4's `input-attributes` rule (MIT License, as above).

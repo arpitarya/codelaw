@@ -5,6 +5,10 @@
 # Nothing is built here. ci.yml assembled and checked `dist` on the release
 # commit; this downloads THAT artifact, re-runs the checks, and uploads it.
 #
+# Every `run:` is `bash -eo pipefail`; every action is pinned by commit SHA,
+# and npm by exact version (W-18). The `npm` and `pypi` environments accept
+# only `v*` tags (a deployment rule set by the decider: RELEASING.md).
+#
 # ⚠ Do NOT rename this file or the `npm` / `pypi` environments. Every trusted
 #   publisher on npmjs.com and pypi.org is bound to `arpitarya/codelaw` ·
 #   `publish.yml` · its environment, and a rename fails the next release at the
@@ -15,6 +19,11 @@ on:
     types: [published]
 permissions:
   contents: read
+defaults:
+  run:
+    shell: bash # an explicit `bash` is `bash --noprofile --norc -eo pipefail`; the implicit default has no pipefail
+env:
+  NPM_VERSION: '11.21.0' # trusted publishing needs ≥ 11.5.1; Node 22 ships npm 10. Pinned: never `latest` in an id-token job
 jobs:
   gate:
     name: the release commit is green on main
@@ -23,10 +32,14 @@ jobs:
     permissions:
       contents: read
       actions: read # ci.yml's verdict and its dist artifact
+      attestations: read # ci.yml's build attestation of every file
     outputs:
       run: ${{ steps.ci.outputs.run }}
+      sums: ${{ steps.verified.outputs.sums }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
       - id: ci
         name: ci.yml succeeded on this commit, on main
         env:
@@ -42,14 +55,26 @@ jobs:
           echo "run=$run" >> "$GITHUB_OUTPUT"
       - name: the tag is the version, and every copy agrees (W-18)
         run: python3 scripts/version.py --check --tag "$GITHUB_REF_NAME"
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: dist
           path: dist/
           run-id: ${{ steps.ci.outputs.run }}
           github-token: ${{ github.token }}
-      - name: the release checks, again, on exactly what will be uploaded
+      - name: the release checks, again, on exactly what will be uploaded (SHA256SUMS included)
         run: python3 scripts/package.py check dist
+      - id: verified
+        name: every file is the one ci.yml built and attested, from this commit, on main (SR-PACKAGES decision 11)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in dist/npm/* dist/pypi/*; do
+            gh attestation verify "$f" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
+              --source-ref refs/heads/main --source-digest "$GITHUB_SHA" >/dev/null
+            echo "✓ $f"
+          done
+          echo "sums=$(sha256sum dist/SHA256SUMS | cut -c1-64)" >> "$GITHUB_OUTPUT"
       - name: the engine has its formatter, MCP server and LSP — L7 and L6 decision 3 forbid releasing without them
         run: python3 scripts/law-gate.py dist
 
@@ -66,18 +91,18 @@ jobs:
     environment:
       name: npm # the OIDC token's environment claim must be the one npm trusts
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: dist
           path: dist/
           run-id: ${{ needs.gate.outputs.run }}
           github-token: ${{ github.token }}
-      - name: npm 11.5.1 or later (trusted publishing needs it; Node 22 ships npm 10)
-        run: npm i -g npm@latest --no-audit --no-fund --loglevel=error && npm --version
+      - name: npm ${{ env.NPM_VERSION }} (trusted publishing needs ≥ 11.5.1; Node 22 ships npm 10)
+        run: npm i -g "npm@$NPM_VERSION" --no-audit --no-fund --loglevel=error && npm --version
       - name: npm trusts this workflow for every package, before anything is published
         # The same OIDC exchange `npm publish` makes, per package: a package npm does
         # not trust would otherwise fail mid-loop and leave the release half on npm.
@@ -107,27 +132,47 @@ jobs:
       name: npm
       url: https://www.npmjs.com/package/codelaw
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: dist
           path: dist/
           run-id: ${{ needs.gate.outputs.run }}
           github-token: ${{ github.token }}
-      - name: npm 11.5.1 or later (trusted publishing needs it; Node 22 ships npm 10)
-        run: npm i -g npm@latest --no-audit --no-fund --loglevel=error && npm --version
+      - name: npm ${{ env.NPM_VERSION }} (trusted publishing needs ≥ 11.5.1; Node 22 ships npm 10)
+        run: npm i -g "npm@$NPM_VERSION" --no-audit --no-fund --loglevel=error && npm --version
+      - name: the download is the set the gate verified (SHA256SUMS, W-18)
+        env:
+          SUMS: ${{ needs.gate.outputs.sums }}
+        run: |
+          echo "$SUMS  dist/SHA256SUMS" | sha256sum --strict --quiet -c
+          (cd dist && sha256sum --strict --quiet -c SHA256SUMS)
+          [ "$(find dist/npm dist/pypi -type f | wc -l)" = "$(wc -l < dist/SHA256SUMS)" ] || { echo "::error::dist holds a file SHA256SUMS does not list"; exit 1; }
       - name: publish — the eight binaries, the five packs, then codelaw last
         # codelaw names the binaries as optionalDependencies, so it goes last: a
         # failure before it leaves the previous codelaw as `latest`, intact.
-        # A pre-release (a version with "-") goes to `next`, never `latest`.
+        # The dist-tag, one for the whole release:
+        #   a pre-release (a version with "-")          → `next`, never `latest`
+        #   older than codelaw's current `latest` (a backport, 0.1.5 after 0.2.0)
+        #                                               → `release-<major>.<minor>`, so `latest` stays on the newer line
+        #   otherwise                                   → `latest`
         # A version already on npm is skipped, so a failed run is re-run, not re-released.
         run: |
+          v="${GITHUB_REF_NAME#v}"
+          cur="$(npm view codelaw dist-tags.latest 2>/dev/null || true)"
+          case "$v" in
+            *-*) tag=next ;;
+            *) if [ -n "$cur" ] && [ "$cur" != "$v" ] && [ "$(printf '%s\n%s\n' "$cur" "$v" | sort -V | tail -1)" = "$cur" ]; then
+                 tag="release-$(echo "$v" | cut -d. -f1-2)"
+               else tag=latest; fi ;;
+          esac
+          echo "dist-tag: $tag (codelaw's latest is ${cur:-none})"
           for t in ./dist/npm/codelaw-cli-*.tgz ./dist/npm/codelaw-rules-*.tgz ./dist/npm/codelaw-[0-9]*.tgz; do
             id="$(tar -xzOf "$t" package/package.json | node -p 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); p.name + "@" + p.version')"
-            case "${id##*@}" in *-*) tag=next ;; *) tag=latest ;; esac  # the version after the LAST @
+            [ "${id##*@}" = "$v" ] || { echo "::error::$id is not the release version $v"; exit 1; }  # the version after the LAST @
             if npm view "$id" version >/dev/null 2>&1; then echo "✓ $id is already on npm"; continue; fi
             echo "→ $id ($tag)"
             npm publish "$t" --tag "$tag" --provenance --access public
@@ -144,13 +189,20 @@ jobs:
       name: pypi
       url: https://pypi.org/project/codelaw/
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: dist
           path: dist/
           run-id: ${{ needs.gate.outputs.run }}
           github-token: ${{ github.token }}
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - name: the download is the set the gate verified (SHA256SUMS, W-18)
+        env:
+          SUMS: ${{ needs.gate.outputs.sums }}
+        run: |
+          echo "$SUMS  dist/SHA256SUMS" | sha256sum --strict --quiet -c
+          (cd dist && sha256sum --strict --quiet -c SHA256SUMS)
+          [ "$(find dist/npm dist/pypi -type f | wc -l)" = "$(wc -l < dist/SHA256SUMS)" ] || { echo "::error::dist holds a file SHA256SUMS does not list"; exit 1; }
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           packages-dir: dist/pypi/
           skip-existing: true
@@ -164,7 +216,7 @@ jobs:
       contents: write
       actions: read
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: dist
           path: dist/
@@ -183,7 +235,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
       - run: bash scripts/withdraw.sh "${GITHUB_REF_NAME#v}" --report | tee -a "$GITHUB_STEP_SUMMARY"
       - run: |
           echo "::error::release ${GITHUB_REF_NAME} is half-published. Do not announce it. Run: scripts/withdraw.sh ${GITHUB_REF_NAME#v}"

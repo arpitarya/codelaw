@@ -98,6 +98,13 @@ def base_manifest(name: str, v: str, description: str) -> dict:
     }
 
 
+def pack_manifest(name: str, v: str) -> dict:
+    """A rule pack's package.json (decision 9); scripts/build-packs.py writes the same one."""
+    m = base_manifest(f"@codelaw/rules-{name}", v, pack_meta(name)["description"])
+    m["keywords"] = ["codelaw", "codelaw-pack", "lint-rules"]
+    return m
+
+
 # ── prepare-wheel / extract ────────────────────────────────────────────────
 
 
@@ -234,9 +241,7 @@ def assemble(bins: pathlib.Path, wheels: pathlib.Path, out: pathlib.Path) -> Non
         shutil.copytree(src, pd)
         copy_licences(pd)
         wheel_for_pack(name, v, pd, pypi_out)  # before package.json joins the folder
-        m = base_manifest(f"@codelaw/rules-{name}", v, pack_meta(name)["description"])
-        m["keywords"] = ["codelaw", "codelaw-pack", "lint-rules"]
-        write_json(pd / "package.json", m)
+        write_json(pd / "package.json", pack_manifest(name, v))
         to_pack.append(pd)
     with concurrent.futures.ThreadPoolExecutor(8) as pool:
         list(pool.map(lambda d: npm_pack(d, npm_out), to_pack))
@@ -353,10 +358,30 @@ def check(out: pathlib.Path) -> None:
         if set(a) - set(LICENCE_FILES) != tree - set(LICENCE_FILES):
             bad.append(f"rules-{name}: the npm tarball is not packs/{name}/ (+ LICENSE)")
 
+    # SHA256SUMS: exactly the files that will be uploaded, each with its digest (W-18)
+    sums = out / "SHA256SUMS"
+    listed: dict[str, str] = {}
+    if not sums.is_file():
+        bad.append("SHA256SUMS is missing")
+    else:
+        for line in sums.read_text(encoding="utf-8").splitlines():
+            m = re.fullmatch(r"([0-9a-f]{64})  ((?:npm|pypi)/[^/]+)", line)
+            if not m:
+                bad.append(f"SHA256SUMS: malformed line {line!r}")
+                continue
+            listed[m.group(2)] = m.group(1)
+    present = {f"{d}/{f.name}" for d in ("npm", "pypi") if (out / d).is_dir() for f in (out / d).iterdir() if f.is_file()}
+    if sums.is_file() and set(listed) != present:
+        bad.append(f"SHA256SUMS lists {sorted(set(listed) - present)[:3]} not in dist, and omits {sorted(present - set(listed))[:3]}")
+    for rel, digest in listed.items():
+        f = out / rel
+        if f.is_file() and hashlib.sha256(f.read_bytes()).hexdigest() != digest:
+            bad.append(f"{rel}: its sha256 is not the one SHA256SUMS lists")
+
     if bad:
         fail(f"{len(bad)} release check(s) failed:\n  " + "\n  ".join(bad))
     print(f"✔ {len(npm)} npm packages and {len(seen_tags) + len(pypi_packs)} wheels at {v}: only the SR-PACKAGES names, one version, "
-          "zero dependencies, licensed, one binary per platform, packs equal on both registries")
+          "zero dependencies, licensed, one binary per platform, packs equal on both registries, SHA256SUMS true")
 
 
 def main() -> None:

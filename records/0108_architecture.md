@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-19T14:51:23Z
+timestamp: 2026-10-20T20:30:00Z
 content_sha: ""
 ---
 
@@ -63,7 +63,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 #### A. Structure
 
-1. **Layers.** The six layers and their crates are [SR-PACKAGES](0107_packages.md) decision 1. A crate depends only on crates in layers above its own, with no cycles inside a layer. The layer order is checked in CI (`B-020`).
+1. **Layers.** Six layers: **five hold crates** — foundation, inputs, engines, orchestration, surfaces, whose crates are [SR-PACKAGES](0107_packages.md) decision 1 — and the sixth, **distribution** (the npm and PyPI packages, the editor extension, the rule packs), holds no crate: it is built from the binary and `packs/` ([SR-PACKAGES](0107_packages.md) decisions 3–9). A crate depends only on crates in its own layer or the layers above it, with no cycles inside a layer. The layer order of the five crate layers is checked in CI by `crates/codelaw-cli/tests/layers.rs` (`B-020`).
 2. **Everything is a library; surfaces are thin.** `codelaw-engine` exposes `check`, `fix`, `format`, `rules_for`, `explain` and the debug queries as functions over typed inputs. The CLI, MCP, LSP and hook crates only translate between their protocol and those functions ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 6, [SR-EDITOR](0114_editor.md) decision 3).
 3. **Pinned grammars and engines.** Every tree-sitter grammar and every formatter engine is vendored at a pinned version in `Cargo.lock`; the grammar and engine versions are part of every cache key ([SR-CACHE](0109_cache.md) decision 2).
 

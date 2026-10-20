@@ -5,6 +5,15 @@ https://github.com/sindresorhus/globals — Copyright (c) Sindre Sorhus
 <sindresorhus@gmail.com> (https://sindresorhus.com), released under the MIT
 License.
 
+data/node/deprecated-api.json was written for this pack: the Node.js APIs that
+the Node.js documentation deprecates (https://nodejs.org/api/deprecations.html),
+each with its documented replacement, in codelaw's own words. No text or code
+is copied from Node.js.
+
+data/react/dom-property-aliases.json was written for this pack: HTML attribute
+names and the React DOM prop names that replace them (`class` -> `className`),
+as React documents them. No React code is included.
+
 The rules are reimplementations written for codelaw. Their `ported_from:`
 fields name the ESLint rules (https://eslint.org, MIT License) whose documented
 behaviour they reproduce; no ESLint code or documentation text is included.

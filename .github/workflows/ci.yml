@@ -8,8 +8,14 @@
 #   build ×8  one maturin wheel per platform; the npm binary is taken OUT of it, so
 #             both registries ship the same bytes (L6 decision 2); each runs its
 #             binary's --version and every pack's tests on its own platform
-#   package   the 14 npm tarballs + 13 wheels, the release checks, and an install
-#             smoke: npm and PyPI give byte-equal output on the L3 fixtures + a pack
+#   package   the 14 npm tarballs + 13 wheels, the release checks (SHA256SUMS
+#             included); on main, a build attestation of every file publish.yml uploads
+#   smoke ×8  the L6 install matrix and runtime fence on every platform: npm and
+#             PyPI installs give byte-equal output on the L3 fixtures + a pack
+#
+# Every `run:` is `bash -eo pipefail` (the defaults below), so a failure inside
+# a pipe — `cargo clippy … | tee` — fails its step (W-18). Every action is
+# pinned by commit SHA; the comment names its release.
 #
 # 🔴 Speed — a verdict already earned is not earned again. Each Rust job keys
 # its result by the inputs that can change it (the sources it reads and the
@@ -35,6 +41,9 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 permissions:
   contents: read
+defaults:
+  run:
+    shell: bash # an explicit `bash` is `bash --noprofile --norc -eo pipefail`; the implicit default has no pipefail
 env:
   CARGO_TERM_COLOR: always
   CARGO_INCREMENTAL: '0'
@@ -49,12 +58,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
       - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
         run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - id: verdict
         if: env.REUSE == 'true'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
           key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**') }}
@@ -64,7 +75,7 @@ jobs:
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --component clippy --no-self-update
       - if: steps.verdict.outputs.cache-hit != 'true'
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           cache-on-failure: true
       - if: steps.verdict.outputs.cache-hit != 'true'
@@ -72,7 +83,7 @@ jobs:
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: mkdir -p .verdict && echo "${{ github.sha }}" > .verdict/sha
       - if: steps.verdict.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
           key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**') }}
@@ -82,16 +93,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
+          persist-credentials: false # nothing here pushes (W-18)
           fetch-depth: 0 # the SR guard replays every commit since records/RULE-SINCE
       - name: every version copy agrees (L6 decision 9, W-18)
         run: python3 scripts/version.py --check
       - name: the SR guard, replayed over history (SR-WORK-OWNERSHIP decision 7)
         run: |
           base="$(grep -v '^#' records/RULE-SINCE)"
+          git rev-parse --verify --quiet "$base^{commit}" >/dev/null || {
+            echo "::error title=SR guard::records/RULE-SINCE names '$base', which is not a commit in this history"
+            exit 1
+          }
+          commits="$(git rev-list --no-merges "$base"..HEAD)" # an assignment: a failing rev-list fails the step
           n=0
-          for c in $(git rev-list --no-merges "$base"..HEAD); do
+          for c in $commits; do
             SR_GUARD_COMMIT=$c bash scripts/sr-guard.sh; n=$((n + 1))
           done
           echo "✔ $n commits since ${base::8}: each touched the records its components need"
@@ -99,7 +116,7 @@ jobs:
         run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - id: verdict
         if: env.REUSE == 'true'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
           key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**') }}
@@ -109,7 +126,7 @@ jobs:
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --component clippy --no-self-update
       - if: steps.verdict.outputs.cache-hit != 'true'
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           cache-on-failure: true
       - name: cargo clippy --workspace --all-targets -- -D warnings
@@ -122,7 +139,7 @@ jobs:
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: mkdir -p .verdict && echo "${{ github.sha }}" > .verdict/sha
       - if: steps.verdict.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
           key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**') }}
@@ -146,18 +163,17 @@ jobs:
           - { key: darwin-x64, target: x86_64-apple-darwin, os: macos-latest, maturin: '' } # cross-built; runs under Rosetta
           - { key: win32-x64, target: x86_64-pc-windows-msvc, os: windows-latest, maturin: '' }
           - { key: win32-arm64, target: aarch64-pc-windows-msvc, os: windows-11-arm, maturin: '' }
-    defaults:
-      run:
-        shell: bash
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
       - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
         run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - id: wheel
         # Everything that goes into the wheel: the engine's sources, the Python
         # module, the licence and README it carries, and these build steps.
         if: env.REUSE == 'true'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: out/wheel
           key: wheel-${{ matrix.key }}-${{ steps.rustc.outputs.v }}-${{ env.MATURIN_VERSION }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.toml', 'Cargo.lock', 'crates/**', 'packaging/python/**', 'packaging/README.md', 'LICENSE', '.github/workflows/ci.yml') }}
@@ -166,11 +182,11 @@ jobs:
       - if: steps.wheel.outputs.cache-hit != 'true'
         run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --target ${{ matrix.target }} --no-self-update
       - if: steps.wheel.outputs.cache-hit != 'true'
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           key: ${{ matrix.target }}
           cache-on-failure: true
-      - uses: actions/setup-python@v6 # the scripts need it on a reused wheel too
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0 — the scripts need it on a reused wheel too
         with:
           python-version: '3.12'
       - name: maturin${{ contains(matrix.maturin, 'zig') && ' + zig' || '' }}
@@ -183,7 +199,7 @@ jobs:
         working-directory: packaging/python
         run: maturin build --release --locked --target ${{ matrix.target }} ${{ matrix.maturin }} --out ../../out/wheel
       - if: steps.wheel.outputs.cache-hit != 'true' && env.REUSE == 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: out/wheel
           key: ${{ steps.wheel.outputs.cache-primary-key }}
@@ -194,7 +210,7 @@ jobs:
           b="out/bin/${{ matrix.key }}/codelaw"; [ -f "$b.exe" ] && b="$b.exe"
           python scripts/version.py --check --binary "$b"
           for p in packs/*/; do "$b" test "$p" | tail -1; "$b" rules lint "$p" | tail -1; done
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: build-${{ matrix.key }}
           path: out/
@@ -205,25 +221,36 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write # the build attestation's signing certificate (main only)
+      attestations: write
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           pattern: build-*
           path: out/
           merge-multiple: true
       - name: assemble every package (SR-PACKAGES decisions 3-9)
         run: python3 scripts/package.py assemble --bins out/bin --wheels out/wheel --out dist
-      - name: the release checks — names (B-020), one version, zero deps, licence, one binary, pack parity
+      - name: the release checks — names (B-020), one version, zero deps, licence, one binary, pack parity, SHA256SUMS
         run: python3 scripts/package.py check dist
       - name: the engine is complete enough to release (L6 decision 3, L7) — reported, not failed, until W-07–W-09 land
         run: python3 scripts/law-gate.py dist --report
-      - name: npm and PyPI installs give byte-equal output (L6 install matrix, linux-x64)
-        run: bash scripts/smoke.sh dist
-      - uses: actions/upload-artifact@v6
+      - name: attest every file publish.yml may upload (SR-PACKAGES decision 11) — main pushes only
+        # publish.yml's gate verifies each file against this attestation, so it
+        # uploads exactly what this run built, from this commit, on main.
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-checksums: dist/SHA256SUMS
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: dist
           path: |
@@ -232,3 +259,50 @@ jobs:
             dist/SHA256SUMS
           if-no-files-found: error
           retention-days: 30
+
+  smoke:
+    # L6 "How L6 is enforced": the install matrix and the runtime fence, on each
+    # of the eight platforms, from the checked `dist` (no registry; pip reads
+    # dist/pypi as its only index and picks the wheel for the machine).
+    # The musl platforms run in a clean Alpine container on the matching host.
+    needs: package
+    name: smoke ${{ matrix.key }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { key: linux-x64-gnu, os: ubuntu-latest, alpine: '' }
+          - { key: linux-x64-musl, os: ubuntu-latest, alpine: '3.22' }
+          - { key: linux-arm64-gnu, os: ubuntu-24.04-arm, alpine: '' }
+          - { key: linux-arm64-musl, os: ubuntu-24.04-arm, alpine: '3.22' }
+          - { key: darwin-arm64, os: macos-latest, alpine: '' }
+          - { key: darwin-x64, os: macos-15-intel, alpine: '' } # native x64: npm and pip pick by the host's arch
+          - { key: win32-x64, os: windows-latest, alpine: '' }
+          - { key: win32-arm64, os: windows-11-arm, alpine: '' }
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: dist
+          path: dist/
+      - if: matrix.alpine == ''
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - if: matrix.alpine == ''
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: '3.12'
+      - name: npm (no Python on PATH) and PyPI (no Node on PATH) give byte-equal output on ${{ matrix.key }}
+        if: matrix.alpine == ''
+        run: bash scripts/smoke.sh dist ${{ matrix.key }}
+      - name: the same, in a clean Alpine ${{ matrix.alpine }} container (musl)
+        if: matrix.alpine != ''
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w "alpine:${{ matrix.alpine }}" sh -euc '
+            apk add --no-cache -q bash git nodejs npm python3
+            bash scripts/smoke.sh dist ${{ matrix.key }}'

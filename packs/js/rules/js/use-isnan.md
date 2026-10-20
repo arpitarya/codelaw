@@ -20,8 +20,8 @@ match:
     field: operator
     regex: ^(==|===|!=|!==|<|>|<=|>=)$
   any:
-    - has: { field: left, regex: ^(Number\.)?NaN$ }
-    - has: { field: right, regex: ^(Number\.)?NaN$ }
+    - has: { field: left, regex: '^(Number\.)?NaN$' }
+    - has: { field: right, regex: '^(Number\.)?NaN$' }
 message: "Nothing equals NaN, not even NaN; use Number.isNaN(x)"
 ```
 

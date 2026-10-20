@@ -14,6 +14,7 @@ report="${2:-}"
 cd "$(git rev-parse --show-toplevel)"
 pv="$(python3 -c 'import sys; sys.path.insert(0, "scripts"); import package; print(package.pep440(sys.argv[1]))' "$v")"
 found=0
+failed=0  # a deprecate that fails must fail the script, not read as done (W-18)
 echo "## codelaw $v — what reached a registry"
 echo
 while read -r reg name <&3; do  # fd 3: npm keeps stdin for its OTP prompt
@@ -22,7 +23,8 @@ while read -r reg name <&3; do  # fd 3: npm keeps stdin for its OTP prompt
       if npm view "$name@$v" version >/dev/null 2>&1; then
         found=1
         if [ "$report" = --report ]; then echo "- npm \`$name@$v\` — \`npm deprecate $name@$v \"withdrawn: release $v was incomplete\"\`"
-        else npm deprecate "$name@$v" "withdrawn: release $v was incomplete" && echo "- npm $name@$v deprecated"; fi
+        elif npm deprecate "$name@$v" "withdrawn: release $v was incomplete"; then echo "- npm $name@$v deprecated"
+        else echo "- ✗ npm $name@$v was NOT deprecated — run it again" >&2; failed=1; fi
       fi ;;
     pypi)
       if curl -fs -o /dev/null "https://pypi.org/pypi/$name/$pv/json"; then
@@ -32,3 +34,4 @@ while read -r reg name <&3; do  # fd 3: npm keeps stdin for its OTP prompt
   esac
 done 3< <(python3 scripts/package.py names)
 [ "$found" = 1 ] || echo "- nothing: no registry has $v"
+[ "$failed" = 0 ] || { echo "✗ the withdrawal of $v is incomplete: see above" >&2; exit 1; }
