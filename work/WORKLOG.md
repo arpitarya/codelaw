@@ -24,7 +24,7 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
-## 2026-10-20 — W-03 in part: js presets finished; data, css and html packs merged; python returned for fixes  ·  Claude Code (Opus 5.5)
+## 2026-10-20 — W-03 steps 2–5: all five rule packs merged  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"continue all run everything in parallel"*.
 - **Done:**
@@ -37,7 +37,8 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the agents shared one scratchpad corpus folder and one emptied it under another mid-run; each now keeps its own. A whole-disk search for CSS files ran past its timeout and was stopped.
   - `packs/html` (71 rules, 6045676) merged after the same checks plus a 51-file rustdoc and Homebrew-docs run: findings sampled were spec violations html-validate also reports.
   - `packs/python` (98 rules) held back: compared with Ruff on pip's source it gave 87 extra unused-import findings and false `undefined-local` and `groupby` findings; returned to its agent with reproductions.
-- **Next:** re-check and merge the python branch; then close W-03 steps 3–5 (step 6, publish, needs the decider).
+  - `packs/python` re-checked after the fixes and merged (f746d06): the agent traced the false positives to the semantic model reading `List[int]` as a PEP 695 type-parameter list, fixed it there with tests; on pip the only remaining extras are lines under one `# noqa`.
+- **Next:** W-03 step 6 — the packaging (B-038), then the decider's ruling to publish and on the project licence.
 
 ---
 

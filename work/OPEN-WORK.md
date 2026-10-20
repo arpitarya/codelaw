@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ### build
 
-🟢 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets, on the W-02 engine. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
+🟢 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets, on the W-02 engine. Filed by Arpit (Cowork). Steps 2–5 done 2026-10-20 (401 rules across the five packs, every pack's tests green); step 6, publishing, needs the packaging (B-038) and then the decider's ruling. [detail](open/W-03-rule-packs.md)
 
 ### testing
 

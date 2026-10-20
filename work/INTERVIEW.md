@@ -24,14 +24,15 @@ entry.**
 
 ## 1 · State of play
 
-*Updated 2026-10-19.* The laws L0–L8 are accepted (L8's budgets unset; L6 host
+*Updated 2026-10-20.* The laws L0–L8 are accepted (L8's budgets unset; L6 host
 floors Python ≥ 3.11, Node ≥ 22); every record 0101–0115 is accepted. W-01
 rewrote the records for five rule packs; **W-02 built the engine**: a Cargo
 workspace of 13 crates under `crates/` and the `codelaw` binary (`check`,
 `fix`, `test`, `rules`, `explain`, `tree`, `new-rule`, `init`, `cache`), with
 the semantic model, `native:` rules and pack resolution. Every crate is owned in
-the register's Ownership table. W-03 has begun: `packs/js` holds `js/recommended`, all 64 of ESLint 10.0.1's
-recommended rules, every one `preview`. Not built:
+the register's Ownership table. W-03 steps 2–5 are done: five packs under `packs/` — js 132 rules, python 98,
+html 71, css 70, data 30 — every rule `preview`, each pack's tests green and
+checked against its upstream linter on third-party code. Not built:
 the formatter (so L7 is unmet), graph, baseline, adapters, MCP, LSP, agent
 surfaces, packaging — backlog B-028–B-039. `cargo test --workspace` is green
 and clippy is clean. **Ground it before you edit it** — `git log`, the queue,
@@ -39,17 +40,17 @@ and clippy is clean. **Ground it before you edit it** — `git log`, the queue,
 
 ## 2 · In flight, and the immediate next step
 
-**W-03** (the five packs, 🟢) is in flight: `js/recommended` is done; next
-are `ts/recommended`, `react`, `node`, `stencil`, then the python, css, html and
-data packs. Write `packs/<name>/` per SR-RULE-PACKS decision 3, run `codelaw
-test packs/<name>`, then run the pack over real code (npm's own source works
-for JS) before trusting it. Ports that need `target:` rules or the graph wait
-in each pack's "not ported yet" list (B-029, B-030), never approximated. Step 6
-(publish) needs packaging (B-038, with B-012) and the decider's ruling. The
-standing instruction to promote B-008 and B-012 when the first manifest lands
-is half done: L2's Cargo check landed in W-02 and B-008 now covers npm/PyPI;
-B-012 waits for B-038. The decider (`git config user.name`) still installs
-`scripts/sr-guard.sh` as the `commit-msg` hook.
+**W-03** (🟢): steps 2–5 are done; what remains is step 6, publishing, which
+needs the packaging (B-038, with B-012) and then the decider's ruling, together
+with the project licence (no pack has a `LICENSE`). Rules that need engine
+features not built wait in each pack README's "not ported" table: `target:`
+rules (B-030), the graph (B-029), a native rule's file path and bytes (B-040),
+a CSS grammar that parses modern CSS (B-041). For the decider to confirm or
+correct: every pack rule ships `preview`; upstream's noisy defaults kept in
+`html/require-sri`, `html/valid-id`, `html/button-type`; `json/package-engines`
+`>=22` and `toml/pyproject-requires-python` `>=3.11`. B-012 waits for B-038.
+The decider (`git config user.name`) still installs `scripts/sr-guard.sh` as
+the `commit-msg` hook.
 
 ## 3 · Standing constraints
 

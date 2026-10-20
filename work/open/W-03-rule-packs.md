@@ -17,9 +17,9 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Research the presets of ESLint, typescript-eslint, TSLint, Ruff, Prettier, stylelint, html-validate, HTMLHint, markdownlint | what each pack ports, and what it must not | ✅ 2026-10-19 (below) |
-| 2 | Write `rules-js` `recommended` presets | JS/TS/JSX/TSX/Node/React/Stencil coverage | ⏳ `js/recommended` ✅ 64 rules · `ts/recommended` ✅ 24 · `react` ✅ 19 · `node` ✅ 3 · `stencil` ✅ 15 · `js/conventions` ✅ 7 |
-| 3 | Write `rules-python` `recommended` | Python coverage | ⏳ |
-| 4 | Write `rules-css` and `rules-html` `recommended` | stylesheet and markup coverage | ⏳ `rules-css` ✅ 70 rules (`css/recommended` 41 · `css/standard` 28 · `css/conventions` 1) · `rules-html` ✅ 71 rules (`html/recommended` 63 · `html/a11y` 26 · `html/document` 5 · `html/conventions` 3) |
+| 2 | Write `rules-js` `recommended` presets | JS/TS/JSX/TSX/Node/React/Stencil coverage | ✅ 2026-10-20 — `js/recommended` 64 rules · `ts/recommended` ✅ 24 · `react` ✅ 19 · `node` ✅ 3 · `stencil` ✅ 15 · `js/conventions` ✅ 7 |
+| 3 | Write `rules-python` `recommended` | Python coverage | ✅ 2026-10-20 — 98 rules (`py/recommended` 96 · `py/conventions` 2) |
+| 4 | Write `rules-css` and `rules-html` `recommended` | stylesheet and markup coverage | ✅ 2026-10-20 — `rules-css` 70 rules (`css/recommended` 41 · `css/standard` 28 · `css/conventions` 1) · `rules-html` ✅ 71 rules (`html/recommended` 63 · `html/a11y` 26 · `html/document` 5 · `html/conventions` 3) |
 | 5 | Write `rules-data` | package.json, tsconfig, pyproject, CI YAML, Markdown | ✅ 2026-10-20 — 30 rules in 7 presets; schema validation waits on B-030 |
 | 6 | Publish all five to npm and PyPI with the engine | `codelaw init` can install them | ⏳ |
 
@@ -35,12 +35,12 @@ Five packs whose `recommended` presets cover the correctness core of each ecosys
 
 | DoD | what | state |
 |---|---|---|
-| 1 · porting rules | Every ported rule is **reimplemented**, never vendored; its docs are written fresh; `ported_from:` names the source rule(s). | ⏳ |
-| 2 · no layout | Rules the formatter owns are dropped (L7, SR-FORMATTER decision 3); the formatter's `[format]` defaults follow Prettier's (below). | ⏳ |
-| 3 · no types | Rules needing type information or the React Compiler are excluded and listed in each pack's README as "not ported, and why". | ⏳ |
-| 4 · L4 | Every rule has a fix class; `auto` wherever safe. | ⏳ |
-| 5 · tests | `codelaw test` green for every rule; the pack README states its rule count per preset and the ported/not-ported table. | ⏳ |
-| 7 · starter catalogue | The 34 v0 starter rules ([SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 8) placed: in `recommended` with `ported_from:` where they match a source rule, otherwise in the pack's `conventions` preset. | ⏳ |
+| 1 · porting rules | Every ported rule is **reimplemented**, never vendored; its docs are written fresh; `ported_from:` names the source rule(s). | ✅ 2026-10-20 |
+| 2 · no layout | Rules the formatter owns are dropped (L7, SR-FORMATTER decision 3); the formatter's `[format]` defaults follow Prettier's (below). | ✅ 2026-10-20 |
+| 3 · no types | Rules needing type information or the React Compiler are excluded and listed in each pack's README as "not ported, and why". | ✅ 2026-10-20 |
+| 4 · L4 | Every rule has a fix class; `auto` wherever safe. | ✅ 2026-10-20 |
+| 5 · tests | `codelaw test` green for every rule; the pack README states its rule count per preset and the ported/not-ported table. | ✅ 2026-10-20 |
+| 7 · starter catalogue | The 34 v0 starter rules ([SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 8) placed: in `recommended` with `ported_from:` where they match a source rule, otherwise in the pack's `conventions` preset. | ✅ 2026-10-20 |
 | 6 · publish | Ten packages (5 × npm + PyPI) released with the engine, same version (W-01 DoD 2). | ⏳ |
 
 ## Research: what each pack ports (2026-10-19)
@@ -128,7 +128,8 @@ Prettier has no lint rules. Its option defaults become SR-FORMATTER's `[format]`
 - **2026-10-20 — `rules-data`:** 30 rules in 7 presets (`data/recommended` 6, `md/recommended` 16, `data/package-json` 2, `data/tsconfig` 1, `data/pyproject` 2, `data/github-actions` 1, `data/conventions` 2), 216 checks green; natives in `data_{json,yaml,toml,md}.rs`. Not ported: `md/relative-links` (a native rule sees no file path or file system) and SchemaStore validation (B-030). Run over this repo's own records and docs, `md/single-h1` counts the frontmatter `title:` as the H1, as markdownlint does.
 - **2026-10-20 — `rules-css`:** 70 native rules in `css_*.rs` over a hand-written CSS reader (tree-sitter-css errors on range media queries, `layer()` imports and percentage keyframe selectors): all 41 of stylelint-config-recommended 18.0.0 and the 28 non-layout rules stylelint-config-standard 40.0.0 adds; 385 checks green. Three rules check less than stylelint, which uses CSSTree's MDN-derived (CC0) syntax data. A 317-file `node_modules` corpus found three false-positive patterns, fixed; a 60-file spot check found none.
 - **2026-10-20 — `rules-html`:** 71 native rules from html-validate 11.16.4's `recommended`, `a11y` and `document` presets (layout and cosmetic rules dropped), over an element tree rebuilt with html-validate's implied-tag rules because tree-sitter-html mis-nests `<option>` and `<head>`/`<body>`; element, entity and input-attribute tables from html-validate (MIT); 349 checks green. A 230-file corpus found six false-positive patterns (one a panic on multi-byte text), all fixed; a 51-file spot check over rustdoc and Homebrew docs found none. Not ported: `no-utf8-bom` (the engine strips the BOM before rules run).
-- **2026-10-20 — `rules-python`:** built (98 rules: Ruff 0.17.1's E4/E7/E9/F, all stable flake8-bugbear, I001, RUF022; `py/conventions`) but **not merged**: checked against Ruff on pip's source, it reports unused imports nested in annotated parameters with defaults, `undefined-local` on annotations in nested functions, and a single-use `groupby` group. Sent back for fixes.
+- **2026-10-20 — `rules-python`:** 98 rules — 55 of Ruff 0.17.1's 59 `E4`/`E7`/`E9`/`F` rules, all 39 stable flake8-bugbear rules, I001 and RUF022 in `py/recommended`; `py/no-print` and `py/no-tunable-literals` in `py/conventions`; 605 checks green. The first cut was held back: compared with Ruff on pip's source it misread annotation subscripts (`List[int]`) as PEP 695 declarations in the semantic model. Fixed at the source, then reconciled with Ruff on three corpora (CPython 3.9 stdlib, pip 21.2.4, rich 15.0.0): every remaining difference is a `# noqa` line, a blank line the formatter owns, or a documented gap of resolving names without statement order.
+- **Steps 2–5 done; step 6 (publish) is what remains:** it needs the packaging (B-038, B-012) and then the decider's ruling to publish, with the project licence (no pack has a `LICENSE` yet).
 - **Every rule is `preview`** (SR-RULE-AUTHORING decision 6), so presets run only with `preview = true` until the corpus job (B-024) promotes them.
 
 ## Blockers
