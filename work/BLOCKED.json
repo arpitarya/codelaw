@@ -1,10 +1,8 @@
 {
  "decision": "ASK",
- "reason": "W-03 step 6: the five packs are built, verified and licensed (MIT, ruled 2026-10-20), but are not published without the decider's go-ahead",
- "questions": [
-  "May the five rule packs be published with the engine, once B-038 builds the engine's packages?"
- ],
- "safe_alternative": "promote B-038 (the engine's npm launcher, eight binaries, PyPI engine wheels and the release job) to a W-nn and build it; nothing is published",
+ "reason": "W-03/W-04: the packages are built and checked in CI and the licence is MIT, but the first release needs the decider's one-time registry setup and go-ahead",
+ "questions": ["Will you do the one-time registry setup (RELEASING.md §One time) and give the go to publish 0.1.0?"],
+ "safe_alternative": "W-05 research runs in Cowork; nothing is published",
  "surfaced": true,
  "filed": "2026-10-20"
 }

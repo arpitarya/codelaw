@@ -1,0 +1,9 @@
+# The one Rust toolchain codelaw is built, tested and released with
+# (SR-PACKAGES decision 13; Arpit, 2026-10-20). A pinned compiler makes the
+# release binaries reproducible and keeps CI's build cache keys stable across
+# runner images. Bump it in its own commit; the workspace's MSRV is
+# Cargo.toml's `rust-version`, not this.
+[toolchain]
+channel = "1.99.1"
+profile = "minimal"
+components = ["clippy"]

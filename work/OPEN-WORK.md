@@ -22,10 +22,10 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed | age |
 |---|---|---|
-| Place the five `.github/` issue and PR templates — the path is protected from remote writes ([W-04](open/W-04-consumer-readme.md)) | 2026-10-20 | 0 d |
-| ↳ **blocks:** W-04 | | |
-| Give the go to publish the packs with the engine — the licence is ruled, MIT ([W-03](open/W-03-rule-packs.md)) | 2026-10-20 | 0 d |
-| ↳ **blocks:** W-03 | | |
+| Place the five `.github/` issue and PR templates — the path is protected from remote writes ([W-06](open/W-06-consumer-readme.md)) | 2026-10-20 | 0 d |
+| ↳ **blocks:** W-06 | | |
+| 🔴 **The one-time registry setup** — the `@codelaw` npm org, the first hand publish of the 14 npm packages, `scripts/npm-trust.sh`, six PyPI pending publishers, the `npm` and `pypi` GitHub environments ([`RELEASING.md`](../RELEASING.md) §One time); then **the ruling to publish** 0.1.0 — the licence is ruled, MIT | 2026-10-20 | 0 d |
+| ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 | | |
 
 ---
 
@@ -33,9 +33,11 @@ here. Read that record before changing anything below it.
 
 ### build
 
-🔴 **W-03** `agent` The five rule packs: built, tested, packaged and MIT-licensed 2026-10-20; blocked on the decider's go to publish, and needs the engine's packages (B-038). Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
+🔴 **W-04** `agent` The release pipeline: `ci.yml` builds the eight platform wheels and assembles, checks and install-smokes all 27 packages on every push; `publish.yml` uploads exactly that, by OIDC, from a published GitHub Release. Filed by Arpit (Claude Code). Steps 1–4 done 2026-10-20, merged into `main`; step 5, the first release, is 🔴 above. [detail](open/W-04-release-pipeline.md)
 
-🔴 **W-04** `agent` README, CHANGELOG, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT landed; blocked on the decider placing the `.github/` templates. Filed by Arpit (Cowork). [detail](open/W-04-consumer-readme.md)
+🔴 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets, on the W-02 engine. Filed by Arpit (Cowork). Steps 2–5 done 2026-10-20 (401 rules); step 6's packaging done (W-04's `scripts/package.py`, and `scripts/build-packs.py` locally), MIT-licensed; publishing waits on the registry setup and the ruling above. [detail](open/W-03-rule-packs.md)
+
+🔴 **W-06** `agent` README, CHANGELOG, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT landed (filed as W-04; renumbered 2026-10-20, the number was taken by the release pipeline); blocked on the decider placing the `.github/` templates. Filed by Arpit (Cowork). [detail](open/W-06-consumer-readme.md)
 
 ### testing
 

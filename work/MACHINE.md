@@ -12,3 +12,5 @@ is added when something fails for a reason the code did not cause.
 |---|---|---|---|
 | macOS laptop (zsh) | `timeout: command not found` | GNU coreutils is not installed | leave `timeout` out; use the tool's own timeout |
 | macOS laptop (zsh) | a script using 3.10+ syntax fails | `python3` is 3.9.6 here (the L6 floor of 3.11 is for consumers) | keep repo scripts to Python 3.9 syntax |
+| GitHub Windows runner | a repo script printing `✔` dies with `UnicodeEncodeError` | the console is cp1252 | `PYTHONUTF8=1` (set in `ci.yml`); the scripts also reconfigure stdout to UTF-8 |
+| Claude Code cloud session | `gh api …/jobs/<id>/logs` and `…/actions/caches` refused | the session's proxy blocks Actions log blobs and the cache API | read a failure from the job's check-run annotations (`gh api repos/<r>/check-runs/<id>/annotations`); steps print their own `::error::` |

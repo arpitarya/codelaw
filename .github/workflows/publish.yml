@@ -1,0 +1,188 @@
+# Publishing (L6 decision 9; SR-PACKAGES; how to cut one: RELEASING.md). Runs
+# when a GitHub Release is published; nothing else publishes. No token
+# anywhere: npm and PyPI trusted publishing (OIDC).
+#
+# Nothing is built here. ci.yml assembled and checked `dist` on the release
+# commit; this downloads THAT artifact, re-runs the checks, and uploads it.
+#
+# ⚠ Do NOT rename this file or the `npm` / `pypi` environments. Every trusted
+#   publisher on npmjs.com and pypi.org is bound to `arpitarya/codelaw` ·
+#   `publish.yml` · its environment, and a rename fails the next release at the
+#   registry for a reason no diff shows.
+name: publish
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+jobs:
+  gate:
+    name: the release commit is green on main
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read # ci.yml's verdict and its dist artifact
+    outputs:
+      run: ${{ steps.ci.outputs.run }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: ci
+        name: ci.yml succeeded on this commit, on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          read -r run got < <(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&branch=main&event=push&per_page=1" \
+            -q '.workflow_runs[0] | "\(.id) \(.status)/\(.conclusion)"')
+          echo "ci.yml on ${GITHUB_SHA::8} (main): run ${run:-none}, ${got:-no run}"
+          [ "$got" = "completed/success" ] || {
+            echo "::error::refusing to publish: ci.yml has not succeeded on ${GITHUB_SHA::8} on main (${got:-no run}). Wait for it or fix it, then re-run this job."
+            exit 1
+          }
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+      - name: the tag is the version, and every copy agrees (B-012)
+        run: python3 scripts/version.py --check --tag "$GITHUB_REF_NAME"
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          run-id: ${{ steps.ci.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: the release checks, again, on exactly what will be uploaded
+        run: python3 scripts/package.py check dist
+
+  trust:
+    # Both registries wait on this, so an npm package that does not trust this
+    # workflow stops the release before PyPI or npm receives anything.
+    name: npm trusts this workflow, before either registry is written
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      id-token: write # the same OIDC exchange npm publish makes; it publishes nothing
+      actions: read
+    environment:
+      name: npm # the OIDC token's environment claim must be the one npm trusts
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: npm 11.5.1 or later (trusted publishing needs it; Node 22 ships npm 10)
+        run: npm i -g npm@latest --no-audit --no-fund --loglevel=error && npm --version
+      - name: npm trusts this workflow for every package, before anything is published
+        # The same OIDC exchange `npm publish` makes, per package: a package npm does
+        # not trust would otherwise fail mid-loop and leave the release half on npm.
+        run: |
+          bad=0
+          for t in ./dist/npm/*.tgz; do
+            read -r name ver < <(tar -xzOf "$t" package/package.json | node -e 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); console.log(p.name, p.version)')
+            npm view "$name@$ver" version >/dev/null 2>&1 && { echo "✓ $name@$ver is already on npm"; continue; }
+            idt="$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org" | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).value')"
+            code="$(curl -sS -o "$RUNNER_TEMP/oidc.json" -w '%{http_code}' -X POST -H "Authorization: Bearer $idt" \
+                    "https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/${name/\//%2f}")"
+            if [ "${code:0:1}" = 2 ]; then echo "✓ $name trusts publish.yml"; else
+              echo "::error::$name — npm refused the OIDC exchange (HTTP $code)"; bad=1; fi
+          done
+          rm -f "$RUNNER_TEMP/oidc.json"
+          [ "$bad" = 0 ] || { echo "::error::Nothing was published. Run scripts/npm-trust.sh once (RELEASING.md), then re-run this workflow."; exit 1; }
+
+  npm:
+    needs: [gate, trust]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write # the OIDC token npm trusted publishing exchanges, and provenance
+      contents: read
+      actions: read
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/codelaw
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: npm 11.5.1 or later (trusted publishing needs it; Node 22 ships npm 10)
+        run: npm i -g npm@latest --no-audit --no-fund --loglevel=error && npm --version
+      - name: publish — the eight binaries, the five packs, then codelaw last
+        # codelaw names the binaries as optionalDependencies, so it goes last: a
+        # failure before it leaves the previous codelaw as `latest`, intact.
+        # A pre-release (a version with "-") goes to `next`, never `latest`.
+        # A version already on npm is skipped, so a failed run is re-run, not re-released.
+        run: |
+          for t in ./dist/npm/codelaw-cli-*.tgz ./dist/npm/codelaw-rules-*.tgz ./dist/npm/codelaw-[0-9]*.tgz; do
+            id="$(tar -xzOf "$t" package/package.json | node -p 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); p.name + "@" + p.version')"
+            case "${id##*@}" in *-*) tag=next ;; *) tag=latest ;; esac  # the version after the LAST @
+            if npm view "$id" version >/dev/null 2>&1; then echo "✓ $id is already on npm"; continue; fi
+            echo "→ $id ($tag)"
+            npm publish "$t" --tag "$tag" --provenance --access public
+          done
+
+  pypi:
+    needs: [gate, trust]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write # PyPI trusted publishing
+      actions: read
+    environment:
+      name: pypi
+      url: https://pypi.org/project/codelaw/
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/pypi/
+          skip-existing: true
+
+  attach:
+    # The checksums of what was published, on the GitHub Release itself.
+    needs: [gate, npm, pypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" dist/SHA256SUMS --clobber --repo "$GITHUB_REPOSITORY"
+
+  half-published:
+    # L6 decision 9: a release that failed part-way is withdrawn. OIDC tokens can
+    # publish but not deprecate or yank, so this names exactly what reached a
+    # registry and the one command that withdraws it — the decider runs it.
+    needs: [gate, trust, npm, pypi]
+    if: failure() && needs.trust.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash scripts/withdraw.sh "${GITHUB_REF_NAME#v}" --report | tee -a "$GITHUB_STEP_SUMMARY"
+      - run: |
+          echo "::error::release ${GITHUB_REF_NAME} is half-published. Do not announce it. Run: scripts/withdraw.sh ${GITHUB_REF_NAME#v}"
+          exit 1

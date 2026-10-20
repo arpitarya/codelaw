@@ -10,7 +10,7 @@ feature: ownership and the commit guard
 owns:
   - scripts/sr-guard.sh
 laws: [L0]
-timestamp: 2026-10-18T12:52:51Z
+timestamp: 2026-10-20T06:30:00Z
 content_sha: ""
 ---
 
@@ -72,8 +72,10 @@ check that slips on the first busy day.
    because the escape line has to be read from the message, which does not
    exist at `pre-commit` time. Install once:
    `ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg`.
-7. `--no-verify` leaves no trace; when CI exists it runs the same check from
-   history (`records/RULE-SINCE` is its baseline).
+7. `--no-verify` leaves no trace locally, so **CI replays the guard over every
+   commit since `records/RULE-SINCE`** (`.github/workflows/ci.yml`, job `lint`),
+   each judged against the register as it stood in that commit
+   (`SR_GUARD_COMMIT=<sha> scripts/sr-guard.sh`).
 8. The guard proves a record was **touched**, never that it is coherent.
 
 ### Consequences
@@ -82,8 +84,8 @@ check that slips on the first busy day.
   installs it; until then nothing runs.
 - `owns:` ↔ Ownership-table agreement (decision 2) is unchecked — backlog row
   B-002.
-- `--no-verify` leaves no trace until a CI replay from `records/RULE-SINCE`
-  exists (decision 7).
+- A `--no-verify` commit fails CI on its first push (decision 7); a merge
+  commit is not replayed, since its changes are its parents'.
 - Coherence is not checked (decision 8; backlog row B-006).
 
 ### Alternatives considered

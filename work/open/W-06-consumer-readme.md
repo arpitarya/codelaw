@@ -1,16 +1,18 @@
 ---
 type: Handoff
-name: W-04
+name: W-06
 description: "Arpit, 2026-10-20: a consumer-facing README that also serves as marketing, plus the files a public repo needs."
-item: W-04
+item: W-06
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-20
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Arpit (Claude Code, Opus 5.5) — renumbered from W-04, which the release pipeline already held"
 ball: agent
 ---
 
-# W-04 — Write the README and the public-repo files
+# W-06 — Write the README and the public-repo files
+
+*Filed as W-04; renumbered W-06 on 2026-10-20 when the release-pipeline branch, which already used W-04, was merged. Older worklog entries say W-04.*
 
 ## At a glance
 

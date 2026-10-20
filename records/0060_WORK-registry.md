@@ -88,26 +88,27 @@ into a scan anyone can do at task end.
 
 | Document | Update trigger | Last verified | Notes |
 |---|---|---|---|
-| `CLAUDE.md` | any rule or pointer changes | 2026-10-19 | 2026-10-19 — layout names `crates/`, `fixtures/` and `Cargo.toml` |
+| `CLAUDE.md` | any rule or pointer changes | 2026-10-20 | 2026-10-20 — layout names `packs/`, `packaging/`, `.github/` |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-20 | 2026-10-20 — W-03 🔴 on the licence ruling; W-04 🔴 |
-| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — B-038 and B-012 narrowed: the packs are built and checked |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-20 | 2026-10-20 — the pipeline merged; W-04's README item renumbered W-06; inbox: the registry setup and the ruling to publish |
+| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — B-038 promoted to W-04; B-020 closed; B-008, B-009, B-012 narrowed; B-042 unbuilt |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-20 | 2026-10-20 — W-03: packs built; licence ruling filed |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-20 | 2026-10-20 — W-03 part: the pack packaging |
-| `work/LESSONS.md` | a failure teaches something durable | 2026-10-19 | 2026-10-19 — corpus runs; duplicate YAML keys |
-| `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-19 | 2026-10-19 — macOS: no `timeout`; Python 3.9 |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-20 | 2026-10-20 — the merge; the licence is MIT |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-20 | 2026-10-20 — the merge: W-04's pipeline, MIT throughout |
+| `work/LESSONS.md` | a failure teaches something durable | 2026-10-20 | 2026-10-20 — skip the compile, not the checks |
+| `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
-| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-19 | 2026-10-19 — predicate, data table, fixpoint, group fix, first-party pack |
+| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-20 | 2026-10-20 — trusted publishing, `dist`, half-published |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-19 | 2026-10-19 — L6 and SR-RULE-PACKS rows; rule packs in the distribution sketch and the config example |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-20 | 2026-10-20 — `scripts/build-packs.py` owned by SR-PACKAGES |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-20 | 2026-10-20 — SR-PACKAGES owns `LICENSE`, `packaging/`, the release scripts, `scripts/build-packs.py` and `.github/workflows` |
+| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-20 | 2026-10-20 — created (W-04) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
 | `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-20 | 2026-10-20 — licence section and badge: MIT |
 | `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-20 | 2026-10-20 — Unreleased: the MIT licence |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
-| `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-04) |
-| `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-04) |
+| `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
+| `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
 | `LICENSE` | the licence or the copyright holder changes (SR-PACKAGES decision 10); the five `packs/*/LICENSE` copies change with it | 2026-10-20 | 2026-10-20 — created: MIT |
 
 ---

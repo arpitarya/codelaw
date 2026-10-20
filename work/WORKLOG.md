@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-20 — merged the release pipeline into `main`; MIT throughout; W-04 → W-06  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"commit everything merge all the branches to main pull the latest changes and checkout to main and delete the other branches"*.
+- **Done:**
+  - Committed the local work (`d41c87f`: W-03 packaging, the MIT `LICENSE`, the public docs, W-05). `main` was level with `origin/main`.
+  - Merged `origin/ci/w-04-release-pipeline` (B-038 built as W-04): nine conflicting work and record files resolved, keeping both sides.
+  - The two sessions had recorded different licence rulings (`MIT OR Apache-2.0` on the branch, MIT locally). Arpit confirmed **MIT only**: `LICENSE-MIT` and `LICENSE-APACHE` removed; `scripts/package.py`, `packaging/python/pyproject.toml`, `packaging/README.md`, `ci.yml` and `.gitignore` now use `LICENSE`; SR-PACKAGES decision 10 rewritten.
+  - Both pack builders kept (Arpit): `scripts/package.py` for the release, `scripts/build-packs.py` for local builds; SR-PACKAGES decision 9 names both.
+  - The consumer-README item was renumbered W-04 → **W-06** (`work/open/W-06-consumer-readme.md`): the branch's W-04 is already in pushed commit messages. Older entries below still say W-04.
+  - The four `worktree-agent-*` branches (all already in `main`) and their worktrees were deleted.
+- **Decided / left open:** the remote branch `ci/w-04-release-pipeline` is left on GitHub, and nothing was pushed. Delete the branch once `main` is pushed. Open, the decider's: W-06's `.github/` templates; the registry setup and the ruling to publish.
+- **Mistakes:** two sessions used the same item number (W-04) and recorded conflicting licence rulings on the same day. Both were caught at the merge.
+- **Next:** the decider pushes `main` (CI then runs on the merged tree), then does `RELEASING.md` §One time.
+
+---
+
 ## 2026-10-20 — the licence ruled: MIT  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"Add mit licence for codelaw"*.
@@ -72,6 +88,17 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** a probe file `.github/x` was written while testing whether `.github/` is writable; removed with the decider's delete permission.
 - **Found while testing** (not fixed, engine untouched): `codelaw rules … | head` panics on a broken pipe; `init` writes a `codelaw.toml` comment pointing at `codelaw config --print`, which is not built (B-037); `fix` leaves a blank first line after removing a file's only import; with `preview` off, `check` says "no rule pack is configured" when packs are configured but all-preview.
 - **Next:** the decider places the `.github/` templates; then W-03 step 6.
+## 2026-10-20 — W-04: the release pipeline, built and timed on real runners  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"checkout fux and sheetpane for how the cicd pipeline are built how pypi and npm packages are published — build a cicd pipeline for codelaw to publish packages it should take around 2 mins even faster."*
+- **Done:**
+  - Read both pipelines: release-triggered `publish.yml`, CI-green gate, OIDC trusted publishing, one artifact for every registry job (fux), the npm trust preflight (sheetpane).
+  - Packaging (B-038 → W-04): npm `codelaw` launcher + `check`/`fix` API + types, eight `@codelaw/cli-*`, PyPI wheels by maturin `bin` bindings, five packs on both; every manifest generated from `Cargo.toml`'s version (`scripts/version.py`).
+  - `ci.yml`: test, clippy, the SR-guard replay (SR-WORK-OWNERSHIP decision 7, new `SR_GUARD_COMMIT` mode), eight parallel platform builds, `scripts/package.py assemble` + `check`, `scripts/smoke.sh`. `publish.yml`: gate, npm and PyPI in parallel, no rebuild; `scripts/withdraw.sh` for a half-published release.
+  - Records: SR-PACKAGES decisions 10–13 and its owns; SR-LAW-6's Consequences and veto check, and SR-ARCHITECTURE's veto check (facts only); SR-WORK-OWNERSHIP decision 7. Branch `ci/w-04-release-pipeline`, green on all eight platforms; nothing published.
+- **Decided / left open:** Arpit ruled the licence (`MIT OR Apache-2.0`), building in CI and publishing what CI built, and pinning Rust 1.99.1. Open, his: the one-time registry setup and the ruling to publish 0.1.0 (inbox). The npm/Python APIs lack `rulesFor` and `format` (B-042).
+- **Mistakes:** the first push committed `scripts/__pycache__/` (now ignored); Windows died on `✔` under cp1252 (`PYTHONUTF8`, MACHINE.md). Lowering `codegen-units` to 16 was measured and rejected — slower to build here (1 m 44 s vs 1 m 26 s warm, 2 cores).
+- **Next:** the decider reviews the branch, merges it, and does `RELEASING.md` §One time.
 
 ---
 

@@ -10,9 +10,19 @@ feature: "packages and their contents"
 owns:
   - Cargo.toml
   - crates/codelaw-cli/tests/layers.rs
+  - LICENSE
+  - packaging
+  - scripts/version.py
+  - scripts/package.py
   - scripts/build-packs.py
+  - scripts/smoke.sh
+  - scripts/withdraw.sh
+  - scripts/npm-trust.sh
+  - .github/workflows
+  - RELEASING.md
+  - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-20T12:00:00Z
+timestamp: 2026-10-20T14:00:00Z
 content_sha: ""
 ---
 
@@ -115,18 +125,36 @@ The decider asked for a record of what goes into which package, under the naming
 
    codelaw never fetches code after install ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
 9. **The five rule packs:** npm `@codelaw/rules-<name>` and PyPI `codelaw-rules-<name>`, for `js`, `html`, `css`, `python` and `data`.
-   - **Built** from `packs/<name>/` in the source repo by the release job, with `scripts/build-packs.py`. The npm tarball and the wheel's `codelaw_rules_<name>/` package data hold the same files; the only additions are each registry's own metadata (`package.json`, `*.dist-info/`).
-   - **The build refuses** a pack whose manifest version differs from the workspace `Cargo.toml`, and, for a release, a pack without a `LICENSE`. It checks the two artefacts against the folder byte for byte, and `--verify` installs both and requires identical `codelaw check` output.
+   - **Built** from `packs/<name>/` in the source repo by the release job (`scripts/package.py assemble`, decision 11). The npm tarball and the wheel's `codelaw_rules_<name>/` package data hold the same files; the only additions are each registry's own metadata (`package.json`, `*.dist-info/`).
+   - **`scripts/build-packs.py`** builds the same ten pack artefacts locally, with no engine binary: it refuses a pack whose manifest version differs from `Cargo.toml` and, with `--release`, a pack without `LICENSE`; it checks both artefacts against the folder byte for byte; `--verify <codelaw>` installs both and requires identical `codelaw check` output.
    - **No dependencies,** and neither `codelaw` package depends on a pack. `codelaw init` adds them to the consumer ([SR-RULE-PACKS](0101_rule-packs.md) decisions 3 and 6).
-10. **Licence: MIT,** for the repository and every package it publishes — both engine packages, the eight binaries, the five rule packs and the extension (the decider's ruling, 2026-10-20).
-   - The root `LICENSE` holds the MIT text and the line `SPDX-License-Identifier: MIT`; `scripts/build-packs.py` reads the id from that line into each `package.json` `license` and each wheel's `License-Expression`.
-   - Each pack folder carries its own copy as `packs/<name>/LICENSE` (SR-RULE-PACKS §2 layout); a release build refuses a pack without one (decision 9).
+10. **Licence: MIT,** for the repository and every package it publishes — both engine packages, the eight binaries, the five rule packs and the extension. **Ruled by Arpit, 2026-10-20** (MIT only; it supersedes `MIT OR Apache-2.0`, recorded the same day on the release-pipeline branch).
+    - The root `LICENSE` holds the MIT text and the line `SPDX-License-Identifier: MIT`.
+    - Every npm package and every wheel carries `LICENSE` and declares `MIT` (`license` in `package.json`, `License-Expression` in the wheel's metadata); `scripts/package.py check` refuses one that doesn't.
+    - Each pack folder carries its own copy as `packs/<name>/LICENSE` (SR-RULE-PACKS §2 layout).
+11. **Built once, in CI; published as built.** The release job of [L6](0008_LAW-6-python-and-node-packages.md) decision 9 is two workflows.
+    - **`ci.yml`, every push:** one maturin wheel per platform (decision 5). The npm binary is **taken out of that wheel**, so both registries ship the same bytes for a platform.
+    - **`scripts/package.py assemble`** builds the 14 npm tarballs and the five pack wheels from those binaries and `packs/`; nothing is compiled there.
+    - **`scripts/package.py check`** refuses the set unless it is exactly §1's names, at one version, with zero runtime dependencies, licensed (decision 10), one binary per platform on both registries, and each pack byte-equal on both.
+    - **`publish.yml`, a published GitHub Release only:** it refuses a commit on which `ci.yml` did not succeed on `main`, downloads **that run's** checked set, checks it again and uploads it. Trusted publishing (OIDC) on both registries; no token exists.
+    - **Nothing is written until npm trusts the workflow for every package:** a preflight job makes npm's OIDC exchange per package, and both registry jobs wait on it.
+    - **npm order:** the eight binaries, then the five packs, then `codelaw` — so a failure leaves the previous `codelaw` as `latest`. A version already published is skipped, so a failed job is re-run, not re-released.
+    - **The one version** is `Cargo.toml`'s; `scripts/version.py` writes and checks every copy.
+12. **A half-published release is withdrawn by the decider.** A CI OIDC token may publish but not deprecate, and PyPI has no yank API.
+    - `publish.yml`'s `half-published` job lists what reached a registry and fails.
+    - `scripts/withdraw.sh <version>` deprecates it on npm and names each PyPI yank page.
+13. **One pinned Rust toolchain:** `rust-toolchain.toml` names the exact release (1.99.1 today) that builds, tests and releases codelaw. **Ruled by Arpit, 2026-10-20.**
+    - Measured the same day: GitHub's runners carried rustc 1.99.0 and 1.99.1 at once, so a build cache keyed by the floating compiler missed on one platform and rebuilt it.
+    - It is bumped in a commit of its own. The MSRV stays `Cargo.toml`'s `rust-version`.
 
 ### Consequences
 
 - **One binary is larger than a modular install,** but there's nothing to mismatch and nothing to download later.
 - **Twenty crates add some build-graph overhead,** but they make the layering checkable and keep compile times incremental.
 - **Ten pack packages publish with every release,** built by one job from `packs/`.
+- **A release costs one CI run, not a rebuild** (decision 11): `publish.yml` only uploads, so a release takes as long as its slowest upload. The price is that a release can only be cut from a commit whose `ci.yml` run still holds its `dist` artifact (30 days).
+- **Withdrawal is manual** (decision 12), so L6 decision 9's *"everything already published is yanked or deprecated"* depends on one person acting — not ungated, but not automatic.
+- **The first npm publish of each package is by hand,** because npm binds a trusted publisher only to a package that exists ([`RELEASING.md`](../RELEASING.md)).
 
 ### Alternatives considered
 
@@ -138,12 +166,14 @@ The decider asked for a record of what goes into which package, under the naming
 
 - [L6](0008_LAW-6-python-and-node-packages.md) decisions 2, 7, 9, 10 and 11: registries, naming, one version, the rule packs.
 - [`docs/DESIGN.md`](../docs/DESIGN.md) §3.1: why one Rust binary.
+- The decider's rulings of 2026-10-20 — the licence (decision 10), building in CI and publishing what CI built (decision 11), and pinning the toolchain (decision 13) — worklog entry of that date.
+- [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) · [PyPI trusted publishers](https://docs.pypi.org/trusted-publishers/) · [maturin `bin` bindings](https://www.maturin.rs/bindings.html#bin).
 
 ### Veto condition
 
 **Reopen this decision if:** a published package exists outside decision 1's distribution table, or a crate depends on a crate in a lower layer.
 
-**How to check it:** `npm search @codelaw` and PyPI show only the names in §1, and `cargo metadata` shows no dependency edge against the layer order (a check, `B-020`).
+**How to check it:** `python3 scripts/package.py check dist` (every `ci.yml` run, and again in `publish.yml`) refuses any name outside §1; `npm search @codelaw` and PyPI show only those names; `crates/codelaw-cli/tests/layers.rs` refuses a dependency edge against the layer order.
 
 ---
 
@@ -153,4 +183,4 @@ The decider asked for a record of what goes into which package, under the naming
 
 **Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-LINTER](0106_linter.md) · [SR-ARCHITECTURE](0108_architecture.md) · [SR-CACHE](0109_cache.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md) · [SR-RULE-AUTHORING](0113_rule-authoring.md) · [SR-EDITOR](0114_editor.md) · [SR-CLI-MCP](0115_cli-and-mcp.md)
 
-**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)
+**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [`RELEASING.md`](../RELEASING.md)

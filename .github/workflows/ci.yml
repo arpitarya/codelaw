@@ -1,0 +1,232 @@
+# CI — every push and PR, and nightly. publish.yml releases ONLY a commit on
+# which this workflow concluded `success` on main, and it publishes the `dist`
+# artifact this run assembled: nothing is compiled at release time
+# (SR-PACKAGES decision 11; W-04).
+#
+#   test      cargo test --workspace (the law checks: L2 licences, L3 fixtures, layers)
+#   lint      the version copies agree (B-012) · the SR guard replayed from RULE-SINCE · clippy
+#   build ×8  one maturin wheel per platform; the npm binary is taken OUT of it, so
+#             both registries ship the same bytes (L6 decision 2); each runs its
+#             binary's --version and every pack's tests on its own platform
+#   package   the 14 npm tarballs + 13 wheels, the release checks, and an install
+#             smoke: npm and PyPI give byte-equal output on the L3 fixtures + a pack
+#
+# 🔴 Speed — a verdict already earned is not earned again. Each Rust job keys
+# its result by the inputs that can change it (the sources it reads and the
+# pinned rustc of rust-toolchain.toml that compiles them):
+#   - build: the WHEEL is cached under that key. A push that changes no input —
+#     records, docs, packs, work/ — restores the wheel instead of compiling it.
+#     The binary's --version and every pack's tests still run on it, every time.
+#   - test / clippy: a green result saves a marker under that key; the same key
+#     on a later push skips the run.
+# ⚠ Only push and pull_request READ a saved verdict. The nightly run and a
+# manual dispatch always run everything fresh — the backstop for a runner image
+# changing what a key cannot see.
+name: ci
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 20 * * *' # 02:00 IST
+concurrency:
+  group: ci-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+permissions:
+  contents: read
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: '0'
+  PYTHONUTF8: '1'
+  MATURIN_VERSION: '1.15.0'
+  # push / PR may reuse a verdict its key already earned; nightly and dispatch never do
+  REUSE: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+jobs:
+  test:
+    # A same-repo PR is the sha its branch push already ran.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
+        run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
+      - id: verdict
+        if: env.REUSE == 'true'
+        uses: actions/cache/restore@v6
+        with:
+          path: .verdict
+          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**') }}
+          lookup-only: true
+      - if: steps.verdict.outputs.cache-hit == 'true'
+        run: echo "::notice title=test::skipped — cargo test already passed on these exact sources with rustc ${{ steps.rustc.outputs.v }}"
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --component clippy --no-self-update
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        run: cargo test --workspace --locked
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        run: mkdir -p .verdict && echo "${{ github.sha }}" > .verdict/sha
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: .verdict
+          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**') }}
+
+  lint:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # the SR guard replays every commit since records/RULE-SINCE
+      - name: every version copy agrees (L6 decision 9, B-012)
+        run: python3 scripts/version.py --check
+      - name: the SR guard, replayed over history (SR-WORK-OWNERSHIP decision 7)
+        run: |
+          base="$(grep -v '^#' records/RULE-SINCE)"
+          n=0
+          for c in $(git rev-list --no-merges "$base"..HEAD); do
+            SR_GUARD_COMMIT=$c bash scripts/sr-guard.sh; n=$((n + 1))
+          done
+          echo "✔ $n commits since ${base::8}: each touched the records its components need"
+      - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
+        run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
+      - id: verdict
+        if: env.REUSE == 'true'
+        uses: actions/cache/restore@v6
+        with:
+          path: .verdict
+          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**') }}
+          lookup-only: true
+      - if: steps.verdict.outputs.cache-hit == 'true'
+        run: echo "::notice title=clippy::skipped — clippy already passed on these exact sources with rustc ${{ steps.rustc.outputs.v }}"
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --component clippy --no-self-update
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      - name: cargo clippy --workspace --all-targets -- -D warnings
+        if: steps.verdict.outputs.cache-hit != 'true'
+        run: |
+          cargo clippy --workspace --all-targets --locked --message-format=short -- -D warnings 2>&1 | tee "$RUNNER_TEMP/clippy.txt" || {
+            echo "::error title=clippy::$(grep -E '(error|warning)' "$RUNNER_TEMP/clippy.txt" | head -30 | sed ':a;N;$!ba;s/%/%25/g;s/\n/%0A/g')"
+            exit 1
+          }
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        run: mkdir -p .verdict && echo "${{ github.sha }}" > .verdict/sha
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: .verdict
+          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**') }}
+
+  build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    name: build ${{ matrix.key }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # The keys and targets are scripts/package.py's TARGETS; `package` fails
+        # if this list and that one differ.
+        include:
+          - { key: linux-x64-gnu, target: x86_64-unknown-linux-gnu, os: ubuntu-latest, maturin: --zig --compatibility manylinux2014 }
+          - { key: linux-x64-musl, target: x86_64-unknown-linux-musl, os: ubuntu-latest, maturin: --zig }
+          - { key: linux-arm64-gnu, target: aarch64-unknown-linux-gnu, os: ubuntu-24.04-arm, maturin: --zig --compatibility manylinux2014 }
+          - { key: linux-arm64-musl, target: aarch64-unknown-linux-musl, os: ubuntu-24.04-arm, maturin: --zig }
+          - { key: darwin-arm64, target: aarch64-apple-darwin, os: macos-latest, maturin: '' }
+          - { key: darwin-x64, target: x86_64-apple-darwin, os: macos-latest, maturin: '' } # cross-built; runs under Rosetta
+          - { key: win32-x64, target: x86_64-pc-windows-msvc, os: windows-latest, maturin: '' }
+          - { key: win32-arm64, target: aarch64-pc-windows-msvc, os: windows-11-arm, maturin: '' }
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
+        run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
+      - id: wheel
+        # Everything that goes into the wheel: the engine's sources, the Python
+        # module, the licence and README it carries, and these build steps.
+        if: env.REUSE == 'true'
+        uses: actions/cache/restore@v6
+        with:
+          path: out/wheel
+          key: wheel-${{ matrix.key }}-${{ steps.rustc.outputs.v }}-${{ env.MATURIN_VERSION }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.toml', 'Cargo.lock', 'crates/**', 'packaging/python/**', 'packaging/README.md', 'LICENSE', '.github/workflows/ci.yml') }}
+      - if: steps.wheel.outputs.cache-hit == 'true'
+        run: echo "::notice title=build ${{ matrix.key }}::reused the wheel built from these exact sources with rustc ${{ steps.rustc.outputs.v }}"
+      - if: steps.wheel.outputs.cache-hit != 'true'
+        run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --target ${{ matrix.target }} --no-self-update
+      - if: steps.wheel.outputs.cache-hit != 'true'
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+          cache-on-failure: true
+      - uses: actions/setup-python@v6 # the scripts need it on a reused wheel too
+        with:
+          python-version: '3.12'
+      - name: maturin${{ contains(matrix.maturin, 'zig') && ' + zig' || '' }}
+        if: steps.wheel.outputs.cache-hit != 'true'
+        run: pip install --disable-pip-version-check -q "maturin${{ contains(matrix.maturin, 'zig') && '[zig]' || '' }}==$MATURIN_VERSION"
+      - if: steps.wheel.outputs.cache-hit != 'true'
+        run: python scripts/package.py prepare-wheel
+      - name: the wheel (maturin's bin bindings, SR-PACKAGES decision 5)
+        if: steps.wheel.outputs.cache-hit != 'true'
+        working-directory: packaging/python
+        run: maturin build --release --locked --target ${{ matrix.target }} ${{ matrix.maturin }} --out ../../out/wheel
+      - if: steps.wheel.outputs.cache-hit != 'true' && env.REUSE == 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: out/wheel
+          key: ${{ steps.wheel.outputs.cache-primary-key }}
+      - name: the npm binary is the wheel's binary
+        run: python scripts/package.py extract out/wheel/*.whl out/bin/${{ matrix.key }}
+      - name: the binary runs, says its version, and passes every pack's tests
+        run: |
+          b="out/bin/${{ matrix.key }}/codelaw"; [ -f "$b.exe" ] && b="$b.exe"
+          python scripts/version.py --check --binary "$b"
+          for p in packs/*/; do "$b" test "$p" | tail -1; "$b" rules lint "$p" | tail -1; done
+      - uses: actions/upload-artifact@v6
+        with:
+          name: build-${{ matrix.key }}
+          path: out/
+          if-no-files-found: error
+          retention-days: 7
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: build-*
+          path: out/
+          merge-multiple: true
+      - name: assemble every package (SR-PACKAGES decisions 3-9)
+        run: python3 scripts/package.py assemble --bins out/bin --wheels out/wheel --out dist
+      - name: the release checks — names (B-020), one version, zero deps, licence, one binary, pack parity
+        run: python3 scripts/package.py check dist
+      - name: npm and PyPI installs give byte-equal output (L6 install matrix, linux-x64)
+        run: bash scripts/smoke.sh dist
+      - uses: actions/upload-artifact@v6
+        with:
+          name: dist
+          path: |
+            dist/npm/*.tgz
+            dist/pypi/*.whl
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30

@@ -24,7 +24,7 @@ entry.**
 
 ## 1 · State of play
 
-*Updated 2026-10-20 (W-04).* The laws L0–L8 are accepted (L8's budgets unset; L6 host
+*Updated 2026-10-20 (the merge of W-04's pipeline).* The laws L0–L8 are accepted (L8's budgets unset; L6 host
 floors Python ≥ 3.11, Node ≥ 22); every record 0101–0115 is accepted. W-01
 rewrote the records for five rule packs; **W-02 built the engine**: a Cargo
 workspace of 13 crates under `crates/` and the `codelaw` binary (`check`,
@@ -32,35 +32,38 @@ workspace of 13 crates under `crates/` and the `codelaw` binary (`check`,
 the semantic model, `native:` rules and pack resolution. Every crate is owned in
 the register's Ownership table. W-03 steps 2–5 are done: five packs under `packs/` — js 132 rules, python 98,
 html 71, css 70, data 30 — every rule `preview`, each pack's tests green and
-checked against its upstream linter on third-party code. Not built:
-the formatter (so L7 is unmet), graph, baseline, adapters, MCP, LSP, agent
-surfaces, packaging — backlog B-028–B-039. `cargo test --workspace` is green
-and clippy is clean. **W-04 (2026-10-20)** added the public docs — `README.md`, `CHANGELOG.md`,
-`CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`; the `.github/` templates
-wait on the decider placing them (remote writes there are refused). **Ground it before you edit it** — `git log`, the queue,
+checked against its upstream linter on third-party code. **W-04 built the
+release pipeline**, merged into `main` 2026-10-20 (green on all eight
+platforms, nothing published): `ci.yml` builds and checks all 27
+packages on every push, `publish.yml` uploads exactly that set by OIDC. The
+licence is MIT (Arpit, 2026-10-20; it superseded `MIT OR Apache-2.0`). **W-06**
+added the public docs — `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`,
+`SECURITY.md`, `CODE_OF_CONDUCT.md`. Not built: the formatter
+(so L7 is unmet), graph, baseline, adapters, MCP, LSP, agent surfaces —
+backlog B-028–B-039. `cargo test --workspace` is green
+and clippy is clean. **Ground it before you edit it** — `git log`, the queue,
 `cargo test`.
 
 ## 2 · In flight, and the immediate next step
 
 **W-05** (🟢, `research`, Cowork): guidance **while** an agent writes — a construct-filtered `brief` before writing and a `hook --pre` check before bytes land; Fux only as an optional free-text layer. Next is step 1, the per-agent pre-write matrix. Design is a proposal until step 5 is ruled on.
 
-**W-04** (🔴): the decider places the five `.github/` templates sent in the
-2026-10-20 session. The README's counts (401 rules, 3,060 checks, fix classes)
-and roadmap must move with the packs — its registry row names the trigger.
+**W-04** (🔴): the pipeline is built, timed and merged; the first release waits on the
+decider's one-time registry setup (`RELEASING.md` §One time) and his ruling to
+publish — the OPEN-WORK inbox.
 
-**W-03** (🔴): steps 2–5 are done, and step 6's packaging landed 2026-10-20 —
-`scripts/build-packs.py` builds the ten pack artefacts into `dist/packs/` and
-verifies them (byte parity, identical output from both installs). Publishing
-waits on the decider's go-ahead (inbox row, 2026-10-20; the licence was ruled
-MIT the same day — `LICENSE` at the root and in each pack, SR-PACKAGES decision 10) and
-on the engine's own packages and release job (B-038, with B-012), the agent's
-next build. Rules that need engine
+**W-06** (🔴, filed as W-04): the decider places the five `.github/` templates. The
+README's counts (401 rules, 3,060 checks, fix classes) and roadmap must move
+with the packs — its registry row names the trigger.
+
+**W-03** (🔴) step 6 is that same release; the packs also build locally with
+`scripts/build-packs.py`. Rules that need engine
 features not built wait in each pack README's "not ported" table: `target:`
 rules (B-030), the graph (B-029), a native rule's file path and bytes (B-040),
 a CSS grammar that parses modern CSS (B-041). For the decider to confirm or
 correct: every pack rule ships `preview`; upstream's noisy defaults kept in
 `html/require-sri`, `html/valid-id`, `html/button-type`; `json/package-engines`
-`>=22` and `toml/pyproject-requires-python` `>=3.11`. B-012 waits for B-038.
+`>=22` and `toml/pyproject-requires-python` `>=3.11`.
 The decider (`git config user.name`) still installs `scripts/sr-guard.sh` as
 the `commit-msg` hook.
 
@@ -81,9 +84,18 @@ the `commit-msg` hook.
   checks.
 - Rule files are YAML 1.2 (SR-RULE-FORMAT decision 3d); `where:` and the fix
   primitives are SR-RULE-FORMAT decisions 3a–3c.
+- **Releases come only from `publish.yml`, and it compiles nothing** — it
+  uploads the `dist` a green `ci.yml` run on `main` assembled (SR-PACKAGES
+  decisions 11–12). The version is set only with `scripts/version.py --set`.
+  `ci.yml` and `publish.yml` keep their names: the registries' trusted
+  publishers are bound to them. The Rust toolchain is pinned in
+  `rust-toolchain.toml` (SR-PACKAGES decision 13); bump it in its own commit.
 
 ## 4 · Lessons learned
 
+- **Skip the compile, not the checks** — a push that changes no engine source
+  restores its eight wheels from cache; the binary's tests still run
+  (`work/LESSONS.md`, 2026-10-20).
 - **Run a new rule over real code** — its own examples passed while eight
   false-positive patterns hid; a corpus run found them (`work/LESSONS.md`).
 - **Write a benchmark's output outside the folder it checks** — otherwise the
