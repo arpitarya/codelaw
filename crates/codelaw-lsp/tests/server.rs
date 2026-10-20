@@ -141,7 +141,7 @@ fn apply(text: &str, edits: &[Value]) -> String {
     let at = |p: &Value| starts[p["line"].as_u64().unwrap() as usize] + p["character"].as_u64().unwrap() as usize;
     let mut spans: Vec<(usize, usize, Vec<u16>)> =
         edits.iter().map(|e| (at(&e["range"]["start"]), at(&e["range"]["end"]), e["newText"].as_str().unwrap().encode_utf16().collect())).collect();
-    spans.sort_by(|a, b| b.0.cmp(&a.0));
+    spans.sort_by_key(|a| std::cmp::Reverse(a.0));
     let mut out = units;
     for (s, e, t) in spans {
         out.splice(s..e, t);
