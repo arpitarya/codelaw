@@ -1,0 +1,20 @@
+@codelaw/rules-html / codelaw-rules-html
+
+data/html/elements.json is derived from the html5 element metadata of
+html-validate, version 11.16.4, https://html-validate.org — Copyright (c) 2017
+David Sveningsson <ext@sidvind.com>, released under the MIT License. Its
+JavaScript functions are rewritten as JSON conditions; the element, attribute
+and content-model data are otherwise unchanged.
+
+data/html/entities.json is the list of named character references shipped
+with html-validate 11.16.4 (MIT License, as above), which follows the WHATWG
+HTML Standard's named character reference table.
+
+data/html/input-attributes.json is derived from the table of html-validate
+11.16.4's `input-attributes` rule (MIT License, as above).
+
+The rules are reimplementations written for codelaw. Their `ported_from:`
+fields name the html-validate rules (https://html-validate.org, MIT License)
+and HTMLHint rules (https://htmlhint.com, MIT License) whose documented
+behaviour they reproduce; no html-validate or HTMLHint code or documentation
+text is included.

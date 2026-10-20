@@ -1,0 +1,4892 @@
+{
+ "$comment": "Element metadata derived from html-validate 11.16.4 (MIT, Copyright (c) 2017 David Sveningsson). Functions are rewritten as conditions; see packs/html/README.md#data.",
+ "elements": {
+  "a": {
+   "aria": {
+    "implicitRole": {
+     "else": "generic",
+     "if": {
+      "attr": "href"
+     },
+     "then": "link"
+    },
+    "naming": {
+     "else": "prohibited",
+     "if": {
+      "attr": "href"
+     },
+     "then": "allowed"
+    }
+   },
+   "attributes": {
+    "charset": {
+     "deprecated": true
+    },
+    "coords": {
+     "deprecated": true
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "download": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     },
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "omit": true
+    },
+    "href": {
+     "enum": [
+      {
+       "name": "/.*/",
+       "regex": "^.*$"
+      }
+     ]
+    },
+    "hreflang": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     }
+    },
+    "itemprop": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     }
+    },
+    "methods": {
+     "deprecated": true
+    },
+    "name": {
+     "deprecated": true
+    },
+    "ping": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     }
+    },
+    "referrerpolicy": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     },
+     "enum": [
+      "",
+      "no-referrer",
+      "no-referrer-when-downgrade",
+      "same-origin",
+      "origin",
+      "strict-origin",
+      "origin-when-cross-origin",
+      "strict-origin-when-cross-origin",
+      "unsafe-url"
+     ]
+    },
+    "rel": {
+     "allowed": {
+      "disallowed-prefix": "dcterms.",
+      "rel-disallowed": [
+       "canonical",
+       "dns-prefetch",
+       "expect",
+       "icon",
+       "manifest",
+       "modulepreload",
+       "pingback",
+       "preconnect",
+       "prefetch",
+       "preload",
+       "stylesheet",
+       "apple-touch-icon",
+       "apple-touch-icon-precomposed",
+       "apple-touch-startup-image",
+       "authorization_endpoint",
+       "component",
+       "chrome-webstore-item",
+       "edit",
+       "gbfs",
+       "gtfs-static",
+       "gtfs-realtime",
+       "import",
+       "mask-icon",
+       "meta",
+       "micropub",
+       "openid.delegate",
+       "openid.server",
+       "openid2.local_id",
+       "openid2.provider",
+       "p3pv1",
+       "pgpkey",
+       "schema.dcterms",
+       "service",
+       "shortlink",
+       "sitemap",
+       "subresource",
+       "sword",
+       "timesheet",
+       "token_endpoint",
+       "wlwmanifest",
+       "stylesheet/less",
+       "yandex-tableau-widget"
+      ],
+      "requires": "href"
+     },
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "list": true
+    },
+    "shape": {
+     "deprecated": true
+    },
+    "target": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     },
+     "enum": [
+      {
+       "name": "a browsing context name (non-empty string, must not start with `_`)",
+       "regex": "^[^_].*$"
+      },
+      "_blank",
+      "_self",
+      "_parent",
+      "_top"
+     ]
+    },
+    "type": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     }
+    },
+    "urn": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "focusable": {
+    "attr": "href"
+   },
+   "interactive": {
+    "attr": "href"
+   },
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "@interactive",
+      "a"
+     ]
+    }
+   ],
+   "phrasing": true,
+   "transparent": true
+  },
+  "abbr": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "acronym": {
+   "deprecated": {
+    "message": "use <abbr> instead",
+    "source": "html5"
+   }
+  },
+  "address": {
+   "aria": {
+    "implicitRole": "group"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "address",
+      "header",
+      "footer",
+      "@heading",
+      "@sectioning"
+     ]
+    }
+   ]
+  },
+  "applet": {
+   "attributes": {
+    "datafld": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    }
+   },
+   "deprecated": {
+    "source": "html5"
+   }
+  },
+  "area": {
+   "aria": {
+    "implicitRole": {
+     "else": "generic",
+     "if": {
+      "attr": "href"
+     },
+     "then": "link"
+    },
+    "naming": {
+     "else": "prohibited",
+     "if": {
+      "attr": "href"
+     },
+     "then": "allowed"
+    }
+   },
+   "attributes": {
+    "alt": {},
+    "coords": {
+     "allowed": {
+      "unless-attr-value": {
+       "name": "shape",
+       "values": [
+        "default"
+       ]
+      }
+     }
+    },
+    "download": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     }
+    },
+    "itemprop": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     }
+    },
+    "nohref": {
+     "deprecated": true
+    },
+    "ping": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     }
+    },
+    "referrerpolicy": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     },
+     "enum": [
+      "",
+      "no-referrer",
+      "no-referrer-when-downgrade",
+      "same-origin",
+      "origin",
+      "strict-origin",
+      "origin-when-cross-origin",
+      "strict-origin-when-cross-origin",
+      "unsafe-url"
+     ]
+    },
+    "rel": {
+     "allowed": {
+      "disallowed-prefix": "dcterms.",
+      "rel-disallowed": [
+       "canonical",
+       "dns-prefetch",
+       "expect",
+       "icon",
+       "manifest",
+       "modulepreload",
+       "pingback",
+       "preconnect",
+       "prefetch",
+       "preload",
+       "stylesheet",
+       "apple-touch-icon",
+       "apple-touch-icon-precomposed",
+       "apple-touch-startup-image",
+       "authorization_endpoint",
+       "component",
+       "chrome-webstore-item",
+       "edit",
+       "gbfs",
+       "gtfs-static",
+       "gtfs-realtime",
+       "import",
+       "mask-icon",
+       "meta",
+       "micropub",
+       "openid.delegate",
+       "openid.server",
+       "openid2.local_id",
+       "openid2.provider",
+       "p3pv1",
+       "pgpkey",
+       "schema.dcterms",
+       "service",
+       "shortlink",
+       "sitemap",
+       "subresource",
+       "sword",
+       "timesheet",
+       "token_endpoint",
+       "wlwmanifest",
+       "stylesheet/less",
+       "yandex-tableau-widget"
+      ],
+      "requires": "href"
+     }
+    },
+    "shape": {
+     "allowed": {
+      "area-shape-needs-coords": true
+     },
+     "enum": [
+      "rect",
+      "circle",
+      "poly",
+      "default"
+     ]
+    },
+    "target": {
+     "allowed": {
+      "if-attribute-present": [
+       "href"
+      ]
+     },
+     "enum": [
+      {
+       "name": "a browsing context name (non-empty string, must not start with `_`)",
+       "regex": "^[^_].*$"
+      },
+      "_blank",
+      "_self",
+      "_parent",
+      "_top"
+     ]
+    }
+   },
+   "flow": {
+    "ancestor": [
+     "map"
+    ]
+   },
+   "focusable": {
+    "attr": "href"
+   },
+   "phrasing": {
+    "ancestor": [
+     "map"
+    ]
+   },
+   "requiredAncestors": [
+    "map",
+    "template"
+   ],
+   "void": true
+  },
+  "article": {
+   "aria": {
+    "implicitRole": "article"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "main"
+     ]
+    }
+   ],
+   "sectioning": true
+  },
+  "aside": {
+   "aria": {
+    "implicitRole": "complementary"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "main"
+     ]
+    }
+   ],
+   "sectioning": true
+  },
+  "audio": {
+   "attributes": {
+    "autoplay": {
+     "boolean": true
+    },
+    "controls": {
+     "boolean": true
+    },
+    "crossorigin": {
+     "enum": [
+      "anonymous",
+      "use-credentials"
+     ],
+     "omit": true
+    },
+    "itemprop": {
+     "allowed": {
+      "if-attribute-present": [
+       "src"
+      ]
+     }
+    },
+    "loop": {
+     "boolean": true
+    },
+    "muted": {
+     "boolean": true
+    },
+    "preload": {
+     "enum": [
+      "none",
+      "metadata",
+      "auto"
+     ],
+     "omit": true
+    },
+    "src": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    }
+   },
+   "embedded": true,
+   "flow": true,
+   "focusable": {
+    "attr": "controls"
+   },
+   "interactive": {
+    "attr": "controls"
+   },
+   "permittedContent": [
+    "@flow",
+    "track",
+    "source"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "audio",
+      "video"
+     ]
+    }
+   ],
+   "permittedOrder": [
+    "source",
+    "track",
+    "@flow"
+   ],
+   "phrasing": true,
+   "transparent": [
+    "@flow"
+   ]
+  },
+  "b": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "base": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "href": {},
+    "target": {}
+   },
+   "metadata": true,
+   "permittedParent": [
+    "head"
+   ],
+   "void": true
+  },
+  "basefont": {
+   "deprecated": {
+    "message": "use CSS instead",
+    "source": "html4"
+   }
+  },
+  "bdi": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "bdo": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "bgsound": {
+   "deprecated": {
+    "message": "use <audio> instead",
+    "source": "non-standard"
+   }
+  },
+  "big": {
+   "deprecated": {
+    "message": "use CSS instead",
+    "source": "html5"
+   }
+  },
+  "blink": {
+   "deprecated": {
+    "source": "non-standard"
+   }
+  },
+  "blockquote": {
+   "aria": {
+    "implicitRole": "blockquote"
+   },
+   "attributes": {
+    "cite": {}
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "sectioning": true
+  },
+  "body": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "alink": {
+     "deprecated": true
+    },
+    "background": {
+     "deprecated": true
+    },
+    "bgcolor": {
+     "deprecated": true
+    },
+    "link": {
+     "deprecated": true
+    },
+    "marginbottom": {
+     "deprecated": true
+    },
+    "marginheight": {
+     "deprecated": true
+    },
+    "marginleft": {
+     "deprecated": true
+    },
+    "marginright": {
+     "deprecated": true
+    },
+    "margintop": {
+     "deprecated": true
+    },
+    "marginwidth": {
+     "deprecated": true
+    },
+    "text": {
+     "deprecated": true
+    },
+    "vlink": {
+     "deprecated": true
+    }
+   },
+   "optionalEnd": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedParent": [
+    "html"
+   ]
+  },
+  "br": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "clear": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "phrasing": true,
+   "void": true
+  },
+  "button": {
+   "aria": {
+    "implicitRole": "button"
+   },
+   "attributes": {
+    "autofocus": {
+     "boolean": true
+    },
+    "command": {
+     "enum": [
+      "toggle-popover",
+      "show-popover",
+      "hide-popover",
+      "close",
+      "request-close",
+      "show-modal",
+      {
+       "name": "/^--/",
+       "regex": "^--"
+      }
+     ]
+    },
+    "commandfor": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "disabled": {
+     "boolean": true
+    },
+    "form": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "formaction": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit"
+       ]
+      }
+     }
+    },
+    "formenctype": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit"
+       ]
+      }
+     }
+    },
+    "formmethod": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit"
+       ]
+      }
+     },
+     "enum": [
+      "get",
+      "post",
+      "dialog"
+     ]
+    },
+    "formnovalidate": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit"
+       ]
+      }
+     },
+     "boolean": true
+    },
+    "formtarget": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit"
+       ]
+      }
+     },
+     "enum": [
+      {
+       "name": "a browsing context name (non-empty string, must not start with `_`)",
+       "regex": "^[^_].*$"
+      },
+      "_blank",
+      "_self",
+      "_parent",
+      "_top"
+     ]
+    },
+    "name": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "popovertarget": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "popovertargetaction": {
+     "enum": [
+      "toggle",
+      "show",
+      "hide"
+     ]
+    },
+    "type": {
+     "enum": [
+      "submit",
+      "reset",
+      "button"
+     ]
+    },
+    "value": {}
+   },
+   "flow": true,
+   "focusable": true,
+   "formAssociated": {
+    "disablable": true,
+    "listed": true
+   },
+   "interactive": true,
+   "labelable": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "@interactive"
+     ]
+    }
+   ],
+   "phrasing": true,
+   "submitButton": {
+    "attr-value": {
+     "default": "submit",
+     "name": "type",
+     "values": [
+      "submit"
+     ]
+    }
+   },
+   "textContent": "accessible"
+  },
+  "canvas": {
+   "embedded": true,
+   "flow": true,
+   "phrasing": true,
+   "transparent": true
+  },
+  "caption": {
+   "aria": {
+    "implicitRole": "caption",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    }
+   },
+   "implicitClosed": [
+    "col",
+    "colgroup",
+    "thead",
+    "tfoot",
+    "tbody",
+    "tr"
+   ],
+   "optionalEnd": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "table"
+     ]
+    }
+   ]
+  },
+  "center": {
+   "deprecated": {
+    "message": "use CSS instead",
+    "source": "html4"
+   }
+  },
+  "cite": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "code": {
+   "aria": {
+    "implicitRole": "code",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "col": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "char": {
+     "deprecated": true
+    },
+    "charoff": {
+     "deprecated": true
+    },
+    "span": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "valign": {
+     "deprecated": true
+    },
+    "width": {
+     "deprecated": true
+    }
+   },
+   "void": true
+  },
+  "colgroup": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "span": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "implicitClosed": [
+    "colgroup",
+    "caption",
+    "thead",
+    "tbody",
+    "tfoot",
+    "tr"
+   ],
+   "permittedContent": [
+    "col",
+    "template"
+   ]
+  },
+  "data": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "value": {}
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "datalist": {
+   "aria": {
+    "implicitRole": "listbox",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing",
+    "option"
+   ],
+   "phrasing": true
+  },
+  "dd": {
+   "implicitClosed": [
+    "dd",
+    "dt"
+   ],
+   "permittedContent": [
+    "@flow"
+   ],
+   "requiredAncestors": [
+    "dl > dd",
+    "dl > div > dd",
+    "template > dd",
+    "template > div > dd"
+   ]
+  },
+  "del": {
+   "aria": {
+    "implicitRole": "deletion",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "cite": {},
+    "datetime": {}
+   },
+   "flow": true,
+   "phrasing": true,
+   "transparent": true
+  },
+  "details": {
+   "aria": {
+    "implicitRole": "group"
+   },
+   "attributes": {
+    "name": {},
+    "open": {
+     "boolean": true
+    }
+   },
+   "flow": true,
+   "interactive": true,
+   "permittedContent": [
+    "summary",
+    "@flow"
+   ],
+   "permittedOrder": [
+    "summary",
+    "@flow"
+   ],
+   "requiredContent": [
+    "summary"
+   ],
+   "sectioning": true
+  },
+  "dfn": {
+   "aria": {
+    "implicitRole": "term"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "dfn"
+     ]
+    }
+   ],
+   "phrasing": true
+  },
+  "dialog": {
+   "aria": {
+    "implicitRole": "dialog"
+   },
+   "attributes": {
+    "closedby": {
+     "enum": [
+      "any",
+      "closerequest",
+      "none"
+     ],
+     "omit": true
+    },
+    "open": {
+     "boolean": true
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ]
+  },
+  "dir": {
+   "deprecated": {
+    "source": "html4"
+   }
+  },
+  "div": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow",
+    "dt",
+    "dd"
+   ]
+  },
+  "dl": {
+   "attributes": {
+    "compact": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@script",
+    "dt",
+    "dd",
+    "div"
+   ]
+  },
+  "dt": {
+   "implicitClosed": [
+    "dd",
+    "dt"
+   ],
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "header",
+      "footer",
+      "@sectioning",
+      "@heading"
+     ]
+    }
+   ],
+   "requiredAncestors": [
+    "dl > dt",
+    "dl > div > dt",
+    "template > dt",
+    "template > div > dt"
+   ]
+  },
+  "em": {
+   "aria": {
+    "implicitRole": "emphasis",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "embed": {
+   "attributes": {
+    "height": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "src": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "required": true
+    },
+    "title": {
+     "required": true
+    },
+    "width": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "embedded": true,
+   "flow": true,
+   "interactive": true,
+   "phrasing": true,
+   "void": true
+  },
+  "fieldset": {
+   "aria": {
+    "implicitRole": "group"
+   },
+   "attributes": {
+    "datafld": {
+     "deprecated": true
+    },
+    "disabled": {
+     "boolean": true
+    },
+    "form": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "name": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    }
+   },
+   "flow": true,
+   "formAssociated": {
+    "disablable": true,
+    "listed": true
+   },
+   "permittedContent": [
+    "@flow",
+    "legend?"
+   ],
+   "permittedOrder": [
+    "legend",
+    "@flow"
+   ]
+  },
+  "figcaption": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "permittedContent": [
+    "@flow"
+   ]
+  },
+  "figure": {
+   "aria": {
+    "implicitRole": "figure"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow",
+    "figcaption?"
+   ],
+   "permittedOrder": [
+    "figcaption",
+    "@flow",
+    "figcaption"
+   ]
+  },
+  "font": {
+   "deprecated": {
+    "message": "use CSS instead",
+    "source": "html4"
+   }
+  },
+  "footer": {
+   "aria": {
+    "implicitRole": {
+     "else": "contentinfo",
+     "if": {
+      "ancestor": [
+       "article",
+       "aside",
+       "main",
+       "nav",
+       "section",
+       "[role=\"article\"]",
+       "[role=\"complementary\"]",
+       "[role=\"main\"]",
+       "[role=\"navigation\"]",
+       "[role=\"region\"]"
+      ]
+     },
+     "then": "generic"
+    },
+    "naming": {
+     "else": "allowed",
+     "if": {
+      "ancestor": [
+       "article",
+       "aside",
+       "main",
+       "nav",
+       "section",
+       "[role=\"article\"]",
+       "[role=\"complementary\"]",
+       "[role=\"main\"]",
+       "[role=\"navigation\"]",
+       "[role=\"region\"]"
+      ]
+     },
+     "then": "prohibited"
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "header",
+      "footer",
+      "main"
+     ]
+    }
+   ]
+  },
+  "form": {
+   "aria": {
+    "implicitRole": "form"
+   },
+   "attributes": {
+    "accept": {
+     "deprecated": true
+    },
+    "accept-charset": {},
+    "action": {
+     "enum": [
+      {
+       "name": "/^\\s*\\S+\\s*$/",
+       "regex": "^\\s*\\S+\\s*$"
+      }
+     ]
+    },
+    "autocomplete": {
+     "enum": [
+      "on",
+      "off"
+     ]
+    },
+    "enctype": {
+     "enum": [
+      "application/x-www-form-urlencoded",
+      "multipart/form-data",
+      "text/plain"
+     ]
+    },
+    "method": {
+     "enum": [
+      "get",
+      "post",
+      "dialog"
+     ]
+    },
+    "name": {},
+    "novalidate": {
+     "boolean": true
+    },
+    "rel": {
+     "allowed": {
+      "rel-disallowed": [
+       "alternate",
+       "canonical",
+       "author",
+       "bookmark",
+       "dns-prefetch",
+       "expect",
+       "icon",
+       "manifest",
+       "modulepreload",
+       "pingback",
+       "preconnect",
+       "prefetch",
+       "preload",
+       "privacy-policy",
+       "stylesheet",
+       "tag",
+       "terms-of-service"
+      ]
+     },
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "list": true
+    },
+    "target": {
+     "enum": [
+      {
+       "name": "a browsing context name (non-empty string, must not start with `_`)",
+       "regex": "^[^_].*$"
+      },
+      "_blank",
+      "_self",
+      "_parent",
+      "_top"
+     ]
+    }
+   },
+   "flow": true,
+   "form": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "@form"
+     ]
+    }
+   ]
+  },
+  "frame": {
+   "attributes": {
+    "datafld": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "title": {
+     "required": true
+    }
+   },
+   "deprecated": {
+    "source": "html5"
+   }
+  },
+  "frameset": {
+   "deprecated": {
+    "source": "html5"
+   }
+  },
+  "h1": {
+   "aria": {
+    "implicitRole": "heading"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "heading": true,
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "h2": {
+   "aria": {
+    "implicitRole": "heading"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "heading": true,
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "h3": {
+   "aria": {
+    "implicitRole": "heading"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "heading": true,
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "h4": {
+   "aria": {
+    "implicitRole": "heading"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "heading": true,
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "h5": {
+   "aria": {
+    "implicitRole": "heading"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "heading": true,
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "h6": {
+   "aria": {
+    "implicitRole": "heading"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "heading": true,
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "head": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "profile": {
+     "deprecated": true
+    }
+   },
+   "implicitClosed": [
+    "body",
+    "@flow-not-meta"
+   ],
+   "optionalEnd": true,
+   "permittedContent": [
+    "base?",
+    "title?",
+    "@meta"
+   ],
+   "permittedParent": [
+    "html"
+   ],
+   "requiredContent": [
+    "title"
+   ]
+  },
+  "header": {
+   "aria": {
+    "implicitRole": {
+     "else": "banner",
+     "if": {
+      "ancestor": [
+       "article",
+       "aside",
+       "main",
+       "nav",
+       "section",
+       "[role=\"article\"]",
+       "[role=\"complementary\"]",
+       "[role=\"main\"]",
+       "[role=\"navigation\"]",
+       "[role=\"region\"]"
+      ]
+     },
+     "then": "generic"
+    },
+    "naming": {
+     "else": "allowed",
+     "if": {
+      "ancestor": [
+       "article",
+       "aside",
+       "main",
+       "nav",
+       "section",
+       "[role=\"article\"]",
+       "[role=\"complementary\"]",
+       "[role=\"main\"]",
+       "[role=\"navigation\"]",
+       "[role=\"region\"]"
+      ]
+     },
+     "then": "prohibited"
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "header",
+      "footer",
+      "main"
+     ]
+    }
+   ]
+  },
+  "hgroup": {
+   "aria": {
+    "implicitRole": "group"
+   },
+   "flow": true,
+   "heading": true,
+   "permittedContent": [
+    "p",
+    "@heading?"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "hgroup"
+     ]
+    }
+   ],
+   "requiredContent": [
+    "@heading"
+   ]
+  },
+  "hr": {
+   "aria": {
+    "implicitRole": "separator"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "color": {
+     "deprecated": true
+    },
+    "noshade": {
+     "deprecated": true
+    },
+    "size": {
+     "deprecated": true
+    },
+    "width": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "void": true
+  },
+  "html": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "lang": {
+     "required": true
+    },
+    "version": {
+     "deprecated": true
+    }
+   },
+   "implicitOpen": [
+    {
+     "for": [
+      "@meta"
+     ],
+     "open": "head"
+    },
+    {
+     "for": [
+      "@flow-not-meta"
+     ],
+     "open": "body"
+    }
+   ],
+   "optionalEnd": true,
+   "permittedContent": [
+    "head?",
+    "body?"
+   ],
+   "permittedOrder": [
+    "head",
+    "body"
+   ],
+   "requiredContent": [
+    "head",
+    "body"
+   ]
+  },
+  "i": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "iframe": {
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "allowtransparency": {
+     "deprecated": true
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "frameborder": {
+     "deprecated": true
+    },
+    "height": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "hspace": {
+     "deprecated": true
+    },
+    "marginheight": {
+     "deprecated": true
+    },
+    "marginwidth": {
+     "deprecated": true
+    },
+    "referrerpolicy": {
+     "enum": [
+      "",
+      "no-referrer",
+      "no-referrer-when-downgrade",
+      "same-origin",
+      "origin",
+      "strict-origin",
+      "origin-when-cross-origin",
+      "strict-origin-when-cross-origin",
+      "unsafe-url"
+     ]
+    },
+    "scrolling": {
+     "deprecated": true
+    },
+    "src": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "title": {
+     "required": true
+    },
+    "vspace": {
+     "deprecated": true
+    },
+    "width": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "embedded": true,
+   "flow": true,
+   "interactive": true,
+   "permittedContent": [],
+   "phrasing": true
+  },
+  "img": {
+   "aria": {
+    "implicitRole": {
+     "else": "img",
+     "if": {
+      "all": [
+       {
+        "attr-value": {
+         "name": "alt",
+         "values": [
+          ""
+         ]
+        }
+       },
+       {
+        "not": {
+         "attr": "aria-label"
+        }
+       },
+       {
+        "not": {
+         "attr": "aria-labelledby"
+        }
+       },
+       {
+        "not": {
+         "attr": "title"
+        }
+       }
+      ]
+     },
+     "then": "none"
+    },
+    "naming": {
+     "else": "prohibited",
+     "if": {
+      "any": [
+       {
+        "attr-nonempty": "alt"
+       },
+       {
+        "attr": "aria-label"
+       },
+       {
+        "attr": "aria-labelledby"
+       },
+       {
+        "attr": "title"
+       }
+      ]
+     },
+     "then": "allowed"
+    }
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "alt": {},
+    "border": {
+     "deprecated": true
+    },
+    "crossorigin": {
+     "enum": [
+      "anonymous",
+      "use-credentials"
+     ],
+     "omit": true
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "decoding": {
+     "enum": [
+      "sync",
+      "async",
+      "auto"
+     ]
+    },
+    "fetchpriority": {
+     "enum": [
+      "high",
+      "low",
+      "auto"
+     ],
+     "omit": true
+    },
+    "height": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "hspace": {
+     "deprecated": true
+    },
+    "ismap": {
+     "boolean": true
+    },
+    "loading": {
+     "enum": [
+      "lazy",
+      "eager"
+     ],
+     "omit": true
+    },
+    "lowsrc": {
+     "deprecated": true
+    },
+    "name": {
+     "deprecated": true
+    },
+    "referrerpolicy": {
+     "enum": [
+      "",
+      "no-referrer",
+      "no-referrer-when-downgrade",
+      "same-origin",
+      "origin",
+      "strict-origin",
+      "origin-when-cross-origin",
+      "strict-origin-when-cross-origin",
+      "unsafe-url"
+     ]
+    },
+    "sizes": {},
+    "src": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "required": true
+    },
+    "srcset": {
+     "enum": [
+      {
+       "name": "/[^]+/",
+       "regex": "^(?s:.)+$"
+      }
+     ]
+    },
+    "usemap": {},
+    "vspace": {
+     "deprecated": true
+    },
+    "width": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "embedded": true,
+   "flow": true,
+   "interactive": {
+    "attr": "usemap"
+   },
+   "phrasing": true,
+   "void": true
+  },
+  "input": {
+   "aria": {
+    "implicitRole": {
+     "else": {
+      "cases": {
+       "button": "button",
+       "checkbox": "checkbox",
+       "color": null,
+       "date": null,
+       "datetime-local": null,
+       "email": "textbox",
+       "file": null,
+       "hidden": null,
+       "image": "button",
+       "month": null,
+       "number": "spinbutton",
+       "password": null,
+       "radio": "radio",
+       "range": "slider",
+       "reset": "button",
+       "search": "searchbox",
+       "submit": "button",
+       "tel": "textbox",
+       "text": "textbox",
+       "time": null,
+       "url": "textbox",
+       "week": null
+      },
+      "default": "textbox",
+      "switch": "type"
+     },
+     "if": {
+      "attr": "list"
+     },
+     "then": "combobox"
+    },
+    "naming": {
+     "else": "prohibited",
+     "if": {
+      "not": {
+       "attr-value": {
+        "name": "type",
+        "values": [
+         "hidden"
+        ]
+       }
+      }
+     },
+     "then": "allowed"
+    }
+   },
+   "attributes": {
+    "accept": {},
+    "align": {
+     "deprecated": true
+    },
+    "alpha": {
+     "boolean": true
+    },
+    "alt": {},
+    "autocapitalize": {
+     "enum": [
+      "off",
+      "none",
+      "on",
+      "sentences",
+      "words",
+      "characters"
+     ]
+    },
+    "autocomplete": {},
+    "autofocus": {
+     "boolean": true
+    },
+    "capture": {
+     "enum": [
+      "environment",
+      "user"
+     ],
+     "omit": true
+    },
+    "checked": {
+     "boolean": true
+    },
+    "colorspace": {
+     "enum": [
+      "limited-srgb",
+      "display-p3"
+     ]
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "dirname": {},
+    "disabled": {
+     "boolean": true
+    },
+    "form": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "formaction": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit",
+        "image"
+       ]
+      }
+     }
+    },
+    "formenctype": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit",
+        "image"
+       ]
+      }
+     }
+    },
+    "formmethod": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit",
+        "image"
+       ]
+      }
+     },
+     "enum": [
+      "get",
+      "post",
+      "dialog"
+     ]
+    },
+    "formnovalidate": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit",
+        "image"
+       ]
+      }
+     },
+     "boolean": true
+    },
+    "formtarget": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": "submit",
+       "key": "type",
+       "values": [
+        "submit",
+        "image"
+       ]
+      }
+     },
+     "enum": [
+      {
+       "name": "a browsing context name (non-empty string, must not start with `_`)",
+       "regex": "^[^_].*$"
+      },
+      "_blank",
+      "_self",
+      "_parent",
+      "_top"
+     ]
+    },
+    "height": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "hspace": {
+     "deprecated": true
+    },
+    "inputmode": {
+     "enum": [
+      "none",
+      "text",
+      "decimal",
+      "numeric",
+      "tel",
+      "search",
+      "email",
+      "url"
+     ]
+    },
+    "ismap": {
+     "deprecated": true
+    },
+    "list": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "max": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "maxlength": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "min": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "minlength": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "multiple": {
+     "boolean": true
+    },
+    "name": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "pattern": {},
+    "placeholder": {},
+    "popovertarget": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "popovertargetaction": {
+     "enum": [
+      "toggle",
+      "show",
+      "hide"
+     ]
+    },
+    "readonly": {
+     "boolean": true
+    },
+    "required": {
+     "boolean": true
+    },
+    "size": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "src": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "step": {},
+    "type": {
+     "enum": [
+      "button",
+      "checkbox",
+      "color",
+      "date",
+      "datetime-local",
+      "email",
+      "file",
+      "hidden",
+      "image",
+      "month",
+      "number",
+      "password",
+      "radio",
+      "range",
+      "reset",
+      "search",
+      "submit",
+      "tel",
+      "text",
+      "time",
+      "url",
+      "week"
+     ]
+    },
+    "usemap": {
+     "deprecated": true
+    },
+    "value": {},
+    "vspace": {
+     "deprecated": true
+    },
+    "width": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "flow": true,
+   "focusable": {
+    "not": {
+     "attr-value": {
+      "name": "type",
+      "values": [
+       "hidden"
+      ]
+     }
+    }
+   },
+   "formAssociated": {
+    "disablable": true,
+    "listed": true
+   },
+   "interactive": {
+    "not": {
+     "attr-value": {
+      "name": "type",
+      "values": [
+       "hidden"
+      ]
+     }
+    }
+   },
+   "labelable": {
+    "not": {
+     "attr-value": {
+      "name": "type",
+      "values": [
+       "hidden"
+      ]
+     }
+    }
+   },
+   "phrasing": true,
+   "submitButton": {
+    "attr-value": {
+     "name": "type",
+     "values": [
+      "submit",
+      "image"
+     ]
+    }
+   },
+   "void": true
+  },
+  "ins": {
+   "aria": {
+    "implicitRole": "insertion",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "cite": {},
+    "datetime": {}
+   },
+   "flow": true,
+   "phrasing": true,
+   "transparent": true
+  },
+  "isindex": {
+   "deprecated": {
+    "source": "html4"
+   }
+  },
+  "kbd": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "keygen": {
+   "deprecated": true,
+   "flow": true,
+   "interactive": true,
+   "labelable": true,
+   "phrasing": true,
+   "void": true
+  },
+  "label": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "datafld": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "for": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    }
+   },
+   "flow": true,
+   "interactive": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "label"
+     ]
+    }
+   ],
+   "phrasing": true
+  },
+  "legend": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    }
+   },
+   "permittedContent": [
+    "@phrasing",
+    "@heading"
+   ]
+  },
+  "li": {
+   "aria": {
+    "implicitRole": {
+     "else": "generic",
+     "if": {
+      "ancestor": [
+       "ul",
+       "ol",
+       "menu"
+      ]
+     },
+     "then": "listitem"
+    }
+   },
+   "attributes": {
+    "type": {
+     "deprecated": true
+    },
+    "value": {
+     "enum": [
+      {
+       "name": "/-?\\d+/",
+       "regex": "^-?\\d+$"
+      }
+     ]
+    }
+   },
+   "implicitClosed": [
+    "li"
+   ],
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedParent": [
+    "ul",
+    "ol",
+    "menu",
+    "template"
+   ]
+  },
+  "link": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "as": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": null,
+       "key": "rel",
+       "values": [
+        "prefetch",
+        "preload",
+        "modulepreload"
+       ]
+      }
+     },
+     "enum": [
+      "audio",
+      "audioworklet",
+      "document",
+      "embed",
+      "fetch",
+      "font",
+      "frame",
+      "iframe",
+      "image",
+      "manifest",
+      "object",
+      "paintworklet",
+      "report",
+      "script",
+      "serviceworker",
+      "sharedworker",
+      "style",
+      "track",
+      "video",
+      "webidentity",
+      "worker",
+      "xslt"
+     ]
+    },
+    "blocking": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": null,
+       "key": "rel",
+       "values": [
+        "expect",
+        "stylesheet"
+       ]
+      }
+     },
+     "enum": [
+      "render"
+     ],
+     "list": true
+    },
+    "charset": {
+     "deprecated": true
+    },
+    "color": {},
+    "crossorigin": {
+     "enum": [
+      "anonymous",
+      "use-credentials"
+     ],
+     "omit": true
+    },
+    "disabled": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": null,
+       "key": "rel",
+       "values": [
+        "stylesheet"
+       ]
+      }
+     },
+     "boolean": true
+    },
+    "fetchpriority": {
+     "enum": [
+      "high",
+      "low",
+      "auto"
+     ]
+    },
+    "href": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "required": {
+      "not": {
+       "attr": "imagesrcset"
+      }
+     }
+    },
+    "hreflang": {},
+    "imagesizes": {
+     "allowed": {
+      "link-image-preload": true
+     },
+     "required": {
+      "attr-width-descriptor": "imagesrcset"
+     }
+    },
+    "imagesrcset": {
+     "allowed": {
+      "link-image-preload": true
+     }
+    },
+    "integrity": {
+     "allowed": {
+      "if-attribute-value": {
+       "default": null,
+       "key": "rel",
+       "values": [
+        "stylesheet",
+        "preload",
+        "modulepreload"
+       ]
+      }
+     },
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "media": {},
+    "methods": {
+     "deprecated": true
+    },
+    "referrerpolicy": {
+     "enum": [
+      "",
+      "no-referrer",
+      "no-referrer-when-downgrade",
+      "same-origin",
+      "origin",
+      "strict-origin",
+      "origin-when-cross-origin",
+      "strict-origin-when-cross-origin",
+      "unsafe-url"
+     ]
+    },
+    "rel": {
+     "allowed": {
+      "rel-disallowed": [
+       "bookmark",
+       "external",
+       "nofollow",
+       "noopener",
+       "noreferrer",
+       "opener",
+       "tag",
+       "disclosure",
+       "entry-content",
+       "lightbox",
+       "lightvideo"
+      ]
+     },
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "list": true
+    },
+    "sizes": {},
+    "target": {
+     "deprecated": true
+    },
+    "type": {},
+    "urn": {
+     "deprecated": true
+    }
+   },
+   "flow": {
+    "any": [
+     {
+      "attr": "itemprop"
+     },
+     {
+      "attr-token": {
+       "name": "rel",
+       "values": [
+        "dns-prefetch",
+        "modulepreload",
+        "pingback",
+        "preconnect",
+        "prefetch",
+        "preload",
+        "stylesheet"
+       ]
+      }
+     }
+    ]
+   },
+   "metadata": true,
+   "phrasing": {
+    "any": [
+     {
+      "attr": "itemprop"
+     },
+     {
+      "attr-token": {
+       "name": "rel",
+       "values": [
+        "dns-prefetch",
+        "modulepreload",
+        "pingback",
+        "preconnect",
+        "prefetch",
+        "preload",
+        "stylesheet"
+       ]
+      }
+     }
+    ]
+   },
+   "void": true
+  },
+  "listing": {
+   "deprecated": {
+    "source": "html32"
+   }
+  },
+  "main": {
+   "aria": {
+    "implicitRole": "main"
+   },
+   "flow": true
+  },
+  "map": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "name": {
+     "enum": [
+      {
+       "name": "/\\S+/",
+       "regex": "^\\S+$"
+      }
+     ],
+     "required": true
+    }
+   },
+   "flow": true,
+   "phrasing": true,
+   "transparent": true
+  },
+  "mark": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "marquee": {
+   "attributes": {
+    "datafld": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    }
+   },
+   "deprecated": {
+    "source": "html5"
+   }
+  },
+  "math": {
+   "aria": {
+    "implicitRole": "math"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "dir": {
+     "enum": [
+      "ltr",
+      "rtl"
+     ]
+    },
+    "display": {
+     "enum": [
+      "block",
+      "inline"
+     ]
+    },
+    "hspace": {
+     "deprecated": true
+    },
+    "name": {
+     "deprecated": true
+    },
+    "overflow": {
+     "enum": [
+      "linebreak",
+      "scroll",
+      "elide",
+      "truncate",
+      "scale"
+     ]
+    },
+    "vspace": {
+     "deprecated": true
+    }
+   },
+   "embedded": true,
+   "flow": true,
+   "foreign": true,
+   "phrasing": true
+  },
+  "menu": {
+   "aria": {
+    "implicitRole": "list"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@script",
+    "li"
+   ]
+  },
+  "meta": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "charset": {
+     "enum": [
+      "utf-8"
+     ]
+    },
+    "content": {
+     "allowed": {
+      "if-attribute-present": [
+       "name",
+       "http-equiv",
+       "itemprop",
+       "property"
+      ]
+     }
+    },
+    "http-equiv": {
+     "allowed": {
+      "if-attribute-absent": [
+       "name",
+       "itemprop"
+      ]
+     }
+    },
+    "itemprop": {
+     "allowed": {
+      "if-attribute-absent": [
+       "http-equiv",
+       "name"
+      ]
+     }
+    },
+    "name": {
+     "allowed": {
+      "if-attribute-absent": [
+       "http-equiv",
+       "itemprop"
+      ]
+     }
+    },
+    "scheme": {
+     "deprecated": true
+    }
+   },
+   "flow": {
+    "attr": "itemprop"
+   },
+   "metadata": true,
+   "phrasing": {
+    "attr": "itemprop"
+   },
+   "void": true
+  },
+  "meter": {
+   "aria": {
+    "implicitRole": "meter"
+   },
+   "attributes": {
+    "high": {
+     "enum": [
+      {
+       "name": "a floating-point number",
+       "regex": "(?i)^-?(\\d+(\\.\\d+)?|\\.\\d+)(E[+-]?\\d+)?$"
+      }
+     ]
+    },
+    "low": {
+     "enum": [
+      {
+       "name": "a floating-point number",
+       "regex": "(?i)^-?(\\d+(\\.\\d+)?|\\.\\d+)(E[+-]?\\d+)?$"
+      }
+     ]
+    },
+    "max": {
+     "enum": [
+      {
+       "name": "a floating-point number",
+       "regex": "(?i)^-?(\\d+(\\.\\d+)?|\\.\\d+)(E[+-]?\\d+)?$"
+      }
+     ]
+    },
+    "min": {
+     "enum": [
+      {
+       "name": "a floating-point number",
+       "regex": "(?i)^-?(\\d+(\\.\\d+)?|\\.\\d+)(E[+-]?\\d+)?$"
+      }
+     ]
+    },
+    "optimum": {
+     "enum": [
+      {
+       "name": "a floating-point number",
+       "regex": "(?i)^-?(\\d+(\\.\\d+)?|\\.\\d+)(E[+-]?\\d+)?$"
+      }
+     ]
+    },
+    "value": {
+     "enum": [
+      {
+       "name": "a floating-point number",
+       "regex": "(?i)^-?(\\d+(\\.\\d+)?|\\.\\d+)(E[+-]?\\d+)?$"
+      }
+     ]
+    }
+   },
+   "flow": true,
+   "labelable": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": "meter"
+    }
+   ],
+   "phrasing": true
+  },
+  "multicol": {
+   "deprecated": {
+    "message": "use CSS instead",
+    "source": "html5"
+   }
+  },
+  "nav": {
+   "aria": {
+    "implicitRole": "navigation"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": "main"
+    }
+   ],
+   "sectioning": true
+  },
+  "nextid": {
+   "deprecated": {
+    "source": "html32"
+   }
+  },
+  "nobr": {
+   "deprecated": {
+    "message": "use CSS instead",
+    "source": "non-standard"
+   }
+  },
+  "noembed": {
+   "deprecated": {
+    "source": "non-standard"
+   }
+  },
+  "noframes": {
+   "deprecated": {
+    "source": "html5"
+   }
+  },
+  "noscript": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "metadata": true,
+   "permittedDescendants": [
+    {
+     "exclude": "noscript"
+    }
+   ],
+   "phrasing": true,
+   "transparent": true
+  },
+  "object": {
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "archive": {
+     "deprecated": true
+    },
+    "blocking": {
+     "enum": [
+      "render"
+     ],
+     "list": true
+    },
+    "border": {
+     "deprecated": true
+    },
+    "classid": {
+     "deprecated": true
+    },
+    "code": {
+     "deprecated": true
+    },
+    "codebase": {
+     "deprecated": true
+    },
+    "codetype": {
+     "deprecated": true
+    },
+    "data": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "required": true
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "declare": {
+     "deprecated": true
+    },
+    "height": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "hspace": {
+     "deprecated": true
+    },
+    "name": {
+     "enum": [
+      {
+       "name": "a browsing context name (non-empty string, must not start with `_`)",
+       "regex": "^[^_].*$"
+      }
+     ]
+    },
+    "standby": {
+     "deprecated": true
+    },
+    "vspace": {
+     "deprecated": true
+    },
+    "width": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "embedded": true,
+   "flow": true,
+   "formAssociated": {
+    "disablable": false,
+    "listed": true
+   },
+   "interactive": {
+    "attr": "usemap"
+   },
+   "permittedContent": [
+    "param",
+    "@flow"
+   ],
+   "permittedOrder": [
+    "param",
+    "@flow"
+   ],
+   "phrasing": true,
+   "transparent": true
+  },
+  "ol": {
+   "aria": {
+    "implicitRole": "list"
+   },
+   "attributes": {
+    "compact": {
+     "deprecated": true
+    },
+    "reversed": {
+     "boolean": true
+    },
+    "start": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "type": {
+     "enum": [
+      "a",
+      "A",
+      "i",
+      "I",
+      "1"
+     ]
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@script",
+    "li"
+   ]
+  },
+  "optgroup": {
+   "aria": {
+    "implicitRole": "group"
+   },
+   "attributes": {
+    "disabled": {
+     "boolean": true
+    },
+    "label": {}
+   },
+   "implicitClosed": [
+    "optgroup"
+   ],
+   "permittedContent": [
+    "@script",
+    "option"
+   ]
+  },
+  "option": {
+   "aria": {
+    "implicitRole": "option"
+   },
+   "attributes": {
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "disabled": {
+     "boolean": true
+    },
+    "label": {},
+    "name": {
+     "deprecated": true
+    },
+    "selected": {
+     "boolean": true
+    },
+    "value": {}
+   },
+   "implicitClosed": [
+    "option",
+    "optgroup"
+   ],
+   "permittedContent": [
+    "@phrasing",
+    "div"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "@interactive",
+      "datalist",
+      "object"
+     ]
+    }
+   ]
+  },
+  "output": {
+   "aria": {
+    "implicitRole": "status"
+   },
+   "attributes": {
+    "for": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "list": true,
+     "reference": "id"
+    },
+    "form": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "name": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    }
+   },
+   "flow": true,
+   "formAssociated": {
+    "disablable": false,
+    "listed": true
+   },
+   "labelable": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "p": {
+   "aria": {
+    "implicitRole": "paragraph",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "implicitClosed": [
+    "address",
+    "article",
+    "aside",
+    "blockquote",
+    "dd",
+    "details",
+    "dialog",
+    "div",
+    "dl",
+    "dt",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "header",
+    "hgroup",
+    "hr",
+    "li",
+    "main",
+    "menu",
+    "nav",
+    "ol",
+    "p",
+    "pre",
+    "search",
+    "section",
+    "table",
+    "ul"
+   ],
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "param": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "datafld": {
+     "deprecated": true
+    },
+    "type": {
+     "deprecated": true
+    },
+    "valuetype": {
+     "deprecated": true
+    }
+   },
+   "void": true
+  },
+  "picture": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "embedded": true,
+   "flow": true,
+   "permittedContent": [
+    "@script",
+    "source",
+    "img"
+   ],
+   "permittedOrder": [
+    "source",
+    "img"
+   ],
+   "phrasing": true
+  },
+  "plaintext": {
+   "deprecated": {
+    "message": "use <pre> or CSS instead",
+    "source": "html2"
+   }
+  },
+  "pre": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "width": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "progress": {
+   "aria": {
+    "implicitRole": "progressbar"
+   },
+   "attributes": {
+    "max": {
+     "enum": [
+      {
+       "name": "a floating-point number",
+       "regex": "(?i)^-?(\\d+(\\.\\d+)?|\\.\\d+)(E[+-]?\\d+)?$"
+      }
+     ]
+    },
+    "value": {
+     "enum": [
+      {
+       "name": "a floating-point number",
+       "regex": "(?i)^-?(\\d+(\\.\\d+)?|\\.\\d+)(E[+-]?\\d+)?$"
+      }
+     ]
+    }
+   },
+   "flow": true,
+   "labelable": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": "progress"
+    }
+   ],
+   "phrasing": true
+  },
+  "q": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "cite": {}
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "rb": {
+   "implicitClosed": [
+    "rb",
+    "rt",
+    "rtc",
+    "rp"
+   ],
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "rp": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "implicitClosed": [
+    "rb",
+    "rt",
+    "rtc",
+    "rp"
+   ],
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "rt": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "implicitClosed": [
+    "rb",
+    "rt",
+    "rtc",
+    "rp"
+   ],
+   "permittedContent": [
+    "@phrasing"
+   ]
+  },
+  "rtc": {
+   "implicitClosed": [
+    "rb",
+    "rtc",
+    "rp"
+   ],
+   "permittedContent": [
+    "@phrasing",
+    "rt"
+   ]
+  },
+  "ruby": {
+   "flow": true,
+   "permittedContent": [
+    "@phrasing",
+    "rb",
+    "rp",
+    "rt",
+    "rtc"
+   ],
+   "phrasing": true
+  },
+  "s": {
+   "aria": {
+    "implicitRole": "deletion",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "samp": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "script": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "async": {
+     "boolean": true
+    },
+    "blocking": {
+     "enum": [
+      "render"
+     ],
+     "list": true
+    },
+    "crossorigin": {
+     "enum": [
+      "anonymous",
+      "use-credentials"
+     ],
+     "omit": true
+    },
+    "defer": {
+     "boolean": true
+    },
+    "event": {
+     "deprecated": true
+    },
+    "fetchpriority": {
+     "enum": [
+      "high",
+      "low",
+      "auto"
+     ]
+    },
+    "for": {
+     "deprecated": true
+    },
+    "integrity": {
+     "allowed": {
+      "if-attribute-present": [
+       "src"
+      ]
+     },
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "language": {
+     "deprecated": true
+    },
+    "nomodule": {
+     "boolean": true
+    },
+    "referrerpolicy": {
+     "enum": [
+      "",
+      "no-referrer",
+      "no-referrer-when-downgrade",
+      "same-origin",
+      "origin",
+      "strict-origin",
+      "origin-when-cross-origin",
+      "strict-origin-when-cross-origin",
+      "unsafe-url"
+     ]
+    },
+    "src": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "type": {}
+   },
+   "flow": true,
+   "metadata": true,
+   "phrasing": true,
+   "scriptSupporting": true
+  },
+  "search": {
+   "aria": {
+    "implicitRole": "search"
+   },
+   "flow": true
+  },
+  "section": {
+   "aria": {
+    "implicitRole": {
+     "else": "generic",
+     "if": {
+      "any": [
+       {
+        "attr": "aria-label"
+       },
+       {
+        "attr": "aria-labelledby"
+       }
+      ]
+     },
+     "then": "region"
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@flow"
+   ],
+   "sectioning": true
+  },
+  "select": {
+   "aria": {
+    "implicitRole": {
+     "else": "combobox",
+     "if": {
+      "any": [
+       {
+        "attr": "multiple"
+       },
+       {
+        "attr-int-above": {
+         "name": "size",
+         "value": 1
+        }
+       }
+      ]
+     },
+     "then": "listbox"
+    }
+   },
+   "attributes": {
+    "autocomplete": {},
+    "autofocus": {
+     "boolean": true
+    },
+    "disabled": {
+     "boolean": true
+    },
+    "form": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "multiple": {
+     "boolean": true
+    },
+    "name": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "required": {
+     "boolean": true
+    },
+    "size": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "flow": true,
+   "focusable": true,
+   "formAssociated": {
+    "disablable": true,
+    "listed": true
+   },
+   "interactive": true,
+   "labelable": true,
+   "permittedContent": [
+    "@script",
+    "button?",
+    "datasrc",
+    "datafld",
+    "dataformatas",
+    "option",
+    "optgroup",
+    "hr"
+   ],
+   "permittedOrder": [
+    "button",
+    "option, optgroup, hr"
+   ],
+   "phrasing": true
+  },
+  "selectedcontent": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "permittedContent": [],
+   "phrasing": true,
+   "requiredAncestors": [
+    "select > button"
+   ],
+   "textContent": "none"
+  },
+  "slot": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "name": {}
+   },
+   "flow": true,
+   "phrasing": true,
+   "transparent": true
+  },
+  "small": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "source": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "height": {
+     "allowed": {
+      "if-parent-present": [
+       "picture"
+      ]
+     },
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "media": {},
+    "sizes": {
+     "allowed": {
+      "if-parent-present": [
+       "picture"
+      ]
+     }
+    },
+    "src": {
+     "allowed": {
+      "if-parent-present": [
+       "audio",
+       "video"
+      ]
+     }
+    },
+    "srcset": {
+     "allowed": {
+      "if-parent-present": [
+       "picture"
+      ]
+     }
+    },
+    "type": {},
+    "width": {
+     "allowed": {
+      "if-parent-present": [
+       "picture"
+      ]
+     },
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "void": true
+  },
+  "spacer": {
+   "deprecated": {
+    "message": "use CSS instead",
+    "source": "non-standard"
+   }
+  },
+  "span": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "datafld": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "strike": {
+   "deprecated": {
+    "message": "use <del> or <s> instead",
+    "source": "html5"
+   }
+  },
+  "strong": {
+   "aria": {
+    "implicitRole": "strong",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "style": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "metadata": true
+  },
+  "sub": {
+   "aria": {
+    "implicitRole": "subscript",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "summary": {
+   "aria": {
+    "implicitRole": "button"
+   },
+   "focusable": {
+    "ancestor": [
+     "details"
+    ]
+   },
+   "permittedContent": [
+    "@phrasing",
+    "@heading"
+   ]
+  },
+  "sup": {
+   "aria": {
+    "implicitRole": "superscript",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "svg": {
+   "aria": {
+    "implicitRole": "graphics-document"
+   },
+   "attributes": {
+    "focusable": {
+     "enum": [
+      "true",
+      "false"
+     ]
+    }
+   },
+   "embedded": true,
+   "flow": true,
+   "foreign": true,
+   "phrasing": true
+  },
+  "svg:desc": {},
+  "svg:title": {},
+  "table": {
+   "aria": {
+    "implicitRole": "table"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "background": {
+     "deprecated": true
+    },
+    "bgcolor": {
+     "deprecated": true
+    },
+    "bordercolor": {
+     "deprecated": true
+    },
+    "cellpadding": {
+     "deprecated": true
+    },
+    "cellspacing": {
+     "deprecated": true
+    },
+    "dataformatas": {
+     "deprecated": true
+    },
+    "datapagesize": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "frame": {
+     "deprecated": true
+    },
+    "rules": {
+     "deprecated": true
+    },
+    "summary": {
+     "deprecated": true
+    },
+    "width": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "implicitOpen": [
+    {
+     "for": [
+      "col"
+     ],
+     "open": "colgroup"
+    }
+   ],
+   "permittedContent": [
+    "@script",
+    "caption?",
+    "colgroup",
+    "tbody",
+    "tfoot?",
+    "thead?",
+    "tr"
+   ],
+   "permittedOrder": [
+    "caption",
+    "colgroup",
+    "thead",
+    "tbody",
+    "tr",
+    "tfoot"
+   ]
+  },
+  "tbody": {
+   "aria": {
+    "implicitRole": "rowgroup"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "background": {
+     "deprecated": true
+    },
+    "char": {
+     "deprecated": true
+    },
+    "charoff": {
+     "deprecated": true
+    },
+    "valign": {
+     "deprecated": true
+    }
+   },
+   "implicitClosed": [
+    "tbody",
+    "tfoot"
+   ],
+   "permittedContent": [
+    "@script",
+    "tr"
+   ]
+  },
+  "td": {
+   "aria": {
+    "implicitRole": {
+     "table-cell-role": "td"
+    }
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "axis": {
+     "deprecated": true
+    },
+    "background": {
+     "deprecated": true
+    },
+    "bgcolor": {
+     "deprecated": true
+    },
+    "char": {
+     "deprecated": true
+    },
+    "charoff": {
+     "deprecated": true
+    },
+    "colspan": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "headers": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "list": true,
+     "reference": "id"
+    },
+    "height": {
+     "deprecated": true
+    },
+    "nowrap": {
+     "deprecated": true
+    },
+    "rowspan": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "scope": {
+     "deprecated": true
+    },
+    "valign": {
+     "deprecated": true
+    },
+    "width": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "implicitClosed": [
+    "td",
+    "th",
+    "tr",
+    "tbody",
+    "tfoot"
+   ],
+   "permittedContent": [
+    "@flow"
+   ]
+  },
+  "template": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "shadowrootclonable": {
+     "boolean": true
+    },
+    "shadowrootcustomelementregistry": {
+     "boolean": true
+    },
+    "shadowrootdelegatesfocus": {
+     "boolean": true
+    },
+    "shadowrootmode": {
+     "enum": [
+      "open",
+      "closed"
+     ]
+    },
+    "shadowrootserializable": {
+     "boolean": true
+    },
+    "shadowrootslotassignment": {
+     "enum": [
+      "named",
+      "manual"
+     ]
+    }
+   },
+   "flow": true,
+   "metadata": true,
+   "phrasing": true,
+   "scriptSupporting": true,
+   "templateRoot": true
+  },
+  "textarea": {
+   "aria": {
+    "implicitRole": "textbox"
+   },
+   "attributes": {
+    "autocomplete": {},
+    "autofocus": {
+     "boolean": true
+    },
+    "cols": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "datafld": {
+     "deprecated": true
+    },
+    "datasrc": {
+     "deprecated": true
+    },
+    "dirname": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "disabled": {
+     "boolean": true
+    },
+    "form": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "reference": "id"
+    },
+    "maxlength": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "minlength": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "name": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "placeholder": {},
+    "readonly": {
+     "boolean": true
+    },
+    "required": {
+     "boolean": true
+    },
+    "rows": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "wrap": {
+     "enum": [
+      "hard",
+      "soft"
+     ]
+    }
+   },
+   "flow": true,
+   "focusable": true,
+   "formAssociated": {
+    "disablable": true,
+    "listed": true
+   },
+   "interactive": true,
+   "labelable": true,
+   "permittedContent": [],
+   "phrasing": true
+  },
+  "tfoot": {
+   "aria": {
+    "implicitRole": "rowgroup"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "background": {
+     "deprecated": true
+    },
+    "char": {
+     "deprecated": true
+    },
+    "charoff": {
+     "deprecated": true
+    },
+    "valign": {
+     "deprecated": true
+    }
+   },
+   "implicitClosed": [
+    "tbody"
+   ],
+   "optionalEnd": true,
+   "permittedContent": [
+    "@script",
+    "tr"
+   ]
+  },
+  "th": {
+   "aria": {
+    "implicitRole": {
+     "table-cell-role": "th"
+    }
+   },
+   "attributes": {
+    "abbr": {},
+    "align": {
+     "deprecated": true
+    },
+    "axis": {
+     "deprecated": true
+    },
+    "background": {
+     "deprecated": true
+    },
+    "bgcolor": {
+     "deprecated": true
+    },
+    "char": {
+     "deprecated": true
+    },
+    "charoff": {
+     "deprecated": true
+    },
+    "colspan": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "headers": {
+     "enum": [
+      {
+       "name": "a valid id",
+       "regex": "^\\S+$"
+      }
+     ],
+     "list": true,
+     "reference": "id"
+    },
+    "height": {
+     "deprecated": true
+    },
+    "nowrap": {
+     "deprecated": true
+    },
+    "rowspan": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "scope": {
+     "enum": [
+      "row",
+      "col",
+      "rowgroup",
+      "colgroup"
+     ]
+    },
+    "valign": {
+     "deprecated": true
+    },
+    "width": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "implicitClosed": [
+    "td",
+    "th",
+    "tr",
+    "tbody",
+    "tfoot"
+   ],
+   "permittedContent": [
+    "@flow"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "header",
+      "footer",
+      "@sectioning",
+      "@heading"
+     ]
+    }
+   ]
+  },
+  "thead": {
+   "aria": {
+    "implicitRole": "rowgroup"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "background": {
+     "deprecated": true
+    },
+    "char": {
+     "deprecated": true
+    },
+    "charoff": {
+     "deprecated": true
+    },
+    "valign": {
+     "deprecated": true
+    }
+   },
+   "implicitClosed": [
+    "tbody",
+    "tfoot"
+   ],
+   "optionalEnd": true,
+   "permittedContent": [
+    "@script",
+    "tr"
+   ]
+  },
+  "time": {
+   "aria": {
+    "implicitRole": "time",
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "datetime": {}
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "title": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "metadata": true,
+   "permittedContent": [],
+   "permittedParent": [
+    "head"
+   ]
+  },
+  "tr": {
+   "aria": {
+    "implicitRole": "row"
+   },
+   "attributes": {
+    "align": {
+     "deprecated": true
+    },
+    "background": {
+     "deprecated": true
+    },
+    "bgcolor": {
+     "deprecated": true
+    },
+    "char": {
+     "deprecated": true
+    },
+    "charoff": {
+     "deprecated": true
+    },
+    "valign": {
+     "deprecated": true
+    }
+   },
+   "implicitClosed": [
+    "tr",
+    "tbody",
+    "tfoot"
+   ],
+   "permittedContent": [
+    "@script",
+    "td",
+    "th"
+   ]
+  },
+  "track": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "attributes": {
+    "default": {
+     "boolean": true
+    },
+    "kind": {
+     "enum": [
+      "subtitles",
+      "captions",
+      "descriptions",
+      "chapters",
+      "metadata"
+     ],
+     "omit": true
+    },
+    "label": {},
+    "src": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ],
+     "required": true
+    },
+    "srclang": {}
+   },
+   "void": true
+  },
+  "tt": {
+   "deprecated": {
+    "source": "html4"
+   }
+  },
+  "u": {
+   "aria": {
+    "implicitRole": "generic",
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "ul": {
+   "aria": {
+    "implicitRole": "list"
+   },
+   "attributes": {
+    "compact": {
+     "deprecated": true
+    },
+    "type": {
+     "deprecated": true
+    }
+   },
+   "flow": true,
+   "permittedContent": [
+    "@script",
+    "li"
+   ]
+  },
+  "var": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "permittedContent": [
+    "@phrasing"
+   ],
+   "phrasing": true
+  },
+  "video": {
+   "attributes": {
+    "autoplay": {
+     "boolean": true
+    },
+    "controls": {
+     "boolean": true
+    },
+    "crossorigin": {
+     "enum": [
+      "anonymous",
+      "use-credentials"
+     ],
+     "omit": true
+    },
+    "height": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    },
+    "itemprop": {
+     "allowed": {
+      "if-attribute-present": [
+       "src"
+      ]
+     }
+    },
+    "loop": {
+     "boolean": true
+    },
+    "muted": {
+     "boolean": true
+    },
+    "playsinline": {
+     "boolean": true
+    },
+    "poster": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "preload": {
+     "enum": [
+      "none",
+      "metadata",
+      "auto"
+     ],
+     "omit": true
+    },
+    "src": {
+     "enum": [
+      {
+       "name": "a non-empty string",
+       "regex": "^.+$"
+      }
+     ]
+    },
+    "width": {
+     "enum": [
+      {
+       "name": "a positive integer",
+       "regex": "^\\d+$"
+      }
+     ]
+    }
+   },
+   "embedded": true,
+   "flow": true,
+   "focusable": {
+    "attr": "controls"
+   },
+   "interactive": {
+    "attr": "controls"
+   },
+   "permittedContent": [
+    "@flow",
+    "track",
+    "source"
+   ],
+   "permittedDescendants": [
+    {
+     "exclude": [
+      "audio",
+      "video"
+     ]
+    }
+   ],
+   "permittedOrder": [
+    "source",
+    "track",
+    "@flow"
+   ],
+   "phrasing": true,
+   "transparent": [
+    "@flow"
+   ]
+  },
+  "wbr": {
+   "aria": {
+    "naming": "prohibited"
+   },
+   "flow": true,
+   "phrasing": true,
+   "void": true
+  },
+  "xmp": {
+   "deprecated": {
+    "source": "html32"
+   }
+  }
+ },
+ "global": {
+  "attributes": {
+   "accesskey": {
+    "enum": [
+     {
+      "name": "/./",
+      "regex": "."
+     }
+    ],
+    "list": true
+   },
+   "aria-*": {},
+   "aria-activedescendant": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ],
+    "reference": "id"
+   },
+   "aria-controls": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ],
+    "list": true,
+    "reference": "id"
+   },
+   "aria-describedby": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ],
+    "list": true,
+    "reference": "id"
+   },
+   "aria-details": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ],
+    "reference": "id"
+   },
+   "aria-errormessage": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ],
+    "reference": "id"
+   },
+   "aria-flowto": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ],
+    "list": true,
+    "reference": "id"
+   },
+   "aria-labelledby": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ],
+    "list": true,
+    "reference": "id"
+   },
+   "aria-owns": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ],
+    "list": true,
+    "reference": "id"
+   },
+   "autocapitalize": {
+    "enum": [
+     "off",
+     "none",
+     "on",
+     "sentences",
+     "words",
+     "characters"
+    ]
+   },
+   "autocorrect": {
+    "enum": [
+     "on",
+     "off"
+    ],
+    "omit": true
+   },
+   "autofocus": {
+    "boolean": true
+   },
+   "class": {},
+   "contenteditable": {
+    "enum": [
+     "true",
+     "false"
+    ],
+    "omit": true
+   },
+   "contextmenu": {
+    "deprecated": true
+   },
+   "data-*": {},
+   "dir": {
+    "enum": [
+     "ltr",
+     "rtl",
+     "auto"
+    ]
+   },
+   "draggable": {
+    "enum": [
+     "true",
+     "false"
+    ]
+   },
+   "enterkeyhint": {
+    "enum": [
+     "enter",
+     "done",
+     "go",
+     "next",
+     "previous",
+     "search",
+     "send"
+    ]
+   },
+   "exportparts": {},
+   "headingoffset": {
+    "enum": [
+     {
+      "name": "/^[0-8]$/",
+      "regex": "^[0-8]$"
+     }
+    ]
+   },
+   "headingreset": {
+    "boolean": true
+   },
+   "hidden": {
+    "enum": [
+     "hidden",
+     "until-found"
+    ],
+    "omit": true
+   },
+   "id": {
+    "enum": [
+     {
+      "name": "a valid id",
+      "regex": "^\\S+$"
+     }
+    ]
+   },
+   "inert": {
+    "boolean": true
+   },
+   "inputmode": {
+    "enum": [
+     "none",
+     "text",
+     "decimal",
+     "numeric",
+     "tel",
+     "search",
+     "email",
+     "url"
+    ]
+   },
+   "is": {},
+   "itemid": {},
+   "itemprop": {},
+   "itemref": {},
+   "itemscope": {
+    "boolean": true
+   },
+   "itemtype": {},
+   "lang": {},
+   "nonce": {},
+   "on*": {},
+   "part": {},
+   "popover": {
+    "enum": [
+     "auto",
+     "hint",
+     "manual"
+    ],
+    "omit": true
+   },
+   "role": {},
+   "slot": {},
+   "spellcheck": {
+    "enum": [
+     "true",
+     "false"
+    ],
+    "omit": true
+   },
+   "style": {},
+   "tabindex": {
+    "enum": [
+     {
+      "name": "/-?\\d+/",
+      "regex": "^-?\\d+$"
+     }
+    ]
+   },
+   "title": {},
+   "translate": {
+    "enum": [
+     "yes",
+     "no"
+    ],
+    "omit": true
+   },
+   "writingsuggestions": {
+    "enum": [
+     "true",
+     "false"
+    ],
+    "omit": true
+   },
+   "xml:*": {},
+   "xmlns": {
+    "enum": [
+     {
+      "name": "a non-empty string",
+      "regex": "^.+$"
+     }
+    ]
+   },
+   "xmlns:*": {
+    "enum": [
+     {
+      "name": "a non-empty string",
+      "regex": "^.+$"
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,6 @@
+description = "Opt-in house conventions: target=_blank needs rel=noopener, and no inline style or script"
+
+[rules]
+"html/no-inline-script" = "error"
+"html/no-inline-style" = "error"
+"html/target-blank-rel" = "error"
