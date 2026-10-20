@@ -1,6 +1,13 @@
 //! Output formats and exit codes (SR-CLI-MCP decisions 3 and 4). Every
 //! format carries the L4 fix fields: the class, and the edits or the steps.
 
+mod query;
+
+pub use query::{
+    explain_engine_json, explain_engine_text, explain_json, explain_text, fix_skill, rules_json, rules_text, snippet_fix_json, tree_json, tree_text, why_json,
+    why_text,
+};
+
 use codelaw_core::{Diagnostic, FixClass, Severity};
 use codelaw_engine::{CheckReport, FixReport};
 use serde_json::{Value, json};
@@ -68,7 +75,8 @@ pub fn exit_code(report: &CheckReport, max_warnings: Option<usize>) -> i32 {
     }
 }
 
-fn diagnostic_json(d: &Diagnostic) -> Value {
+/// One diagnostic as `--format json` writes it.
+pub fn diagnostic_json(d: &Diagnostic) -> Value {
     json!({
         "rule": d.rule,
         "severity": d.severity.name(),

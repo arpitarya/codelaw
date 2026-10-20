@@ -24,6 +24,7 @@ codelaw-fix = { path = "crates/codelaw-fix" }
 codelaw-engine = { path = "crates/codelaw-engine" }
 codelaw-report = { path = "crates/codelaw-report" }
 codelaw-test = { path = "crates/codelaw-test" }
+codelaw-mcp = { path = "crates/codelaw-mcp" }
 
 # Grammars and matcher: pinned (SR-ARCHITECTURE decision 3). All MIT.
 ast-grep-core = { version = "=0.51.0", features = ["tree-sitter"] }

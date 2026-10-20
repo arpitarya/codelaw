@@ -332,6 +332,7 @@ dependencies = [
  "codelaw-fix",
  "codelaw-lang",
  "codelaw-match",
+ "codelaw-mcp",
  "codelaw-report",
  "codelaw-rules",
  "codelaw-test",
@@ -422,6 +423,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "codelaw-mcp"
+version = "0.1.0"
+dependencies = [
+ "codelaw-core",
+ "codelaw-engine",
+ "codelaw-report",
+ "codelaw-rules",
+ "serde_json",
+]
+
+[[package]]
 name = "codelaw-native"
 version = "0.1.0"
 dependencies = [
@@ -439,8 +451,11 @@ version = "0.1.0"
 dependencies = [
  "codelaw-core",
  "codelaw-engine",
+ "codelaw-lang",
+ "codelaw-rules",
  "serde",
  "serde_json",
+ "tree-sitter",
 ]
 
 [[package]]

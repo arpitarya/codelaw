@@ -95,7 +95,7 @@ The decider asked for a record of what goes into which package, under the naming
    | orchestration | `codelaw-report` | text, JSON, SARIF and agent output; exit codes |
    | orchestration | `codelaw-test` | the rule tester and `codelaw bench` ([SR-RULE-AUTHORING](0113_rule-authoring.md), [L8](0010_LAW-8-performance-budgets.md)) |
    | surfaces | `codelaw-cli` | the `codelaw` binary's entry point and commands ([SR-CLI-MCP](0115_cli-and-mcp.md)) |
-   | surfaces | `codelaw-mcp` | the MCP server ([SR-CLI-MCP](0115_cli-and-mcp.md)) |
+   | surfaces | `codelaw-mcp` | the MCP server: a hand-written JSON-RPC loop over stdio ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 5) |
    | surfaces | `codelaw-lsp` | the language server ([SR-EDITOR](0114_editor.md)) |
    | surfaces | `codelaw-agents` | hook mode, `sync-agents`, and the skill sources from `agents/skills/` ([SR-AGENT-SURFACES](0102_agent-surfaces.md)) |
 

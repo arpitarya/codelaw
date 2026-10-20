@@ -6,12 +6,14 @@ mod compile;
 mod discover;
 mod fix;
 mod lint;
+mod query;
 mod suppress;
 
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
 pub use fix::{FileFix, FixOptions, FixReport};
 pub use lint::FileResult;
+pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
 
 use codelaw_cache::DiskCache;
 use codelaw_config::{Config, ConfigError};

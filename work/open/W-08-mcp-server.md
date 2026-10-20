@@ -16,9 +16,9 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Add `codelaw-mcp` and `codelaw mcp` (stdio) with the tools SR-CLI-MCP decision 5 lists | agents query codelaw directly | ⏳ |
-| 2 | Every tool calls the same engine functions as the CLI | one engine, two doors | ⏳ |
-| 3 | A parity test: CLI and MCP give the same answer on every fixture | SR-CLI-MCP decision 6 checked (was B-025) | ⏳ |
+| 1 | Add `codelaw-mcp` and `codelaw mcp` (stdio) with the tools SR-CLI-MCP decision 5 lists | agents query codelaw directly | ✅ |
+| 2 | Every tool calls the same engine functions as the CLI | one engine, two doors | ✅ |
+| 3 | A parity test: CLI and MCP give the same answer on every fixture | SR-CLI-MCP decision 6 checked (was B-025) | ✅ |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
 
@@ -32,9 +32,11 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · server | `codelaw mcp` speaks MCP over stdio; every tool of SR-CLI-MCP decision 5 is listed and works. | ⏳ |
-| 2 · parity | One test runs every fixture through CLI and MCP and compares the JSON. | ⏳ |
-| 3 · gate | `scripts/law-gate.py` no longer lists `mcp`. | ⏳ |
+| 1 · server | `codelaw mcp` speaks MCP over stdio; every tool of SR-CLI-MCP decision 5 is listed and works. | ✅ |
+| 2 · parity | One test runs every fixture through CLI and MCP and compares the JSON. | ✅ |
+| 3 · gate | `scripts/law-gate.py` no longer lists `mcp`. | ✅ |
+
+**Done 2026-10-20.** Two tools stand on work that is not built yet: `format_snippet` returns what `fix` writes, and gains the format step when W-07 gives `fix` one; `trace_rule` is `rules --why --for`, and `match --explain`'s matcher trace (W-16) is to return through it. The warm, cached rule set and the socket are W-15's.
 
 ## Blockers
 

@@ -7,6 +7,7 @@ use clap::{Args, Subcommand};
 use codelaw_cache::Key;
 use codelaw_config::Config;
 use codelaw_core::{FixClass, Language};
+use codelaw_report::Format;
 use codelaw_engine::{EngineOptions, Project};
 use codelaw_rules::{LoadError, LoadedRule, RuleFile, RuleSet, RuleSource, load_pack, load_rules_dir, parse_cases, parse_rule};
 use std::path::{Path, PathBuf};
@@ -23,6 +24,9 @@ pub struct RulesArgs {
     /// Why a rule is active, and from which source.
     #[arg(long)]
     why: Option<String>,
+    /// text or json.
+    #[arg(long, default_value = "text")]
+    format: String,
 }
 
 #[derive(Subcommand)]
@@ -127,71 +131,47 @@ pub fn rules_for_test(target: Option<&str>) -> Result<Vec<LoadedRule>, String> {
     }
 }
 
-fn severity_of(cfg: &Option<codelaw_config::RuleConfig>) -> String {
-    cfg.as_ref().and_then(|c| c.severity).map(|s| s.name().to_owned()).unwrap_or_else(|| "off".into())
-}
-
 pub fn rules(args: RulesArgs) -> ExitCode {
     match args.action {
         Some(RulesAction::Lint { paths }) => return lint(paths),
         Some(RulesAction::Eject { id }) => return eject(&id),
         None => {}
     }
-    let project = match load(&args.for_path.iter().cloned().collect::<Vec<_>>(), EngineOptions::from_env()) {
+    let json = match crate::format(&args.format) {
+        Ok(Format::Json) => true,
+        Ok(_) => false,
+        Err(e) => return fail(e),
+    };
+    let mut project = match load(&args.for_path.iter().cloned().collect::<Vec<_>>(), EngineOptions::from_env()) {
         Ok(p) => p,
         Err(e) => return fail(e),
     };
-    let file = args.for_path.as_ref().map(|p| std::fs::canonicalize(p).unwrap_or_else(|_| p.clone()));
-    let rel = file.as_ref().map(|f| codelaw_core::normalize_path(f.strip_prefix(project.root()).unwrap_or(f)));
-    let language = file.as_ref().and_then(|f| Language::from_path(f));
-    if args.for_path.is_some() && language.is_none() {
-        return fail("--for needs a file codelaw checks (a known extension)");
-    }
-    let layers = file.as_ref().map(|f| project.config.layers_for(f));
-
     if let Some(id) = args.why {
-        let Some(r) = project.rules.get(&id) else {
-            return fail(format!("no rule `{id}` in this project"));
-        };
-        println!("{id}  {}", r.rule.title);
-        println!("  source:     {} ({})", r.source.label(), codelaw_core::normalize_path(&r.rule.path));
-        if !r.shadows.is_empty() {
-            println!("  shadows:    {}", r.shadows.join(", "));
-        }
-        println!("  enabled by: {}", r.enabled_by.as_deref().unwrap_or("nothing (not in any extended preset)"));
-        println!("  default:    {}", severity_of(&r.default));
-        if r.preview_blocked {
-            println!("  preview:    yes — runs only with `preview = true`");
-        }
-        if let (Some(layers), Some(rel), Some(lang)) = (&layers, &rel, language) {
-            let compiled = project.compiled.iter().find(|c| c.id() == id).expect("compiled");
-            for l in layers.iter().filter(|l| l.rules.contains_key(&id)) {
-                println!("  set by:     {} = {}", l.source, l.rules[&id].severity().unwrap_or("(options)"));
+        return match project.rule_why(&id, args.for_path.as_deref()) {
+            Ok(w) if json => print_json(&codelaw_report::why_json(&w)),
+            Ok(w) => {
+                print!("{}", codelaw_report::why_text(&w));
+                ExitCode::SUCCESS
             }
-            let effective = project.rules.effective(r, layers);
-            let applies = compiled.applies_to_language(lang) && compiled.applies_to_path(rel);
-            println!("  for {rel}:  {}", if applies { severity_of(&effective) } else { "does not apply (language or `files`)".into() });
-        }
-        return ExitCode::SUCCESS;
+            Err(e) => fail(e),
+        };
     }
+    let rows = match &args.for_path {
+        Some(p) => match project.rules_for(p) {
+            Ok(r) => r,
+            Err(e) => return fail(e),
+        },
+        None => project.list_rules(),
+    };
+    if json {
+        return print_json(&codelaw_report::rules_json(&rows, args.for_path.as_deref().map(codelaw_core::normalize_path).as_deref()));
+    }
+    print!("{}", codelaw_report::rules_text(&rows));
+    ExitCode::SUCCESS
+}
 
-    for c in &project.compiled {
-        let r = &c.loaded;
-        let sev = match (&layers, &rel, language) {
-            (Some(layers), Some(rel), Some(lang)) => {
-                if !c.applies_to_language(lang) || !c.applies_to_path(rel) {
-                    continue;
-                }
-                severity_of(&project.rules.effective(r, layers))
-            }
-            _ => severity_of(&r.default),
-        };
-        if args.for_path.is_some() && sev == "off" {
-            continue;
-        }
-        let preview = if r.preview_blocked { "  (preview)" } else { "" };
-        println!("{:<40} {:<6} {:<8} {}{preview}", r.rule.id, sev, r.rule.fix.name(), r.source.label());
-    }
+fn print_json(v: &serde_json::Value) -> ExitCode {
+    println!("{}", serde_json::to_string_pretty(v).expect("json"));
     ExitCode::SUCCESS
 }
 
@@ -255,44 +235,31 @@ fn eject(id: &str) -> ExitCode {
     ExitCode::SUCCESS
 }
 
-pub fn explain(id: &str) -> ExitCode {
+pub fn explain(id: &str, format: &str) -> ExitCode {
+    let json = match crate::format(format) {
+        Ok(Format::Json) => true,
+        Ok(_) => false,
+        Err(e) => return fail(e),
+    };
     if let Some(e) = codelaw_rules::engine_rule(id) {
-        println!("{}  {}\n\n  severity: {}  ·  fix: {}  ·  source: engine", e.id, e.title, e.severity, e.fix);
-        for (i, s) in e.steps.iter().enumerate() {
-            println!("  {}. {s}", i + 1);
+        if json {
+            return print_json(&codelaw_report::explain_engine_json(e));
         }
+        print!("{}", codelaw_report::explain_engine_text(e));
         return ExitCode::SUCCESS;
     }
     let project = match load(&[], EngineOptions::from_env()) {
         Ok(p) => p,
         Err(e) => return fail(e),
     };
-    let Some(r) = project.rules.get(id) else {
-        let near = codelaw_config::did_you_mean(id, project.rules.rules.iter().map(|r| r.rule.id.as_str()))
-            .map(|n| format!("; did you mean `{n}`?"))
-            .unwrap_or_default();
-        return fail(format!("unknown rule `{id}`{near}"));
-    };
-    let rule = &r.rule;
-    let langs: Vec<&str> = rule.languages.iter().map(|l| l.name()).collect();
-    println!("{}  {}\n", rule.id, rule.title);
-    println!("{}\n", rule.summary);
-    println!("Why: {}\n", rule.why);
-    println!("  languages: {}  ·  severity: {}  ·  fix: {}  ·  source: {}", langs.join(", "), severity_of(&r.default), rule.fix, r.source.label());
-    if let Some(reason) = &rule.fix_reason {
-        println!("  not automatic because: {reason}");
-    }
-    if !rule.ported_from.is_empty() {
-        println!("  ported from: {}", rule.ported_from.join(", "));
-    }
-    if rule.fix == FixClass::Manual || !rule.steps.is_empty() {
-        println!("\nHow to fix:");
-        for (i, s) in rule.steps.iter().enumerate() {
-            println!("  {}. {s}", i + 1);
+    match project.find_rule(id) {
+        Ok(r) if json => print_json(&codelaw_report::explain_json(r)),
+        Ok(r) => {
+            print!("{}", codelaw_report::explain_text(r));
+            ExitCode::SUCCESS
         }
+        Err(e) => fail(e),
     }
-    println!("\n{}", codelaw_core::normalize_path(&rule.path));
-    ExitCode::SUCCESS
 }
 
 /// The rule template with every required field filled
