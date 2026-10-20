@@ -53,19 +53,19 @@ Every finding below is fixed with a regression test, or recorded as a deliberate
 | 19 | `codelaw new-rule ../x` writes outside the rules folder. | `codelaw-cli/src/rules_cmd.rs:333` | minor | ⏳ |
 | 20 | `read_data` follows directory symlinks with no cycle check: a cycle in a pack's `data/` loops forever. | `codelaw-rules/src/pack.rs:265` | minor (plausible) | ⏳ |
 | 21 | Three `unnecessary_sort_by` warnings (`sort_by_key`) that `-D warnings` would fail on — hidden by W-18's masked clippy step. | `codelaw-fix (clippy)` | minor | ⏳ |
-| 22 | `md/link-fragments` slices `&t[i+1..i+3]` after `%`: `[x](#%aé)` panics. | `codelaw-native/src/data_md.rs:839` | major | ⏳ |
-| 23 | PEP 695 type parameters resolve in the wrong scope: `def first[T](xs: list[T]) -> T` reports `T` undefined (F821); class type params are invisible to methods and bases. | `codelaw-semantic/src/python.rs:120,138,365 · model.rs:374` | major | ⏳ |
-| 24 | A non-literal `__all__` (`["a"] + sub.__all__`, `.extend()`, `.append()`) becomes an empty export list, so F401 fires on re-exports. | `codelaw-semantic/src/python.rs:194,476` | major | ⏳ |
-| 25 | `export { Color }` marks only one namespace of a merged value+type name: `ts/no-unused-vars` flags the type half. | `codelaw-semantic/src/js.rs:609 · model.rs:376` | major | ⏳ |
-| 26 | `react/exhaustive-deps`' suggestion keys deps by root name: `[props.a, props.b]` collapses and the rewrite drops `props.a`. | `codelaw-native/src/react.rs:357` | minor | ⏳ |
-| 27 | `const [, setN] = useState(0)`: the setter is found by named-child position, so `setN` is reported missing. | `codelaw-native/src/react.rs:280` | minor | ⏳ |
-| 28 | `type Alias[T] = list[T]` never binds `Alias` (left side is a `generic_type`). | `codelaw-semantic/src/python.rs:334` | minor (plausible) | ⏳ |
-| 29 | Quote stripping slices bytes: an unterminated string ending in a multi-byte character can panic. | `codelaw-native/src/css_declarations.rs:331,438 · data_yaml.rs:26 · util.rs:96` | minor (plausible) | ⏳ |
-| 30 | `js/no-undef` ignores `/* global x */` and `/* eslint-env */`, which ESLint honours. | `codelaw-native/src/no_undef.rs:29` | minor | ⏳ |
-| 31 | `X: TypeAlias = "Decimal | int"` doesn't count as a use of a `TYPE_CHECKING` import (F401). | `codelaw-native/src/python_pyflakes.rs:151` | minor (plausible) | ⏳ |
-| 32 | Quadratic hook-reference scan and stray-end-tag search; per-element recursion (64 MB stacks mitigate). | `codelaw-native/src/react.rs:342 · html_dom.rs:461,491` | minor | ⏳ |
-| 33 | TS enum members are never declared and `NS.T` records `NS` as a value: false positives the day `js/no-undef` runs on TypeScript. | `codelaw-semantic (TS)` | latent | ⏳ |
-| 34 | `yaml/document-start` shares yamllint's rule name while the NOTICE says no names were taken: rename the rule or soften the claim (L2). | `packs/data/NOTICE:16` | minor | ⏳ |
+| 22 | `md/link-fragments` slices `&t[i+1..i+3]` after `%`: `[x](#%aé)` panics. | `codelaw-native/src/data_md.rs:839` | major | ✅ |
+| 23 | PEP 695 type parameters resolve in the wrong scope: `def first[T](xs: list[T]) -> T` reports `T` undefined (F821); class type params are invisible to methods and bases. | `codelaw-semantic/src/python.rs:120,138,365 · model.rs:374` | major | ✅ |
+| 24 | A non-literal `__all__` (`["a"] + sub.__all__`, `.extend()`, `.append()`) becomes an empty export list, so F401 fires on re-exports. | `codelaw-semantic/src/python.rs:194,476` | major | ✅ |
+| 25 | `export { Color }` marks only one namespace of a merged value+type name: `ts/no-unused-vars` flags the type half. | `codelaw-semantic/src/js.rs:609 · model.rs:376` | major | ✅ |
+| 26 | `react/exhaustive-deps`' suggestion keys deps by root name: `[props.a, props.b]` collapses and the rewrite drops `props.a`. | `codelaw-native/src/react.rs:357` | minor | ✅ |
+| 27 | `const [, setN] = useState(0)`: the setter is found by named-child position, so `setN` is reported missing. | `codelaw-native/src/react.rs:280` | minor | ✅ |
+| 28 | `type Alias[T] = list[T]` never binds `Alias` (left side is a `generic_type`). | `codelaw-semantic/src/python.rs:334` | minor (plausible) | ✅ |
+| 29 | Quote stripping slices bytes: an unterminated string ending in a multi-byte character can panic. | `codelaw-native/src/css_declarations.rs:331,438 · data_yaml.rs:26 · util.rs:96` | minor (plausible) | ✅ |
+| 30 | `js/no-undef` ignores `/* global x */` and `/* eslint-env */`, which ESLint honours. | `codelaw-native/src/no_undef.rs:29` | minor | ✅ |
+| 31 | `X: TypeAlias = "Decimal | int"` doesn't count as a use of a `TYPE_CHECKING` import (F401). | `codelaw-native/src/python_pyflakes.rs:151` | minor (plausible) | ✅ |
+| 32 | Quadratic hook-reference scan and stray-end-tag search; per-element recursion (64 MB stacks mitigate). | `codelaw-native/src/react.rs:342 · html_dom.rs:461,491` | minor | ✅ |
+| 33 | TS enum members are never declared and `NS.T` records `NS` as a value: false positives the day `js/no-undef` runs on TypeScript. | `codelaw-semantic (TS)` | latent | ✅ |
+| 34 | `yaml/document-start` shares yamllint's rule name while the NOTICE says no names were taken: rename the rule or soften the claim (L2). | `packs/data/NOTICE:16` | minor | ✅ |
 
 ## Blockers
 

@@ -14,7 +14,9 @@ since: 0.1.0
 ---
 
 Every name the code reads or writes is declared in the file, built into JavaScript, or a global of
-an environment the rule's `env` option names.
+an environment the rule's `env` option names. As in ESLint, a `/* global a, b:writable */` comment
+declares names for that file (`name:off` declares nothing), and a `/* eslint-env node */` comment
+adds environments.
 
 **Why:** An undeclared name is usually a typo or a missing import, and throws a ReferenceError when
 that line runs.

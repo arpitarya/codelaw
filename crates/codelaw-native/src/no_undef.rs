@@ -1,6 +1,8 @@
 //! `js/no-undef`: a reference nothing declares — not the file, not the
 //! language, not the environments the rule's `env` option names. The
-//! environments' globals are the pack's `globals/<env>` data tables.
+//! environments' globals are the pack's `globals/<env>` data tables. As in
+//! ESLint, a `/* global a, b:writable */` comment declares names and a
+//! `/* eslint-env node */` comment adds environments, for that file.
 
 use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::Language;
@@ -27,7 +29,10 @@ impl NativeRule for NoUndef {
         let root = node.get_inner_node();
         let check_typeof = ctx.options.get("typeof").and_then(|v| v.as_bool()).unwrap_or(false);
         let mut known: BTreeSet<String> = BTreeSet::new();
-        for env in ctx.options.get("env").and_then(|v| v.as_array()).into_iter().flatten().filter_map(|v| v.as_str()) {
+        let (comment_globals, comment_envs) = directive_comments(root, ctx.source);
+        let envs = ctx.options.get("env").and_then(|v| v.as_array()).into_iter().flatten().filter_map(|v| v.as_str()).map(str::to_owned).chain(comment_envs);
+        known.extend(comment_globals);
+        for env in envs {
             match ctx.data.get(&format!("globals/{env}")).map(|v| v.as_ref()) {
                 Some(serde_json::Value::Object(o)) => known.extend(o.keys().cloned()),
                 Some(serde_json::Value::Array(a)) => known.extend(a.iter().filter_map(|x| x.as_str().map(str::to_owned))),
@@ -54,6 +59,39 @@ impl NativeRule for NoUndef {
     }
 }
 
+/// The names `/* global … */` (or `globals`) comments declare, and the
+/// environments `/* eslint-env … */` comments name. `name:off` declares
+/// nothing; `:readonly` and `:writable` are both declarations.
+fn directive_comments(root: tree_sitter::Node<'_>, src: &str) -> (Vec<String>, Vec<String>) {
+    let (mut globals, mut envs) = (Vec::new(), Vec::new());
+    let mut cursor = root.walk();
+    let mut stack = vec![root];
+    while let Some(n) = stack.pop() {
+        if n.kind() == "comment" {
+            let t = &src[n.byte_range()];
+            let Some(body) = t.strip_prefix("/*").and_then(|b| b.strip_suffix("*/")) else { continue };
+            let body = body.trim_start();
+            let (word, rest) = body.split_at(body.find(char::is_whitespace).unwrap_or(body.len()));
+            let items = rest.split([',', ' ', '\t', '\n', '\r']).map(str::trim).filter(|x| !x.is_empty());
+            match word {
+                "global" | "globals" => {
+                    for item in items {
+                        let (name, value) = item.split_once(':').unwrap_or((item, ""));
+                        if value.trim() != "off" && !name.is_empty() {
+                            globals.push(name.to_owned());
+                        }
+                    }
+                }
+                "eslint-env" => envs.extend(items.map(str::to_owned)),
+                _ => {}
+            }
+            continue;
+        }
+        stack.extend(n.children(&mut cursor));
+    }
+    (globals, envs)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -74,5 +112,21 @@ mod tests {
         NoUndef.check(root.root(), &ctx, &mut out);
         let names: Vec<&str> = out.iter().map(|f| &src[f.start..f.end]).collect();
         assert_eq!(names, ["process"]);
+    }
+
+    #[test]
+    fn global_and_eslint_env_comments() {
+        // W-17 row 30: ESLint honours these; so does the rule.
+        let src = "/* global jQuery, $:readonly, gone:off */\n/*eslint-env node*/\n// global notThisOne\njQuery($); gone; process.exit(); notThisOne;";
+        let root = codelaw_lang::parse(Language::Javascript, src);
+        let model = codelaw_semantic::build(Language::Javascript, &root, src);
+        let mut data = BTreeMap::new();
+        data.insert("globals/node".to_owned(), Arc::new(serde_json::json!({ "process": false })));
+        let options = BTreeMap::new();
+        let ctx = NativeContext { source: src, language: Language::Javascript, semantic: model.as_ref(), options: &options, data: &data };
+        let mut out = Vec::new();
+        NoUndef.check(root.root(), &ctx, &mut out);
+        let names: Vec<&str> = out.iter().map(|f| &src[f.start..f.end]).collect();
+        assert_eq!(names, ["gone", "notThisOne"]);
     }
 }

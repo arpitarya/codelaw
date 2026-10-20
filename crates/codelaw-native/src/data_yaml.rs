@@ -3,7 +3,7 @@
 //! YAML 1.1 and YAML 1.2 read differently. The ideas come from the YAML 1.2
 //! specification; no yamllint code or text is used (it is GPL-3.0).
 
-use crate::util::{children, line_of, named_children, text};
+use crate::util::{children, line_of, named_children, text, unquote};
 use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
@@ -24,9 +24,9 @@ fn key_value(key: Node<'_>, src: &str) -> Option<String> {
     let t = text(scalar, src);
     match scalar.kind() {
         "plain_scalar" => Some(t.trim().to_owned()),
-        "single_quote_scalar" => Some(t[1..t.len().saturating_sub(1).max(1)].replace("''", "'")),
+        "single_quote_scalar" => Some(unquote(t).replace("''", "'")),
         "double_quote_scalar" => {
-            let inner = &t[1..t.len().saturating_sub(1).max(1)];
+            let inner = unquote(t);
             let mut out = String::new();
             let mut it = inner.chars();
             while let Some(c) = it.next() {
@@ -285,6 +285,10 @@ mod tests {
     #[test]
     fn duplicate_keys() {
         assert_eq!(found(&NoDuplicateKeys, "a: 1\n'a': 2\nb: {c: 1, \"c\": 2}\nd:\n  a: 1\n"), ["'a'", "\"c\""]);
+        // W-17 row 29: quoted keys ending in a multi-byte character, closed
+        // or not, never panic.
+        assert_eq!(found(&NoDuplicateKeys, "'é': 1\n\"é\": 2\n"), ["\"é\""]);
+        let _ = found(&NoDuplicateKeys, "'aé: 1\n\"bé: 2\n");
     }
 
     #[test]

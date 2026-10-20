@@ -16,7 +16,7 @@ fn key_part(n: Node<'_>, src: &str) -> String {
     if n.kind() != "quoted_key" || t.len() < 2 {
         return t.to_owned();
     }
-    let inner = &t[1..t.len() - 1];
+    let inner = crate::util::unquote(t);
     if t.starts_with('\'') {
         return inner.to_owned();
     }

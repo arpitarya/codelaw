@@ -15,6 +15,7 @@ use crate::{NativeContext, NativeFinding};
 use codelaw_core::TextEdit;
 use serde_json::{Map, Value};
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::rc::Rc;
 use std::sync::Arc;
 use tree_sitter::Node;
@@ -247,7 +248,17 @@ fn child_named<'t>(n: Node<'t>, kind: &str) -> Option<Node<'t>> {
     n.children(&mut c).find(|x| x.kind() == kind)
 }
 
-fn tokens<'t>(n: Node<'t>, src: &str, out: &mut Vec<Tok<'t>>) {
+/// The tag, text and comment tokens of a tree, in document order. An
+/// explicit stack, not recursion: nesting depth is the input's to choose.
+fn tokens<'t>(root: Node<'t>, src: &str, out: &mut Vec<Tok<'t>>) {
+    let mut pending = vec![root];
+    while let Some(n) = pending.pop() {
+        token(n, src, out, &mut pending);
+    }
+}
+
+/// One node's token, or its children queued (last first) on `pending`.
+fn token<'t>(n: Node<'t>, src: &str, out: &mut Vec<Tok<'t>>, pending: &mut Vec<Node<'t>>) {
     match n.kind() {
         "start_tag" => out.push(Tok::Start { node: n, self_closing: false }),
         "self_closing_tag" => out.push(Tok::Start { node: n, self_closing: true }),
@@ -287,18 +298,15 @@ fn tokens<'t>(n: Node<'t>, src: &str, out: &mut Vec<Tok<'t>>) {
             let mut c = n.walk();
             let kids: Vec<Node> = n.children(&mut c).collect();
             if kids.iter().any(|k| k.kind() != "ERROR" && k.is_named()) {
-                for k in kids {
-                    tokens(k, src, out);
-                }
+                pending.extend(kids.into_iter().rev());
             } else {
                 out.push(Tok::Text(Text { start: n.start_byte(), end: n.end_byte(), kind: TextKind::Unparsed }));
             }
         }
         _ => {
             let mut c = n.walk();
-            for k in n.children(&mut c) {
-                tokens(k, src, out);
-            }
+            let kids: Vec<Node> = n.children(&mut c).collect();
+            pending.extend(kids.into_iter().rev());
         }
     }
 }
@@ -366,6 +374,9 @@ struct Builder<'m> {
     texts: Vec<Text>,
     roots: Vec<Child>,
     stack: Vec<usize>,
+    /// How many elements of each tag are on `stack`: an end tag that
+    /// matches none is stray without a scan of the stack.
+    open: HashMap<String, usize>,
     dom_extra: Extra,
 }
 
@@ -381,6 +392,22 @@ struct Extra {
 impl Builder<'_> {
     fn top(&self) -> Option<usize> {
         self.stack.last().copied()
+    }
+    fn push(&mut self, i: usize) {
+        *self.open.entry(self.elems[i].tag.clone()).or_default() += 1;
+        self.stack.push(i);
+    }
+    fn pop(&mut self) -> Option<usize> {
+        let i = self.stack.pop()?;
+        if let Some(n) = self.open.get_mut(&self.elems[i].tag) {
+            *n -= 1;
+        }
+        Some(i)
+    }
+    fn truncate(&mut self, len: usize) {
+        while self.stack.len() > len {
+            self.pop();
+        }
     }
     fn append(&mut self, child: Child) {
         match self.top() {
@@ -419,7 +446,7 @@ impl Builder<'_> {
                 if self.meta.closes(&self.elems[top].tag, &tag) {
                     let by = if self.elems[top].tag == tag { ClosedBy::Sibling } else { ClosedBy::Adjacent(tag.clone()) };
                     self.elems[top].closed = Closed::Implicit(by);
-                    self.stack.pop();
+                    self.pop();
                 } else {
                     break;
                 }
@@ -436,7 +463,7 @@ impl Builder<'_> {
                 if let Some(open) = open {
                     let at = node.start_byte();
                     let i = self.new_elem(open.to_owned(), at, at, Vec::new(), true);
-                    self.stack.push(i);
+                    self.push(i);
                 }
             }
         }
@@ -449,7 +476,7 @@ impl Builder<'_> {
         if self.meta.is_void(&tag) || self_closing {
             self.elems[idx].closed = Closed::Void;
         } else {
-            self.stack.push(idx);
+            self.push(idx);
         }
     }
     fn end(&mut self, name: String, start: usize, end: usize, junk: Option<(usize, usize)>) {
@@ -458,7 +485,8 @@ impl Builder<'_> {
             self.dom_extra.void_end.push(seen);
             return;
         }
-        let Some(pos) = self.stack.iter().rposition(|&i| self.elems[i].tag == name) else {
+        let open = self.open.get(&name).copied().unwrap_or(0) > 0;
+        let Some(pos) = self.stack.iter().rposition(|&i| self.elems[i].tag == name).filter(|_| open) else {
             self.dom_extra.stray.push(seen);
             return;
         };
@@ -473,14 +501,14 @@ impl Builder<'_> {
                 Closed::Unclosed
             };
         }
-        self.stack.truncate(pos);
+        self.truncate(pos);
         let e = &mut self.elems[target];
         e.closed = Closed::EndTag;
         e.end_tag = Some((start, end));
         e.end_tag_junk = junk;
     }
     fn finish(&mut self) {
-        while let Some(i) = self.stack.pop() {
+        while let Some(i) = self.pop() {
             let tag = self.elems[i].tag.clone();
             self.elems[i].closed =
                 if self.meta.has_implicit_close(&tag) { Closed::Implicit(ClosedBy::EndOfDocument) } else { Closed::Unclosed };
@@ -488,28 +516,31 @@ impl Builder<'_> {
     }
 }
 
-fn compute_end(elems: &mut Vec<Elem>, texts: &[Text], i: usize) -> usize {
-    let mut end = elems[i].open_end;
-    let children = elems[i].children.clone();
-    for c in children {
-        let e = match c {
-            Child::Elem(j) => compute_end(elems, texts, j),
-            Child::Text(t) => texts[t].end,
-        };
-        end = end.max(e);
+/// Each element's end: the furthest of its start tag, children and end
+/// tag. A child is always created after its parent, so walking the
+/// elements backwards meets every child first — no recursion.
+fn compute_ends(elems: &mut [Elem], texts: &[Text]) {
+    for i in (0..elems.len()).rev() {
+        let mut end = elems[i].open_end;
+        for c in &elems[i].children {
+            let e = match *c {
+                Child::Elem(j) => elems[j].end,
+                Child::Text(t) => texts[t].end,
+            };
+            end = end.max(e);
+        }
+        if let Some((_, e)) = elems[i].end_tag {
+            end = end.max(e);
+        }
+        elems[i].end = end;
     }
-    if let Some((_, e)) = elems[i].end_tag {
-        end = end.max(e);
-    }
-    elems[i].end = end;
-    end
 }
 
 impl Dom {
     pub fn build(root: Node<'_>, src: &str, meta: Meta<'_>) -> Dom {
         let mut toks = Vec::new();
         tokens(root, src, &mut toks);
-        let mut b = Builder { meta, elems: Vec::new(), texts: Vec::new(), roots: Vec::new(), stack: Vec::new(), dom_extra: Extra::default() };
+        let mut b = Builder { meta, elems: Vec::new(), texts: Vec::new(), roots: Vec::new(), stack: Vec::new(), open: HashMap::new(), dom_extra: Extra::default() };
         for t in toks {
             match t {
                 Tok::Start { node, self_closing } => b.start(node, self_closing, src),
@@ -528,10 +559,7 @@ impl Dom {
             }
         }
         b.finish();
-        let roots: Vec<usize> = b.roots.iter().filter_map(|c| if let Child::Elem(i) = c { Some(*i) } else { None }).collect();
-        for r in roots {
-            compute_end(&mut b.elems, &b.texts, r);
-        }
+        compute_ends(&mut b.elems, &b.texts);
         let x = b.dom_extra;
         Dom {
             elems: b.elems,
@@ -591,9 +619,13 @@ impl Dom {
         out
     }
     fn collect_desc(&self, i: usize, out: &mut Vec<usize>) {
-        for j in self.child_elems(i).collect::<Vec<_>>() {
+        let mut pending: Vec<usize> = self.child_elems(i).collect();
+        pending.reverse();
+        while let Some(j) = pending.pop() {
             out.push(j);
-            self.collect_desc(j, out);
+            let at = pending.len();
+            pending.extend(self.child_elems(j));
+            pending[at..].reverse();
         }
     }
 
@@ -670,7 +702,8 @@ impl Dom {
         s
     }
     fn collect_text(&self, i: usize, s: &mut String) {
-        for c in &self.elems[i].children {
+        let mut pending: Vec<&Child> = self.elems[i].children.iter().rev().collect();
+        while let Some(c) = pending.pop() {
             match c {
                 Child::Text(t) => {
                     let t = &self.texts[*t];
@@ -678,7 +711,7 @@ impl Dom {
                         s.push_str(&self.source[t.start..t.end]);
                     }
                 }
-                Child::Elem(j) => self.collect_text(*j, s),
+                Child::Elem(j) => pending.extend(self.elems[*j].children.iter().rev()),
             }
         }
     }
@@ -1116,5 +1149,29 @@ pub(crate) mod tests {
         let span = d.by_tag("span").next().unwrap();
         assert_eq!(d.elems[span].closed, Closed::Unclosed);
         assert_eq!(d.stray_end_tags.len(), 1);
+    }
+
+    #[test]
+    fn deep_nesting_and_many_strays_need_no_deep_stack() {
+        // W-17 row 32: building, `descendants` and `text_content` are
+        // iterative, and a stray end tag costs no scan of the open stack.
+        let n = 5_000;
+        let src = format!("{}x{}", "<div>".repeat(n), "</div>".repeat(n));
+        let small_stack = std::thread::Builder::new().stack_size(256 << 10);
+        let (desc, text, end) = small_stack
+            .spawn(move || {
+                let d = build(&src);
+                let top = d.by_tag("div").next().unwrap();
+                (d.descendants(top).len(), d.text_content(top), d.elems[top].end == src.len())
+            })
+            .unwrap()
+            .join()
+            .unwrap();
+        // tree-sitter-html tracks only so many open tags, so at this depth
+        // the end tags arrive as text; every element and the text still do.
+        assert_eq!((desc, end), (n - 1, true));
+        assert!(text.starts_with('x'));
+        let d = build(&format!("{}{}", "<div>".repeat(200), "</b>".repeat(2_000)));
+        assert_eq!(d.stray_end_tags.len(), 2_000);
     }
 }

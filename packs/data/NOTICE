@@ -14,5 +14,7 @@ no code from it is included.
 
 The JSON, YAML and TOML rules are written from the format specifications
 (RFC 8259, YAML 1.2.2, YAML 1.1, TOML 1.0.0) and the Python packaging
-specifications (PEP 503, PEP 621). No code, text or rule definitions are taken
-from yamllint (GPL-3.0).
+specifications (PEP 503, PEP 621). No code, documentation text, options or
+messages are taken from yamllint (GPL-3.0). One rule name coincides with one of
+yamllint's: `yaml/document-start` and yamllint's `document-start` both describe
+the `---` document marker; the rule's behaviour and text are codelaw's own.

@@ -122,7 +122,7 @@ css_rule!(SyntaxStringNoInvalid, "css/syntax-string-no-invalid", |sheet, src, ct
         if !v.starts_with(['"', '\'']) || v.len() < 2 {
             continue;
         }
-        if let Some(why) = syntax_problem(&v[1..v.len() - 1]) {
+        if let Some(why) = syntax_problem(crate::util::unquote(v)) {
             out.push(finding(n.params.0, n.params.1, format!("Invalid syntax string: {why}")));
         }
     }
@@ -236,7 +236,7 @@ fn import_key(src: &str, r: (usize, usize)) -> Option<(String, String)> {
     let url = match first.kind {
         VKind::Str => {
             let t = first.text(src);
-            t[1..t.len().saturating_sub(1).max(1)].to_owned()
+            crate::util::unquote(t).to_owned()
         }
         VKind::Func if first.name(src).eq_ignore_ascii_case("url") => {
             let t = text(src, first.inner).trim();

@@ -90,3 +90,43 @@ del missing
 ```expect
 1:5 py/undefined-name
 ```
+
+### case: PEP 695 type parameters reach annotations, bases and methods
+
+```py
+class Base[T]:
+    pass
+
+
+def first[T](xs: list[T]) -> T:
+    return xs[0]
+
+
+class Box[T](Base[T]):
+    def get(self) -> T:
+        item: T = self.item
+        return item
+
+
+type Pair[K] = tuple[K, K]
+p: Pair[int] = (1, 2)
+```
+
+```expect
+(none)
+```
+
+### case: a type parameter is not visible outside its declaration
+
+```py
+def first[T](xs: list[T], default=T) -> T:
+    return xs[0]
+
+
+x: T
+```
+
+```expect
+1:35 py/undefined-name
+5:4 py/undefined-name
+```

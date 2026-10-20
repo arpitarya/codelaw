@@ -105,6 +105,8 @@ The decider asked for the architecture to be designed and its gaps filled. The f
   - **How it's built:** from the same syntax tree, in one pass after parsing (crate `codelaw-semantic`), and only when at least one active rule needs it.
   - **How rules use it:** `match:` rules query it through the predicates of [SR-RULE-FORMAT](0112_rule-format.md) decision 3a, written under `where:`; native rules read it directly.
   - **Shared with the graph:** its imports and exports are the per-file facts the project graph links, so they're computed once ([SR-PROJECT-GRAPH](0103_project-graph.md)).
+  - **Python specifics** (W-17): PEP 695 type parameters live in an annotation scope around their `def`, `class` or `type` statement — annotations, bases, the body and methods see them, defaults and the enclosing scope don't. An `__all__` the model can read (lists, tuples, `+`, `+=`, `.extend()`, `.append()` of string literals) is the export list; one with any other part (`sub.__all__`, a call) is unknowable, and every public module-level name, imports included, counts as exported — a deliberate false negative over a false `unused-import`.
+  - **JS/TS specifics** (W-17): `export { Name }` exports every namespace of the name (a value and a type merged under one name); enum members are declared in the enum's own scope and never unused; the head of `NS.T` in a type is a type reference.
   - **No type information** ([L3](0005_LAW-3-languages.md)).
   - **Where the approach comes from:** `oxc_semantic` (MIT) for JS/TS and Ruff's semantic model (MIT) for Python. Taking either as a dependency needs its own record.
   - **Cached** with the file's results ([SR-CACHE](0109_cache.md)).

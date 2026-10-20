@@ -15,6 +15,14 @@ pub(crate) fn build(root: Node<'_>, src: &str, typescript: bool) -> SemanticMode
         let local = reference.and_then(|r| b.m.references[r].symbol);
         if let Some(id) = local {
             b.m.symbols[id].exported = true;
+            // `export { Color }` exports every namespace of the name: a
+            // value and a type merged under one name are both exported.
+            if reference.is_some_and(|r| b.m.references[r].any_namespace) {
+                let (scope, name) = (b.m.symbols[id].scope, b.m.symbols[id].name.clone());
+                for other in b.m.scopes[scope].bindings.get(&name).cloned().unwrap_or_default() {
+                    b.m.symbols[other].exported = true;
+                }
+            }
         }
         b.m.exports.push(Export { local, ..export });
     }
@@ -98,7 +106,17 @@ impl<'s> Builder<'s> {
             "type_identifier" => {
                 self.reference(scope, n, true, false, true);
             }
-            "nested_type_identifier" => self.visit_field(n, "module", scope),
+            // `NS.T`, `A.B.T` in a type: the leftmost name is read as a
+            // namespace (an import, a namespace, an enum), not as a value.
+            "nested_type_identifier" => {
+                let mut head = n.child_by_field_name("module");
+                while let Some(h) = head.filter(|h| h.kind() != "identifier") {
+                    head = h.named_child(0);
+                }
+                if let Some(h) = head {
+                    self.reference(scope, h, true, false, true);
+                }
+            }
             "nested_identifier" => {
                 if let Some(first) = n.named_child(0) {
                     self.visit(first, scope);
@@ -318,10 +336,20 @@ impl<'s> Builder<'s> {
                 if let Some(name) = n.child_by_field_name("name") {
                     self.declare(scope, name, SymbolKind::Enum);
                 }
+                // Members are in scope inside the initializers
+                // (`B = A << 1`); they are read as `E.A`, so never unused.
                 if let Some(body) = n.child_by_field_name("body") {
+                    let inner = self.scope(scope, ScopeKind::Block, body);
+                    for m in named_children(body) {
+                        let name = if m.kind() == "enum_assignment" { m.child_by_field_name("name") } else { Some(m) };
+                        if let Some(name) = name.filter(|x| x.kind() == "property_identifier") {
+                            let id = self.declare(inner, name, SymbolKind::Const);
+                            self.m.symbols[id].implicitly_used = true;
+                        }
+                    }
                     for m in named_children(body) {
                         if m.kind() == "enum_assignment" {
-                            self.visit_field(m, "value", scope);
+                            self.visit_field(m, "value", inner);
                         }
                     }
                 }
