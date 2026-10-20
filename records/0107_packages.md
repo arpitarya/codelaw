@@ -22,7 +22,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-20T20:00:00Z
+timestamp: 2026-10-20T20:30:00Z
 content_sha: ""
 ---
 
@@ -135,7 +135,7 @@ The decider asked for a record of what goes into which package, under the naming
     - Each pack folder carries its own copy as `packs/<name>/LICENSE` (SR-RULE-PACKS §2 layout).
 11. **Built once, in CI; published as built.** The release job of [L6](0008_LAW-6-python-and-node-packages.md) decision 9 is two workflows.
     - **`ci.yml`, every push:** one maturin wheel per platform (decision 5). The npm binary is **taken out of that wheel**, so both registries ship the same bytes for a platform.
-    - **`scripts/package.py assemble`** builds the 14 npm tarballs and the five pack wheels from those binaries and `packs/`; nothing is compiled there.
+    - **`scripts/package.py assemble`** builds the 14 npm tarballs and the five pack wheels from those binaries and `packs/`; nothing is compiled there. With the eight engine wheels that is **20 packages in 27 files** (npm 14 packages, 14 tarballs; PyPI 6 projects, 13 wheels) — docs count packages, and say files when they mean files.
     - **`scripts/package.py check`** refuses the set unless it is exactly §1's names, at one version, with zero runtime dependencies, licensed (decision 10), one binary per platform on both registries, each pack byte-equal on both, and `SHA256SUMS` listing exactly its files with their digests.
     - **The install smoke** (`scripts/smoke.sh`, [L6](0008_LAW-6-python-and-node-packages.md) §How L6 is enforced) runs on each of the eight platforms in `ci.yml`'s `smoke` job, the musl two in a clean Alpine container; pip installs with `dist/pypi` as its only index, so it picks the wheel itself.
     - **On `main`, `ci.yml` attests every file of the set** (a build-provenance attestation over `SHA256SUMS`).

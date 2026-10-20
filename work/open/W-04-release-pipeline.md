@@ -59,7 +59,7 @@ Wall time is first job start to last job end.
 
 ## Progress
 
-- **2026-10-20:** packaging, `ci.yml`, `publish.yml`, `RELEASING.md`, `LICENSE-*`. Local proof on linux-x64: maturin wheel `manylinux_2_17` with the binary, the Python module and a CycloneDX SBOM; `package.py check` passes the 14 tarballs + 5 pack wheels; `smoke.sh` — npm with no Python on `PATH` and PyPI with no Node on `PATH` give byte-equal JSON over the L3 fixtures + `rules-data` (16 diagnostics), and both APIs agree.
+- **2026-10-20:** packaging, `ci.yml`, `publish.yml`, `RELEASING.md`, the licence files (then `LICENSE-MIT` and `LICENSE-APACHE`; one MIT `LICENSE` since the merge, SR-PACKAGES decision 10). Local proof on linux-x64: maturin wheel `manylinux_2_17` with the binary, the Python module and a CycloneDX SBOM; `package.py check` passes the 14 tarballs + 5 pack wheels; `smoke.sh` — npm with no Python on `PATH` and PyPI with no Node on `PATH` give byte-equal JSON over the L3 fixtures + `rules-data` (16 diagnostics), and both APIs agree.
 - **Independent review** (a separate agent, read-only) found five defects, all fixed: the `next` tag matched the hyphen in package names; PyPI could publish while npm's trust check failed (the check is now a job both wait on); `version.py` accepted pre-releases PyPI can't take; a `dist` older than 30 days (documented); the Python API could pick up another `codelaw` on the same bin folder (it now reads its own file list).
 - **The SR guard now runs in CI** (SR-WORK-OWNERSHIP decision 7): `SR_GUARD_COMMIT=<sha>` replays a commit against the register as it stood then; the 21 commits since `RULE-SINCE` all pass.
 

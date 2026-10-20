@@ -20,7 +20,7 @@ anywhere — both registries use trusted publishing (OIDC).
 
 | workflow | when | what | time |
 |---|---|---|---|
-| `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 27 packages assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](work/open/W-04-release-pipeline.md) §Measured |
+| `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 20 packages (27 files: 14 npm tarballs, 13 wheels) assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](work/open/W-04-release-pipeline.md) §Measured |
 | `publish.yml` | a GitHub Release | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | see W-04 §Measured |
 
 Every check `ci.yml` runs on the packages is `scripts/package.py check`:

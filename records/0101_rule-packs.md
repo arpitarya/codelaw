@@ -10,7 +10,7 @@ feature: "predefined rules and rule packs"
 owns:
   - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-20T04:42:58Z
+timestamp: 2026-10-20T20:30:00Z
 content_sha: ""
 ---
 
@@ -32,11 +32,13 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 | Package (npm · PyPI) | Languages | Presets |
 |---|---|---|
 | `codelaw` · `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics and `graph/no-deprecated-usage` | — |
-| `@codelaw/rules-js` · `codelaw-rules-js` | JS, JSX, TS, TSX, incl. Node, React, Stencil | `js/recommended`, `ts/recommended`, `react/recommended`, `node/recommended`, `stencil/recommended`, `js/strict`, `js/conventions` |
+| `@codelaw/rules-js` · `codelaw-rules-js` | JS, JSX, TS, TSX, incl. Node, React, Stencil | `js/recommended`, `ts/recommended`, `react/recommended`, `node/recommended`, `stencil/recommended`, `js/conventions` · *later:* `js/strict` |
 | `@codelaw/rules-html` · `codelaw-rules-html` | HTML, incl. HTML embedded in Markdown and templates | `html/recommended`, `html/a11y`, `html/document`, `html/conventions` |
 | `@codelaw/rules-css` · `codelaw-rules-css` | CSS | `css/recommended`, `css/standard`, `css/conventions` |
-| `@codelaw/rules-python` · `codelaw-rules-python` | Python | `py/recommended`, `py/strict`, `py/conventions` |
+| `@codelaw/rules-python` · `codelaw-rules-python` | Python | `py/recommended`, `py/conventions` · *later:* `py/strict` |
 | `@codelaw/rules-data` · `codelaw-rules-data` | JSON, YAML, TOML, Markdown | `data/recommended`, `md/recommended`, `data/package-json`, `data/tsconfig`, `data/pyproject`, `data/github-actions`, `data/conventions` |
+
+*Later* marks a preset the ruling names that no pack ships yet: `js/strict` and `py/strict` are planned in [W-03](../work/open/W-03-rule-packs.md) and are not in `packs/` (checked 2026-10-20). Every other preset in the table is in its pack's `codelaw-pack.toml` and `presets/`.
 
 **What you install depends on your repo.** A Python-only repo installs `codelaw` and `codelaw-rules-python`, plus `codelaw-rules-data` if it wants `pyproject.toml`, YAML and Markdown checked, all from PyPI, and never touches npm. A React repo installs `codelaw`, `@codelaw/rules-js` and, likely, `@codelaw/rules-data` from npm.
 
@@ -184,7 +186,7 @@ The fix class follows [L4](0006_LAW-4-every-rule-has-a-fix.md). The aim is `auto
 | `md/single-h1` | markdown | More than one `#` heading | manual |
 | `md/heading-increment` | markdown | Heading level jumps (`#` → `###`) | suggest |
 | `md/fence-language` | markdown | Fenced code block without a language | manual (which language?) |
-| `md/relative-links` | markdown | Relative link to a file that doesn't exist | manual |
+| `md/relative-links` | markdown | Relative link to a file that doesn't exist — **not shipped yet:** a native rule sees one file's text, not its path or the files around it ([W-21](../work/open/W-21-pack-engine-gaps.md) row 2) | manual |
 | `css/no-empty-block` | css | Empty rule block `a {}` | **auto** (remove it) |
 | `css/no-duplicate-selector` | css | The same selector declared twice in one file | manual (merging depends on cascade order) |
 | `css/no-important` | css | `!important` | manual |
@@ -194,12 +196,12 @@ The fix class follows [L4](0006_LAW-4-every-rule-has-a-fix.md). The aim is `auto
 | `html/no-duplicate-id` | html | The same `id` twice in one document | manual |
 | `html/button-type` | html | `<button>` without `type` | suggest (`type="button"`; changes form behaviour) |
 
-That's 34 rules: 9 auto, 11 suggest and 14 manual. Every `manual` rule carries `fix_reason:` and `## How to fix` ([L4](0006_LAW-4-every-rule-has-a-fix.md) decisions 2–3).
+That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `md/relative-links`; 13 manual). Every `manual` rule carries `fix_reason:` and `## How to fix` ([L4](0006_LAW-4-every-rule-has-a-fix.md) decisions 2–3).
 
 ### Consequences
 
 - **`codelaw` installed alone lints nothing.** It formats every language and reports `codelaw/no-rules`. `codelaw init` is the documented path, and `codelaw-setup` follows it ([SR-AGENT-SURFACES](0102_agent-surfaces.md)).
-- **Each release publishes twelve packages:** the engine and five packs, on two registries, plus the eight binary packages. One failed publish fails the release ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
+- **Each release publishes twenty packages:** the engine and the five packs on each of two registries (twelve), plus the eight `@codelaw/cli-*` binary packages on npm. That is 27 files, because PyPI's `codelaw` is eight platform wheels. One failed publish fails the release ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
 - **A repo carries only its ecosystems' rules and data tables.** A Python-only repo stays on PyPI ([L3](0005_LAW-3-languages.md) decision 2).
 - **Rules still update with engine releases** (one version). Engine and rules can't drift, which was the reason for embedding them in the first version: `min_codelaw` and the native-id check keep that guarantee.
 - **The engine work this needs:** the semantic model, `native:` rules and pack loading, in [W-02](../archive/open/W-02-engine-p0.md) ([SR-ARCHITECTURE](0108_architecture.md) decisions 15a–15c).
