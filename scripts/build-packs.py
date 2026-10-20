@@ -9,6 +9,11 @@ byte; only the registry's own metadata (`package.json`, `*.dist-info/`) is
 added. The version comes from the one file, the workspace `Cargo.toml`
 (SR-LAW-6 decision 9).
 
+The package.json and the wheel are `scripts/package.py`'s own (`pack_manifest`,
+`wheel_for_pack`, `pep440`), so a local build and the release build cannot
+drift: `0.2.0-beta.1` is the wheel `0.2.0b1` here too. Only the npm tarball is
+written here rather than by `npm pack`, so no npm is needed.
+
     python3 scripts/build-packs.py                    # build into dist/packs/
     python3 scripts/build-packs.py --verify CODELAW   # and install both ways, compare
     python3 scripts/build-packs.py --release          # refuse to build without a LICENSE
@@ -17,9 +22,7 @@ Stdlib only, Python 3.9 syntax (work/MACHINE.md). Nothing is published.
 """
 
 import argparse
-import base64
 import gzip
-import hashlib
 import io
 import json
 import os
@@ -33,11 +36,13 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+import package  # noqa: E402  the release build's own code (SR-PACKAGES decision 9)
+
 PACKS = ["js", "html", "css", "python", "data"]
 # npm's own fixed mtime for tarball entries (1985-10-26T08:15:00Z).
 NPM_MTIME = 499162500
 ZIP_DATE = (1980, 1, 1, 0, 0, 0)
-REQUIRES_PYTHON = ">=3.11"  # SR-LAW-6 decision 8
 
 
 def fail(msg):
@@ -101,32 +106,13 @@ def read_pack(name, version, release):
     }
 
 
-def licence_id():
-    """The SPDX id, read from the line `SPDX-License-Identifier: <id>` in the root LICENSE."""
-    path = ROOT / "LICENSE"
-    if not path.is_file():
-        return None
-    match = re.search(r"SPDX-License-Identifier:\s*(\S+)", path.read_text(encoding="utf-8"))
-    return match.group(1) if match else None
+def package_json(pack, version):
+    return (json.dumps(package.pack_manifest(pack["name"], version), indent=2) + "\n").encode("utf-8")
 
 
-def package_json(pack, version, spdx):
-    data = {
-        "name": pack["npm"],
-        "version": version,
-        "description": pack["description"],
-        "keywords": ["codelaw", "codelaw-pack", "lint"],
-        "homepage": "https://github.com/arpitarya/codelaw",
-        "repository": {"type": "git", "url": "git+https://github.com/arpitarya/codelaw.git", "directory": "packs/" + pack["name"]},
-    }
-    if spdx:
-        data["license"] = spdx
-    return (json.dumps(data, indent=2) + "\n").encode("utf-8")
-
-
-def build_npm(pack, version, spdx, out_dir):
+def build_npm(pack, version, out_dir):
     buf = io.BytesIO()
-    entries = list(pack["files"]) + [("package.json", package_json(pack, version, spdx))]
+    entries = list(pack["files"]) + [("package.json", package_json(pack, version))]
     with tarfile.open(fileobj=buf, mode="w", format=tarfile.PAX_FORMAT) as tar:
         for rel, data in sorted(entries):
             info = tarfile.TarInfo("package/" + rel)
@@ -138,42 +124,6 @@ def build_npm(pack, version, spdx, out_dir):
     path = out_dir / "codelaw-rules-{}-{}.tgz".format(pack["name"], version)
     with open(path, "wb") as raw, gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as gz:
         gz.write(buf.getvalue())
-    return path
-
-
-def record_hash(data):
-    digest = base64.urlsafe_b64encode(hashlib.sha256(data).digest()).rstrip(b"=").decode("ascii")
-    return "sha256=" + digest
-
-
-def build_wheel(pack, version, spdx, out_dir):
-    dist_info = "{}-{}.dist-info".format(pack["module"], version)
-    metadata = [
-        "Metadata-Version: 2.4",
-        "Name: " + pack["pypi"],
-        "Version: " + version,
-        "Summary: " + pack["description"],
-        "Home-page: https://github.com/arpitarya/codelaw",
-        "Keywords: codelaw,codelaw-pack,lint",
-        "Requires-Python: " + REQUIRES_PYTHON,
-    ]
-    if spdx:
-        metadata.append("License-Expression: " + spdx)
-        metadata.append("License-File: {}/LICENSE".format(pack["module"]))
-    wheel = ["Wheel-Version: 1.0", "Generator: codelaw build-packs", "Root-Is-Purelib: true", "Tag: py3-none-any"]
-    entries = [(pack["module"] + "/" + rel, data) for rel, data in pack["files"]]
-    entries.append((dist_info + "/METADATA", ("\n".join(metadata) + "\n").encode("utf-8")))
-    entries.append((dist_info + "/WHEEL", ("\n".join(wheel) + "\n").encode("utf-8")))
-    record_name = dist_info + "/RECORD"
-    record = "".join("{},{},{}\n".format(n, record_hash(d), len(d)) for n, d in entries) + record_name + ",,\n"
-    entries.append((record_name, record.encode("utf-8")))
-    path = out_dir / "{}-{}-py3-none-any.whl".format(pack["module"], version)
-    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for name, data in entries:
-            info = zipfile.ZipInfo(name, ZIP_DATE)
-            info.compress_type = zipfile.ZIP_DEFLATED
-            info.external_attr = 0o644 << 16
-            zf.writestr(info, data)
     return path
 
 
@@ -246,19 +196,17 @@ def main():
     args = parser.parse_args()
 
     version = workspace_version()
-    spdx = licence_id()
-    if args.release and not spdx:
-        fail("no `SPDX-License-Identifier:` line in LICENSE — the project licence is the decider's ruling")
+    package.pep440(version)  # a version PyPI cannot take stops here, before anything is written
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     built = []
     for name in PACKS:
         pack = read_pack(name, version, args.release)
-        npm_path = build_npm(pack, version, spdx, out_dir)
-        wheel_path = build_wheel(pack, version, spdx, out_dir)
+        npm_path = build_npm(pack, version, out_dir)
+        wheel_path = package.wheel_for_pack(name, version, ROOT / "packs" / name, out_dir)
         check_parity(pack, npm_path, wheel_path)
         built.append((pack, npm_path, wheel_path))
-        note = "" if pack["licensed"] and spdx else "  (no licence: not publishable)"
+        note = "" if pack["licensed"] else "  (no LICENSE: not publishable)"
         print("{}@{}: {} files -> {}, {}{}".format(pack["npm"], version, len(pack["files"]), npm_path.name, wheel_path.name, note))
     if args.verify:
         verify(str(Path(args.verify).resolve()), built, version)

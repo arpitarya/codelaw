@@ -22,7 +22,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-20T14:00:00Z
+timestamp: 2026-10-20T20:00:00Z
 content_sha: ""
 ---
 
@@ -126,7 +126,8 @@ The decider asked for a record of what goes into which package, under the naming
    codelaw never fetches code after install ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
 9. **The five rule packs:** npm `@codelaw/rules-<name>` and PyPI `codelaw-rules-<name>`, for `js`, `html`, `css`, `python` and `data`.
    - **Built** from `packs/<name>/` in the source repo by the release job (`scripts/package.py assemble`, decision 11). The npm tarball and the wheel's `codelaw_rules_<name>/` package data hold the same files; the only additions are each registry's own metadata (`package.json`, `*.dist-info/`).
-   - **`scripts/build-packs.py`** builds the same ten pack artefacts locally, with no engine binary: it refuses a pack whose manifest version differs from `Cargo.toml` and, with `--release`, a pack without `LICENSE`; it checks both artefacts against the folder byte for byte; `--verify <codelaw>` installs both and requires identical `codelaw check` output.
+   - **`scripts/build-packs.py`** builds the same ten pack artefacts locally, with no engine binary, **from `scripts/package.py`'s own code**: the same `package.json` (`pack_manifest`), the same wheel and wheel metadata (`wheel_for_pack`), and the same PEP 440 version (`pep440`: `0.2.0-beta.1` is the wheel `0.2.0b1`). **The one difference:** it writes the npm tarball itself (deterministic entries, npm's fixed mtime) instead of running `npm pack`, so it needs no npm; the tarball holds the same files and `package.json`.
+   - It refuses a pack whose manifest version differs from `Cargo.toml`, a version PyPI cannot take, and, with `--release`, a pack without `LICENSE`; it checks both artefacts against the folder byte for byte; `--verify <codelaw>` installs both and requires identical `codelaw check` output.
    - **No dependencies,** and neither `codelaw` package depends on a pack. `codelaw init` adds them to the consumer ([SR-RULE-PACKS](0101_rule-packs.md) decisions 3 and 6).
 10. **Licence: MIT,** for the repository and every package it publishes — both engine packages, the eight binaries, the five rule packs and the extension. **Ruled by Arpit, 2026-10-20** (MIT only; it supersedes `MIT OR Apache-2.0`, recorded the same day on the release-pipeline branch).
     - The root `LICENSE` holds the MIT text and the line `SPDX-License-Identifier: MIT`.
@@ -135,15 +136,20 @@ The decider asked for a record of what goes into which package, under the naming
 11. **Built once, in CI; published as built.** The release job of [L6](0008_LAW-6-python-and-node-packages.md) decision 9 is two workflows.
     - **`ci.yml`, every push:** one maturin wheel per platform (decision 5). The npm binary is **taken out of that wheel**, so both registries ship the same bytes for a platform.
     - **`scripts/package.py assemble`** builds the 14 npm tarballs and the five pack wheels from those binaries and `packs/`; nothing is compiled there.
-    - **`scripts/package.py check`** refuses the set unless it is exactly §1's names, at one version, with zero runtime dependencies, licensed (decision 10), one binary per platform on both registries, and each pack byte-equal on both.
+    - **`scripts/package.py check`** refuses the set unless it is exactly §1's names, at one version, with zero runtime dependencies, licensed (decision 10), one binary per platform on both registries, each pack byte-equal on both, and `SHA256SUMS` listing exactly its files with their digests.
+    - **The install smoke** (`scripts/smoke.sh`, [L6](0008_LAW-6-python-and-node-packages.md) §How L6 is enforced) runs on each of the eight platforms in `ci.yml`'s `smoke` job, the musl two in a clean Alpine container; pip installs with `dist/pypi` as its only index, so it picks the wheel itself.
+    - **On `main`, `ci.yml` attests every file of the set** (a build-provenance attestation over `SHA256SUMS`).
     - **`scripts/law-gate.py`** refuses a release whose binary has no `format`, `mcp` or `lsp` command ([L7](0009_LAW-7-linter-and-formatter.md); [L6](0008_LAW-6-python-and-node-packages.md) decision 3). `publish.yml`'s gate runs it and stops; `ci.yml` reports it on every push without failing; the decider runs it before the one-time hand publish (`RELEASING.md`).
-    - **`publish.yml`, a published GitHub Release only:** it refuses a commit on which `ci.yml` did not succeed on `main`, downloads **that run's** checked set, checks it again and uploads it. Trusted publishing (OIDC) on both registries; no token exists.
+    - **`publish.yml`, a published GitHub Release only:** it refuses a commit on which `ci.yml` did not succeed on `main`, downloads **that run's** checked set, checks it again, verifies every file against `ci.yml`'s attestation for the release commit on `main`, and uploads it; each upload job re-checks its download against the gate's `SHA256SUMS`. Trusted publishing (OIDC) on both registries; no token exists.
+    - **Only a `v*` tag may deploy** to the `npm` and `pypi` environments (a deployment rule the decider sets in GitHub; `RELEASING.md`): a trusted publisher checks repository, workflow and environment, not the ref.
+    - **Hardening (W-18):** every `run:` is `bash -eo pipefail`; every action is pinned by commit SHA; the OIDC jobs install an exact npm version; no checkout keeps its credentials.
     - **Nothing is written until npm trusts the workflow for every package:** a preflight job makes npm's OIDC exchange per package, and both registry jobs wait on it.
     - **npm order:** the eight binaries, then the five packs, then `codelaw` — so a failure leaves the previous `codelaw` as `latest`. A version already published is skipped, so a failed job is re-run, not re-released.
+    - **npm dist-tag:** a pre-release goes to `next`; a version older than `codelaw`'s current `latest` (a backport) to `release-<major>.<minor>`; any other to `latest`.
     - **The one version** is `Cargo.toml`'s; `scripts/version.py` writes and checks every copy.
 12. **A half-published release is withdrawn by the decider.** A CI OIDC token may publish but not deprecate, and PyPI has no yank API.
     - `publish.yml`'s `half-published` job lists what reached a registry and fails.
-    - `scripts/withdraw.sh <version>` deprecates it on npm and names each PyPI yank page.
+    - `scripts/withdraw.sh <version>` deprecates it on npm and names each PyPI yank page; a deprecation that fails makes it exit non-zero.
 13. **One pinned Rust toolchain:** `rust-toolchain.toml` names the exact release (1.99.1 today) that builds, tests and releases codelaw. **Ruled by Arpit, 2026-10-20.**
     - Measured the same day: GitHub's runners carried rustc 1.99.0 and 1.99.1 at once, so a build cache keyed by the floating compiler missed on one platform and rebuilt it.
     - It is bumped in a commit of its own. The MSRV stays `Cargo.toml`'s `rust-version`.

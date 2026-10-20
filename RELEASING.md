@@ -20,15 +20,24 @@ anywhere — both registries use trusted publishing (OIDC).
 
 | workflow | when | what | time |
 |---|---|---|---|
-| `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 27 packages assembled, checked and install-smoked | see [W-04](work/open/W-04-release-pipeline.md) §Measured |
-| `publish.yml` | a GitHub Release | the gate (CI green on this sha, on `main`), then npm and PyPI **in parallel**, then the checksums on the release | see W-04 §Measured |
+| `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 27 packages assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](work/open/W-04-release-pipeline.md) §Measured |
+| `publish.yml` | a GitHub Release | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | see W-04 §Measured |
 
 Every check `ci.yml` runs on the packages is `scripts/package.py check`:
 only the SR-PACKAGES names (B-020), one version (W-18), zero runtime
 dependencies, the licence in every package, **the same binary on npm and PyPI**
 for each platform, and each pack **byte-equal** on both registries.
 `scripts/smoke.sh` installs them with no registry and checks that npm (no Python
-on `PATH`) and PyPI (no Node on `PATH`) give byte-equal output.
+on `PATH`) and PyPI (no Node on `PATH`) give byte-equal output — on each of the
+eight platforms, the musl two in a clean Alpine container.
+
+**Hardening (W-18).** Every workflow `run:` is `bash -eo pipefail`. Every action
+is pinned by commit SHA (the comment names the release; bump both together), and
+the OIDC jobs install an exact npm (`NPM_VERSION` in `publish.yml`), never
+`npm@latest`. `ci.yml` attests every file of `dist` on `main`; `publish.yml`
+uploads nothing whose digest is not in `SHA256SUMS` and not attested by `ci.yml`
+on the release commit. A version older than npm's current `latest` (a backport)
+goes to the dist-tag `release-<major>.<minor>`, so `latest` stays on the newest line.
 
 ## One time, by hand (the decider)
 
@@ -50,9 +59,15 @@ publisher creates the project on its first upload.
    one per project: `codelaw` and `codelaw-rules-{js,html,css,python,data}`;
    owner `arpitarya`, repository `codelaw`, workflow `publish.yml`, environment
    `pypi`.
-5. **GitHub environments** `npm` and `pypi` (*Settings → Environments*). Add
-   yourself as a required reviewer to approve each publish, if you want one
-   (`npm` is asked twice: the trust preflight and the publish both use it).
+5. **GitHub environments** `npm` and `pypi` (*Settings → Environments*) —
+   **required, both:**
+   - *Deployment branches and tags* → **Selected branches and tags** → add one
+     **tag** rule, `v*`, and **no branch rule**. A trusted publisher checks the
+     repository, the workflow file and the environment, never the ref, so this
+     rule is what makes a published release the only way to publish: a
+     `publish.yml` run from any branch is refused at the environment.
+   - Optionally, yourself as a required reviewer, to approve each publish (`npm`
+     is asked twice: the trust preflight and the publish both use it).
 
 After this, no release needs a token, a code or your machine.
 
