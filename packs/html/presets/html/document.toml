@@ -1,0 +1,8 @@
+description = "html-validate 11.16.4 document: checks that only make sense for a complete page, reimplemented"
+
+[rules]
+"html/heading-level" = "error"
+"html/input-missing-label" = "error"
+"html/missing-doctype" = "error"
+"html/no-missing-references" = "error"
+"html/require-sri" = "error"
