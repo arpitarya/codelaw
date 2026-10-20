@@ -1,0 +1,4 @@
+description = "House conventions for CSS, opt-in"
+
+[rules]
+"css/no-important" = "error"

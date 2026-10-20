@@ -1,0 +1,394 @@
+{
+ "backface-visibility": [
+  "hidden",
+  "visible"
+ ],
+ "border-block-end-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-block-start-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-block-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-bottom-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-collapse": [
+  "collapse",
+  "separate"
+ ],
+ "border-inline-end-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-inline-start-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-inline-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-left-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-right-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "border-top-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "box-decoration-break": [
+  "clone",
+  "slice"
+ ],
+ "box-sizing": [
+  "border-box",
+  "content-box",
+  "padding-box"
+ ],
+ "caption-side": [
+  "block-end",
+  "block-start",
+  "bottom",
+  "bottom-outside",
+  "inline-end",
+  "inline-start",
+  "top",
+  "top-outside"
+ ],
+ "clear": [
+  "block-end",
+  "block-start",
+  "both",
+  "bottom",
+  "inline-end",
+  "inline-start",
+  "left",
+  "none",
+  "right",
+  "top"
+ ],
+ "column-rule-style": [
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "content-visibility": [
+  "auto",
+  "hidden",
+  "visible"
+ ],
+ "direction": [
+  "ltr",
+  "rtl"
+ ],
+ "empty-cells": [
+  "hide",
+  "show"
+ ],
+ "flex-direction": [
+  "column",
+  "column-reverse",
+  "row",
+  "row-reverse"
+ ],
+ "flex-wrap": [
+  "nowrap",
+  "wrap",
+  "wrap-reverse"
+ ],
+ "float": [
+  "block-end",
+  "block-start",
+  "bottom",
+  "footnote",
+  "inline-end",
+  "inline-start",
+  "left",
+  "none",
+  "right",
+  "snap-block",
+  "snap-inline",
+  "top"
+ ],
+ "font-kerning": [
+  "auto",
+  "none",
+  "normal"
+ ],
+ "font-weight": [
+  "bold",
+  "bolder",
+  "lighter",
+  "normal"
+ ],
+ "hyphens": [
+  "auto",
+  "manual",
+  "none"
+ ],
+ "isolation": [
+  "auto",
+  "isolate"
+ ],
+ "list-style-position": [
+  "inside",
+  "outside"
+ ],
+ "mix-blend-mode": [
+  "color",
+  "color-burn",
+  "color-dodge",
+  "darken",
+  "difference",
+  "exclusion",
+  "hard-light",
+  "hue",
+  "lighten",
+  "luminosity",
+  "multiply",
+  "normal",
+  "overlay",
+  "plus-darker",
+  "plus-lighter",
+  "saturation",
+  "screen",
+  "soft-light"
+ ],
+ "object-fit": [
+  "contain",
+  "cover",
+  "fill",
+  "none",
+  "scale-down"
+ ],
+ "outline-style": [
+  "auto",
+  "dashed",
+  "dotted",
+  "double",
+  "groove",
+  "hidden",
+  "inset",
+  "none",
+  "outset",
+  "ridge",
+  "solid"
+ ],
+ "overflow": [
+  "auto",
+  "clip",
+  "hidden",
+  "overlay",
+  "scroll",
+  "visible"
+ ],
+ "overflow-block": [
+  "auto",
+  "clip",
+  "hidden",
+  "overlay",
+  "scroll",
+  "visible"
+ ],
+ "overflow-inline": [
+  "auto",
+  "clip",
+  "hidden",
+  "overlay",
+  "scroll",
+  "visible"
+ ],
+ "overflow-wrap": [
+  "anywhere",
+  "break-word",
+  "normal"
+ ],
+ "overflow-x": [
+  "auto",
+  "clip",
+  "hidden",
+  "overlay",
+  "scroll",
+  "visible"
+ ],
+ "overflow-y": [
+  "auto",
+  "clip",
+  "hidden",
+  "overlay",
+  "scroll",
+  "visible"
+ ],
+ "position": [
+  "absolute",
+  "fixed",
+  "relative",
+  "static",
+  "sticky"
+ ],
+ "resize": [
+  "block",
+  "both",
+  "horizontal",
+  "inline",
+  "none",
+  "vertical"
+ ],
+ "scroll-behavior": [
+  "auto",
+  "smooth"
+ ],
+ "table-layout": [
+  "auto",
+  "fixed"
+ ],
+ "text-overflow": [
+  "clip",
+  "ellipsis",
+  "fade"
+ ],
+ "unicode-bidi": [
+  "bidi-override",
+  "embed",
+  "isolate",
+  "isolate-override",
+  "normal",
+  "plaintext"
+ ],
+ "visibility": [
+  "collapse",
+  "hidden",
+  "visible"
+ ],
+ "word-break": [
+  "auto-phrase",
+  "break-all",
+  "break-word",
+  "keep-all",
+  "manual",
+  "normal"
+ ],
+ "writing-mode": [
+  "horizontal-tb",
+  "lr",
+  "lr-tb",
+  "rl",
+  "rl-tb",
+  "sideways-lr",
+  "sideways-rl",
+  "tb",
+  "tb-rl",
+  "vertical-lr",
+  "vertical-rl"
+ ]
+}
