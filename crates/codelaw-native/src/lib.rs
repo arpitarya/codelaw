@@ -63,6 +63,89 @@ pub struct NativeContext<'a> {
     pub options: &'a BTreeMap<String, serde_json::Value>,
     /// The rule's pack's data tables (SR-ARCHITECTURE decision 15c).
     pub data: &'a BTreeMap<String, Arc<serde_json::Value>>,
+    /// The file itself: its path, its raw bytes and a read-only view of the
+    /// files around it (decision 15b). For an embedded region, the host file.
+    pub file: &'a dyn FileContext,
+}
+
+/// The file a native rule checks, beyond its text (SR-ARCHITECTURE decision
+/// 15b): where it is, its bytes as they are on disk, and a read-only view of
+/// the other files of the project.
+///
+/// Paths are relative to the project root, `/`-separated, with no `.` or
+/// `..` segment ([`resolve_path`] makes one from a link). Nothing outside the
+/// project root can be named, and nothing can be written. The engine records
+/// every question a rule asks, so a cached result is reused only while every
+/// answer still holds.
+pub trait FileContext: Sync {
+    /// The file's path.
+    fn path(&self) -> &str;
+    /// The file's bytes, a UTF-8 byte-order mark included: the text rules
+    /// see has none.
+    fn bytes(&self) -> &[u8];
+    /// Whether a file or folder exists at `path`.
+    fn exists(&self, path: &str) -> bool;
+    /// Whether `path` is a folder.
+    fn is_dir(&self, path: &str) -> bool;
+    /// The text of the file at `path`, when it exists and is UTF-8.
+    fn read(&self, path: &str) -> Option<String>;
+    /// The names in the folder at `path` (`""` is the root), sorted.
+    fn list(&self, path: &str) -> Option<Vec<String>>;
+}
+
+/// A file with no neighbours: what a rule sees when only its text is known.
+#[derive(Clone, Debug, Default)]
+pub struct DetachedFile {
+    pub path: String,
+    pub bytes: Vec<u8>,
+}
+
+impl DetachedFile {
+    pub fn new(path: impl Into<String>, source: &str) -> Self {
+        DetachedFile { path: path.into(), bytes: source.as_bytes().to_vec() }
+    }
+}
+
+impl FileContext for DetachedFile {
+    fn path(&self) -> &str {
+        &self.path
+    }
+    fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+    fn exists(&self, path: &str) -> bool {
+        path.is_empty() || path == self.path
+    }
+    fn is_dir(&self, path: &str) -> bool {
+        path.is_empty()
+    }
+    fn read(&self, path: &str) -> Option<String> {
+        (path == self.path).then(|| String::from_utf8_lossy(&self.bytes).into_owned())
+    }
+    fn list(&self, path: &str) -> Option<Vec<String>> {
+        path.is_empty().then(|| vec![self.path.clone()])
+    }
+}
+
+/// Resolve `link` against the folder of `from` (both project-relative): the
+/// project-relative path it names, or `None` when it leaves the project
+/// root. A `link` starting with `/` is relative to the root.
+pub fn resolve_path(from: &str, link: &str) -> Option<String> {
+    let mut parts: Vec<&str> = Vec::new();
+    if !link.starts_with('/') {
+        parts.extend(from.split('/').filter(|p| !p.is_empty()));
+        parts.pop();
+    }
+    for seg in link.split('/') {
+        match seg {
+            "" | "." => {}
+            ".." => {
+                parts.pop()?;
+            }
+            s => parts.push(s),
+        }
+    }
+    Some(parts.join("/"))
 }
 
 /// One finding of a native rule. `edits` are offered when the rule file's
@@ -436,7 +519,8 @@ pub(crate) fn run(rule: &dyn NativeRule, language: Language, src: &str) -> Vec<N
     let model = codelaw_semantic::build(language, &root, src);
     let options = BTreeMap::new();
     let data = BTreeMap::new();
-    let ctx = NativeContext { source: src, language, semantic: model.as_ref(), options: &options, data: &data };
+    let file = DetachedFile::new(format!("example.{}", language.extension()), src);
+    let ctx = NativeContext { source: src, language, semantic: model.as_ref(), options: &options, data: &data, file: &file };
     let mut out = Vec::new();
     for node in root.root().dfs() {
         if rule.kinds().contains(&node.kind().as_ref()) {
@@ -453,5 +537,16 @@ mod tests {
         let ids: Vec<&str> = super::registry().iter().map(|r| r.id()).collect();
         let unique: std::collections::BTreeSet<&str> = ids.iter().copied().collect();
         assert_eq!(unique.len(), ids.len(), "a native id is registered twice");
+    }
+
+    #[test]
+    fn resolve_path() {
+        use super::resolve_path as r;
+        assert_eq!(r("docs/a.md", "b.md").as_deref(), Some("docs/b.md"));
+        assert_eq!(r("docs/a.md", "./x/../c.md").as_deref(), Some("docs/c.md"));
+        assert_eq!(r("docs/a.md", "../README.md").as_deref(), Some("README.md"));
+        assert_eq!(r("docs/a.md", "/src/x.rs").as_deref(), Some("src/x.rs"));
+        assert_eq!(r("a.md", "../outside.md"), None);
+        assert_eq!(r("a.md", "sub/").as_deref(), Some("sub"));
     }
 }
