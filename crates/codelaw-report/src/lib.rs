@@ -1,7 +1,10 @@
 //! Output formats and exit codes (SR-CLI-MCP decisions 3 and 4). Every
 //! format carries the L4 fix fields: the class, and the edits or the steps.
 
+mod hook;
 mod query;
+
+pub use hook::{HOOK_FINDINGS, hook_blocks, hook_text};
 
 pub use query::{
     explain_engine_json, explain_engine_text, explain_json, explain_text, fix_skill, rules_json, rules_text, snippet_fix_json, tree_json, tree_text, why_json,

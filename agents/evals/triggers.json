@@ -1,0 +1,173 @@
+{
+  "about": "Trigger evals for every skill in agents/skills (SR-AGENT-SURFACES decision 5): prompts that should fire the skill, and near-misses that should not. Task evals (a fixture repo, a task, a deterministic pass check) are not written yet.",
+  "skills": {
+    "codelaw-write": {
+      "should": [
+        "Add a function `clamp` to src/utils/math.ts",
+        "Create a new Python module pkg/retry.py with a retry decorator",
+        "Edit the GitHub workflow .github/workflows/ci.yml to add a test job",
+        "Write a React component for the settings page in src/Settings.tsx"
+      ],
+      "should_not": [
+        "Explain what js/eqeqeq requires",
+        "Why is CI failing on the lint step?",
+        "Make a rule that forbids moment.js imports",
+        "Summarise what this repository does"
+      ]
+    },
+    "codelaw-fix": {
+      "should": [
+        "fix the lint errors",
+        "codelaw is failing on my branch, can you sort it out?",
+        "The post-edit hook reported 3 codelaw violations in src/app.ts",
+        "make codelaw check pass"
+      ],
+      "should_not": [
+        "Is `==` allowed here?",
+        "Ignore js/no-console on this line, it's intended",
+        "Fix the failing unit test in tests/test_api.py",
+        "Set up codelaw in this repo"
+      ]
+    },
+    "codelaw-explain": {
+      "should": [
+        "Why did ts/no-var fire on line 12?",
+        "What does rule py/no-print want?",
+        "Is a default export allowed in this file?",
+        "Where does the rule css/no-important come from?"
+      ],
+      "should_not": [
+        "Fix all the codelaw findings",
+        "Make a rule that enforces sorted imports",
+        "Explain how this function works",
+        "Review this PR against our rules"
+      ]
+    },
+    "codelaw-author-rule": {
+      "should": [
+        "Make a rule that forbids importing lodash directly",
+        "We always put exports at the end of the file, enforce that",
+        "Add a lint rule so nobody uses console.log in src/",
+        "Enforce that every YAML workflow sets timeout-minutes"
+      ],
+      "should_not": [
+        "This rule has a false positive on optional chaining",
+        "Turn off js/no-console for the scripts folder",
+        "What does js/exports-at-end require?",
+        "Publish our rules as an npm package"
+      ]
+    },
+    "codelaw-setup": {
+      "should": [
+        "Set up codelaw in this repo",
+        "Add a linter that agents follow to this project",
+        "Install codelaw and the right rule packs here",
+        "We want to start using codelaw for our Python service"
+      ],
+      "should_not": [
+        "Upgrade codelaw to the latest version",
+        "Move us from ESLint to codelaw",
+        "Fix the codelaw errors",
+        "Add a new rule for our naming convention"
+      ]
+    },
+    "codelaw-migrate": {
+      "should": [
+        "Move this repo from ESLint to codelaw",
+        "Replace Ruff with codelaw and keep the same checks",
+        "Turn our CONTRIBUTING style guide into codelaw rules",
+        "Port our markdownlint config"
+      ],
+      "should_not": [
+        "Set up codelaw in an empty repo",
+        "Explain eslint's no-var rule",
+        "Upgrade codelaw from 0.1 to 0.2",
+        "Fix the lint errors"
+      ]
+    },
+    "codelaw-debug-rule": {
+      "should": [
+        "acme/no-moment is a false positive on this dynamic import",
+        "The rule didn't catch `var` inside a for loop",
+        "codelaw test is failing for my rule acme/exports-at-end",
+        "The fix for acme/sort-imports produces broken code"
+      ],
+      "should_not": [
+        "Why did js/eqeqeq fire here?",
+        "This finding is intended, silence it",
+        "Make a new rule that bans default exports",
+        "CI is red on codelaw"
+      ]
+    },
+    "codelaw-ci-triage": {
+      "should": [
+        "The codelaw job failed in CI, here is the log",
+        "Here's the SARIF file from code scanning, what broke?",
+        "Why is CI red on lint?",
+        "codelaw sync-agents --check failed in the pipeline"
+      ],
+      "should_not": [
+        "Set up codelaw in CI",
+        "Fix the lint errors in src/app.ts",
+        "Review my PR against our rules",
+        "The unit tests fail on CI"
+      ]
+    },
+    "codelaw-review": {
+      "should": [
+        "Review this diff against our rules",
+        "Lint review PR 42",
+        "What does codelaw say about the changes on this branch?",
+        "Check my changes with codelaw before I open the PR"
+      ],
+      "should_not": [
+        "Review this PR for design problems",
+        "Fix the codelaw errors on this branch",
+        "Explain rule js/no-var",
+        "Why is CI failing?"
+      ]
+    },
+    "codelaw-suppress": {
+      "should": [
+        "This violation is intended, ignore js/eqeqeq here",
+        "Silence codelaw on this line",
+        "Turn py/no-print off for the scripts/ folder, they are CLI tools",
+        "Leave the code as is but stop codelaw flagging it"
+      ],
+      "should_not": [
+        "Fix this codelaw finding",
+        "The rule is wrong for every optional chain",
+        "What does py/no-print want?",
+        "Remove the unused suppression comments"
+      ]
+    },
+    "codelaw-pack": {
+      "should": [
+        "Share our codelaw rules across all our repos",
+        "Publish our .codelaw/rules as an npm rule pack",
+        "Create a team codelaw pack for PyPI",
+        "Make our rules reusable in the other services"
+      ],
+      "should_not": [
+        "Install the codelaw JS rule pack",
+        "Write a rule that forbids moment",
+        "Upgrade the codelaw packs",
+        "Publish the release of our app"
+      ]
+    },
+    "codelaw-upgrade": {
+      "should": [
+        "Upgrade codelaw",
+        "A new codelaw version is out, bump us",
+        "Dependabot opened a PR bumping codelaw to 0.3.0",
+        "Update codelaw and its rule packs"
+      ],
+      "should_not": [
+        "Set up codelaw",
+        "Upgrade React to 19",
+        "Migrate from ESLint",
+        "Fix the new lint errors"
+      ]
+    }
+  }
+}
