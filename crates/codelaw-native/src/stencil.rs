@@ -361,12 +361,20 @@ stencil_rule!(StrictMutable, "stencil/strict-mutable", |body, ctx, comp, out| {
 
 stencil_rule!(TagPrefix, "stencil/tag-prefix", |body, ctx, comp, out| {
     let Some(comp) = comp else { return };
-    let Some(prefix) = ctx.options.get("prefix").and_then(|v| v.as_str()).filter(|p| !p.is_empty()) else { return };
+    let prefix = ctx.options.get("prefix").and_then(|v| v.as_str()).filter(|p| !p.is_empty());
     let args = decorator_parts(comp, ctx.source).and_then(|(_, a)| a);
     if let Some(tag) = option_value(args, "tag", ctx.source) {
         let t = text(tag, ctx.source).trim_matches(['"', '\'', '`']);
-        if !t.starts_with(&format!("{prefix}-")) {
-            out.push(finding(tag, format!("The tag `{t}` doesn't start with this project's prefix `{prefix}-`"), Vec::new()));
+        match prefix {
+            Some(p) if !t.starts_with(&format!("{p}-")) => {
+                out.push(finding(tag, format!("The tag `{t}` doesn't start with this project's prefix `{p}-`"), Vec::new()));
+            }
+            // With no prefix configured, a tag still needs one: a custom
+            // element's name must contain a dash.
+            None if !t.contains('-') => {
+                out.push(finding(tag, format!("The tag `{t}` has no prefix; custom element names are `<prefix>-<name>`"), Vec::new()));
+            }
+            _ => {}
         }
     }
 });

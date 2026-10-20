@@ -1,0 +1,10 @@
+description = "House conventions from codelaw's starter catalogue; opt in"
+
+[rules]
+"js/exports-at-end" = "error"
+"js/import-groups" = "error"
+"js/no-default-export" = "error"
+"ts/type-only-imports" = "error"
+"react/hook-prefix" = "error"
+"react/props-type-name" = "error"
+"stencil/tag-prefix" = "error"

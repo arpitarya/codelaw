@@ -2,5 +2,5 @@ name = "@codelaw/rules-js"
 version = "0.1.0"
 min_codelaw = "0.1.0"
 languages = ["javascript", "jsx", "typescript", "tsx"]
-presets = ["js/recommended", "ts/recommended", "react/recommended"]
+presets = ["js/recommended", "ts/recommended", "react/recommended", "node/recommended", "stencil/recommended", "js/conventions"]
 description = "codelaw's rules for JavaScript, TypeScript, JSX and TSX (SR-RULE-PACKS)"

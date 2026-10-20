@@ -1,0 +1,18 @@
+description = "@stencil/eslint-plugin 1.4.0 recommended without its type-checked rules, reimplemented"
+
+[rules]
+"stencil/ban-default-true" = "error"
+"stencil/ban-exported-const-enums" = "error"
+"stencil/ban-prefix" = "error"
+"stencil/decorators-context" = "error"
+"stencil/host-data-deprecated" = "error"
+"stencil/methods-must-be-public" = "error"
+"stencil/no-unused-watch" = "error"
+"stencil/own-methods-must-be-private" = "error"
+"stencil/own-props-must-be-private" = "error"
+"stencil/prefer-vdom-listener" = "error"
+"stencil/prop-readonly" = "error"
+"stencil/props-must-be-public" = "error"
+"stencil/required-jsdoc" = "error"
+"stencil/reserved-member-names" = "error"
+"stencil/strict-mutable" = "error"

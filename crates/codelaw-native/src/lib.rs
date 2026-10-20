@@ -9,6 +9,7 @@
 
 mod accessors;
 mod classes;
+mod conventions;
 mod duplicates;
 mod expressions;
 mod literals;
@@ -73,6 +74,7 @@ static TS_NO_UNUSED_EXPRESSIONS: typescript::NoUnusedExpressions = typescript::N
 static REGISTRY: &[&dyn NativeRule] = &[
     &classes::ConstructorSuper,
     &accessors::GetterReturn,
+    &conventions::ImportGroups,
     &expressions::NoConstantBinaryExpression,
     &duplicates::NoDupeArgs,
     &duplicates::NoDupeClassMembers,
@@ -104,6 +106,7 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &react::ExhaustiveDeps,
     &react::JsxNoDuplicateProps,
     &react::NoUnknownProperty,
+    &conventions::PropsTypeName,
     &react::RequireRenderReturn,
     &react::RulesOfHooks,
     &stencil::BanDefaultTrue,
@@ -128,6 +131,7 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &TS_NO_UNUSED_VARS,
     &typescript::NoWrapperObjectTypes,
     &typescript::PreferAsConst,
+    &conventions::TypeOnlyImports,
 ];
 
 /// Every registered native rule, sorted by id.
