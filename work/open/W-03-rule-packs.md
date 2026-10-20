@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-19: research the ESLint, typescript-eslint, TSLint,
 item: W-03
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-19
+updated: 2026-10-20
 updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: agent
 ---
@@ -19,8 +19,8 @@ ball: agent
 | 1 | Research the presets of ESLint, typescript-eslint, TSLint, Ruff, Prettier, stylelint, html-validate, HTMLHint, markdownlint | what each pack ports, and what it must not | ✅ 2026-10-19 (below) |
 | 2 | Write `rules-js` `recommended` presets | JS/TS/JSX/TSX/Node/React/Stencil coverage | ⏳ `js/recommended` ✅ 64 rules · `ts/recommended` ✅ 24 · `react` ✅ 19 · `node` ✅ 3 · `stencil` ✅ 15 · `js/conventions` ✅ 7 |
 | 3 | Write `rules-python` `recommended` | Python coverage | ⏳ |
-| 4 | Write `rules-css` and `rules-html` `recommended` | stylesheet and markup coverage | ⏳ |
-| 5 | Write `rules-data` | package.json, tsconfig, pyproject, CI YAML, Markdown | ⏳ |
+| 4 | Write `rules-css` and `rules-html` `recommended` | stylesheet and markup coverage | ⏳ `rules-css` ✅ 70 rules (`css/recommended` 41 · `css/standard` 28 · `css/conventions` 1) · `rules-html` ⏳ |
+| 5 | Write `rules-data` | package.json, tsconfig, pyproject, CI YAML, Markdown | ✅ 2026-10-20 — 30 rules in 7 presets; schema validation waits on B-030 |
 | 6 | Publish all five to npm and PyPI with the engine | `codelaw init` can install them | ⏳ |
 
 **Arpit, 2026-10-19:** *"research the rules preset in ruff, eslint, tslint, prettier, and other and create as separate packages, like 1 for js/ts/node/jsx/tsx, 1 for html, 1 for css, 1 for python and engine will be separate"*
@@ -78,7 +78,7 @@ Five packs whose `recommended` presets cover the correctness core of each ecosys
 | stylelint-config-recommended | 41 rules | **Port** all into `css/recommended` (`block-no-empty`, `no-duplicate-selectors`, `property-no-unknown`, `declaration-block-no-duplicate-properties`, `font-family-no-missing-generic-family-keyword`, …). |
 | stylelint-config-standard | recommended + modern-convention rules | **Port** the non-layout ones into `css/standard` (modern color and media-range notation); drop anything the formatter owns. |
 | Biome CSS rules | 15 stable, ported from stylelint | Cross-check. |
-| Data the rules need | — | Property, at-rule and pseudo-class tables from `@mdn/browser-compat-data` (CC0-1.0), shipped inside the pack. |
+| Data the rules need | — | Property, at-rule, selector and keyword tables shipped inside the pack, from MIT sources only (stylelint's reference tables, `known-css-properties`, `html-tags`); CC0 data such as MDN's is not OSI-approved (L2), so it is not used. |
 
 ### `rules-html` — HTML
 
@@ -125,6 +125,8 @@ Prettier has no lint rules. Its option defaults become SR-FORMATTER's `[format]`
 - **2026-10-19 — `ts/recommended`:** all 20 rules of typescript-eslint 8.71.2's `recommended` (not type-checked) plus the four core rules its `eslint-recommended` switches on; 88 rules in `packs/js`, 1,048 checks green. A TypeScript corpus (zod, ajv, TanStack Query sources) found two false-positive patterns, fixed with tests.
 - **2026-10-19 — `react/recommended`:** 17 rules of eslint-plugin-react 7.37.5 (`recommended` + `jsx-runtime`) and `rules-of-hooks` and `exhaustive-deps` from eslint-plugin-react-hooks 7.1.1; 107 rules in `packs/js`. react-query's sources come out clean, and planted violations are all found.
 - **2026-10-20 — `node`, `stencil`, `js/conventions`:** 132 rules in `packs/js`, 1,505 checks green; the Node rules checked against npm's source. The python, css, html and data packs are being built by four agents in parallel worktrees.
+- **2026-10-20 — `rules-data`:** 30 rules in 7 presets (`data/recommended` 6, `md/recommended` 16, `data/package-json` 2, `data/tsconfig` 1, `data/pyproject` 2, `data/github-actions` 1, `data/conventions` 2), 216 checks green; natives in `data_{json,yaml,toml,md}.rs`. Not ported: `md/relative-links` (a native rule sees no file path or file system) and SchemaStore validation (B-030). Run over this repo's own records and docs, `md/single-h1` counts the frontmatter `title:` as the H1, as markdownlint does.
+- **2026-10-20 — `rules-css`:** 70 native rules in `css_*.rs` over a hand-written CSS reader (tree-sitter-css errors on range media queries, `layer()` imports and percentage keyframe selectors): all 41 of stylelint-config-recommended 18.0.0 and the 28 non-layout rules stylelint-config-standard 40.0.0 adds; 385 checks green. Three rules check less than stylelint, which uses CSSTree's MDN-derived (CC0) syntax data. A 317-file `node_modules` corpus found three false-positive patterns, fixed; a 60-file spot check found none.
 - **Every rule is `preview`** (SR-RULE-AUTHORING decision 6), so presets run only with `preview = true` until the corpus job (B-024) promotes them.
 
 ## Blockers

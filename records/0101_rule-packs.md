@@ -10,7 +10,7 @@ feature: "predefined rules and rule packs"
 owns:
   - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-19T14:51:23Z
+timestamp: 2026-10-20T04:42:58Z
 content_sha: ""
 ---
 
@@ -126,10 +126,8 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
    - Only ideas are taken from GPL-licensed tools (Pylint, yamllint), never their text or code ([L2](0004_LAW-2-foss-dependencies.md)).
    - **Not ported:** rules that need type information or the React Compiler's analysis. Each pack's README lists them under "not ported, and why".
    - **Never ported:** layout-only rules, which the formatter owns ([L7](0009_LAW-7-linter-and-formatter.md), [SR-FORMATTER](0105_formatter.md) decision 3).
-   - **Data tables** in `data/` come only from permissively licensed sources, named in the pack's NOTICE:
-     - MDN browser-compat-data (CC0-1.0);
-     - html-validate's element metadata (MIT);
-     - SchemaStore (Apache-2.0).
+   - **Data tables** in `data/` come only from sources under a permissive OSI-approved licence ([L2](0004_LAW-2-foss-dependencies.md)), each named in the pack's NOTICE with its version — for example `globals` and `known-css-properties` (MIT), html-validate's element metadata (MIT), SchemaStore (Apache-2.0).
+     - CC0-1.0 is not OSI-approved, so MDN's `browser-compat-data` and `mdn-data` are not used; a table written for a pack from the specifications says so in its NOTICE.
 8. **The v0 starter catalogue is kept** (below). Each starter rule goes to the pack named by its namespace.
    - A starter rule that matches a ported source rule carries it in `ported_from:` and sits in `recommended`.
    - The rest are house conventions (`js/exports-at-end`, `py/no-print`, …) and form each pack's opt-in `conventions` preset.
