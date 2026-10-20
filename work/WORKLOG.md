@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-20 — parallel lanes on W-07–W-22; W-08, W-09, W-17, W-18, W-22 landed  ·  Claude Code cloud (Opus 5.5)
+
+- **Asked:** *"list all the open items"*, then *"implement all open items … in parallel … merge everything to main"*, then *"Whatever is done is done. Merge commit everything, merge everything to main. And stop the work."*
+- **Done:** eleven agents in git worktrees. Landed and merged: W-17 (all 34 rows), W-18 (all but the environment rule and staging index), W-22, W-09 (all but formatting), W-08. Fixed `session-lock.sh` (decider approved). Unfinished work pushed as `wip/*` branches, not merged: W-07, W-10, W-11, W-12, W-14, W-16, W-20, W-21. W-13, W-15, W-19 not started.
+- **Decided / left open:** WIP kept off `main` because it is unbuilt. New inbox row: the tag-only `v*` environment rule. Questions in INTERVIEW §2 (rustfmt, the WHATWG entities licence, `yaml/document-start`, the project root with no config).
+- **Mistakes:** nine parallel cargo target dirs filled the disk allowance once (ENOSPC lost some output). Fixed by deleting finished target dirs and building without debug info. Logged in `MACHINE.md`.
+- **Next:** W-07 from `wip/W-07-formatter`, locally.
+
+---
+
 ## 2026-10-20 — code review; the release law gate; pending work filed as W-07–W-22  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"Review the code. What are the blockers and what is pending?"*, then *"Why was the law broken? fix it. … create work items for what all things are pending."*

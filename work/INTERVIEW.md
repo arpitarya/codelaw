@@ -52,13 +52,32 @@ decision 3); the 2026-10-20 review's findings are W-17, W-18 and W-22. **Ground 
 
 **W-05** (🟢, `research`, Cowork): guidance **while** an agent writes — a construct-filtered `brief` before writing and a `hook --pre` check before bytes land; Fux only as an optional free-text layer. Next is step 1, the per-agent pre-write matrix. Design is a proposal until step 5 is ruled on.
 
-**Next for an agent:** 🟢🧨 W-17 (engine defects — a panicking rule exits 0;
-three `auto` fixes change behaviour) and W-18 (CI and release hardening), then
-the release blockers W-07 (formatter), W-08 (MCP), W-09 (LSP).
+**2026-10-20, cloud session (stopped by the decider to continue locally):**
+W-08, W-17 and W-22 landed and are archived; W-09 landed except formatting
+(waits on W-07); W-18 landed except the tag-only environment rule (decider,
+inbox) and the staging-index install. Unfinished, unbuilt work sits on pushed
+branches `wip/W-07-formatter`, `wip/W-08-mcp-W-10-agent-surfaces` (W-10, on
+top of W-08), `wip/W-11-graph`, `wip/W-12-structured-rules`,
+`wip/W-14-adapters`, `wip/W-16-commands-api`, `wip/W-20-conformance`,
+`wip/W-21-pack-gaps` — each is one WIP commit (most with `--no-verify`) on a
+base before the final merges: rebase or merge `main` in, build, finish,
+and rewrite the WIP commit so the SR guard passes before it lands. W-15 and
+W-19 were not started.
+
+**Next for an agent:** W-07 (formatter — the last release blocker, then
+W-09's formatting), from `wip/W-07-formatter`.
+
+**Open questions for the decider (from 2026-10-20 agents):** a
+`rustfmt.toml` and a one-time format of the tree (the code isn't
+rustfmt-formatted, so `cargo fmt --all` rewrites ~94 files); whether the html
+pack's `entities.json` (WHATWG table, CC BY 4.0, taken via html-validate's MIT
+copy) passes L2; renaming `yaml/document-start` (shares yamllint's name;
+NOTICE now says so); `codelaw check <file>` with no config takes the file's
+own folder as the project root.
 
 **W-04** (🔴): the pipeline is built, timed and merged; the first release waits on the
 decider's one-time registry setup (`RELEASING.md` §One time, steps 1, 4, 5 —
-the parts that publish nothing) and on W-07–W-09. The ruling to publish is
+the parts that publish nothing) and on W-07 and W-09. The ruling to publish is
 not asked until they land: L7 and L6 decision 3 forbid an engine without its
 formatter, MCP server and LSP.
 
