@@ -95,6 +95,9 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
 - **Judgment today:** no manifest exists yet and no licence check runs —
   backlog row W-20 (`ungated`). The check is owed the day the first manifest
   lands.
+- **The editor extension's npm lockfile** (`packaging/vscode/package-lock.json`)
+  is checked by `crates/codelaw-cli/tests/licences.rs`, beside the Cargo
+  manifest, runtime and dev dependencies alike (decision 4).
 - Weak copyleft (MPL, EPL) is refused too, so some ecosystem crates are
   unavailable; the answer is a permissive alternative or building it.
 - The parsing stack named in `docs/DESIGN.md` — tree-sitter and

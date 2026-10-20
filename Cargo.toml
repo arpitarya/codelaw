@@ -24,6 +24,7 @@ codelaw-fix = { path = "crates/codelaw-fix" }
 codelaw-engine = { path = "crates/codelaw-engine" }
 codelaw-report = { path = "crates/codelaw-report" }
 codelaw-test = { path = "crates/codelaw-test" }
+codelaw-lsp = { path = "crates/codelaw-lsp" }
 
 # Grammars and matcher: pinned (SR-ARCHITECTURE decision 3). All MIT.
 ast-grep-core = { version = "=0.51.0", features = ["tree-sitter"] }
@@ -47,6 +48,10 @@ blake3 = "1.8"
 clap = { version = "4.6", features = ["derive"] }
 globset = "0.4.20"
 ignore = "0.4.33"
+# The language server (SR-EDITOR decision 1): rust-analyzer's scaffold and
+# the protocol types. lsp-server is MIT OR Apache-2.0, lsp-types is MIT.
+lsp-server = "0.10.0"
+lsp-types = "0.97.0"
 postcard = { version = "1.1", features = ["use-std"] }
 pulldown-cmark = { version = "0.13", default-features = false }
 rayon = "1.12"

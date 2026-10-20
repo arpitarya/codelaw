@@ -40,6 +40,13 @@ enum Command {
     NewRule(rules_cmd::NewRuleArgs),
     /// Set codelaw up in this repo: config, rule packs, folders.
     Init(init::InitArgs),
+    /// Serve the Language Server Protocol over stdio (SR-EDITOR).
+    Lsp {
+        /// Talk over stdin and stdout: the default and only transport;
+        /// accepted because editors pass it.
+        #[arg(long)]
+        stdio: bool,
+    },
     /// Manage the cache.
     Cache {
         #[command(subcommand)]
@@ -279,6 +286,7 @@ fn main() -> ExitCode {
         Command::Tree(a) => tree::tree(a),
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
+        Command::Lsp { .. } => codelaw_lsp::run_stdio().map_or_else(fail, |()| ExitCode::SUCCESS),
         Command::Cache { action } => cache(action),
     }
 }

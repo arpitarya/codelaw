@@ -115,7 +115,7 @@ The decider asked for a record of what goes into which package, under the naming
    - eight platform wheels, built with maturin's `bin` bindings;
    - each wheel holds the binary, a `codelaw` Python module (`check`, `fix`, `format`, `rules_for`) and `py.typed`;
    - no sdist ([L6](0008_LAW-6-python-and-node-packages.md) decision 7).
-6. **The editor extension `codelaw.codelaw`** is published as platform-specific packages. It runs the project's own codelaw first (`node_modules/.bin`, then `.venv/bin`) and falls back to a bundled binary ([SR-EDITOR](0114_editor.md)).
+6. **The editor extension `codelaw.codelaw`** (source: `packaging/vscode`) is published as platform-specific packages. It runs the project's own codelaw first (`node_modules/.bin`, then `.venv/bin`) and falls back to a bundled binary ([SR-EDITOR](0114_editor.md)).
 7. **One version for everything:** every crate, both registries' engine packages, the five rule packs and the extension carry the same version from one file ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
 8. **Not in any package:**
    - adapters (external tools);

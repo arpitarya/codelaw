@@ -223,6 +223,30 @@ impl Project {
         fix::fix_paths(self, paths, options)
     }
 
+    /// The entry `codelaw check <abs>` would check, or `None` when it would
+    /// not check that file: an unknown extension, outside `include`, or a
+    /// language turned off. The file need not exist yet (an editor's unsaved
+    /// buffer, SR-EDITOR decision 3).
+    pub fn entry_for(&self, abs: &Path) -> Option<FileEntry> {
+        let language = Language::from_path(abs)?;
+        (self.config.is_included(abs) && discover::language_enabled(self, abs, language))
+            .then(|| FileEntry { abs: abs.to_path_buf(), rel: discover::rel_path(abs, self.root()), language })
+    }
+
+    /// Check an editor's text for `entry` as `codelaw check` checks the
+    /// file on disk: the same skips, the same rules, the same order
+    /// (SR-EDITOR decision 3). Nothing is read from or written to disk.
+    /// `text` has no byte-order mark; offsets are into it.
+    pub fn check_document(&self, entry: &FileEntry, text: &str) -> Vec<Diagnostic> {
+        let mut d = self.check_unsaved(entry, text).diagnostics;
+        if !self.rules.has_rules() {
+            d.push(lint::no_rules(self));
+        }
+        d.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+        d.dedup_by(|a, b| a.file == b.file && a.start_byte == b.start_byte && a.end_byte == b.end_byte && a.rule == b.rule);
+        d
+    }
+
     /// The files a run would check, in order.
     pub fn files(&mut self, paths: &[PathBuf]) -> Result<Vec<FileEntry>, EngineError> {
         Ok(discover::discover(self, paths)?.0)

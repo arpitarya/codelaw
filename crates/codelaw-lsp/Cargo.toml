@@ -1,0 +1,15 @@
+[package]
+name = "codelaw-lsp"
+description = "The language server: a thin translation from LSP over stdio to codelaw-engine (SR-EDITOR)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+codelaw-core.workspace = true
+codelaw-config.workspace = true
+codelaw-rules.workspace = true
+codelaw-engine.workspace = true
+lsp-server.workspace = true
+lsp-types.workspace = true
+serde_json.workspace = true

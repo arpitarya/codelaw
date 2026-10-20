@@ -136,7 +136,7 @@ Start from `TEMPLATE.md`.
 | [0111](0111_consumer-layout.md) | **SR-CONSUMER-LAYOUT** | What codelaw adds to a consumer repo — written, generated, derived, installed | accepted | no |
 | [0112](0112_rule-format.md) | **SR-RULE-FORMAT** | The rule-file template — frontmatter schema, codelaw block, body order, examples, cases sidecar | accepted | partly |
 | [0113](0113_rule-authoring.md) | **SR-RULE-AUTHORING** | Writing rules by hand or with an agent skill; the debug tools; four test levels | accepted | partly |
-| [0114](0114_editor.md) | **SR-EDITOR** | The LSP server in the binary and the thin VS Code extension | accepted | no |
+| [0114](0114_editor.md) | **SR-EDITOR** | The LSP server in the binary and the thin VS Code extension | accepted | partly |
 | [0115](0115_cli-and-mcp.md) | **SR-CLI-MCP** | The CLI and the MCP server — one engine, two doors, same answers | accepted | partly |
 
 ---
@@ -176,6 +176,7 @@ directions.
 | `crates/codelaw-report` | SR-CLI-MCP | decisions 3 and 4 |
 | `crates/codelaw-test` | SR-RULE-AUTHORING | decision 4 |
 | `crates/codelaw-cli` | SR-CLI-MCP | decisions 1–3 |
+| `crates/codelaw-lsp` | SR-EDITOR | decisions 1–3: the language server |
 | `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced, for the Cargo manifest |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
@@ -183,6 +184,7 @@ directions.
 | `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the five first-party packs' rules, presets and data |
 | `LICENSE` | SR-PACKAGES | decision 10: the licence every package carries |
 | `packaging` | SR-PACKAGES | decisions 3 and 5: the npm launcher and API, the PyPI module and its maturin build |
+| `packaging/vscode` | SR-EDITOR | decision 4: the thin VS Code extension (SR-PACKAGES decision 6 is how it ships) |
 | `scripts/version.py` | SR-PACKAGES | decision 7: the one version, written and checked everywhere |
 | `scripts/law-gate.py` | SR-PACKAGES | decision 11: refuses a release while the engine lacks `format`, `mcp` or `lsp` (L6 decision 3, L7) |
 | `scripts/package.py` | SR-PACKAGES | decision 11: assembles every package and runs the release checks |
