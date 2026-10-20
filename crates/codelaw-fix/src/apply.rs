@@ -104,35 +104,116 @@ fn errors(language: Language, text: &str) -> usize {
     codelaw_lang::syntax_error_count(&codelaw_lang::parse(language, text))
 }
 
+/// One step of the apply loop, for `codelaw fix --trace`
+/// (SR-RULE-AUTHORING decision 3): what was offered, what was applied, and
+/// why the rest was not.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum TraceEvent {
+    /// A fix on offer, with its number of edits.
+    Offered { rule: String, edits: usize },
+    /// Identical to a fix already selected this pass (a group fix).
+    Duplicate { rule: String },
+    /// Waits for the next pass: it touches `behind`'s edits, or `behind` was
+    /// kept alone after a failed verification.
+    Deferred { rule: String, behind: String },
+    /// Applied and verified.
+    Applied { rule: String, edits: usize },
+    /// Refused for good; its diagnostic is reported as `manual`.
+    Refused { rule: String, why: Failure },
+}
+
+/// How the loop ended.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LoopEnd {
+    /// Nothing more on offer.
+    Fixpoint,
+    /// The fixes undid each other.
+    Conflict,
+    /// Still offering fixes after [`MAX_PASSES`].
+    MaxPasses,
+}
+
+impl LoopEnd {
+    pub fn name(self) -> &'static str {
+        match self {
+            LoopEnd::Fixpoint => "fixpoint",
+            LoopEnd::Conflict => "conflict",
+            LoopEnd::MaxPasses => "did-not-converge",
+        }
+    }
+}
+
+/// The steps of one run of the loop, pass by pass.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LoopTrace {
+    pub passes: Vec<Vec<TraceEvent>>,
+    pub end: LoopEnd,
+}
+
+impl Default for LoopTrace {
+    fn default() -> Self {
+        LoopTrace { passes: Vec::new(), end: LoopEnd::Fixpoint }
+    }
+}
+
+fn log(trace: &mut Option<LoopTrace>, e: TraceEvent) {
+    if let Some(t) = trace.as_mut() {
+        match t.passes.last_mut() {
+            Some(p) => p.push(e),
+            None => t.passes.push(vec![e]),
+        }
+    }
+}
+
+fn new_pass(trace: &mut Option<LoopTrace>) {
+    if let Some(t) = trace.as_mut() {
+        t.passes.push(Vec::new());
+    }
+}
+
 /// Run fixes to a fixpoint. `collect` is called with the current text and
 /// returns the candidates on offer, in a deterministic order; candidates
 /// whose key is in `refused` must not be offered again.
-pub fn fix_loop(
+pub fn fix_loop(language: Language, original: &str, collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>) -> LoopOutcome {
+    fix_loop_traced(language, original, collect, &mut None)
+}
+
+/// [`fix_loop`], recording each step in `trace` when it is `Some`.
+pub fn fix_loop_traced(
     language: Language,
     original: &str,
     mut collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>,
+    trace: &mut Option<LoopTrace>,
 ) -> LoopOutcome {
     let base_errors = errors(language, original);
     let mut out = LoopOutcome { text: original.to_owned(), ..Default::default() };
     let mut seen: HashSet<[u8; 32]> = HashSet::new();
     seen.insert(hash_bytes(original.as_bytes()).0);
+    let mut end = LoopEnd::Fixpoint;
 
     while out.passes < MAX_PASSES {
         let candidates: Vec<Candidate> =
             collect(&out.text, &out.refused).into_iter().filter(|c| !out.refused.contains(&c.key(&out.text))).collect();
         if candidates.is_empty() {
-            return out;
+            break;
         }
         out.passes += 1;
+        new_pass(trace);
 
         // One copy of identical fixes (a group fix is offered by every
         // diagnostic in it), then greedily the ones that don't touch.
         let mut selected: Vec<&Candidate> = Vec::new();
         for c in &candidates {
+            log(trace, TraceEvent::Offered { rule: c.rule.clone(), edits: c.edits.len() });
             if selected.iter().any(|s| s.edits == c.edits) {
+                log(trace, TraceEvent::Duplicate { rule: c.rule.clone() });
                 continue;
             }
-            if c.edits.is_empty() || selected.iter().any(|s| overlaps(&s.edits, &c.edits)) {
+            if c.edits.is_empty() {
+                continue;
+            }
+            if let Some(s) = selected.iter().find(|s| overlaps(&s.edits, &c.edits)) {
+                log(trace, TraceEvent::Deferred { rule: c.rule.clone(), behind: s.rule.clone() });
                 continue;
             }
             selected.push(c);
@@ -146,27 +227,33 @@ pub fn fix_loop(
             Some(t) => {
                 for c in &selected {
                     *out.applied.entry(c.rule.clone()).or_default() += 1;
+                    log(trace, TraceEvent::Applied { rule: c.rule.clone(), edits: c.edits.len() });
                 }
                 t
             }
             None => {
                 // Find the culprits one at a time; keep the first good fix.
-                let mut kept = None;
+                let mut kept: Option<(String, &Candidate)> = None;
                 for c in &selected {
+                    if let Some((_, k)) = &kept {
+                        log(trace, TraceEvent::Deferred { rule: c.rule.clone(), behind: k.rule.clone() });
+                        continue;
+                    }
                     match apply_edits(&out.text, &c.edits) {
                         Ok(t) if errors(language, &t) <= base_errors => {
                             *out.applied.entry(c.rule.clone()).or_default() += 1;
-                            kept = Some(t);
-                            break;
+                            log(trace, TraceEvent::Applied { rule: c.rule.clone(), edits: c.edits.len() });
+                            kept = Some((t, c));
                         }
                         _ => {
                             out.refused.insert(c.key(&out.text));
                             out.failed.insert((c.rule.clone(), Failure::VerifyFailed));
+                            log(trace, TraceEvent::Refused { rule: c.rule.clone(), why: Failure::VerifyFailed });
                         }
                     }
                 }
                 match kept {
-                    Some(t) => t,
+                    Some((t, _)) => t,
                     None => continue,
                 }
             }
@@ -175,17 +262,31 @@ pub fn fix_loop(
             for c in &selected {
                 out.refused.insert(c.key(&out.text));
                 out.failed.insert((c.rule.clone(), Failure::Conflict));
+                log(trace, TraceEvent::Refused { rule: c.rule.clone(), why: Failure::Conflict });
             }
-            return out;
+            end = LoopEnd::Conflict;
+            break;
         }
         out.text = next;
     }
-    for c in collect(&out.text, &out.refused) {
-        let key = c.key(&out.text);
-        if !out.refused.contains(&key) {
-            out.refused.insert(key);
-            out.failed.insert((c.rule.clone(), Failure::NoConvergence));
+    if out.passes >= MAX_PASSES && end == LoopEnd::Fixpoint {
+        let mut first = true;
+        for c in collect(&out.text, &out.refused) {
+            let key = c.key(&out.text);
+            if !out.refused.contains(&key) {
+                if first {
+                    first = false;
+                    new_pass(trace);
+                    end = LoopEnd::MaxPasses;
+                }
+                out.refused.insert(key);
+                out.failed.insert((c.rule.clone(), Failure::NoConvergence));
+                log(trace, TraceEvent::Refused { rule: c.rule.clone(), why: Failure::NoConvergence });
+            }
         }
+    }
+    if let Some(t) = trace.as_mut() {
+        t.end = end;
     }
     out
 }

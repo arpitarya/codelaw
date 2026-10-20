@@ -13,8 +13,10 @@
 //!   $REF: { undeclared: { globals: [window], tables: [globals/browser] } }
 //! ```
 
+mod explain;
 mod predicate;
 
+pub use explain::{ClauseResult, Explainer, NodeExplanation};
 pub use predicate::{Predicate, parse_predicates};
 
 use ast_grep_config::{DeserializeEnv, RuleCore, SerializableRuleCore};
@@ -62,7 +64,7 @@ pub struct CompiledMatch {
     predicates: Vec<(String, Predicate)>,
 }
 
-fn captured(n: &SyntaxNode<'_>) -> Captured {
+pub(crate) fn captured(n: &SyntaxNode<'_>) -> Captured {
     let r = n.range();
     Captured { start: r.start, end: r.end, text: n.text().to_string(), kind: n.kind().to_string() }
 }
@@ -122,12 +124,14 @@ fn prune_unknown_kinds(v: &mut serde_json::Value, grammar: Grammar, never: &serd
     }
 }
 
-/// Compile a rule's `match:` block for one grammar. `data` is the rule's
-/// pack's tables, for predicates that name one.
-pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<serde_json::Value>>) -> Result<CompiledMatch, String> {
-    let BlockKind::Match { rule: matcher, constraints, utils, predicates } = &rule.block.kind else {
-        return Err("not a `match:` rule".into());
-    };
+/// An ast-grep rule core from a `match:` object, its constraints and utils,
+/// with kinds the grammar lacks pruned.
+pub(crate) fn rule_core(
+    matcher: &serde_json::Value,
+    constraints: Option<&serde_json::Value>,
+    utils: Option<&serde_json::Value>,
+    grammar: Grammar,
+) -> Result<RuleCore, String> {
     use ast_grep_core::tree_sitter::LanguageExt;
     let root_kind = grammar.ast_grep("").root().kind().to_string();
     let never = serde_json::json!({ "all": [{ "kind": root_kind }, { "not": { "kind": root_kind } }] });
@@ -146,7 +150,16 @@ pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<se
     }
     let serial: SerializableRuleCore =
         serde_json::from_value(serde_json::Value::Object(core)).map_err(|e| format!("invalid `match:`: {e}"))?;
-    let core = serial.get_matcher(DeserializeEnv::new(grammar)).map_err(|e| format!("invalid `match:` for {grammar:?}: {e}"))?;
+    serial.get_matcher(DeserializeEnv::new(grammar)).map_err(|e| format!("invalid `match:` for {grammar:?}: {e}"))
+}
+
+/// Compile a rule's `match:` block for one grammar. `data` is the rule's
+/// pack's tables, for predicates that name one.
+pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<serde_json::Value>>) -> Result<CompiledMatch, String> {
+    let BlockKind::Match { rule: matcher, constraints, utils, predicates } = &rule.block.kind else {
+        return Err("not a `match:` rule".into());
+    };
+    let core = rule_core(matcher, constraints.as_ref(), utils.as_ref(), grammar)?;
     let predicates = match predicates {
         Some(p) => parse_predicates(p, data)?,
         None => Vec::new(),

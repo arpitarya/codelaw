@@ -44,6 +44,9 @@ tree-sitter-md = "=0.5.3"
 
 bit-set = "0.11"
 blake3 = "1.8"
+# Tests only: validates codelaw.schema.json and SARIF output (SR-CONFIG decision 6,
+# SR-CLI-MCP decision 4). MIT OR Apache-2.0.
+boon = "=0.6.1"
 clap = { version = "4.6", features = ["derive"] }
 globset = "0.4.20"
 ignore = "0.4.33"

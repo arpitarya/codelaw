@@ -3,13 +3,21 @@
 //! `codelaw.toml`, then `[tool.codelaw]` in `pyproject.toml`, then the
 //! `"codelaw"` key of `package.json` (decision 1). Validation is strict
 //! (decision 5) and the resolved config is a pure function of its inputs
-//! (decision 9).
+//! (decision 9). Every value is traceable to its source (decision 7).
 
 mod raw;
 mod resolve;
+mod trace;
 
 pub use raw::{RawConfig, RuleSetting};
 pub use resolve::{Config, ConfigFile, DEFAULT_EXCLUDES, Home, Layer, RuleConfig, find_config, load_file};
+pub use trace::{TraceEnv, Traced};
+
+/// `codelaw.schema.json`: every key a config may set, each naming the one
+/// record that defines it (decision 6). Shipped in npm `codelaw` and printed
+/// by `codelaw config --schema`; `tests/schema.rs` holds it to the records
+/// and to what the loader accepts.
+pub const SCHEMA: &str = include_str!("../codelaw.schema.json");
 
 use std::fmt;
 use std::path::PathBuf;

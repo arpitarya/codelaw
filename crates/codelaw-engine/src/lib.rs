@@ -3,15 +3,19 @@
 //! protocol and these functions (decision 2).
 
 mod compile;
+mod debug;
 mod discover;
 mod fix;
 mod lint;
 mod suppress;
+mod timings;
 
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
 pub use fix::{FileFix, FixOptions, FixReport};
+pub use debug::{FileTrace, MatchReport, RuleCard};
 pub use lint::FileResult;
+pub use timings::{PhaseTiming, RuleTiming, TimingReport};
 
 use codelaw_cache::DiskCache;
 use codelaw_config::{Config, ConfigError};
@@ -34,6 +38,8 @@ pub struct EngineOptions {
     pub threads: Option<usize>,
     /// `--no-cache`.
     pub no_cache: bool,
+    /// `--timings`: measure each phase and rule.
+    pub timings: bool,
     /// `CODELAW_CACHE_DIR`.
     pub cache_dir_env: Option<String>,
     /// `CODELAW_SITE_PACKAGES`, set by the Python launcher.
@@ -115,6 +121,7 @@ pub struct Project {
     pub cache: DiskCache,
     pub warnings: Vec<String>,
     pool: rayon::ThreadPool,
+    timings: Option<timings::Timings>,
 }
 
 fn pool(threads: Option<usize>) -> rayon::ThreadPool {
@@ -157,7 +164,12 @@ impl Project {
                 }
             }
         }
+        let compile_started = std::time::Instant::now();
         let (compiled, mut warnings) = compile::compile_all(&rules, &config).map_err(EngineError::Load)?;
+        let timings = options.timings.then(|| timings::Timings::new(compiled.len()));
+        if let Some(t) = &timings {
+            t.add(timings::Phase::Compile, compile_started);
+        }
         warnings.append(&mut config.warnings);
         warnings.extend(rules.warnings.iter().cloned());
         let cache = if options.no_cache || !config.cache_enabled() {
@@ -166,7 +178,7 @@ impl Project {
             DiskCache::new(Some(config.cache_dir(options.cache_dir_env.as_deref())))
         };
         let pool = pool(options.threads);
-        Ok(Project { config, rules, compiled, options, cache, warnings, pool })
+        Ok(Project { config, rules, compiled, options, cache, warnings, pool, timings })
     }
 
     pub fn root(&self) -> &Path {
@@ -175,7 +187,11 @@ impl Project {
 
     /// Check files and folders (the project root when `paths` is empty).
     pub fn check(&mut self, paths: &[PathBuf]) -> Result<CheckReport, EngineError> {
+        let discovering = self.timings.is_some().then(std::time::Instant::now);
         let (files, mut skipped, warnings) = discover::discover(self, paths)?;
+        if let (Some(t), Some(start)) = (&self.timings, discovering) {
+            t.add(timings::Phase::Discover, start);
+        }
         let mut report = CheckReport { warnings: self.warnings.clone(), ..Default::default() };
         report.warnings.extend(warnings);
         let this = &*self;

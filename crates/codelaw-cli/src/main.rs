@@ -2,7 +2,9 @@
 //! `codelaw-engine` and prints the result; no logic lives here
 //! (SR-ARCHITECTURE decision 2, SR-CLI-MCP decision 6).
 
+mod config_cmd;
 mod init;
+mod match_cmd;
 mod rules_cmd;
 mod tree;
 
@@ -36,10 +38,14 @@ enum Command {
     Explain { id: String },
     /// Show the syntax tree the engine sees.
     Tree(tree::TreeArgs),
+    /// Which clause of a rule matched or failed on a file, and what it captured.
+    Match(match_cmd::MatchArgs),
     /// Write a new rule file from the template.
     NewRule(rules_cmd::NewRuleArgs),
     /// Set codelaw up in this repo: config, rule packs, folders.
     Init(init::InitArgs),
+    /// Print the resolved configuration with each value's source, or its JSON Schema.
+    Config(config_cmd::ConfigArgs),
     /// Manage the cache.
     Cache {
         #[command(subcommand)]
@@ -69,6 +75,9 @@ pub struct Common {
     /// Neither read nor write the cache.
     #[arg(long)]
     no_cache: bool,
+    /// Print where the time went: each phase and the slowest rules.
+    #[arg(long)]
+    timings: bool,
 }
 
 #[derive(Args)]
@@ -77,7 +86,7 @@ struct CheckArgs {
     paths: Vec<PathBuf>,
     #[command(flatten)]
     common: Common,
-    /// text, json or agent.
+    /// text, json, sarif or agent.
     #[arg(long, default_value = "text")]
     format: String,
     /// Fail when there are more warnings than this.
@@ -96,6 +105,10 @@ struct FixArgs {
     /// Compute the fixes but write nothing.
     #[arg(long)]
     dry_run: bool,
+    /// Show each pass of the fix loop: what was offered, applied or refused, and why.
+    #[arg(long)]
+    trace: bool,
+    /// text, json, sarif or agent.
     #[arg(long, default_value = "text")]
     format: String,
     #[arg(long)]
@@ -145,6 +158,7 @@ pub fn engine_options(common: &Common) -> Result<EngineOptions, String> {
     }
     o.threads = common.threads;
     o.no_cache = common.no_cache;
+    o.timings = common.timings;
     Ok(o)
 }
 
@@ -157,7 +171,7 @@ pub fn load(paths: &[PathBuf], options: EngineOptions) -> Result<Project, Engine
 }
 
 fn format(s: &str) -> Result<Format, String> {
-    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json or agent)"))
+    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif or agent)"))
 }
 
 fn check(args: CheckArgs) -> ExitCode {
@@ -179,9 +193,11 @@ fn check(args: CheckArgs) -> ExitCode {
     };
     match fmt {
         Format::Text => print!("{}", codelaw_report::check_text(&report, color())),
-        Format::Json => println!("{}", serde_json::to_string_pretty(&codelaw_report::check_json(&report)).expect("json")),
+        Format::Json => println!("{}", serde_json::to_string_pretty(&with_timings(codelaw_report::check_json(&report), &project)).expect("json")),
+        Format::Sarif => println!("{}", serde_json::to_string_pretty(&codelaw_report::check_sarif(&report, &project)).expect("json")),
         Format::Agent => print!("{}", codelaw_report::check_agent(&report)),
     }
+    print_timings(&project, fmt);
     ExitCode::from(codelaw_report::exit_code(&report, args.max_warnings) as u8)
 }
 
@@ -198,6 +214,15 @@ fn fix(args: FixArgs) -> ExitCode {
         Ok(p) => p,
         Err(e) => return fail(e),
     };
+    // The trace runs in memory first, so it sees the files before any write.
+    let trace = if args.trace {
+        match project.trace_fix(&args.paths, &FixOptions { unsafe_fixes: args.unsafe_fixes, dry_run: true }) {
+            Ok(t) => Some(t),
+            Err(e) => return fail(e),
+        }
+    } else {
+        None
+    };
     let report = match project.fix(&args.paths, &FixOptions { unsafe_fixes: args.unsafe_fixes, dry_run: args.dry_run }) {
         Ok(r) => r,
         Err(e) => return fail(e),
@@ -211,10 +236,39 @@ fn fix(args: FixArgs) -> ExitCode {
             }
             print!("{}", codelaw_report::fix_text(&report, color()));
         }
-        Format::Json => println!("{}", serde_json::to_string_pretty(&codelaw_report::fix_json(&report)).expect("json")),
+        Format::Json => {
+            let mut v = with_timings(codelaw_report::fix_json(&report), &project);
+            if let Some(t) = &trace {
+                v["trace"] = codelaw_report::trace_json(t);
+            }
+            println!("{}", serde_json::to_string_pretty(&v).expect("json"));
+        }
+        Format::Sarif => println!("{}", serde_json::to_string_pretty(&codelaw_report::check_sarif(&report.check, &project)).expect("json")),
         Format::Agent => print!("{}", codelaw_report::check_agent(&report.check)),
     }
+    // Text: on stdout after the report; SARIF and agent: on stderr.
+    match (&trace, fmt) {
+        (Some(t), Format::Text) => print!("{}", codelaw_report::trace_text(t)),
+        (Some(t), Format::Sarif | Format::Agent) => eprint!("{}", codelaw_report::trace_text(t)),
+        _ => {}
+    }
+    print_timings(&project, fmt);
     ExitCode::from(codelaw_report::exit_code(&report.check, args.max_warnings) as u8)
+}
+
+/// `--timings` in JSON output: a `timings` field.
+fn with_timings(mut v: serde_json::Value, project: &Project) -> serde_json::Value {
+    if let Some(t) = project.timings() {
+        v["timings"] = codelaw_report::timings_json(&t);
+    }
+    v
+}
+
+/// `--timings` beside the other formats: on stderr, so stdout stays parseable.
+fn print_timings(project: &Project, fmt: Format) {
+    if let Some(t) = project.timings().filter(|_| fmt != Format::Json) {
+        eprint!("{}", codelaw_report::timings_text(&t));
+    }
 }
 
 fn test(args: TestArgs) -> ExitCode {
@@ -277,8 +331,10 @@ fn main() -> ExitCode {
         Command::Rules(a) => rules_cmd::rules(a),
         Command::Explain { id } => rules_cmd::explain(&id),
         Command::Tree(a) => tree::tree(a),
+        Command::Match(a) => match_cmd::run(a),
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
+        Command::Config(a) => config_cmd::run(a),
         Command::Cache { action } => cache(action),
     }
 }

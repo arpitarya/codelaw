@@ -37,6 +37,7 @@ import version as versionmod  # noqa: E402
 ROOT = versionmod.ROOT
 LICENCE = "MIT"
 LICENCE_FILES = ("LICENSE",)
+SCHEMA = ROOT / "crates" / "codelaw-config" / "codelaw.schema.json"  # shipped in npm codelaw (SR-PACKAGES decision 3)
 REPO = "https://github.com/arpitarya/codelaw"
 PACKS = ("js", "html", "css", "python", "data")
 
@@ -211,6 +212,7 @@ def assemble(bins: pathlib.Path, wheels: pathlib.Path, out: pathlib.Path) -> Non
     d = stage / "codelaw"
     shutil.copytree(ROOT / "packaging" / "npm" / "codelaw", d)
     shutil.copyfile(ROOT / "packaging" / "README.md", d / "README.md")
+    shutil.copyfile(SCHEMA, d / "codelaw.schema.json")  # the config schema (SR-CONFIG decision 6)
     copy_licences(d)
     m = base_manifest("codelaw", v, "A linter and formatter whose rules are Markdown files")
     m.update({
@@ -218,8 +220,8 @@ def assemble(bins: pathlib.Path, wheels: pathlib.Path, out: pathlib.Path) -> Non
         "bin": {"codelaw": "bin/codelaw.js"},
         "main": "index.js",
         "types": "index.d.ts",
-        "exports": {".": {"types": "./index.d.ts", "default": "./index.js"}, "./package.json": "./package.json"},
-        "files": ["bin/", "index.js", "index.d.ts", *LICENCE_FILES],
+        "exports": {".": {"types": "./index.d.ts", "default": "./index.js"}, "./package.json": "./package.json", "./codelaw.schema.json": "./codelaw.schema.json"},
+        "files": ["bin/", "index.js", "index.d.ts", "codelaw.schema.json", *LICENCE_FILES],
         "engines": {"node": ">=22"},
         "keywords": ["linter", "formatter", "eslint", "ruff", "prettier"],
         "optionalDependencies": {f"@codelaw/cli-{k}": v for k in TARGETS},
@@ -289,6 +291,8 @@ def check(out: pathlib.Path) -> None:
     want_npm = {"codelaw"} | {f"@codelaw/cli-{k}" for k in TARGETS} | {f"@codelaw/rules-{n}" for n in PACKS}
     if set(npm) != want_npm:
         bad.append(f"npm names: missing {sorted(want_npm - set(npm))}, not allowed {sorted(set(npm) - want_npm)}")
+    if "codelaw" in npm and npm["codelaw"].get("codelaw.schema.json") != SCHEMA.read_bytes():
+        bad.append(f"codelaw: codelaw.schema.json is missing or differs from {SCHEMA.relative_to(ROOT)} (SR-CONFIG decision 6)")
     if "codelaw" in npm:
         opt = json.loads(npm["codelaw"]["package.json"]).get("optionalDependencies", {})
         if opt != {f"@codelaw/cli-{k}": v for k in TARGETS}:

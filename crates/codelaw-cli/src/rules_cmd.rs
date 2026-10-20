@@ -23,6 +23,9 @@ pub struct RulesArgs {
     /// Why a rule is active, and from which source.
     #[arg(long)]
     why: Option<String>,
+    /// text or json (the shape of the npm `rulesFor` and Python `rules_for`).
+    #[arg(long, default_value = "text")]
+    format: String,
 }
 
 #[derive(Subcommand)]
@@ -137,6 +140,11 @@ pub fn rules(args: RulesArgs) -> ExitCode {
         Some(RulesAction::Eject { id }) => return eject(&id),
         None => {}
     }
+    let json = match args.format.as_str() {
+        "text" => false,
+        "json" => true,
+        other => return fail(format!("unknown --format `{other}` (text or json)")),
+    };
     let project = match load(&args.for_path.iter().cloned().collect::<Vec<_>>(), EngineOptions::from_env()) {
         Ok(p) => p,
         Err(e) => return fail(e),
@@ -175,22 +183,15 @@ pub fn rules(args: RulesArgs) -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    for c in &project.compiled {
-        let r = &c.loaded;
-        let sev = match (&layers, &rel, language) {
-            (Some(layers), Some(rel), Some(lang)) => {
-                if !c.applies_to_language(lang) || !c.applies_to_path(rel) {
-                    continue;
-                }
-                severity_of(&project.rules.effective(r, layers))
-            }
-            _ => severity_of(&r.default),
-        };
-        if args.for_path.is_some() && sev == "off" {
-            continue;
-        }
-        let preview = if r.preview_blocked { "  (preview)" } else { "" };
-        println!("{:<40} {:<6} {:<8} {}{preview}", r.rule.id, sev, r.rule.fix.name(), r.source.label());
+    let cards = match project.rules_for(args.for_path.as_deref()) {
+        Ok(c) => c,
+        Err(e) => return fail(e),
+    };
+    if json {
+        let shown = rel.as_deref().or(args.for_path.as_deref().and_then(|p| p.to_str()));
+        println!("{}", serde_json::to_string_pretty(&codelaw_report::rules_json(&cards, shown)).expect("json"));
+    } else {
+        print!("{}", codelaw_report::rules_text(&cards));
     }
     ExitCode::SUCCESS
 }

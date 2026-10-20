@@ -1,6 +1,6 @@
 [package]
 name = "codelaw-report"
-description = "Text, JSON and agent output, and exit codes (SR-CLI-MCP decisions 3 and 4)"
+description = "Text, JSON, SARIF and agent output, and exit codes (SR-CLI-MCP decisions 3 and 4)"
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
@@ -8,5 +8,9 @@ publish.workspace = true
 [dependencies]
 codelaw-core.workspace = true
 codelaw-engine.workspace = true
+codelaw-config.workspace = true
+codelaw-fix.workspace = true
+codelaw-match.workspace = true
+codelaw-rules.workspace = true
 serde.workspace = true
 serde_json.workspace = true

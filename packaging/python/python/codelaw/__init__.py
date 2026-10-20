@@ -16,7 +16,7 @@ from importlib import metadata
 from collections.abc import Sequence
 from typing import Any
 
-__all__ = ["binary_path", "check", "fix"]
+__all__ = ["binary_path", "check", "fix", "rules_for"]
 
 
 def binary_path() -> str:
@@ -118,3 +118,8 @@ def fix(
     if dry_run:
         a.append("--dry-run")
     return _run([*a, "--", *paths])
+
+
+def rules_for(path: str) -> dict[str, Any]:
+    """``codelaw rules --for <path> --format json``; returns the rules that apply to the file."""
+    return _run(["rules", "--for", path, "--format", "json"])

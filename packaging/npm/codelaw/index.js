@@ -79,3 +79,8 @@ export function fix(paths = [], options = {}) {
   if (options.dryRun) a.push("--dry-run");
   return run([...a, "--", ...paths]);
 }
+
+/** `codelaw rules --for <path> --format json`; returns the rules that apply to the file, with their severity. */
+export function rulesFor(path) {
+  return run(["rules", "--for", path, "--format", "json"]);
+}
