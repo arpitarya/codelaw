@@ -1,0 +1,5 @@
+description = "Starter rules for package.json"
+
+[rules]
+"json/package-engines" = "warn"
+"json/package-scripts-sorted" = "warn"

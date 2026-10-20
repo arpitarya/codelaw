@@ -1,0 +1,18 @@
+@codelaw/rules-data / codelaw-rules-data
+
+This pack ships no third-party data tables.
+
+The Markdown rules are reimplementations written for codelaw. Their
+`ported_from:` fields name the markdownlint rules (version 0.42.0,
+https://github.com/DavidAnson/markdownlint — Copyright (c) David Anson,
+released under the MIT License) whose documented behaviour they reproduce; no
+markdownlint code or documentation text is included.
+
+The ordering convention of `json/package-scripts-sorted` follows
+sort-package-json (https://github.com/keithamus/sort-package-json, MIT License);
+no code from it is included.
+
+The JSON, YAML and TOML rules are written from the format specifications
+(RFC 8259, YAML 1.2.2, YAML 1.1, TOML 1.0.0) and the Python packaging
+specifications (PEP 503, PEP 621). No code, text or rule definitions are taken
+from yamllint (GPL-3.0).

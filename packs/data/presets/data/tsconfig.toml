@@ -1,0 +1,4 @@
+description = "Starter rules for tsconfig.json"
+
+[rules]
+"json/tsconfig-strict" = "warn"

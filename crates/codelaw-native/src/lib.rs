@@ -9,6 +9,10 @@
 
 mod accessors;
 mod classes;
+mod data_json;
+mod data_md;
+mod data_toml;
+mod data_yaml;
 mod duplicates;
 mod expressions;
 mod literals;
@@ -100,6 +104,24 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &useless_escape::NoUselessEscape,
     &typescript::NoVar,
     &typescript::PreferConst,
+    &data_json::NoDuplicateKeys,
+    &data_json::PackageEngines,
+    &data_json::PackageScriptsSorted,
+    &data_json::TsconfigStrict,
+    &data_md::CommandsShowOutput,
+    &data_md::DescriptiveLinkText,
+    &data_md::FirstLineHeading,
+    &data_md::HeadingIncrement,
+    &data_md::LinkFragments,
+    &data_md::LinkImageReferenceDefinitions,
+    &data_md::NoBareUrls,
+    &data_md::NoDuplicateHeading,
+    &data_md::NoEmphasisAsHeading,
+    &data_md::NoInlineHtml,
+    &data_md::NoReversedLinks,
+    &data_md::ReferenceLinksImages,
+    &data_md::SingleH1,
+    &data_md::TableColumnCount,
     &node::NoDeprecatedApi,
     &react::ExhaustiveDeps,
     &react::JsxNoDuplicateProps,
@@ -122,12 +144,20 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &stencil::ReservedMemberNames,
     &stencil::StrictMutable,
     &stencil::TagPrefix,
+    &data_toml::DepsSorted,
+    &data_toml::NoDuplicateKeys,
+    &data_toml::PyprojectRequiresPython,
     &typescript::NoDuplicateEnumValues,
     &typescript::NoUnsafeDeclarationMerging,
     &TS_NO_UNUSED_EXPRESSIONS,
     &TS_NO_UNUSED_VARS,
     &typescript::NoWrapperObjectTypes,
     &typescript::PreferAsConst,
+    &data_yaml::DocumentStart,
+    &data_yaml::NoAmbiguousBooleans,
+    &data_yaml::NoAmbiguousNumbers,
+    &data_yaml::NoDuplicateKeys,
+    &data_yaml::NoUndeclaredAlias,
 ];
 
 /// Every registered native rule, sorted by id.

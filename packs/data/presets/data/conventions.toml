@@ -1,0 +1,5 @@
+description = "Opt-in house conventions for YAML and Markdown"
+
+[rules]
+"md/no-inline-html" = "warn"
+"yaml/document-start" = "warn"
