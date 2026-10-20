@@ -1,0 +1,5 @@
+description = "House conventions from codelaw's starter catalogue that no upstream preset covers; opt-in"
+
+[rules]
+"py/no-print" = "warn"
+"py/no-tunable-literals" = "warn"

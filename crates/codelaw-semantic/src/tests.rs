@@ -226,3 +226,22 @@ fn python_shadowing_builtins() {
     assert!(!t.m.shadowed(t.sym("list", 0), false));
     assert!(t.m.shadowed(t.sym("list", 0), true));
 }
+
+#[test]
+fn python_format_spec_fields_are_read() {
+    let t = model(Language::Python, "def f(x):\n    width = 3\n    return f\"{x:{width}d}\"\n");
+    assert!(!t.unused("width"));
+}
+
+#[test]
+fn python_generic_subscripts_are_references() {
+    let t = model(
+        Language::Python,
+        "from typing import Any, List, Optional\n\ndef main(args: Optional[List[str]] = None) -> List[Any]:\n    return []\n\ndef f[T: int](x: T) -> T:\n    return x\n",
+    );
+    assert!(!t.unused("List"));
+    assert!(!t.unused("Any"));
+    assert!(!t.unused("Optional"));
+    assert!(t.m.symbols.iter().all(|s| s.name != "str"), "`str` in `List[str]` is a reference, not a declaration");
+    assert!(t.m.symbols.iter().any(|s| s.name == "T"), "a PEP 695 type parameter is declared");
+}
