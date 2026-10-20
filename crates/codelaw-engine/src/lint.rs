@@ -162,7 +162,9 @@ impl Project {
         if let Some(reason) = self.generated(text) {
             return skip("codelaw/generated", reason);
         }
-        FileResult { diagnostics: lint_text(self, entry, text, &RunMode::check()).diagnostics, skipped: None }
+        let mut diagnostics = lint_text(self, entry, text, &RunMode::check()).diagnostics;
+        diagnostics.extend(crate::format::check_diagnostic(self, entry, text));
+        FileResult { diagnostics, skipped: None }
     }
 
     pub(crate) fn check_file(&self, entry: &FileEntry) -> FileResult {
@@ -178,12 +180,14 @@ impl Project {
             .part(self.rules.fingerprint.0)
             .part(self.config.fingerprint().0)
             .part(codelaw_lang::GRAMMARS_FINGERPRINT)
+            .part(codelaw_format::ENGINES_FINGERPRINT)
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
             .key();
         let mut diagnostics = match self.cache.get::<Vec<Diagnostic>>(&key) {
             Some(d) => d,
             None => {
-                let out = lint_text(self, entry, &file.text, &RunMode::check());
+                let mut out = lint_text(self, entry, &file.text, &RunMode::check());
+                out.diagnostics.extend(crate::format::check_diagnostic(self, entry, &file.text));
                 if !out.diagnostics.iter().any(|d| d.rule == "codelaw/internal-error") {
                     self.cache.put(&key, &out.diagnostics);
                 }

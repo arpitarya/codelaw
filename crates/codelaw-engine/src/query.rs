@@ -143,15 +143,21 @@ impl Project {
     /// Check `code` as if it were the text of `file`, which need not exist
     /// (MCP `check_snippet`): the `check` report of that one file.
     pub fn check_snippet(&self, file: &Path, code: &str) -> Result<crate::CheckReport, EngineError> {
-        let (_, rel, language) = self.locate(file)?;
-        Ok(crate::CheckReport { diagnostics: self.check_source(&rel, language, code), skipped: Vec::new(), files_checked: 1, warnings: self.warnings.clone() })
+        let (abs, rel, language) = self.locate(file)?;
+        let mut diagnostics = self.check_source(&rel, language, code);
+        // `check` reports an unformatted file too (SR-FORMATTER decision 1).
+        diagnostics.extend(crate::format::check_diagnostic(self, &crate::FileEntry { abs, rel, language }, code));
+        diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+        Ok(crate::CheckReport { diagnostics, skipped: Vec::new(), files_checked: 1, warnings: self.warnings.clone() })
     }
 
     /// Fix `code` as if it were the text of `file`, applying `auto` fixes
-    /// (and the format step, once `fix` has one); nothing is written.
+    /// and then the format step, as `fix` does; nothing is written.
     pub fn fix_snippet(&self, file: &Path, code: &str) -> Result<crate::FileFix, EngineError> {
-        let (_, rel, language) = self.locate(file)?;
-        Ok(self.fix_source(&rel, language, code, false))
+        let (abs, rel, language) = self.locate(file)?;
+        let entry = crate::FileEntry { abs, rel, language };
+        let options = crate::FixOptions { unsafe_fixes: false, dry_run: true };
+        Ok(crate::fix::fix_text(self, &entry, code, &options, self.formats(&entry)))
     }
 }
 

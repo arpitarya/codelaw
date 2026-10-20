@@ -48,6 +48,23 @@ pub const ENGINE_RULES: &[EngineRule] = &[
         steps: &["Report the rule and file to the rule's maintainer; the rest of the run is unaffected."],
     },
     EngineRule {
+        id: "format/unformatted",
+        title: "File is not formatted",
+        severity: Severity::Warn,
+        fix: FixClass::Auto,
+        steps: &["Run `codelaw format` (or `codelaw fix`) on the file."],
+    },
+    EngineRule {
+        id: "format/failed",
+        title: "The formatter left the file as it was",
+        severity: Severity::Info,
+        fix: FixClass::Manual,
+        steps: &[
+            "If the file does not parse, correct the syntax error and run `codelaw format` again.",
+            "Otherwise the formatted text failed verification; add the file to `[format] exclude` and report it with the file attached.",
+        ],
+    },
+    EngineRule {
         id: "codelaw/file-changed-during-run",
         title: "File changed on disk during the run, so the fix was not written",
         severity: Severity::Warn,

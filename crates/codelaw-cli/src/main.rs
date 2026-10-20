@@ -2,6 +2,7 @@
 //! `codelaw-engine` and prints the result; no logic lives here
 //! (SR-ARCHITECTURE decision 2, SR-CLI-MCP decision 6).
 
+mod format_cmd;
 mod init;
 mod rules_cmd;
 mod tree;
@@ -28,6 +29,8 @@ enum Command {
     Check(CheckArgs),
     /// Apply `auto` fixes (and `suggest` with --unsafe), then report what is left.
     Fix(FixArgs),
+    /// Format files in place, or with --check/--diff report what would change.
+    Format(format_cmd::FormatArgs),
     /// Run rules against their own examples and cases.
     Test(TestArgs),
     /// List rules, or show which apply to a file and why.
@@ -295,6 +298,7 @@ fn main() -> ExitCode {
     match cli.command {
         Command::Check(a) => check(a),
         Command::Fix(a) => fix(a),
+        Command::Format(a) => format_cmd::format(a),
         Command::Test(a) => test(a),
         Command::Rules(a) => rules_cmd::rules(a),
         Command::Explain { id, format } => rules_cmd::explain(&id, &format),

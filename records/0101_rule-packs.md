@@ -10,7 +10,7 @@ feature: "predefined rules and rule packs"
 owns:
   - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-20T20:30:00Z
+timestamp: 2026-10-21T12:00:00Z
 content_sha: ""
 ---
 
@@ -31,7 +31,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 
 | Package (npm · PyPI) | Languages | Presets |
 |---|---|---|
-| `codelaw` · `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics and `graph/no-deprecated-usage` | — |
+| `codelaw` · `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics, the formatter's `format/unformatted` and `format/failed`, and `graph/no-deprecated-usage` | — |
 | `@codelaw/rules-js` · `codelaw-rules-js` | JS, JSX, TS, TSX, incl. Node, React, Stencil | `js/recommended`, `ts/recommended`, `react/recommended`, `node/recommended`, `stencil/recommended`, `js/conventions` · *later:* `js/strict` |
 | `@codelaw/rules-html` · `codelaw-rules-html` | HTML, incl. HTML embedded in Markdown and templates | `html/recommended`, `html/a11y`, `html/document`, `html/conventions` |
 | `@codelaw/rules-css` · `codelaw-rules-css` | CSS | `css/recommended`, `css/standard`, `css/conventions` |
@@ -77,6 +77,7 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
 
 1. **The engine carries no rules except its own:**
    - the `codelaw/*` meta diagnostics, such as `codelaw/not-utf8`, `codelaw/internal-error` and `codelaw/no-rules` ([SR-ARCHITECTURE](0108_architecture.md));
+   - `format/unformatted` and `format/failed`, the formatter's findings in `check` ([SR-FORMATTER](0105_formatter.md) decisions 1 and 4);
    - `graph/no-deprecated-usage`, which reads the consumer's deprecations registry and belongs to no language ([SR-BASELINE](0104_baseline-and-deprecations.md)).
 
    Every other rule codelaw publishes lives in a pack.

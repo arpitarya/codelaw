@@ -212,3 +212,65 @@ fn l5_no_model_in_the_dependency_graph() {
         assert!(!banned.iter().any(|b| name == *b || name.starts_with(&format!("{b}-")) || name.ends_with(&format!("-{b}"))), "model dependency `{name}` (L5)");
     }
 }
+
+/// One unformatted file per L3 language, for the L7 check.
+const MESSY: &[(&str, &str, &str)] = &[
+    ("javascript", "m.js", "const a = {b:1}\n"),
+    ("typescript", "m.ts", "let a:number=1\n"),
+    ("python", "m.py", "x = {  'a':1 }\n"),
+    ("json", "m.json", "{\"a\":1}\n"),
+    ("yaml", "m.yaml", "a:   1\n"),
+    ("toml", "m.toml", "a=1\n"),
+    ("markdown", "m.md", "# T\n* a\n"),
+    ("css", "m.css", "a{color:red}\n"),
+    ("html", "m.html", "<div><p>x</p>\n\n\n</div>\n"),
+];
+
+/// SR-LAW-7 §How L7 is enforced: over the L3 fixture matrix, every
+/// language has a lint rule and a formatter that round-trips its fixtures.
+#[test]
+fn l7_every_language_has_a_lint_rule_and_a_formatter_that_round_trips_its_fixtures() {
+    assert_eq!(MESSY.len(), LANGUAGES.len());
+    for lang in LANGUAGES {
+        let repo = build_repo(&format!("l7-{lang}"), &[lang]);
+        // A lint rule: the language's fixture rule fires on its files.
+        let v = check_json(&repo, &[]);
+        let rules: Vec<&str> = v["diagnostics"].as_array().unwrap().iter().map(|d| d["rule"].as_str().unwrap()).collect();
+        assert!(rules.iter().any(|r| r.starts_with("fixture/")), "{lang}: no lint rule fires: {rules:?}");
+        // A formatter that round-trips the fixtures: they are formatted,
+        // and formatting them changes no byte.
+        assert!(!rules.iter().any(|r| r.starts_with("format/")), "{lang}: the fixtures are not formatted: {v}");
+        let before = files_under(&repo, &repo);
+        let (code, out, err) = codelaw(&repo, &["format", "--check", "--no-cache"]);
+        assert_eq!(code, 0, "{lang}: format --check\n{out}{err}");
+        let (code, out, err) = codelaw(&repo, &["format", "--no-cache"]);
+        assert_eq!(code, 0, "{lang}: format\n{out}{err}");
+        assert_eq!(files_under(&repo, &repo), before, "{lang}: formatting the fixtures changed them");
+        // And it formats: an unformatted file is reported, rewritten, then clean.
+        let (_, file, text) = MESSY.iter().find(|(l, _, _)| l == lang).unwrap();
+        fs::write(repo.join(file), text).unwrap();
+        let (code, out, _) = codelaw(&repo, &["format", "--check", "--no-cache"]);
+        assert_eq!((code, out.trim()), (1, format!("would format {file}").as_str()), "{lang}");
+        let v = check_json(&repo, &[]);
+        assert!(v["diagnostics"].as_array().unwrap().iter().any(|d| d["rule"] == "format/unformatted" && d["file"] == *file), "{lang}: check misses {file}");
+        let (code, _, err) = codelaw(&repo, &["format", "--no-cache"]);
+        assert_eq!(code, 0, "{lang}: {err}");
+        assert_ne!(fs::read_to_string(repo.join(file)).unwrap(), *text, "{lang}: {file} was not formatted");
+        let (code, out, err) = codelaw(&repo, &["format", "--check", "--no-cache"]);
+        assert_eq!(code, 0, "{lang}: not idempotent\n{out}{err}");
+        let _ = fs::remove_dir_all(&repo);
+    }
+}
+
+/// SR-FORMATTER decision 4: a file the formatter cannot handle is reported
+/// and left as it was.
+#[test]
+fn l7_a_format_that_fails_is_reported_and_the_file_kept() {
+    let repo = temp("l7-fail");
+    fs::write(repo.join("bad.js"), "const = ;\n").unwrap();
+    let (code, out, _) = codelaw(&repo, &["format", "--no-cache"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(out.contains("format/failed"), "{out}");
+    assert_eq!(fs::read_to_string(repo.join("bad.js")).unwrap(), "const = ;\n");
+    let _ = fs::remove_dir_all(&repo);
+}

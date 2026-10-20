@@ -1,0 +1,11 @@
+# codelaw's MIT stand-in for the `option-ext` crate (MPL-2.0), which Biome
+# reaches through `directories` -> `dirs-sys`. L2 refuses MPL transitively,
+# so the root manifest patches it with this (SR-FORMATTER decision 2).
+# It provides only what `dirs-sys` calls.
+[package]
+name = "option-ext"
+version = "0.2.0"
+edition = "2024"
+license = "MIT"
+publish = false
+description = "codelaw's MIT stand-in for option-ext: Option::contains as an extension trait"

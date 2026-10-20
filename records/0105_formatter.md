@@ -7,9 +7,11 @@ description: "codelaw formats all nine languages with embedded, permissively lic
 status: accepted
 date: 2026-10-18
 feature: "formatting"
-owns: []
+owns:
+  - crates/codelaw-format
+  - scripts/format-parity.py
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-18T17:00:00Z
+timestamp: 2026-10-21T12:00:00Z
 content_sha: ""
 ---
 
@@ -65,14 +67,14 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    |---|---|---|---|---|
    | JS · JSX · TS · TSX | Biome formatter (`biome_js_formatter`) | Prettier-compatible (Biome tracks its Prettier compatibility in a published report) | MIT / Apache-2.0 | git dependency pinned to a Biome release tag; the crates.io copies are stale |
    | JSON · JSONC | Biome formatter (`biome_json_formatter`) | Prettier-compatible | MIT / Apache-2.0 | same pin |
-   | Python | Ruff formatter (`ruff_python_formatter`) | Black-compatible (> 99.9 % identical lines on Django and Zulip, per Ruff) | MIT | git dependency pinned to a Ruff release tag, the way `dprint-plugin-ruff` already does |
+   | Python | Ruff formatter (`ruff_python_formatter`) | Black-compatible (> 99.9 % identical lines on Django and Zulip, per Ruff) | MIT | crates.io, pinned exactly (`=0.0.18`, the crates Ruff 0.17.1 publishes) |
    | YAML | `pretty_yaml` | configurable, close to Prettier's YAML style | MIT | crates.io |
    | TOML | `taplo` formatter | taplo style | MIT | crates.io |
    | Markdown | `dprint-plugin-markdown` | CommonMark/GFM, dprint style | MIT | crates.io |
    | CSS | Biome formatter (`biome_css_formatter`) | Prettier-compatible; standard CSS only (no SCSS/Less) | MIT / Apache-2.0 | same Biome pin |
    | HTML | `markup_fmt` | Prettier-like; embedded `<script>` and `<style>` are handed to the JS and CSS engines through its callback | MIT | crates.io |
 
-   Every engine must pass [L2](0004_LAW-2-foss-dependencies.md); the licence check is `W-20`.
+   Every engine must pass [L2](0004_LAW-2-foss-dependencies.md); `crates/codelaw-cli/tests/licences.rs` checks every crate in `Cargo.lock`, the git-pinned Biome ones included. One transitive crate failed L2: Biome reaches `option-ext` (MPL-2.0) through `directories`. The workspace's `[patch.crates-io]` replaces it with `crates/codelaw-format/shims/option-ext`, an MIT re-implementation of the one trait method `dirs-sys` uses; the licence check sees the shim, not the original. The engine versions are `codelaw_format::ENGINES_FINGERPRINT`, part of every cache key a format result enters (decision 7).
 
 3. **Layout belongs to the formatter, and the rule loader enforces it.** A lint rule whose fix only changes layout is refused. `codelaw test` checks this deterministically: if `format(Don't) == format(Do)`, the rule is a layout rule and fails. This is the formatter-versus-linter fight that ESLint's stylistic rules caused, ruled out by construction.
 
@@ -83,6 +85,9 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    4. Verify: the file still parses, a second `format` changes nothing, and no lint rule fires that didn't fire before formatting.
 
    If verification fails, the file is left untouched and the failure is reported ([L4](0006_LAW-4-every-rule-has-a-fix.md) decision 5).
+   - **What verification checks:** the formatted text parses with the engine's own parser; a second format changes nothing; for JSON, YAML and TOML it holds the same data as the original; and no lint rule fires on it that did not fire before.
+   - **How a failure is reported:** `format/failed` (`info`, `manual`), with note `format-syntax` (the input does not parse), `format-engine` or `format-verify-failed`. In `fix`, a failed format keeps the lint fixes and drops only the format.
+   - **Where the step runs:** `fix` on disk and MCP `format_snippet` format; `fix --dry-run` does too. The rule tester and the LSP's "fix all" (`fix_source`) do not: an editor formats through its own formatting request.
 
 5. **One config, Prettier/Black-shaped keys.**
    ```toml
@@ -105,7 +110,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    [format.markdown]
    format_code_blocks = true       # fenced js/ts/py/json/yaml/toml blocks use their own formatter
    ```
-   - **Defaults:** Prettier's for JS/TS/JSON/CSS/HTML/YAML/Markdown; Black/Ruff's for Python.
+   - **Defaults:** Prettier's for JS/TS/JSON/CSS/HTML/YAML/Markdown; Black/Ruff's for Python. One exception: `end_of_line` unset keeps each file's dominant line ending, because only a set `end_of_line` may change one ([SR-ARCHITECTURE](0108_architecture.md) decision 9).
    - **`.editorconfig` is always read** as the base layer; `codelaw.toml` wins over it.
    - **Migrating from existing configs:** `codelaw format --import-config` reads `.prettierrc*`, `[tool.ruff.format]` and `[tool.black]` once and writes the equivalent `[format]` keys. From then on, `codelaw.toml` is the only source.
 
@@ -120,16 +125,33 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    - Already-formatted files are skipped using the content-hash cache.
 
 8. **Every surface.**
-   - **LSP:** document and range formatting, and format-on-save.
+   - **LSP:** document and range formatting, and format-on-save. Document formatting is built; range formatting is not (`W-23`).
    - **Agent hook ([SR-AGENT-SURFACES](0102_agent-surfaces.md)):** runs `fix` then `format` on the edited file, so an agent never hand-formats and never fights the formatter.
-   - **MCP:** a `format_snippet` tool.
+   - **MCP:** a `format_snippet` tool: the bytes `fix <path>` would write, format step included.
    - **Generated agent instructions** say "don't format by hand; codelaw formats on save".
+
+### What is built
+
+Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. **Not built yet, `W-23`:** decision 3 (the layout-rule refusal in `codelaw test`); decision 5's `.editorconfig` layer and `--import-config`; decision 6's markers, of which only Ruff's own `# fmt: off`/`# fmt: on`/`# fmt: skip` work today; decision 8's range formatting. The agent hook is `W-10`'s.
 
 ### Consequences
 
 - **Two engines are git-pinned with unstable APIs** (Biome, Ruff). Upgrades are deliberate, gated by a snapshot corpus, and a breaking upstream change can stall them. `dprint-plugin-ruff` shows the approach is sustainable.
 - **Git dependencies mean the engine crate can't be published to crates.io.** That doesn't matter: [L6](0008_LAW-6-python-and-node-packages.md) ships through npm and PyPI.
-- **"Prettier-compatible" isn't "identical"** on every edge case for JS, and YAML and Markdown follow their engines' styles. The measured gap is `W-07`.
+- **"Prettier-compatible" isn't "identical"** on every edge case for JS, and YAML and Markdown follow their engines' styles. Measured 2026-10-21 by `scripts/format-parity.py` against Prettier 3.6.2 and Black 25.9.0, on 1,688 files: every fenced example in `packs/` plus the repo's own tracked files, at commit `67beb69`. All options were defaults. A file either tool cannot parse is skipped.
+
+  | language | vs | files compared | identical files | identical lines | skipped |
+  |---|---|---|---|---|---|
+  | JS · JSX | Prettier | 382 | 100.0 % | 100.0 % | 6 |
+  | TS · TSX | Prettier | 424 | 100.0 % | 100.0 % | 6 |
+  | JSON | Prettier | 16 | 100.0 % | 100.0 % | 0 |
+  | CSS | Prettier | 189 | 97.4 % | 99.4 % | 10 |
+  | YAML | Prettier | 21 | 95.2 % | 99.2 % | 5 |
+  | Markdown | Prettier | 88 | 42.0 % | 96.7 % | 0 |
+  | HTML | Prettier | 182 | 62.1 % | 68.4 % | 13 |
+  | Python | Black | 346 | 97.7 % | 99.6 % | 0 |
+
+  `markup_fmt` (HTML) is the one engine far from Prettier. Markdown differs in a few lines of most files. TOML has no Prettier or Black formatter to compare against.
 - **The binary grows** by the size of six formatter engines. Accepted, because each package must be complete ([L6](0008_LAW-6-python-and-node-packages.md) decision 3).
 
 ### Alternatives considered
@@ -151,7 +173,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 **Reopen this decision if:** an embedded engine's licence stops being permissive, or measured Prettier/Black compatibility on the corpus falls below what teams accept (`W-07`).
 
-**How to check it:** `W-20`'s licence check over the engine's lockfile, and the `W-07` corpus report, once both exist.
+**How to check it:** `crates/codelaw-cli/tests/licences.rs` over `Cargo.lock`, and `python3 scripts/format-parity.py --binary <codelaw>`.
 
 ---
 

@@ -22,7 +22,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-20T20:30:00Z
+timestamp: 2026-10-21T12:00:00Z
 content_sha: ""
 ---
 
@@ -98,6 +98,8 @@ The decider asked for a record of what goes into which package, under the naming
    | surfaces | `codelaw-mcp` | the MCP server: a hand-written JSON-RPC loop over stdio ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 5) |
    | surfaces | `codelaw-lsp` | the language server ([SR-EDITOR](0114_editor.md)) |
    | surfaces | `codelaw-agents` | hook mode, `sync-agents`, and the skill sources from `agents/skills/` ([SR-AGENT-SURFACES](0102_agent-surfaces.md)) |
+
+   The workspace's `Cargo.toml` may carry a `[patch.crates-io]` only to replace a transitive crate that fails [L2](0004_LAW-2-foss-dependencies.md) with a permissive stand-in kept under `crates/`. The record that takes in the dependency that pulls it names it. Today there is one: `option-ext`, for Biome ([SR-FORMATTER](0105_formatter.md) decision 2).
 
 2. **The binary** links every crate. A single `codelaw` executable serves the CLI, `codelaw lsp` and `codelaw mcp`, with no second executable.
 3. **npm `codelaw`** contains:

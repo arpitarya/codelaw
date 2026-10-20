@@ -151,7 +151,11 @@ fn apply(text: &str, edits: &[Value]) -> String {
 
 /// Multi-byte (é, 中) and astral (𝄞, 😀) characters before the finding,
 /// on the same line and on earlier lines.
-const ASTRAL: &str = "const s = \"é𝄞😀\"; // 中文\nif (s == \"𝄞\") { go(\"😀\" == t); }\n";
+/// Formatted, so the only findings are the rule's.
+const ASTRAL: &str = "const s = \"é𝄞😀\"; // 中文\nif (s == \"𝄞\") go(\"😀\" == t);\n";
+
+/// The same, unformatted: the block is on one line.
+const UNFORMATTED: &str = "const s = \"é𝄞😀\"; // 中文\nif (s == \"𝄞\") { go(\"😀\" == t); }\n";
 
 #[test]
 fn diagnostics_use_utf16_positions_on_astral_text() {
@@ -211,6 +215,36 @@ fn fixes_are_workspace_edits_and_nothing_is_written() {
     assert_eq!(fixed.matches("===").count(), 2);
 
     // The editor applies the edit; the server wrote nothing.
+    assert_eq!(snapshot(&root), before, "the language server wrote to disk");
+    c.shutdown();
+    let _ = fs::remove_dir_all(&root);
+}
+
+#[test]
+fn formatting_is_one_edit_to_what_format_writes_and_nothing_is_written() {
+    let root = repo("format");
+    let path = root.join("src/astral.js");
+    fs::write(&path, UNFORMATTED).unwrap();
+    let before = snapshot(&root);
+    let u = uri(&path);
+    let mut c = Client::start(&root);
+    let published = c.open(&u, "javascript", UNFORMATTED);
+    assert!(published["diagnostics"].as_array().unwrap().iter().any(|d| d["code"] == "format/unformatted"), "{published}");
+
+    let edits = c.request("textDocument/formatting", json!({ "textDocument": { "uri": u }, "options": { "tabSize": 2, "insertSpaces": true } }));
+    let edits = edits.as_array().unwrap();
+    assert_eq!(edits.len(), 1, "{edits:?}");
+    let formatted = apply(UNFORMATTED, edits);
+    let project = Project::load(&root, EngineOptions { no_cache: true, ..Default::default() }).unwrap();
+    let entry = project.entry_for(&path).unwrap();
+    assert_eq!(formatted, project.format_source(&entry.rel, entry.language, UNFORMATTED).unwrap());
+    assert_ne!(formatted, UNFORMATTED);
+
+    // Formatted text formats to no edit at all.
+    c.notify("textDocument/didChange", json!({ "textDocument": { "uri": u, "version": 2 }, "contentChanges": [{ "text": formatted }] }));
+    let again = c.request("textDocument/formatting", json!({ "textDocument": { "uri": u }, "options": { "tabSize": 2, "insertSpaces": true } }));
+    assert_eq!(again, json!([]));
+
     assert_eq!(snapshot(&root), before, "the language server wrote to disk");
     c.shutdown();
     let _ = fs::remove_dir_all(&root);

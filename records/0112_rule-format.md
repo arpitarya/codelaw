@@ -10,7 +10,7 @@ feature: "the rule file"
 owns:
   - crates/codelaw-rules
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-19T14:51:23Z
+timestamp: 2026-10-21T12:00:00Z
 content_sha: ""
 ---
 
@@ -99,7 +99,7 @@ The decider asked for a record of the rule-file template. The format so far exis
 
 ### Decision
 
-1. **Path and id.** The file is `<rules_dir>/<namespace>/<name>.md`, and its `id` must equal `<namespace>/<name>`. First-party namespaces (`js`, `ts`, `react`, `node`, `stencil`, `py`, `json`, `yaml`, `toml`, `md`, `data`, `css`, `html`, `graph`, `format`, `codelaw`) are reserved for the first-party rule packs and the engine ([SR-RULE-PACKS](0101_rule-packs.md)).
+1. **Path and id.** The file is `<rules_dir>/<namespace>/<name>.md`, and its `id` must equal `<namespace>/<name>`. First-party namespaces (`js`, `ts`, `react`, `node`, `stencil`, `py`, `json`, `yaml`, `toml`, `md`, `data`, `css`, `html`, `graph`, `format`, `codelaw`) are reserved for the first-party rule packs and the engine ([SR-RULE-PACKS](0101_rule-packs.md)). The engine's own rules have no rule file; `crates/codelaw-rules`' `ENGINE_RULES` table gives each one's title, severity, fix class and steps, so `explain` and `--rule` know them. `format/` holds two: `format/unformatted` (`warn`, `auto`) and `format/failed` (`info`, `manual`) ([SR-FORMATTER](0105_formatter.md) decisions 1 and 4).
 2. **Frontmatter schema** is §1's template, every field typed.
    - **Required:** `id`, `title`, `languages`, `fix`, plus `fix_reason` unless `fix: auto` ([L4](0006_LAW-4-every-rule-has-a-fix.md)).
    - **`ported_from:`** (optional) lists `<tool>/<rule>` ids, for example `[eslint/no-dupe-keys, ruff/F601]`: the source rules this one reimplements ([SR-RULE-PACKS](0101_rule-packs.md) decision 7). `codelaw-migrate` maps existing configs through it ([SR-AGENT-SURFACES](0102_agent-surfaces.md)).

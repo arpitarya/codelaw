@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "linter and formatter, always both"
 owns: []
 laws: [L0, L3, L7]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-21T12:00:00Z
 content_sha: ""
 ---
 
@@ -64,13 +64,13 @@ The decider ruled that codelaw is both a linter and a formatter. Until now that 
 #### How L7 is enforced
 
 - The [L3](0005_LAW-3-languages.md) fixture matrix also asserts that every language has at least one lint rule and a formatter that round-trips its fixtures.
-- The fixture-matrix check is not built yet: `W-07`.
+- Built 2026-10-21 (`W-07`): `crates/codelaw-cli/tests/laws.rs` `l7_every_language_has_a_lint_rule_and_a_formatter_that_round_trips_its_fixtures`. For each L3 language it checks four things: a fixture rule fires; `format --check` passes on the fixtures and `format` changes no byte; an unformatted file is reported by `check` and `format --check`, then rewritten; the result is idempotent. `l7_a_format_that_fails_is_reported_and_the_file_kept` covers SR-FORMATTER decision 4.
 - **The release gate:** `scripts/law-gate.py` refuses to release a binary that has no `format` command, in `publish.yml` and before the one-time hand publish ([SR-PACKAGES](0107_packages.md) decision 11). Added 2026-10-20, after a release was put to the decider while the formatter did not exist.
 
 ### Consequences
 
 - **Every new language costs two integrations** (lint and format) before it can join L3.
-- **Only the release gate checks this law** until W-07 adds the fixture matrix; a linter-only binary can be built and tested, never released.
+- **Two checks hold this law:** the fixture matrix in `cargo test`, and the release gate. A linter-only binary fails the first and can never be released past the second.
 
 ### Alternatives considered
 

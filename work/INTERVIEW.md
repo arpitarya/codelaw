@@ -38,9 +38,10 @@ platforms, nothing published): `ci.yml` builds and checks all 27
 packages on every push, `publish.yml` uploads exactly that set by OIDC. The
 licence is MIT (Arpit, 2026-10-20; it superseded `MIT OR Apache-2.0`). **W-06**
 added the public docs — `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`,
-`SECURITY.md`, `CODE_OF_CONDUCT.md`. Not built: the formatter
-(so L7 is unmet), graph, baseline, adapters, MCP, LSP, agent surfaces —
-open items W-07–W-21 since 2026-10-20 (the backlog keeps only B-006, B-007).
+`SECURITY.md`, `CODE_OF_CONDUCT.md`. **The engine is complete since
+2026-10-21:** the formatter (W-07), MCP (W-08) and LSP (W-09) have landed, and
+`law-gate.py` lists nothing. Not built: graph, baseline, adapters, agent
+surfaces, the rest of SR-FORMATTER (W-23) — open items W-10–W-23.
 `cargo test --workspace` is green (204 tests; every pack's `codelaw test`
 green). **Clippy is not clean:** CI's clippy step can't fail (no `pipefail`)
 and hid three warnings — W-17, W-18. **A release is refused by
@@ -64,8 +65,18 @@ base before the final merges: rebase or merge `main` in, build, finish,
 and rewrite the WIP commit so the SR guard passes before it lands. W-15 and
 W-19 were not started.
 
-**Next for an agent:** W-07 (formatter — the last release blocker, then
-W-09's formatting), from `wip/W-07-formatter`.
+**2026-10-21, local session:** W-07 landed from `wip/W-07-formatter`, and
+W-09 with it (LSP document formatting). `codelaw format`, the format step of
+`fix`, and `format/unformatted` in `check`, the editor and MCP's snippets all
+use six embedded engines behind one verifier. Parity against Prettier and
+Black is recorded in SR-FORMATTER: JS/TS/JSON are 100 % identical, HTML only
+62 %. What W-07's DoD left of SR-FORMATTER is W-23. **One reconciliation:**
+`end_of_line` unset keeps each file's line ending (SR-ARCHITECTURE decision
+9); the WIP had rewritten CRLF to LF, which matches Prettier but breaks that
+record.
+
+**Next for an agent:** W-10 (agent surfaces) from
+`wip/W-08-mcp-W-10-agent-surfaces`, the W-10 commit only.
 
 **Open questions for the decider (from 2026-10-20 agents):** a
 `rustfmt.toml` and a one-time format of the tree (the code isn't
@@ -77,9 +88,9 @@ own folder as the project root.
 
 **W-04** (🔴): the pipeline is built, timed and merged; the first release waits on the
 decider's one-time registry setup (`RELEASING.md` §One time, steps 1, 4, 5 —
-the parts that publish nothing) and on W-07 and W-09. The ruling to publish is
-not asked until they land: L7 and L6 decision 3 forbid an engine without its
-formatter, MCP server and LSP.
+the parts that publish nothing). W-07 and W-09 landed 2026-10-21, so the
+engine L7 and L6 decision 3 require is complete; the ruling to publish is the
+decider's.
 
 **W-06** (🔴, filed as W-04): the decider places the five `.github/` templates. The
 README's counts (401 rules, 3,060 checks, fix classes) and roadmap must move

@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-cli
   - crates/codelaw-mcp
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-20T18:00:00Z
+timestamp: 2026-10-21T12:00:00Z
 content_sha: ""
 ---
 
@@ -80,6 +80,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - `--unsafe` (apply `suggest` fixes), `--dry-run`;
    - `--threads N`, `--no-cache`, `--timings`, `--max-warnings N`, `--prefer-warm` (use a running `lsp`/`mcp`/`daemon` of the same version; [SR-ARCHITECTURE](0108_architecture.md) decision 21).
 3. **Exit codes:** `0` no errors · `1` errors remain · `2` config, rule or usage error.
+   - **`format [paths] [--check] [--diff]`:** `0` every file is formatted, or was just formatted. `1` with `--check` or `--diff` when a file is not formatted, or when any file could not be formatted or written (`format/failed`, `codelaw/write-failed`). `2` as above. `--check` prints `would format <file>` per file; `--diff` prints a unified diff; neither writes.
 4. **Output formats:**
    - `text`: grouped, coloured on a TTY, plain otherwise.
    - `json`: one versioned object (`schema_version`, `codelaw_version`, `summary`, `diagnostics[]` with rule, severity, file, range, message, fix class and edits or steps, `skipped[]` for files not checked and why, and `warnings[]`). A diagnostic's range carries line, column and byte offset; an edit's range is byte offsets. `fix` adds `fixed[]`: each changed file, the fixes applied per rule, and whether it was written. Text output prints a file as `fixed` only once the disk holds the fixed text (`not written` otherwise, `would fix` with `--dry-run`), and the summary counts only those.
@@ -104,7 +105,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
      | `check_snippet {path, code}` | `check <path> --format json` on a file holding `code` |
      | `check_paths {paths, rule, lang}` | `check [paths] [--rule] [--lang] --format json` |
      | `fix_paths {paths, unsafe, dry_run, rule, lang}` | `fix … --format json` |
-     | `format_snippet {path, code}` | the bytes `fix <path>` writes, without writing them; the format step joins when `fix` has one ([SR-FORMATTER](0105_formatter.md), W-07) |
+     | `format_snippet {path, code}` | the bytes `fix <path>` writes, format step included, without writing them ([SR-FORMATTER](0105_formatter.md) decision 4) |
      | `dump_tree {path \| code+lang, line}` | `tree … --format json` |
      | `trace_rule {id, path}` | `rules --why <id> --for <path> --format json`; `match --explain`'s matcher-level trace (W-16) is to return through it |
 

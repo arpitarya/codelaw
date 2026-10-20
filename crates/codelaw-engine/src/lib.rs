@@ -5,6 +5,7 @@
 mod compile;
 mod discover;
 mod fix;
+mod format;
 mod lint;
 mod query;
 mod suppress;
@@ -12,6 +13,7 @@ mod suppress;
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
 pub use fix::{FileFix, FixOptions, FixReport};
+pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
 pub use lint::FileResult;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
 
@@ -122,6 +124,8 @@ pub struct Project {
     pub options: EngineOptions,
     pub cache: DiskCache,
     pub warnings: Vec<String>,
+    /// `[format]` (SR-FORMATTER decision 5).
+    pub formatting: Formatting,
     pool: rayon::ThreadPool,
 }
 
@@ -173,8 +177,9 @@ impl Project {
         } else {
             DiskCache::new(Some(config.cache_dir(options.cache_dir_env.as_deref())))
         };
+        let formatting = Formatting::from_config(&config)?;
         let pool = pool(options.threads);
-        Ok(Project { config, rules, compiled, options, cache, warnings, pool })
+        Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool })
     }
 
     pub fn root(&self) -> &Path {
@@ -222,7 +227,7 @@ impl Project {
     /// Fix one file's text in memory; nothing is written.
     pub fn fix_source(&self, rel_path: &str, language: Language, source: &str, unsafe_fixes: bool) -> FileFix {
         let entry = FileEntry { abs: self.config.root_dir.join(rel_path), rel: rel_path.to_owned(), language };
-        fix::fix_text(self, &entry, source, &FixOptions { unsafe_fixes, dry_run: true })
+        fix::fix_text(self, &entry, source, &FixOptions { unsafe_fixes, dry_run: true }, false)
     }
 
     /// Fix files and folders and write the results (SR-ARCHITECTURE

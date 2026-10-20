@@ -13,7 +13,7 @@
 //! Not yet here, and why: incremental re-parse (W-15; every change
 //! re-checks the whole document), project rules and workspace diagnostics
 //! (the graph is not built), pull diagnostics, the warm-process socket
-//! (SR-ARCHITECTURE decision 21), and formatting ([`format`], W-07).
+//! (SR-ARCHITECTURE decision 21).
 
 pub mod format;
 pub mod position;
@@ -53,7 +53,7 @@ pub fn run_stdio() -> Result<(), Error> {
     Ok(())
 }
 
-/// What the server offers. Formatting only once the formatter exists.
+/// What the server offers.
 pub fn capabilities() -> ServerCapabilities {
     ServerCapabilities {
         position_encoding: Some(PositionEncodingKind::UTF16),
@@ -379,7 +379,7 @@ impl<'c> Server<'c> {
         Some(Hover { contents: HoverContents::Markup(MarkupContent { kind: MarkupKind::Markdown, value }), range: None })
     }
 
-    /// The whole document, formatted, as one edit (W-07 wires the engine).
+    /// The whole document, formatted, as one edit.
     fn formatting(&self, p: DocumentFormattingParams) -> Option<Vec<TextEdit>> {
         let doc = self.docs.get(p.text_document.uri.as_str())?;
         let (project, entry) = self.project_of(doc)?;
