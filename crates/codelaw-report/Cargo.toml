@@ -8,5 +8,8 @@ publish.workspace = true
 [dependencies]
 codelaw-core.workspace = true
 codelaw-engine.workspace = true
+codelaw-lang.workspace = true
+codelaw-rules.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+tree-sitter.workspace = true

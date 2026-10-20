@@ -21,6 +21,7 @@ codelaw-engine.workspace = true
 codelaw-report.workspace = true
 codelaw-test.workspace = true
 codelaw-lsp.workspace = true
+codelaw-mcp.workspace = true
 clap.workspace = true
 serde_json.workspace = true
 toml.workspace = true

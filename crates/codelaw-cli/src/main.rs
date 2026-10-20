@@ -33,7 +33,12 @@ enum Command {
     /// List rules, or show which apply to a file and why.
     Rules(rules_cmd::RulesArgs),
     /// Show what a rule requires and how to fix it.
-    Explain { id: String },
+    Explain {
+        id: String,
+        /// text or json.
+        #[arg(long, default_value = "text")]
+        format: String,
+    },
     /// Show the syntax tree the engine sees.
     Tree(tree::TreeArgs),
     /// Write a new rule file from the template.
@@ -52,6 +57,8 @@ enum Command {
         #[command(subcommand)]
         action: CacheAction,
     },
+    /// Serve the MCP tools to an agent over stdio (SR-CLI-MCP decision 5).
+    Mcp,
 }
 
 #[derive(Subcommand)]
@@ -163,7 +170,7 @@ pub fn load(paths: &[PathBuf], options: EngineOptions) -> Result<Project, Engine
     Project::load(&start, options)
 }
 
-fn format(s: &str) -> Result<Format, String> {
+pub fn format(s: &str) -> Result<Format, String> {
     Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json or agent)"))
 }
 
@@ -290,11 +297,15 @@ fn main() -> ExitCode {
         Command::Fix(a) => fix(a),
         Command::Test(a) => test(a),
         Command::Rules(a) => rules_cmd::rules(a),
-        Command::Explain { id } => rules_cmd::explain(&id),
+        Command::Explain { id, format } => rules_cmd::explain(&id, &format),
         Command::Tree(a) => tree::tree(a),
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
         Command::Lsp { .. } => codelaw_lsp::run_stdio().map_or_else(fail, |()| ExitCode::SUCCESS),
         Command::Cache { action } => cache(action),
+        Command::Mcp => match codelaw_mcp::serve(std::io::stdin().lock(), std::io::stdout().lock()) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(e) => fail(e),
+        },
     }
 }

@@ -10,8 +10,9 @@ feature: "the CLI and the MCP server"
 owns:
   - crates/codelaw-report
   - crates/codelaw-cli
+  - crates/codelaw-mcp
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-20T18:00:00Z
 content_sha: ""
 ---
 
@@ -86,11 +87,29 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - `agent`: compact, token-budgeted lines for hooks.
 
    Every format carries the [L4](0006_LAW-4-every-rule-has-a-fix.md) fix fields.
+
+   `rules [--for <path>] [--why <id>]`, `explain` and `tree` take `--format text|json` too. Their JSON objects carry `schema_version` and `codelaw_version` like `check`'s: `rules` gives `for` and `rules[]` (id, severity, fix, title, source, preview); `rules --why` gives the rule's source, path, shadows, `enabled_by`, default and, with `--for`, `for` (file, `set_by[]`, `applies`, effective severity, and the rule's `diagnostics[]` in that file); `explain` gives summary, why, languages, severity, `fix` (class, reason, skill, steps), `ported_from`, source, path and the Do/Don't `examples[]`; `tree` gives `language`, `line` and nested `nodes[]` (kind, field, range, `text` on leaves, `error`/`missing` flags, children).
 5. **The MCP server.**
    - `codelaw mcp` speaks MCP over **stdio only**: offline, local, nothing listening on a port ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
    - **Tools:** `rules_for_path`, `explain_rule`, `list_rules`, `check_snippet`, `check_paths`, `fix_paths` (applies `auto`; returns `suggest` fixes as diffs to accept), `format_snippet`, `dump_tree`, `trace_rule`.
    - Results use the same JSON shapes as `--format json`.
-6. **Parity ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A test runs every fixture through the CLI and through MCP and requires identical diagnostics and fixed bytes. No logic lives in either surface; both are thin adapters over `codelaw-engine` ([SR-PACKAGES](0107_packages.md)).
+   - **Protocol:** JSON-RPC 2.0, one message per line on stdin and stdout; `initialize` (revisions `2025-06-18`, `2025-03-26`, `2024-11-05`; the client's when it is one of these), `ping`, `tools/list`, `tools/call`, and empty `resources/list` / `prompts/list`. A hand-written loop in `codelaw-mcp`, no SDK: it adds no dependency beyond `serde_json` ([L2](0004_LAW-2-foss-dependencies.md)). Stdout carries protocol messages only.
+   - **Each tool and its CLI twin** — the tool result's text is the twin's stdout without its final newline, and its `structuredContent` is the same object; a tool error (`isError`) is the twin's message after `error: `:
+
+     | tool | CLI twin |
+     |---|---|
+     | `rules_for_path {path}` | `rules --for <path> --format json` |
+     | `explain_rule {id}` | `explain <id> --format json` |
+     | `list_rules {}` | `rules --format json` |
+     | `check_snippet {path, code}` | `check <path> --format json` on a file holding `code` |
+     | `check_paths {paths, rule, lang}` | `check [paths] [--rule] [--lang] --format json` |
+     | `fix_paths {paths, unsafe, dry_run, rule, lang}` | `fix … --format json` |
+     | `format_snippet {path, code}` | the bytes `fix <path>` writes, without writing them; the format step joins when `fix` has one ([SR-FORMATTER](0105_formatter.md), W-07) |
+     | `dump_tree {path \| code+lang, line}` | `tree … --format json` |
+     | `trace_rule {id, path}` | `rules --why <id> --for <path> --format json`; `match --explain`'s matcher-level trace (W-16) is to return through it |
+
+   - The server loads the project per call, so an edited config or rule is seen on the next call; the warm, cached rule set is [SR-ARCHITECTURE](0108_architecture.md) decision 21's (W-15).
+6. **Parity ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A test runs every fixture through the CLI and through MCP and requires identical diagnostics and fixed bytes: `crates/codelaw-cli/tests/mcp_parity.rs` runs each `fixtures/l3` language alone and all together through every tool of decision 5 and its twin, byte for byte, and compares the files `fix` and `fix_paths` write. No logic lives in either surface; both are thin adapters over `codelaw-engine` ([SR-PACKAGES](0107_packages.md)).
 7. **Agent-friendly by design.**
    - Every MCP tool's description says when to call it.
    - `rules_for_path` returns rule cards under about 60 tokens each, with detail on demand ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 3).
@@ -119,7 +138,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
 
 **Reopen this decision if:** the CLI and MCP give different results for the same input, or either surface contains engine logic.
 
-**How to check it:** the CLI/MCP parity test over every fixture (`W-08`).
+**How to check it:** the CLI/MCP parity test over every fixture, `cargo test -p codelaw-cli --test mcp_parity`.
 
 ---
 

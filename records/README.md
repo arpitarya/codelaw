@@ -177,6 +177,7 @@ directions.
 | `crates/codelaw-test` | SR-RULE-AUTHORING | decision 4 |
 | `crates/codelaw-cli` | SR-CLI-MCP | decisions 1–3 |
 | `crates/codelaw-lsp` | SR-EDITOR | decisions 1–3: the language server |
+| `crates/codelaw-mcp` | SR-CLI-MCP | decisions 5–6: the MCP server and its parity with the CLI |
 | `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced, for the Cargo manifest |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
