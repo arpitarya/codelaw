@@ -69,7 +69,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | debug | `tree` · `match --explain` · `fix --trace` · `graph refs` · `graph why-unused` |
    | project | `init [--agents …] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print` · `config --schema` |
    | baseline | `baseline add` · `baseline prune` · `baseline check` · `deprecate` |
-   | servers | `lsp` · `mcp` · `daemon start/stop/status` · `hook` |
+   | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
 
 2. **Common flags:**

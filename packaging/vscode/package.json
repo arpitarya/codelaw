@@ -1,0 +1,58 @@
+{
+  "name": "codelaw",
+  "publisher": "codelaw",
+  "displayName": "codelaw",
+  "description": "codelaw in the editor: diagnostics, quick fixes and formatting from the project's own codelaw (SR-EDITOR).",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/arpitarya/codelaw" },
+  "engines": { "vscode": "^1.82.0" },
+  "categories": ["Linters", "Formatters"],
+  "main": "./out/src/extension.js",
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:python",
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "onLanguage:yaml",
+    "onLanguage:toml",
+    "onLanguage:markdown",
+    "onLanguage:css",
+    "onLanguage:html",
+    "workspaceContains:codelaw.toml"
+  ],
+  "contributes": {
+    "commands": [
+      { "command": "codelaw.fixAll", "title": "Fix all auto-fixable problems", "category": "codelaw" },
+      { "command": "codelaw.format", "title": "Format document", "category": "codelaw" },
+      { "command": "codelaw.explainRule", "title": "Explain rule", "category": "codelaw" },
+      { "command": "codelaw.restartServer", "title": "Restart server", "category": "codelaw" },
+      { "command": "codelaw.showOutput", "title": "Show output", "category": "codelaw" }
+    ],
+    "configuration": {
+      "title": "codelaw",
+      "properties": {
+        "codelaw.enable": { "type": "boolean", "default": true, "description": "Run codelaw in this workspace." },
+        "codelaw.path": { "type": ["string", "null"], "default": null, "scope": "machine-overridable", "description": "The codelaw binary to run. Empty: the workspace's node_modules/.bin, then .venv/bin, then the bundled binary." },
+        "codelaw.fixOnSave": { "type": "boolean", "default": false, "description": "Apply the auto fixes when a file is saved." },
+        "codelaw.formatOnSave": { "type": "boolean", "default": false, "description": "Format with codelaw when a file is saved." },
+        "codelaw.trace.server": { "type": "string", "enum": ["off", "messages", "verbose"], "default": "off", "description": "Log the LSP traffic to the output channel." }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "tsc -p . && node --test out/test/binary.test.js"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.6",
+    "@types/vscode": "1.82.0",
+    "typescript": "5.6.3"
+  }
+}

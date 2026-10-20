@@ -127,17 +127,42 @@ impl Project {
             Some(t) => (t.to_owned(), true),
             None => (text.to_owned(), false),
         };
-        if !self.config.lint_generated() {
-            let mut end = text.len().min(1024);
-            while !text.is_char_boundary(end) {
-                end -= 1;
-            }
-            let head = &text[..end];
-            if let Some(marker) = self.config.generated_markers().into_iter().find(|m| head.contains(m.as_str())) {
-                return Err(skip("codelaw/generated", format!("marked generated (`{marker}`); set `[files] lint_generated = true` to check it")));
-            }
+        if let Some(reason) = self.generated(&text) {
+            return Err(skip("codelaw/generated", reason));
         }
         Ok(ReadFile { text, bom, bytes })
+    }
+
+    /// Why a file's text is skipped as generated, if it is (decision 10).
+    fn generated(&self, text: &str) -> Option<String> {
+        if self.config.lint_generated() {
+            return None;
+        }
+        let mut end = text.len().min(1024);
+        while !text.is_char_boundary(end) {
+            end -= 1;
+        }
+        let head = &text[..end];
+        let marker = self.config.generated_markers().into_iter().find(|m| head.contains(m.as_str()))?;
+        Some(format!("marked generated (`{marker}`); set `[files] lint_generated = true` to check it"))
+    }
+
+    /// An editor's text of a file, through the same skips `check_file`
+    /// makes on the file on disk (SR-EDITOR decision 3).
+    pub(crate) fn check_unsaved(&self, entry: &FileEntry, text: &str) -> FileResult {
+        let layers = self.config.layers_for(&entry.abs);
+        let skip = |id: &str, reason: String| FileResult {
+            diagnostics: meta_diagnostic(&entry.rel, &layers, id, reason.clone()).into_iter().collect(),
+            skipped: Some(Skipped { file: entry.rel.clone(), reason }),
+        };
+        let (len, max) = (text.len() as u64, self.config.max_file_size());
+        if len > max {
+            return skip("codelaw/file-too-large", format!("larger than `[files] max_file_size` ({len} > {max} bytes)"));
+        }
+        if let Some(reason) = self.generated(text) {
+            return skip("codelaw/generated", reason);
+        }
+        FileResult { diagnostics: lint_text(self, entry, text, &RunMode::check()).diagnostics, skipped: None }
     }
 
     pub(crate) fn check_file(&self, entry: &FileEntry) -> FileResult {

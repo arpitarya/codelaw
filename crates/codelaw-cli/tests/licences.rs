@@ -124,3 +124,27 @@ fn every_cargo_dependency_is_free_and_permissive() {
     assert!(checked > 50, "only {checked} dependencies seen");
     assert!(refused.is_empty(), "L2 refuses:\n{}", refused.join("\n"));
 }
+
+/// The editor extension's npm lockfile (SR-EDITOR decision 4): runtime and
+/// dev dependencies alike (decision 4).
+#[test]
+fn every_npm_dependency_of_the_extension_is_free_and_permissive() {
+    let lock = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packaging/vscode/package-lock.json");
+    let lock: Value = serde_json::from_str(&std::fs::read_to_string(&lock).expect("packaging/vscode/package-lock.json")).unwrap();
+    let mut refused = Vec::new();
+    let mut checked = 0;
+    for (path, p) in lock["packages"].as_object().unwrap() {
+        if path.is_empty() {
+            continue;
+        }
+        checked += 1;
+        let name = format!("{path} {}", p["version"].as_str().unwrap_or("?"));
+        match p["license"].as_str() {
+            Some(l) if expression_allowed(l) => {}
+            Some(l) => refused.push(format!("{name}: `{l}`")),
+            None => refused.push(format!("{name}: no licence expression")),
+        }
+    }
+    assert!(checked >= 5, "only {checked} npm packages seen");
+    assert!(refused.is_empty(), "L2 refuses:\n{}", refused.join("\n"));
+}

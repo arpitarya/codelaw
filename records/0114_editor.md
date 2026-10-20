@@ -7,9 +7,11 @@ description: "codelaw serves the Language Server Protocol from its own binary (d
 status: accepted
 date: 2026-10-18
 feature: "editor integration"
-owns: []
+owns:
+  - crates/codelaw-lsp
+  - packaging/vscode
 laws: [L0, L3, L5, L6, L7, L8]
-timestamp: 2026-10-18T18:00:00Z
+timestamp: 2026-10-20T20:00:00Z
 content_sha: ""
 ---
 
@@ -54,10 +56,13 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
 
 ### Decision
 
-1. **`codelaw lsp`** speaks LSP over stdio from the same binary ([SR-PACKAGES](0107_packages.md) decision 2).
+1. **`codelaw lsp`** speaks LSP over stdio from the same binary ([SR-PACKAGES](0107_packages.md) decision 2). It is the crate `codelaw-lsp` on [`lsp-server`](https://crates.io/crates/lsp-server) (rust-analyzer's scaffold, MIT OR Apache-2.0) and [`lsp-types`](https://crates.io/crates/lsp-types) (MIT) — [L2](0004_LAW-2-foss-dependencies.md). `--stdio` is accepted (editors pass it) and is the only transport.
+   - **Positions:** UTF-16 (`positionEncoding: utf-16`), converted from the engine's bytes in one module of the crate ([SR-ARCHITECTURE](0108_architecture.md) decision 13).
+   - **Never writes:** fixes and formatting are `WorkspaceEdit`s and `TextEdit`s; the editor writes ([SR-ARCHITECTURE](0108_architecture.md) decision 12). The server reads no cache and writes none.
+   - **Which project:** the config nearest the file, as `codelaw check <file>` finds it; with none, the workspace folder that holds the file.
    - **Diagnostics:** pull and push, with codes linking to rule docs.
-   - **Code actions:** `quickfix` for `auto` and `suggest` fixes, plus `source.fixAll.codelaw` and `source.organizeImports` where a rule provides it.
-   - **Formatting:** document and range ([SR-FORMATTER](0105_formatter.md)).
+   - **Code actions:** `quickfix` for `auto` and `suggest` fixes (`auto` preferred), plus `source.fixAll.codelaw` (the text `codelaw fix` would write, as one edit) and `source.organizeImports` where a rule provides it.
+   - **Formatting:** document and range ([SR-FORMATTER](0105_formatter.md)). Advertised only once the formatter is in the binary; until then the capability is absent.
    - **Hover:** on a diagnostic.
    - **Workspace diagnostics:** for project rules.
    - **Watched files:** config, rules and baseline changes reload live.
@@ -68,7 +73,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - `lsp_after_edit` is an [L8](0010_LAW-8-performance-budgets.md) budget.
 3. **Same verdicts as the CLI ([L5](0007_LAW-5-no-model-in-the-engine.md)).** The server calls the same engine functions; the editor never shows a result that `codelaw check` wouldn't.
 4. **The VS Code extension `codelaw.codelaw`:**
-   - **Contents:** an LSP client (`vscode-languageclient`, MIT), a status-bar item, and the commands *Fix all*, *Format*, *Explain rule*, *Restart server* and *Show output*.
+   - **Source:** `packaging/vscode`, TypeScript. **Contents:** an LSP client (`vscode-languageclient`, MIT; its tree is MIT and ISC), a status-bar item, and the commands *Fix all*, *Format*, *Explain rule* (runs `codelaw explain`), *Restart server* and *Show output*. Its build and test tools (`typescript`, Apache-2.0; `@types/*`, MIT) are dev-only; `crates/codelaw-cli/tests/licences.rs` checks its lockfile.
    - **Settings:** `codelaw.enable`, `codelaw.path`, `codelaw.fixOnSave`, `codelaw.formatOnSave`, `codelaw.trace.server`.
    - **Choosing a binary:**
      1. `codelaw.path`;
@@ -102,7 +107,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
 
 **Reopen this decision if:** the editor shows a diagnostic or fix that `codelaw check` on the same file doesn't, or the extension contains lint or format logic.
 
-**How to check it:** the LSP parity test (CLI vs LSP over every fixture) and a review of the extension's source size (`W-08`).
+**How to check it:** the LSP parity test (`crates/codelaw-lsp/tests/server.rs`: `check` vs LSP over every L3 fixture) and a review of the extension's source size (`W-08`).
 
 ---
 

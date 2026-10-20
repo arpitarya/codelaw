@@ -64,7 +64,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 #### A. Structure
 
 1. **Layers.** The six layers and their crates are [SR-PACKAGES](0107_packages.md) decision 1. A crate depends only on crates in layers above its own, with no cycles inside a layer. The layer order is checked in CI (`B-020`).
-2. **Everything is a library; surfaces are thin.** `codelaw-engine` exposes `check`, `fix`, `format`, `rules_for`, `explain` and the debug queries as functions over typed inputs. The CLI, MCP, LSP and hook crates only translate between their protocol and those functions ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 6, [SR-EDITOR](0114_editor.md) decision 3).
+2. **Everything is a library; surfaces are thin.** `codelaw-engine` exposes `check`, `fix`, `format`, `rules_for`, `explain` and the debug queries as functions over typed inputs. The CLI, MCP, LSP and hook crates only translate between their protocol and those functions ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 6, [SR-EDITOR](0114_editor.md) decision 3). For an editor's unsaved text, `entry_for` says whether `check` would check the file and `check_document` checks the text through the same skips and rules; neither reads nor writes the file.
 3. **Pinned grammars and engines.** Every tree-sitter grammar and every formatter engine is vendored at a pinned version in `Cargo.lock`; the grammar and engine versions are part of every cache key ([SR-CACHE](0109_cache.md) decision 2).
 
 #### B. The pipelines

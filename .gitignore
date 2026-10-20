@@ -8,4 +8,7 @@
 /packaging/python/LICENSE
 /packaging/python/README.md
 /dist/
+# the editor extension's npm install and tsc output (packaging/vscode)
+/packaging/vscode/node_modules/
+/packaging/vscode/out/
 __pycache__/
