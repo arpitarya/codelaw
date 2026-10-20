@@ -16,6 +16,7 @@ owns:
   - scripts/package.py
   - scripts/build-packs.py
   - scripts/smoke.sh
+  - scripts/law-gate.py
   - scripts/withdraw.sh
   - scripts/npm-trust.sh
   - .github/workflows
