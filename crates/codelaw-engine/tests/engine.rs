@@ -380,3 +380,229 @@ fn check_source_matches_check() {
     let _ = Path::new("");
     let _ = FixClass::Auto;
 }
+
+// ---- W-17: regression tests for the 2026-10-20 review ----
+
+/// The panic fixture (SR-ARCHITECTURE decision 25): a first-party pack whose
+/// `js/test-panic` rule runs the `test/panic` native rule, which panics.
+fn panic_pack(r: &Repo, severity: &str) {
+    let text = rule("js/test-panic", &[Language::Javascript], "manual", "native: test/panic", &[(Language::Javascript, "x", "y")]);
+    let preset = format!("[rules]\n\"js/test-panic\" = \"{severity}\"\n\"js/eqeqeq\" = \"warn\"\n");
+    pack(r, "node_modules/@codelaw/rules-js", "@codelaw/rules-js", "0.1.0", &[("js/test-panic", text), ("js/eqeqeq", js_eqeq())], &[("js/recommended", &preset)]);
+    r.file("codelaw.toml", "extends = [\"codelaw:js/recommended\"]\n");
+}
+
+#[test]
+fn a_rule_panic_is_an_internal_error_never_the_rules_own() {
+    let r = Repo::new("panic");
+    panic_pack(&r, "warn");
+    // A suppression of the rule itself does not hide its failure.
+    r.file("a.js", "// codelaw-ignore js/test-panic: hiding the failure would be wrong\na == b;\n");
+    let opts = || EngineOptions { cache_dir_env: Some(r.0.join("cache").to_string_lossy().into()), ..Default::default() };
+    for run in ["cold", "warm"] {
+        let report = Project::load(&r.0, opts()).unwrap().check(&[]).unwrap();
+        let s = summary(&report.diagnostics);
+        assert!(s.contains(&"a.js:1:1 codelaw/internal-error manual".to_owned()), "{run}: {s:?}");
+        assert!(s.contains(&"a.js:2:1 js/eqeqeq auto".to_owned()), "the other rules still run ({run}): {s:?}");
+        assert!(!report.diagnostics.iter().any(|d| d.rule == "js/test-panic"), "{run}: {s:?}");
+        assert_eq!(report.internal_errors(), 1, "{run}");
+        let d = report.diagnostics.iter().find(|d| d.rule == "codelaw/internal-error").unwrap();
+        assert_eq!(d.severity, codelaw_core::Severity::Error);
+        assert!(d.message.contains("js/test-panic") && d.message.contains("always panics"), "{}", d.message);
+    }
+    // `fix` reports it too, keeps the suppression (the rule did not run, so
+    // it is not unused) and still applies the other rules' fixes.
+    let report = r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
+    assert_eq!(report.check.internal_errors(), 1);
+    assert_eq!(r.read("a.js"), "// codelaw-ignore js/test-panic: hiding the failure would be wrong\na === b;\n");
+}
+
+#[test]
+fn a_failed_write_reports_the_file_as_it_is_on_disk() {
+    let r = Repo::new("writefail");
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("a.js", "a == b;\n");
+    // A folder takes the temp file's name, so the write fails even for
+    // root, who ignores read-only permissions.
+    let tmp = r.0.join(format!(".a.js.codelaw-{}.tmp", std::process::id()));
+    fs::create_dir_all(&tmp).unwrap();
+    let report = r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
+    assert_eq!(r.read("a.js"), "a == b;\n");
+    assert_eq!(report.files.len(), 1);
+    assert!(!report.files[0].written);
+    assert_eq!(report.fixed_count(), 0);
+    let s = summary(&report.check.diagnostics);
+    assert_eq!(s, ["a.js:1:1 acme/eqeqeq auto", "a.js:1:1 codelaw/write-failed manual"], "the pre-fix findings, and the failure");
+    let failed = report.check.diagnostics.iter().find(|d| d.rule == "codelaw/write-failed").unwrap();
+    assert_eq!(failed.severity, codelaw_core::Severity::Error, "a failed write fails the run");
+    assert!(tmp.is_dir(), "the folder in the way is left alone");
+}
+
+#[cfg(unix)]
+#[test]
+fn a_fix_writes_through_a_symlink() {
+    let r = Repo::new("symlink");
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("codelaw.toml", "[files]\nfollow_symlinks = true\n").file("real/a.js", "a == b;\n");
+    std::os::unix::fs::symlink(r.0.join("real/a.js"), r.0.join("b.js")).unwrap();
+    std::os::unix::fs::symlink(r.0.join("real"), r.0.join("linked")).unwrap();
+    let report = r.project().unwrap().fix(&[r.0.join("linked")], &FixOptions::default()).unwrap();
+    assert!(report.files.iter().all(|f| f.written), "{:?}", report.check.diagnostics);
+    assert!(fs::symlink_metadata(r.0.join("linked")).unwrap().file_type().is_symlink(), "the link stays a link");
+    assert_eq!(r.read("real/a.js"), "a === b;\n", "the file it points to is fixed");
+    // One file reached by three paths is fixed once.
+    fs::write(r.0.join("real/a.js"), "c == d;\n").unwrap();
+    let report = r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
+    assert!(report.files.iter().all(|f| f.written), "{:?}", report.check.diagnostics);
+    assert!(fs::symlink_metadata(r.0.join("b.js")).unwrap().file_type().is_symlink(), "a file link stays a link");
+    assert_eq!(r.read("real/a.js"), "c === d;\n");
+}
+
+#[test]
+fn a_pack_that_copies_a_first_party_name_is_still_third_party() {
+    let r = Repo::new("fakefirstparty");
+    let native = || {
+        rule("js/no-unreachable", &[Language::Javascript], "suggest", "native: js/no-unreachable", &[(Language::Javascript, "function f() { return 1; g(); }", "function f() { return 1; }")])
+    };
+    pack(&r, "vendor/js", "@codelaw/rules-js", "0.1.0", &[("js/no-unreachable", native())], &[("js/recommended", "")]);
+    r.file("codelaw.toml", "extends = [\"path:vendor/js\"]\n");
+    let e = r.project().err().unwrap().to_string();
+    assert!(e.contains("`native:` is accepted only in first-party packs"), "{e}");
+    // The same pack where a first-party install lives is first-party.
+    let r2 = Repo::new("realfirstparty");
+    pack(&r2, "node_modules/@codelaw/rules-js", "@codelaw/rules-js", "0.1.0", &[("js/no-unreachable", native())], &[("js/recommended", "")]);
+    r2.file("codelaw.toml", "extends = [\"npm:@codelaw/rules-js\"]\n");
+    assert!(r2.project().is_ok());
+}
+
+#[cfg(unix)]
+#[test]
+fn a_symlink_cycle_in_pack_data_ends() {
+    let r = Repo::new("datacycle");
+    pack(&r, "node_modules/@codelaw/rules-js", "@codelaw/rules-js", "0.1.0", &[("js/eqeqeq", js_eqeq())], &[("js/recommended", "[rules]\n\"js/eqeqeq\" = \"warn\"\n")]);
+    r.file("node_modules/@codelaw/rules-js/data/globals/x.json", "{\"a\": 1}");
+    std::os::unix::fs::symlink(r.0.join("node_modules/@codelaw/rules-js/data"), r.0.join("node_modules/@codelaw/rules-js/data/globals/loop")).unwrap();
+    r.file("codelaw.toml", "extends = [\"codelaw:js/recommended\"]\n").file("a.js", "a == b;\n");
+    assert_eq!(summary(&r.check()), ["a.js:1:1 js/eqeqeq auto"]);
+}
+
+#[test]
+fn the_verifier_refuses_a_fix_that_makes_a_new_rule_fire() {
+    let r = Repo::new("verifynew");
+    let strict = rule("acme/no-strict-eq", &[Language::Javascript], "manual", "match:\n  pattern: $A === $B\nmessage: no ===", &[(Language::Javascript, "a === b;", "a == b;")]);
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file(".codelaw/rules/acme/no-strict-eq.md", &strict).file("a.js", "a == b;\n");
+    let report = r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
+    assert_eq!(r.read("a.js"), "a == b;\n", "the fix would make acme/no-strict-eq fire");
+    let d = &report.check.diagnostics;
+    assert_eq!(summary(d), ["a.js:1:1 acme/eqeqeq manual"]);
+    assert_eq!(d[0].note.as_deref(), Some("fix-verify-failed"));
+
+    // A rule that fires and is fixed in a later pass is not new at the end.
+    let chain = rule(
+        "acme/strict-to-call",
+        &[Language::Javascript],
+        "auto",
+        "match:\n  pattern: $A === $B\nmessage: use eq()\nfix: \"eq($A, $B)\"",
+        &[(Language::Javascript, "a === b;", "eq(a, b);")],
+    );
+    fs::remove_file(r.0.join(".codelaw/rules/acme/no-strict-eq.md")).unwrap();
+    r.file(".codelaw/rules/acme/strict-to-call.md", &chain);
+    r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
+    assert_eq!(r.read("a.js"), "eq(a, b);\n");
+}
+
+#[test]
+fn the_verifier_counts_syntax_errors_inside_regions() {
+    let r = Repo::new("verifyregion");
+    let breaking = rule("acme/break", &[Language::Javascript], "auto", "match:\n  pattern: $A == $B\nmessage: x\nfix: \"$A == ($B\"", &[(Language::Javascript, "a == b;", "a == (b;")]);
+    r.file(".codelaw/rules/acme/break.md", &breaking).file("a.html", "<p>x</p>\n<script>\na == b;\n</script>\n");
+    let report = r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
+    assert_eq!(r.read("a.html"), "<p>x</p>\n<script>\na == b;\n</script>\n", "the JavaScript would no longer parse");
+    assert_eq!(report.check.diagnostics[0].note.as_deref(), Some("fix-verify-failed"));
+}
+
+#[test]
+fn suppressions_are_checked_where_no_rule_runs_and_only_open_a_comment() {
+    let r = Repo::new("suppressnorule");
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq())
+        .file("a.py", "# codelaw-ignore acme/nope: typo\nx = 1\n# codelaw-ignore acme/eqeqeq\ny = 2\n")
+        .file("b.js", "// see codelaw-ignore docs for the syntax\nlet x = 1;\n");
+    assert_eq!(summary(&r.check()), ["a.py:1:1 codelaw/unknown-suppression manual", "a.py:3:1 codelaw/suppression-needs-reason manual"]);
+}
+
+#[test]
+fn a_file_named_on_the_command_line_gets_its_nested_config() {
+    let r = Repo::new("nestedexplicit");
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq())
+        .file("codelaw.toml", "")
+        .file("pkg/codelaw.toml", "[rules]\n\"acme/eqeqeq\" = \"off\"\n")
+        .file("pkg/src/a.js", "a == b;\n")
+        .file("b.js", "a == b;\n");
+    assert_eq!(summary(&r.check()), ["b.js:1:1 acme/eqeqeq auto"]);
+    for path in ["pkg/src/a.js", "pkg/src", "pkg"] {
+        let named = r.project().unwrap().check(&[r.0.join(path)]).unwrap().diagnostics;
+        assert!(named.is_empty(), "`codelaw check {path}` reads pkg/codelaw.toml: {:?}", summary(&named));
+    }
+}
+
+#[test]
+fn ignore_files_above_the_project_are_read_only_inside_its_repository() {
+    let outer = Repo::new("aboveroot");
+    outer.file(".gitignore", "*.js\n");
+    let r = outer.0.join("proj");
+    fs::create_dir_all(r.join(".codelaw/rules/acme")).unwrap();
+    fs::write(r.join(".codelaw/rules/acme/eqeqeq.md"), eqeq()).unwrap();
+    fs::write(r.join("codelaw.toml"), "").unwrap();
+    fs::create_dir_all(r.join("src")).unwrap();
+    fs::write(r.join("src/a.js"), "a == b;\n").unwrap();
+    let check = |paths: &[PathBuf]| Project::load(&r, EngineOptions { no_cache: true, ..Default::default() }).unwrap().check(paths).unwrap().diagnostics;
+    // No repository: a `.gitignore` above the project (say `~/.gitignore`)
+    // is a machine's, not the project's.
+    assert_eq!(summary(&check(&[])), ["src/a.js:1:1 acme/eqeqeq auto"]);
+    assert_eq!(summary(&check(&[r.join("src")])), ["src/a.js:1:1 acme/eqeqeq auto"]);
+    // Inside a repository whose root is above the project, its ignore files apply.
+    fs::create_dir_all(outer.0.join(".git")).unwrap();
+    assert!(check(&[]).is_empty());
+    assert!(check(&[r.join("src")]).is_empty());
+    // And the project's own ignore files apply to a walk of a subfolder.
+    fs::remove_dir_all(outer.0.join(".git")).unwrap();
+    fs::write(r.join(".gitignore"), "src/gen/\n").unwrap();
+    fs::create_dir_all(r.join("src/gen")).unwrap();
+    fs::write(r.join("src/gen/b.js"), "a == b;\n").unwrap();
+    assert_eq!(summary(&check(&[r.join("src")])), ["src/a.js:1:1 acme/eqeqeq auto"]);
+}
+
+#[cfg(unix)]
+#[test]
+fn walk_errors_are_reported_as_skipped() {
+    let r = Repo::new("walkerr");
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("codelaw.toml", "[files]\nfollow_symlinks = true\n").file("d/a.js", "a == b;\n");
+    std::os::unix::fs::symlink(r.0.join("d"), r.0.join("d/loop")).unwrap();
+    let report = r.project().unwrap().check(&[]).unwrap();
+    assert_eq!(summary(&report.diagnostics), ["d/a.js:1:1 acme/eqeqeq auto"]);
+    let skipped: Vec<&str> = report.skipped.iter().map(|s| s.file.as_str()).collect();
+    assert_eq!(skipped, ["d/loop"], "{:?}", report.skipped);
+}
+
+#[test]
+fn files_outside_the_root_are_relative_paths() {
+    let r = Repo::new("outsideroot");
+    r.file("proj/.codelaw/rules/acme/eqeqeq.md", &eqeq()).file("proj/codelaw.toml", "").file("other/a.js", "a == b;\n");
+    let mut p = Project::load(&r.0.join("proj"), EngineOptions { no_cache: true, ..Default::default() }).unwrap();
+    let d = p.check(&[r.0.join("other/a.js")]).unwrap().diagnostics;
+    assert_eq!(summary(&d), ["../other/a.js:1:1 acme/eqeqeq auto"]);
+}
+
+#[test]
+fn bom_offsets_are_file_offsets_and_fix_reports_like_check() {
+    let r = Repo::new("bomoffsets");
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("a.js", "\u{feff}x;\na == b;\n").file("b.js", "x;\na == b;\n");
+    let report = r.project().unwrap().check(&[]).unwrap();
+    let a = report.diagnostics.iter().find(|d| d.file == "a.js").unwrap();
+    let b = report.diagnostics.iter().find(|d| d.file == "b.js").unwrap();
+    assert_eq!((a.start_byte, a.end_byte), (b.start_byte + 3, b.end_byte + 3), "offsets count the BOM's bytes");
+    assert_eq!(a.edits[0].start, b.edits[0].start + 3);
+    let bytes = fs::read(r.0.join("a.js")).unwrap();
+    assert_eq!(&bytes[a.start_byte..a.end_byte], b"a == b");
+    let dry = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false }).unwrap();
+    assert_eq!(dry.fixed_count(), 2);
+    assert!(dry.check.diagnostics.is_empty(), "{:?}", dry.check.diagnostics);
+}

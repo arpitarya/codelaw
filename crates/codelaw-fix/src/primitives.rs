@@ -148,9 +148,12 @@ fn primitive(item: &Value) -> Result<Primitive, String> {
             Primitive::RenameSymbolLocal { target: target(field(o, "target", name)?)?, to: string(field(o, "to", name)?, "to")? }
         }
         other => {
+            // The first four characters, not bytes: a name is whatever a
+            // (possibly third-party) rule file wrote, `fixé` included.
+            let prefix: String = other.chars().take(4).collect();
             let near = PRIMITIVES
                 .iter()
-                .find(|p| p.starts_with(&other[..other.len().min(4)]))
+                .find(|p| p.starts_with(prefix.as_str()))
                 .map(|p| format!("; did you mean `{p}`?"))
                 .unwrap_or_default();
             return Err(format!("unknown fix primitive `{other}`{near} (one of {})", PRIMITIVES.join(", ")));
@@ -338,7 +341,7 @@ fn declared(node: tree_sitter::Node<'_>, src: &str) -> (Vec<String>, Vec<String>
 }
 
 fn sort_edits(mut edits: Vec<TextEdit>) -> Vec<TextEdit> {
-    edits.sort_by(|a, b| (a.start, a.end).cmp(&(b.start, b.end)));
+    edits.sort_by_key(|e| (e.start, e.end));
     edits.dedup();
     edits
 }

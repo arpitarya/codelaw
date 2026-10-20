@@ -23,6 +23,8 @@ mod data_toml;
 mod data_yaml;
 mod duplicates;
 mod expressions;
+#[cfg(feature = "fault-injection")]
+mod fault;
 mod html_a11y;
 mod html_content;
 mod html_document;
@@ -427,6 +429,10 @@ pub fn registry() -> &'static [&'static dyn NativeRule] {
 }
 
 pub fn lookup(id: &str) -> Option<&'static dyn NativeRule> {
+    #[cfg(feature = "fault-injection")]
+    if let Some(r) = fault::lookup(id) {
+        return Some(r);
+    }
     REGISTRY.iter().copied().find(|r| r.id() == id)
 }
 

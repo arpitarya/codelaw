@@ -2,7 +2,8 @@
 id: py/zip-without-explicit-strict
 title: "`zip()` says `strict=`"
 languages: [python]
-fix: auto
+fix: suggest
+fix_reason: "`strict=` exists only from Python 3.10, and codelaw cannot tell which Python the code runs on: on an older one the added keyword raises `TypeError`"
 stability: preview
 options:
   target_version: { type: string, description: "the oldest Python the code supports, e.g. \"3.9\"; below 3.10 the rule is off" }
@@ -42,4 +43,4 @@ pairs = zip(names, ages, strict=False)
 
 ## Differences from the source
 
-The fix adds `strict=False`, which keeps today's behaviour; set `strict=True` where the inputs must match. Ruff reads the target version from its own settings; here it is the `target_version` option, and the rule runs when it is unset.
+The fix adds `strict=False`, which keeps today's behaviour; set `strict=True` where the inputs must match. Ruff reads the target version from its own settings; here it is the `target_version` option, and the rule runs when it is unset. Because it may be unset, the fix is `suggest` (`codelaw fix --unsafe`), not `auto`: on Python before 3.10 the keyword raises `TypeError`.

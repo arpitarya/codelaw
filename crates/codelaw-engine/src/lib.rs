@@ -106,6 +106,12 @@ impl CheckReport {
     }
 }
 
+/// One diagnostic per rule and range, after sorting: a region and its host
+/// can report the same finding. `check` and `fix` dedupe alike.
+pub(crate) fn dedup_diagnostics(d: &mut Vec<Diagnostic>) {
+    d.dedup_by(|a, b| a.file == b.file && a.start_byte == b.start_byte && a.end_byte == b.end_byte && a.rule == b.rule);
+}
+
 /// A loaded project: config, rule set and compiled rules.
 pub struct Project {
     pub config: Config,
@@ -192,7 +198,7 @@ impl Project {
             report.diagnostics.push(lint::no_rules(self));
         }
         report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
-        report.diagnostics.dedup_by(|a, b| a.file == b.file && a.start_byte == b.start_byte && a.end_byte == b.end_byte && a.rule == b.rule);
+        dedup_diagnostics(&mut report.diagnostics);
         skipped.sort();
         report.skipped = skipped;
         self.cache.prune(self.config.cache_max_size());

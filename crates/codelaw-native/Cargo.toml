@@ -12,3 +12,8 @@ codelaw-semantic.workspace = true
 regex.workspace = true
 serde_json.workspace = true
 tree-sitter.workspace = true
+
+[features]
+# Test-only rules that fail on purpose (src/fault.rs); no shipped build
+# enables it.
+fault-injection = []

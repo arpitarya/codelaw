@@ -122,6 +122,21 @@ fn prune_unknown_kinds(v: &mut serde_json::Value, grammar: Grammar, never: &serd
     }
 }
 
+/// Whether a string in the `match:` block captures `$$$name`.
+fn mentions_multi(v: &serde_json::Value, name: &str) -> bool {
+    match v {
+        serde_json::Value::String(s) => {
+            let needle = format!("$$${name}");
+            s.match_indices(&needle).any(|(i, _)| {
+                !s[i + needle.len()..].starts_with(|c: char| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_')
+            })
+        }
+        serde_json::Value::Array(a) => a.iter().any(|x| mentions_multi(x, name)),
+        serde_json::Value::Object(o) => o.values().any(|x| mentions_multi(x, name)),
+        _ => false,
+    }
+}
+
 /// Compile a rule's `match:` block for one grammar. `data` is the rule's
 /// pack's tables, for predicates that name one.
 pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<serde_json::Value>>) -> Result<CompiledMatch, String> {
@@ -151,9 +166,19 @@ pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<se
         Some(p) => parse_predicates(p, data)?,
         None => Vec::new(),
     };
+    if !predicates.is_empty() && !matches!(grammar, Grammar::JavaScript | Grammar::TypeScript | Grammar::Tsx | Grammar::Python) {
+        // Only these have a semantic model; a predicate elsewhere could
+        // never hold, so the rule would silently match nothing.
+        return Err(format!("`where:` needs a semantic model, which only JavaScript, TypeScript and Python have, not {grammar:?}"));
+    }
     for (var, _) in &predicates {
-        if var != MATCH_KEY && !core.defined_vars().contains(var.trim_start_matches('$')) {
+        let name = var.trim_start_matches('$');
+        if var != MATCH_KEY && !core.defined_vars().contains(name) {
             return Err(format!("`where:` names `{var}`, which `match:` does not capture"));
+        }
+        // A predicate is about one node; `$$$NAME` captures a list of them.
+        if var != MATCH_KEY && (var.starts_with("$$$") || mentions_multi(matcher, name)) {
+            return Err(format!("`where:` names `{var}`, but `$$${name}` captures a list of nodes; a predicate applies to one node (`$NAME`)"));
         }
     }
     Ok(CompiledMatch { core, predicates })

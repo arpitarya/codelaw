@@ -117,6 +117,10 @@ fn bad_fix_specs() {
     assert!(parse_fix(&serde_json::json!([{"strip-export": "$X"}])).unwrap_err().contains("did you mean `strip-export-keyword`"));
     assert!(parse_fix(&serde_json::json!([{"replace": {"target": "$X"}}])).unwrap_err().contains("needs `with`"));
     assert!(parse_fix(&serde_json::json!({"external": "x", "y": 1})).is_err());
+    // A multi-byte name is an error, not a panic (W-17).
+    for name in ["fixé", "éééé-x", "a😀", ""] {
+        assert!(parse_fix(&serde_json::json!([{ name: "$X" }])).unwrap_err().contains("unknown fix primitive"), "{name}");
+    }
 }
 
 #[cfg(unix)]
@@ -143,4 +147,17 @@ fn external_fixer_contract() {
     assert!(run_external(&call("cat >/dev/null; exit 3")).unwrap_err().contains("exited"));
     let slow = ExternalCall { timeout: std::time::Duration::from_millis(100), ..call("sleep 5") };
     assert!(run_external(&slow).unwrap_err().contains("timed out"));
+    // W-17: a fixer that writes far more to stderr than a pipe holds is
+    // not blocked; its last stderr line names a failure.
+    let chatty = "cat >/dev/null; i=0; while [ $i -lt 4000 ]; do echo 'noise noise noise noise noise noise noise noise noise noise' >&2; i=$((i+1)); done; echo '{\"edits\":[]}'";
+    assert_eq!(run_external(&call(chatty)).unwrap(), vec![]);
+    assert!(run_external(&call("cat >/dev/null; echo 'bad input' >&2; exit 1")).unwrap_err().contains("bad input"));
+    // A grandchild that keeps stdout open neither hangs the run nor
+    // outlives the timeout: the whole process group is stopped.
+    let started = std::time::Instant::now();
+    let held = run_external(&call("cat >/dev/null; (sleep 30) & echo '{\"edits\":[]}'"));
+    assert_eq!(held.unwrap(), vec![]);
+    let slow_tree = ExternalCall { timeout: std::time::Duration::from_millis(200), ..call("cat >/dev/null; sleep 30 & sleep 30") };
+    assert!(run_external(&slow_tree).unwrap_err().contains("timed out"));
+    assert!(started.elapsed() < std::time::Duration::from_secs(10), "{:?}", started.elapsed());
 }

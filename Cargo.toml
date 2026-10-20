@@ -47,6 +47,7 @@ bit-set = "0.11"
 blake3 = "1.8"
 clap = { version = "4.6", features = ["derive"] }
 globset = "0.4.20"
+libc = "0.2"
 ignore = "0.4.33"
 # The language server (SR-EDITOR decision 1): rust-analyzer's scaffold and
 # the protocol types. lsp-server is MIT OR Apache-2.0, lsp-types is MIT.

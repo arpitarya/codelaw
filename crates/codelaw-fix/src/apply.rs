@@ -82,7 +82,7 @@ pub fn overlaps(a: &[TextEdit], b: &[TextEdit]) -> bool {
 /// but not overlap.
 pub fn apply_edits(text: &str, edits: &[TextEdit]) -> Result<String, String> {
     let mut sorted: Vec<&TextEdit> = edits.iter().collect();
-    sorted.sort_by(|a, b| (a.start, a.end).cmp(&(b.start, b.end)));
+    sorted.sort_by_key(|e| (e.start, e.end));
     let mut out = String::with_capacity(text.len());
     let mut cursor = 0;
     for e in sorted {
@@ -106,13 +106,23 @@ fn errors(language: Language, text: &str) -> usize {
 
 /// Run fixes to a fixpoint. `collect` is called with the current text and
 /// returns the candidates on offer, in a deterministic order; candidates
-/// whose key is in `refused` must not be offered again.
-pub fn fix_loop(
-    language: Language,
+/// whose key is in `refused` must not be offered again. Syntax errors are
+/// counted in the host grammar only; the engine counts embedded regions
+/// too, through [`fix_loop_with`].
+pub fn fix_loop(language: Language, original: &str, collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>) -> LoopOutcome {
+    fix_loop_with(original, |t| errors(language, t), collect)
+}
+
+/// [`fix_loop`] with the syntax-error count supplied: a fix is kept only if
+/// `errors` of the result is no more than `errors` of the original. The
+/// loop ends only when the text offers no fix, which is the idempotence
+/// check of SR-ARCHITECTURE decision 5: one more run changes nothing.
+pub fn fix_loop_with(
     original: &str,
+    errors: impl Fn(&str) -> usize,
     mut collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>,
 ) -> LoopOutcome {
-    let base_errors = errors(language, original);
+    let base_errors = errors(original);
     let mut out = LoopOutcome { text: original.to_owned(), ..Default::default() };
     let mut seen: HashSet<[u8; 32]> = HashSet::new();
     seen.insert(hash_bytes(original.as_bytes()).0);
@@ -139,7 +149,7 @@ pub fn fix_loop(
         }
         let all: Vec<TextEdit> = selected.iter().flat_map(|c| c.edits.iter().cloned()).collect();
         let next = match apply_edits(&out.text, &all) {
-            Ok(t) if errors(language, &t) <= base_errors => Some(t),
+            Ok(t) if errors(&t) <= base_errors => Some(t),
             _ => None,
         };
         let next = match next {
@@ -154,7 +164,7 @@ pub fn fix_loop(
                 let mut kept = None;
                 for c in &selected {
                     match apply_edits(&out.text, &c.edits) {
-                        Ok(t) if errors(language, &t) <= base_errors => {
+                        Ok(t) if errors(&t) <= base_errors => {
                             *out.applied.entry(c.rule.clone()).or_default() += 1;
                             kept = Some(t);
                             break;

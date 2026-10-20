@@ -78,4 +78,4 @@ const path = "a.b";
 
 ## Differences from the source
 
-Escapes inside regular expressions are not checked yet.
+Escapes inside regular expressions are not checked yet. A tagged template (`String.raw`, `html`) is not checked: its tag sees the raw text, backslashes included, as in ESLint.

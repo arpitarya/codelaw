@@ -27,6 +27,10 @@ impl NativeRule for NoUselessEscape {
         let Some(parent) = n.parent() else { return };
         let delimiter = match parent.kind() {
             "string" => text(parent, ctx.source).chars().next().unwrap_or('"'),
+            // A tagged template hands its raw text to the tag
+            // (``String.raw`\d` `` keeps the backslash), so no escape in it
+            // is useless; ESLint exempts it too.
+            "template_string" if parent.parent().is_some_and(|p| p.kind() == "call_expression") => return,
             "template_string" => '`',
             _ => return,
         };
@@ -53,5 +57,14 @@ mod tests {
         let src = r#"a = "\d \" \' \n"; b = '\" \''; c = `\$ \{ \# \``;"#;
         let found: Vec<String> = crate::run(&NoUselessEscape, Language::Javascript, src).into_iter().map(|f| src[f.start..f.end].to_owned()).collect();
         assert_eq!(found, [r"\d", r"\'", r#"\""#, r"\#"]);
+    }
+
+    #[test]
+    fn tagged_templates_are_raw() {
+        let src = "const re = new RegExp(String.raw`\\d+\\.\\d`);\nconst s = html`\\#`;\nconst t = `\\#`;\n";
+        let found: Vec<String> = crate::run(&NoUselessEscape, Language::Javascript, src).into_iter().map(|f| src[f.start..f.end].to_owned()).collect();
+        assert_eq!(found, [r"\#"], "only the untagged template");
+        let ts = "const x = String.raw`\\d`;\n";
+        assert!(crate::run(&NoUselessEscape, Language::Typescript, ts).is_empty());
     }
 }
