@@ -1,0 +1,6 @@
+name = "@codelaw/rules-python"
+version = "0.1.0"
+min_codelaw = "0.1.0"
+languages = ["python"]
+presets = ["py/recommended", "py/conventions"]
+description = "codelaw's rules for Python (SR-RULE-PACKS)"

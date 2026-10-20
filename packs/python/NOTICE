@@ -1,0 +1,14 @@
+@codelaw/rules-python / codelaw-rules-python
+
+data/python/stdlib.json lists the top-level module names of the Python
+standard library: the union of `sys.stdlib_module_names` from CPython 3.10,
+3.11, 3.12, 3.13 and 3.14 (https://www.python.org), released under the Python
+Software Foundation License Version 2 (PSF-2.0). Copyright (c) 2001 Python
+Software Foundation; All Rights Reserved.
+
+The rules are reimplementations written for codelaw. Their `ported_from:`
+fields name the Ruff rules (https://docs.astral.sh/ruff/, version 0.17.1, MIT
+License, Copyright (c) 2022 Charles Marsh) whose documented behaviour they
+reproduce; Ruff's rules in turn reimplement Pyflakes (MIT), pycodestyle
+(MIT/Expat), flake8-bugbear (MIT) and isort (MIT). No code or documentation
+text from any of them is included.
