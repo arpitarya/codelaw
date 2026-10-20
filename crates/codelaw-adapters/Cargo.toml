@@ -1,0 +1,13 @@
+[package]
+name = "codelaw-adapters"
+description = "Optional external linters run as subprocesses: manifests, runner and output mapping (SR-LINTER decision 2, SR-ARCHITECTURE decision 19)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+codelaw-core.workspace = true
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true

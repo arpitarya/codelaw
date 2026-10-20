@@ -1,0 +1,15 @@
+# Ruff (MIT) — SR-LINTER decision 2: on by default when installed.
+# `--no-fix` so a project's `fix = true` never makes `check` write. Edits come
+# back in the JSON with an applicability: safe → auto, unsafe → suggest,
+# display-only or none → manual (L4 decision 9). Columns count code points.
+name = "ruff"
+binary = "ruff"
+licence = "MIT"
+default = true
+languages = ["python"]
+version_args = ["--version"]
+args = ["check", "--output-format=json", "--no-cache", "--no-fix", "--exit-zero", "--force-exclude"]
+# The fixtures were captured from 0.16.9; Ruff's minor releases change rules.
+tested = ">=0.16.9, <0.17.0"
+output = "ruff"
+ported_prefix = "ruff/"

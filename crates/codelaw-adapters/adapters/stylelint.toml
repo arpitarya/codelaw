@@ -1,0 +1,17 @@
+# stylelint (MIT) — SR-LINTER decision 2: available, run when named.
+# `--compute-edit-info` puts the autofix in the JSON (offsets in UTF-16 code
+# units): such a finding is `auto`, the rest `manual`. stylelint 16 removed
+# its stylistic rules, so no layout-only rule reaches the report (SR-LINTER
+# decision 7). The report is printed on stderr when there are problems.
+name = "stylelint"
+binary = "stylelint"
+licence = "MIT"
+default = false
+languages = ["css"]
+version_args = ["--version"]
+args = ["--formatter", "json", "--compute-edit-info", "--allow-empty-input"]
+# The fixtures were captured from 17.16.0; `--compute-edit-info` is 16.15+.
+tested = ">=17.16.0, <18.0.0"
+output = "stylelint"
+ported_prefix = "stylelint/"
+docs = "https://stylelint.io/user-guide/rules/{rule}"

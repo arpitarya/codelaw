@@ -1,0 +1,14 @@
+# html-validate (MIT) — SR-LINTER decision 2: available, run when named.
+# It offers no autofix, so every finding is `manual` with the rule's docs.
+# Lines and columns count UTF-16 code units.
+name = "html-validate"
+binary = "html-validate"
+licence = "MIT"
+default = false
+languages = ["html"]
+version_args = ["--version"]
+args = ["--formatter", "json"]
+# The fixtures were captured from 11.17.0.
+tested = ">=11.17.0, <12.0.0"
+output = "html-validate"
+ported_prefix = "html-validate/"
