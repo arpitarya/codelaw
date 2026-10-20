@@ -7,11 +7,14 @@ cd "$(dirname "$0")/../.." || exit 0
 
 LOCKS_DIR=.claude/.locks
 mkdir -p "$LOCKS_DIR"
-ME="${CLAUDE_SESSION_ID:-$PPID}"
 NOW=$(date +%s)
 TTL=900
 
 INPUT=$(cat)
+# The owner is the hook input's session_id: $PPID differs per tool call, so a
+# session would otherwise lock itself out of the file it just wrote.
+ME=$(printf '%s' "$INPUT" | jq -r '.session_id // empty' 2>/dev/null)
+ME="${ME:-${CLAUDE_SESSION_ID:-$PPID}}"
 FILE_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // .tool_input.notebook_path // empty' 2>/dev/null)
 [ -z "$FILE_PATH" ] && exit 0
 

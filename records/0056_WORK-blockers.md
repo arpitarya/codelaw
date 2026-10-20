@@ -94,7 +94,9 @@ that works around one makes the decision it was waiting for.
 
 - Decision 7 is enforced by three hooks: `inject-inbox.sh` (UserPromptSubmit),
   `stop-if-blocked.sh` (Stop) and `session-lock.sh` (PreToolUse on writes,
-  TTL 900 s). All three need `jq`.
+  TTL 900 s). All three need `jq`. The lock's owner is the hook input's
+  `session_id` (2026-10-20: keyed on `$PPID`, which changes per tool call, a
+  session locked itself out of its own files).
 - The Stop hook relents after three refusals (decision 8) — backlog row B-007,
   a `cost`.
 - Decisions 4–6 and 10 — the minimum question, no workarounds, the re-ball on a
