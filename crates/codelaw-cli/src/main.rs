@@ -2,6 +2,7 @@
 //! `codelaw-engine` and prints the result; no logic lives here
 //! (SR-ARCHITECTURE decision 2, SR-CLI-MCP decision 6).
 
+mod graph_cmd;
 mod init;
 mod rules_cmd;
 mod tree;
@@ -40,6 +41,8 @@ enum Command {
     NewRule(rules_cmd::NewRuleArgs),
     /// Set codelaw up in this repo: config, rule packs, folders.
     Init(init::InitArgs),
+    /// Query the project graph: `refs`, `why-unused`.
+    Graph(graph_cmd::GraphArgs),
     /// Manage the cache.
     Cache {
         #[command(subcommand)]
@@ -279,6 +282,7 @@ fn main() -> ExitCode {
         Command::Tree(a) => tree::tree(a),
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
+        Command::Graph(a) => graph_cmd::graph(a),
         Command::Cache { action } => cache(action),
     }
 }

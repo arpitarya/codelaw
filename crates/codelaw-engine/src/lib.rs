@@ -6,6 +6,7 @@ mod compile;
 mod discover;
 mod fix;
 mod lint;
+mod project;
 mod suppress;
 
 pub use compile::{CompiledRule, Matcher};
@@ -190,6 +191,13 @@ impl Project {
         }
         if !self.rules.has_rules() {
             report.diagnostics.push(lint::no_rules(self));
+        }
+        // Project rules see the whole root, and report inside `paths`.
+        if !self.graph_rules().is_empty() {
+            let config = self.graph_config()?;
+            let sources = self.graph_sources()?;
+            let scopes = project::scopes(self.root(), paths);
+            report.diagnostics.extend(self.run_graph_rules(&sources, config).into_iter().filter(|d| project::within(&d.file, &scopes)));
         }
         report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
         report.diagnostics.dedup_by(|a, b| a.file == b.file && a.start_byte == b.start_byte && a.end_byte == b.end_byte && a.rule == b.rule);

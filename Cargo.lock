@@ -330,6 +330,7 @@ dependencies = [
  "codelaw-core",
  "codelaw-engine",
  "codelaw-fix",
+ "codelaw-graph",
  "codelaw-lang",
  "codelaw-match",
  "codelaw-report",
@@ -370,6 +371,7 @@ dependencies = [
  "codelaw-config",
  "codelaw-core",
  "codelaw-fix",
+ "codelaw-graph",
  "codelaw-lang",
  "codelaw-match",
  "codelaw-native",
@@ -393,6 +395,20 @@ dependencies = [
  "codelaw-semantic",
  "serde",
  "serde_json",
+ "tree-sitter",
+]
+
+[[package]]
+name = "codelaw-graph"
+version = "0.1.0"
+dependencies = [
+ "codelaw-core",
+ "codelaw-lang",
+ "codelaw-semantic",
+ "globset",
+ "serde",
+ "serde_json",
+ "toml",
  "tree-sitter",
 ]
 

@@ -172,6 +172,24 @@ impl RuleSet {
                     shadows.push(e.source.label());
                 }
                 let preview_blocked = rule.stability == Stability::Preview && !config.preview();
+                // A `graph/` rule two first-party packs ship is one rule over
+                // both packs' languages (SR-RULE-PACKS decision 2).
+                let mut rule = rule.clone();
+                if let Some(e) = entry
+                    && rule.namespace() == "graph"
+                    && pack.first_party
+                    && matches!(&e.source, RuleSource::Pack { first_party: true, .. })
+                {
+                    let mut languages = e.rule.languages.clone();
+                    languages.extend(rule.languages.iter().filter(|l| !e.rule.languages.contains(l)));
+                    let mut examples = e.rule.examples.clone();
+                    examples.extend(rule.examples.iter().filter(|x| !e.rule.examples.iter().any(|y| y.language == x.language)).cloned());
+                    let mut cases = e.rule.cases.clone();
+                    cases.extend(rule.cases.iter().cloned());
+                    rule.languages = languages;
+                    rule.examples = examples;
+                    rule.cases = cases;
+                }
                 merged.insert(
                     rule.id.clone(),
                     LoadedRule {

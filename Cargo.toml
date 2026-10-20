@@ -21,6 +21,7 @@ codelaw-semantic = { path = "crates/codelaw-semantic" }
 codelaw-match = { path = "crates/codelaw-match" }
 codelaw-native = { path = "crates/codelaw-native" }
 codelaw-fix = { path = "crates/codelaw-fix" }
+codelaw-graph = { path = "crates/codelaw-graph" }
 codelaw-engine = { path = "crates/codelaw-engine" }
 codelaw-report = { path = "crates/codelaw-report" }
 codelaw-test = { path = "crates/codelaw-test" }

@@ -13,7 +13,7 @@ use codelaw_cache::Key;
 use codelaw_config::{Config, RuleConfig};
 use codelaw_core::{FixClass, Language};
 use codelaw_engine::{EngineOptions, Project};
-use codelaw_rules::{LoadedRule, RuleSet, Snippet};
+use codelaw_rules::{LoadedRule, RuleSet, Scope, Snippet};
 use std::collections::BTreeSet;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -122,9 +122,26 @@ impl<'a> Tester<'a> {
         snippet.path.clone().unwrap_or_else(|| format!("example.{}", language.extension()))
     }
 
-    /// This rule's diagnostics on a snippet, as `line:col rule` lines.
+    fn project_scope(&self) -> bool {
+        self.loaded.rule.scope == Scope::Project
+    }
+
+    /// This rule's diagnostics on a snippet, as `line:col rule` lines
+    /// (`path:line:col rule` for a multi-file snippet).
     fn fires(&mut self, language: Language, snippet: &Snippet, code: &str) -> Vec<String> {
         let id = self.loaded.rule.id.clone();
+        if self.project_scope() {
+            let files = split_files(language, code);
+            let multi = files.len() > 1 || files.first().is_some_and(|f| f.header.is_some());
+            let set: Vec<(String, Language, String)> = files.iter().map(|f| (f.path.clone(), f.language, f.text.clone())).collect();
+            return self
+                .plain
+                .check_files(&set)
+                .into_iter()
+                .filter(|d| d.rule == id)
+                .map(|d| if multi { format!("{}:{}:{} {}", d.file, d.start.line, d.start.column, d.rule) } else { format!("{}:{} {}", d.start.line, d.start.column, d.rule) })
+                .collect();
+        }
         let path = Self::path(language, snippet);
         let p = self.project(snippet);
         p.check_source(&path, language, code)
@@ -135,6 +152,19 @@ impl<'a> Tester<'a> {
     }
 
     fn fix(&mut self, language: Language, snippet: &Snippet, code: &str) -> String {
+        if self.project_scope() {
+            let files = split_files(language, code);
+            let set: Vec<(String, Language, String)> = files.iter().map(|f| (f.path.clone(), f.language, f.text.clone())).collect();
+            let fixed = self.plain.fix_files(&set, true);
+            return files
+                .iter()
+                .zip(fixed)
+                .map(|(f, (_, text))| match &f.header {
+                    Some(h) => format!("{h}\n{text}"),
+                    None => text,
+                })
+                .collect();
+        }
         let path = Self::path(language, snippet);
         self.project(snippet).fix_source(&path, language, code, true).fixed
     }
@@ -237,6 +267,61 @@ impl<'a> Tester<'a> {
             }
         }
     }
+}
+
+/// One file of a multi-file snippet.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SnippetFile {
+    /// The header line as written (`// packages/a/src/x.ts`).
+    pub header: Option<String>,
+    pub path: String,
+    pub language: Language,
+    pub text: String,
+}
+
+/// The path a header line names: `// path`, `# path`, `/* path */` or
+/// `<!-- path -->`, alone on its line.
+fn header_path(line: &str) -> Option<String> {
+    let t = line.trim();
+    let inner = if let Some(r) = t.strip_prefix("//") {
+        r
+    } else if let Some(r) = t.strip_prefix("<!--") {
+        r.strip_suffix("-->")?
+    } else if let Some(r) = t.strip_prefix("/*") {
+        r.strip_suffix("*/")?
+    } else if let Some(r) = t.strip_prefix('#') {
+        r
+    } else {
+        return None;
+    };
+    let p = inner.trim();
+    if p.is_empty() || p.contains(char::is_whitespace) || !p.contains('.') {
+        return None;
+    }
+    let name = p.rsplit('/').next().unwrap_or(p);
+    let known = Language::from_path(std::path::Path::new(p)).is_some() || matches!(name, "setup.py" | "setup.cfg");
+    known.then(|| p.to_owned())
+}
+
+/// Split a `files` snippet into its `// path` sections (SR-PROJECT-GRAPH
+/// decision 6); a snippet with no header is one file, `example.<ext>`.
+pub fn split_files(language: Language, code: &str) -> Vec<SnippetFile> {
+    let mut out: Vec<SnippetFile> = Vec::new();
+    let mut lead = String::new();
+    for line in code.split_inclusive('\n') {
+        if let Some(p) = header_path(line) {
+            let language = Language::from_path(std::path::Path::new(&p)).unwrap_or(language);
+            out.push(SnippetFile { header: Some(line.trim_end_matches(['\n', '\r']).to_owned()), path: p, language, text: String::new() });
+        } else if let Some(f) = out.last_mut() {
+            f.text.push_str(line);
+        } else {
+            lead.push_str(line);
+        }
+    }
+    if out.is_empty() {
+        return vec![SnippetFile { header: None, path: format!("example.{}", language.extension()), language, text: code.to_owned() }];
+    }
+    out
 }
 
 /// Test one rule.
