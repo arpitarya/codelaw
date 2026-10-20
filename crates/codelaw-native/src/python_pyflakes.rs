@@ -165,6 +165,14 @@ fn names_in_string_annotations(root: Node<'_>, src: &str, model: &SemanticModel)
 fn in_typing_context(n: Node<'_>, model: &SemanticModel, src: &str) -> bool {
     const GENERIC_BUILTINS: &[&str] = &["builtins.list", "builtins.dict", "builtins.set", "builtins.frozenset", "builtins.tuple", "builtins.type"];
     let typing = |q: &str| q.starts_with("typing.") || q.starts_with("typing_extensions.") || q.starts_with("collections.abc.") || GENERIC_BUILTINS.contains(&q);
+    // `X: TypeAlias = "Decimal | int"`: the value of an explicit alias is a type.
+    if let Some(a) = n.parent().filter(|p| p.kind() == "assignment" && p.child_by_field_name("right").is_some_and(|r| r.id() == n.id()))
+        && let Some(t) = a.child_by_field_name("type")
+        && let Some(e) = t.named_child(0).or(Some(t))
+        && crate::python_util::qualified_name(e, model, src).is_some_and(|q| q == "typing.TypeAlias" || q == "typing_extensions.TypeAlias")
+    {
+        return true;
+    }
     let mut cur = n;
     while let Some(p) = cur.parent() {
         match p.kind() {

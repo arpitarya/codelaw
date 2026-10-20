@@ -10,7 +10,7 @@ use tree_sitter::Node;
 const MODULE: ScopeId = 0;
 
 pub(crate) fn build(root: Node<'_>, src: &str) -> SemanticModel {
-    let mut b = Builder { src, m: SemanticModel { python: true, ..Default::default() }, all: None };
+    let mut b = Builder { src, m: SemanticModel { python: true, ..Default::default() }, all: None, all_dynamic: false };
     b.m.push_scope(None, ScopeKind::Module, root.start_byte(), root.end_byte());
     b.children(root, MODULE);
     b.m.resolve();
@@ -23,6 +23,9 @@ struct Builder<'s> {
     m: SemanticModel,
     /// The names of a module-level `__all__`, if it has one.
     all: Option<Vec<String>>,
+    /// Some part of `__all__` is not a literal (`sub.__all__`, a call): the
+    /// export list cannot be known statically.
+    all_dynamic: bool,
 }
 
 fn named_children<'t>(n: Node<'t>) -> Vec<Node<'t>> {
@@ -116,18 +119,21 @@ impl<'s> Builder<'s> {
                 if let Some(name) = n.child_by_field_name("name") {
                     self.bind(scope, name, SymbolKind::Function);
                 }
-                let inner = self.scope(scope, ScopeKind::Function, n);
-                self.visit_field(n, "type_parameters", inner);
+                // PEP 695: `def f[T](x: T) -> T` puts `T` in an annotation
+                // scope that holds the annotations and the body; defaults
+                // are still evaluated outside it.
+                let annotations = self.type_param_scope(n, scope);
+                let inner = self.scope(annotations, ScopeKind::Function, n);
                 if let Some(params) = n.child_by_field_name("parameters") {
-                    self.params(params, scope, inner);
+                    self.params(params, scope, annotations, inner);
                 }
-                self.visit_field(n, "return_type", scope);
+                self.visit_field(n, "return_type", annotations);
                 self.visit_field(n, "body", inner);
             }
             "lambda" => {
                 let inner = self.scope(scope, ScopeKind::Function, n);
                 if let Some(params) = n.child_by_field_name("parameters") {
-                    self.params(params, scope, inner);
+                    self.params(params, scope, scope, inner);
                 }
                 self.visit_field(n, "body", inner);
             }
@@ -135,38 +141,17 @@ impl<'s> Builder<'s> {
                 if let Some(name) = n.child_by_field_name("name") {
                     self.bind(scope, name, SymbolKind::Class);
                 }
-                self.visit_field(n, "superclasses", scope);
-                let inner = self.scope(scope, ScopeKind::Class, n);
-                self.visit_field(n, "type_parameters", inner);
+                // PEP 695: `class C[T](Base[T])` — the bases and every
+                // method see `T` (an annotation scope is not a class scope).
+                let annotations = self.type_param_scope(n, scope);
+                self.visit_field(n, "superclasses", annotations);
+                let inner = self.scope(annotations, ScopeKind::Class, n);
                 self.visit_field(n, "body", inner);
             }
             // `List[int]` in an annotation is a subscript, not a PEP 695
             // declaration: its names are references.
             "type_parameter" if n.parent().is_some_and(|p| p.kind() == "generic_type") => self.children(n, scope),
-            "type_parameter" => {
-                for c in named_children(n) {
-                    match c.kind() {
-                        "type" => match c.named_child(0) {
-                            Some(id) if id.kind() == "identifier" => {
-                                self.bind(scope, id, SymbolKind::TypeParam);
-                            }
-                            // `T: int` binds `T`; the bound is a reference.
-                            Some(ct) if ct.kind() == "constrained_type" => {
-                                for (i, part) in named_children(ct).into_iter().enumerate() {
-                                    match part.named_child(0).filter(|x| i == 0 && x.kind() == "identifier") {
-                                        Some(id) => {
-                                            self.bind(scope, id, SymbolKind::TypeParam);
-                                        }
-                                        None => self.visit(part, scope),
-                                    }
-                                }
-                            }
-                            _ => self.visit(c, scope),
-                        },
-                        _ => self.visit(c, scope),
-                    }
-                }
-            }
+            "type_parameter" => self.type_params(n, scope),
             "list_comprehension" | "set_comprehension" | "dictionary_comprehension" | "generator_expression" => {
                 let inner = self.scope(scope, ScopeKind::Comprehension, n);
                 let mut first = true;
@@ -196,7 +181,9 @@ impl<'s> Builder<'s> {
                     && self.text(l) == "__all__"
                     && let Some(r) = n.child_by_field_name("right")
                 {
-                    self.all = Some(self.string_list(r));
+                    self.all = Some(Vec::new());
+                    self.all_dynamic = false;
+                    self.add_all(r);
                 }
                 if let Some(l) = left {
                     self.target(l, scope, SymbolKind::Variable);
@@ -211,8 +198,8 @@ impl<'s> Builder<'s> {
                             && self.text(l) == "__all__"
                             && let Some(r) = n.child_by_field_name("right")
                         {
-                            let more = self.string_list(r);
-                            self.all.get_or_insert_with(Vec::new).extend(more);
+                            self.all.get_or_insert_with(Vec::new);
+                            self.add_all(r);
                         }
                         self.reference(scope, l, true, true);
                         if !self.m.scopes[scope].bindings.contains_key(self.text(l)) {
@@ -223,6 +210,29 @@ impl<'s> Builder<'s> {
                     }
                 }
                 self.visit_field(n, "right", scope);
+            }
+            // `__all__.extend([...])`, `__all__.append("x")`.
+            "call" => {
+                if scope == MODULE
+                    && let Some(f) = n.child_by_field_name("function")
+                    && matches!(self.text(f), "__all__.extend" | "__all__.append")
+                    && self.all.is_some()
+                {
+                    let append = self.text(f).ends_with("append");
+                    let args: Vec<Node<'_>> = n.child_by_field_name("arguments").map(named_children).unwrap_or_default();
+                    match args.as_slice() {
+                        [a] if append && a.kind() == "string" => {
+                            if let Some(v) = self.string_value(*a) {
+                                self.all.get_or_insert_with(Vec::new).push(v);
+                            } else {
+                                self.all_dynamic = true;
+                            }
+                        }
+                        [a] if !append => self.add_all(*a),
+                        _ => self.all_dynamic = true,
+                    }
+                }
+                self.children(n, scope);
             }
             "for_statement" => {
                 if let Some(l) = n.child_by_field_name("left") {
@@ -332,12 +342,29 @@ impl<'s> Builder<'s> {
                 }
             }
             "type_alias_statement" => {
+                // `type A = …` or `type A[T] = …`: the left side is a
+                // `generic_type` when it has parameters, whose scope holds
+                // the (lazily evaluated) right side.
+                let mut value_scope = scope;
                 if let Some(left) = n.child_by_field_name("left")
-                    && let Some(id) = left.named_child(0).filter(|i| i.kind() == "identifier")
+                    && let Some(head) = left.named_child(0)
                 {
-                    self.bind(scope, id, SymbolKind::TypeAlias);
+                    let name = match head.kind() {
+                        "identifier" => Some(head),
+                        "generic_type" => head.named_child(0).filter(|i| i.kind() == "identifier"),
+                        _ => None,
+                    };
+                    if let Some(id) = name {
+                        self.bind(scope, id, SymbolKind::TypeAlias);
+                    }
+                    if head.kind() == "generic_type"
+                        && let Some(params) = named_children(head).into_iter().find(|c| c.kind() == "type_parameter")
+                    {
+                        value_scope = self.scope(scope, ScopeKind::TypeParams, n);
+                        self.type_params(params, value_scope);
+                    }
                 }
-                self.visit_field(n, "right", scope);
+                self.visit_field(n, "right", value_scope);
             }
             "case_clause" => {
                 for c in named_children(n) {
@@ -352,7 +379,48 @@ impl<'s> Builder<'s> {
         }
     }
 
-    fn params(&mut self, params: Node<'_>, outer: ScopeId, inner: ScopeId) {
+    /// The PEP 695 annotation scope of a generic `def` or `class`, with its
+    /// type parameters bound; `scope` itself when it has none.
+    fn type_param_scope(&mut self, n: Node<'_>, scope: ScopeId) -> ScopeId {
+        match n.child_by_field_name("type_parameters") {
+            Some(params) => {
+                let tp = self.scope(scope, ScopeKind::TypeParams, n);
+                self.type_params(params, tp);
+                tp
+            }
+            None => scope,
+        }
+    }
+
+    /// `[T, U: int, *Ts]` of a declaration: each name binds in `scope`.
+    fn type_params(&mut self, n: Node<'_>, scope: ScopeId) {
+        for c in named_children(n) {
+            match c.kind() {
+                "type" => match c.named_child(0) {
+                    Some(id) if id.kind() == "identifier" => {
+                        self.bind(scope, id, SymbolKind::TypeParam);
+                    }
+                    // `T: int` binds `T`; the bound is a reference.
+                    Some(ct) if ct.kind() == "constrained_type" => {
+                        for (i, part) in named_children(ct).into_iter().enumerate() {
+                            match part.named_child(0).filter(|x| i == 0 && x.kind() == "identifier") {
+                                Some(id) => {
+                                    self.bind(scope, id, SymbolKind::TypeParam);
+                                }
+                                None => self.visit(part, scope),
+                            }
+                        }
+                    }
+                    _ => self.visit(c, scope),
+                },
+                _ => self.visit(c, scope),
+            }
+        }
+    }
+
+    /// `outer` evaluates defaults, `annotations` the parameter annotations
+    /// (a PEP 695 annotation scope, or `outer`), `inner` binds the names.
+    fn params(&mut self, params: Node<'_>, outer: ScopeId, annotations: ScopeId, inner: ScopeId) {
         for p in named_children(params) {
             match p.kind() {
                 "identifier" => {
@@ -362,13 +430,13 @@ impl<'s> Builder<'s> {
                     if let Some(name) = p.child_by_field_name("name") {
                         self.param_name(name, inner);
                     }
-                    self.visit_field(p, "type", outer);
+                    self.visit_field(p, "type", annotations);
                     self.visit_field(p, "value", outer);
                 }
                 "typed_parameter" => {
                     for c in named_children(p) {
                         if Some(c) == p.child_by_field_name("type") {
-                            self.visit(c, outer);
+                            self.visit(c, annotations);
                         } else {
                             self.param_name(c, inner);
                         }
@@ -473,18 +541,55 @@ impl<'s> Builder<'s> {
         }
     }
 
-    fn string_list(&self, n: Node<'_>) -> Vec<String> {
-        let mut out = Vec::new();
-        if matches!(n.kind(), "list" | "tuple") {
-            for s in named_children(n) {
-                if s.kind() == "string" {
-                    let content: String =
-                        named_children(s).into_iter().filter(|c| c.kind() == "string_content").map(|c| self.text(c)).collect();
-                    out.push(content);
+    /// Add the names of an `__all__` value: a list or tuple of strings, or
+    /// a `+` of them. Anything else (`sub.__all__`, a call, an f-string)
+    /// makes the list dynamic.
+    fn add_all(&mut self, n: Node<'_>) {
+        match n.kind() {
+            "list" | "tuple" => {
+                for s in named_children(n) {
+                    match self.string_value(s) {
+                        Some(v) => self.all.get_or_insert_with(Vec::new).push(v),
+                        None if s.kind() == "comment" => {}
+                        None => self.all_dynamic = true,
+                    }
                 }
             }
+            "parenthesized_expression" => {
+                for c in named_children(n) {
+                    self.add_all(c);
+                }
+            }
+            "binary_operator" if n.child_by_field_name("operator").is_some_and(|o| o.kind() == "+") => {
+                self.visit_all_side(n, "left");
+                self.visit_all_side(n, "right");
+            }
+            _ => self.all_dynamic = true,
         }
-        out
+    }
+
+    fn visit_all_side(&mut self, n: Node<'_>, field: &str) {
+        match n.child_by_field_name(field) {
+            Some(c) => self.add_all(c),
+            None => self.all_dynamic = true,
+        }
+    }
+
+    /// The value of a plain string literal; `None` for an f-string or one
+    /// with escapes or interpolations.
+    fn string_value(&self, s: Node<'_>) -> Option<String> {
+        if s.kind() != "string" {
+            return None;
+        }
+        let mut out = String::new();
+        for c in named_children(s) {
+            match c.kind() {
+                "string_start" | "string_end" => {}
+                "string_content" => out.push_str(self.text(c)),
+                _ => return None,
+            }
+        }
+        Some(out)
     }
 
     fn push_import(&mut self, source: String, imported: Imported, local: Option<usize>, n: Node<'_>) {
@@ -500,6 +605,9 @@ impl<'s> Builder<'s> {
             for id in ids {
                 let s = &self.m.symbols[id];
                 let export = match &listed {
+                    // A dynamic `__all__` may name any public module-level
+                    // name, imports included: claim none of them is unused.
+                    Some(all) if self.all_dynamic => all.contains(&name) || !name.starts_with('_'),
                     Some(all) => all.contains(&name),
                     None => !name.starts_with('_') && (s.kind != SymbolKind::Import || s.exported),
                 };

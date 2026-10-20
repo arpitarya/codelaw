@@ -834,11 +834,13 @@ fn percent_decode(t: &str) -> String {
     let mut out = Vec::with_capacity(b.len());
     let mut i = 0;
     while i < b.len() {
+        // Hex digits are checked byte by byte: slicing `t` after a `%` could
+        // split a multi-byte character (`#%aé`) and panic.
         if b[i] == b'%'
-            && i + 2 < b.len()
-            && let Ok(v) = u8::from_str_radix(&t[i + 1..i + 3], 16)
+            && i + 3 <= b.len()
+            && let (Some(hi), Some(lo)) = (hex_digit(b[i + 1]), hex_digit(b[i + 2]))
         {
-            out.push(v);
+            out.push(hi << 4 | lo);
             i += 3;
             continue;
         }
@@ -846,6 +848,10 @@ fn percent_decode(t: &str) -> String {
         i += 1;
     }
     String::from_utf8(out).unwrap_or_else(|_| t.to_owned())
+}
+
+fn hex_digit(b: u8) -> Option<u8> {
+    (b as char).to_digit(16).map(|d| d as u8)
 }
 
 /// `id="x"` and `name="x"` attributes anywhere in the document.

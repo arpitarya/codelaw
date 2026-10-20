@@ -60,7 +60,9 @@ The starter-catalogue rules are all here under their starter ids:
 The JSON, YAML and TOML rules come from the formats' specifications (RFC 8259,
 YAML 1.2.2 and its YAML 1.1 differences, TOML 1.0.0) and the Python packaging
 specifications (PEP 503 names, PEP 621 `[project]`). yamllint (GPL-3.0) is not
-a source: no code, text or rule names are taken from it.
+a source: no code, documentation text, options or messages are taken from it.
+One rule name coincides with one of yamllint's — `yaml/document-start` and its
+`document-start`: both describe the same `---` marker.
 
 ## How the ports differ
 

@@ -43,3 +43,15 @@
 ```expect
 5:1 md/link-fragments
 ```
+
+### case: percent before a multi-byte character
+
+````md
+# Title
+
+[a](#%aé) [b](#%74itle)
+````
+
+```expect
+3:1 md/link-fragments
+```

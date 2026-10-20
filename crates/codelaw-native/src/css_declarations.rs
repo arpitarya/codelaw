@@ -5,7 +5,7 @@ use crate::css_syntax::{
     Kind, Sheet, VKind, VNode, css_rule, dimension, finding, fixed, matches_any, non_standard_value, opt_list, opt_str, set, significant, split_commas, standard_property,
     table, text, unprefixed, values, vendor_prefix,
 };
-use crate::util::whole_lines;
+use crate::util::{unquote, whole_lines};
 use codelaw_core::TextEdit;
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -328,7 +328,7 @@ fn families(src: &str, r: (usize, usize)) -> Vec<((usize, usize), String, bool)>
         .map(|f| {
             let t = text(src, f);
             let quoted = t.starts_with(['"', '\'']);
-            let name = if quoted && t.len() >= 2 { t[1..t.len() - 1].to_owned() } else { t.split_whitespace().collect::<Vec<_>>().join(" ") };
+            let name = if quoted && t.len() >= 2 { unquote(t).to_owned() } else { t.split_whitespace().collect::<Vec<_>>().join(" ") };
             (f, name, quoted)
         })
         .collect()
@@ -435,7 +435,7 @@ fn grid_rows(src: &str, list: &[VNode]) -> Vec<Vec<String>> {
         .filter(|n| n.kind == VKind::Str)
         .map(|n| {
             let t = n.text(src);
-            let inner = if t.len() >= 2 { &t[1..t.len() - 1] } else { "" };
+            let inner = if t.len() >= 2 { unquote(t) } else { "" };
             let mut cells = Vec::new();
             let mut cur = String::new();
             for c in inner.chars() {

@@ -93,7 +93,17 @@ pub fn property_name(key: Node<'_>, src: &str) -> Option<String> {
 /// A string literal's value, without its quotes (escapes are kept).
 pub fn string_value(n: Node<'_>, src: &str) -> String {
     let t = text(n, src);
-    if t.len() >= 2 { t[1..t.len() - 1].to_owned() } else { t.to_owned() }
+    if t.len() >= 2 { unquote(t).to_owned() } else { t.to_owned() }
+}
+
+/// `t` without its first and last character, cut on character boundaries:
+/// an unterminated string ending in `é` must not split it (byte slicing
+/// `[1..len - 1]` panics there). Fewer than two characters give "".
+pub fn unquote(t: &str) -> &str {
+    let mut c = t.chars();
+    c.next();
+    c.next_back();
+    c.as_str()
 }
 
 /// A numeric key as JavaScript would print it: `0x1`, `1.0` and `1` are one key.

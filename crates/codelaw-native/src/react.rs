@@ -8,7 +8,7 @@ use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
 use codelaw_semantic::{ScopeId, SemanticModel};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use tree_sitter::Node;
 
 const JSX: &[Language] = &[Language::Javascript, Language::Jsx, Language::Typescript, Language::Tsx];
@@ -276,8 +276,12 @@ fn stable(model: &SemanticModel, root: Node<'_>, symbol: usize, src: &str) -> bo
     match hook {
         "useRef" => true,
         "useState" | "useReducer" | "useTransition" | "useActionState" => {
-            // The second element of `[value, setValue]`.
-            id.parent().is_some_and(|p| p.kind() == "array_pattern" && named_children(p).iter().position(|c| c.id() == id.id()) == Some(1))
+            // The second element of `[value, setValue]`, counted by the
+            // commas before it so a hole (`[, setValue]`) keeps its place.
+            id.parent().is_some_and(|p| {
+                let mut c = p.walk();
+                p.kind() == "array_pattern" && p.children(&mut c).take_while(|c| c.id() != id.id()).filter(|c| c.kind() == ",").count() == 1
+            })
         }
         _ => false,
     }
@@ -339,7 +343,18 @@ impl NativeRule for ExhaustiveDeps {
         // Values the callback reads that the component declares, outside the
         // callback itself.
         let mut needed: BTreeSet<String> = BTreeSet::new();
-        for r in &model.references {
+        // The callback's own references, found by walking its subtree: a
+        // scan of every reference in the file per hook call is quadratic.
+        let mut refs: BTreeSet<usize> = BTreeSet::new();
+        let mut cursor = callback.walk();
+        let mut stack = vec![callback];
+        while let Some(n) = stack.pop() {
+            if let Some(r) = model.reference_at(n.start_byte()) {
+                refs.insert(r.start);
+            }
+            stack.extend(n.named_children(&mut cursor));
+        }
+        for r in refs.into_iter().filter_map(|at| model.reference_at(at)) {
             if r.start < callback.start_byte() || r.end > callback.end_byte() || r.type_only {
                 continue;
             }
@@ -354,25 +369,22 @@ impl NativeRule for ExhaustiveDeps {
             // A reference that is only `.current` of something is a ref read.
             needed.insert(s.name.clone());
         }
-        let mut listed: BTreeMap<String, Node> = BTreeMap::new();
-        for d in named_children(deps) {
-            if let Some(name) = root_name(d, src) {
-                listed.insert(name, d);
-            }
-        }
-        let missing: Vec<&String> = needed.iter().filter(|n| !listed.contains_key(*n)).collect();
+        // Each listed dependency with its root name: `[props.a, props.b]`
+        // is two entries under one root, and both survive the rewrite.
+        let listed: Vec<(String, Node)> = named_children(deps).into_iter().filter_map(|d| root_name(d, src).map(|name| (name, d))).collect();
+        let missing: Vec<&String> = needed.iter().filter(|n| !listed.iter().any(|(l, _)| l == *n)).collect();
         let mut problems = Vec::new();
         if !missing.is_empty() {
             problems.push(format!("missing {}", missing.iter().map(|m| format!("`{m}`")).collect::<Vec<_>>().join(", ")));
         }
         // An outer value (an import, a module constant) never changes between
         // renders, so listing it does nothing.
-        let mut unnecessary = Vec::new();
+        let mut unnecessary: Vec<String> = Vec::new();
         for (name, d) in &listed {
             let sym = model.reference_at(d.start_byte()).and_then(|r| r.symbol);
             let outer = sym.is_some_and(|s| !scope_chain(model, model.symbol(s).scope).contains(&component_scope) && model.symbol(s).scope != component_scope);
             let unused_here = !needed.contains(name) && !effect;
-            if outer || unused_here {
+            if (outer || unused_here) && !unnecessary.contains(name) {
                 unnecessary.push(name.clone());
             }
         }
@@ -382,7 +394,7 @@ impl NativeRule for ExhaustiveDeps {
         if problems.is_empty() {
             return;
         }
-        let mut wanted: Vec<String> = listed.keys().filter(|k| !unnecessary.contains(k)).map(|k| text(listed[k], src).to_owned()).collect();
+        let mut wanted: Vec<String> = listed.iter().filter(|(k, _)| !unnecessary.contains(k)).map(|(_, d)| text(*d, src).to_owned()).collect();
         wanted.extend(missing.iter().map(|m| (*m).clone()));
         wanted.sort();
         wanted.dedup();
@@ -430,5 +442,16 @@ mod tests {
             ("`useCallback` has unnecessary `api` in its dependency list".to_string(), "[n]".to_string()),
             ("`useCallback` without a dependency list does nothing; pass one".to_string(), String::new()),
         ]);
+    }
+
+    #[test]
+    fn exhaustive_deps_member_paths_and_holes() {
+        // W-17 row 26: two paths under one root both survive the rewrite.
+        let src = "function App(props) {\n  const [x] = useState(0);\n  const f = useCallback(() => props.a + props.b + x, [props.a, props.b]);\n}";
+        let found: Vec<String> = crate::run(&ExhaustiveDeps, Language::Jsx, src).into_iter().flat_map(|f| f.edits.into_iter().map(|e| e.text)).collect();
+        assert_eq!(found, ["[props.a, props.b, x]"]);
+        // W-17 row 27: a setter after a hole is still the stable second element.
+        let src = "function App() {\n  const [, setN] = useState(0);\n  useEffect(() => { setN(1); }, []);\n}";
+        assert!(crate::run(&ExhaustiveDeps, Language::Jsx, src).is_empty());
     }
 }

@@ -236,3 +236,54 @@ mp.connection.wait([])
 ```expect
 (none)
 ```
+
+### case: __all__ built from another module's __all__
+
+```py
+from . import sub
+from .sub import *
+from .core import load
+
+__all__ = ["sub"] + sub.__all__
+```
+
+```expect
+(none)
+```
+
+### case: __all__ extended and appended
+
+```py
+from .core import load, save, drop
+
+__all__ = []
+__all__.extend(["load"])
+__all__.append("save")
+```
+
+```expect
+1:31 py/unused-import
+```
+
+```fixed
+from .core import load, save
+
+__all__ = []
+__all__.extend(["load"])
+__all__.append("save")
+```
+
+### case: a TypeAlias string uses a TYPE_CHECKING import
+
+```py
+from typing import TYPE_CHECKING, TypeAlias
+
+if TYPE_CHECKING:
+    from decimal import Decimal
+
+Number: TypeAlias = "Decimal | int"
+```
+
+```expect
+(none)
+```

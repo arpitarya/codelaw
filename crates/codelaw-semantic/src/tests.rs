@@ -245,3 +245,58 @@ fn python_generic_subscripts_are_references() {
     assert!(t.m.symbols.iter().all(|s| s.name != "str"), "`str` in `List[str]` is a reference, not a declaration");
     assert!(t.m.symbols.iter().any(|s| s.name == "T"), "a PEP 695 type parameter is declared");
 }
+
+#[test]
+fn python_pep695_type_params_scope() {
+    // W-17 row 23: annotations, return types, bases and methods see the
+    // parameters; defaults and the module do not.
+    let t = model(
+        Language::Python,
+        "def first[T](xs: list[T], d=T) -> T:\n    y: T = xs[0]\n    return y\n\nclass Box[U](Base[U]):\n    def get(self) -> U:\n        return self.u\n\nx: T\n",
+    );
+    assert!(!t.undeclared("T", 1), "a parameter annotation");
+    assert!(t.undeclared("T", 2), "a default is evaluated outside");
+    assert!(!t.undeclared("T", 3), "the return type");
+    assert!(!t.undeclared("T", 4), "the body");
+    assert!(t.undeclared("T", 5), "the module");
+    assert!(!t.undeclared("U", 1), "a base");
+    assert!(!t.undeclared("U", 2), "a method");
+}
+
+#[test]
+fn python_generic_type_alias_binds() {
+    // W-17 row 28: `type Alias[T] = ...` binds `Alias`; `T` is the alias's own.
+    let t = model(Language::Python, "type Alias[T] = list[T]\nx: Alias[int]\ny: T\n");
+    assert!(!t.undeclared("Alias", 1));
+    assert!(!t.undeclared("T", 1));
+    assert!(t.undeclared("T", 2));
+}
+
+#[test]
+fn python_dynamic_all() {
+    // W-17 row 24: a non-literal part makes the export list unknowable.
+    let t = model(Language::Python, "from . import sub\nfrom .x import a, b\n__all__ = ['sub'] + sub.__all__\n");
+    assert!(!t.unused("a"), "may be re-exported");
+    assert!(!t.unused("b"));
+    let t = model(Language::Python, "from .x import a, b, c\n__all__ = ['a']\n__all__.extend(['b'])\n__all__ += ('c',)\n");
+    assert!(!t.unused("a"));
+    assert!(!t.unused("b"), "extended");
+    assert!(!t.unused("c"), "added");
+    let t = model(Language::Python, "from .x import a, b\n__all__ = []\n__all__.append('a')\n");
+    assert!(!t.unused("a"), "appended");
+    assert!(t.unused("b"), "a literal list stays exact");
+}
+
+#[test]
+fn typescript_merged_export_and_enums() {
+    // W-17 row 25: `export { Color }` exports the value and the type.
+    let t = model(Language::Typescript, "const Color = 1;\ntype Color = number;\nexport { Color };\n");
+    let ids = &t.m.scopes[0].bindings["Color"];
+    assert_eq!(ids.len(), 2);
+    assert!(ids.iter().all(|&id| !t.m.is_unused(id)), "both namespaces are exported");
+    // W-17 row 33: members are declared; `NS.T` reads `NS` as a type.
+    let t = model(Language::Typescript, "enum E { A = 1, B = A << 1, C }\nlet v: NS.T;\nlet w: E.A = E.B;\n");
+    assert!(!t.undeclared("A", 1), "a member in an initializer");
+    assert!(t.m.reference_at(t.at("NS", 0)).is_some_and(|r| r.type_only));
+    assert!(!t.unused("E"));
+}
