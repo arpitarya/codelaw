@@ -24,7 +24,7 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
-## 2026-10-20 — W-03 in part: js presets finished; data and css packs merged; python and html agents running  ·  Claude Code (Opus 5.5)
+## 2026-10-20 — W-03 in part: js presets finished; data, css and html packs merged; python returned for fixes  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"continue all run everything in parallel"*.
 - **Done:**
@@ -35,7 +35,9 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
   - Backlog B-040 (native rules see no file path) and B-041 (tree-sitter-css can't parse modern CSS).
 - **Decided / left open:** `md/no-duplicate-heading` defaults to siblings only; `json/package-engines` defaults to `>=22` and `toml/pyproject-requires-python` to `>=3.11`, the L6 host floors — for the decider to correct. Still open: whether every pack rule stays `preview`, and the project licence (blocks publishing).
 - **Mistakes:** the agents shared one scratchpad corpus folder and one emptied it under another mid-run; each now keeps its own. A whole-disk search for CSS files ran past its timeout and was stopped.
-- **Next:** review and merge the python and html branches; then close W-03 steps 3–4.
+  - `packs/html` (71 rules, 6045676) merged after the same checks plus a 51-file rustdoc and Homebrew-docs run: findings sampled were spec violations html-validate also reports.
+  - `packs/python` (98 rules) held back: compared with Ruff on pip's source it gave 87 extra unused-import findings and false `undefined-local` and `groupby` findings; returned to its agent with reproductions.
+- **Next:** re-check and merge the python branch; then close W-03 steps 3–5 (step 6, publish, needs the decider).
 
 ---
 

@@ -11,6 +11,7 @@ against this file before an item may be closed
 
 | date | item | what landed | outcome | evidence |
 |---|---|---|---|---|
+| 2026-10-20 | W-03 (part) | `packs/html`: 71 native rules — html-validate 11.16.4's `recommended`, `a11y` and `document` presets without layout rules — over a rebuilt element tree; element data from html-validate (MIT) | landed; 349 checks green | `packs/html/`, `crates/codelaw-native/src/html_*.rs` |
 | 2026-10-20 | W-03 (part) | `packs/css`: 70 native rules — all 41 of stylelint-config-recommended 18.0.0 (`css/recommended`) and the 28 non-layout rules of stylelint-config-standard 40.0.0 (`css/standard`) — over a hand-written CSS reader; data tables from MIT sources only | landed; 385 checks green | `packs/css/`, `crates/codelaw-native/src/css_*.rs` |
 | 2026-10-20 | W-03 (part) | `packs/data`: 30 rules in 7 presets — JSON, YAML and TOML correctness, 16 markdownlint 0.42.0 rules, `package.json`, `tsconfig`, `pyproject` and GitHub Actions presets | landed; 216 checks green; SchemaStore validation waits on B-030 | `packs/data/`, `crates/codelaw-native/src/data_*.rs` |
 | 2026-10-20 | W-03 (part) | `packs/js` completed: `ts`, `react`, `node`, `stencil` presets and `js/conventions` — 132 rules | landed; 1,505 checks green | `packs/js/` |
