@@ -6,7 +6,7 @@ item: W-03
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-20
-updated_by: "Arpit (Claude Code, Opus 5.5)"
+updated_by: "Arpit (Claude Code, Opus 5.5) — step 6 packaging"
 ball: agent
 ---
 
@@ -21,7 +21,7 @@ ball: agent
 | 3 | Write `rules-python` `recommended` | Python coverage | ✅ 2026-10-20 — 98 rules (`py/recommended` 96 · `py/conventions` 2) |
 | 4 | Write `rules-css` and `rules-html` `recommended` | stylesheet and markup coverage | ✅ 2026-10-20 — `rules-css` 70 rules (`css/recommended` 41 · `css/standard` 28 · `css/conventions` 1) · `rules-html` ✅ 71 rules (`html/recommended` 63 · `html/a11y` 26 · `html/document` 5 · `html/conventions` 3) |
 | 5 | Write `rules-data` | package.json, tsconfig, pyproject, CI YAML, Markdown | ✅ 2026-10-20 — 30 rules in 7 presets; schema validation waits on B-030 |
-| 6 | Publish all five to npm and PyPI with the engine | `codelaw init` can install them | ⏳ |
+| 6 | Publish all five to npm and PyPI with the engine | `codelaw init` can install them | ⏳ — packaging ✅ 2026-10-20 (`scripts/build-packs.py`: ten artefacts, reproducible, byte parity, installed by real `npm` and `pip`); licence ✅ MIT 2026-10-20 (`LICENSE` at the root and in every pack; `--release` builds); 🔴 the go to publish; the engine's packages (B-038) not built |
 
 **Arpit, 2026-10-19:** *"research the rules preset in ruff, eslint, tslint, prettier, and other and create as separate packages, like 1 for js/ts/node/jsx/tsx, 1 for html, 1 for css, 1 for python and engine will be separate"*
 
@@ -41,7 +41,7 @@ Five packs whose `recommended` presets cover the correctness core of each ecosys
 | 4 · L4 | Every rule has a fix class; `auto` wherever safe. | ✅ 2026-10-20 |
 | 5 · tests | `codelaw test` green for every rule; the pack README states its rule count per preset and the ported/not-ported table. | ✅ 2026-10-20 |
 | 7 · starter catalogue | The 34 v0 starter rules ([SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 8) placed: in `recommended` with `ported_from:` where they match a source rule, otherwise in the pack's `conventions` preset. | ✅ 2026-10-20 |
-| 6 · publish | Ten packages (5 × npm + PyPI) released with the engine, same version (W-01 DoD 2). | ⏳ |
+| 6 · publish | Ten packages (5 × npm + PyPI) released with the engine, same version (W-01 DoD 2). | ⏳ built, not published |
 
 ## Research: what each pack ports (2026-10-19)
 
@@ -129,14 +129,15 @@ Prettier has no lint rules. Its option defaults become SR-FORMATTER's `[format]`
 - **2026-10-20 — `rules-css`:** 70 native rules in `css_*.rs` over a hand-written CSS reader (tree-sitter-css errors on range media queries, `layer()` imports and percentage keyframe selectors): all 41 of stylelint-config-recommended 18.0.0 and the 28 non-layout rules stylelint-config-standard 40.0.0 adds; 385 checks green. Three rules check less than stylelint, which uses CSSTree's MDN-derived (CC0) syntax data. A 317-file `node_modules` corpus found three false-positive patterns, fixed; a 60-file spot check found none.
 - **2026-10-20 — `rules-html`:** 71 native rules from html-validate 11.16.4's `recommended`, `a11y` and `document` presets (layout and cosmetic rules dropped), over an element tree rebuilt with html-validate's implied-tag rules because tree-sitter-html mis-nests `<option>` and `<head>`/`<body>`; element, entity and input-attribute tables from html-validate (MIT); 349 checks green. A 230-file corpus found six false-positive patterns (one a panic on multi-byte text), all fixed; a 51-file spot check over rustdoc and Homebrew docs found none. Not ported: `no-utf8-bom` (the engine strips the BOM before rules run).
 - **2026-10-20 — `rules-python`:** 98 rules — 55 of Ruff 0.17.1's 59 `E4`/`E7`/`E9`/`F` rules, all 39 stable flake8-bugbear rules, I001 and RUF022 in `py/recommended`; `py/no-print` and `py/no-tunable-literals` in `py/conventions`; 605 checks green. The first cut was held back: compared with Ruff on pip's source it misread annotation subscripts (`List[int]`) as PEP 695 declarations in the semantic model. Fixed at the source, then reconciled with Ruff on three corpora (CPython 3.9 stdlib, pip 21.2.4, rich 15.0.0): every remaining difference is a `# noqa` line, a blank line the formatter owns, or a documented gap of resolving names without statement order.
-- **Steps 2–5 done; step 6 (publish) is what remains:** it needs the packaging (B-038, B-012) and then the decider's ruling to publish, with the project licence (no pack has a `LICENSE` yet).
+- **Steps 2–5 done; step 6 (publish) is what remains:** it needs the packaging (B-038, B-012) and then the decider's ruling to publish (the licence: MIT, ruled 2026-10-20).
+- **2026-10-20 — step 6, packaging:** `scripts/build-packs.py` builds `@codelaw/rules-<name>` (npm tarball) and `codelaw-rules-<name>` (`py3-none-any` wheel) for all five packs into `dist/packs/`, with the version from `Cargo.toml`. Byte-reproducible; each artefact checked against `packs/<name>/` file by file. `--verify` installs all five both ways over `fixtures/l3` with every `recommended` preset: 20 diagnostics, identical output. Installed with real `npm i` (Node 24) and `pip install` (Python 3.14); the engine finds them in `node_modules/` and through `VIRTUAL_ENV`; `pip uninstall` leaves nothing. `--release` refuses: there is no `LICENSE`.
 - **Every rule is `preview`** (SR-RULE-AUTHORING decision 6), so presets run only with `preview = true` until the corpus job (B-024) promotes them.
 
 ## Blockers
 
 None for steps 2–5: W-02 landed the engine, the semantic model, `native:` rules and pack loading on 2026-10-19.
 
-- **Step 6 (publish)** needs the packaging the engine doesn't have yet (B-038, B-012), and publishing to npm and PyPI is outward-facing: the decider rules on it when the packs are ready.
+- **Step 6 (publish)** — the packs are built (2026-10-20). Still needed: 🔴 **the decider's go to publish** (inbox, 2026-10-20; the licence was ruled MIT 2026-10-20, SR-PACKAGES decision 10); the engine's own packages and the release job (B-038, with B-012), since the packs publish with the engine (SR-LAW-6 decision 9).
 - **Engine features some ports need, not built yet:** `target:` + `assert:` rules and the `sort-keys`/`ensure-key` primitives (B-030) for `rules-data`'s schema and sorting rules; the project graph (B-029) for `graph/no-unused-exports`. Rules that need them wait in the pack README's "not ported yet" list; they are not approximated.
 
 ## Record affected

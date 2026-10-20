@@ -90,19 +90,25 @@ into a scan anyone can do at task end.
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-19 | 2026-10-19 — layout names `crates/`, `fixtures/` and `Cargo.toml` |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-19 | 2026-10-19 — W-02 closed; W-03 🟢 |
-| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-19 | 2026-10-19 — B-028–B-039 unbuilt; B-010, B-021 closed; B-008, B-009, B-011, B-020, B-024 narrowed |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-20 | 2026-10-20 — W-03 🔴 on the licence ruling; W-04 🔴 |
+| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — B-038 and B-012 narrowed: the packs are built and checked |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-19 | 2026-10-19 — W-03 in flight |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-19 | 2026-10-19 — W-03 part: `js/recommended` |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-20 | 2026-10-20 — W-03: packs built; licence ruling filed |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-20 | 2026-10-20 — W-03 part: the pack packaging |
 | `work/LESSONS.md` | a failure teaches something durable | 2026-10-19 | 2026-10-19 — corpus runs; duplicate YAML keys |
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-19 | 2026-10-19 — macOS: no `timeout`; Python 3.9 |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
 | `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-19 | 2026-10-19 — predicate, data table, fixpoint, group fix, first-party pack |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-19 | 2026-10-19 — L6 and SR-RULE-PACKS rows; rule packs in the distribution sketch and the config example |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-19 | 2026-10-19 — `packs` owned by SR-RULE-PACKS |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-20 | 2026-10-20 — `scripts/build-packs.py` owned by SR-PACKAGES |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-20 | 2026-10-20 — licence section and badge: MIT |
+| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-20 | 2026-10-20 — Unreleased: the MIT licence |
+| `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
+| `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-04) |
+| `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-04) |
+| `LICENSE` | the licence or the copyright holder changes (SR-PACKAGES decision 10); the five `packs/*/LICENSE` copies change with it | 2026-10-20 | 2026-10-20 — created: MIT |
 
 ---
 

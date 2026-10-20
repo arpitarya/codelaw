@@ -24,6 +24,57 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-20 — the licence ruled: MIT  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Add mit licence for codelaw"*.
+- **Done:**
+  - `LICENSE` (MIT, © 2026 Arpit Arya, with `SPDX-License-Identifier: MIT`) at the root and copied into all five `packs/<name>/`.
+  - SR-PACKAGES decision 10 records the ruling: MIT for the repo and every package.
+  - `build-packs.py --release --verify` now builds all ten artefacts. Each `package.json` carries `"license": "MIT"`, and each wheel carries `License-Expression: MIT` and its `LICENSE`. Both installs gave byte-identical output.
+  - The README licence section and badge, a CHANGELOG line and a CONTRIBUTING line are updated. The inbox row, `BLOCKED.json`, W-03 and W-04 are narrowed to the go to publish. Nothing committed.
+- **Decided / left open:** the decider's licence ruling, MIT, taken as given. Still open: the go to publish (inbox). The crates carry no `license` field; B-038 adds it when it builds the engine packages.
+- **Mistakes:** none.
+- **Next:** B-038, the engine's packages; then the decider's go to publish.
+
+---
+
+## 2026-10-20 — W-05 filed: guidance while an agent writes  ·  Cowork (Opus 5.5)
+
+- **Asked:** *codelaw should tell an agent how to write code while it writes, not only fix it after; research, propose in chat, file a work item; can Fux do it?*
+- **Done:** W-05 (`work/open/W-05-write-time-guidance.md`), its `research` row, two glossary terms. Nothing committed.
+- **Decided / left open:** proposed a construct-filtered `brief` and a `hook --pre` check (Claude Code `PreToolUse` can deny with a reason the agent reads); Fux as an optional free-text layer, not a dependency, since L5 needs codelaw complete alone and Fux SR-MCP refuses new tools. Rulings come at W-05 step 5.
+- **Mistakes:** none.
+- **Next:** W-05 step 1, the per-agent pre-write matrix.
+
+---
+
+## 2026-10-20 — W-03 step 6: the pack packaging  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement w-03"*.
+- **Done:**
+  - Triage: one 🔴 inbox row (W-04's `.github/` templates, 0 d); W-03 was the only 🟢 item.
+  - `scripts/build-packs.py` (stdlib, Python 3.9): the five packs → `@codelaw/rules-<name>` tarballs and `codelaw-rules-<name>` `py3-none-any` wheels in `dist/packs/`, version from `Cargo.toml`. Byte-reproducible; byte parity with `packs/<name>/` checked per artefact; `--verify` installs both layouts over `fixtures/l3` (10 `recommended` presets, 20 diagnostics, identical JSON); `--release` refuses without a `LICENSE`.
+  - Checked by hand with real `npm i` (Node 24) and `pip install` / `pip uninstall` (Python 3.14 venv); the engine resolves the packs from `node_modules/` and through `VIRTUAL_ENV`.
+  - SR-PACKAGES decision 9 names the script and owns it (register row); B-038 and B-012 narrowed; `/dist/` ignored; CONTRIBUTING gains the build command.
+- **Decided / left open:** filed to the decider: the project licence (one SPDX id) and the go to publish; `BLOCKED.json` set to `ASK`. The engine's packages (B-038: launcher, eight binaries, engine wheels, release job) are not built: they are not W-03's own scope and want their own `W-nn`.
+- **Mistakes:** none. The uncommitted W-04 changes from the Cowork session were left as they were, and this session's changes were added on top of them in the shared files.
+- **Next:** the decider rules on the licence; meanwhile B-038 can be promoted to a `W-nn` and built.
+
+## 2026-10-20 — W-04: the consumer README and the public-repo docs  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"create the readme file and other necessary files. research and create one which is helpful for consumer and could be used for marketing as well"*.
+- **Done:**
+  - Researched dev-tool README structure (Ruff, Biome, a README guide). Built 0.1.0 in a Linux workspace and ran every README command on a sample mixed repo, so the output blocks are real.
+  - `README.md`: pitch, plain-words section, real `check`/`fix` output, quickstart from source (packs linked into `node_modules/` until published), the five packs with counts and fix classes, a local rule with `codelaw test`, config, a Claude Code `PostToolUse` hook recipe, commands, who it is for, roadmap matching B-028–B-041, FAQ.
+  - `CHANGELOG.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`. The new docs pass `md/recommended` and `data/recommended` (dogfooded).
+  - Registry rows for the five docs (SR-WORK-REGISTRY §3); W-04 filed.
+- **Decided / left open:** `.github/` is protected from remote writes, so the five issue and PR templates were sent to the decider to place (W-04, 🔴). The licence is still open (W-03 step 6); the README says it will be chosen before the first release. `codelaw`, `@codelaw/rules-js` and `codelaw-rules-js` returned 404 on npm and PyPI today, so the names look free.
+- **Mistakes:** a probe file `.github/x` was written while testing whether `.github/` is writable; removed with the decider's delete permission.
+- **Found while testing** (not fixed, engine untouched): `codelaw rules … | head` panics on a broken pipe; `init` writes a `codelaw.toml` comment pointing at `codelaw config --print`, which is not built (B-037); `fix` leaves a blank first line after removing a file's only import; with `preview` off, `check` says "no rule pack is configured" when packs are configured but all-preview.
+- **Next:** the decider places the `.github/` templates; then W-03 step 6.
+
+---
+
 ## 2026-10-20 — W-03 steps 2–5: all five rule packs merged  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"continue all run everything in parallel"*.

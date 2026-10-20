@@ -10,8 +10,9 @@ feature: "packages and their contents"
 owns:
   - Cargo.toml
   - crates/codelaw-cli/tests/layers.rs
+  - scripts/build-packs.py
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-20T12:00:00Z
 content_sha: ""
 ---
 
@@ -114,8 +115,12 @@ The decider asked for a record of what goes into which package, under the naming
 
    codelaw never fetches code after install ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
 9. **The five rule packs:** npm `@codelaw/rules-<name>` and PyPI `codelaw-rules-<name>`, for `js`, `html`, `css`, `python` and `data`.
-   - **Built** from `packs/<name>/` in the source repo by the release job. The npm tarball and the wheel's `codelaw_rules_<name>/` package data hold the same files.
+   - **Built** from `packs/<name>/` in the source repo by the release job, with `scripts/build-packs.py`. The npm tarball and the wheel's `codelaw_rules_<name>/` package data hold the same files; the only additions are each registry's own metadata (`package.json`, `*.dist-info/`).
+   - **The build refuses** a pack whose manifest version differs from the workspace `Cargo.toml`, and, for a release, a pack without a `LICENSE`. It checks the two artefacts against the folder byte for byte, and `--verify` installs both and requires identical `codelaw check` output.
    - **No dependencies,** and neither `codelaw` package depends on a pack. `codelaw init` adds them to the consumer ([SR-RULE-PACKS](0101_rule-packs.md) decisions 3 and 6).
+10. **Licence: MIT,** for the repository and every package it publishes — both engine packages, the eight binaries, the five rule packs and the extension (the decider's ruling, 2026-10-20).
+   - The root `LICENSE` holds the MIT text and the line `SPDX-License-Identifier: MIT`; `scripts/build-packs.py` reads the id from that line into each `package.json` `license` and each wheel's `License-Expression`.
+   - Each pack folder carries its own copy as `packs/<name>/LICENSE` (SR-RULE-PACKS §2 layout); a release build refuses a pack without one (decision 9).
 
 ### Consequences
 

@@ -1,8 +1,10 @@
 {
- "decision": "PROCEED",
- "reason": "nothing is blocked — the work system was set up on 2026-10-18",
- "questions": [],
- "safe_alternative": "",
+ "decision": "ASK",
+ "reason": "W-03 step 6: the five packs are built, verified and licensed (MIT, ruled 2026-10-20), but are not published without the decider's go-ahead",
+ "questions": [
+  "May the five rule packs be published with the engine, once B-038 builds the engine's packages?"
+ ],
+ "safe_alternative": "promote B-038 (the engine's npm launcher, eight binaries, PyPI engine wheels and the release job) to a W-nn and build it; nothing is published",
  "surfaced": true,
- "filed": "2026-10-18"
+ "filed": "2026-10-20"
 }

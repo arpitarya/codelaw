@@ -28,6 +28,8 @@ description: "Recurring terms, defined once."
 | project root | the topmost config, or a nested config with `root = true`; one graph and one baseline per project root (SR-ARCHITECTURE) |
 | warm socket | the `.codelaw/cache/run/<pid>.sock` a running lsp, mcp or daemon registers so one-shot runs can reuse it (SR-ARCHITECTURE) |
 | semantic model | the per-file map of scopes, bindings and references that rules like `no-unused-vars` query (SR-ARCHITECTURE decision 15a) |
+| brief | the rules for a set of paths and constructs, given to an agent before it writes; `codelaw brief`, MCP `brief_for_task` (proposed, W-05) |
+| pre-write check | `codelaw hook --pre`: the proposed file checked in memory before it reaches disk; only new violations reported (proposed, W-05) |
 | native rule | a rule whose matcher is implemented in the engine in Rust; its Markdown file still carries docs, fix class and examples (SR-ARCHITECTURE decision 15b) |
 | change set | the files counted as touched: from `--changed-since`, `--staged` or the agent hook, never inferred; SR-BASELINE |
 | predicate | a semantic-model condition on a capture, written under `where:` in a `match:` rule — `unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`; SR-RULE-FORMAT decision 3a |

@@ -22,8 +22,10 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed | age |
 |---|---|---|
-
-*Empty since 2026-10-19 — every row ruled ("go with the recommendations"); the next gate is the ruling to publish the packs (W-03 step 6).*
+| Place the five `.github/` issue and PR templates — the path is protected from remote writes ([W-04](open/W-04-consumer-readme.md)) | 2026-10-20 | 0 d |
+| ↳ **blocks:** W-04 | | |
+| Give the go to publish the packs with the engine — the licence is ruled, MIT ([W-03](open/W-03-rule-packs.md)) | 2026-10-20 | 0 d |
+| ↳ **blocks:** W-03 | | |
 
 ---
 
@@ -31,12 +33,16 @@ here. Read that record before changing anything below it.
 
 ### build
 
-🟢 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets, on the W-02 engine. Filed by Arpit (Cowork). Steps 2–5 done 2026-10-20 (401 rules across the five packs, every pack's tests green); step 6, publishing, needs the packaging (B-038) and then the decider's ruling. [detail](open/W-03-rule-packs.md)
+🔴 **W-03** `agent` The five rule packs: built, tested, packaged and MIT-licensed 2026-10-20; blocked on the decider's go to publish, and needs the engine's packages (B-038). Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
+
+🔴 **W-04** `agent` README, CHANGELOG, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT landed; blocked on the decider placing the `.github/` templates. Filed by Arpit (Cowork). [detail](open/W-04-consumer-readme.md)
 
 ### testing
 
 ### record update
 
 ### research
+
+🟢 **W-05** `cowork` Research guiding an agent **while** it writes: a `brief` before writing (rules filtered by path and construct) and a `hook --pre` check before a write reaches disk; Fux as an optional free-text layer. Filed by Arpit (Cowork). [detail](open/W-05-write-time-guidance.md)
 
 ---

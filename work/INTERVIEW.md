@@ -24,7 +24,7 @@ entry.**
 
 ## 1 · State of play
 
-*Updated 2026-10-20.* The laws L0–L8 are accepted (L8's budgets unset; L6 host
+*Updated 2026-10-20 (W-04).* The laws L0–L8 are accepted (L8's budgets unset; L6 host
 floors Python ≥ 3.11, Node ≥ 22); every record 0101–0115 is accepted. W-01
 rewrote the records for five rule packs; **W-02 built the engine**: a Cargo
 workspace of 13 crates under `crates/` and the `codelaw` binary (`check`,
@@ -35,14 +35,26 @@ html 71, css 70, data 30 — every rule `preview`, each pack's tests green and
 checked against its upstream linter on third-party code. Not built:
 the formatter (so L7 is unmet), graph, baseline, adapters, MCP, LSP, agent
 surfaces, packaging — backlog B-028–B-039. `cargo test --workspace` is green
-and clippy is clean. **Ground it before you edit it** — `git log`, the queue,
+and clippy is clean. **W-04 (2026-10-20)** added the public docs — `README.md`, `CHANGELOG.md`,
+`CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`; the `.github/` templates
+wait on the decider placing them (remote writes there are refused). **Ground it before you edit it** — `git log`, the queue,
 `cargo test`.
 
 ## 2 · In flight, and the immediate next step
 
-**W-03** (🟢): steps 2–5 are done; what remains is step 6, publishing, which
-needs the packaging (B-038, with B-012) and then the decider's ruling, together
-with the project licence (no pack has a `LICENSE`). Rules that need engine
+**W-05** (🟢, `research`, Cowork): guidance **while** an agent writes — a construct-filtered `brief` before writing and a `hook --pre` check before bytes land; Fux only as an optional free-text layer. Next is step 1, the per-agent pre-write matrix. Design is a proposal until step 5 is ruled on.
+
+**W-04** (🔴): the decider places the five `.github/` templates sent in the
+2026-10-20 session. The README's counts (401 rules, 3,060 checks, fix classes)
+and roadmap must move with the packs — its registry row names the trigger.
+
+**W-03** (🔴): steps 2–5 are done, and step 6's packaging landed 2026-10-20 —
+`scripts/build-packs.py` builds the ten pack artefacts into `dist/packs/` and
+verifies them (byte parity, identical output from both installs). Publishing
+waits on the decider's go-ahead (inbox row, 2026-10-20; the licence was ruled
+MIT the same day — `LICENSE` at the root and in each pack, SR-PACKAGES decision 10) and
+on the engine's own packages and release job (B-038, with B-012), the agent's
+next build. Rules that need engine
 features not built wait in each pack README's "not ported" table: `target:`
 rules (B-030), the graph (B-029), a native rule's file path and bytes (B-040),
 a CSS grammar that parses modern CSS (B-041). For the decider to confirm or

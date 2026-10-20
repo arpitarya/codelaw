@@ -1,0 +1,34 @@
+# Changelog
+
+Every user-visible change, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
+
+## Unreleased
+
+### Added
+
+- **Licence: MIT**, for the repo and every package. `LICENSE` at the root and in each of the five rule packs.
+- `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` and the GitHub issue and pull-request templates.
+
+## 0.1.0 — preview, not published
+
+The first working engine and rule packs, built from source. Nothing has been published to npm or PyPI.
+
+### Added
+
+- **The engine:** one Rust binary covering JavaScript, JSX, TypeScript, TSX, Python, JSON, YAML, TOML, Markdown, CSS and HTML, alone or in any combination.
+- **Commands:** `check`, `fix` (with `--unsafe` and `--dry-run`), `test`, `rules` (`--for`, `lint`), `explain`, `tree`, `new-rule`, `init` and `cache`.
+- **Output formats:** `text`, `json` and `agent`.
+- **Rules as Markdown files:** front matter, a `codelaw` matcher and fix block, and `Do` / `Don't` examples that double as tests.
+- **Fix classes:** `auto`, `suggest` and `manual`. Fixes run in passes until nothing more changes, and a fix that would add a syntax error is rolled back.
+- **Five rule packs, 401 rules, all `preview`:**
+  - `js`: 132 rules, from ESLint, typescript-eslint, eslint-plugin-react, react-hooks, eslint-plugin-n and @stencil/eslint-plugin.
+  - `python`: 98 rules, from Ruff's defaults, flake8-bugbear, isort and `RUF022`.
+  - `html`: 71 rules, from html-validate.
+  - `css`: 70 rules, from stylelint's recommended and standard configs.
+  - `data`: 30 rules, JSON/YAML/TOML correctness and markdownlint.
+- **Configuration:** `codelaw.toml`, `[tool.codelaw]` in `pyproject.toml`, or `"codelaw"` in `package.json`, with strict validation, `[rules]` and `[[overrides]]`.
+- **Local rules** in `.codelaw/rules/`, picked up with no build step.
+
+### Not yet built
+
+- The formatter, the MCP server, agent hooks and `init --agents`, the language server, project-wide rules, baselines and SARIF output. See the README's roadmap.
