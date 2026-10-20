@@ -1,0 +1,121 @@
+{
+ "descriptors": {
+  "color-profile": [
+   "components",
+   "rendering-intent",
+   "src"
+  ],
+  "counter-style": [
+   "additive-symbols",
+   "fallback",
+   "negative",
+   "pad",
+   "prefix",
+   "range",
+   "speak-as",
+   "suffix",
+   "symbols",
+   "system"
+  ],
+  "font-face": [
+   "ascent-override",
+   "descent-override",
+   "font-display",
+   "font-family",
+   "font-feature-settings",
+   "font-language-override",
+   "font-named-instance",
+   "font-size",
+   "font-stretch",
+   "font-style",
+   "font-variant",
+   "font-variation-settings",
+   "font-weight",
+   "font-width",
+   "line-gap-override",
+   "size-adjust",
+   "src",
+   "subscript-position-override",
+   "subscript-size-override",
+   "superscript-position-override",
+   "superscript-size-override",
+   "unicode-range"
+  ],
+  "font-feature-values": [
+   "font-display"
+  ],
+  "font-palette-values": [
+   "base-palette",
+   "font-family",
+   "override-colors"
+  ],
+  "page": [
+   "bleed",
+   "marks",
+   "page-margin-safety",
+   "page-orientation",
+   "size"
+  ],
+  "property": [
+   "inherits",
+   "initial-value",
+   "syntax"
+  ],
+  "view-transition": [
+   "navigation",
+   "types"
+  ]
+ },
+ "keyword_values": {
+  "counter-style/system": [
+   "additive",
+   "alphabetic",
+   "cyclic",
+   "extends",
+   "fixed",
+   "numeric",
+   "symbolic"
+  ],
+  "font-face/font-display": [
+   "auto",
+   "block",
+   "fallback",
+   "optional",
+   "swap"
+  ],
+  "font-face/font-style": [
+   "italic",
+   "normal",
+   "oblique"
+  ],
+  "font-feature-values/font-display": [
+   "auto",
+   "block",
+   "fallback",
+   "optional",
+   "swap"
+  ],
+  "font-palette-values/base-palette": [
+   "dark",
+   "light"
+  ],
+  "page/marks": [
+   "crop",
+   "cross",
+   "none"
+  ],
+  "page/page-orientation": [
+   "rotate-left",
+   "rotate-right",
+   "upright"
+  ],
+  "property/inherits": [
+   "false",
+   "true"
+  ],
+  "view-transition/navigation": [
+   "auto",
+   "none"
+  ]
+ }
+}

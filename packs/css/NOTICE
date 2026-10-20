@@ -1,0 +1,45 @@
+@codelaw/rules-css / codelaw-rules-css
+
+The rules are reimplementations written for codelaw. Their `ported_from:`
+fields name the stylelint rules (https://stylelint.io, MIT License) whose
+documented behaviour they reproduce; no stylelint code or documentation text
+is included.
+
+The data tables in data/css/ come from these sources:
+
+stylelint 17.16.0 — https://github.com/stylelint/stylelint
+  Copyright (c) 2015 - present Maxime Thirouin, David Clark & Richard Hallows
+  MIT License.
+  css/at-rules, css/selectors, css/type-selectors (with the packages below),
+  css/media, css/units, css/keywords, css/properties-groups, css/shorthands,
+  css/functions and css/prefixed are extracted from lib/reference/*.mjs and
+  lib/utils/isAutoprefixable.mjs; css/deprecated is transcribed from the
+  rules at-rule-no-deprecated, property-no-deprecated and
+  declaration-property-value-keyword-no-deprecated; css/properties includes
+  its previouslyKnownProperties list.
+
+known-css-properties 0.37.0 — https://github.com/known-css/known-css-properties
+  Copyright (c) 2017 Mavrix Technologies
+  MIT License.
+  css/properties.
+
+html-tags 5.1.0 — https://github.com/sindresorhus/html-tags
+  Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
+  MIT License.
+  css/type-selectors (html).
+
+svg-tags 1.0.0 — https://github.com/element-io/svg-tags
+  Copyright (c) 2014 Athan Reines.
+  MIT License.
+  css/type-selectors (svg).
+
+mathml-tag-names 4.0.0 — https://github.com/wooorm/mathml-tag-names
+  Copyright (c) Titus Wormer <tituswormer@gmail.com>
+  MIT License.
+  css/type-selectors (mathml).
+
+css/descriptors and css/property-keywords were written for this pack from
+the W3C CSS specifications.
+
+No data comes from MDN data or @mdn/browser-compat-data (CC0-1.0, which is
+not an OSI-approved licence).

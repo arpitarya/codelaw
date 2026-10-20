@@ -1,0 +1,178 @@
+{
+ "at_rules": [
+  "document",
+  "nest",
+  "viewport"
+ ],
+ "color_properties": [
+  "border-color",
+  "scrollbar-color"
+ ],
+ "colors": {
+  "activeborder": "ButtonBorder",
+  "activecaption": "Canvas",
+  "appworkspace": "Canvas",
+  "background": "Canvas",
+  "buttonhighlight": "ButtonFace",
+  "buttonshadow": "ButtonFace",
+  "captiontext": "CanvasText",
+  "inactiveborder": "ButtonBorder",
+  "inactivecaption": "Canvas",
+  "inactivecaptiontext": "GrayText",
+  "infobackground": "Canvas",
+  "infotext": "CanvasText",
+  "menu": "Canvas",
+  "menutext": "CanvasText",
+  "scrollbar": "Canvas",
+  "threeddarkshadow": "ButtonBorder",
+  "threedface": "ButtonFace",
+  "threedhighlight": "ButtonBorder",
+  "threedlightshadow": "ButtonBorder",
+  "threedshadow": "ButtonBorder",
+  "window": "Canvas",
+  "windowframe": "ButtonBorder",
+  "windowtext": "CanvasText"
+ },
+ "keywords": {
+  "appearance": {
+   "button": "auto",
+   "checkbox": "auto",
+   "listbox": "auto",
+   "menulist": "auto",
+   "meter": "auto",
+   "progress-bar": "auto",
+   "push-button": "auto",
+   "radio": "auto",
+   "searchfield": "auto",
+   "slider-horizontal": "auto",
+   "square-button": "auto",
+   "textarea": "auto"
+  },
+  "box-sizing": {
+   "padding-box": null
+  },
+  "height": {
+   "intrinsic": null,
+   "min-intrinsic": null
+  },
+  "image-orientation": {
+   "flip": null
+  },
+  "image-rendering": {
+   "optimizequality": "smooth",
+   "optimizespeed": "pixelated"
+  },
+  "max-height": {
+   "intrinsic": null,
+   "min-intrinsic": null
+  },
+  "max-width": {
+   "intrinsic": null,
+   "min-intrinsic": null
+  },
+  "min-height": {
+   "intrinsic": null,
+   "min-intrinsic": null
+  },
+  "min-width": {
+   "intrinsic": null,
+   "min-intrinsic": null
+  },
+  "overflow": {
+   "overlay": "auto"
+  },
+  "overflow-x": {
+   "overlay": "auto"
+  },
+  "overflow-y": {
+   "overlay": "auto"
+  },
+  "text-decoration": {
+   "blink": null
+  },
+  "text-decoration-line": {
+   "blink": null
+  },
+  "text-justify": {
+   "distribute": "inter-character"
+  },
+  "text-orientation": {
+   "sideways-right": "sideways"
+  },
+  "user-select": {
+   "element": "contain"
+  },
+  "width": {
+   "intrinsic": null,
+   "min-intrinsic": null
+  },
+  "word-break": {
+   "break-word": null
+  },
+  "zoom": {
+   "reset": "1"
+  }
+ },
+ "properties": {
+  "-khtml-box-align": "align-items",
+  "-khtml-box-direction": null,
+  "-khtml-box-flex": "flex-grow",
+  "-khtml-box-lines": null,
+  "-khtml-box-ordinal-group": "order",
+  "-khtml-box-orient": null,
+  "-khtml-box-pack": null,
+  "-khtml-user-modify": null,
+  "-moz-box-align": "align-items",
+  "-moz-box-direction": null,
+  "-moz-box-flex": "flex-grow",
+  "-moz-box-lines": null,
+  "-moz-box-ordinal-group": "order",
+  "-moz-box-orient": null,
+  "-moz-box-pack": null,
+  "-moz-user-modify": null,
+  "-ms-box-align": "align-items",
+  "-ms-box-direction": null,
+  "-ms-box-flex": "flex-grow",
+  "-ms-box-lines": null,
+  "-ms-box-ordinal-group": "order",
+  "-ms-box-orient": null,
+  "-ms-box-pack": null,
+  "-webkit-box-align": "align-items",
+  "-webkit-box-direction": null,
+  "-webkit-box-flex": "flex-grow",
+  "-webkit-box-lines": null,
+  "-webkit-box-ordinal-group": "order",
+  "-webkit-box-orient": null,
+  "-webkit-box-pack": null,
+  "-webkit-user-modify": null,
+  "clip": null,
+  "grid-column-gap": "column-gap",
+  "grid-gap": "gap",
+  "grid-row-gap": "row-gap",
+  "ime-mode": null,
+  "page-break-after": "break-after",
+  "page-break-before": "break-before",
+  "page-break-inside": "break-inside",
+  "position-try-options": "position-try-fallbacks",
+  "scroll-snap-coordinate": null,
+  "scroll-snap-destination": null,
+  "scroll-snap-margin": "scroll-margin",
+  "scroll-snap-margin-bottom": "scroll-margin-bottom",
+  "scroll-snap-margin-left": "scroll-margin-left",
+  "scroll-snap-margin-right": "scroll-margin-right",
+  "scroll-snap-margin-top": "scroll-margin-top",
+  "scroll-snap-points-x": null,
+  "scroll-snap-points-y": null,
+  "scroll-snap-type-x": null,
+  "scroll-snap-type-y": null,
+  "word-wrap": "overflow-wrap"
+ },
+ "property_value_remap": {
+  "page-break-after": {
+   "always": "page"
+  },
+  "page-break-before": {
+   "always": "page"
+  }
+ }
+}

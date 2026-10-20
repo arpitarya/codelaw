@@ -1,0 +1,49 @@
+{
+ "color": [
+  "color",
+  "color-contrast",
+  "color-mix",
+  "contrast-color",
+  "device-cmyk",
+  "hsl",
+  "hsla",
+  "hwb",
+  "lab",
+  "lch",
+  "light-dark",
+  "oklab",
+  "oklch",
+  "rgb",
+  "rgba"
+ ],
+ "math": [
+  "abs",
+  "acos",
+  "asin",
+  "atan",
+  "atan2",
+  "calc",
+  "calc-size",
+  "clamp",
+  "cos",
+  "exp",
+  "hypot",
+  "log",
+  "max",
+  "min",
+  "mod",
+  "pow",
+  "rem",
+  "round",
+  "sign",
+  "sin",
+  "sqrt",
+  "tan"
+ ],
+ "legacy_color": [
+  "hsl",
+  "hsla",
+  "rgb",
+  "rgba"
+ ]
+}
