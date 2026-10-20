@@ -418,7 +418,10 @@ dependencies = [
  "codelaw-lang",
  "codelaw-rules",
  "codelaw-semantic",
+ "regex",
  "serde_json",
+ "strsim",
+ "tree-sitter",
 ]
 
 [[package]]

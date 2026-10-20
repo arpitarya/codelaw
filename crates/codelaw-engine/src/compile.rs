@@ -4,9 +4,9 @@
 
 use codelaw_config::Config;
 use codelaw_core::Language;
-use codelaw_fix::{FixSpec, parse_fix};
+use codelaw_fix::{DataStep, FixSpec, parse_data_fix, parse_fix};
 use codelaw_lang::{AgLanguage, Grammar};
-use codelaw_match::CompiledMatch;
+use codelaw_match::{CompiledMatch, CompiledTarget};
 use codelaw_native::NativeRule;
 use codelaw_rules::{BlockKind, LoadError, LoadedRule, RuleSet};
 use globset::{GlobBuilder, GlobSet, GlobSetBuilder};
@@ -15,6 +15,9 @@ pub enum Matcher {
     /// One compiled `match:` per grammar the rule's languages parse with.
     Match(Vec<(Grammar, CompiledMatch)>),
     Native(&'static dyn NativeRule),
+    /// `target:` + `assert:` on the data tree of a JSON, YAML or TOML file
+    /// (SR-RULE-FORMAT decision 3e); it runs once per file, not per node.
+    Target(CompiledTarget),
     /// A form this version cannot run yet; the reason is warned once.
     Unsupported(&'static str),
 }
@@ -23,6 +26,8 @@ pub struct CompiledRule {
     pub loaded: LoadedRule,
     pub matcher: Matcher,
     pub fix: Option<FixSpec>,
+    /// A `target:` rule's fix steps.
+    pub data_fix: Option<Vec<DataStep>>,
     pub needs_semantic: bool,
     files: Option<GlobSet>,
     exclude: GlobSet,
@@ -49,6 +54,8 @@ impl CompiledRule {
         match &self.matcher {
             Matcher::Match(per) => per.iter().find(|(g, _)| *g == grammar).map(|(_, m)| m.kinds()),
             Matcher::Native(n) => Some(Some(kind_ids(grammar, n.kinds()))),
+            // Dispatched to no node: the unit runs it on its data tree.
+            Matcher::Target(_) => matches!(grammar, Grammar::Json | Grammar::Yaml | Grammar::Toml).then_some(Some(Vec::new())),
             Matcher::Unsupported(_) => None,
         }
     }
@@ -139,14 +146,39 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
                 }
             },
             BlockKind::Graph(_) => Matcher::Unsupported("`graph:` rules need the project graph (SR-PROJECT-GRAPH), which this version does not build yet"),
-            BlockKind::Target { .. } => Matcher::Unsupported("`target:` + `assert:` rules are not built yet in this version"),
+            BlockKind::Target { .. } => match codelaw_match::compile_target(rule, &loaded.data) {
+                Ok(t) => {
+                    for l in &rule.languages {
+                        if !matches!(l, Language::Json | Language::Yaml | Language::Toml) {
+                            fail(format!("`target:` rules read JSON, YAML and TOML, not {l}"));
+                        }
+                    }
+                    Matcher::Target(t)
+                }
+                Err(e) => {
+                    fail(e);
+                    continue;
+                }
+            },
         };
         if let Matcher::Unsupported(why) = &matcher
             && loaded.default.is_some()
         {
             warnings.push(format!("rule `{}` does not run: {why}", rule.id));
         }
+        let is_target = matches!(matcher, Matcher::Target(_));
+        let data_fix = match (&rule.block.fix, is_target) {
+            (Some(v), true) => match parse_data_fix(v, &loaded.data) {
+                Ok(f) => Some(f),
+                Err(e) => {
+                    fail(format!("invalid `fix:`: {e}"));
+                    None
+                }
+            },
+            _ => None,
+        };
         let fix = match &rule.block.fix {
+            Some(_) if is_target => None,
             Some(v) => match parse_fix(v) {
                 Ok(f) => Some(f),
                 Err(e) => {
@@ -161,9 +193,9 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
         let needs_semantic = match &matcher {
             Matcher::Match(per) => per.iter().any(|(_, m)| m.needs_semantic()),
             Matcher::Native(n) => n.needs_semantic(),
-            Matcher::Unsupported(_) => false,
+            Matcher::Target(_) | Matcher::Unsupported(_) => false,
         } || matches!(&fix, Some(FixSpec::Steps(s)) if s.iter().any(|p| matches!(p, codelaw_fix::Primitive::RenameSymbolLocal { .. })));
-        out.push(CompiledRule { loaded: loaded.clone(), matcher, fix, needs_semantic, files, exclude });
+        out.push(CompiledRule { loaded: loaded.clone(), matcher, fix, data_fix, needs_semantic, files, exclude });
     }
     // One message per problem, not one per language that shares a grammar.
     errors.dedup_by(|a, b| a.message == b.message && a.file == b.file);

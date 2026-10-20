@@ -3,9 +3,11 @@
 mod apply;
 mod external;
 mod primitives;
+mod structured;
 
 pub use apply::{Candidate, Failure, LoopOutcome, MAX_PASSES, apply_edits, fix_loop, overlaps};
 pub use external::{ExternalCall, request_json, run_external};
+pub use structured::{DATA_PRIMITIVES, DataFixContext, DataStep, data_edits, parse_data_fix};
 pub use primitives::{FixContext, FixSpec, Place, Primitive, Target, edits_for, group_edits, parse_fix};
 
 #[cfg(test)]

@@ -9,7 +9,7 @@ use crate::{Project, suppress};
 use codelaw_cache::KeyBuilder;
 use codelaw_config::{Layer, RuleConfig};
 use codelaw_core::{Diagnostic, FixClass, Language, LineIndex, Severity, Skipped, TextEdit};
-use codelaw_fix::{Candidate, ExternalCall, FixContext, FixSpec, edits_for, group_edits, run_external};
+use codelaw_fix::{Candidate, DataFixContext, ExternalCall, FixContext, FixSpec, data_edits, edits_for, group_edits, run_external};
 use codelaw_lang::{Grammar, Region, RegionOptions, Root};
 use codelaw_match::{Match, interpolate};
 use codelaw_native::{NativeContext, NativeFinding};
@@ -494,12 +494,14 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                         failed[slot] = Some(panic_message(p.as_ref()));
                     }
                 }
-                Matcher::Unsupported(_) => {}
+                Matcher::Target(_) | Matcher::Unsupported(_) => {}
             }
         }
     }
 
     let mut out = Vec::new();
+    // The data tree, built once for every `target:` rule of the unit.
+    let mut data_tree: Option<Option<codelaw_match::data::DataTree>> = None;
     for (slot, (index, rule, _)) in unit.rules.iter().enumerate() {
         if let Some(why) = &failed[slot] {
             out.push(internal_error(*index, 0, 0, rule.id(), why));
@@ -568,6 +570,35 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 }
                 for (m, (edits, note)) in ms.iter().zip(per) {
                     out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note });
+                }
+            }
+            Matcher::Target(t) => {
+                let tree = data_tree.get_or_insert_with(|| {
+                    catch_unwind(AssertUnwindSafe(|| codelaw_match::data::build(unit.language, unit.root.root().get_inner_node(), &unit.text))).ok().flatten()
+                });
+                let Some(tree) = tree.as_ref() else { continue };
+                let found = match catch_unwind(AssertUnwindSafe(|| t.check(tree))) {
+                    Ok(f) => f,
+                    Err(p) => {
+                        out.push(internal_error(*index, 0, 0, rule.id(), &panic_message(p.as_ref())));
+                        continue;
+                    }
+                };
+                let message = rule.loaded.rule.block.message.as_deref().unwrap_or(rule.loaded.rule.title.as_str());
+                for f in found {
+                    let (edits, note) = match (&rule.data_fix, wants_fix) {
+                        (Some(steps), true) => {
+                            let ctx = DataFixContext { source: &unit.text, language: unit.language, tree, document: f.document, assert: &t.assert };
+                            match catch_unwind(AssertUnwindSafe(|| data_edits(steps, &ctx, &f.slot))) {
+                                Ok(Ok(e)) => (Some(e), None),
+                                Ok(Err(e)) => (None, Some(format!("fix-unavailable: {e}"))),
+                                Err(p) => (None, Some(format!("fix-unavailable: {}", panic_message(p.as_ref())))),
+                            }
+                        }
+                        _ => (None, None),
+                    };
+                    let text = codelaw_match::target::interpolate(message, tree, &f.slot, &unit.text, f.error.as_deref());
+                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: text, edits, note });
                 }
             }
             Matcher::Unsupported(_) => {}
