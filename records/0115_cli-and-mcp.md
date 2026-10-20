@@ -119,7 +119,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
 
 **Reopen this decision if:** the CLI and MCP give different results for the same input, or either surface contains engine logic.
 
-**How to check it:** the CLI/MCP parity test over every fixture (`B-025`).
+**How to check it:** the CLI/MCP parity test over every fixture (`W-08`).
 
 ---
 

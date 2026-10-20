@@ -197,7 +197,7 @@ $ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
 
 - **The baseline is committed and reviewed**, and CODEOWNERS approval on it is a process cost.
 - **As-of defaults to the `HEAD` commit date**, so a long-lived branch sees its own date. Accepted; `--as-of` overrides.
-- **Counts, not locations:** a use removed and another added in the same file net out. Accepted (Notion's trade-off); `B-014` watches it.
+- **Counts, not locations:** a use removed and another added in the same file net out. Accepted (Notion's trade-off); `W-13` watches it.
 
 ### Alternatives considered
 
@@ -216,7 +216,7 @@ $ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
 
 **Reopen this decision if:** in practice, a count-based baseline lets a new use slip in by offsetting a removed one.
 
-**How to check it:** `CI history (`B-014`) shows a file whose count held steady while a new use appeared`
+**How to check it:** `CI history (`W-13`) shows a file whose count held steady while a new use appeared`
 
 ---
 

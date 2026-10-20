@@ -11,6 +11,17 @@ named here only as the failure that produced it. A lesson whose remedy is
 
 ---
 
+## 2026-10-20 — a law with no gate gets walked past by the next release
+
+L7 says the linter and formatter never ship apart, and L6 decision 3 says every
+package carries the formatter, MCP server and LSP. The work was split sensibly —
+lint first (W-02), packs (W-03), the pipeline (W-04) — and each item was green
+on its own terms, while the formatter sat in the backlog as "L7 requires it".
+Nothing mechanical stood between that and a publish, so the queue ended up
+asking the decider to hand-publish 0.1.0. **Before a step that cannot be
+undone (a publish), check every law against what will ship, and make the
+check a gate** — `scripts/law-gate.py` is that gate for L6 and L7.
+
 ## 2026-10-20 — the slowest platform sets the pipeline's time; skip it, don't rush it
 
 Eight platform builds run in parallel, so a push takes as long as Windows arm64

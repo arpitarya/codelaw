@@ -184,6 +184,7 @@ directions.
 | `LICENSE` | SR-PACKAGES | decision 10: the licence every package carries |
 | `packaging` | SR-PACKAGES | decisions 3 and 5: the npm launcher and API, the PyPI module and its maturin build |
 | `scripts/version.py` | SR-PACKAGES | decision 7: the one version, written and checked everywhere |
+| `scripts/law-gate.py` | SR-PACKAGES | decision 11: refuses a release while the engine lacks `format`, `mcp` or `lsp` (L6 decision 3, L7) |
 | `scripts/package.py` | SR-PACKAGES | decision 11: assembles every package and runs the release checks |
 | `scripts/smoke.sh` | SR-PACKAGES | decision 11: the npm-vs-PyPI install smoke |
 | `scripts/withdraw.sh` | SR-PACKAGES | decision 12 |

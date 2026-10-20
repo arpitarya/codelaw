@@ -17,11 +17,11 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Check which agents can inspect a write **before** it lands: Claude Code, Codex, Copilot, Kiro — the exact input and output fields of each | a pre-write row for the SR-AGENT-SURFACES matrix | ⬜ (Claude Code confirmed in chat, 2026-10-20) |
-| 2 | Prototype `codelaw hook --pre` on the 0.1.0 binary: build the file as it would be after the edit, in memory, check it under its path, and report only **new** diagnostics | a timing against the one-file hook target (B-016) | ⬜ |
+| 2 | Prototype `codelaw hook --pre` on the 0.1.0 binary: build the file as it would be after the edit, in memory, check it under its path, and report only **new** diagnostics | a timing against the one-file hook target (W-19) | ⬜ |
 | 3 | Work out "construct → rules" from each rule's matcher root node kind, over all 401 pack rules | a coverage count; the list of `native:` rules that must declare their constructs | ⬜ |
 | 4 | Fux spike (optional): list one pack's installed `rules/` folder in `.fux/sources/dirs` (the stop-gap), write 20 intents, and measure whether `fux_search` puts the right rule in the top 5 | evidence for or against Fux as the free-text layer, before a Fux SR for package sources is drafted | ⬜ |
 | 5 | Draft the amendments: SR-AGENT-SURFACES (pre-write row, brief surface), SR-CLI-MCP (`brief`, `brief_for_task`, `hook --pre`), SR-LAW-8 (a `hook_pre` budgeted operation), glossary | records ready for the decider to rule on | ⬜ |
-| 6 | On the ruling, file the build `W-nn` (it rides with B-033 MCP and B-035 hooks) | the feature built | ⬜ |
+| 6 | On the ruling, file the build `W-nn` (it rides with W-08 MCP and W-10 hooks) | the feature built | ⬜ |
 
 **Arpit, 2026-10-20:** *"It shouldn't be like that, okay, after I have written the code, then you go ahead and fix it. Well, that should be there, but even while writing the code, if it can tell AI agents that this is how you should write it, that's even better. … can we use Fux for it since it is already doing most of it"*
 
@@ -39,7 +39,7 @@ An agent learns codelaw's rules **at three moments**, and the first two are new:
 
 ## What already exists, and the gap
 
-- SR-AGENT-SURFACES already has **Instruct** (AGENTS.md, skills), **Query** (`rules_for_path`, `check_snippet`) and **Enforce** (post-edit hooks). Nothing built yet (B-033, B-035).
+- SR-AGENT-SURFACES already has **Instruct** (AGENTS.md, skills), **Query** (`rules_for_path`, `check_snippet`) and **Enforce** (post-edit hooks). Nothing built yet (W-08, W-10).
 - **Gap 1:** `rules_for_path` returns every rule for a path. A JS file has 132 candidate rules, about 8,000 tokens at 60 each — too many to read before every function.
 - **Gap 2:** every enforcement point runs after the bytes land. Claude Code's `PreToolUse` can see the proposed content and refuse the call with a reason Claude reads, so codelaw can check it first.
 

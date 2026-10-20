@@ -107,6 +107,7 @@ flowchart LR
 
 #### How L6 is enforced
 
+- **Completeness gate:** `scripts/law-gate.py` refuses a release whose binary has no `format`, `mcp` or `lsp` (decision 3), in `publish.yml` and before the one-time hand publish ([SR-PACKAGES](0107_packages.md) decision 11).
 - **Version check:** CI fails if `pyproject.toml`, `package.json` and the binary's `--version` disagree.
 - **Install matrix:** on every release candidate, a clean container per platform installs from each registry (a staging index first) and runs the [L3](0005_LAW-3-languages.md) combined fixture. The npm and PyPI outputs must be byte-equal.
 - **Pack parity:** each pack's npm tarball and PyPI wheel hold the same files, byte for byte, and the install matrix installs the packs for each fixture's languages.
@@ -118,7 +119,7 @@ flowchart LR
 - **Every release builds a binary for each platform and publishes the engine and the five packs to both registries.** One failed publish fails the release.
 - **`codelaw` installed alone lints nothing:** rules come from packs, and `codelaw init` installs them ([SR-RULE-PACKS](0101_rule-packs.md) decision 6).
 - **The wrappers stay thin:** zero runtime dependencies, which also keeps them trivially within [L2](0004_LAW-2-foss-dependencies.md).
-- **Checked since 2026-10-20 by every `ci.yml` run:** the version check (`scripts/version.py --check`, with the binary on every platform), the dependency check and pack parity (`scripts/package.py check`), and the runtime fence and npm-vs-PyPI byte-equality (`scripts/smoke.sh`). **The install matrix runs on linux-x64 only** and installs from the built files, not a staging index: `B-012` in `work/BACKLOG.md`.
+- **Checked since 2026-10-20 by every `ci.yml` run:** the version check (`scripts/version.py --check`, with the binary on every platform), the dependency check and pack parity (`scripts/package.py check`), and the runtime fence and npm-vs-PyPI byte-equality (`scripts/smoke.sh`). **The install matrix runs on linux-x64 only** and installs from the built files, not a staging index: `W-18` in `work/BACKLOG.md`.
 
 ### Alternatives considered
 

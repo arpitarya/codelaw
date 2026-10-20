@@ -77,18 +77,18 @@ The decider wants performance to be a key property and accepts that today's numb
    - A budget is never raised.
    - If the reference machine must change, the decider re-measures **every** budget on the new machine in one change, and no budget may get slower relative to the measured baseline.
 6. **Until a budget is set,** the gate reports that operation's p95 on every change without blocking, and the design targets in [SR-ARCHITECTURE](0108_architecture.md) guide the work.
-7. **The gate runs on every change to the engine** once the engine exists. Its mechanism is `B-018`.
+7. **The gate runs on every change to the engine** once the engine exists. Its mechanism is `W-19`.
 
 #### How L8 is enforced
 
-- The CI perf gate (`B-018`) over `perf/budgets.toml`.
+- The CI perf gate (`W-19`) over `perf/budgets.toml`.
 - Determinism ([L5](0007_LAW-5-no-model-in-the-engine.md)) keeps the measured work identical across runs, so only timing varies.
 
 ### Consequences
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
-- **Nothing checks this law yet:** `B-018` (the gate) and `B-019` (first measurements and the proposed budgets).
+- **Nothing checks this law yet:** `W-19` (the gate, the first measurements and the proposed budgets).
 
 ### Alternatives considered
 
@@ -106,7 +106,7 @@ The decider wants performance to be a key property and accepts that today's numb
 
 **Reopen this decision if:** a change merged while an operation's p95 exceeded its set budget, or a budget value in `perf/budgets.toml` increased.
 
-**How to check it:** `git log -p perf/budgets.toml` shows no budget value rising, and the perf gate's history shows no merge over budget (once `B-018` exists).
+**How to check it:** `git log -p perf/budgets.toml` shows no budget value rising, and the perf gate's history shows no merge over budget (once `W-19` exists).
 
 ---
 

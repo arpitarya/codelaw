@@ -102,7 +102,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
 
 **Reopen this decision if:** the editor shows a diagnostic or fix that `codelaw check` on the same file doesn't, or the extension contains lint or format logic.
 
-**How to check it:** the LSP parity test (CLI vs LSP over every fixture) and a review of the extension's source size (`B-025`).
+**How to check it:** the LSP parity test (CLI vs LSP over every fixture) and a review of the extension's source size (`W-08`).
 
 ---
 

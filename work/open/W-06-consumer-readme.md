@@ -35,7 +35,7 @@ A README that sells codelaw honestly: what it does today, proved with real outpu
 ## Definition of done
 
 - Every command and output block in the README was run against the 0.1.0 binary.
-- Built versus not built matches `work/BACKLOG.md` B-028–B-041.
+- Built versus not built matches the open items W-07–W-21 in `work/OPEN-WORK.md`.
 - The new docs pass `codelaw:md/recommended` and `codelaw:data/recommended`.
 
 ## Hazards

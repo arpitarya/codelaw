@@ -40,17 +40,27 @@ licence is MIT (Arpit, 2026-10-20; it superseded `MIT OR Apache-2.0`). **W-06**
 added the public docs — `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`,
 `SECURITY.md`, `CODE_OF_CONDUCT.md`. Not built: the formatter
 (so L7 is unmet), graph, baseline, adapters, MCP, LSP, agent surfaces —
-backlog B-028–B-039. `cargo test --workspace` is green
-and clippy is clean. **Ground it before you edit it** — `git log`, the queue,
+open items W-07–W-21 since 2026-10-20 (the backlog keeps only B-006, B-007).
+`cargo test --workspace` is green (204 tests; every pack's `codelaw test`
+green). **Clippy is not clean:** CI's clippy step can't fail (no `pipefail`)
+and hid three warnings — W-17, W-18. **A release is refused by
+`scripts/law-gate.py`** until `format`, `mcp` and `lsp` exist (L7, L6
+decision 3); the 2026-10-20 review's findings are W-17, W-18 and W-22. **Ground it before you edit it** — `git log`, the queue,
 `cargo test`.
 
 ## 2 · In flight, and the immediate next step
 
 **W-05** (🟢, `research`, Cowork): guidance **while** an agent writes — a construct-filtered `brief` before writing and a `hook --pre` check before bytes land; Fux only as an optional free-text layer. Next is step 1, the per-agent pre-write matrix. Design is a proposal until step 5 is ruled on.
 
+**Next for an agent:** 🟢🧨 W-17 (engine defects — a panicking rule exits 0;
+three `auto` fixes change behaviour) and W-18 (CI and release hardening), then
+the release blockers W-07 (formatter), W-08 (MCP), W-09 (LSP).
+
 **W-04** (🔴): the pipeline is built, timed and merged; the first release waits on the
-decider's one-time registry setup (`RELEASING.md` §One time) and his ruling to
-publish — the OPEN-WORK inbox.
+decider's one-time registry setup (`RELEASING.md` §One time, steps 1, 4, 5 —
+the parts that publish nothing) and on W-07–W-09. The ruling to publish is
+not asked until they land: L7 and L6 decision 3 forbid an engine without its
+formatter, MCP server and LSP.
 
 **W-06** (🔴, filed as W-04): the decider places the five `.github/` templates. The
 README's counts (401 rules, 3,060 checks, fix classes) and roadmap must move
@@ -59,8 +69,8 @@ with the packs — its registry row names the trigger.
 **W-03** (🔴) step 6 is that same release; the packs also build locally with
 `scripts/build-packs.py`. Rules that need engine
 features not built wait in each pack README's "not ported" table: `target:`
-rules (B-030), the graph (B-029), a native rule's file path and bytes (B-040),
-a CSS grammar that parses modern CSS (B-041). For the decider to confirm or
+rules (W-12), the graph (W-11), a native rule's file path and bytes (W-21),
+a CSS grammar that parses modern CSS (W-21). For the decider to confirm or
 correct: every pack rule ships `preview`; upstream's noisy defaults kept in
 `html/require-sri`, `html/valid-id`, `html/button-type`; `json/package-engines`
 `>=22` and `toml/pyproject-requires-python` `>=3.11`.

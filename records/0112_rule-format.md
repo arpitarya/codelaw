@@ -162,7 +162,7 @@ The decider asked for a record of the rule-file template. The format so far exis
 
 **Reopen this decision if:** a rule file loads that violates decision 2–5, or `codelaw new-rule` writes a file that `codelaw rules lint` rejects.
 
-**How to check it:** `codelaw rules lint` over `rules/**` and a freshly scaffolded rule (`B-024`).
+**How to check it:** `codelaw rules lint` over `rules/**` and a freshly scaffolded rule (`W-20`).
 
 ---
 

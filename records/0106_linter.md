@@ -133,7 +133,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
 
 7. **The linter never judges layout.** A layout-only rule is refused at load ([SR-FORMATTER](0105_formatter.md) decision 3). Adapter rules that only concern layout are switched off by default (for example stylelint's stylistic rules).
 
-8. **Performance budget.** Each file is parsed once per run and shared by every rule, and an unchanged file is served from the cache. The targets are unmeasured until there's an engine (`B-016`):
+8. **Performance budget.** Each file is parsed once per run and shared by every rule, and an unchanged file is served from the cache. The targets are unmeasured until there's an engine (`W-19`):
    - warm-cache `check` on 10,000 files: under 2 s;
    - hook mode on one file: under 100 ms.
 
@@ -162,7 +162,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
 
 **Reopen this decision if:** a language in [L3](0005_LAW-3-languages.md) has no tree-sitter grammar that ast-grep can load, or an injection kind can't map diagnostics back to exact host locations.
 
-**How to check it:** `codelaw test --injections` passes on every host and region pair in decision 3, once the engine exists (`B-016`).
+**How to check it:** `codelaw test --injections` passes on every host and region pair in decision 3, once the engine exists (`W-19`).
 
 ---
 

@@ -225,7 +225,7 @@ packages/legacy/src/plugins.py:14:1  info  graph/no-unused-exports  `register` l
 - **A cache and incremental relinking are required** to keep hook latency down.
 - **Without types, method-level usage is out of scope.** The design prefers missing a finding to reporting a false one.
 - **Dynamic code yields `info`-level "uncertain" results**, never errors.
-- **The false-positive rate is unmeasured:** `B-013`.
+- **The false-positive rate is unmeasured:** `W-11`.
 
 ### Alternatives considered
 
@@ -242,7 +242,7 @@ packages/legacy/src/plugins.py:14:1  info  graph/no-unused-exports  `register` l
 
 **Reopen this decision if:** a real repo's unused-export report contains a false positive that no entry, keep or decorator setting can express.
 
-**How to check it:** `the corpus run (`B-013`) reports zero false positives that config can't express`
+**How to check it:** `the corpus run (`W-11`) reports zero false positives that config can't express`
 
 ---
 

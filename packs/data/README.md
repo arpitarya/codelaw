@@ -84,7 +84,7 @@ a source: no code, text or rule names are taken from it.
 | rule | why |
 |---|---|
 | `md/relative-links` (starter) | needs the file system: a native rule sees one file's text, not its path or the files around it |
-| JSON Schema validation against SchemaStore (`package.json`, `tsconfig.json`, `pyproject.toml`, workflows) | needs the structured-file engine (`target:` + `assert:`, B-030) or a native JSON Schema validator for the keywords those schemas use (`$ref`, `oneOf`/`anyOf`, `patternProperties`, `if`/`then`), plus the schemas shipped in `data/`; neither exists yet |
+| JSON Schema validation against SchemaStore (`package.json`, `tsconfig.json`, `pyproject.toml`, workflows) | needs the structured-file engine (`target:` + `assert:`, W-12) or a native JSON Schema validator for the keywords those schemas use (`$ref`, `oneOf`/`anyOf`, `patternProperties`, `if`/`then`), plus the schemas shipped in `data/`; neither exists yet |
 | markdownlint MD043 `required-headings` | does nothing until configured with a heading list; a later version |
 | markdownlint MD044 `proper-names` | does nothing until configured with a list of names; a later version |
 | markdownlint MD054 `link-image-style` | every style is allowed by default, so the default set does nothing; a style choice |

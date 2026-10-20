@@ -80,7 +80,7 @@ A linter is trusted only if CI, a laptop and an agent's hook agree. A model in t
 
 - **Checks that would need a model are out of the engine.** They become exact-match rules, or agent skills outside it.
 - **Date-aware and change-aware rules need explicit inputs** (the as-of date and the change set).
-- **Nothing checks this law yet:** `B-011` in `work/BACKLOG.md`.
+- **Nothing checks this law yet:** `W-20` in `work/BACKLOG.md`.
 
 ### Alternatives considered
 

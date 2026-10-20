@@ -97,7 +97,7 @@ The decider asked for a record of what the consumer directory looks like. It was
 
 **Reopen this decision if:** codelaw writes a path in a consumer repo that §1's tree doesn't list, or gitignores anything but `.codelaw/cache/`.
 
-**How to check it:** `codelaw init --agents claude,copilot,codex,kiro` in an empty fixture repo, with `git status` compared against §1 (`B-023`).
+**How to check it:** `codelaw init --agents claude,copilot,codex,kiro` in an empty fixture repo, with `git status` compared against §1 (`W-20`).
 
 ---
 

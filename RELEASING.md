@@ -10,6 +10,12 @@ GitHub Release. It compiles nothing: it uploads the `dist` artifact that
 `ci.yml` assembled and checked on the release commit. No token exists
 anywhere — both registries use trusted publishing (OIDC).
 
+> **Not releasable yet (2026-10-20).** The engine has no `format`, `mcp` or `lsp`
+> command, and [L7](records/0009_LAW-7-linter-and-formatter.md) and
+> [L6](records/0008_LAW-6-python-and-node-packages.md) decision 3 forbid shipping
+> without them. `python3 scripts/law-gate.py dist/` says what is missing;
+> W-07, W-08 and W-09 build them.
+
 ## The pipeline
 
 | workflow | when | what | time |
@@ -18,7 +24,7 @@ anywhere — both registries use trusted publishing (OIDC).
 | `publish.yml` | a GitHub Release | the gate (CI green on this sha, on `main`), then npm and PyPI **in parallel**, then the checksums on the release | see W-04 §Measured |
 
 Every check `ci.yml` runs on the packages is `scripts/package.py check`:
-only the SR-PACKAGES names (B-020), one version (B-012), zero runtime
+only the SR-PACKAGES names (B-020), one version (W-18), zero runtime
 dependencies, the licence in every package, **the same binary on npm and PyPI**
 for each platform, and each pack **byte-equal** on both registries.
 `scripts/smoke.sh` installs them with no registry and checks that npm (no Python
@@ -32,7 +38,9 @@ publisher creates the project on its first upload.
 
 1. **npm:** create the `@codelaw` organisation (account with 2FA).
 2. **npm, first publish by hand** — from the `dist` artifact of a green
-   `ci.yml` run on `main` (`gh run download <run-id> -n dist`):
+   `ci.yml` run on `main` (`gh run download <run-id> -n dist`). **First run
+   `python3 scripts/law-gate.py dist`; publish nothing unless it passes** (L7,
+   L6 decision 3). Then:
    `for t in npm/*.tgz; do npm publish "$t" --access public; done`. npm opens a
    browser sign-in to approve the writes.
 3. **npm trusted publishers:** `scripts/npm-trust.sh` (npm 12, your login) —

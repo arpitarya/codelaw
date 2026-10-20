@@ -83,7 +83,7 @@ check that slips on the first busy day.
 - Decisions 3 and 6 are enforced by `scripts/sr-guard.sh` once the decider
   installs it; until then nothing runs.
 - `owns:` ↔ Ownership-table agreement (decision 2) is unchecked — backlog row
-  B-002.
+  W-20.
 - A `--no-verify` commit fails CI on its first push (decision 7); a merge
   commit is not replayed, since its changes are its parents'.
 - Coherence is not checked (decision 8; backlog row B-006).

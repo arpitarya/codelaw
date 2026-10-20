@@ -249,9 +249,9 @@ under its header:
   are supported by `.claude/hooks/inject-inbox.sh`, which puts the inbox in
   front of every prompt; the age arithmetic is still the session's.
 - The row rules (13–19, 42, 45) are enforced by nothing but the inbox-shape
-  hook — backlog row B-001.
+  hook — backlog row W-20.
 - A `W-nn` that resolves to neither `work/open/` nor `archive/open/` is caught
-  by nobody — backlog row B-004.
+  by nobody — backlog row W-20.
 - Everything else — balls, ordering, closing, authorship, the meeting view — is
   judgment.
 

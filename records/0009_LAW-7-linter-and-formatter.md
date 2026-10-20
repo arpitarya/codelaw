@@ -64,12 +64,13 @@ The decider ruled that codelaw is both a linter and a formatter. Until now that 
 #### How L7 is enforced
 
 - The [L3](0005_LAW-3-languages.md) fixture matrix also asserts that every language has at least one lint rule and a formatter that round-trips its fixtures.
-- Nothing runs that check yet: `B-017`.
+- The fixture-matrix check is not built yet: `W-07`.
+- **The release gate:** `scripts/law-gate.py` refuses to release a binary that has no `format` command, in `publish.yml` and before the one-time hand publish ([SR-PACKAGES](0107_packages.md) decision 11). Added 2026-10-20, after a release was put to the decider while the formatter did not exist.
 
 ### Consequences
 
 - **Every new language costs two integrations** (lint and format) before it can join L3.
-- **Nothing checks this law yet:** `B-017`.
+- **Only the release gate checks this law** until W-07 adds the fixture matrix; a linter-only binary can be built and tested, never released.
 
 ### Alternatives considered
 

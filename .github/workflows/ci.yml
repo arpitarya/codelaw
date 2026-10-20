@@ -4,7 +4,7 @@
 # (SR-PACKAGES decision 11; W-04).
 #
 #   test      cargo test --workspace (the law checks: L2 licences, L3 fixtures, layers)
-#   lint      the version copies agree (B-012) · the SR guard replayed from RULE-SINCE · clippy
+#   lint      the version copies agree (W-18) · the SR guard replayed from RULE-SINCE · clippy
 #   build ×8  one maturin wheel per platform; the npm binary is taken OUT of it, so
 #             both registries ship the same bytes (L6 decision 2); each runs its
 #             binary's --version and every pack's tests on its own platform
@@ -85,7 +85,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # the SR guard replays every commit since records/RULE-SINCE
-      - name: every version copy agrees (L6 decision 9, B-012)
+      - name: every version copy agrees (L6 decision 9, W-18)
         run: python3 scripts/version.py --check
       - name: the SR guard, replayed over history (SR-WORK-OWNERSHIP decision 7)
         run: |
@@ -219,6 +219,8 @@ jobs:
         run: python3 scripts/package.py assemble --bins out/bin --wheels out/wheel --out dist
       - name: the release checks — names (B-020), one version, zero deps, licence, one binary, pack parity
         run: python3 scripts/package.py check dist
+      - name: the engine is complete enough to release (L6 decision 3, L7) — reported, not failed, until W-07–W-09 land
+        run: python3 scripts/law-gate.py dist --report
       - name: npm and PyPI installs give byte-equal output (L6 install matrix, linux-x64)
         run: bash scripts/smoke.sh dist
       - uses: actions/upload-artifact@v6

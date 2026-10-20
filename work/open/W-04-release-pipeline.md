@@ -65,12 +65,13 @@ Wall time is first job start to last job end.
 
 ## Blockers
 
+- **Step 5 waits on W-07, W-08 and W-09** (2026-10-20): L7 and L6 decision 3 forbid releasing an engine without the formatter, MCP server and LSP. `scripts/law-gate.py` now refuses such a release in `publish.yml`; `ci.yml` reports it on every push.
 - **Step 5 is the decider's:** the `@codelaw` npm org, the first hand publish of the 14 npm packages, `scripts/npm-trust.sh`, six PyPI pending publishers and the `npm` / `pypi` GitHub environments ([`RELEASING.md`](../../RELEASING.md) §One time) — then his ruling to publish, which is W-03 step 6.
 
 ## Not done here (backlog)
 
-- **The JS/Python API has `check` and `fix` only** — SR-PACKAGES decision 3's `rulesFor` and `format`, and `codelaw.schema.json`, need a `rules --format json`, the `format` command (B-028) and the schema (B-022): `B-042`.
-- **The install matrix runs on linux-x64 only**; the other seven platforms run `--version` and every pack's tests on their own binary: `B-012`.
+- **The JS/Python API has `check` and `fix` only** — SR-PACKAGES decision 3's `rulesFor` and `format`, and `codelaw.schema.json`, need a `rules --format json`, the `format` command (W-07) and the schema (W-16): `W-16`.
+- **The install matrix runs on linux-x64 only**; the other seven platforms run `--version` and every pack's tests on their own binary: `W-18`.
 
 ## Record affected
 

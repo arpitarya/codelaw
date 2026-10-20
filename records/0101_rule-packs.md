@@ -202,7 +202,7 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. Every `manual` rule carries `
 - **Each release publishes twelve packages:** the engine and five packs, on two registries, plus the eight binary packages. One failed publish fails the release ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
 - **A repo carries only its ecosystems' rules and data tables.** A Python-only repo stays on PyPI ([L3](0005_LAW-3-languages.md) decision 2).
 - **Rules still update with engine releases** (one version). Engine and rules can't drift, which was the reason for embedding them in the first version: `min_codelaw` and the native-id check keep that guarantee.
-- **The engine work this needs:** the semantic model, `native:` rules and pack loading, in [W-02](../work/open/W-02-engine-p0.md) ([SR-ARCHITECTURE](0108_architecture.md) decisions 15a–15c).
+- **The engine work this needs:** the semantic model, `native:` rules and pack loading, in [W-02](../archive/open/W-02-engine-p0.md) ([SR-ARCHITECTURE](0108_architecture.md) decisions 15a–15c).
 - **The packs' content** is [W-03](../work/open/W-03-rule-packs.md).
 
 ### Alternatives considered
@@ -237,4 +237,4 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. Every `manual` rule carries `
 
 **Records** — [SR-LAW-2](0004_LAW-2-foss-dependencies.md) · [SR-LAW-3](0005_LAW-3-languages.md) · [SR-LAW-4](0006_LAW-4-every-rule-has-a-fix.md) · [SR-LAW-5](0007_LAW-5-no-model-in-the-engine.md) · [SR-LAW-6](0008_LAW-6-python-and-node-packages.md) · [SR-LAW-7](0009_LAW-7-linter-and-formatter.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-ARCHITECTURE](0108_architecture.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md)
 
-**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [W-02](../work/open/W-02-engine-p0.md) · [W-03](../work/open/W-03-rule-packs.md)
+**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [W-02](../archive/open/W-02-engine-p0.md) · [W-03](../work/open/W-03-rule-packs.md)

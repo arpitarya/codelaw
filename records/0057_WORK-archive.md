@@ -73,7 +73,7 @@ session cite it as current. One frozen tree with a map solves both.
 ### Consequences
 
 - Nothing mechanical enforces this record. A second `archive/` directory is
-  caught by nobody — backlog row B-005.
+  caught by nobody — backlog row W-20.
 - A citation to an archived document is judgment until a link test exists.
 
 ### Alternatives considered

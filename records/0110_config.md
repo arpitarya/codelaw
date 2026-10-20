@@ -132,7 +132,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
 **Reopen this decision if:** a key is accepted that no record defines, or `config --print` can't name a value's source.
 
-**How to check it:** the schema test: every key in `codelaw.schema.json` is defined in exactly one record, and every record-defined key is in the schema (`B-022`).
+**How to check it:** the schema test: every key in `codelaw.schema.json` is defined in exactly one record, and every record-defined key is in the schema (`W-16`).
 
 ---
 

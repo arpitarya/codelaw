@@ -157,7 +157,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 #### H. Targets until [L8](0010_LAW-8-performance-budgets.md)'s budgets are set
 
-29. Design targets, not law: `check_warm_10k` < 2 s · `check_cold_10k` < 20 s · `fix_one_file` < 100 ms warm, < 300 ms cold · `lsp_after_edit` < 50 ms · `startup` < 20 ms · `peak_memory_10k` < 1 GiB. `B-019` turns them into measurements.
+29. Design targets, not law: `check_warm_10k` < 2 s · `check_cold_10k` < 20 s · `fix_one_file` < 100 ms warm, < 300 ms cold · `lsp_after_edit` < 50 ms · `startup` < 20 ms · `peak_memory_10k` < 1 GiB. `W-19` turns them into measurements.
 30. **Performance rules for contributors:** no rule may re-parse; no regex over a whole file when a kind filter exists; no allocation per node in a hot loop without a benchmark; every new step runs `codelaw bench` before merge.
 
 ### Consequences
@@ -165,7 +165,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 - **The `[files]`, `[daemon]` and `[lsp]` config sections are this record's** and are added to the schema ([SR-CONFIG](0110_config.md) decision 3).
 - **Shelling out to `git`** keeps the binary small and matches what every CI image has, at the cost of three features being absent without it.
 - **Adapters are excluded from hook and LSP mode,** so an agent sees adapter findings only in CI. Deliberate, for `fix_one_file`.
-- **Warm-process discovery adds a socket file under the cache;** stale-socket cleanup is tested (`B-026`).
+- **Warm-process discovery adds a socket file under the cache;** stale-socket cleanup is tested (`W-17`).
 - **The semantic model is in the hot path** for every JS/TS and Python file that a scope-aware rule touches; it's built lazily and measured by `check_warm_10k` ([L8](0010_LAW-8-performance-budgets.md)).
 - **Not decided yet, by design:** a JavaScript rule API (DESIGN P4), type-aware rules, and SCSS/Vue/Svelte. Each needs its own record before any work.
 
@@ -190,7 +190,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 **Reopen this decision if:** a crate depends on a crate in a lower layer, a rule re-parses a file, a rule failure aborts a run, or the engine performs any network, model, clock or telemetry call.
 
-**How to check it:** the layer check (`crates/codelaw-cli/tests/layers.rs`), `codelaw check --timings` showing one parse per file, the rule-panic fixture (`B-026`), and the network fence from SR-LAW-5.
+**How to check it:** the layer check (`crates/codelaw-cli/tests/layers.rs`), `codelaw check --timings` showing one parse per file, the rule-panic fixture (`W-17`), and the network fence from SR-LAW-5.
 
 ---
 

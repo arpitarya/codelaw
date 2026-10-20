@@ -72,7 +72,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    | CSS | Biome formatter (`biome_css_formatter`) | Prettier-compatible; standard CSS only (no SCSS/Less) | MIT / Apache-2.0 | same Biome pin |
    | HTML | `markup_fmt` | Prettier-like; embedded `<script>` and `<style>` are handed to the JS and CSS engines through its callback | MIT | crates.io |
 
-   Every engine must pass [L2](0004_LAW-2-foss-dependencies.md); the licence check is `B-008`.
+   Every engine must pass [L2](0004_LAW-2-foss-dependencies.md); the licence check is `W-20`.
 
 3. **Layout belongs to the formatter, and the rule loader enforces it.** A lint rule whose fix only changes layout is refused. `codelaw test` checks this deterministically: if `format(Don't) == format(Do)`, the rule is a layout rule and fails. This is the formatter-versus-linter fight that ESLint's stylistic rules caused, ruled out by construction.
 
@@ -129,7 +129,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 - **Two engines are git-pinned with unstable APIs** (Biome, Ruff). Upgrades are deliberate, gated by a snapshot corpus, and a breaking upstream change can stall them. `dprint-plugin-ruff` shows the approach is sustainable.
 - **Git dependencies mean the engine crate can't be published to crates.io.** That doesn't matter: [L6](0008_LAW-6-python-and-node-packages.md) ships through npm and PyPI.
-- **"Prettier-compatible" isn't "identical"** on every edge case for JS, and YAML and Markdown follow their engines' styles. The measured gap is `B-015`.
+- **"Prettier-compatible" isn't "identical"** on every edge case for JS, and YAML and Markdown follow their engines' styles. The measured gap is `W-07`.
 - **The binary grows** by the size of six formatter engines. Accepted, because each package must be complete ([L6](0008_LAW-6-python-and-node-packages.md) decision 3).
 
 ### Alternatives considered
@@ -149,9 +149,9 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 ### Veto condition
 
-**Reopen this decision if:** an embedded engine's licence stops being permissive, or measured Prettier/Black compatibility on the corpus falls below what teams accept (`B-015`).
+**Reopen this decision if:** an embedded engine's licence stops being permissive, or measured Prettier/Black compatibility on the corpus falls below what teams accept (`W-07`).
 
-**How to check it:** `B-008`'s licence check over the engine's lockfile, and the `B-015` corpus report, once both exist.
+**How to check it:** `W-20`'s licence check over the engine's lockfile, and the `W-07` corpus report, once both exist.
 
 ---
 

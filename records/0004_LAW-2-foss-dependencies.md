@@ -93,7 +93,7 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
 ### Consequences
 
 - **Judgment today:** no manifest exists yet and no licence check runs —
-  backlog row B-008 (`ungated`). The check is owed the day the first manifest
+  backlog row W-20 (`ungated`). The check is owed the day the first manifest
   lands.
 - Weak copyleft (MPL, EPL) is refused too, so some ecosystem crates are
   unavailable; the answer is a permissive alternative or building it.
@@ -121,7 +121,7 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
 **Reopen this decision if:** any resolved dependency carries a licence that is
 not both OSI-approved and permissive.
 
-**How to check it:** `ls Cargo.lock package-lock.json pnpm-lock.yaml uv.lock poetry.lock 2>/dev/null || echo "no dependencies yet"` — once a lockfile exists, the licence check B-008 names.
+**How to check it:** `ls Cargo.lock package-lock.json pnpm-lock.yaml uv.lock poetry.lock 2>/dev/null || echo "no dependencies yet"` — once a lockfile exists, the licence check W-20 names.
 
 ---
 
@@ -134,7 +134,7 @@ is never listed here.*
 
 **Project docs**
 
-- [`work/BACKLOG.md`](../work/BACKLOG.md) — B-008
+- [`work/BACKLOG.md`](../work/BACKLOG.md) — W-20
 - [`work/WORKLOG.md`](../work/WORKLOG.md)
 
 **External**

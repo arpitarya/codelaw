@@ -99,7 +99,7 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 
 - **Every capability is tested nine times.** The fixture matrix is the price of decision 6.
 - **Vue, Svelte, Angular, SCSS/Less and type-aware checks stay outside the core** until this law is amended; adapters cover them.
-- **Nothing checks this law yet:** `B-009` in `work/BACKLOG.md`.
+- **Nothing checks this law yet:** `W-18` in `work/BACKLOG.md`.
 
 ### Alternatives considered
 

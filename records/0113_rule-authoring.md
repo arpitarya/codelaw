@@ -110,7 +110,7 @@ The decider asked that rules can be written manually or by an AI agent with a sk
 
 **Reopen this decision if:** a rule can reach `stable` without passing all four levels, or an agent-written rule merges without a green `codelaw test`.
 
-**How to check it:** the CI job that promotes a rule to `stable` runs all four levels (`B-024`).
+**How to check it:** the CI job that promotes a rule to `stable` runs all four levels (`W-20`).
 
 ---
 

@@ -24,6 +24,20 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-20 — code review; the release law gate; pending work filed as W-07–W-22  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Review the code. What are the blockers and what is pending?"*, then *"Why was the law broken? fix it. … create work items for what all things are pending."*
+- **Done:**
+  - **Review:** `cargo test --workspace` green (204 tests, rustc 1.97 — the pinned 1.99.1 wasn't downloadable here); every pack's `codelaw test` and `rules lint` green; three read-only reviewers (engine; semantic + native; packs + pipeline). Findings in W-17, W-18, W-22.
+  - **The law:** nothing was published, but the inbox asked the decider to hand-publish 0.1.0, which has no `format`, `mcp` or `lsp` — against L7 and L6 decision 3. Added `scripts/law-gate.py`; `publish.yml`'s gate runs it, `ci.yml` reports it; `RELEASING.md` step 2 requires it; SR-PACKAGES decision 11, L6 and L7 enforcement sections, the register's ownership row.
+  - **Queue:** W-07–W-22 filed; every backlog row but B-006, B-007 promoted and deleted, and every live citation repointed to its W-nn. The registry-setup inbox row narrowed to steps 1, 4 and 5 (they publish nothing); W-03 and W-04 wait on W-07–W-09.
+  - **Lesson:** a law with no gate gets walked past by the next release (`LESSONS.md`).
+- **Decided / left open:** this session kept L6 and L7 as they are and gated the release. Amending them to allow a linter-only preview is the decider's call, not taken here. Reproduced: the `py/*-without-explicit-strict` auto fixes write `map(…, strict=False)`, a TypeError before Python 3.14.
+- **Mistakes:** none in this change. Earlier sessions' INTERVIEW said "clippy is clean"; CI's clippy step can't fail, and rustc 1.97's clippy finds three warnings.
+- **Next:** W-17 and W-18 (🟢🧨), then W-07, W-08, W-09.
+
+---
+
 ## 2026-10-20 — merged the release pipeline into `main`; MIT throughout; W-04 → W-06  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"commit everything merge all the branches to main pull the latest changes and checkout to main and delete the other branches"*.

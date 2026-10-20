@@ -8,7 +8,7 @@ script writes and checks.
 
     python3 scripts/version.py                     print the version
     python3 scripts/version.py --set 0.2.0         write it everywhere
-    python3 scripts/version.py --check             every copy agrees (B-012)
+    python3 scripts/version.py --check             every copy agrees (W-18)
     python3 scripts/version.py --check --tag v0.2.0 --binary target/release/codelaw
 
 Python 3.9 syntax on purpose (work/MACHINE.md): no tomllib, so the few lines

@@ -40,7 +40,7 @@ jobs:
             exit 1
           }
           echo "run=$run" >> "$GITHUB_OUTPUT"
-      - name: the tag is the version, and every copy agrees (B-012)
+      - name: the tag is the version, and every copy agrees (W-18)
         run: python3 scripts/version.py --check --tag "$GITHUB_REF_NAME"
       - uses: actions/download-artifact@v7
         with:
@@ -50,6 +50,8 @@ jobs:
           github-token: ${{ github.token }}
       - name: the release checks, again, on exactly what will be uploaded
         run: python3 scripts/package.py check dist
+      - name: the engine has its formatter, MCP server and LSP — L7 and L6 decision 3 forbid releasing without them
+        run: python3 scripts/law-gate.py dist
 
   trust:
     # Both registries wait on this, so an npm package that does not trust this

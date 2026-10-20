@@ -65,7 +65,7 @@ section says so. The larger ones:
 | `react/jsx-uses-vars` | marks JSX names as used for `no-unused-vars`; codelaw's semantic model already counts them |
 | `react/react-in-jsx-scope`, `react/jsx-uses-react` | turned off by `jsx-runtime` |
 | eslint-plugin-react-hooks' 14 React Compiler rules | need the React Compiler's analysis |
-| `node/no-missing-import`, `node/no-missing-require`, `node/no-extraneous-import`, `node/no-extraneous-require`, `node/no-unpublished-import`, `node/no-unpublished-require` | need module resolution and `package.json`: the project graph (backlog B-029) |
+| `node/no-missing-import`, `node/no-missing-require`, `node/no-extraneous-import`, `node/no-extraneous-require`, `node/no-unpublished-import`, `node/no-unpublished-require` | need module resolution and `package.json`: the project graph (backlog W-11) |
 | `node/no-unsupported-features/es-builtins`, `/es-syntax`, `/node-builtins` | need the project's Node.js version from `package.json` and per-version feature tables |
 | `node/hashbang` | needs `package.json`'s `bin` field |
 | `node/process-exit-as-throw` | reports nothing; it only changes ESLint's code-path analysis |
