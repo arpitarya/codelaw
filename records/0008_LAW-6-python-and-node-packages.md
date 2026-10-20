@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "how codelaw is packaged and released"
 owns: []
 laws: [L0, L2, L3, L6]
-timestamp: 2026-10-18T16:45:00Z
+timestamp: 2026-10-20T06:30:00Z
 content_sha: ""
 ---
 
@@ -118,7 +118,7 @@ flowchart LR
 - **Every release builds a binary for each platform and publishes the engine and the five packs to both registries.** One failed publish fails the release.
 - **`codelaw` installed alone lints nothing:** rules come from packs, and `codelaw init` installs them ([SR-RULE-PACKS](0101_rule-packs.md) decision 6).
 - **The wrappers stay thin:** zero runtime dependencies, which also keeps them trivially within [L2](0004_LAW-2-foss-dependencies.md).
-- **Nothing checks this law yet:** `B-012` in `work/BACKLOG.md`.
+- **Checked since 2026-10-20 by every `ci.yml` run:** the version check (`scripts/version.py --check`, with the binary on every platform), the dependency check and pack parity (`scripts/package.py check`), and the runtime fence and npm-vs-PyPI byte-equality (`scripts/smoke.sh`). **The install matrix runs on linux-x64 only** and installs from the built files, not a staging index: `B-012` in `work/BACKLOG.md`.
 
 ### Alternatives considered
 
@@ -137,7 +137,7 @@ flowchart LR
 
 **Reopen this decision if:** the npm and PyPI packages (engine or pack) carry different versions, either engine package depends on the other, or a pack's npm and PyPI contents differ.
 
-**How to check it:** `once manifests exist: compare the version in package.json and pyproject.toml; until then nothing to check`
+**How to check it:** `python3 scripts/package.py check dist` — one version, no engine depending on the other, each pack byte-equal on both registries.
 
 ---
 

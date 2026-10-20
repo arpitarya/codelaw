@@ -12,16 +12,32 @@
 #     no SR affected
 #
 # That is a claim written into git history under your name, not a silent skip.
+#
+# CI replays it over history (decision 7): with SR_GUARD_COMMIT=<sha> the files
+# and the message are that commit's, not the index's.
+#
+#     for c in $(git rev-list --no-merges "$(grep -v '^#' records/RULE-SINCE)"..HEAD); do
+#       SR_GUARD_COMMIT=$c scripts/sr-guard.sh; done
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
 REGISTER="$ROOT/records/README.md"
+if [ -n "${SR_GUARD_COMMIT:-}" ]; then
+  # the register and the message as they were in that commit
+  REGISTER="$(mktemp)"; msg_file="$(mktemp)"
+  trap 'rm -f "$REGISTER" "$msg_file"' EXIT
+  git show "$SR_GUARD_COMMIT:records/README.md" >"$REGISTER" 2>/dev/null || exit 0
+  git log -1 --format=%B "$SR_GUARD_COMMIT" >"$msg_file"
+fi
 [ -f "$REGISTER" ] || exit 0
 
-staged="$(git --no-optional-locks diff --cached --name-only)"
+if [ -n "${SR_GUARD_COMMIT:-}" ]; then
+  staged="$(git diff-tree --no-commit-id --name-only -r "$SR_GUARD_COMMIT")"
+else
+  staged="$(git --no-optional-locks diff --cached --name-only)"
+  msg_file="${1:?sr-guard.sh must run as a commit-msg hook with the message file as \$1}"
+fi
 [ -n "$staged" ] || exit 0
-
-msg_file="${1:?sr-guard.sh must run as a commit-msg hook with the message file as \$1}"
 [ -f "$msg_file" ] || exit 0
 
 if grep -qiE '^[[:space:]]*(no[ -]sr[ -]affected|\[no-sr\])[[:space:]]*$' "$msg_file"; then
@@ -57,10 +73,14 @@ resolve() {  # owner name -> repo-relative record path, or empty
       break
     done <<<"$names"
   elif [[ "$owner" =~ ^W-[0-9]+$ ]]; then
-    for cand in "$ROOT"/work/open/"$owner"-*.md; do
-      [ -f "$cand" ] || continue
-      record="work/open/$(basename "$cand")"; break
-    done
+    if [ -n "${SR_GUARD_COMMIT:-}" ]; then
+      record="$(git ls-tree --name-only "$SR_GUARD_COMMIT" work/open/ | grep -m1 "^work/open/$owner-.*\.md$" || true)"
+    else
+      for cand in "$ROOT"/work/open/"$owner"-*.md; do
+        [ -f "$cand" ] || continue
+        record="work/open/$(basename "$cand")"; break
+      done
+    fi
   fi
   printf '%s' "$record"
 }
@@ -95,7 +115,7 @@ done <<<"$staged"
 if [ -n "$hits" ]; then
   cat >&2 <<MSG
 
-  SR guard: this commit changes an SR-owned or SR-described component and
+  SR guard${SR_GUARD_COMMIT:+ (commit ${SR_GUARD_COMMIT:0:8})}: this commit changes an SR-owned or SR-described component and
   does not update the record that owns or describes it.
 
 $hits

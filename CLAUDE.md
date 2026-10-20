@@ -116,6 +116,9 @@ docs/        WHAT THE PROJECT IS — the glossary
 archive/     THE ONE ARCHIVE — everything retired, mirroring the live tree
 crates/      THE ENGINE — one Cargo workspace (Cargo.toml); each crate's owner is in the register
 fixtures/    test repos the law checks run on
-scripts/     the commit guard and the inbox check
+packs/       THE FIVE RULE PACKS — the same folder on npm and PyPI
+packaging/   the npm launcher and API, the PyPI module — every manifest is generated (SR-PACKAGES)
+scripts/     the commit guard, the inbox check, the version and the release scripts
+.github/     ci.yml builds and checks every package; publish.yml uploads them — RELEASING.md
 .claude/     hooks and their wiring
 ```

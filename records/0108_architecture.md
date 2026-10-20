@@ -190,7 +190,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 **Reopen this decision if:** a crate depends on a crate in a lower layer, a rule re-parses a file, a rule failure aborts a run, or the engine performs any network, model, clock or telemetry call.
 
-**How to check it:** the layer check (`B-020`), `codelaw check --timings` showing one parse per file, the rule-panic fixture (`B-026`), and the network fence from SR-LAW-5.
+**How to check it:** the layer check (`crates/codelaw-cli/tests/layers.rs`), `codelaw check --timings` showing one parse per file, the rule-panic fixture (`B-026`), and the network fence from SR-LAW-5.
 
 ---
 

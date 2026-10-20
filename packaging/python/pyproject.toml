@@ -1,0 +1,33 @@
+# PyPI `codelaw`: eight platform wheels, built by maturin's `bin` bindings
+# (SR-PACKAGES decision 5). The binary installs as the `codelaw` command; the
+# `codelaw` module beside it is the Python API. No sdist (L6 decision 7).
+# The version is Cargo.toml's, read by maturin (L6 decision 9) — never written here.
+[build-system]
+requires = ["maturin>=1.15,<2"]
+build-backend = "maturin"
+
+[project]
+name = "codelaw"
+dynamic = ["version"]
+description = "A linter and formatter whose rules are Markdown files"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT OR Apache-2.0"
+license-files = ["LICENSE-MIT", "LICENSE-APACHE"]
+dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Rust",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Repository = "https://github.com/arpitarya/codelaw"
+
+[tool.maturin]
+bindings = "bin"
+manifest-path = "../../crates/codelaw-cli/Cargo.toml"
+python-source = "python"
+strip = true

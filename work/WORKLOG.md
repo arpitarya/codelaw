@@ -24,6 +24,20 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-20 — W-04: the release pipeline, built and timed on real runners  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"checkout fux and sheetpane for how the cicd pipeline are built how pypi and npm packages are published — build a cicd pipeline for codelaw to publish packages it should take around 2 mins even faster."*
+- **Done:**
+  - Read both pipelines: release-triggered `publish.yml`, CI-green gate, OIDC trusted publishing, one artifact for every registry job (fux), the npm trust preflight (sheetpane).
+  - Packaging (B-038 → W-04): npm `codelaw` launcher + `check`/`fix` API + types, eight `@codelaw/cli-*`, PyPI wheels by maturin `bin` bindings, five packs on both; every manifest generated from `Cargo.toml`'s version (`scripts/version.py`).
+  - `ci.yml`: test, clippy, the SR-guard replay (SR-WORK-OWNERSHIP decision 7, new `SR_GUARD_COMMIT` mode), eight parallel platform builds, `scripts/package.py assemble` + `check`, `scripts/smoke.sh`. `publish.yml`: gate, npm and PyPI in parallel, no rebuild; `scripts/withdraw.sh` for a half-published release.
+  - Records: SR-PACKAGES decisions 10–13 and its owns; SR-LAW-6's Consequences and veto check, and SR-ARCHITECTURE's veto check (facts only); SR-WORK-OWNERSHIP decision 7. Branch `ci/w-04-release-pipeline`, green on all eight platforms; nothing published.
+- **Decided / left open:** Arpit ruled the licence (`MIT OR Apache-2.0`), building in CI and publishing what CI built, and pinning Rust 1.99.1. Open, his: the one-time registry setup and the ruling to publish 0.1.0 (inbox). The npm/Python APIs lack `rulesFor` and `format` (B-042).
+- **Mistakes:** the first push committed `scripts/__pycache__/` (now ignored); Windows died on `✔` under cp1252 (`PYTHONUTF8`, MACHINE.md). Lowering `codegen-units` to 16 was measured and rejected — slower to build here (1 m 44 s vs 1 m 26 s warm, 2 cores).
+- **Next:** the decider reviews the branch, merges it, and does `RELEASING.md` §One time.
+
+---
+
 ## 2026-10-20 — W-03 steps 2–5: all five rule packs merged  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"continue all run everything in parallel"*.

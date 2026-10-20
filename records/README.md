@@ -180,6 +180,17 @@ directions.
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
 | `fixtures/l3` | SR-LAW-3 | the fixture matrix |
 | `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the five first-party packs' rules, presets and data |
+| `LICENSE-MIT` | SR-PACKAGES | decision 10: the licence every package carries |
+| `LICENSE-APACHE` | SR-PACKAGES | decision 10 |
+| `packaging` | SR-PACKAGES | decisions 3 and 5: the npm launcher and API, the PyPI module and its maturin build |
+| `scripts/version.py` | SR-PACKAGES | decision 7: the one version, written and checked everywhere |
+| `scripts/package.py` | SR-PACKAGES | decision 11: assembles every package and runs the release checks |
+| `scripts/smoke.sh` | SR-PACKAGES | decision 11: the npm-vs-PyPI install smoke |
+| `scripts/withdraw.sh` | SR-PACKAGES | decision 12 |
+| `scripts/npm-trust.sh` | SR-PACKAGES | decision 11: the one-time npm trusted-publisher setup |
+| `.github/workflows` | SR-PACKAGES | decision 11: build once in CI, publish as built |
+| `RELEASING.md` | SR-PACKAGES | decision 11: how a release is cut |
+| `rust-toolchain.toml` | SR-PACKAGES | decision 13: the one pinned Rust toolchain |
 
 <!-- OWNERSHIP-TABLE-END -->
 

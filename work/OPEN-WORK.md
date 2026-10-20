@@ -22,8 +22,8 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed | age |
 |---|---|---|
-
-*Empty since 2026-10-19 — every row ruled ("go with the recommendations"); the next gate is the ruling to publish the packs (W-03 step 6).*
+| 🔴 **The one-time registry setup** — the `@codelaw` npm org, the first hand publish of the 14 npm packages, `scripts/npm-trust.sh`, six PyPI pending publishers, the `npm` and `pypi` GitHub environments ([`RELEASING.md`](../RELEASING.md) §One time); then **the ruling to publish** 0.1.0 | 2026-10-20 | 0 d |
+| ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 | | |
 
 ---
 
@@ -31,7 +31,9 @@ here. Read that record before changing anything below it.
 
 ### build
 
-🟢 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets, on the W-02 engine. Filed by Arpit (Cowork). Steps 2–5 done 2026-10-20 (401 rules across the five packs, every pack's tests green); step 6, publishing, needs the packaging (B-038) and then the decider's ruling. [detail](open/W-03-rule-packs.md)
+🔴 **W-04** `agent` The release pipeline: `ci.yml` builds the eight platform wheels and assembles, checks and install-smokes all 27 packages on every push; `publish.yml` uploads exactly that, by OIDC, from a published GitHub Release. Filed by Arpit (Claude Code). Steps 1–4 done 2026-10-20 on branch `ci/w-04-release-pipeline`; step 5, the first release, is 🔴 above. [detail](open/W-04-release-pipeline.md)
+
+🔴 **W-03** `agent` Build the five rule packs (js, html, css, python, data) from the researched ESLint/Ruff/stylelint/html-validate presets, on the W-02 engine. Filed by Arpit (Cowork). Steps 2–5 done 2026-10-20 (401 rules across the five packs, every pack's tests green); step 6, publishing, waits on the registry setup and the ruling above (the packaging is W-04). [detail](open/W-03-rule-packs.md)
 
 ### testing
 

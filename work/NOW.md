@@ -3,4 +3,4 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-in flight — 2026-10-20: W-03 (Claude Code, Opus 5.5): all five rule packs merged and green — js 132, python 98, html 71, css 70, data 30. Next: step 6, publishing — the packaging (B-038), then the decider's ruling to publish and on the licence.
+in flight — 2026-10-20: W-04 (Claude Code, Opus 5.5): the release pipeline is green on branch `ci/w-04-release-pipeline` (all eight platforms, nothing published). Next: the decider merges it, does the one-time registry setup (RELEASING.md) and rules on publishing 0.1.0.

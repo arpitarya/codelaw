@@ -3,3 +3,9 @@
 .claude/.progress-nudged
 /target/
 .claude/worktrees/
+
+# copied in by scripts/package.py prepare-wheel; the sources are at the root and packaging/README.md
+/packaging/python/LICENSE-*
+/packaging/python/README.md
+/dist/
+__pycache__/

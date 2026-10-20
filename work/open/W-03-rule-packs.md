@@ -136,7 +136,7 @@ Prettier has no lint rules. Its option defaults become SR-FORMATTER's `[format]`
 
 None for steps 2–5: W-02 landed the engine, the semantic model, `native:` rules and pack loading on 2026-10-19.
 
-- **Step 6 (publish)** needs the packaging the engine doesn't have yet (B-038, B-012), and publishing to npm and PyPI is outward-facing: the decider rules on it when the packs are ready.
+- **Step 6 (publish)**: the packaging and the release pipeline are W-04 (2026-10-20), and the licence is ruled (`MIT OR Apache-2.0`). What remains is the decider's: the one-time registry setup (`RELEASING.md` §One time) and the ruling to publish — the OPEN-WORK inbox.
 - **Engine features some ports need, not built yet:** `target:` + `assert:` rules and the `sort-keys`/`ensure-key` primitives (B-030) for `rules-data`'s schema and sorting rules; the project graph (B-029) for `graph/no-unused-exports`. Rules that need them wait in the pack README's "not ported yet" list; they are not approximated.
 
 ## Record affected

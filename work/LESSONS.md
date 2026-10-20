@@ -11,6 +11,15 @@ named here only as the failure that produced it. A lesson whose remedy is
 
 ---
 
+## 2026-10-20 — the slowest platform sets the pipeline's time; skip it, don't rush it
+
+Eight platform builds run in parallel, so a push takes as long as Windows arm64
+(~2½ min for one LTO build) whatever the other seven do. Faster runners were not
+the lever: **not rebuilding was** — the wheel is cached under the hash of every
+input that goes into it, so a push that changes no engine source (records,
+docs, packs, `work/`) restores eight wheels instead of compiling them. The
+binary's tests still run on every push; only the compile is skipped.
+
 ## 2026-10-19 — a rule's own examples don't find its false positives; a corpus does
 
 All 58 first ports passed their examples, then a run over npm's source found
