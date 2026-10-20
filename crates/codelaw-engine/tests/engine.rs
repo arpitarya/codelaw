@@ -56,6 +56,8 @@ fn rule(id: &str, languages: &[Language], fix: &str, block: &str, examples: &[(L
     for (l, dont, do_) in examples {
         s.push_str(&format!("### {}\n\n#### Don't\n\n```{}\n{dont}\n```\n\n#### Do\n\n```{}\n{do_}\n```\n\n", l.display(), l.extension(), l.extension()));
     }
+    // One line break at the end, as the Markdown formatter leaves it.
+    s.truncate(s.trim_end().len() + 1);
     s
 }
 
@@ -84,9 +86,9 @@ fn no_rules_is_one_info_diagnostic() {
 #[test]
 fn local_rule_check_and_fix() {
     let r = Repo::new("local");
-    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("src/a.js", "if (a == b) {}\nc == d;\n").file("src/b.py", "a == b\n");
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("src/a.js", "if (a == b) {\n}\nc == d;\n").file("src/b.py", "a == b\n");
     let d = r.check();
-    assert_eq!(summary(&d), ["src/a.js:1:5 acme/eqeqeq auto", "src/a.js:2:1 acme/eqeqeq auto"]);
+    assert_eq!(summary(&d), ["src/a.js:1:5 acme/eqeqeq auto", "src/a.js:3:1 acme/eqeqeq auto"]);
     assert_eq!(d[0].edits.len(), 1);
     assert_eq!(d[0].source, "local");
 
@@ -94,7 +96,7 @@ fn local_rule_check_and_fix() {
     let report = p.fix(&[], &FixOptions::default()).unwrap();
     assert_eq!(report.files.len(), 1);
     assert!(report.files[0].written);
-    assert_eq!(r.read("src/a.js"), "if (a === b) {}\nc === d;\n");
+    assert_eq!(r.read("src/a.js"), "if (a === b) {\n}\nc === d;\n");
     assert!(report.check.diagnostics.is_empty(), "{:?}", report.check.diagnostics);
     // A second fix is a fixpoint.
     let report = r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
@@ -258,13 +260,13 @@ fn suppressions() {
 #[test]
 fn html_regions_lint_and_fix_in_the_host() {
     let r = Repo::new("regions");
-    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("index.html", "<p>x</p>\n<script>\n  if (a == b) go();\n</script>\n<script type=\"text/template\">a == b</script>\n");
+    r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("index.html", "<p>x</p>\n<script>\n  if (a == b) go();\n</script>\n<script type=\"text/template\">a == b\n</script>\n");
     let d = r.check();
     assert_eq!(summary(&d), ["index.html:3:7 acme/eqeqeq auto"]);
     r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
     assert!(r.read("index.html").contains("if (a === b) go();"));
     // A language switched off is off inside hosts too.
-    r.file("index.html", "<script>a == b</script>\n").file("codelaw.toml", "languages = [\"html\"]\n");
+    r.file("index.html", "<script>\n  a == b;\n</script>\n").file("codelaw.toml", "languages = [\"html\"]\n");
     assert!(r.check().is_empty());
 }
 
@@ -513,9 +515,9 @@ fn the_verifier_refuses_a_fix_that_makes_a_new_rule_fire() {
 fn the_verifier_counts_syntax_errors_inside_regions() {
     let r = Repo::new("verifyregion");
     let breaking = rule("acme/break", &[Language::Javascript], "auto", "match:\n  pattern: $A == $B\nmessage: x\nfix: \"$A == ($B\"", &[(Language::Javascript, "a == b;", "a == (b;")]);
-    r.file(".codelaw/rules/acme/break.md", &breaking).file("a.html", "<p>x</p>\n<script>\na == b;\n</script>\n");
+    r.file(".codelaw/rules/acme/break.md", &breaking).file("a.html", "<p>x</p>\n<script>\n  a == b;\n</script>\n");
     let report = r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
-    assert_eq!(r.read("a.html"), "<p>x</p>\n<script>\na == b;\n</script>\n", "the JavaScript would no longer parse");
+    assert_eq!(r.read("a.html"), "<p>x</p>\n<script>\n  a == b;\n</script>\n", "the JavaScript would no longer parse");
     assert_eq!(report.check.diagnostics[0].note.as_deref(), Some("fix-verify-failed"));
 }
 

@@ -2,8 +2,9 @@
 //! the `auto` edits (and `suggest` with `--unsafe`), re-parse, repeat to a
 //! fixpoint, verify, and write safely (decision 12).
 //!
-//! The formatter step of decision 5 is not here yet: SR-FORMATTER's engines
-//! are not built in this version.
+//! On disk, `fix` ends with the format step (SR-FORMATTER decision 4): the
+//! fixed text is formatted and verified, and a format that fails
+//! verification is rolled back while the lint fixes are kept.
 
 use crate::discover::FileEntry;
 use crate::lint::{FileResult, RunMode, lint_text, meta_diagnostic};
@@ -37,6 +38,8 @@ pub struct FileFix {
     /// What is left after fixing, sorted.
     pub remaining: Vec<Diagnostic>,
     pub written: bool,
+    /// The format step changed the layout.
+    pub formatted: bool,
 }
 
 impl FileFix {
@@ -84,8 +87,9 @@ fn firing(diagnostics: &[Diagnostic]) -> BTreeSet<String> {
     diagnostics.iter().filter(|d| !d.rule.starts_with("codelaw/")).map(|d| d.rule.clone()).collect()
 }
 
-/// Fix one file's text.
-pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options: &FixOptions) -> FileFix {
+/// Fix one file's text, then, with `format`, format it (decision 4 of
+/// SR-FORMATTER; `fix_source` and the rule tester don't).
+pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options: &FixOptions, format: bool) -> FileFix {
     let wanted = |class: FixClass| class == FixClass::Auto || (options.unsafe_fixes && class == FixClass::Suggest);
     let mut before: Option<BTreeSet<String>> = None;
     let run = |denied: &BTreeSet<String>, before: &mut Option<BTreeSet<String>>| {
@@ -135,6 +139,21 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
             outcome.failed.insert((rule.clone(), Failure::VerifyFailed));
         }
     }
+    let mut fixed = outcome.text;
+    let mut applied = outcome.applied;
+    let mut formatted = false;
+    if format {
+        match crate::format::verified(project, entry, &fixed) {
+            Ok(out) if out != fixed => {
+                fixed = out;
+                formatted = true;
+                *applied.entry(crate::format::UNFORMATTED.to_owned()).or_default() += 1;
+                remaining = lint_text(project, entry, &fixed, &RunMode { external_fixers: false, refused: Some(&outcome.refused) }).diagnostics;
+            }
+            Ok(_) => {}
+            Err(e) => remaining.extend(crate::format::failed(project, entry, &e)),
+        }
+    }
     let failures: BTreeMap<&str, Failure> = outcome.failed.iter().map(|(r, f)| (r.as_str(), *f)).collect();
     for d in &mut remaining {
         if let Some(f) = failures.get(d.rule.as_str())
@@ -160,17 +179,18 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
     FileFix {
         file: entry.rel.clone(),
         original: text.to_owned(),
-        fixed: outcome.text,
+        fixed,
         passes: outcome.passes,
-        applied: outcome.applied,
+        applied,
         remaining,
         written: false,
+        formatted,
     }
 }
 
 /// Why a fixed file was not written.
 #[derive(Debug)]
-enum WriteError {
+pub(crate) enum WriteError {
     /// The file changed on disk since it was read (decision 12).
     Changed,
     /// The write itself failed: permissions, a full disk, a missing folder.
@@ -181,7 +201,7 @@ enum WriteError {
 /// the file changed since it was read (SR-ARCHITECTURE decision 12). A
 /// symlink is written through: the file it points to is replaced, and the
 /// link stays a link.
-fn safe_write(path: &Path, read_bytes: &[u8], text: &str, bom: bool) -> Result<(), WriteError> {
+pub(crate) fn safe_write(path: &Path, read_bytes: &[u8], text: &str, bom: bool) -> Result<(), WriteError> {
     use std::io::Write;
     let failed = |e: std::io::Error| WriteError::Failed(e.to_string());
     let target = std::fs::canonicalize(path).map_err(failed)?;
@@ -232,7 +252,7 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
                     Ok(f) => f,
                     Err(skip) => return (None, skip),
                 };
-                let mut fix = fix_text(this, entry, &file.text, options);
+                let mut fix = fix_text(this, entry, &file.text, options, this.formats(entry));
                 let mut diagnostics = std::mem::take(&mut fix.remaining);
                 if fix.changed() && !options.dry_run {
                     match safe_write(&entry.abs, &file.bytes, &fix.fixed, file.bom) {

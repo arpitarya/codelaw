@@ -10,11 +10,11 @@ GitHub Release. It compiles nothing: it uploads the `dist` artifact that
 `ci.yml` assembled and checked on the release commit. No token exists
 anywhere — both registries use trusted publishing (OIDC).
 
-> **Not releasable yet (2026-10-20).** The engine has no `format`, `mcp` or `lsp`
-> command, and [L7](records/0009_LAW-7-linter-and-formatter.md) and
-> [L6](records/0008_LAW-6-python-and-node-packages.md) decision 3 forbid shipping
-> without them. `python3 scripts/law-gate.py dist/` says what is missing;
-> W-07, W-08 and W-09 build them.
+> **The engine is complete (2026-10-21).** `format`, `mcp` and `lsp` are all in
+> the binary, as [L7](records/0009_LAW-7-linter-and-formatter.md) and
+> [L6](records/0008_LAW-6-python-and-node-packages.md) decision 3 require, and
+> `python3 scripts/law-gate.py dist/` lists nothing. The first release still
+> waits on the one-time setup below and the decider's go.
 
 ## The pipeline
 

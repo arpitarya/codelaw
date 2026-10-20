@@ -11,7 +11,7 @@ owns:
   - fixtures/l3
   - crates/codelaw-cli/tests/laws.rs
 laws: [L0, L3]
-timestamp: 2026-10-18T16:45:00Z
+timestamp: 2026-10-21T12:00:00Z
 content_sha: ""
 ---
 
@@ -85,6 +85,7 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 #### How L3 is enforced
 
 - **Fixture matrix in CI:** nine single-language fixture repos plus one combined repo. Each runs every command. The isolation check (decision 5) diffs each file's output across the single-language and combined runs.
+- **The fixtures are formatted.** Every fixture file is already in codelaw's format, so `check` on the matrix reports only the fixture rules. [SR-LAW-7](0009_LAW-7-linter-and-formatter.md)'s check, in the same `laws.rs`, fails on a fixture that `codelaw format` would change.
 - **Runtime fence:** the Python-only fixture runs in a container with no Node, and the JS-only fixture runs with no Python.
 - **Rule load check:** a rule whose `languages:` names a language outside the nine is refused at load (exit code 2).
 

@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-20: the LSP and editor extension SR-EDITOR and L6 d
 item: W-09
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-20
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-21
+updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: agent
 ---
 
@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Add `codelaw-lsp` and `codelaw lsp`: diagnostics, code actions for fixes, formatting | the editor sees what `check` sees | ✅ diagnostics, quick fixes, fix all, hover · ⏳ formatting (W-07) |
+| 1 | Add `codelaw-lsp` and `codelaw lsp`: diagnostics, code actions for fixes, formatting | the editor sees what `check` sees | ✅ diagnostics, quick fixes, fix all, hover, document formatting (2026-10-21) |
 | 2 | Convert positions to UTF-16 at the LSP boundary only | SR-ARCHITECTURE decision 13 | ✅ |
 | 3 | Publish the thin `codelaw.codelaw` extension (Marketplace + Open VSX) | one-click install | ✅ built in `packaging/vscode` · ⏳ packaging and publishing (release pipeline, decider) |
-| 4 | Extend the CLI/MCP parity test to the LSP | three doors, one answer | ✅ CLI vs LSP · ⏳ MCP joins when W-08 lands |
+| 4 | Extend the CLI/MCP parity test to the LSP | three doors, one answer | ✅ CLI vs LSP; MCP's own parity test landed with W-08 |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
 
@@ -33,21 +33,24 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · server | `codelaw lsp`: publishDiagnostics, codeAction (auto/suggest fixes), formatting via W-07. | ✅ diagnostics and code actions · ⏳ formatting: `crates/codelaw-lsp/src/format.rs` is the one function to wire when W-07 lands; the capability is not advertised until then |
+| 1 · server | `codelaw lsp`: publishDiagnostics, codeAction (auto/suggest fixes), formatting via W-07. | ✅ diagnostics, code actions, and document formatting through `Project::format_source`, advertised (2026-10-21) |
 | 2 · positions | A test on multi-byte and astral characters round-trips UTF-16 positions. | ✅ `position.rs` unit tests and `tests/server.rs` |
 | 3 · no writes | The server returns `WorkspaceEdit`s only (SR-ARCHITECTURE decision 12). | ✅ tested: the repo is byte-identical after fixes; the crate has no write path |
 | 4 · extension | `codelaw.codelaw` finds `node_modules/.bin`, then `.venv/bin`, then a bundled binary (SR-EDITOR). | ✅ `packaging/vscode/src/binary.ts`, tested under `node --test` |
 | 5 · gate | `scripts/law-gate.py` no longer lists `lsp`. | ✅ |
 
-## Left, and why
+## Closed 2026-10-21
 
-- **Formatting** waits for W-07's `codelaw-format`.
+Formatting was the last DoD row. What the record names and this item did not build now lives elsewhere: range formatting is W-23, incremental re-parse is W-15, the `.vsix` packages and their publish are W-04's release, and pull and workspace diagnostics, project rules on save and the two missing code actions are backlog rows B-043 and B-044.
+
+## Left, and why (as of 2026-10-20)
+
 - **Not built yet:** pull and workspace diagnostics, project rules on save (no graph yet), "Ignore here with reason", the warm socket (SR-ARCHITECTURE decision 21), incremental re-parse (W-15; every change re-checks the document, full sync).
 - **Release:** the platform-specific `.vsix` packages (bundled binary in `bin/`, `LICENSE`, the one version stamped over `0.0.0`) and their Marketplace/Open VSX publish join the release pipeline; publishing is the decider's.
 
 ## Blockers
 
-None for the server. Formatting on save needs W-07.
+None.
 
 ## Record affected
 

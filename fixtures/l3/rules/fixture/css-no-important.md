@@ -28,11 +28,15 @@ message: "`!important`"
 #### Don't
 
 ```css
-a { color: red !important; }
+a {
+  color: red !important;
+}
 ```
 
 #### Do
 
 ```css
-a { color: red; }
+a {
+  color: red;
+}
 ```

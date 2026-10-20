@@ -8,6 +8,12 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 - **Licence: MIT**, for the repo and every package. `LICENSE` at the root and in each of the five rule packs.
 - `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` and the GitHub issue and pull-request templates.
+- **The formatter:** `codelaw format [--check] [--diff]` for all nine languages, with six engines compiled in: Biome, Ruff's formatter, pretty_yaml, taplo, dprint-plugin-markdown and markup_fmt. `fix` now ends with a format. `check` reports unformatted files as `format/unformatted` (`auto`). A format that would not parse, would change again on a second run, or would change a JSON/YAML/TOML value is refused and reported as `format/failed`. Line endings are kept unless `[format] end_of_line` is set.
+- **`codelaw mcp`**, the MCP server for agents, and **`codelaw lsp`**, the language server: diagnostics, quick fixes, fix all, hovers and document formatting.
+
+### Changed
+
+- `codelaw fix` now formats every file it checks. Set `[format] enabled = false` to keep the old behaviour, or `[format] check = false` to keep formatting out of `check`.
 
 ## 0.1.0 — preview, not published
 

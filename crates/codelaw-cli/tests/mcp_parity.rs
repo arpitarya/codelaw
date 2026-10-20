@@ -233,3 +233,22 @@ fn mcp_errors_match_the_cli() {
     assert!(text.contains("did you mean"), "{text}");
     let _ = fs::remove_dir_all(root);
 }
+
+/// An unformatted file: `check_snippet` reports `format/unformatted` as
+/// `check` does, and `format_snippet` returns the bytes `fix` writes, the
+/// format step included (SR-FORMATTER decision 4).
+#[test]
+fn snippets_format_as_check_and_fix_do() {
+    let root = repo("format", &["javascript"]);
+    let (file, code) = ("src/messy.js", "if (a == b) { go() }\n");
+    fs::write(root.join(file), code).unwrap();
+    let mut mcp = Mcp::start(&root);
+    let checked = cli(&root, &["check", file, "--format", "json"]);
+    assert!(checked.contains("format/unformatted"), "{checked}");
+    assert_eq!(mcp.call("check_snippet", json!({ "path": file, "code": code })), checked);
+    let v: Value = serde_json::from_str(&mcp.call("format_snippet", json!({ "path": file, "code": code }))).unwrap();
+    cli(&root, &["fix", file, "--format", "json"]);
+    assert_eq!(v["code"].as_str().unwrap(), fs::read_to_string(root.join(file)).unwrap());
+    assert_eq!(v["code"].as_str().unwrap(), "if (a === b) {\n  go();\n}\n");
+    let _ = fs::remove_dir_all(root);
+}

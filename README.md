@@ -21,7 +21,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 ---
 
 > [!IMPORTANT]
-> **codelaw is a preview (0.1.0) and is not on npm or PyPI yet.** The linter, the fixer and all five rule packs work today if you build from source. The formatter, the MCP server, the editor extension and the published packages come next. [Roadmap](#roadmap) lists what is built and what is not.
+> **codelaw is a preview (0.1.0) and is not on npm or PyPI yet.** The linter, the fixer, the formatter, the MCP server, the language server and all five rule packs work today if you build from source. The published packages and the editor extension's Marketplace listing come next. [Roadmap](#roadmap) lists what is built and what is not.
 
 ## In plain words
 
@@ -182,7 +182,7 @@ Five first-party packs. Each one ships under the same name on both registries: `
 
 - **Reimplemented, not wrapped.** Each rule is written fresh in codelaw's format, and its `ported_from:` field names the original. You don't need ESLint, Ruff or stylelint installed.
 - **Differences are written down.** Each pack's README lists where a port behaves differently from the original, and which rules weren't ported and why.
-- **Layout rules are left out on purpose.** Indentation, spacing and quotes are the formatter's job ([roadmap](#roadmap)).
+- **Layout rules are left out on purpose.** Indentation, spacing and quotes are the formatter's job (`codelaw format`).
 - **3,060 example checks, all green.** `codelaw test packs/<pack>` runs them.
 - **`*/conventions` presets are opt-in**: house-style rules such as `js/exports-at-end` and `py/no-print`.
 
@@ -338,7 +338,8 @@ flowchart LR
   ```
 
 - **The same command works in any agent with post-edit hooks** (Codex, Copilot, Kiro), and in pre-commit and CI.
-- **Coming next:** `codelaw mcp`, so agents can ask `rules_for_path` *before* writing; `codelaw init --agents` to install the hooks; and generated `AGENTS.md`, `CLAUDE.md`, Copilot and Kiro instruction files ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
+- **`codelaw mcp`** lets an agent ask `rules_for_path` *before* writing, and `format_snippet` for the exact bytes `fix` would write.
+- **Coming next:** `codelaw init --agents` to install the hooks; and generated `AGENTS.md`, `CLAUDE.md`, Copilot and Kiro instruction files ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
 
 ---
 
@@ -347,7 +348,9 @@ flowchart LR
 | command | what it does |
 |---|---|
 | `codelaw check [paths]` | Report every finding with its fix. `--format text\|json\|agent`, `--max-warnings N`, `--lang`, `--rule` |
-| `codelaw fix [paths]` | Apply `auto` fixes, then report what's left. `--unsafe` adds `suggest` fixes; `--dry-run` writes nothing |
+| `codelaw fix [paths]` | Apply `auto` fixes, format, then report what's left. `--unsafe` adds `suggest` fixes; `--dry-run` writes nothing |
+| `codelaw format [paths]` | Format every file: Prettier-style JS/TS/JSON/CSS/HTML/YAML/Markdown, Black-style Python, taplo-style TOML. `--check` and `--diff` change nothing |
+| `codelaw mcp` · `codelaw lsp` | The MCP server for agents and the language server for editors, from the same binary |
 | `codelaw init` | Detect languages and write `codelaw.toml`, `.codelaw/rules/` and the `.gitignore` line. `--no-install` prints the pack install commands instead of running them |
 | `codelaw rules` | List active rules. `--for <file>` shows the ones that apply to that file. `rules lint` checks rule files |
 | `codelaw explain <id>` | What a rule requires, why, and how to fix it |
@@ -371,7 +374,7 @@ flowchart LR
 **Stay with what you have, for now, when:**
 
 - you need **type-aware** rules, such as floating promises or `no-unsafe-*`. tree-sitter has no type information, so these stay with typescript-eslint, pyright or mypy;
-- you need a **formatter** today. codelaw's is designed but not built yet, so keep Prettier, Black or Ruff format alongside it;
+- you need **byte-for-byte Prettier output** for HTML or Markdown. codelaw's formatter matches Prettier on every JS, TS and JSON file measured, but on only 62 % of HTML files and 42 % of Markdown files ([SR-FORMATTER](records/0105_formatter.md));
 - you need a **stable, published** tool in production CI. 0.1.0 is a preview.
 
 ---
@@ -381,13 +384,14 @@ flowchart LR
 | | feature | state |
 |---|---|---|
 | ✅ | Engine: nine languages, one binary, parse once, cache | built |
-| ✅ | `check`, `fix`, `test`, `rules`, `explain`, `tree`, `new-rule`, `init`, `cache` | built |
+| ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `new-rule`, `init`, `cache` | built |
 | ✅ | Five rule packs: 401 rules | built, `preview` |
 | ✅ | `--format agent` and `--format json` | built |
 | 🔜 | npm and PyPI packages (`npx codelaw`, `uvx codelaw`) | next |
-| 🔜 | Formatter (`codelaw format`): Prettier-style JS/TS/JSON, Black-style Python | designed |
-| 🔜 | MCP server, agent hooks, `init --agents`, `sync-agents` | designed |
-| 🔜 | Language server and VS Code extension | designed |
+| ✅ | Formatter (`codelaw format`, and the last step of `fix`): Prettier-style JS/TS/JSON, Black-style Python | built |
+| ✅ | MCP server (`codelaw mcp`) | built |
+| ✅ | Language server (`codelaw lsp`): diagnostics, quick fixes, formatting | built; the VS Code extension is built, not published |
+| 🔜 | Agent hooks, `init --agents`, `sync-agents` | designed |
 | 🔜 | Project-wide rules (unused exports), baselines, SARIF output | designed |
 
 The design for each item is a record in [`records/`](records/README.md); the open work is [`work/OPEN-WORK.md`](work/OPEN-WORK.md).
