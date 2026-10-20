@@ -1,5 +1,34 @@
 # py/undefined-local — cases
 
+### case: annotations of a nested function
+
+```py
+from typing import Any, Iterator
+
+
+def _unique(fn):
+    def unique(*args: Any, **kw: Any) -> Iterator[Any]:
+        return fn(*args, **kw)
+    return unique
+```
+
+```expect
+(none)
+```
+
+### case: builtin annotation in a nested function
+
+```py
+def outer():
+    def parse_line(line: str) -> str:
+        return line
+    return parse_line
+```
+
+```expect
+(none)
+```
+
 ### case: read in the right-hand side
 
 ```py

@@ -1,5 +1,16 @@
 # py/useless-expression — cases
 
+### case: arithmetic on literals
+
+```py
+def f():
+    1 / 0
+```
+
+```expect
+2:5 py/useless-expression
+```
+
 ### case: docstrings and ellipsis
 
 ```py

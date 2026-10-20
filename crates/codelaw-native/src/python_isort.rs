@@ -130,13 +130,13 @@ fn unit_cmp(a: &Unit, b: &Unit) -> Ordering {
         .then_with(|| a.alias.is_some().cmp(&b.alias.is_some()))
         .then_with(|| natural_cmp(a.alias.as_deref().unwrap_or(""), b.alias.as_deref().unwrap_or("")))
         .then_with(|| a.star.cmp(&b.star).reverse())
-        .then_with(|| {
-            let aliased = |u: &Unit| u.members.iter().any(|m| m.1.is_some());
-            aliased(a).cmp(&aliased(b))
-        })
         .then_with(|| match (a.members.first(), b.members.first()) {
             (Some(x), Some(y)) => member_cmp(&x.0, &y.0),
             _ => Ordering::Equal,
+        })
+        .then_with(|| {
+            let aliased = |u: &Unit| u.members.iter().any(|m| m.1.is_some());
+            aliased(a).cmp(&aliased(b))
         })
 }
 

@@ -1,5 +1,41 @@
 # py/redefined-while-unused — cases
 
+### case: redefinition in another branch
+
+```py
+import sys
+
+if __name__ == "__main__":
+    import sys
+    print(sys.argv)
+```
+
+```expect
+(none)
+```
+
+### case: import used in a string annotation
+
+```py
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .console import Console
+
+
+def f(c: "Console") -> None:
+    pass
+
+
+if __name__ == "__main__":
+    from rich.console import Console
+    Console()
+```
+
+```expect
+(none)
+```
+
 ### case: try/except alternatives
 
 ```py

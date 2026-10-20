@@ -1,5 +1,21 @@
 # py/unsorted-imports — cases
 
+### case: same module ordered by first name
+
+```py
+from multiprocessing import pool
+from multiprocessing import Pool as ProcessPool
+```
+
+```expect
+1:1 py/unsorted-imports
+```
+
+```fixed
+from multiprocessing import Pool as ProcessPool
+from multiprocessing import pool
+```
+
 ### case: members and merging
 
 ```py

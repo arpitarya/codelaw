@@ -78,6 +78,25 @@ pub(crate) fn bind_ctx(id: Node<'_>) -> (Bind, Option<Node<'_>>) {
     (Bind::Other, None)
 }
 
+/// The innermost branch a node is in: a block of an `if`/`elif`/`else`,
+/// a `try` clause or a `case`, within the same function.
+fn branch(n: Node<'_>) -> Option<Node<'_>> {
+    let mut cur = statement_of(n);
+    while let Some(p) = cur.parent() {
+        match p.kind() {
+            "if_statement" | "elif_clause" | "else_clause" | "except_clause" | "finally_clause" | "case_clause" | "try_statement"
+                if cur.kind() == "block" =>
+            {
+                return Some(cur);
+            }
+            "function_definition" | "class_definition" | "lambda" => return None,
+            _ => {}
+        }
+        cur = p;
+    }
+    None
+}
+
 fn ident_at(root: Node<'_>, start: usize, end: usize) -> Option<Node<'_>> {
     root.descendant_for_byte_range(start, end).filter(|n| n.kind() == "identifier")
 }
@@ -124,11 +143,12 @@ pub(crate) fn different_forks(a: Node<'_>, b: Node<'_>) -> bool {
 
 /// Names that appear inside string annotations (`x: "Foo"`), which use the
 /// imports they name.
-fn names_in_string_annotations(root: Node<'_>, src: &str) -> BTreeSet<String> {
+fn names_in_string_annotations(root: Node<'_>, src: &str, model: &SemanticModel) -> BTreeSet<String> {
     let mut out = BTreeSet::new();
     let mut stack = vec![root];
     while let Some(n) = stack.pop() {
-        if n.kind() == "string" && n.parent().is_some() && has_type_ancestor(n) {
+        // `# type:` comments are not read: Ruff 0.17 doesn't count them as uses either.
+        if n.kind() == "string" && n.parent().is_some() && (has_type_ancestor(n) || in_typing_context(n, model, src)) {
             if let Some((_, content)) = string_parts(n, src) {
                 collect_words(&content, &mut out);
             }
@@ -137,6 +157,42 @@ fn names_in_string_annotations(root: Node<'_>, src: &str) -> BTreeSet<String> {
         stack.extend(kids(n));
     }
     out
+}
+
+/// Whether a string sits where typing reads it as a type: inside a
+/// subscript of a typing generic (`Dict["Name", int]`), as `cast()`'s first
+/// argument, or as a `TypeVar`'s `bound=`.
+fn in_typing_context(n: Node<'_>, model: &SemanticModel, src: &str) -> bool {
+    const GENERIC_BUILTINS: &[&str] = &["builtins.list", "builtins.dict", "builtins.set", "builtins.frozenset", "builtins.tuple", "builtins.type"];
+    let typing = |q: &str| q.starts_with("typing.") || q.starts_with("typing_extensions.") || q.starts_with("collections.abc.") || GENERIC_BUILTINS.contains(&q);
+    let mut cur = n;
+    while let Some(p) = cur.parent() {
+        match p.kind() {
+            "subscript" => {
+                if p.child_by_field_name("value").and_then(|v| crate::python_util::qualified_name(v, model, src)).is_some_and(|q| typing(&q)) {
+                    return true;
+                }
+            }
+            "argument_list" => {
+                let Some(call) = p.parent() else { return false };
+                let q = call.child_by_field_name("function").and_then(|f| crate::python_util::qualified_name(f, model, src)).unwrap_or_default();
+                let first = kids(p).first().is_some_and(|f| f.id() == cur.id());
+                if (q.ends_with(".cast") && typing(&q) && first) || (cur.kind() == "keyword_argument" && q.ends_with(".TypeVar")) {
+                    return true;
+                }
+                return false;
+            }
+            "keyword_argument" => {
+                if p.child_by_field_name("name").is_none_or(|k| text(k, src) != "bound") {
+                    return false;
+                }
+            }
+            "block" | "module" | "lambda" | "function_definition" | "class_definition" => return false,
+            _ => {}
+        }
+        cur = p;
+    }
+    false
 }
 
 fn has_type_ancestor(n: Node<'_>) -> bool {
@@ -235,7 +291,7 @@ fn inside_try_body(n: Node<'_>) -> bool {
 fn unused_import(root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
     let Some(model) = ctx.semantic else { return };
     let src = ctx.source;
-    let in_annotations = names_in_string_annotations(root, src);
+    let in_annotations = names_in_string_annotations(root, src, model);
     // Statement start → (entries, unused entries).
     let mut by_stmt: BTreeMap<usize, (usize, Vec<usize>)> = BTreeMap::new();
     let mut unused = Vec::new();
@@ -273,7 +329,13 @@ fn unused_import(root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFi
         let edits = if inside_try_body(stmt) {
             None
         } else if gone.len() == total {
-            remove_stmt(stmt, src)
+            // When every statement of a block goes, the block keeps a `pass`.
+            let whole_block = stmt.parent().filter(|b| b.kind() == "block").and_then(|b| {
+                let stmts = statements(b);
+                let all_gone = stmts.iter().all(|x| by_stmt.get(&x.start_byte()).is_some_and(|(t, g)| *t == g.len() && *t > 0));
+                all_gone.then(|| vec![TextEdit::new(stmts[0].start_byte(), stmts[stmts.len() - 1].end_byte(), "pass")])
+            });
+            whole_block.or_else(|| remove_stmt(stmt, src))
         } else {
             remove_entry(entry, src)
         };
@@ -657,8 +719,9 @@ fn is_overload(def: Node<'_>, model: &SemanticModel, src: &str) -> bool {
 fn redefined_while_unused(root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
     let Some(model) = ctx.semantic else { return };
     let src = ctx.source;
+    let in_annotations = names_in_string_annotations(root, src, model);
     for (id, s) in model.symbols.iter().enumerate() {
-        if s.decls.len() < 2 {
+        if s.decls.len() < 2 || in_annotations.contains(&s.name) {
             continue;
         }
         let mut decls = s.decls.clone();
@@ -685,7 +748,8 @@ fn redefined_while_unused(root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec
                     && ctx_b.and_then(|c| c.child_by_field_name("right")).is_some_and(|rh| rh.start_byte() <= r.start && r.start < rh.end_byte());
                 r.read && (between || in_rhs) && body.is_none_or(|d| !(d.start_byte() <= r.start && r.start < d.end_byte()))
             });
-            if used || different_forks(na, nb) {
+            // As in Ruff, only a redefinition in the same branch counts.
+            if used || different_forks(na, nb) || branch(na).map(|b| b.id()) != branch(nb).map(|b| b.id()) {
                 continue;
             }
             // An optional accelerator: `try: from _speedups import f`.

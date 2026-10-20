@@ -137,8 +137,8 @@ The ones that shape results most:
 | area | difference |
 |---|---|
 | name resolution | The semantic model is per scope, not per statement: a name bound anywhere in a scope counts as bound everywhere in it, and `del` is not tracked. Ruff follows the order statements run in, so it reports a few more `F821`, `F405`, `F811` and `F401` findings in code that rebinds names conditionally. |
-| `py/redefined-while-unused` | A read anywhere between two definitions counts as a use, even inside a function body that only runs later; a parameter shadowing a module-level import is not reported. |
-| `py/unused-import` | Not reported for imports in a class body, `import a.b` loading a submodule of a package also imported under an alias, or importing `__all__`. Imports inside a `try` body are reported without an edit. The fix is `suggest`, because an import can run code. |
+| `py/redefined-while-unused` | A read anywhere between two definitions counts as a use, even inside a function body that only runs later, and so does a mention in a string annotation; as in Ruff, a redefinition in a different branch (`if __name__ == "__main__":`) is not reported; a parameter shadowing a module-level import is not reported. |
+| `py/unused-import` | Names in string annotations, and in strings inside typing generics (`Dict["Name", int]`), `cast()` and `TypeVar(bound=)`, count as uses; `# type:` comments don't, as in Ruff 0.17. Not reported for imports in a class body, `import a.b` loading a submodule of a package also imported under an alias, or importing `__all__` (Ruff reports that one). Imports inside a `try` body are reported without an edit. The fix is `suggest`, because an import can run code. |
 | `py/unused-variable` | As in Ruff, unpacking is reported only from a tuple or list literal. Outside functions only an unused `except … as name` is reported. |
 | `py/unsorted-imports` | Checks order only. Blank lines after the import block and line wrapping are the formatter's; `from m import a, b as c` and `import a, b` are not reported for their shape. First-party modules come from the `known_first_party` option. |
 | `py/no-star-import` | Relative star imports (`from .sub import *`) are not reported: that is how a package re-exports its submodules. |
@@ -171,14 +171,14 @@ library. `py/unsorted-imports` uses it to place imports in sections. See
 
 ## Corpus check
 
-420 files of CPython 3.9's standard library (`lib/python3.9`, without tests),
-checked with every rule on and compared line by line with Ruff 0.17.1 running
-the same rules: 1,524 findings from 39 rules. 28 of the 38 ported rules that
-fired agree with Ruff on every line. The other ten differ only in the ways
-documented above (statement-order name resolution, blank lines after imports,
-`# noqa` comments, the `target_version` default), plus `B028` on a `warnings`
-name with a `None` fallback, which codelaw still resolves to the module, and
-`B012`, where codelaw reports every `return` in a `finally` block, and `B024`
-on `class ABC` inside the `abc` module itself. Applying
-every `auto` and `suggest` fix changed 259 files, broke none, and left no
-fixable finding behind.
+Each run checks every rule and compares it line by line with Ruff 0.17.1
+running the same rules (`--select E4,E7,E9,F,B,I001,RUF022`).
+
+| corpus | files | findings | rules where codelaw and Ruff differ, and why |
+|---|---|---|---|
+| CPython 3.9 standard library (`lib/python3.9`, no tests) | 420 | 1,526 | I001 (blank lines after imports, left to the formatter), F821/F405/F811/F401/F841 (Ruff follows statement order and `del`; codelaw doesn't report `from io import __all__`), F401/I001 `# noqa` lines, B028 (a `warnings` name with a `None` fallback), B012 (codelaw reports every `return` in a `finally`), B024 (`class ABC` inside `abc.py`), B912 (`target_version` unset) |
+| pip 21.2.4 `pip/_internal` | 141 | 310 | F401: 12 lines, every one marked `# noqa`; B912 (`target_version` unset) |
+| rich 15.0.0 (fully annotated) | 100 | 98 | I001: 5 blocks missing only a blank line between sections; F401 and B007: one `# noqa` line each |
+
+Applying every `auto` and `suggest` fix to all three corpora changed 368 files,
+broke none, and left no fixable finding behind.

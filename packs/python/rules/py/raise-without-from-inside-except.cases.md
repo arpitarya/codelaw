@@ -1,5 +1,21 @@
 # py/raise-without-from-inside-except — cases
 
+### case: raise inside a nested try
+
+```py
+try:
+    run()
+except ValueError:
+    try:
+        raise KeyError()
+    except KeyError:
+        pass
+```
+
+```expect
+(none)
+```
+
 ### case: re-raising
 
 ```py

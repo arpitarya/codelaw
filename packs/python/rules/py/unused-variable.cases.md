@@ -1,5 +1,17 @@
 # py/unused-variable — cases
 
+### case: read in a nested format spec
+
+```py
+def f(x):
+    width = 3
+    return f"{x:{width}d}"
+```
+
+```expect
+(none)
+```
+
 ### case: underscore names are deliberate
 
 ```py

@@ -91,8 +91,17 @@ impl<'s> Builder<'s> {
                 for c in named_children(n) {
                     if c.kind() == "interpolation" {
                         for e in named_children(c) {
-                            if !matches!(e.kind(), "format_specifier" | "type_conversion") {
-                                self.visit(e, scope);
+                            match e.kind() {
+                                "type_conversion" => {}
+                                // `f"{x:{width}}"`: the nested fields are expressions.
+                                "format_specifier" => {
+                                    for f in named_children(e).into_iter().filter(|f| f.kind() == "format_expression") {
+                                        if let Some(x) = f.child_by_field_name("expression") {
+                                            self.visit(x, scope);
+                                        }
+                                    }
+                                }
+                                _ => self.visit(e, scope),
                             }
                         }
                     }
@@ -131,14 +140,29 @@ impl<'s> Builder<'s> {
                 self.visit_field(n, "type_parameters", inner);
                 self.visit_field(n, "body", inner);
             }
+            // `List[int]` in an annotation is a subscript, not a PEP 695
+            // declaration: its names are references.
+            "type_parameter" if n.parent().is_some_and(|p| p.kind() == "generic_type") => self.children(n, scope),
             "type_parameter" => {
                 for c in named_children(n) {
                     match c.kind() {
-                        "type" => {
-                            if let Some(id) = c.named_child(0).filter(|i| i.kind() == "identifier") {
+                        "type" => match c.named_child(0) {
+                            Some(id) if id.kind() == "identifier" => {
                                 self.bind(scope, id, SymbolKind::TypeParam);
                             }
-                        }
+                            // `T: int` binds `T`; the bound is a reference.
+                            Some(ct) if ct.kind() == "constrained_type" => {
+                                for (i, part) in named_children(ct).into_iter().enumerate() {
+                                    match part.named_child(0).filter(|x| i == 0 && x.kind() == "identifier") {
+                                        Some(id) => {
+                                            self.bind(scope, id, SymbolKind::TypeParam);
+                                        }
+                                        None => self.visit(part, scope),
+                                    }
+                                }
+                            }
+                            _ => self.visit(c, scope),
+                        },
                         _ => self.visit(c, scope),
                     }
                 }

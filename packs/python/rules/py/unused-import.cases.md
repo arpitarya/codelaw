@@ -1,5 +1,86 @@
 # py/unused-import — cases
 
+### case: every import of a block
+
+```py
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import a
+    import b
+```
+
+```expect
+4:12 py/unused-import
+5:12 py/unused-import
+```
+
+```fixed
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    pass
+```
+
+### case: names nested in an annotation with a default
+
+```py
+from typing import List, Optional
+
+
+def main(args: Optional[List[str]] = None) -> int:
+    return 0
+```
+
+```expect
+(none)
+```
+
+### case: annotated assignment
+
+```py
+from typing import Any, Set
+
+
+def f():
+    seen: Set[Any] = set()
+    return seen
+```
+
+```expect
+(none)
+```
+
+### case: string inside a typing generic
+
+```py
+from typing import TYPE_CHECKING, Dict
+
+if TYPE_CHECKING:
+    from .names import NormalizedName
+
+PackageSet = Dict["NormalizedName", int]
+```
+
+```expect
+(none)
+```
+
+### case: type comments are not read, as in Ruff
+
+```py
+from types import TracebackType
+
+
+def f(a):
+    # type: (TracebackType) -> None
+    pass
+```
+
+```expect
+1:19 py/unused-import
+```
+
 ### case: listed in __all__
 
 ```py

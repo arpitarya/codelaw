@@ -467,6 +467,10 @@ fn useless_expression(n: Node<'_>, _ctx: &NativeContext<'_>, out: &mut Vec<Nativ
         "string" | "concatenated_string" | "ellipsis" | "comparison_operator" => false,
         "attribute" => attribute_chain(inner),
         "tuple" | "expression_list" => kids(inner).iter().all(|c| is_pure(*c) || attribute_chain(*c)),
+        "binary_operator" => {
+            let lit = |x: Option<Node<'_>>| x.is_some_and(|x| matches!(unparen(x).kind(), "integer" | "float"));
+            lit(inner.child_by_field_name("left")) && lit(inner.child_by_field_name("right"))
+        }
         _ => is_pure(inner),
     };
     if flagged {
@@ -688,14 +692,13 @@ fn function_uses_loop_variable(n: Node<'_>, ctx: &NativeContext<'_>, out: &mut V
             if inside || in_default || m.scopes[m.symbol_scope(r)].kind == ScopeKind::Class {
                 continue;
             }
-            if reported.insert(r.name.clone()) {
-                out.push(NativeFinding {
-                    start: r.start,
-                    end: r.end,
-                    message: format!("This function reads the loop variable `{}` when it runs, not when it was defined", r.name),
-                    edits: Vec::new(),
-                });
-            }
+            reported.insert(r.name.clone());
+            out.push(NativeFinding {
+                start: r.start,
+                end: r.end,
+                message: format!("This function reads the loop variable `{}` when it runs, not when it was defined", r.name),
+                edits: Vec::new(),
+            });
         }
     }
 }
@@ -899,12 +902,31 @@ py_rule!(ExceptWithNonExceptionClasses, "py/except-with-non-exception-classes", 
 
 fn in_nested_loop(r: usize, body: Node<'_>) -> bool {
     let Some(mut cur) = body.descendant_for_byte_range(r, r) else { return false };
+    // The iterable of a `for` (and of a comprehension's first `for`) is
+    // evaluated once, before the loop runs.
+    let mut evaluated_once = false;
     while let Some(p) = cur.parent() {
         if p.id() == body.id() {
             return false;
         }
-        if matches!(p.kind(), "for_statement" | "while_statement" | "list_comprehension" | "set_comprehension" | "dictionary_comprehension" | "generator_expression") {
-            return true;
+        match p.kind() {
+            "for_statement" => {
+                if p.child_by_field_name("right") != Some(cur) {
+                    return true;
+                }
+            }
+            "for_in_clause" => {
+                let first = p.parent().and_then(|c| kids(c).into_iter().find(|k| k.kind() == "for_in_clause"));
+                evaluated_once = p.child_by_field_name("right") == Some(cur) && first.is_some_and(|f| f.id() == p.id());
+            }
+            "while_statement" => return true,
+            "list_comprehension" | "set_comprehension" | "dictionary_comprehension" | "generator_expression" => {
+                if !evaluated_once {
+                    return true;
+                }
+                evaluated_once = false;
+            }
+            _ => {}
         }
         cur = p;
     }
@@ -944,12 +966,20 @@ fn reuse_of_groupby_generator(n: Node<'_>, ctx: &NativeContext<'_>, out: &mut Ve
 }
 py_rule!(ReuseOfGroupbyGenerator, "py/reuse-of-groupby-generator", ["for_statement"], true, reuse_of_groupby_generator);
 
-fn unintentional_type_annotation(n: Node<'_>, _ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+fn unintentional_type_annotation(n: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
     let Some(a) = n.named_child(0).filter(|a| a.kind() == "assignment") else { return };
     if a.child_by_field_name("right").is_some() || a.child_by_field_name("type").is_none() {
         return;
     }
-    if a.child_by_field_name("left").is_some_and(|l| matches!(l.kind(), "attribute" | "subscript")) {
+    let suspicious = a.child_by_field_name("left").is_some_and(|l| {
+        let base = match l.kind() {
+            "attribute" => l.child_by_field_name("object"),
+            "subscript" => l.child_by_field_name("value"),
+            _ => None,
+        };
+        base.is_some_and(|b| b.kind() == "identifier" && (l.kind() == "subscript" || text(b, ctx.source) != "self"))
+    });
+    if suspicious {
         out.push(hit(a, "This annotates an attribute or item without assigning it; did you mean `=`?"));
     }
 }
@@ -1048,6 +1078,8 @@ fn raise_without_from_inside_except(n: Node<'_>, ctx: &NativeContext<'_>, out: &
                 break;
             }
             "finally_clause" | "else_clause" if p.parent().is_some_and(|g| g.kind() == "try_statement") => return,
+            // Raised inside a nested `try`: that `try`'s own handlers deal with it.
+            "try_statement" if p.child_by_field_name("body") == Some(cur) => return,
             _ => {}
         }
         cur = p;

@@ -1,5 +1,18 @@
 # py/function-uses-loop-variable — cases
 
+### case: every read is reported
+
+```py
+for i in range(3):
+    def f():
+        return i + i
+```
+
+```expect
+3:16 py/function-uses-loop-variable
+3:20 py/function-uses-loop-variable
+```
+
 ### case: key functions run immediately
 
 ```py
