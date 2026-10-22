@@ -179,9 +179,18 @@
     },
     "adapters": {
       "x-codelaw-record": "SR-LINTER",
-      "x-codelaw-validated": false,
-      "description": "Optional external linters (SR-LINTER decision 2). Its keys are validated once adapters are built.",
-      "type": "object"
+      "description": "Optional external linters run by `check` and `fix` (SR-LINTER decision 2). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "array",
+          "items": { "enum": ["html-validate", "oxlint", "ruff", "stylelint"] },
+          "uniqueItems": true,
+          "description": "The adapters to run when installed; oxlint and Ruff when unset, none when empty."
+        },
+        "timeout": { "$ref": "#/definitions/duration", "description": "Per run of an adapter; 60 s by default." }
+      }
     },
     "agents": {
       "x-codelaw-record": "SR-AGENT-SURFACES",

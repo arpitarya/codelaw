@@ -5,8 +5,8 @@ use std::collections::BTreeMap;
 /// strict: an unknown key is a load error (SR-CONFIG decision 5).
 ///
 /// The sections owned by records whose features are not built yet
-/// (`[format]`, `[graph]`, `[baseline]`, `[adapters]`, `[agents]`,
-/// `[daemon]`, `[lsp]`) are accepted as tables and not yet validated.
+/// (`[format]`, `[graph]`, `[baseline]`, `[agents]`, `[daemon]`, `[lsp]`)
+/// are accepted as tables and not yet validated.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RawConfig {
@@ -43,7 +43,8 @@ pub struct RawConfig {
     pub format: Option<toml::Table>,
     pub graph: Option<toml::Table>,
     pub baseline: Option<toml::Table>,
-    pub adapters: Option<toml::Table>,
+    #[serde(default)]
+    pub adapters: RawAdapters,
     pub agents: Option<toml::Table>,
     pub daemon: Option<toml::Table>,
     pub lsp: Option<toml::Table>,
@@ -111,6 +112,14 @@ pub struct RawCache {
 #[serde(deny_unknown_fields)]
 pub struct RawFix {
     pub external_timeout: Option<Duration>,
+}
+
+/// `[adapters]`: SR-LINTER decision 2.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawAdapters {
+    pub enabled: Option<Vec<String>>,
+    pub timeout: Option<Duration>,
 }
 
 /// `[lint]`: SR-LINTER decision 3.

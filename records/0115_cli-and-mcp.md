@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-cli
   - crates/codelaw-mcp
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -78,6 +78,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - `--changed-since <ref>`, `--staged`, `--as-of <date>`;
    - `--format text|json|sarif|agent`;
    - `--unsafe` (apply `suggest` fixes), `--dry-run`;
+   - `--no-adapters` on `check` and `fix`: don't run the installed external linters those two commands run otherwise ([SR-LINTER](0106_linter.md) decision 2);
    - `--threads N`, `--no-cache`, `--timings`, `--max-warnings N`, `--prefer-warm` (use a running `lsp`/`mcp`/`daemon` of the same version; [SR-ARCHITECTURE](0108_architecture.md) decision 21).
 3. **Exit codes:** `0` no errors · `1` errors remain · `2` config, rule or usage error.
    - **`format [paths] [--check] [--diff]`:** `0` every file is formatted, or was just formatted. `1` with `--check` or `--diff` when a file is not formatted, or when any file could not be formatted or written (`format/failed`, `codelaw/write-failed`). `2` as above. `--check` prints `would format <file>` per file; `--diff` prints a unified diff; neither writes.
@@ -94,6 +95,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - `codelaw mcp` speaks MCP over **stdio only**: offline, local, nothing listening on a port ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
    - **Tools:** `rules_for_path`, `explain_rule`, `list_rules`, `check_snippet`, `check_paths`, `fix_paths` (applies `auto`; returns `suggest` fixes as diffs to accept), `format_snippet`, `dump_tree`, `trace_rule`.
    - Results use the same JSON shapes as `--format json`.
+   - **No adapters:** MCP never runs the external linters ([SR-ARCHITECTURE](0108_architecture.md) decision 19), so an agent sees their findings in CI only; the twins below carry `--no-adapters`.
    - **Protocol:** JSON-RPC 2.0, one message per line on stdin and stdout; `initialize` (revisions `2025-06-18`, `2025-03-26`, `2024-11-05`; the client's when it is one of these), `ping`, `tools/list`, `tools/call`, and empty `resources/list` / `prompts/list`. A hand-written loop in `codelaw-mcp`, no SDK: it adds no dependency beyond `serde_json` ([L2](0004_LAW-2-foss-dependencies.md)). Stdout carries protocol messages only.
    - **Each tool and its CLI twin** — the tool result's text is the twin's stdout without its final newline, and its `structuredContent` is the same object; a tool error (`isError`) is the twin's message after `error: `:
 
@@ -103,8 +105,8 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
      | `explain_rule {id}` | `explain <id> --format json` |
      | `list_rules {}` | `rules --format json` |
      | `check_snippet {path, code}` | `check <path> --format json` on a file holding `code` |
-     | `check_paths {paths, rule, lang}` | `check [paths] [--rule] [--lang] --format json` |
-     | `fix_paths {paths, unsafe, dry_run, rule, lang}` | `fix … --format json` |
+     | `check_paths {paths, rule, lang}` | `check [paths] [--rule] [--lang] --no-adapters --format json` |
+     | `fix_paths {paths, unsafe, dry_run, rule, lang}` | `fix … --no-adapters --format json` |
      | `format_snippet {path, code}` | the bytes `fix <path>` writes, format step included, without writing them ([SR-FORMATTER](0105_formatter.md) decision 4) |
      | `dump_tree {path \| code+lang, line}` | `tree … --format json` |
      | `trace_rule {id, path}` | `rules --why <id> --for <path> --format json`; `match --explain`'s matcher-level trace (W-16) is to return through it |

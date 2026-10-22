@@ -202,6 +202,10 @@ impl Config {
         push("cache.max_size", size(self.cache_max_size()), s);
         let (_, s) = root_key(&["fix", "external_timeout"], |r| r.fix.external_timeout.map(|_| Value::Null), Value::Null);
         push("fix.external_timeout", duration(self.external_timeout()), s);
+        let (v, s) = root_key(&["adapters", "enabled"], |r| r.adapters.enabled.as_ref().map(|x| json!(x)), Value::Null);
+        push("adapters.enabled", v, s);
+        let (_, s) = root_key(&["adapters", "timeout"], |r| r.adapters.timeout.map(|_| Value::Null), Value::Null);
+        push("adapters.timeout", duration(self.adapter_timeout()), s);
         let (v, s) = root_key(&["lint", "tagged_templates"], |r| r.lint.tagged_templates.map(|x| json!(x)), json!(false));
         push("lint.tagged_templates", v, s);
         let (v, s) = root_key(&["markdown", "lint_code_blocks"], |r| r.markdown.lint_code_blocks.map(|x| json!(x)), json!(false));
@@ -212,7 +216,6 @@ impl Config {
             ("format", (|r: &RawConfig| r.format.clone()) as fn(&RawConfig) -> Option<toml::Table>),
             ("graph", |r| r.graph.clone()),
             ("baseline", |r| r.baseline.clone()),
-            ("adapters", |r| r.adapters.clone()),
             ("agents", |r| r.agents.clone()),
             ("daemon", |r| r.daemon.clone()),
             ("lsp", |r| r.lsp.clone()),

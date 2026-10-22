@@ -68,7 +68,7 @@ impl FixReport {
 /// Syntax errors in a file's host and in every embedded region a fix can
 /// reach, so a fix that breaks the JavaScript inside a `<script>` or a
 /// Markdown fence is refused like one that breaks the host (L4 decision 5).
-fn syntax_errors(project: &Project, entry: &FileEntry, text: &str) -> usize {
+pub(crate) fn syntax_errors(project: &Project, entry: &FileEntry, text: &str) -> usize {
     let root = codelaw_lang::parse(entry.language, text);
     let mut n = codelaw_lang::syntax_error_count(&root);
     if matches!(entry.language, Language::Html | Language::Markdown) {
@@ -83,7 +83,7 @@ fn syntax_errors(project: &Project, entry: &FileEntry, text: &str) -> usize {
 }
 
 /// The rules with a finding, engine diagnostics aside.
-fn firing(diagnostics: &[Diagnostic]) -> BTreeSet<String> {
+pub(crate) fn firing(diagnostics: &[Diagnostic]) -> BTreeSet<String> {
     diagnostics.iter().filter(|d| !d.rule.starts_with("codelaw/")).map(|d| d.rule.clone()).collect()
 }
 
@@ -293,6 +293,12 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
         if let Some(f) = fix.filter(|f| f.changed()) {
             report.files.push(f);
         }
+    }
+    // The adapters (SR-ARCHITECTURE decision 19) after every file's own
+    // fixes, so they see the files codelaw wrote.
+    if project.adapters_on() {
+        let checked: Vec<&FileEntry> = files.iter().filter(|e| !skipped.iter().any(|s| s.file == e.rel)).collect();
+        crate::adapters::fix(project, &checked, options, &mut report);
     }
     if !project.rules.has_rules() {
         report.check.diagnostics.push(crate::lint::no_rules(project));

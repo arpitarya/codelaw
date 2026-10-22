@@ -10,8 +10,9 @@ feature: "linting"
 owns:
   - crates/codelaw-lang
   - crates/codelaw-match
+  - crates/codelaw-adapters
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-19T14:52:50Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -84,7 +85,12 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
 2. **Three rule scopes**, all in the same Markdown rule format ([SR-RULE-PACKS](0101_rule-packs.md)) and all bound by [L4](0006_LAW-4-every-rule-has-a-fix.md):
    - **`scope: file`** (the default): an ast-grep pattern or YAML rule with relational clauses (`inside`, `has`, `precedes`, `follows`) and the semantic-model predicates ([SR-RULE-FORMAT](0112_rule-format.md) decision 3a), or a `native:` rule ([SR-ARCHITECTURE](0108_architecture.md) decision 15b) for checks a pattern can't express; fixes come from the edit primitives;
    - **`scope: project`**: a `graph:` query ([SR-PROJECT-GRAPH](0103_project-graph.md));
-   - **adapters**: oxlint and Ruff by default when installed; stylelint (CSS) and html-validate (HTML) available. Each one is run only if installed, its output is mapped to the three fix classes, and none of them is bundled ([L6](0008_LAW-6-python-and-node-packages.md) completeness never depends on an adapter).
+   - **adapters**: oxlint and Ruff by default when installed; stylelint (CSS) and html-validate (HTML) available. Each one is run only if installed, its output is mapped to the three fix classes, and none of them is bundled ([L6](0008_LAW-6-python-and-node-packages.md) completeness never depends on an adapter). Built in `crates/codelaw-adapters` (W-14):
+     - **Which run:** `[adapters] enabled` lists them by name (`"oxlint"`, `"ruff"`, `"stylelint"`, `"html-validate"`); unset, it is the two defaults; `[]` turns every adapter off. A name codelaw has no manifest for is a config error (exit 2), so yamllint, refused by [L2](0004_LAW-2-foss-dependencies.md) as GPL-3.0, can't be named. `[adapters] timeout` bounds each run of a program, 60 s by default. Both are root config only.
+     - **Each tool's licence is in its manifest** and must be on L2's permissive list; all four are MIT. The tools are the user's install, never codelaw's dependency.
+     - **The mapping, per tool** ([L4](0006_LAW-4-every-rule-has-a-fix.md) decision 9): Ruff's `safe` fix is `auto`, `unsafe` is `suggest`, `display-only` or none is `manual`; stylelint's `--compute-edit-info` fix is `auto`, the rest `manual`; oxlint and html-validate give no edits, so every finding is `manual`. A `manual` finding's steps are the tool's help line, when it gives one, and a link to the rule's docs. Positions are converted from each tool's unit (oxlint UTF-8 bytes, Ruff code points, stylelint and html-validate UTF-16 units) to codelaw's.
+     - **Shown once:** an adapter finding whose tool rule a codelaw rule names in `ported_from:` (`ruff/F401`, `eslint/no-debugger`, `stylelint/<rule>`, `html-validate/<rule>`) is dropped when that codelaw rule reports the same file and an overlapping range; codelaw's finding, with codelaw's fix, stays.
+     - **Off for:** `--no-adapters`, `--rule` (the run is narrowed to codelaw's rules), and every surface but the CLI's `check` and `fix` ([SR-ARCHITECTURE](0108_architecture.md) decision 19).
 
 3. **Embedded code ("injections").** A host file's embedded regions are parsed with their own grammar and linted with their own language's rules.
 

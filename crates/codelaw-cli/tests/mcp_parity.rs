@@ -71,7 +71,14 @@ fn command(cwd: &Path) -> Command {
 /// What the CLI prints with `--format json`, without its final newline;
 /// for a usage error (exit 2), `error: ` and the message.
 fn cli(cwd: &Path, args: &[&str]) -> String {
-    let out = command(cwd).args(args).output().unwrap();
+    let mut c = command(cwd);
+    c.args(args);
+    // MCP never runs adapters (SR-ARCHITECTURE decision 19); the twins of
+    // `check_paths` and `fix_paths` are `check` and `fix` without them.
+    if matches!(args.first(), Some(&"check" | &"fix")) {
+        c.arg("--no-adapters");
+    }
+    let out = c.output().unwrap();
     let stdout = String::from_utf8(out.stdout).unwrap();
     if out.status.code() == Some(2) {
         let stderr = String::from_utf8(out.stderr).unwrap();

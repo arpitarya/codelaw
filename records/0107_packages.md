@@ -23,7 +23,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -91,7 +91,7 @@ The decider asked for a record of what goes into which package, under the naming
    | engines | `codelaw-format` | the formatter engines ([SR-FORMATTER](0105_formatter.md)) |
    | engines | `codelaw-graph` | [SR-PROJECT-GRAPH](0103_project-graph.md) |
    | engines | `codelaw-baseline` | [SR-BASELINE](0104_baseline-and-deprecations.md) |
-   | engines | `codelaw-adapters` | optional external linters ([SR-LINTER](0106_linter.md) decision 2) |
+   | engines | `codelaw-adapters` | optional external linters run as programs: manifests, runner, output mapping ([SR-LINTER](0106_linter.md) decision 2); `codelaw-engine` runs them |
    | orchestration | `codelaw-engine` | the check, fix and format pipelines |
    | orchestration | `codelaw-report` | text, JSON, SARIF and agent output; exit codes |
    | orchestration | `codelaw-test` | the rule tester and `codelaw bench` ([SR-RULE-AUTHORING](0113_rule-authoring.md), [L8](0010_LAW-8-performance-budgets.md)) |
