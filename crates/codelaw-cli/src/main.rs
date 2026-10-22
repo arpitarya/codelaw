@@ -165,6 +165,16 @@ struct TestArgs {
     /// Only the case with this title.
     #[arg(long)]
     case: Option<String>,
+    /// Level 4 as well: run the rules over every file under this folder (a
+    /// pinned corpus checkout) and hold each file to the invariants.
+    #[arg(long, value_name = "DIR")]
+    corpus: Option<PathBuf>,
+    /// The finding counts the corpus run must give (a TOML file).
+    #[arg(long, value_name = "FILE", requires = "corpus")]
+    snapshot: Option<PathBuf>,
+    /// Write the counts to --snapshot instead of comparing them.
+    #[arg(long, requires = "snapshot")]
+    update_snapshot: bool,
 }
 
 pub fn color() -> bool {
@@ -410,9 +420,37 @@ fn test(args: TestArgs) -> ExitCode {
     if rules.is_empty() {
         return fail("no rules to test");
     }
-    let reports = codelaw_test::test_rules(rules.iter(), args.case.as_deref());
+    let mut reports = codelaw_test::test_rules(rules.iter(), args.case.as_deref());
     if args.case.is_some() && reports.iter().all(|r| r.checks == 0) {
         return fail(format!("no case titled `{}`", args.case.unwrap_or_default()));
+    }
+    if let Some(dir) = &args.corpus {
+        // Level 4 (SR-RULE-AUTHORING decision 4), after levels 1–3.
+        let files = match codelaw_test::corpus_files(dir) {
+            Ok(f) if f.is_empty() => return fail(format!("{}: no file the engine reads", dir.display())),
+            Ok(f) => f,
+            Err(e) => return fail(format!("{}: {e}", dir.display())),
+        };
+        let mut corpus: Vec<codelaw_test::CorpusReport> = rules.iter().map(|r| codelaw_test::corpus_rule(r, &files)).collect();
+        corpus.sort_by(|a, b| a.report.id.cmp(&b.report.id));
+        match (&args.snapshot, args.update_snapshot) {
+            (Some(path), true) => {
+                if let Err(e) = std::fs::write(path, codelaw_test::write_snapshot(&corpus)) {
+                    return fail(format!("{}: {e}", path.display()));
+                }
+            }
+            (Some(path), false) => match std::fs::read_to_string(path).map_err(|e| e.to_string()).and_then(|t| codelaw_test::read_snapshot(&t)) {
+                Ok(snapshot) => codelaw_test::compare_snapshot(&mut corpus, &snapshot),
+                Err(e) => return fail(format!("{}: {e}", path.display())),
+            },
+            (None, _) => {}
+        }
+        for (r, c) in reports.iter_mut().zip(&corpus) {
+            r.checks += c.report.checks;
+            r.failures.extend(c.report.failures.iter().cloned());
+        }
+        let findings: usize = corpus.iter().map(|c| c.findings).sum();
+        println!("corpus: {} files · {findings} findings", files.len());
     }
     print!("{}", codelaw_test::render(&reports, color()));
     if reports.iter().all(|r| r.passed()) { ExitCode::SUCCESS } else { ExitCode::from(1) }

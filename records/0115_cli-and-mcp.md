@@ -66,7 +66,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | Group | Commands |
    |---|---|
    | everyday | `check` · `fix` · `format` · `explain` |
-   | rules | `rules [--for <path>] [--why <id>]` · `new-rule` · `rules eject` · `rules lint` · `test` |
+   | rules | `rules [--for <path>] [--why <id>]` · `new-rule` · `rules eject` · `rules lint` · `test [--case <title>] [--corpus <dir> [--snapshot <file> [--update-snapshot]]]` (SR-RULE-AUTHORING decision 4) |
    | debug | `tree` · `match <id> <file> [--explain] [--line N]` · `fix --trace` · `graph refs` · `graph why-unused` |
    | project | `init [--agents …] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print [--for <file>]` · `config --schema` |
    | baseline | `baseline add` · `baseline prune` · `baseline check` · `deprecate` |

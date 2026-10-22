@@ -156,6 +156,7 @@ directions.
 |---|---|---|
 | `scripts/sr-guard.sh` | SR-WORK-OWNERSHIP | the guard is the executable form of decisions 3 and 6 |
 | `scripts/check-open-work-inbox.py` | SR-WORK-OPEN-QUEUE | rule 45a's check |
+| `scripts/check-work-system.py` | SR-WORK-OPEN-QUEUE | the row, inbox and lost-id checks; it also runs the ownership, registry and archive checks |
 | `scripts/build-packs.py` | SR-PACKAGES | decision 9: the pack tarballs and wheels, built from `packs/` |
 | `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | rule 45a, in-session |
 | `.claude/hooks/inject-inbox.sh` | SR-WORK-BLOCKERS | decision 7 |
@@ -183,7 +184,10 @@ directions.
 | `crates/codelaw-agents` | SR-AGENT-SURFACES | decisions 1, 2 and 6: hook mode, `sync-agents` and the compiled-in skills |
 | `agents` | SR-AGENT-SURFACES | decisions 1, 4 and 5: the skill sources, the custom agent and the trigger evals |
 | `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
-| `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced, for the Cargo manifest |
+| `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced: the Cargo packages, the npm lockfiles and the build tools |
+| `crates/codelaw-cli/tests/network_fence.rs` | SR-LAW-5 | how L5 is enforced: the network fence (a different decision from the CLI's) |
+| `crates/codelaw-cli/tests/consumer_layout.rs` | SR-CONSUMER-LAYOUT | the veto's `init` check against §1's tree (a different decision from the CLI's) |
+| `crates/codelaw-cli/tests/promotion.rs` | SR-RULE-AUTHORING | decisions 4 and 6: level 4 and the `stable` gate (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
 | `fixtures/l3` | SR-LAW-3 | the fixture matrix |
 | `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the five first-party packs' rules, presets and data |
@@ -223,5 +227,8 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 | `crates/codelaw-fix/src/structured.rs` | SR-RULE-FORMAT | decisions 3c and 3e: a `target:` rule's fix steps and their verification |
 | `crates/codelaw-adapters` | SR-ARCHITECTURE | decision 19: the adapter contract (lookup, versions, process handling, cache key) the crate implements |
 | `crates/codelaw-engine/src/adapters.rs` | SR-LINTER | decision 2: which adapters run, the per-tool mapping and the ported-rule dedupe |
+| `scripts/check-work-system.py` | SR-WORK-OWNERSHIP | decision 2: its `owns:` ↔ Ownership-table check |
+| `scripts/check-work-system.py` | SR-WORK-REGISTRY | decisions 5–8: its registry check |
+| `scripts/check-work-system.py` | SR-WORK-ARCHIVE | decision 1: its one-`archive/` check |
 
 <!-- DESCRIBES-TABLE-END -->

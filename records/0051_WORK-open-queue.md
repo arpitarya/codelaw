@@ -10,6 +10,7 @@ feature: the work queue
 owns:
   - scripts/check-open-work-inbox.py
   - .claude/hooks/guard-open-work-inbox.sh
+  - scripts/check-work-system.py
 laws: [L0]
 timestamp: 2026-10-18T12:52:51Z
 content_sha: ""
@@ -248,10 +249,18 @@ under its header:
   (PostToolUse), which runs `scripts/check-open-work-inbox.py`. Rules 33 and 41
   are supported by `.claude/hooks/inject-inbox.sh`, which puts the inbox in
   front of every prompt; the age arithmetic is still the session's.
-- The row rules (13–19, 42, 45) are enforced by nothing but the inbox-shape
-  hook — backlog row W-20.
-- A `W-nn` that resolves to neither `work/open/` nor `archive/open/` is caught
-  by nobody — backlog row W-20.
+- **Checked in CI** (`ci.yml`, job `lint`) by `scripts/check-work-system.py`:
+  - the row rules — one or two lines (13), the row's shape (14), at most 280
+    characters as rendered, a link counted by its text (15), no body (16),
+    the row's id matches its detail link (17), a link that resolves (45);
+  - the inbox — every row 🔴 (44) and followed by its `↳ **blocks:**`
+    sub-row (42);
+  - a `W-nn` named in `CLAUDE.md`, `work/`, `records/` or `docs/` that
+    resolves to neither `work/open/` nor `archive/open/` (the veto).
+
+  The same script checks SR-WORK-OWNERSHIP decision 2, SR-WORK-REGISTRY
+  decisions 5–8 and SR-WORK-ARCHIVE decision 1. Rules 18 and 19 — what is
+  short, what belongs in the file — stay judgment.
 - Everything else — balls, ordering, closing, authorship, the meeting view — is
   judgment.
 
@@ -269,6 +278,8 @@ under its header:
 - [`scripts/check-open-work-inbox.py`](../scripts/check-open-work-inbox.py) and
   [`.claude/hooks/guard-open-work-inbox.sh`](../.claude/hooks/guard-open-work-inbox.sh)
   — rule 45a's check.
+- [`scripts/check-work-system.py`](../scripts/check-work-system.py) — the row,
+  inbox and lost-id checks, in CI.
 - [`work/OPEN-WORK.md`](../work/OPEN-WORK.md) and
   [`work/open/README.md`](../work/open/README.md) — the queue and the item-file
   contract.
@@ -277,9 +288,10 @@ under its header:
 
 **Reopen this decision if:** the inbox fails its shape check, a second live document names what to do next, or a `W-nn` named in a live document resolves to neither `work/open/` nor `archive/open/`.
 
-**How to check it:** `python3 scripts/check-open-work-inbox.py && echo inbox-ok`, then
-`grep -rhoE 'W-[0-9]+' --include=*.md CLAUDE.md work records docs | sort -u | while read w; do ls work/open/$w-*.md archive/open/$w-*.md >/dev/null 2>&1 || echo "lost: $w"; done`
-must print nothing.
+**How to check it:** `python3 scripts/check-open-work-inbox.py && python3 scripts/check-work-system.py && echo ok`
+— the second prints each `lost: W-nn` and each row-rule violation. (The
+`ls work/open/$w-*.md archive/open/$w-*.md` loop this line used to give
+reported every id as lost, since `ls` fails when either glob is empty.)
 
 ---
 

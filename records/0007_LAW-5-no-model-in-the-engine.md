@@ -7,7 +7,8 @@ description: "codelaw computes every verdict and fix without any model, offline 
 status: accepted
 date: 2026-10-18
 feature: "keeping models out of the engine"
-owns: []
+owns:
+  - crates/codelaw-cli/tests/network_fence.rs
 laws: [L0, L3, L4, L5]
 timestamp: 2026-10-18T16:45:00Z
 content_sha: ""
@@ -80,7 +81,7 @@ A linter is trusted only if CI, a laptop and an agent's hook agree. A model in t
 
 - **Checks that would need a model are out of the engine.** They become exact-match rules, or agent skills outside it.
 - **Date-aware and change-aware rules need explicit inputs** (the as-of date and the change set).
-- **Nothing checks this law yet:** `W-20` in `work/BACKLOG.md`.
+- **The network fence is `crates/codelaw-cli/tests/network_fence.rs`:** `codelaw check` (json, text, agent) and `codelaw fix` (safe, and `--unsafe`) run on the L3 fixture repo with networking denied by the operating system, and must give the same exit code, the same output and the same fixed bytes as an open run. The fence is proven before it is used: on Linux a network namespace whose only interface is `lo` (`unshare --net`, or `sudo -n unshare --net` dropping back with `setpriv`); on macOS `sandbox-exec` denying `network*`, refusing a connection to a port the test itself listens on. Where no fence can be raised the test says so and passes, unless `CODELAW_REQUIRE_NETWORK_FENCE=1`, which CI sets ([SR-PACKAGES](0107_packages.md) Consequences). It fences `check` and `fix`, not yet the full suite the enforcement list names.
 
 ### Alternatives considered
 
@@ -104,6 +105,6 @@ A linter is trusted only if CI, a laptop and an agent's hook agree. A model in t
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-BASELINE](0104_baseline-and-deprecations.md)
+**Records** — [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-PACKAGES](0107_packages.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)
