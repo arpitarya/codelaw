@@ -16,14 +16,14 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | preset | rules | what it holds |
 |---|---|---|
 | `data/recommended` | 6 | correctness for JSON, YAML and TOML: keys defined twice in each, YAML aliases without an anchor, and the YAML scalars that YAML 1.1 and 1.2 read differently |
-| `md/recommended` | 16 | the non-layout rules of markdownlint 0.42.0's default set |
+| `md/recommended` | 17 | the non-layout rules of markdownlint 0.42.0's default set, and the starter rule `md/relative-links` |
 | `data/package-json` | 4 | `json/package-scripts-sorted`, `json/package-deps-sorted`, `json/package-engines`, `json/package-json-schema` — `files: **/package.json` |
 | `data/tsconfig` | 2 | `json/tsconfig-strict`, `json/tsconfig-schema` — `files: **/tsconfig.json`, `**/tsconfig.*.json` |
 | `data/pyproject` | 3 | `toml/deps-sorted`, `toml/pyproject-requires-python`, `toml/pyproject-schema` — `files: **/pyproject.toml` |
 | `data/github-actions` | 3 | `yaml/gha-pin-sha`, `yaml/gha-workflow-schema`, `yaml/gha-action-schema` — workflows and composite actions |
 | `data/conventions` | 2 | opt-in house style: `yaml/document-start`, `md/no-inline-html` |
 
-36 rules: 8 `auto`, 5 `suggest`, 23 `manual`. Every rule is
+37 rules: 8 `auto`, 5 `suggest`, 24 `manual`. Every rule is
 **reimplemented**, not vendored: the checks, messages and docs are written
 fresh, and each ported rule's `ported_from:` names its source. Rules that need
 more than a pattern are native rules in `crates/codelaw-native/src/data_*.rs`;
@@ -34,8 +34,8 @@ The starter-catalogue rules are all here under their starter ids:
 `json/package-scripts-sorted`, `json/package-engines`, `json/tsconfig-strict`,
 `json/no-duplicate-keys`, `yaml/no-duplicate-keys`, `yaml/gha-pin-sha`,
 `yaml/document-start`, `toml/pyproject-requires-python`, `toml/deps-sorted`,
-`md/single-h1`, `md/heading-increment` and `md/fence-language` — all but
-`md/relative-links` (below).
+`md/single-h1`, `md/heading-increment`, `md/fence-language` and
+`md/relative-links`.
 
 ## Ported
 
@@ -58,6 +58,7 @@ The starter-catalogue rules are all here under their starter ids:
 | `md/link-image-reference-definitions` | markdownlint MD053 | auto |
 | `md/table-column-count` | markdownlint MD056 | manual |
 | `md/descriptive-link-text` | markdownlint MD059 | manual |
+| `md/relative-links` | codelaw's starter catalogue | manual |
 | `json/package-json-schema` | SchemaStore `package.json` | manual |
 | `json/tsconfig-schema` | SchemaStore `tsconfig.json` | manual |
 | `toml/pyproject-schema` | SchemaStore `pyproject.json` | manual |
@@ -94,7 +95,6 @@ One rule name coincides with one of yamllint's — `yaml/document-start` and its
 
 | rule | why |
 |---|---|
-| `md/relative-links` (starter) | needs the file system: a native rule sees one file's text, not its path or the files around it |
 | markdownlint MD043 `required-headings` | does nothing until configured with a heading list; a later version |
 | markdownlint MD044 `proper-names` | does nothing until configured with a list of names; a later version |
 | markdownlint MD054 `link-image-style` | every style is allowed by default, so the default set does nothing; a style choice |

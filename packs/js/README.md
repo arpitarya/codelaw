@@ -18,7 +18,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `js/recommended` | 64 | ESLint `js.configs.recommended`, `@eslint/js` 10.0.1 — all 64 rules |
 | `ts/recommended` | 24 | typescript-eslint `recommended` 8.71.2 (not type-checked) — all 20 rules — plus the four core rules its `eslint-recommended` switches on for TypeScript: `js/no-var`, `js/prefer-const`, `js/prefer-rest-params`, `js/prefer-spread` |
 | `react/recommended` | 19 | eslint-plugin-react 7.37.5 `recommended` + `jsx-runtime` (17 of its 20 active rules), and eslint-plugin-react-hooks 7.1.1's `rules-of-hooks` and `exhaustive-deps` |
-| `node/recommended` | 3 | eslint-plugin-n 18.5.0 `recommended-module` — the 3 of its 14 rules that need no `package.json` |
+| `node/recommended` | 4 | eslint-plugin-n 18.5.0 `recommended-module` — the 4 of its 14 rules that need no module resolution or per-version feature tables |
 | `stencil/recommended` | 15 | @stencil/eslint-plugin 1.4.0 `recommended` — 15 of its 21 rules |
 | `js/conventions` | 7 | codelaw's starter catalogue: `js/exports-at-end`, `js/import-groups`, `js/no-default-export`, `ts/type-only-imports`, `react/hook-prefix`, `react/props-type-name`, `stencil/tag-prefix` — opt in |
 
@@ -54,6 +54,7 @@ section says so. The larger ones:
 | `react/exhaustive-deps` | dependencies compared by root name; setters, dispatchers and refs are stable |
 | `react/rules-of-hooks` | an early `return` anywhere before a hook counts as making it conditional |
 | `node/no-deprecated-api` | the APIs come from the pack's `node/deprecated-api` table; the supported Node.js version is not read |
+| `node/hashbang` | JavaScript and JSX only (no `convertPath` for TypeScript sources); `suggest`, since removing a hashbang can stop a script that is run directly |
 | `stencil/tag-prefix` | with no `prefix` option set, a tag only needs some prefix |
 | `stencil/prop-readonly` | the starter id for upstream `props-must-be-readonly` |
 
@@ -67,7 +68,6 @@ section says so. The larger ones:
 | eslint-plugin-react-hooks' 14 React Compiler rules | need the React Compiler's analysis |
 | `node/no-missing-import`, `node/no-missing-require`, `node/no-extraneous-import`, `node/no-extraneous-require`, `node/no-unpublished-import`, `node/no-unpublished-require` | need module resolution and `package.json`: the project graph (backlog W-11) |
 | `node/no-unsupported-features/es-builtins`, `/es-syntax`, `/node-builtins` | need the project's Node.js version from `package.json` and per-version feature tables |
-| `node/hashbang` | needs `package.json`'s `bin` field |
 | `node/process-exit-as-throw` | reports nothing; it only changes ESLint's code-path analysis |
 | `stencil/async-methods`, `stencil/render-returns-host`, `stencil/single-export`, `stencil/strict-boolean-conditions` | need type information |
 | `stencil/element-type` | needs the component's tag mapped to its element type name |

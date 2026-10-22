@@ -126,11 +126,19 @@ impl<'a> Tester<'a> {
         self.loaded.rule.scope == Scope::Project
     }
 
+    /// Whether a snippet is checked as a set of files: always for a project
+    /// rule; for a file rule when its first line names a file, so a native
+    /// rule sees the files around the one it checks (SR-ARCHITECTURE
+    /// decision 15b).
+    fn as_files(&self, code: &str) -> bool {
+        self.project_scope() || code.lines().next().and_then(header_path).is_some()
+    }
+
     /// This rule's diagnostics on a snippet, as `line:col rule` lines
     /// (`path:line:col rule` for a multi-file snippet).
     fn fires(&mut self, language: Language, snippet: &Snippet, code: &str) -> Vec<String> {
         let id = self.loaded.rule.id.clone();
-        if self.project_scope() {
+        if self.as_files(code) {
             let files = split_files(language, code);
             let multi = files.len() > 1 || files.first().is_some_and(|f| f.header.is_some());
             let set: Vec<(String, Language, String)> = files.iter().map(|f| (f.path.clone(), f.language, f.text.clone())).collect();
@@ -152,7 +160,7 @@ impl<'a> Tester<'a> {
     }
 
     fn fix(&mut self, language: Language, snippet: &Snippet, code: &str) -> String {
-        if self.project_scope() {
+        if self.as_files(code) {
             let files = split_files(language, code);
             let set: Vec<(String, Language, String)> = files.iter().map(|f| (f.path.clone(), f.language, f.text.clone())).collect();
             let fixed = self.plain.fix_files(&set, true);
@@ -192,8 +200,15 @@ impl<'a> Tester<'a> {
         }
         // Still parses.
         self.report.checks += 1;
-        let before = codelaw_lang::syntax_error_count(&codelaw_lang::parse(language, &snippet.code));
-        let after = codelaw_lang::syntax_error_count(&codelaw_lang::parse(language, &fixed));
+        // A set of files parses file by file, each in its own language.
+        let errors = |code: &str| -> usize {
+            if self.as_files(code) {
+                split_files(language, code).iter().map(|f| codelaw_lang::syntax_error_count(&codelaw_lang::parse(f.language, &f.text))).sum()
+            } else {
+                codelaw_lang::syntax_error_count(&codelaw_lang::parse(language, code))
+            }
+        };
+        let (before, after) = (errors(&snippet.code), errors(&fixed));
         if after > before {
             self.fail(Level::Invariants, at.to_owned(), "the fix adds a syntax error".into());
         }

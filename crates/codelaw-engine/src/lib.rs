@@ -5,6 +5,7 @@
 mod compile;
 mod debug;
 mod discover;
+mod files;
 mod fix;
 mod format;
 mod lint;
@@ -237,10 +238,24 @@ impl Project {
     }
 
     /// Check one file's text as if it were at `rel_path` (MCP
-    /// `check_snippet`, the rule tester).
+    /// `check_snippet`, the rule tester). A leading byte-order mark is read
+    /// as the file's, as `check` reads one on disk.
     pub fn check_source(&self, rel_path: &str, language: Language, source: &str) -> Vec<Diagnostic> {
+        self.check_source_in(rel_path, language, source, files::Tree::Disk)
+    }
+
+    /// `check_source`, with native rules seeing the files of `tree`.
+    pub(crate) fn check_source_in(&self, rel_path: &str, language: Language, source: &str, tree: files::Tree<'_>) -> Vec<Diagnostic> {
         let entry = FileEntry { abs: self.config.root_dir.join(rel_path), rel: rel_path.to_owned(), language };
-        let mut d = lint::lint_text(self, &entry, source, &lint::RunMode::check()).diagnostics;
+        let (text, bom) = match source.strip_prefix('\u{feff}') {
+            Some(t) => (t, true),
+            None => (source, false),
+        };
+        let mode = lint::RunMode { tree, ..lint::RunMode::check().with_bom(bom) };
+        let mut d = lint::lint_text(self, &entry, text, &mode).diagnostics;
+        if bom {
+            lint::shift_for_bom(&mut d);
+        }
         if !self.rules.has_rules() {
             d.push(lint::no_rules(self));
         }
@@ -248,10 +263,26 @@ impl Project {
         d
     }
 
-    /// Fix one file's text in memory; nothing is written.
+    /// Fix one file's text in memory; nothing is written. A leading
+    /// byte-order mark is kept, as `fix` keeps one on disk.
     pub fn fix_source(&self, rel_path: &str, language: Language, source: &str, unsafe_fixes: bool) -> FileFix {
+        self.fix_source_in(rel_path, language, source, unsafe_fixes, files::Tree::Disk)
+    }
+
+    /// `fix_source`, with native rules seeing the files of `tree`.
+    pub(crate) fn fix_source_in(&self, rel_path: &str, language: Language, source: &str, unsafe_fixes: bool, tree: files::Tree<'_>) -> FileFix {
         let entry = FileEntry { abs: self.config.root_dir.join(rel_path), rel: rel_path.to_owned(), language };
-        fix::fix_text(self, &entry, source, &FixOptions { unsafe_fixes, dry_run: true }, false)
+        let (text, bom) = match source.strip_prefix('\u{feff}') {
+            Some(t) => (t, true),
+            None => (source, false),
+        };
+        let mut f = fix::fix_text(self, &entry, text, &FixOptions { unsafe_fixes, dry_run: true }, false, bom, tree);
+        if bom {
+            f.original.insert(0, '\u{feff}');
+            f.fixed.insert(0, '\u{feff}');
+            lint::shift_for_bom(&mut f.remaining);
+        }
+        f
     }
 
     /// Fix files and folders and write the results (SR-ARCHITECTURE

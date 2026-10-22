@@ -3,10 +3,13 @@
 //! `node/deprecated-api` data: `{ "<module>": { "<member>": "<use instead>" } }`,
 //! with `"*"` for a module deprecated as a whole and `"globals"` for
 //! globals such as `Buffer()`.
+//!
+//! `node/hashbang`: a command `package.json`'s `bin` names starts with a
+//! Node.js hashbang, and no other file has one.
 
 use crate::util::{named_children, string_value, text};
 use crate::{NativeContext, NativeFinding, NativeRule};
-use codelaw_core::Language;
+use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
 use codelaw_semantic::Imported;
 use serde_json::Value;
@@ -125,6 +128,87 @@ impl NativeRule for NoDeprecatedApi {
     }
 }
 
+/// `node/hashbang`: a file `package.json`'s `bin` names starts with
+/// `#!/usr/bin/env node`; any other file has no hashbang. Reads the nearest
+/// `package.json` above the file (SR-ARCHITECTURE decision 15b); with none,
+/// nothing is checked.
+pub struct Hashbang;
+
+const NODE_HASHBANG: &str = "#!/usr/bin/env node";
+
+/// The nearest `package.json` at or above `path`'s folder: its folder and
+/// its parsed text.
+fn nearest_package(ctx: &NativeContext<'_>) -> Option<(String, Value)> {
+    let mut dir = crate::resolve_path(ctx.file.path(), ".")?;
+    loop {
+        let manifest = if dir.is_empty() { "package.json".to_owned() } else { format!("{dir}/package.json") };
+        if let Some(text) = ctx.file.read(&manifest) {
+            return serde_json::from_str(&text).ok().map(|v| (dir, v));
+        }
+        if dir.is_empty() {
+            return None;
+        }
+        dir = dir.rsplit_once('/').map(|(d, _)| d.to_owned()).unwrap_or_default();
+    }
+}
+
+/// Whether `bin` (a path or a map of names to paths) names `path`.
+fn is_bin(bin: Option<&Value>, package_dir: &str, path: &str) -> bool {
+    let manifest = if package_dir.is_empty() { "package.json".to_owned() } else { format!("{package_dir}/package.json") };
+    let names = |p: &str| crate::resolve_path(&manifest, p).is_some_and(|r| r == path);
+    match bin {
+        Some(Value::String(s)) => names(s),
+        Some(Value::Object(m)) => m.values().filter_map(|v| v.as_str()).any(names),
+        _ => false,
+    }
+}
+
+impl NativeRule for Hashbang {
+    fn id(&self) -> &'static str {
+        "node/hashbang"
+    }
+    fn languages(&self) -> &'static [Language] {
+        &[Language::Javascript, Language::Jsx]
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["program"]
+    }
+    fn check(&self, _node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let src = ctx.source;
+        // A region (a `<script>`) is not the file `bin` names.
+        if ctx.file.bytes().strip_prefix("\u{feff}".as_bytes()).unwrap_or(ctx.file.bytes()) != src.as_bytes() {
+            return;
+        }
+        let Some((dir, manifest)) = nearest_package(ctx) else { return };
+        let bin = is_bin(manifest.get("bin"), &dir, ctx.file.path());
+        let first = src.split_inclusive('\n').next().unwrap_or("");
+        let has = first.starts_with("#!");
+        let line_end = first.trim_end_matches(['\n', '\r']).len();
+        if bin && !has {
+            out.push(NativeFinding {
+                start: 0,
+                end: 0,
+                message: format!("`package.json` runs this file as a command, so it starts with `{NODE_HASHBANG}`"),
+                edits: vec![TextEdit::new(0, 0, format!("{NODE_HASHBANG}\n"))],
+            });
+        } else if bin && has && first[..line_end].trim_end() != NODE_HASHBANG {
+            out.push(NativeFinding {
+                start: 0,
+                end: line_end,
+                message: format!("A command run by `package.json` starts with `{NODE_HASHBANG}`"),
+                edits: vec![TextEdit::new(0, line_end, NODE_HASHBANG)],
+            });
+        } else if !bin && has {
+            out.push(NativeFinding {
+                start: 0,
+                end: line_end,
+                message: "`package.json`'s `bin` doesn't name this file, so it needs no hashbang".into(),
+                edits: vec![TextEdit::new(0, first.len(), "")],
+            });
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -155,5 +239,30 @@ mod tests {
             "`url.parse` is deprecated; use new URL()",
             "`util.isArray` is deprecated; use Array.isArray",
         ]);
+    }
+
+    fn hashbang(path: &str, src: &str, files: &[(&str, &str)]) -> Vec<String> {
+        let root = codelaw_lang::parse(Language::Javascript, src);
+        let (options, data) = (BTreeMap::new(), BTreeMap::new());
+        let file = crate::MemoryFiles::new(path, src, files);
+        let ctx = NativeContext { source: src, language: Language::Javascript, semantic: None, options: &options, data: &data, file: &file };
+        let mut out = Vec::new();
+        Hashbang.check(root.root(), &ctx, &mut out);
+        out.into_iter().map(|f| f.edits.into_iter().map(|e| format!("{}..{} {:?}", e.start, e.end, e.text)).collect::<Vec<_>>().join(";")).collect()
+    }
+
+    #[test]
+    fn hashbang_follows_bin() {
+        let pkg = r#"{ "name": "x", "bin": { "x": "./bin/x.js" } }"#;
+        let files = [("tools/package.json", pkg)];
+        assert_eq!(hashbang("tools/bin/x.js", "run();\n", &files), ["0..0 \"#!/usr/bin/env node\\n\""]);
+        assert!(hashbang("tools/bin/x.js", "#!/usr/bin/env node\nrun();\n", &files).is_empty());
+        assert_eq!(hashbang("tools/bin/x.js", "#!/usr/bin/node\nrun();\n", &files), ["0..15 \"#!/usr/bin/env node\""]);
+        assert_eq!(hashbang("tools/lib/y.js", "#!/usr/bin/env node\nrun();\n", &files), ["0..20 \"\""]);
+        assert!(hashbang("tools/lib/y.js", "run();\n", &files).is_empty());
+        // `bin` as a string, from a nested folder up to the root manifest.
+        assert_eq!(hashbang("cli.js", "x;\n", &[("package.json", r#"{ "bin": "cli.js" }"#)]).len(), 1);
+        // No package.json: nothing is known, nothing is reported.
+        assert!(hashbang("a.js", "#!/usr/bin/env node\n", &[]).is_empty());
     }
 }

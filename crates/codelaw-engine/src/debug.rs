@@ -172,7 +172,7 @@ impl Project {
                 entry.language,
                 &file.text,
                 |current, refused| {
-                    lint_text(self, entry, current, &RunMode { external_fixers: true, refused: Some(refused) })
+                    lint_text(self, entry, current, &RunMode { external_fixers: true, refused: Some(refused), bom: file.bom, tree: crate::files::Tree::Disk })
                         .candidates
                         .into_iter()
                         .filter(|(_, class)| *class == FixClass::Auto || (options.unsafe_fixes && *class == FixClass::Suggest))

@@ -174,6 +174,29 @@ html_rule!(MissingDoctype, "html/missing-doctype", |dom, meta, ctx, out| {
     out.push(crate::html_dom::finding_with(s, t, "The document has no doctype; start it with `<!DOCTYPE html>`", vec![TextEdit::new(0, 0, "<!DOCTYPE html>\n")]));
 });
 
+/// A byte-order mark, as the file has it on disk: the text rules see never
+/// holds one, so this reads the file's bytes (SR-ARCHITECTURE decision 15b).
+/// Only the host document is checked: an HTML region of another file is not
+/// where the mark is.
+pub struct NoUtf8Bom;
+
+impl crate::NativeRule for NoUtf8Bom {
+    fn id(&self) -> &'static str {
+        "html/no-utf8-bom"
+    }
+    fn languages(&self) -> &'static [codelaw_core::Language] {
+        &[codelaw_core::Language::Html]
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["document"]
+    }
+    fn check(&self, _node: codelaw_lang::SyntaxNode<'_>, ctx: &crate::NativeContext<'_>, out: &mut Vec<crate::NativeFinding>) {
+        if ctx.file.bytes().strip_prefix("\u{feff}".as_bytes()) == Some(ctx.source.as_bytes()) {
+            out.push(crate::NativeFinding { start: 0, end: 0, message: "The file starts with a UTF-8 byte-order mark; save it as UTF-8 without one".into(), edits: Vec::new() });
+        }
+    }
+}
+
 html_rule!(NoMissingReferences, "html/no-missing-references", |dom, meta, ctx, out| {
     let ids = crate::html_a11y::ids(dom);
     for i in dom.all() {

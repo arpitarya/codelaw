@@ -1,4 +1,4 @@
-description = "The non-layout rules of markdownlint 0.42.0's default set, reimplemented (layout belongs to the formatter)"
+description = "The non-layout rules of markdownlint 0.42.0's default set, reimplemented (layout belongs to the formatter), and the starter rule md/relative-links"
 
 [rules]
 "md/commands-show-output" = "warn"
@@ -15,5 +15,6 @@ description = "The non-layout rules of markdownlint 0.42.0's default set, reimpl
 "md/no-empty-links" = "error"
 "md/no-reversed-links" = "error"
 "md/reference-links-images" = "error"
+"md/relative-links" = "error"
 "md/single-h1" = "warn"
 "md/table-column-count" = "error"

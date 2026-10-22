@@ -157,7 +157,7 @@ impl Project {
         let (abs, rel, language) = self.locate(file)?;
         let entry = crate::FileEntry { abs, rel, language };
         let options = crate::FixOptions { unsafe_fixes: false, dry_run: true };
-        Ok(crate::fix::fix_text(self, &entry, code, &options, self.formats(&entry)))
+        Ok(crate::fix::fix_text(self, &entry, code, &options, self.formats(&entry), false, crate::files::Tree::Disk))
     }
 }
 

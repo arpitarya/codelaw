@@ -46,6 +46,7 @@ description = "html-validate 11.16.4 recommended, without its layout rules and t
 "html/no-implicit-close" = "error"
 "html/no-implicit-input-type" = "error"
 "html/no-multiple-main" = "error"
+"html/no-utf8-bom" = "error"
 "html/no-raw-characters" = "error"
 "html/no-redundant-aria-label" = "error"
 "html/no-redundant-for" = "error"
