@@ -310,9 +310,13 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
             if !language_enabled(project, &entry.abs, region.language) {
                 continue;
             }
+            // A `target:` rule's paths are about a whole file; inside another
+            // file's region (front matter, a code block) it runs only where
+            // its `host:` names that file's language (SR-RULE-FORMAT 3e).
             let rules: Vec<_> = active
                 .iter()
                 .filter(|(_, r, _)| r.applies_to_language(region.language) && r.loaded.rule.host.is_none_or(|h| h == entry.language))
+                .filter(|(_, r, _)| !matches!(r.matcher, Matcher::Target(_)) || r.loaded.rule.host.is_some())
                 .cloned()
                 .collect();
             if rules.is_empty() {
@@ -618,8 +622,9 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
     }
 
     let mut out = Vec::new();
-    // The data tree, built once for every `target:` rule of the unit.
-    let mut data_tree: Option<Option<codelaw_match::data::DataTree>> = None;
+    // The data tree, built once for every `target:` rule of the unit; a
+    // build that panics fails each of them (decision 25).
+    let mut data_tree: Option<Result<Option<codelaw_match::data::DataTree>, String>> = None;
     for (slot, (index, rule, _)) in unit.rules.iter().enumerate() {
         if let Some(why) = &failed[slot] {
             out.push(internal_error(*index, 0, 0, rule.id(), why));
@@ -694,9 +699,17 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
             Matcher::Graph(_) => {}
             Matcher::Target(t) => {
                 let tree = data_tree.get_or_insert_with(|| {
-                    catch_unwind(AssertUnwindSafe(|| codelaw_match::data::build(unit.language, unit.root.root().get_inner_node(), &unit.text))).ok().flatten()
+                    catch_unwind(AssertUnwindSafe(|| codelaw_match::data::build(unit.language, unit.root.root().get_inner_node(), &unit.text)))
+                        .map_err(|p| format!("the data tree failed: {}", panic_message(p.as_ref())))
                 });
-                let Some(tree) = tree.as_ref() else { continue };
+                let tree = match tree {
+                    Ok(Some(t)) => &*t,
+                    Ok(None) => continue,
+                    Err(why) => {
+                        out.push(internal_error(*index, 0, 0, rule.id(), why));
+                        continue;
+                    }
+                };
                 let found = match catch_unwind(AssertUnwindSafe(|| t.check(tree))) {
                     Ok(f) => f,
                     Err(p) => {

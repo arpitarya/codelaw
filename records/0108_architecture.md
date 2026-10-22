@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -103,7 +103,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 #### D. Rules and regions
 
-15. **Compile once, dispatch by kind.** Rule files are compiled at load into matchers whose kind filters are indexed. Each file is walked once, and every node is handed only to the rules whose filter matches it. The compiled set is cached by the hash of every active rule file plus the config ([SR-CACHE](0109_cache.md)).
+15. **Compile once, dispatch by kind.** Rule files are compiled at load into matchers whose kind filters are indexed. Each file is walked once, and every node is handed only to the rules whose filter matches it. A `target:` rule ([SR-RULE-FORMAT](0112_rule-format.md) decision 3e) matches no node: it runs once per JSON, YAML or TOML file on the data tree, built once for all of them; a data tree that panics fails each of those rules (decision 25), and their fixes are verified as 3e says before decision 5's loop applies them. The compiled set is cached by the hash of every active rule file plus the config ([SR-CACHE](0109_cache.md)).
 
 15a. **Semantic model.** For JS/TS (JSX and TSX included) and Python, each file gets scopes, bindings, references, imports and exports.
   - **How it's built:** from the same syntax tree, in one pass after parsing (crate `codelaw-semantic`), and only when at least one active rule needs it.
