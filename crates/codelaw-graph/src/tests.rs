@@ -182,6 +182,47 @@ fn locate_err(g: &Graph, spec: &str) -> bool {
     query::locate(g, spec).is_err()
 }
 
+fn import_findings(block: serde_json::Value, files: &[(&str, &str)]) -> Vec<String> {
+    let rule = compile(&serde_json::json!({ "import": block }), None).unwrap();
+    let g = graph(files, GraphConfig::default());
+    run(&rule, &g, ALL).into_iter().map(|f| format!("{}:{} {}", f.file, f.span.0, f.captures[0].1)).collect()
+}
+
+#[test]
+fn missing_imports() {
+    let files = [
+        ("tsconfig.json", r#"{"compilerOptions":{"paths":{"@/*":["src/*"]}}}"#),
+        ("src/a.ts", "import { b } from './b';\nimport { c } from './c';\nimport x from '@/nope';\nimport y from 'react';\nimport s from './s.svg';\nexport * from './gone.js';\n"),
+        ("src/b.ts", "export const b = require('./missing');\n"),
+    ];
+    let esm = import_findings(serde_json::json!({"form": ["import", "export", "dynamic"], "resolves": false}), &files);
+    assert_eq!(esm, vec!["src/a.ts:43 ./c", "src/a.ts:64 @/nope", "src/a.ts:136 ./gone.js"]);
+    let cjs = import_findings(serde_json::json!({"form": ["require"], "resolves": false}), &files);
+    assert_eq!(cjs, vec!["src/b.ts:25 ./missing"]);
+}
+
+#[test]
+fn undeclared_imports() {
+    let files = [
+        ("package.json", r#"{"name":"app","dependencies":{"react":"19"},"devDependencies":{"@types/node":"22","@acme/ui":"*"}}"#),
+        ("src/a.ts", "import React from 'react';\nimport fs from 'node:fs';\nimport path from 'path';\nimport lodash from 'lodash/fp';\nimport { Ui } from '@acme/ui/button';\nimport type { X } from 'node';\nimport self from 'app/x';\nimport alias from '~/x';\nimport v from 'virtual:pwa';\n"),
+    ];
+    let got = import_findings(serde_json::json!({"declared": false}), &files);
+    assert_eq!(got, vec!["src/a.ts:97 lodash/fp"]);
+}
+
+#[test]
+fn unpublished_imports() {
+    let files = [
+        ("package.json", r#"{"name":"lib","main":"lib/index.js","files":["lib"],"dependencies":{"a":"1"},"devDependencies":{"b":"1"}}"#),
+        ("lib/index.js", "const a = require('a');\nconst b = require('b');\nconst t = require('../test/helper');\nconst u = require('./util');\n"),
+        ("lib/util.js", "module.exports = 1;\n"),
+        ("test/helper.js", "const b = require('b');\n"),
+    ];
+    let got = import_findings(serde_json::json!({"form": ["require"], "published": false}), &files);
+    assert_eq!(got, vec!["lib/index.js:42 b", "lib/index.js:66 ../test/helper"]);
+}
+
 #[test]
 fn deterministic() {
     let files = [("src/a.ts", "import { x } from './b';\nx();\n"), ("src/b.ts", "export function x() {}\nexport function y() {}\n")];

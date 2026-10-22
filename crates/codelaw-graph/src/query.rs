@@ -1,9 +1,9 @@
 //! `graph:` queries (SR-PROJECT-GRAPH decision 6), their findings and fixes,
 //! and the two debug commands: `graph refs` and `graph why-unused`.
 
-use crate::facts::{Decl, DeclKind, FactLang, Span};
+use crate::facts::{Decl, DeclKind, FactLang, Span, SpecForm};
 use crate::link::{Graph, Module, Use};
-use crate::resolve::Target;
+use crate::resolve::{Target, is_node_builtin, package_name};
 use codelaw_core::{Language, TextEdit};
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -17,6 +17,21 @@ pub enum Query {
     UnusedCssClasses,
     /// `deprecated: registry` (SR-BASELINE decision 6).
     DeprecatedUsage,
+    /// `import: { form: [...], resolves | declared | published: false }`:
+    /// the `node/` import rules.
+    Imports { forms: Vec<SpecForm>, check: ImportCheck },
+}
+
+/// What a `graph: import:` query reports.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ImportCheck {
+    /// `resolves: false`: a path of the project that names no file.
+    Missing,
+    /// `declared: false`: a package the nearest `package.json` doesn't declare.
+    Undeclared,
+    /// `published: false`: a file `npm publish` packs imports one it
+    /// doesn't, or a package that is only a devDependency.
+    Unpublished,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -72,7 +87,7 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         Some(other) => return Err(format!("`certainty_from: {other}` must be `module.dynamic`")),
     };
     for k in g.keys() {
-        if !["symbol", "unless", "when", "class", "deprecated", "certainty_from"].contains(&k.as_str()) {
+        if !["symbol", "unless", "when", "class", "deprecated", "import", "certainty_from"].contains(&k.as_str()) {
             return Err(format!("unknown `graph:` key `{k}`"));
         }
     }
@@ -115,8 +130,35 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         Query::UnusedCssClasses
     } else if g.get("deprecated").is_some() {
         Query::DeprecatedUsage
+    } else if let Some(imp) = g.get("import") {
+        let Value::Object(o) = imp else { return Err("`graph: import:` must be a mapping".into()) };
+        let mut forms = Vec::new();
+        for f in strings(o.get("form")) {
+            forms.push(SpecForm::parse(&f).ok_or_else(|| format!("unknown import form `{f}` (import, export, dynamic, require)"))?);
+        }
+        if forms.is_empty() {
+            forms = vec![SpecForm::Import, SpecForm::Export, SpecForm::Dynamic, SpecForm::Require];
+        }
+        let mut checks = Vec::new();
+        for (k, v) in o {
+            let check = match k.as_str() {
+                "form" => continue,
+                "resolves" => ImportCheck::Missing,
+                "declared" => ImportCheck::Undeclared,
+                "published" => ImportCheck::Unpublished,
+                other => return Err(format!("unknown `graph: import:` key `{other}`")),
+            };
+            if v.as_bool() != Some(false) {
+                return Err(format!("`graph: import: {k}:` takes `false`"));
+            }
+            checks.push(check);
+        }
+        let [check] = checks[..] else {
+            return Err("`graph: import:` takes exactly one of `resolves: false`, `declared: false`, `published: false`".into());
+        };
+        Query::Imports { forms, check }
     } else {
-        return Err("`graph:` names no query (`symbol:`, `class:` or `deprecated:`)".into());
+        return Err("`graph:` names no query (`symbol:`, `class:`, `import:` or `deprecated:`)".into());
     };
     let mut gf = GraphFix::default();
     match fix {
@@ -312,7 +354,73 @@ pub fn run(rule: &GraphRule, graph: &Graph, languages: &[Language]) -> Vec<Graph
         Query::UnusedExports { kinds, tags, .. } => unused_exports(rule, graph, languages, kinds, tags),
         Query::UnusedCssClasses => unused_css(rule, graph, languages),
         Query::DeprecatedUsage => Vec::new(),
+        Query::Imports { forms, check } => imports(graph, languages, forms, *check),
     }
+}
+
+/// Whether `node/no-missing-import` judges a path: no extension, or a
+/// JS/TS one. Any other (`.svg`, `.css`, `.json`) may be a file the
+/// graph doesn't list, or one a bundler makes.
+fn judged(spec: &str) -> bool {
+    let last = spec.rsplit('/').next().unwrap_or(spec);
+    match last.rsplit_once('.') {
+        None => true,
+        Some((stem, ext)) => stem.is_empty() || matches!(ext, "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs" | "mts" | "cts"),
+    }
+}
+
+fn manifest_path(dir: &str) -> String {
+    if dir.is_empty() { "package.json".into() } else { format!("{dir}/package.json") }
+}
+
+fn imports(graph: &Graph, languages: &[Language], forms: &[SpecForm], check: ImportCheck) -> Vec<GraphFinding> {
+    let r = &graph.resolver;
+    let mut out = Vec::new();
+    for m in graph.modules.values() {
+        if m.facts.lang != Some(FactLang::Js) || !languages_match(&m.path, languages) {
+            continue;
+        }
+        let pkg = r.package_of(&m.path);
+        for s in m.facts.specifiers.iter().filter(|s| forms.contains(&s.form)) {
+            let spec = s.spec.split('?').next().unwrap_or(&s.spec);
+            let local = r.is_local_spec(&m.path, spec);
+            let mut captures = vec![("SOURCE".to_owned(), s.spec.clone()), ("FILE".to_owned(), file_name(&m.path).to_owned())];
+            let hit = match check {
+                ImportCheck::Missing => local && judged(spec) && r.resolve_js(&m.path, spec).is_empty(),
+                ImportCheck::Undeclared => {
+                    let Some(p) = pkg.map(|i| &r.packages[i]) else { continue };
+                    let Some(name) = package_name(spec).filter(|_| !local && !is_node_builtin(spec)) else { continue };
+                    // `baseUrl` makes a bare-looking path the project's own.
+                    let own_file = r.workspace_package(name).is_none() && r.resolve_js(&m.path, spec).iter().any(|t| matches!(t, Target::File(_)));
+                    let types = format!("@types/{}", name.trim_start_matches('@').replace('/', "__"));
+                    let declared = p.deps.contains(name) || p.dev_deps.contains(name) || (s.type_only && (p.deps.contains(&types) || p.dev_deps.contains(&types)));
+                    captures.push(("PACKAGE".into(), name.to_owned()));
+                    captures.push(("MANIFEST".into(), manifest_path(&p.dir)));
+                    !own_file && !declared && p.name.as_deref() != Some(name)
+                }
+                ImportCheck::Unpublished => {
+                    let Some(i) = pkg else { continue };
+                    let p = &r.packages[i];
+                    if p.private || p.files.is_none() || !r.published(i, &m.path) {
+                        continue;
+                    }
+                    captures.push(("MANIFEST".into(), manifest_path(&p.dir)));
+                    if local {
+                        r.resolve_js(&m.path, spec).iter().any(|t| matches!(t, Target::File(f) if r.package_of(f) == Some(i) && !r.published(i, f)))
+                    } else if let Some(name) = package_name(spec).filter(|_| !s.type_only) {
+                        captures.push(("PACKAGE".into(), name.to_owned()));
+                        p.dev_deps.contains(name) && !p.deps.contains(name)
+                    } else {
+                        false
+                    }
+                }
+            };
+            if hit {
+                out.push(GraphFinding { file: m.path.clone(), span: s.span, captures, edits: Vec::new(), uncertain: None, message: None });
+            }
+        }
+    }
+    out
 }
 
 fn unused_exports(rule: &GraphRule, graph: &Graph, languages: &[Language], kinds: &[DeclKind], tags: &[String]) -> Vec<GraphFinding> {
@@ -509,7 +617,7 @@ pub fn why_unused(graph: &Graph, spec: &str, kinds: &[DeclKind], tags: &[String]
     let v = evaluate(graph, m, d, kinds, tags);
     let mut out = format!("{module}#{name}\n");
     for c in &v.clauses {
-        out.push_str(&format!("  {} {:<50} {}\n", if c.keeps { "keeps " } else { "passes" }, c.clause, c.detail));
+        out.push_str(&format!("  {} {:<62} {}\n", if c.keeps { "keeps " } else { "passes" }, c.clause, c.detail));
     }
     let verdict = if v.reported {
         match &m.facts.dynamic {

@@ -89,6 +89,44 @@ pub struct PackageJson {
     /// `main`, `module`, `types`, `typings`, `source`, `browser`, `style`.
     pub fields: Vec<String>,
     pub bin: Vec<String>,
+    /// `dependencies`, `peerDependencies`, `optionalDependencies`.
+    pub deps: BTreeSet<String>,
+    pub dev_deps: BTreeSet<String>,
+    /// `files`: what `npm publish` packs, when it says.
+    pub files: Option<Vec<String>>,
+}
+
+/// Node.js's built-in modules: never a dependency to declare.
+pub const NODE_BUILTINS: &[&str] = &[
+    "assert", "assert/strict", "async_hooks", "buffer", "child_process", "cluster", "console", "constants", "crypto", "dgram",
+    "diagnostics_channel", "dns", "dns/promises", "domain", "events", "fs", "fs/promises", "http", "http2", "https", "inspector",
+    "inspector/promises", "module", "net", "os", "path", "path/posix", "path/win32", "perf_hooks", "process", "punycode",
+    "querystring", "readline", "readline/promises", "repl", "stream", "stream/consumers", "stream/promises", "stream/web",
+    "string_decoder", "sys", "timers", "timers/promises", "tls", "trace_events", "tty", "url", "util", "util/types", "v8", "vm",
+    "wasi", "worker_threads", "zlib",
+];
+
+/// Whether a specifier names a Node.js built-in (`fs`, `node:test`).
+pub fn is_node_builtin(spec: &str) -> bool {
+    spec.starts_with("node:") || NODE_BUILTINS.contains(&spec)
+}
+
+/// The npm package a bare specifier names (`@a/b/c` → `@a/b`), or `None`
+/// when it is not a bare package name (relative, absolute, `#imports`,
+/// a URL or a `virtual:` scheme, an alias such as `@/x` or `~/x`).
+pub fn package_name(spec: &str) -> Option<&str> {
+    let first = spec.chars().next()?;
+    if !(first.is_ascii_lowercase() || first.is_ascii_digit() || first == '@') || spec.contains(':') {
+        return None;
+    }
+    let (name, _) = split_package(spec);
+    if let Some(scoped) = name.strip_prefix('@') {
+        let (scope, rest) = scoped.split_once('/')?;
+        if scope.is_empty() || rest.is_empty() {
+            return None;
+        }
+    }
+    Some(name)
 }
 
 impl PackageJson {
@@ -111,6 +149,12 @@ impl PackageJson {
             Some(Value::Object(m)) => p.bin.extend(m.values().filter_map(Value::as_str).map(str::to_owned)),
             _ => {}
         }
+        let names = |k: &str| v.get(k).and_then(Value::as_object).map(|m| m.keys().cloned().collect::<Vec<_>>()).unwrap_or_default();
+        for k in ["dependencies", "peerDependencies", "optionalDependencies"] {
+            p.deps.extend(names(k));
+        }
+        p.dev_deps.extend(names("devDependencies"));
+        p.files = v.get("files").and_then(Value::as_array).map(|a| a.iter().filter_map(Value::as_str).map(str::to_owned).collect());
         Some(p)
     }
 }
@@ -221,6 +265,11 @@ impl Resolver {
         Resolver { files, packages, tsconfigs, pyprojects, py_roots, dirs, by_name }
     }
 
+    /// The workspace package of a name.
+    pub fn workspace_package(&self, name: &str) -> Option<usize> {
+        self.by_name.get(name).copied()
+    }
+
     pub fn exists(&self, f: &str) -> bool {
         self.files.contains(f)
     }
@@ -289,7 +338,9 @@ impl Resolver {
                 }
             }
         }
-        None
+        // Built into the package root from `src/` (`./index.js` →
+        // `src/index.ts`, the W-11 corpus run, `zustand`).
+        join(pkg_dir, &format!("src/{stripped}")).and_then(|p| self.probe(&p))
     }
 
     /// Every entry file of a package: `exports`, `main` and friends, `bin`;
@@ -329,6 +380,36 @@ impl Resolver {
         out.sort();
         out.dedup();
         (out, unmapped)
+    }
+
+    /// Whether a specifier names a file of the project: relative, absolute,
+    /// or matched by a tsconfig `paths` pattern for `from`.
+    pub fn is_local_spec(&self, from: &str, spec: &str) -> bool {
+        if spec.starts_with("./") || spec.starts_with("../") || spec == "." || spec == ".." || spec.starts_with('/') {
+            return true;
+        }
+        self.tsconfig_for(from).is_some_and(|ts| ts.paths.iter().any(|(p, _)| match_pattern(p, spec).is_some()))
+    }
+
+    /// Whether `npm publish` packs a file of a package whose `package.json`
+    /// has `files`: a listed file or folder, a matching glob, or an entry
+    /// (`main`, `bin`), which npm always packs. `!` patterns exclude.
+    pub fn published(&self, pkg: usize, file: &str) -> bool {
+        let p = &self.packages[pkg];
+        let Some(files) = &p.files else { return true };
+        let rel = if p.dir.is_empty() { file } else { file.strip_prefix(&format!("{}/", p.dir)).unwrap_or(file) };
+        let norm = |s: &str| s.trim_start_matches("./").trim_end_matches('/').to_owned();
+        if p.fields.iter().chain(&p.bin).any(|f| norm(f) == rel) {
+            return true;
+        }
+        let hit = |pattern: &str| {
+            let e = norm(pattern);
+            rel == e
+                || rel.starts_with(&format!("{e}/"))
+                || [e.clone(), format!("{e}/**")].iter().any(|g| globset::Glob::new(g).is_ok_and(|g| g.compile_matcher().is_match(rel)))
+        };
+        let included = files.iter().filter(|f| !f.starts_with('!')).any(|f| hit(f));
+        included && !files.iter().filter_map(|f| f.strip_prefix('!')).any(hit)
     }
 
     fn tsconfig_for(&self, file: &str) -> Option<&TsConfig> {
@@ -601,6 +682,11 @@ mod tests {
         let pkg = PackageJson::parse("packages/utils", r#"{"name":"@acme/utils","exports":{".":{"import":"./dist/index.js","types":"./dist/index.d.ts"}}}"#).unwrap();
         let res = Resolver::new(["packages/utils/src/index.ts".to_string()].into_iter().collect(), vec![pkg], Vec::new(), Vec::new());
         assert_eq!(res.resolve_js("packages/web/a.ts", "@acme/utils"), vec![Target::File("packages/utils/src/index.ts".into())]);
+        // Built into the package root from `src/`.
+        let pkg = PackageJson::parse("", r#"{"name":"z","main":"./index.js","exports":{".":"./index.js","./*":"./*.js"}}"#).unwrap();
+        let res = Resolver::new(["src/index.ts".to_string(), "src/middleware.ts".to_string()].into_iter().collect(), vec![pkg], Vec::new(), Vec::new());
+        assert_eq!(res.resolve_js("x.ts", "z"), vec![Target::File("src/index.ts".into())]);
+        assert_eq!(res.resolve_js("x.ts", "z/middleware"), vec![Target::File("src/middleware.ts".into())]);
     }
 
     #[test]
