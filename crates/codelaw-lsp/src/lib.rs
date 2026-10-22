@@ -10,17 +10,23 @@
 //!   `TextEdit`s; the editor applies them (SR-ARCHITECTURE decision 12).
 //!   Nothing in this crate opens a file for writing.
 //!
-//! Not yet here, and why: incremental re-parse (W-15; every change
-//! re-checks the whole document), project rules and workspace diagnostics
-//! (the graph is not built), pull diagnostics, the warm-process socket
-//! (SR-ARCHITECTURE decision 21).
+//! Edits arrive as incremental changes, and each open document keeps its
+//! syntax tree between them: an edit re-parses only what it touched and
+//! re-runs that file's rules (SR-EDITOR decision 2, SR-ARCHITECTURE
+//! decision 23). The tree is the one a fresh parse gives, so the verdict is
+//! the same; a document's tree is dropped when it closes (decision 24).
+//!
+//! Not yet here, and why: project rules and workspace diagnostics (the
+//! graph is not built), pull diagnostics. The warm-process socket of
+//! SR-ARCHITECTURE decision 21 is registered by the `codelaw lsp` command,
+//! not here: this crate never writes a file.
 
 pub mod format;
 pub mod position;
 pub mod uri;
 
 use codelaw_core::{Diagnostic, FixClass, Severity};
-use codelaw_engine::{EngineOptions, FileEntry, Project};
+use codelaw_engine::{DocumentTree, EngineOptions, FileEntry, Project};
 use lsp_server::{Connection, ErrorCode, Message, Notification, Request, Response};
 use lsp_types::notification::{
     DidChangeTextDocument, DidChangeWatchedFiles, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument, LogMessage, Notification as _,
@@ -59,7 +65,7 @@ pub fn capabilities() -> ServerCapabilities {
         position_encoding: Some(PositionEncodingKind::UTF16),
         text_document_sync: Some(TextDocumentSyncCapability::Options(TextDocumentSyncOptions {
             open_close: Some(true),
-            change: Some(TextDocumentSyncKind::FULL),
+            change: Some(TextDocumentSyncKind::INCREMENTAL),
             save: Some(TextDocumentSyncSaveOptions::Supported(true)),
             ..Default::default()
         })),
@@ -122,6 +128,9 @@ struct Doc {
     target: Option<(PathBuf, FileEntry)>,
     /// The engine's diagnostics for `text`, in byte offsets.
     diagnostics: Vec<Diagnostic>,
+    /// The syntax tree of the body, kept between edits; `None` until the
+    /// document is first checked, or after an edit it cannot follow.
+    tree: Option<DocumentTree>,
 }
 
 impl Doc {
@@ -131,6 +140,27 @@ impl Doc {
         match self.text.strip_prefix('\u{feff}') {
             Some(t) => (t, '\u{feff}'.len_utf8()),
             None => (&self.text, 0),
+        }
+    }
+
+    /// Apply one content change. A ranged change edits the text and the
+    /// kept tree incrementally; a whole-text change, or an edit that moves
+    /// the byte-order mark, drops the tree so the next check parses afresh.
+    fn change(&mut self, change: lsp_types::TextDocumentContentChangeEvent) {
+        let Some(range) = change.range else {
+            self.text = change.text;
+            self.tree = None;
+            return;
+        };
+        let idx = Utf16Index::new(&self.text);
+        let (a, b) = (idx.offset(range.start), idx.offset(range.end));
+        let (start, end) = (a.min(b), a.max(b));
+        let shift = self.body().1;
+        self.text.replace_range(start..end, &change.text);
+        let follows = start >= shift && self.body().1 == shift;
+        let kept = follows && self.tree.as_mut().is_some_and(|tree| tree.edit(start - shift, end - shift, &change.text).is_ok());
+        if !kept {
+            self.tree = None;
         }
     }
 }
@@ -170,7 +200,7 @@ impl<'c> Server<'c> {
             DidOpenTextDocument::METHOD => {
                 let p: DidOpenTextDocumentParams = serde_json::from_value(n.params)?;
                 let d = p.text_document;
-                let doc = Doc { uri: d.uri, version: d.version, text: d.text, target: None, diagnostics: vec![] };
+                let doc = Doc { uri: d.uri, version: d.version, text: d.text, target: None, diagnostics: vec![], tree: None };
                 let key = doc.uri.as_str().to_owned();
                 self.docs.insert(key.clone(), doc);
                 self.check(&key)?;
@@ -178,9 +208,11 @@ impl<'c> Server<'c> {
             DidChangeTextDocument::METHOD => {
                 let p: DidChangeTextDocumentParams = serde_json::from_value(n.params)?;
                 let key = p.text_document.uri.as_str().to_owned();
-                // Full sync: the last change is the whole text.
-                if let (Some(doc), Some(change)) = (self.docs.get_mut(&key), p.content_changes.into_iter().last()) {
-                    doc.text = change.text;
+                // Incremental sync: the changes apply in order.
+                if let Some(doc) = self.docs.get_mut(&key) {
+                    for change in p.content_changes {
+                        doc.change(change);
+                    }
                     doc.version = p.text_document.version;
                     self.check(&key)?;
                 }
@@ -272,15 +304,29 @@ impl<'c> Server<'c> {
             }
             None => None,
         };
-        let doc = self.docs.get(key).expect("an open document");
+        let doc = self.docs.get_mut(key).expect("an open document");
         let project = target.as_ref().and_then(|(pk, _)| self.projects[pk].as_ref().ok());
         let diagnostics = match (&target, project) {
-            (Some((_, entry)), Some(project)) => project.check_document(entry, doc.body().0),
-            _ => vec![],
+            (Some((_, entry)), Some(project)) => {
+                // The kept tree when it is of this text and language; the
+                // engine checks that too, so a stale tree never shows.
+                let kept = doc.tree.take();
+                let body = doc.body().0;
+                let tree = match kept {
+                    Some(t) if t.language() == entry.language && t.text() == body => t,
+                    _ => DocumentTree::new(entry.language, body),
+                };
+                let d = project.check_document_tree(entry, &tree);
+                doc.tree = Some(tree);
+                d
+            }
+            _ => {
+                doc.tree = None;
+                vec![]
+            }
         };
         let lsp = to_lsp(doc, target.as_ref().map(|t| &t.1), project.map(Project::root), &diagnostics);
         let params = PublishDiagnosticsParams { uri: doc.uri.clone(), diagnostics: lsp, version: Some(doc.version) };
-        let doc = self.docs.get_mut(key).expect("an open document");
         doc.target = target;
         doc.diagnostics = diagnostics;
         self.notify::<PublishDiagnostics>(params)
@@ -418,7 +464,7 @@ fn to_lsp(doc: &Doc, entry: Option<&FileEntry>, root: Option<&Path>, diagnostics
 /// Saving these changes what every file's verdict may be.
 fn reloads(path: &Path) -> bool {
     let name = path.file_name().and_then(|n| n.to_str()).unwrap_or_default();
-    matches!(name, "codelaw.toml" | "pyproject.toml" | "package.json")
+    matches!(name, "codelaw.toml" | "pyproject.toml" | "package.json" | ".editorconfig")
         || path.components().any(|c| c.as_os_str() == ".codelaw")
         || (name.ends_with(".md") && path.components().any(|c| c.as_os_str() == "rules"))
 }

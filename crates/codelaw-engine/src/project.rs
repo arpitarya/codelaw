@@ -20,6 +20,9 @@ pub(crate) struct Source {
     pub abs: PathBuf,
     pub language: Option<Language>,
     pub text: String,
+    /// `[files]` and `languages` let it be checked: findings in it are
+    /// reported. A file they leave out still counts for its uses.
+    pub reported: bool,
 }
 
 impl Project {
@@ -42,7 +45,7 @@ impl Project {
 
     /// Every file of the project root the graph reads, from disk.
     pub(crate) fn graph_sources(&mut self) -> Result<Vec<Source>, EngineError> {
-        let files = crate::discover::discover(self, &[])?.0;
+        let files = crate::discover::discover_with(self, &[], false)?.0;
         let mut out: Vec<Source> = Vec::new();
         let mut dirs: BTreeSet<PathBuf> = BTreeSet::new();
         let root = self.config.root_dir.clone();
@@ -55,13 +58,14 @@ impl Project {
                 d = dir.parent().map(Path::to_path_buf);
             }
             let name = f.abs.file_name().and_then(|n| n.to_str()).unwrap_or_default().to_owned();
+            let reported = crate::discover::reported(self, &f.abs, f.language);
             if !codelaw_graph::reads(f.language) && !is_manifest(&name) {
                 // Other files only exist for resolution.
-                out.push(Source { rel: f.rel, abs: f.abs, language: None, text: String::new() });
+                out.push(Source { rel: f.rel, abs: f.abs, language: None, text: String::new(), reported });
                 continue;
             }
             if let Ok(file) = self.read_entry(&f) {
-                out.push(Source { rel: f.rel, abs: f.abs, language: Some(f.language), text: file.text });
+                out.push(Source { rel: f.rel, abs: f.abs, language: Some(f.language), text: file.text, reported });
             }
         }
         // Manifests, whatever `languages` says: resolution needs them.
@@ -74,7 +78,7 @@ impl Project {
                     continue;
                 }
                 if let Ok(text) = std::fs::read_to_string(&abs) {
-                    out.push(Source { rel, abs, language: None, text });
+                    out.push(Source { rel, abs, language: None, text, reported: false });
                 }
             }
         }
@@ -135,7 +139,7 @@ impl Project {
                 if !rule.applies_to_path(&f.file) {
                     continue;
                 }
-                let Some(src) = by_rel.get(f.file.as_str()) else { continue };
+                let Some(src) = by_rel.get(f.file.as_str()).filter(|s| s.reported) else { continue };
                 let layers = self.config.layers_for(&src.abs);
                 let Some(cfg) = self.rules.effective(&rule.loaded, &layers) else { continue };
                 let Some(mut severity) = cfg.severity else { continue };
@@ -287,7 +291,7 @@ impl Project {
     fn virtual_sources(&self, files: &[(String, Language, String)]) -> Vec<Source> {
         let mut v: Vec<Source> = files
             .iter()
-            .map(|(rel, language, text)| Source { rel: rel.clone(), abs: self.config.root_dir.join(rel), language: Some(*language), text: text.clone() })
+            .map(|(rel, language, text)| Source { rel: rel.clone(), abs: self.config.root_dir.join(rel), language: Some(*language), text: text.clone(), reported: true })
             .collect();
         v.sort_by(|a, b| a.rel.cmp(&b.rel));
         v

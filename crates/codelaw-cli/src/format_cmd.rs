@@ -1,15 +1,16 @@
-//! `codelaw format [--check] [--diff] <paths>` (SR-FORMATTER decision 1).
+//! `codelaw format [--check] [--diff] [--format text|json] <paths>`
+//! (SR-FORMATTER decision 1; SR-CLI-MCP decisions 3 and 4).
 
-use crate::{Common, color, engine_options, fail, load};
+use crate::{Common, Ctx, Output, engine_options_in, json_line, load, timings, with_timings};
+use codelaw_report::Format;
 use clap::Args;
 use codelaw_engine::{FormatReport, FormatRunOptions};
 use std::path::PathBuf;
-use std::process::ExitCode;
 
 #[derive(Args)]
 pub struct FormatArgs {
     /// Files and folders; the project root when none.
-    paths: Vec<PathBuf>,
+    pub paths: Vec<PathBuf>,
     #[command(flatten)]
     common: Common,
     /// Change nothing; exit 1 if any file is not formatted.
@@ -18,6 +19,9 @@ pub struct FormatArgs {
     /// Change nothing; print what formatting would change, as a unified diff.
     #[arg(long)]
     diff: bool,
+    /// text or json (the shape of the npm and Python `format`).
+    #[arg(long, default_value = "text")]
+    format: String,
 }
 
 /// A unified diff of one file's formatting.
@@ -38,38 +42,59 @@ pub fn exit_code(report: &FormatReport, check: bool) -> u8 {
     }
 }
 
-pub fn format(args: FormatArgs) -> ExitCode {
-    let options = match engine_options(&args.common) {
+impl FormatArgs {
+    pub fn prefer_warm(&self) -> bool {
+        self.common.prefer_warm
+    }
+}
+
+pub fn format(args: FormatArgs, ctx: &Ctx) -> Output {
+    let json = match crate::format(&args.format) {
+        Ok(Format::Text) => false,
+        Ok(Format::Json) if !args.diff => true,
+        Ok(Format::Json) => return Output::fail("--diff prints a diff; it takes no --format json"),
+        Ok(_) => return Output::fail(format!("`format` takes --format text or json, not `{}`", args.format)),
+        Err(e) => return Output::fail(e),
+    };
+    let options = match engine_options_in(&args.common, ctx.env.clone()) {
         Ok(o) => o,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
     let mut project = match load(&args.paths, options) {
         Ok(p) => p,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
     let check = args.check || args.diff;
     let report = match project.format(&args.paths, &FormatRunOptions { check }) {
         Ok(r) => r,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
+    let mut out = Output::default();
+    if json {
+        out.stdout = json_line(&with_timings(codelaw_report::format_json(&report, check), &project));
+        out.code = exit_code(&report, check);
+        return out;
+    }
     for f in &report.files {
         if args.diff {
-            print!("{}", unified_diff(&f.file, &f.original, &f.formatted));
+            out.stdout.push_str(&unified_diff(&f.file, &f.original, &f.formatted));
         } else if args.check {
-            println!("would format {}", f.file);
+            out.stdout.push_str(&format!("would format {}\n", f.file));
         } else if f.written {
-            println!("formatted {}", f.file);
+            out.stdout.push_str(&format!("formatted {}\n", f.file));
         }
     }
     if !report.check.diagnostics.is_empty() {
-        print!("{}", codelaw_report::check_text(&report.check, color()));
+        out.stdout.push_str(&codelaw_report::check_text(&report.check, ctx.color));
     }
     let n = report.files.len();
     let files = report.check.files_checked;
-    match (check, n) {
-        (_, 0) => eprintln!("{files} files already formatted"),
-        (true, _) => eprintln!("{n} of {files} files would be formatted"),
-        (false, _) => eprintln!("formatted {n} of {files} files"),
-    }
-    ExitCode::from(exit_code(&report, check))
+    out.stderr.push_str(&match (check, n) {
+        (_, 0) => format!("{files} files already formatted\n"),
+        (true, _) => format!("{n} of {files} files would be formatted\n"),
+        (false, _) => format!("formatted {n} of {files} files\n"),
+    });
+    timings(&project, Format::Text, &mut out);
+    out.code = exit_code(&report, check);
+    out
 }

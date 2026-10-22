@@ -53,6 +53,21 @@ fn a_fix_that_differs_from_do() {
     assert!(failures(&r).contains(&"examples · JavaScript Do (line 32): fires at 1:1 acme/eqeqeq".to_string()), "{:?}", failures(&r));
 }
 
+/// SR-FORMATTER decision 3: a `Don't` that formats to its `Do` is a
+/// layout rule, and `codelaw test` refuses it.
+#[test]
+fn a_layout_rule_is_refused() {
+    let r = test_rule(&loaded(&rule("if (a==b) {}", "if (a == b) {\n}"), None), None);
+    let f = failures(&r);
+    assert!(
+        f.contains(&"examples · JavaScript Don't (line 26): a layout rule: formatted, it is identical to the Do (line 32), so the two differ only in layout, and layout belongs to the formatter (SR-FORMATTER decision 3)".to_string()),
+        "{f:?}"
+    );
+    // A Do that formats differently is not a layout rule.
+    let r = test_rule(&loaded(&rule("if (a==b) {}", "if (a===b) {}"), None), None);
+    assert!(!failures(&r).iter().any(|f| f.contains("layout rule")), "{:?}", failures(&r));
+}
+
 #[test]
 fn cases_compare_exactly() {
     let cases = "### case: two\n\n```js\na == b; c == d;\n```\n\n```expect\n1:1 acme/eqeqeq\n1:9 acme/eqeqeq\n```\n\n```fixed\na === b; c === d;\n```\n\n### case: wrong\n\n```js\nx == y;\n```\n\n```expect\n(none)\n```\n";

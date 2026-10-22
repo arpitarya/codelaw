@@ -2,6 +2,7 @@
 //! Prettier-shaped keys with Prettier's defaults, and a `[format.python]`
 //! table with Black/Ruff's. Every key is strict: an unknown one is an error.
 
+use std::collections::BTreeSet;
 use toml::{Table, Value};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -134,6 +135,21 @@ fn choice<T: Copy>(section: &str, key: &str, v: &Value, options: &[(&str, T)]) -
 }
 
 impl FormatOptions {
+    /// The keys a `[format]` table sets, `python.` and `markdown.`
+    /// prefixed for its subtables: the ones `.editorconfig` may not change.
+    pub fn set_keys(table: Option<&Table>) -> BTreeSet<String> {
+        let mut out = BTreeSet::new();
+        for (key, v) in table.into_iter().flatten() {
+            match v.as_table() {
+                Some(t) if key == "python" || key == "markdown" => out.extend(t.keys().map(|k| format!("{key}.{k}"))),
+                _ => {
+                    out.insert(key.clone());
+                }
+            }
+        }
+        out
+    }
+
     /// The options a `[format]` table gives, over the defaults.
     pub fn from_table(table: Option<&Table>) -> Result<FormatOptions, String> {
         let mut o = FormatOptions::default();

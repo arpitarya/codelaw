@@ -2,6 +2,7 @@
 //! data checks the verifier uses.
 
 use crate::FormatError;
+use crate::markers;
 use crate::options::{self, FormatOptions};
 use codelaw_core::Language;
 use std::borrow::Cow;
@@ -11,16 +12,21 @@ fn engine_error(e: impl std::fmt::Display) -> FormatError {
     FormatError::Engine(e.to_string())
 }
 
+/// Format with the language's engine, its ignore markers honoured
+/// (decision 6, `markers`).
 pub(crate) fn format(language: Language, path: &str, text: &str, o: &FormatOptions) -> Result<String, FormatError> {
+    use markers::{BIOME, PRETTIER};
     match language {
-        Language::Javascript | Language::Jsx | Language::Typescript | Language::Tsx => biome_js(js_source(language, path), text, o, o.line_width),
-        Language::Json => biome_json(text, o, o.line_width),
-        Language::Css => biome_css(text, o, o.line_width),
-        Language::Python => ruff(path, text, o, o.python_line_width),
-        Language::Yaml => yaml(text, o, o.line_width),
-        Language::Toml => toml_fmt(text, o, o.line_width),
-        Language::Markdown => markdown(text, o),
-        Language::Html => html(text, o),
+        Language::Javascript | Language::Jsx | Language::Typescript | Language::Tsx => {
+            markers::native(text, &["//", "/*"], BIOME, |t| biome_js(js_source(language, path), t, o, o.line_width))
+        }
+        Language::Json => markers::native(text, &["//", "/*"], BIOME, |t| biome_json(t, o, o.line_width)),
+        Language::Css => markers::native(text, &["/*"], BIOME, |t| biome_css(t, o, o.line_width)),
+        Language::Python => markers::python(text, |t| ruff(path, t, o, o.python_line_width)),
+        Language::Yaml => markers::native(text, &["#"], PRETTIER, |t| yaml(t, o, o.line_width)),
+        Language::Toml => markers::toml(text, |t| toml_fmt(t, o, o.line_width)),
+        Language::Markdown => markers::native(text, &["<!--"], PRETTIER, |t| markdown(t, o)),
+        Language::Html => markers::native(text, &["<!--"], PRETTIER, |t| html(t, o)),
     }
 }
 
@@ -200,6 +206,8 @@ fn yaml(text: &str, o: &FormatOptions, width: u16) -> Result<String, FormatError
         options::EndOfLine::Lf => pretty_yaml::config::LineBreak::Lf,
         options::EndOfLine::Crlf => pretty_yaml::config::LineBreak::Crlf,
     };
+    // `# prettier-ignore`, and `# codelaw-format-ignore` rewritten to it.
+    options.language.ignore_comment_directive = markers::PRETTIER.into();
     pretty_yaml::format_text(text, &options).map_err(|e| FormatError::Syntax(e.to_string()))
 }
 
@@ -263,6 +271,11 @@ fn markdown(text: &str, o: &FormatOptions) -> Result<String, FormatError> {
             options::EndOfLine::Lf => NewLineKind::LineFeed,
             options::EndOfLine::Crlf => NewLineKind::CarriageReturnLineFeed,
         })
+        // `<!-- prettier-ignore -->`, and `<!-- codelaw-format-ignore -->`
+        // rewritten to it; Prettier's start and end markers too.
+        .ignore_directive(markers::PRETTIER)
+        .ignore_start_directive("prettier-ignore-start")
+        .ignore_end_directive("prettier-ignore-end")
         .build();
     let blocks = o.markdown_code_blocks;
     let result = dprint_plugin_markdown::format_text(text, &config, |tag, code, width| {
@@ -288,7 +301,7 @@ fn html(text: &str, o: &FormatOptions) -> Result<String, FormatError> {
     options.language.script_indent = true;
     options.language.style_indent = true;
     options.language.doctype_keyword_case = markup_fmt::config::DoctypeKeywordCase::Lower;
-    options.language.ignore_comment_directive = "prettier-ignore".into();
+    options.language.ignore_comment_directive = markers::PRETTIER.into();
     options.layout.line_break = match o.eol() {
         options::EndOfLine::Lf => markup_fmt::config::LineBreak::Lf,
         options::EndOfLine::Crlf => markup_fmt::config::LineBreak::Crlf,

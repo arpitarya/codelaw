@@ -2,12 +2,14 @@
 //! library: the CLI and every other surface only translate between their
 //! protocol and these functions (decision 2).
 
+mod adapters;
 mod compile;
 mod debug;
 mod discover;
 mod files;
 mod fix;
 mod format;
+mod incremental;
 mod lint;
 mod query;
 mod project;
@@ -16,11 +18,12 @@ mod timings;
 
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
-pub use fix::{FileFix, FixOptions, FixReport};
+pub use fix::{FileFix, FileTrace, FixOptions, FixReport};
+pub use incremental::DocumentTree;
 pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
 pub use lint::FileResult;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
-pub use debug::{FileTrace, MatchReport, RuleCard};
+pub use debug::MatchReport;
 pub use timings::{PhaseTiming, RuleTiming, TimingReport};
 
 use codelaw_cache::DiskCache;
@@ -52,6 +55,13 @@ pub struct EngineOptions {
     pub site_packages_env: Option<String>,
     /// `VIRTUAL_ENV`.
     pub virtual_env: Option<String>,
+    /// Run the installed adapters (SR-LINTER decision 2). Only the CLI's
+    /// `check` and `fix` set it, never hook, editor or MCP mode
+    /// (SR-ARCHITECTURE decision 19); `--no-adapters` clears it.
+    pub adapters: bool,
+    /// `PATH`, where an adapter is looked for after the project's
+    /// `node_modules/.bin` and `.venv/bin`.
+    pub path_env: Option<std::ffi::OsString>,
 }
 
 impl EngineOptions {
@@ -62,6 +72,7 @@ impl EngineOptions {
             cache_dir_env: var("CODELAW_CACHE_DIR"),
             site_packages_env: var("CODELAW_SITE_PACKAGES"),
             virtual_env: var("VIRTUAL_ENV"),
+            path_env: std::env::var_os("PATH"),
             ..Default::default()
         }
     }
@@ -128,7 +139,9 @@ pub(crate) fn dedup_diagnostics(d: &mut Vec<Diagnostic>) {
 pub struct Project {
     pub config: Config,
     pub rules: RuleSet,
-    pub compiled: Vec<CompiledRule>,
+    /// Shared with every other load of the same inputs in this process
+    /// (SR-ARCHITECTURE decision 21).
+    pub compiled: std::sync::Arc<Vec<CompiledRule>>,
     pub options: EngineOptions,
     pub cache: DiskCache,
     pub warnings: Vec<String>,
@@ -136,6 +149,8 @@ pub struct Project {
     pub formatting: Formatting,
     pool: rayon::ThreadPool,
     timings: Option<timings::Timings>,
+    /// The adapters found installed, looked up on first use.
+    adapters: std::sync::OnceLock<codelaw_adapters::Resolved>,
 }
 
 fn pool(threads: Option<usize>) -> rayon::ThreadPool {
@@ -179,7 +194,7 @@ impl Project {
             }
         }
         let compile_started = std::time::Instant::now();
-        let (compiled, mut warnings) = compile::compile_all(&rules, &config).map_err(EngineError::Load)?;
+        let (compiled, mut warnings) = compile::compile_cached(&rules, &config).map_err(EngineError::Load)?;
         let timings = options.timings.then(|| timings::Timings::new(compiled.len()));
         if let Some(t) = &timings {
             t.add(timings::Phase::Compile, compile_started);
@@ -192,8 +207,14 @@ impl Project {
             DiskCache::new(Some(config.cache_dir(options.cache_dir_env.as_deref())))
         };
         let formatting = Formatting::from_config(&config)?;
+        // `[adapters] enabled` names only adapters codelaw has, on every
+        // surface, whether or not this one runs them.
+        if let Err(e) = codelaw_adapters::selected(config.adapters_enabled()) {
+            return Err(EngineError::Config(codelaw_config::ConfigError::new(config.files.first().map(|f| f.path.clone()), e)));
+        }
         let pool = pool(options.threads);
-        Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool, timings })
+        let adapters = std::sync::OnceLock::new();
+        Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool, timings, adapters })
     }
 
     pub fn root(&self) -> &Path {
@@ -211,12 +232,14 @@ impl Project {
         report.warnings.extend(warnings);
         let this = &*self;
         let results: Vec<FileResult> = self.pool.install(|| files.par_iter().map(|f| this.check_file(f)).collect());
-        for r in results {
+        let mut checked: Vec<&FileEntry> = Vec::new();
+        for (r, entry) in results.into_iter().zip(&files) {
             report.diagnostics.extend(r.diagnostics);
             if let Some(s) = r.skipped {
                 skipped.push(s);
             } else {
                 report.files_checked += 1;
+                checked.push(entry);
             }
         }
         if !self.rules.has_rules() {
@@ -228,6 +251,12 @@ impl Project {
             let sources = self.graph_sources()?;
             let scopes = project::scopes(self.root(), paths);
             report.diagnostics.extend(self.run_graph_rules(&sources, config).into_iter().filter(|d| project::within(&d.file, &scopes)));
+        }
+        // The adapters (SR-ARCHITECTURE decision 4, step 5).
+        if self.adapters_on() {
+            let mut run = adapters::check(self, &checked, &report.diagnostics);
+            report.diagnostics.append(&mut run.diagnostics);
+            report.warnings.append(&mut run.warnings);
         }
         report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
         dedup_diagnostics(&mut report.diagnostics);
@@ -276,7 +305,7 @@ impl Project {
             Some(t) => (t, true),
             None => (source, false),
         };
-        let mut f = fix::fix_text(self, &entry, text, &FixOptions { unsafe_fixes, dry_run: true }, false, bom, tree);
+        let mut f = fix::fix_text(self, &entry, text, &FixOptions { unsafe_fixes, dry_run: true, trace: false }, false, bom, tree);
         if bom {
             f.original.insert(0, '\u{feff}');
             f.fixed.insert(0, '\u{feff}');
@@ -306,13 +335,23 @@ impl Project {
     /// (SR-EDITOR decision 3). Nothing is read from or written to disk.
     /// `text` has no byte-order mark; offsets are into it.
     pub fn check_document(&self, entry: &FileEntry, text: &str) -> Vec<Diagnostic> {
-        let mut d = self.check_unsaved(entry, text).diagnostics;
+        self.check_document_with(entry, text, None)
+    }
+
+    fn check_document_with(&self, entry: &FileEntry, text: &str, host: Option<&codelaw_lang::Root>) -> Vec<Diagnostic> {
+        let mut d = self.check_unsaved(entry, text, host).diagnostics;
         if !self.rules.has_rules() {
             d.push(lint::no_rules(self));
         }
         d.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
         d.dedup_by(|a, b| a.file == b.file && a.start_byte == b.start_byte && a.end_byte == b.end_byte && a.rule == b.rule);
         d
+    }
+
+    /// Whether `fix` may start an external fixer (decision 18), a command
+    /// that inherits the environment of the process running it.
+    pub fn runs_external_fixers(&self) -> bool {
+        self.compiled.iter().any(|c| c.loaded.external_allowed && matches!(c.fix, Some(codelaw_fix::FixSpec::External(_))))
     }
 
     /// The files a run would check, in order.

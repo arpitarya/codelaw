@@ -58,8 +58,9 @@ pub fn parse_targets(names: &[String]) -> Result<Vec<Target>, String> {
     Ok(out)
 }
 
-/// The `[agents]` section (SR-CONSUMER-LAYOUT decision 5; SR-CONFIG
-/// decision 5: strict, an unknown key is an error).
+/// The `[agents]` section (SR-AGENT-SURFACES decision 6; SR-CONFIG
+/// decision 5: the loader refuses an unknown key, this refuses an unknown
+/// agent, naming the nearest).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct AgentsConfig {
     /// `targets`: the agents whose files `sync-agents` writes.
@@ -72,29 +73,14 @@ pub struct AgentsConfig {
 impl AgentsConfig {
     pub fn from_config(config: &codelaw_config::Config) -> Result<AgentsConfig, String> {
         let Some(file) = config.files.first() else { return Ok(AgentsConfig::default()) };
-        let Some(table) = &file.raw.agents else { return Ok(AgentsConfig::default()) };
         let at = codelaw_core::normalize_path(&file.path);
-        let mut out = AgentsConfig::default();
-        for (key, value) in table {
-            match key.as_str() {
-                "targets" => {
-                    let names = value
-                        .as_array()
-                        .and_then(|a| a.iter().map(|v| v.as_str().map(str::to_owned)).collect::<Option<Vec<_>>>())
-                        .ok_or_else(|| format!("{at}: `[agents] targets` is a list of agent names"))?;
-                    out.targets = parse_targets(&names).map_err(|e| format!("{at}: [agents] targets: {e}"))?;
-                }
-                "command" => {
-                    let c = value.as_str().filter(|s| !s.trim().is_empty()).ok_or_else(|| format!("{at}: `[agents] command` is a non-empty string"))?;
-                    out.command = Some(c.to_owned());
-                }
-                other => {
-                    let near = codelaw_config::did_you_mean(other, ["targets", "command"]).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
-                    return Err(format!("{at}: unknown key `{other}` in [agents]{near}"));
-                }
-            }
-        }
-        Ok(out)
+        let raw = &file.raw.agents;
+        let targets = parse_targets(raw.targets.as_deref().unwrap_or_default()).map_err(|e| format!("{at}: [agents] targets: {e}"))?;
+        let command = match &raw.command {
+            Some(c) if c.trim().is_empty() => return Err(format!("{at}: `[agents] command` is a non-empty string")),
+            c => c.clone(),
+        };
+        Ok(AgentsConfig { targets, command })
     }
 }
 

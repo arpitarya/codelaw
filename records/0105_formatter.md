@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-format
   - scripts/format-parity.py
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -77,6 +77,8 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    Every engine must pass [L2](0004_LAW-2-foss-dependencies.md); `crates/codelaw-cli/tests/licences.rs` checks every crate in `Cargo.lock`, the git-pinned Biome ones included. One transitive crate failed L2: Biome reaches `option-ext` (MPL-2.0) through `directories`. The workspace's `[patch.crates-io]` replaces it with `crates/codelaw-format/shims/option-ext`, an MIT re-implementation of the one trait method `dirs-sys` uses; the licence check sees the shim, not the original. The engine versions are `codelaw_format::ENGINES_FINGERPRINT`, part of every cache key a format result enters (decision 7).
 
 3. **Layout belongs to the formatter, and the rule loader enforces it.** A lint rule whose fix only changes layout is refused. `codelaw test` checks this deterministically: if `format(Don't) == format(Do)`, the rule is a layout rule and fails. This is the formatter-versus-linter fight that ESLint's stylistic rules caused, ruled out by construction.
+   - **How:** for every language's examples, each `Don't` is formatted with the default options and compared with each `Do` and `Fixed`, formatted the same way, file by file for a multi-file snippet. Equal texts fail the `Don't` at the examples level with a message naming this decision ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 4). A snippet the formatter cannot format is not compared.
+   - **Measured on the five packs, 2026-10-22:** two rules fail it. `js/no-irregular-whitespace` is a layout rule: Biome turns the no-break space of its `Don't` into a space. `css/media-query-no-invalid` is not: Biome rewrites `@media not(` to `@media not (`, which turns an invalid query into a valid one, so here the formatter changes meaning. Both wait on the decider (`W-23`).
 
 4. **Order of operations:**
    1. Parse.
@@ -112,12 +114,25 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    ```
    - **Defaults:** Prettier's for JS/TS/JSON/CSS/HTML/YAML/Markdown; Black/Ruff's for Python. One exception: `end_of_line` unset keeps each file's dominant line ending, because only a set `end_of_line` may change one ([SR-ARCHITECTURE](0108_architecture.md) decision 9).
    - **`.editorconfig` is always read** as the base layer; `codelaw.toml` wins over it.
+     - **Which files:** as the EditorConfig specification says, the `.editorconfig` in the file's folder and in each folder above it, up to one with `root = true`; the nearer file and the later section win. Each folder's file is read once per run (`crates/codelaw-format/src/editorconfig.rs` parses, `codelaw-engine` caches), and a file's resolved options are part of its cache key. A project with no folder on disk (the rule tester's) reads none.
+     - **Which properties:** `indent_style` → `indent_style`; `indent_size` (or `tab_width` when it is `tab` or unset) → `indent_width` and `[format.python] indent_width`; `end_of_line` (`lf`, `crlf`) → `end_of_line`; `max_line_length` → `line_width` and `[format.python] line_width`. A value out of the key's range, `cr` or `off` is ignored, and `unset` removes a property.
+     - **What wins:** a key `[format]` (or `[format.python]`) sets is never changed by `.editorconfig`. Section globs go through `globset` (MIT / Unlicense), already a dependency of the engine.
    - **Migrating from existing configs:** `codelaw format --import-config` reads `.prettierrc*`, `[tool.ruff.format]` and `[tool.black]` once and writes the equivalent `[format]` keys. From then on, `codelaw.toml` is the only source.
 
 6. **Ignore markers.**
    - **codelaw's own:** `// codelaw-format-ignore` and `# codelaw-format-ignore` skip the next node.
    - **Honoured for compatibility:** `// prettier-ignore`, `<!-- prettier-ignore -->`, and Ruff/Black's `# fmt: off` / `# fmt: on` and `# fmt: skip`.
    - **Whole files:** `[format] exclude`.
+   - **How every engine honours them** (`crates/codelaw-format/src/markers.rs`). A marker is a comment in the language's own syntax (`//` or `/* */` in JS/TS/JSON, `/* */` in CSS, `#` in Python/YAML/TOML, `<!-- -->` in Markdown/HTML) whose text starts with the marker word.
+
+     | engine | how |
+     |---|---|
+     | Biome (JS · TS · JSON · CSS) | the marker is rewritten to Biome's own `biome-ignore format: codelaw` before formatting and restored after |
+     | pretty_yaml · dprint-plugin-markdown · markup_fmt | each is configured with `prettier-ignore` as its directive; `codelaw-format-ignore` is rewritten to it and restored. Markdown also takes `<!-- prettier-ignore-start -->` … `<!-- prettier-ignore-end -->` |
+     | Ruff (Python) | Ruff's own `# fmt:` pragmas work as they are. An own-line marker followed at its own indentation by a statement becomes `# fmt: off`, and a `# fmt: on` follows that statement; both are undone after. A marker inside an expression, or with no statement after it at its level, skips nothing |
+     | taplo (TOML) | taplo has no directive: the file is formatted, then the next entry, table header or array element after each marker is put back as it was written |
+
+     Restoring goes by order: a marker the engine drops or moves fails the file with `format-engine`, so a fenced-off node is never reformatted silently. pretty_yaml applies a marker before a block's first entry to the whole block, not only that entry. The statement tree comes from `ruff_python_ast` and `ruff_text_size` (MIT, `=0.0.18`, the same Ruff release as the formatter).
 
 7. **Deterministic and stable ([L5](0007_LAW-5-no-model-in-the-engine.md)).**
    - The same input and the same codelaw version always give byte-identical output.
@@ -132,7 +147,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 ### What is built
 
-Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. **Not built yet, `W-23`:** decision 3 (the layout-rule refusal in `codelaw test`); decision 5's `.editorconfig` layer and `--import-config`; decision 6's markers, of which only Ruff's own `# fmt: off`/`# fmt: on`/`# fmt: skip` work today; decision 8's range formatting. The agent hook is `W-10`'s.
+Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`; decision 5's `.editorconfig` layer; decision 6's markers in every engine. **Not built yet, `W-23`:** decision 5's `--import-config`; decision 8's range formatting. The agent hook is `W-10`'s.
 
 ### Consequences
 

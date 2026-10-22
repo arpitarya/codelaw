@@ -102,9 +102,12 @@ fn when_picks_a_branch() {
     let fix = json!([{"when": {"path": {"strict": {"present": true}}}, "then": [{"ensure-key": {"key": "strict", "value": true}}], "else": [{"ensure-key": {"key": "strict", "value": true}}, "sort-keys"]}]);
     let out = fixed(Language::Json, "{\"opts\": {\"strict\": false}}", "opts", a.clone(), fix.clone()).unwrap();
     assert_eq!(out, "{\"opts\": {\"strict\": true}}");
-    // `else` runs both steps, each on the text as it was.
-    let out = fixed(Language::Json, "{\"opts\": {\"x\": 1, \"a\": 2}}", "opts", a.clone(), fix).unwrap();
-    assert_eq!(out, "{\"opts\": {\"a\": 2, \"x\": 1, \"strict\": true}}");
+    // `else` runs both steps in order: the sort places the key just written.
+    let out = fixed(Language::Json, "{\"opts\": {\"x\": 1, \"a\": 2}}", "opts", a.clone(), fix.clone()).unwrap();
+    assert_eq!(out, "{\"opts\": {\"a\": 2, \"strict\": true, \"x\": 1}}");
+    // A container already in order needs only the key.
+    let out = fixed(Language::Yaml, "opts:\n  a: 1 # one\n  x: 2\n", "opts", a.clone(), fix).unwrap();
+    assert_eq!(out, "opts:\n  a: 1 # one\n  strict: true\n  x: 2\n");
     let fix = json!([{"when": {"path": {"strict": {"present": true}}}, "then": [{"ensure-key": {"key": "strict", "value": true}}]}]);
     let e = fixed(Language::Json, "{\"opts\": {\"x\": 1}}", "opts", a.clone(), fix).unwrap_err();
     assert!(e.contains("nothing to change"), "{e}");

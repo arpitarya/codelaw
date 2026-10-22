@@ -1,6 +1,6 @@
 # html-validate (MIT) — SR-LINTER decision 2: available, run when named.
 # It offers no autofix, so every finding is `manual` with the rule's docs.
-# Lines and columns count UTF-16 code units.
+# Offsets and columns count UTF-16 code units.
 name = "html-validate"
 binary = "html-validate"
 licence = "MIT"
@@ -8,7 +8,10 @@ default = false
 languages = ["html"]
 version_args = ["--version"]
 args = ["--formatter", "json"]
-# The fixtures were captured from 11.17.0.
+# The fixtures were captured from 11.17.0 (tests/fixtures/html-validate).
 tested = ">=11.17.0, <12.0.0"
 output = "html-validate"
 ported_prefix = "html-validate/"
+# The files whose content enters each cache key (SR-ARCHITECTURE decision 19),
+# looked for in every folder from the file's up to the project root.
+config_files = [".htmlvalidate.json", ".htmlvalidate.js", ".htmlvalidate.cjs", ".htmlvalidate.mjs", ".htmlvalidateignore"]

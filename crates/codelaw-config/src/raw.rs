@@ -5,8 +5,8 @@ use std::collections::BTreeMap;
 /// strict: an unknown key is a load error (SR-CONFIG decision 5).
 ///
 /// The sections owned by records whose features are not built yet
-/// (`[format]`, `[graph]`, `[baseline]`, `[adapters]`, `[agents]`,
-/// `[daemon]`, `[lsp]`) are accepted as tables and not yet validated.
+/// (`[format]`, `[graph]`, `[baseline]`, `[lsp]`) are accepted as tables
+/// and not yet validated.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RawConfig {
@@ -43,9 +43,12 @@ pub struct RawConfig {
     pub format: Option<toml::Table>,
     pub graph: Option<toml::Table>,
     pub baseline: Option<toml::Table>,
-    pub adapters: Option<toml::Table>,
-    pub agents: Option<toml::Table>,
-    pub daemon: Option<toml::Table>,
+    #[serde(default)]
+    pub adapters: RawAdapters,
+    #[serde(default)]
+    pub agents: RawAgents,
+    #[serde(default)]
+    pub daemon: RawDaemon,
     pub lsp: Option<toml::Table>,
 }
 
@@ -113,11 +116,35 @@ pub struct RawFix {
     pub external_timeout: Option<Duration>,
 }
 
+/// `[adapters]`: SR-LINTER decision 2.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawAdapters {
+    pub enabled: Option<Vec<String>>,
+    pub timeout: Option<Duration>,
+}
+
+/// `[daemon]`: SR-ARCHITECTURE decision 22.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawDaemon {
+    pub idle_timeout: Option<Duration>,
+}
+
 /// `[lint]`: SR-LINTER decision 3.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RawLint {
     pub tagged_templates: Option<bool>,
+}
+
+/// `[agents]`: SR-AGENT-SURFACES decision 6. The names are checked
+/// against the agents of the matrix by `codelaw-agents`, which knows them.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawAgents {
+    pub targets: Option<Vec<String>>,
+    pub command: Option<String>,
 }
 
 /// `[markdown]`: L3 decision 8.

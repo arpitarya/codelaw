@@ -72,6 +72,7 @@ The decider made performance a law (L8) and asked for a caching record. Caches w
 6. **Size limit:** 512 MB by default (`[cache] max_size`). When a run ends over the limit, the least-recently-used entries are removed. `codelaw cache stats` and `codelaw cache clean` manage it by hand.
 7. **The cache never changes output ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A test runs every fixture cold, then warm, then after random entries are deleted, and requires byte-identical output each time.
 8. **In-memory tier.** The long-lived modes ([SR-ARCHITECTURE](0108_architecture.md) decisions 21–24) keep trees, compiled rules and the graph in memory. The disk cache is the floor, not the ceiling.
+   - **The compiled rule set lives only here.** Compiled matchers hold parser state with no on-disk form, so the §1 table's first row is kept in memory, per process, keyed by the rule set's fingerprint (every rule file, its source and default, every pack's data tables), the config's, the grammars and the version, plus each rule's path, `enabled_by`, shadows and fixer permission (`codelaw-engine`'s `compile` module, W-15). A one-shot run compiles once; a warm process compiles once per distinct key, keeping the 8 most recent.
 9. **Off switch:** `--no-cache` and `[cache] enabled = false`. Correct either way, slower without.
 
 ### Consequences

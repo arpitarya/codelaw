@@ -1,7 +1,13 @@
 //! Compile once, dispatch by kind (SR-ARCHITECTURE decision 15): every
 //! loaded rule becomes a matcher per grammar, with the node kinds it can
 //! match, before any file is read.
+//!
+//! The compiled set is cached in memory by the hash of everything it is
+//! compiled from (SR-CACHE decision 1's first row, decision 8's tier), so a
+//! warm process (`lsp`, `mcp`, `daemon`) compiles a rule set once, however
+//! many times it loads the project (SR-ARCHITECTURE decision 21).
 
+use codelaw_cache::{Key, KeyBuilder};
 use codelaw_config::Config;
 use codelaw_core::Language;
 use codelaw_fix::{DataStep, FixSpec, parse_data_fix, parse_fix};
@@ -10,6 +16,7 @@ use codelaw_match::{CompiledMatch, CompiledTarget};
 use codelaw_native::NativeRule;
 use codelaw_rules::{BlockKind, LoadError, LoadedRule, RuleSet};
 use globset::{GlobBuilder, GlobSet, GlobSetBuilder};
+use std::sync::{Arc, Mutex};
 
 pub enum Matcher {
     /// One compiled `match:` per grammar the rule's languages parse with.
@@ -82,6 +89,54 @@ fn globs(patterns: &[String]) -> Result<GlobSet, String> {
         b.add(GlobBuilder::new(p.trim_start_matches("./")).literal_separator(true).build().map_err(|e| format!("invalid glob `{p}`: {e}"))?);
     }
     b.build().map_err(|e| e.to_string())
+}
+
+/// A compiled rule set and the warnings compiling it gave.
+pub(crate) type Compiled = (Arc<Vec<CompiledRule>>, Vec<String>);
+
+/// How many compiled rule sets a process keeps: one per project it serves,
+/// most recently used first.
+const KEPT: usize = 8;
+
+static COMPILED: Mutex<Vec<(Key, Compiled)>> = Mutex::new(Vec::new());
+
+/// The compiled rule set's key: every input `compile_all` reads, and every
+/// field of a loaded rule it copies into the result (SR-CACHE decision 1).
+/// The rule set's fingerprint covers each rule file's bytes, its source and
+/// default, and every pack's data tables (decision 15c); the config's
+/// covers the config files; the version (in every key) and the grammars
+/// are the code.
+pub(crate) fn rule_set_key(rules: &RuleSet, config: &Config) -> Key {
+    let mut k = KeyBuilder::new("compiled-rules");
+    k.push(rules.fingerprint.0);
+    k.push(config.fingerprint().0);
+    k.push(codelaw_lang::GRAMMARS_FINGERPRINT);
+    for r in &rules.rules {
+        k.push(codelaw_core::normalize_path(&r.rule.path));
+        k.push(r.enabled_by.as_deref().unwrap_or_default());
+        k.push(r.shadows.join("\0"));
+        k.push(format!("{}{}", r.external_allowed, r.preview_blocked));
+    }
+    k.key()
+}
+
+/// The compiled rule set, from the in-memory cache when this process has
+/// compiled the same inputs before. A failed compile is never cached.
+pub(crate) fn compile_cached(rules: &RuleSet, config: &Config) -> Result<Compiled, Vec<LoadError>> {
+    let key = rule_set_key(rules, config);
+    let mut kept = COMPILED.lock().unwrap_or_else(|e| e.into_inner());
+    if let Some(i) = kept.iter().position(|(k, _)| *k == key) {
+        let hit = kept.remove(i);
+        let out = hit.1.clone();
+        kept.insert(0, hit);
+        return Ok(out);
+    }
+    // Compiled under the lock, so two loads of one project compile it once.
+    let (compiled, warnings) = compile_all(rules, config)?;
+    let out = (Arc::new(compiled), warnings);
+    kept.insert(0, (key, out.clone()));
+    kept.truncate(KEPT);
+    Ok(out)
 }
 
 /// Compile every loaded rule. A rule that fails refuses the run (exit 2),

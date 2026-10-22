@@ -954,7 +954,9 @@ dependencies = [
 name = "codelaw-adapters"
 version = "0.1.0"
 dependencies = [
+ "codelaw-config",
  "codelaw-core",
+ "libc",
  "semver",
  "serde",
  "serde_json",
@@ -972,7 +974,6 @@ dependencies = [
  "codelaw-report",
  "codelaw-rules",
  "serde_json",
- "toml",
 ]
 
 [[package]]
@@ -991,6 +992,7 @@ version = "0.1.0"
 dependencies = [
  "boon",
  "clap",
+ "codelaw-agents",
  "codelaw-cache",
  "codelaw-config",
  "codelaw-core",
@@ -1039,6 +1041,7 @@ dependencies = [
 name = "codelaw-engine"
 version = "0.1.0"
 dependencies = [
+ "codelaw-adapters",
  "codelaw-cache",
  "codelaw-config",
  "codelaw-core",
@@ -1089,11 +1092,14 @@ dependencies = [
  "codelaw-core",
  "dprint-core",
  "dprint-plugin-markdown",
+ "globset",
  "markup_fmt",
  "pretty_yaml",
  "ruff_formatter",
+ "ruff_python_ast",
  "ruff_python_formatter",
  "ruff_python_parser",
+ "ruff_text_size",
  "serde-saphyr",
  "serde_json",
  "taplo",
@@ -1226,9 +1232,12 @@ dependencies = [
  "codelaw-config",
  "codelaw-core",
  "codelaw-engine",
+ "codelaw-format",
  "codelaw-lang",
  "codelaw-rules",
  "codelaw-semantic",
+ "ignore",
+ "toml",
 ]
 
 [[package]]

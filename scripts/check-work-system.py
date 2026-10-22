@@ -1,64 +1,40 @@
 #!/usr/bin/env python3
-"""The work-system checks the WORK records name and nothing ran (W-20 DoD 5).
+"""The work system's mechanical checks — each one a rule its record states
+and nothing else enforced (W-20). This script states no rule of its own:
 
-Each check is the executable form of one rule stated in a record; this script
-states no rule of its own:
+  queue      SR-WORK-OPEN-QUEUE rules 13-17 and 42, 44, 45 — the shape of
+             every row of work/OPEN-WORK.md and of its inbox
+  lost       SR-WORK-OPEN-QUEUE veto — every `W-nn` named in a live document
+             resolves to work/open/ or archive/open/
+  ownership  SR-WORK-OWNERSHIP decision 2 — each record's `owns:` and the
+             register's Ownership table agree, in both directions
+  registry   SR-WORK-REGISTRY decisions 5-8 — no row into archive/, every
+             row's target exists, one row per document, every maintained
+             document has its row
+  archive    SR-WORK-ARCHIVE decision 1 — exactly one archive/, at the root
 
-  queue-rows   SR-WORK-OPEN-QUEUE rules 13-17 (and 18): an Open items row is one
-               or two lines, has the rule-14 shape, is at most 280 characters,
-               has no body, and links its own detail file.
-  inbox        SR-WORK-OPEN-QUEUE rule 42: every inbox row is followed by its
-               `↳ **blocks:**` sub-row; rule 45a by check-open-work-inbox.py.
-  links        SR-WORK-OPEN-QUEUE rule 45: every link in the queue resolves.
-  lost-ids     SR-WORK-OPEN-QUEUE's veto: every `W-nn` named in CLAUDE.md,
-               work/, records/ or docs/ resolves to work/open/ or archive/open/.
-  ownership    SR-WORK-OWNERSHIP decision 2: every record's `owns:` and the
-               register's Ownership table agree in both directions, each
-               component is listed once, and every file under the owned trees
-               has an owner (records/README.md §Ownership).
-  registry     SR-WORK-REGISTRY decisions 5-8: no row points into archive/,
-               every target exists, one row per document, and every
-               maintained document has a row.
-  archive      SR-WORK-ARCHIVE decision 1: exactly one `archive/`, at the root.
-
-Read-only. Exits 0 with one summary line when everything holds; exits 1 with
-one line per violation otherwise. Python 3.9 syntax (work/MACHINE.md).
-
-    python3 scripts/check-work-system.py
+Read-only: it never writes a file. Exits 0 when every check passes; else
+prints one line per violation and exits 1. `--self-test` runs it on a made-up
+repo that breaks every rule once.
 """
-import importlib.util
 import os
 import re
-import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-BALLS = "🔴🟣🟡🟢"
-LANES = ("arpit", "agent", "cowork")  # SR-WORK-OPEN-QUEUE rule 35
-ROW_MAX = 280  # rule 15
+BALLS = ("🔴", "🟣", "🟡", "🟢")
 ROW_RE = re.compile(
-    r"^[🔴🟣🟡🟢]🧨?🔺? \*\*(W-\d+)\*\* `([a-z]+)` .+ "
-    r"Filed by [^()]+ \([^()]+\)\. \[detail\]\(open/(W-\d+)-[a-z0-9-]+\.md\)$"
+    r"^(?P<ball>🔴|🟣|🟡|🟢)(?:🧨)?(?:🔺)? \*\*(?P<id>W-\d+)\*\* `(?:arpit|agent|cowork)` .+"
+    r" Filed by [^()]+ \([^()]+\)\. \[detail\]\((?P<link>open/(?P<link_id>W-\d+)-[A-Za-z0-9-]+\.md)\)$"
 )
 LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
-ID_RE = re.compile(r"\bW-[0-9]+\b")
-# The trees whose every file has an owner (records/README.md §Ownership).
-OWNED_TREES = ("scripts/", ".claude/hooks/", "crates/", "fixtures/", "packs/")
-# Documents the registry does not track, each with the rule that keeps it
-# current by other means (SR-WORK-REGISTRY decision 8 names *maintained* ones).
-NOT_MAINTAINED = {
-    "work/NOW.md": "one line, overwritten by every session (SR-WORK-SESSION decision 5)",
-    "work/WORKLOG.md": "append-only, one entry per session (SR-WORK-SESSION)",
-}
-
-
-def rel(p):
-    return p.relative_to(ROOT).as_posix()
+W_RE = re.compile(r"\bW-\d+\b")
+SKIP_DIRS = {".git", "target", "node_modules", "worktrees"}
 
 
 def section(lines, heading):
-    """The lines under `heading` up to the next `---` or `## ` heading."""
+    """The lines under `heading` up to the next `---` line or `## ` heading."""
     try:
         start = next(i for i, l in enumerate(lines) if l.strip() == heading)
     except StopIteration:
@@ -71,264 +47,285 @@ def section(lines, heading):
     return out
 
 
-def check_queue(errors):
-    queue = ROOT / "work" / "OPEN-WORK.md"
-    lines = queue.read_text(encoding="utf-8").splitlines()
-    where = "work/OPEN-WORK.md"
-
-    # Open items: rules 13-17.
-    items = section(lines, "## Open items")
-    if items is None:
-        errors.append(f"{where}: no '## Open items' section")
-        items = []
-    rows = []
-    for l in items:
-        if not l.strip() or l.startswith("### "):
+def links_exist(text, base, where, out):
+    """Rule 45: a row points only at things that exist."""
+    for target in LINK_RE.findall(text):
+        if re.match(r"^[a-z]+:", target) or target.startswith("#"):
             continue
-        if l[0] in BALLS:
-            rows.append([l])
-        elif l[0] in " \t" or re.match(r"^([-*+]|\d+\.) ", l) or l.startswith("|"):
-            errors.append(f"{where}: rule 16 — a row has a body (nested bullet, table or indented line): {l.strip()[:60]!r}")
-        elif rows:
-            rows[-1].append(l)
-        else:
-            errors.append(f"{where}: rule 20 — a line with no ball: {l[:60]!r}")
-    for r in rows:
-        text = " ".join(x.strip() for x in r)
-        head = text[:50]
-        if len(r) > 2:
-            errors.append(f"{where}: rule 13 — a row of {len(r)} lines: {head!r}")
-        if len(text) > ROW_MAX:
-            errors.append(f"{where}: rule 15 — a row of {len(text)} characters (at most {ROW_MAX}): {head!r}")
-        m = ROW_RE.match(text)
-        if not m:
-            errors.append(f"{where}: rule 14 — not `ball · **W-nn** · `lane` · what · Filed by <person> (<surface>). · [detail](open/W-nn-slug.md)`: {head!r}")
-            continue
-        if m.group(2) not in LANES:
-            errors.append(f"{where}: rule 35 — lane `{m.group(2)}` is not one of {', '.join(LANES)}: {head!r}")
-        if m.group(1) != m.group(3):
-            errors.append(f"{where}: rule 17 — row {m.group(1)} links {m.group(3)}'s file")
-    if not rows:
-        errors.append(f"{where}: no Open items rows were read — the parser and the queue disagree")
+        path = target.split("#", 1)[0]
+        if path and not (base / path).exists():
+            out.append(f"{where}: links `{target}`, which does not exist (SR-WORK-OPEN-QUEUE rule 45)")
 
-    # The inbox: rules 18 and 42 (45a is check-open-work-inbox.py's).
+
+def check_queue(root):
+    out = []
+    path = root / "work" / "OPEN-WORK.md"
+    if not path.is_file():
+        return [f"work/OPEN-WORK.md is missing (SR-WORK-OPEN-QUEUE rule 1)"]
+    lines = path.read_text(encoding="utf-8").splitlines()
+    base = path.parent
+
     inbox = section(lines, "## Blocked on the decider")
-    table = [l for l in (inbox or []) if l.startswith("|")][2:]
+    if inbox is None:
+        out.append("work/OPEN-WORK.md has no `## Blocked on the decider` section (SR-WORK-OPEN-QUEUE rule 39)")
+        inbox = []
+    table = [l for l in inbox if l.startswith("|")][2:]  # past the header and separator
     for i, l in enumerate(table):
         cells = [c.strip() for c in l.strip().strip("|").split("|")]
         if cells[0].startswith("↳"):
             if not cells[0].startswith("↳ **blocks:**"):
-                errors.append(f"{where}: rule 42 — a sub-row that is not `↳ **blocks:**`: {cells[0][:60]!r}")
-            elif i == 0 or table[i - 1].strip().strip("|").strip().startswith("↳"):
-                errors.append(f"{where}: rule 42 — a `↳ **blocks:**` sub-row with no inbox row above it")
+                out.append(f"inbox row {i + 1}: a `↳` sub-row is `↳ **blocks:** …` (SR-WORK-OPEN-QUEUE rule 42)")
             continue
-        if len(cells[0]) > ROW_MAX:
-            errors.append(f"{where}: rule 18 — an inbox row of {len(cells[0])} characters (at most {ROW_MAX}): {cells[0][:50]!r}")
-        nxt = table[i + 1] if i + 1 < len(table) else ""
-        if not nxt.strip().strip("|").strip().startswith("↳ **blocks:**"):
-            errors.append(f"{where}: rule 42 — inbox row not followed by its `↳ **blocks:**` sub-row: {cells[0][:50]!r}")
+        what = cells[0][:60]
+        if not cells[0].startswith("🔴"):
+            out.append(f"inbox row `{what}…`: an inbox row is always 🔴 (SR-WORK-OPEN-QUEUE rule 44)")
+        after = table[i + 1].strip().strip("|").strip() if i + 1 < len(table) else ""
+        if not after.startswith("↳ **blocks:**"):
+            out.append(f"inbox row `{what}…`: not followed by a `↳ **blocks:**` sub-row (SR-WORK-OPEN-QUEUE rule 42)")
+        links_exist(l, base, f"inbox row `{what}…`", out)
 
-    # Rule 45: every link points at something that exists.
-    for n, l in enumerate(lines, 1):
-        for target in LINK_RE.findall(l):
-            if re.match(r"^[a-z]+:", target) or target.startswith("#"):
-                continue
-            path = (queue.parent / target.split("#")[0]).resolve()
-            if not path.exists():
-                errors.append(f"{where}:{n}: rule 45 — the link `{target}` points at nothing")
+    items = section(lines, "## Open items")
+    if items is None:
+        return out + ["work/OPEN-WORK.md has no `## Open items` section (SR-WORK-OPEN-QUEUE rule 1)"]
+    rows = []  # (first line number, [physical lines])
+    for n, l in enumerate(items):
+        if not l.strip() or l.startswith("### "):
+            rows.append(None)
+            continue
+        if l.startswith(BALLS):
+            rows.append((n, [l]))
+        elif rows and rows[-1] is not None and not l.startswith((" ", "\t", "-", "*", "|", ">")):
+            rows[-1][1].append(l)  # the row's own second line
+        else:
+            out.append(f"Open items: `{l.strip()[:60]}` is a row body, or a row with no ball (SR-WORK-OPEN-QUEUE rules 16, 20)")
+    for row in filter(None, rows):
+        physical = row[1]
+        text = " ".join(p.strip() for p in physical)
+        m = ROW_RE.match(text)
+        name = m.group("id") if m else text[:40]
+        if len(physical) > 2:
+            out.append(f"{name}: {len(physical)} lines; a row is one or two (SR-WORK-OPEN-QUEUE rule 13)")
+        if not m:
+            out.append(f"`{name}…`: not `ball · **W-nn** · `lane` · what · Filed by <person> (<surface>). · [detail](open/W-nn-slug.md)` (SR-WORK-OPEN-QUEUE rule 14)")
+        # Counted as read: the text of a link, not its target; no `**` or backticks.
+        shown = LINK_RE.sub("]", text).replace("[", "").replace("]", "").replace("**", "").replace("`", "")
+        if len(shown) > 280:
+            out.append(f"{name}: {len(shown)} characters as rendered; at most 280 (SR-WORK-OPEN-QUEUE rule 15)")
+        if m and m.group("id") != m.group("link_id"):
+            out.append(f"{name}: links {m.group('link')}, another item's file (SR-WORK-OPEN-QUEUE rule 17)")
+        links_exist(text, base, name, out)
+    return out
 
-    # Rule 45a, through its own script.
-    sys.dont_write_bytecode = True  # read-only: no __pycache__ in scripts/
-    spec = importlib.util.spec_from_file_location("inbox", ROOT / "scripts" / "check-open-work-inbox.py")
-    inbox_mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(inbox_mod)
-    e = inbox_mod.check(queue)
-    if e:
-        errors.append(f"{where}: {e}")
 
-
-def markdown_files():
-    out = [ROOT / "CLAUDE.md"]
-    for top in ("work", "records", "docs"):
-        out += sorted((ROOT / top).rglob("*.md"))
-    return [p for p in out if p.is_file()]
-
-
-def check_lost_ids(errors):
-    """SR-WORK-OPEN-QUEUE's veto, done right: an id resolves when EITHER folder has it."""
-    homes = set()
+def check_lost(root):
+    """Every `W-nn` named in CLAUDE.md, work/, records/ or docs/ resolves."""
+    out = []
+    known = set()
     for d in ("work/open", "archive/open"):
-        for p in (ROOT / d).glob("W-*.md"):
-            m = re.match(r"(W-\d+)-", p.name)
+        for f in (root / d).glob("W-*.md"):
+            m = re.match(r"(W-\d+)-", f.name)
             if m:
-                homes.add(m.group(1))
-    seen = {}
-    for p in markdown_files():
-        for n, l in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
-            for w in ID_RE.findall(l):
-                seen.setdefault(w, f"{rel(p)}:{n}")
-    if not seen:
-        errors.append("lost ids: no `W-nn` was found anywhere — the scan is broken")
-    for w in sorted(seen):
-        if w not in homes:
-            errors.append(f"{seen[w]}: lost id — {w} is in neither work/open/ nor archive/open/")
+                known.add(m.group(1))
+    named = {}
+    files = [root / "CLAUDE.md"] if (root / "CLAUDE.md").is_file() else []
+    for d in ("work", "records", "docs"):
+        files += sorted((root / d).rglob("*.md")) if (root / d).is_dir() else []
+    for f in files:
+        for w in W_RE.findall(f.read_text(encoding="utf-8")):
+            named.setdefault(w, f.relative_to(root).as_posix())
+    for w in sorted(set(named) - known, key=lambda x: int(x[2:])):
+        out.append(f"lost: {w} (named in {named[w]}) has no file in work/open/ or archive/open/ (SR-WORK-OPEN-QUEUE veto)")
+    return out
 
 
-def table_rows(text, start, end):
-    m = re.search(re.escape(start) + r"(.*?)" + re.escape(end), text, re.S)
+def frontmatter(text):
+    if not text.startswith("---\n"):
+        return {}
+    end = text.find("\n---", 4)
+    fields, key = {}, None
+    for l in text[4:end].splitlines():
+        m = re.match(r"^([A-Za-z_]+):\s*(.*)$", l)
+        if m:
+            key, value = m.group(1), m.group(2).strip()
+            if value.startswith("[") and value.endswith("]"):
+                fields[key] = [v.strip().strip("\"'") for v in value[1:-1].split(",") if v.strip()]
+            else:
+                fields[key] = value.strip("\"'") if value else []
+        elif key and l.strip().startswith("- ") and isinstance(fields.get(key), list):
+            fields[key].append(l.strip()[2:].strip().strip("\"'"))
+    return fields
+
+
+def marked_table(text, name):
+    m = re.search(rf"<!-- {name}-START -->(.*?)<!-- {name}-END -->", text, re.S)
     rows = []
     for l in (m.group(1) if m else "").splitlines():
         cells = [c.strip() for c in l.strip().strip("|").split("|")]
-        if not l.startswith("|") or len(cells) < 2 or cells[0] in ("component",) or set(cells[0]) <= set("-"):
-            continue
-        comp = cells[0].strip("`").split("::")[0].rstrip("/")
-        rows.append((comp, cells[1].strip("*` ")))
+        if l.startswith("|") and len(cells) >= 2 and cells[0].startswith("`"):
+            rows.append((cells[0].strip("`"), cells[1]))
     return rows, m is not None
 
 
-def frontmatter_owns(text):
-    m = re.match(r"---\n(.*?)\n---\n", text, re.S)
-    if not m:
-        return None, []
-    fm = m.group(1)
-    name = re.search(r"^name:\s*(\S+)", fm, re.M)
-    owns = []
-    block = re.search(r"^owns:(.*?)(?=^\S)", fm + "\nend:", re.M | re.S)
-    if block:
-        inline = block.group(1).strip()
-        if inline.startswith("["):
-            owns = [x.strip().strip("'\"") for x in inline.strip("[]").split(",") if x.strip()]
-        else:
-            owns = [x.strip()[2:].strip().strip("'\"").rstrip("/") for x in block.group(1).splitlines() if x.strip().startswith("- ")]
-    return (name.group(1) if name else None), owns
-
-
-def tracked_files():
-    try:
-        out = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=True).stdout
-        return [f for f in out.decode("utf-8").split("\0") if f]
-    except (OSError, subprocess.CalledProcessError):
-        files = []
-        for d, dirs, names in os.walk(ROOT):
-            dirs[:] = [x for x in dirs if x not in (".git", "target", "node_modules", "__pycache__")]
-            files += [Path(d, n).relative_to(ROOT).as_posix() for n in names]
-        return files
-
-
-def check_ownership(errors):
-    register = (ROOT / "records" / "README.md").read_text(encoding="utf-8")
-    rows, found = table_rows(register, "<!-- OWNERSHIP-TABLE-START -->", "<!-- OWNERSHIP-TABLE-END -->")
-    where = "records/README.md §Ownership"
-    if not found or not rows:
-        errors.append(f"{where}: the marked table is missing")
-        return
+def check_ownership(root):
+    out = []
+    register = root / "records" / "README.md"
+    rows, found = marked_table(register.read_text(encoding="utf-8"), "OWNERSHIP-TABLE")
+    if not found:
+        return ["records/README.md has no OWNERSHIP-TABLE markers (SR-WORK-OWNERSHIP decision 2)"]
     table = {}
-    for comp, owner in rows:
-        if comp in table:
-            errors.append(f"{where}: `{comp}` is listed twice")
-        table[comp] = owner
-    declared = {}
-    for p in sorted((ROOT / "records").glob("[0-9][0-9][0-9][0-9]_*.md")):
-        name, owns = frontmatter_owns(p.read_text(encoding="utf-8"))
-        if name is None:
-            continue
-        declared[name] = p
-        for comp in owns:
-            if table.get(comp) != name:
-                got = f"the table says {table[comp]}" if comp in table else "the table does not list it"
-                errors.append(f"{rel(p)}: decision 2 — `owns: {comp}`, but {got}")
-    for comp, owner in table.items():
-        if owner.startswith("W-"):
-            if not list((ROOT / "work" / "open").glob(f"{owner}-*.md")):
-                errors.append(f"{where}: `{comp}` is owned by {owner}, which is not an open item")
-            continue
-        if owner not in declared:
-            errors.append(f"{where}: `{comp}` is owned by {owner}, which is no record")
-            continue
-        _, owns = frontmatter_owns(declared[owner].read_text(encoding="utf-8"))
-        if comp not in owns:
-            errors.append(f"{rel(declared[owner])}: decision 2 — the table gives it `{comp}`, but its `owns:` does not list it")
-        if not (ROOT / comp).exists():
-            errors.append(f"{where}: `{comp}` does not exist")
-    # Every file under the owned trees has an owner (most specific wins).
-    for f in tracked_files():
-        if f.startswith(OWNED_TREES) and not any(f == c or f.startswith(c + "/") for c in table):
-            errors.append(f"{where}: `{f}` has no owner")
+    for component, owner in rows:
+        if component in table:
+            out.append(f"Ownership table: `{component}` has two rows (SR-WORK-OWNERSHIP decision 1)")
+        table[component] = owner
+        if not (root / component).exists():
+            out.append(f"Ownership table: `{component}` does not exist (SR-WORK-OWNERSHIP decision 2)")
+    owns = {}
+    for f in sorted((root / "records").glob("[0-9]*.md")):
+        fm = frontmatter(f.read_text(encoding="utf-8"))
+        name = fm.get("name")
+        if isinstance(name, str) and name:
+            owns[name] = (f.name, fm.get("owns") or [])
+    for name, (file, components) in owns.items():
+        for c in components:
+            if c not in table:
+                out.append(f"{name} ({file}) owns `{c}`, which the Ownership table does not list (SR-WORK-OWNERSHIP decision 2)")
+            elif table[c] != name:
+                out.append(f"{name} ({file}) owns `{c}`, which the Ownership table gives to {table[c]} (SR-WORK-OWNERSHIP decision 2)")
+    for c, owner in table.items():
+        if re.match(r"^W-\d+$", owner):
+            # A component with no decision yet is owned by an open item (the register's own rule).
+            if not list((root / "work" / "open").glob(owner + "-*.md")):
+                out.append(f"Ownership table: `{c}` is owned by {owner}, which is no open item (SR-WORK-OWNERSHIP decision 2)")
+        elif owner not in owns:
+            out.append(f"Ownership table: `{c}` is owned by {owner}, which is no record's name (SR-WORK-OWNERSHIP decision 2)")
+        elif c not in owns[owner][1]:
+            out.append(f"Ownership table: `{c}` is {owner}'s, and {owns[owner][0]}'s `owns:` does not list it (SR-WORK-OWNERSHIP decision 2)")
+    return out
 
 
-def check_registry(errors):
-    record = ROOT / "records" / "0060_WORK-registry.md"
+def maintained(root):
+    """The documents decision 8 asks a row for: the Markdown at the root,
+    at the top of docs/ and work/, each work/*/ index, and the register
+    and template of records/."""
+    out = [p for p in root.glob("*.md")]
+    out += list((root / "docs").glob("*.md")) + list((root / "work").glob("*.md"))
+    out += list((root / "work").glob("*/README.md"))
+    out += [root / "records" / n for n in ("README.md", "TEMPLATE.md") if (root / "records" / n).is_file()]
+    return sorted(p.relative_to(root).as_posix() for p in out)
+
+
+def check_registry(root):
+    out = []
+    record = root / "records" / "0060_WORK-registry.md"
+    if not record.is_file():
+        return ["records/0060_WORK-registry.md is missing (SR-WORK-REGISTRY decision 1)"]
     lines = record.read_text(encoding="utf-8").splitlines()
-    where = "records/0060_WORK-registry.md §3"
-    body = []
-    on = False
+    rows, inside = [], False
     for l in lines:
         if l.startswith("## §3"):
-            on = True
-        elif l.startswith("## ") and on:
+            inside = True
+        elif l.startswith("## ") and inside:
             break
-        elif on:
-            body.append(l)
-    docs = []
-    for l in body:
-        m = re.match(r"^\| `([^`]+)` \|", l)
-        if m:
-            docs.append(m.group(1))
-    if not docs:
-        errors.append(f"{where}: no rows were read")
+        elif inside:
+            m = re.match(r"^\| `([^`]+)` \|", l)
+            if m:
+                rows.append(m.group(1))
     seen = set()
-    for d in docs:
-        if d.startswith("archive/"):
-            errors.append(f"{where}: decision 5 — `{d}` points into archive/")
-        if not (ROOT / d).exists():
-            errors.append(f"{where}: decision 6 — `{d}` does not exist")
-        if d in seen:
-            errors.append(f"{where}: decision 7 — `{d}` has two rows")
-        seen.add(d)
-    # Decision 8: the maintained documents — the root's, docs/, work/ and the
-    # READMEs of work/'s folders, the register and the template.
-    maintained = [p for p in ROOT.glob("*.md")] + list((ROOT / "docs").glob("*.md")) + list((ROOT / "work").glob("*.md"))
-    maintained += list((ROOT / "work").glob("*/README.md")) + [ROOT / "records" / "README.md", ROOT / "records" / "TEMPLATE.md"]
-    for p in sorted(set(maintained)):
-        r = rel(p)
-        if p.is_file() and r not in seen and r not in NOT_MAINTAINED:
-            errors.append(f"{where}: decision 8 — `{r}` is a maintained document with no row")
-    for r in NOT_MAINTAINED:
-        if not (ROOT / r).exists():
-            errors.append(f"scripts/check-work-system.py: NOT_MAINTAINED names `{r}`, which does not exist")
+    for p in rows:
+        if p.startswith("archive/"):
+            out.append(f"registry: `{p}` points into archive/ (SR-WORK-REGISTRY decision 5)")
+        elif not (root / p).exists():
+            out.append(f"registry: `{p}` does not exist (SR-WORK-REGISTRY decision 6)")
+        if p in seen:
+            out.append(f"registry: `{p}` has two rows (SR-WORK-REGISTRY decision 7)")
+        seen.add(p)
+    for p in maintained(root):
+        if p not in seen:
+            out.append(f"registry: `{p}` is a maintained document with no row (SR-WORK-REGISTRY decision 8)")
+    return out
 
 
-def check_archive(errors):
-    found = []
-    for d, dirs, _ in os.walk(ROOT):
-        dirs[:] = [x for x in dirs if x not in (".git", "node_modules", "target")]
+def check_archive(root):
+    out = []
+    for d, dirs, _ in os.walk(root):
+        here = Path(d)
+        if here == root:
+            dirs[:] = [x for x in dirs if x != "archive" and x not in SKIP_DIRS]
+        else:
+            dirs[:] = [x for x in dirs if x not in SKIP_DIRS]
         for x in dirs:
-            if x == "archive":
-                found.append(Path(d, x).relative_to(ROOT).as_posix())
-    if found != ["archive"]:
-        errors.append(f"SR-WORK-ARCHIVE decision 1 — exactly one `archive/`, at the root; found: {', '.join(found) or 'none'}")
+            if x.lower() == "archive":
+                out.append(f"a second archive: {(here / x).relative_to(root).as_posix()}/ (SR-WORK-ARCHIVE decision 1)")
+    if not (root / "archive").is_dir():
+        out.append("archive/ is missing at the repo root (SR-WORK-ARCHIVE decision 1)")
+    return out
+
+
+CHECKS = (check_queue, check_lost, check_ownership, check_registry, check_archive)
+
+
+def run(root):
+    out = []
+    for check in CHECKS:
+        out += check(root)
+    return out
+
+
+def self_test():
+    """A made-up repo that breaks each rule once; every break must be named."""
+    with tempfile.TemporaryDirectory() as t:
+        r = Path(t)
+        files = {
+            "CLAUDE.md": "See W-01 and W-02 and W-99.\n",
+            "work/open/W-01-a.md": "# W-01\n",
+            "archive/open/W-02-b.md": "# W-02\n",
+            "work/README.md": "map\n",
+            "work/NEW.md": "unregistered\n",
+            "docs/old/archive/x.md": "a second archive\n",
+            "records/README.md": "<!-- OWNERSHIP-TABLE-START -->\n| component | owner | note |\n|---|---|---|\n"
+            "| `scripts/a.sh` | SR-A | ok |\n| `scripts/b.sh` | SR-A | not in owns |\n| `scripts/gone.sh` | SR-NONE | x |\n"
+            "<!-- OWNERSHIP-TABLE-END -->\n",
+            "records/0001_a.md": "---\nname: SR-A\nowns:\n  - scripts/a.sh\n  - scripts/c.sh\n---\n",
+            "records/0060_WORK-registry.md": "## §3 — The registry\n\n| Document | t | v | n |\n|---|---|---|---|\n"
+            "| `work/README.md` | t | v | n |\n| `work/README.md` | t | v | n |\n| `archive/open/W-02-b.md` | t | v | n |\n"
+            "| `work/MISSING.md` | t | v | n |\n| `CLAUDE.md` | t | v | n |\n| `records/README.md` | t | v | n |\n"
+            "| `work/OPEN-WORK.md` | t | v | n |\n\n## References\n",
+            "scripts/a.sh": "", "scripts/b.sh": "",
+            "work/OPEN-WORK.md": "# OPEN-WORK\n\n---\n\n## Blocked on the decider\n\n| what | filed | age |\n|---|---|---|\n"
+            "| Decide a thing ([W-01](open/W-01-a.md)) | 2026-10-20 | 0 d |\n"
+            "| 🔴 Decide another ([x](open/nope.md)) | 2026-10-20 | 0 d |\n| ↳ **blocks:** W-01 | | |\n\n---\n\n## Open items\n\n### build\n\n"
+            "🟢 **W-01** `agent` Fine. Filed by Arpit (Cowork). [detail](open/W-01-a.md)\n"
+            "🟢 **W-01** `agent` Wrong file. Filed by Arpit (Cowork). [detail](open/W-02-b.md)\n"
+            "🟢 **W-01** `agent` " + "long " * 60 + "Filed by Arpit (Cowork). [detail](open/W-01-a.md)\n"
+            "- a body under it\n"
+            "🟢 W-01 no shape\n\n---\n",
+        }
+        for p, text in files.items():
+            (r / p).parent.mkdir(parents=True, exist_ok=True)
+            (r / p).write_text(text, encoding="utf-8")
+        got = "\n".join(run(r))
+        expect = [
+            "rule 44", "rule 42", "open/nope.md", "rule 17", "rule 15", "rules 16, 20", "rule 14",
+            "lost: W-99", "owns `scripts/c.sh`", "`scripts/b.sh` is SR-A's", "SR-NONE, which is no record",
+            "`scripts/gone.sh` does not exist", "points into archive/", "`work/MISSING.md` does not exist",
+            "`work/README.md` has two rows", "`work/NEW.md` is a maintained document", "a second archive: docs/old/archive/",
+        ]
+        missed = [e for e in expect if e not in got]
+        if missed or "W-01 (named" in got or "W-02 (named" in got:
+            print("self-test failed; missed: " + repr(missed) + "\n" + got)
+            return 1
+    print(f"self-test: {len(expect)} breaks, each named")
+    return 0
 
 
 def main():
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
-    checks = [
-        ("queue rows, inbox, links (SR-WORK-OPEN-QUEUE rules 13-18, 42, 45, 45a)", check_queue),
-        ("lost W-nn ids (SR-WORK-OPEN-QUEUE veto)", check_lost_ids),
-        ("owns ↔ Ownership table (SR-WORK-OWNERSHIP decision 2)", check_ownership),
-        ("the registry (SR-WORK-REGISTRY decisions 5-8)", check_registry),
-        ("one archive/ (SR-WORK-ARCHIVE decision 1)", check_archive),
-    ]
-    errors = []
-    for _, fn in checks:
-        fn(errors)
-    if errors:
-        for e in errors:
-            print(f"✖ {e}")
-        print(f"\n{len(errors)} work-system violation(s)")
-        return 1
-    print(f"✔ the work system holds: {'; '.join(name for name, _ in checks)}")
-    return 0
+    if sys.argv[1:] == ["--self-test"]:
+        return self_test()
+    root = Path(__file__).resolve().parent.parent
+    out = run(root)
+    for line in out:
+        print(line)
+    return 1 if out else 0
 
 
 if __name__ == "__main__":

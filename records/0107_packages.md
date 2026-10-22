@@ -16,6 +16,7 @@ owns:
   - scripts/package.py
   - scripts/build-packs.py
   - scripts/smoke.sh
+  - scripts/staging-index.py
   - scripts/law-gate.py
   - scripts/withdraw.sh
   - scripts/npm-trust.sh
@@ -23,7 +24,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -91,7 +92,7 @@ The decider asked for a record of what goes into which package, under the naming
    | engines | `codelaw-format` | the formatter engines ([SR-FORMATTER](0105_formatter.md)) |
    | engines | `codelaw-graph` | [SR-PROJECT-GRAPH](0103_project-graph.md) |
    | engines | `codelaw-baseline` | [SR-BASELINE](0104_baseline-and-deprecations.md) |
-   | engines | `codelaw-adapters` | optional external linters ([SR-LINTER](0106_linter.md) decision 2) |
+   | engines | `codelaw-adapters` | optional external linters run as programs: manifests, runner, output mapping ([SR-LINTER](0106_linter.md) decision 2); `codelaw-engine` runs them |
    | orchestration | `codelaw-engine` | the check, fix and format pipelines |
    | orchestration | `codelaw-report` | text, JSON, SARIF and agent output; exit codes |
    | orchestration | `codelaw-test` | the rule tester and `codelaw bench` ([SR-RULE-AUTHORING](0113_rule-authoring.md), [L8](0010_LAW-8-performance-budgets.md)) |
@@ -102,10 +103,10 @@ The decider asked for a record of what goes into which package, under the naming
 
    The workspace's `Cargo.toml` may carry a `[patch.crates-io]` only to replace a transitive crate that fails [L2](0004_LAW-2-foss-dependencies.md) with a permissive stand-in kept under `crates/`. The record that takes in the dependency that pulls it names it. Today there is one: `option-ext`, for Biome ([SR-FORMATTER](0105_formatter.md) decision 2).
 
-2. **The binary** links every crate. A single `codelaw` executable serves the CLI, `codelaw lsp` and `codelaw mcp`, with no second executable.
+2. **The binary** links every crate. A single `codelaw` executable serves the CLI, `codelaw lsp`, `codelaw mcp`, `codelaw hook` and `codelaw sync-agents`, with no second executable; the agent skills are compiled into it ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 7).
 3. **npm `codelaw`** contains:
    - `bin/codelaw.js`: picks the right `@codelaw/cli-*` package for the platform and runs the binary;
-   - `index.js` and `index.d.ts`: `check`, `fix`, `format`, `rulesFor`, each returning the `--format json` shape;
+   - `index.js` and `index.d.ts`: `check`, `fix`, `format`, `rulesFor`, each returning the `--format json` shape of `check`, `fix`, `format` and `rules --for <path>` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 4), unchanged; options are the flags (`lang`, `rule`, `threads`, `noCache`; `unsafe` and `dryRun` on `fix`; `check` on `format`). `crates/codelaw-cli/tests/api.rs` runs this API and decision 5's against the binary and requires the same JSON from both;
    - `codelaw.schema.json`: the config schema ([SR-CONFIG](0110_config.md));
    - `optionalDependencies` on the eight binary packages, and no other dependency.
 4. **npm `@codelaw/cli-<os>-<arch>`, eight packages:**
@@ -116,7 +117,7 @@ The decider asked for a record of what goes into which package, under the naming
    Each holds only the binary, with `os`, `cpu` and `libc` fields so npm installs exactly one.
 5. **PyPI `codelaw`:**
    - eight platform wheels, built with maturin's `bin` bindings;
-   - each wheel holds the binary, a `codelaw` Python module (`check`, `fix`, `format`, `rules_for`) and `py.typed`;
+   - each wheel holds the binary, a `codelaw` Python module (`check`, `fix`, `format`, `rules_for`; the same calls and JSON as decision 3, options as keyword arguments) and `py.typed`;
    - no sdist ([L6](0008_LAW-6-python-and-node-packages.md) decision 7).
 6. **The editor extension `codelaw.codelaw`** (source: `packaging/vscode`) is published as platform-specific packages. It runs the project's own codelaw first (`node_modules/.bin`, then `.venv/bin`) and falls back to a bundled binary ([SR-EDITOR](0114_editor.md)).
 7. **One version for everything:** every crate, both registries' engine packages, the five rule packs and the extension carry the same version from one file ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
@@ -140,7 +141,9 @@ The decider asked for a record of what goes into which package, under the naming
     - **`ci.yml`, every push:** one maturin wheel per platform (decision 5). The npm binary is **taken out of that wheel**, so both registries ship the same bytes for a platform.
     - **`scripts/package.py assemble`** builds the 14 npm tarballs and the five pack wheels from those binaries and `packs/`; nothing is compiled there. With the eight engine wheels that is **20 packages in 27 files** (npm 14 packages, 14 tarballs; PyPI 6 projects, 13 wheels) — docs count packages, and say files when they mean files.
     - **`scripts/package.py check`** refuses the set unless it is exactly §1's names, at one version, with zero runtime dependencies, licensed (decision 10), one binary per platform on both registries, each pack byte-equal on both, and `SHA256SUMS` listing exactly its files with their digests.
-    - **The install smoke** (`scripts/smoke.sh`, [L6](0008_LAW-6-python-and-node-packages.md) §How L6 is enforced) runs on each of the eight platforms in `ci.yml`'s `smoke` job, the musl two in a clean Alpine container; pip installs with `dist/pypi` as its only index, so it picks the wheel itself.
+    - **The install smoke** (`scripts/smoke.sh`, [L6](0008_LAW-6-python-and-node-packages.md) §How L6 is enforced) runs on each of the eight platforms in `ci.yml`'s `smoke` job, the musl two in a clean Alpine container.
+    - **It installs from a staging index (W-18, 2026-10-22).** `scripts/staging-index.py` serves a throwaway npm registry and a PyPI simple index on `127.0.0.1` only, from the Python standard library, so it adds no dependency ([L2](0004_LAW-2-foss-dependencies.md)). The smoke publishes every file of the set to it — `npm publish` for each tarball, `uv publish` for each wheel — then installs `codelaw` and a pack **by name**, as a user does: `npm i` (npm picks `@codelaw/cli-<key>` itself), `npx`, `pip install` (the staging index is pip's only index) and `uvx`. Every npm and uv cache and config it uses is its own, so each install downloads from the index, and the smoke fails unless the index served those downloads. It never publishes to any other registry; TestPyPI is not used.
+    - **Its build tool is `uv`** (`MIT OR Apache-2.0`, no dependencies), pinned in `smoke.sh` and declared with its licence in `crates/codelaw-cli/tests/licences.rs`.
     - **On `main`, `ci.yml` attests every file of the set** (a build-provenance attestation over `SHA256SUMS`).
     - **`scripts/law-gate.py`** refuses a release whose binary has no `format`, `mcp` or `lsp` command ([L7](0009_LAW-7-linter-and-formatter.md); [L6](0008_LAW-6-python-and-node-packages.md) decision 3). `publish.yml`'s gate runs it and stops; `ci.yml` reports it on every push without failing; the decider runs it before the one-time hand publish (`RELEASING.md`).
     - **`publish.yml`, a published GitHub Release only:** it refuses a commit on which `ci.yml` did not succeed on `main`, downloads **that run's** checked set, checks it again, verifies every file against `ci.yml`'s attestation for the release commit on `main`, and uploads it; each upload job re-checks its download against the gate's `SHA256SUMS`. Trusted publishing (OIDC) on both registries; no token exists.
@@ -164,6 +167,7 @@ The decider asked for a record of what goes into which package, under the naming
 - **Ten pack packages publish with every release,** built by one job from `packs/`.
 - **A release costs one CI run, not a rebuild** (decision 11): `publish.yml` only uploads, so a release takes as long as its slowest upload. The price is that a release can only be cut from a commit whose `ci.yml` run still holds its `dist` artifact (30 days).
 - **Withdrawal is manual** (decision 12), so L6 decision 9's *"everything already published is yanked or deprecated"* depends on one person acting — not ungated, but not automatic.
+- **CI's `test` job sets `CODELAW_REQUIRE_NETWORK_FENCE=1`,** so on its Linux runner the L5 network fence ([SR-LAW-5](0007_LAW-5-no-model-in-the-engine.md)) fails instead of skipping when no fence can be raised. Its `lint` job runs the work-system checks (`scripts/check-open-work-inbox.py`, `scripts/check-work-system.py`), so a malformed queue row or a lost `W-nn` fails CI ([SR-WORK-OPEN-QUEUE](0051_WORK-open-queue.md)).
 - **The first npm publish of each package is by hand,** because npm binds a trusted publisher only to a package that exists ([`RELEASING.md`](../RELEASING.md)).
 
 ### Alternatives considered

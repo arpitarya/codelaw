@@ -55,6 +55,9 @@ pub struct WhyForFile {
     pub severity: String,
     /// What the rule reports in the file, when the file exists.
     pub diagnostics: Vec<Diagnostic>,
+    /// For a `match:` rule that applies to an existing file: which clause
+    /// held or failed on each candidate node (`match --explain`).
+    pub matches: Option<crate::MatchReport>,
 }
 
 fn row(r: &LoadedRule, severity: String) -> RuleRow {
@@ -67,13 +70,19 @@ impl Project {
         self.compiled.iter().map(|c| row(&c.loaded, severity_name(&c.loaded.default))).collect()
     }
 
-    /// A file as the engine sees it: absolute, relative to the root, and
-    /// its language.
-    fn locate(&self, file: &Path) -> Result<(PathBuf, String, Language), EngineError> {
+    /// A path as the engine sees it: absolute, and relative to the root.
+    /// It need not exist (`config --print --for`, MCP `check_snippet`).
+    pub(crate) fn locate_path(&self, file: &Path) -> (PathBuf, String) {
         let abs = std::fs::canonicalize(file).unwrap_or_else(|_| {
             if file.is_absolute() { file.to_path_buf() } else { std::env::current_dir().map(|d| d.join(file)).unwrap_or_else(|_| file.to_path_buf()) }
         });
         let rel = codelaw_core::normalize_path(abs.strip_prefix(self.root()).unwrap_or(&abs));
+        (abs, rel)
+    }
+
+    /// [`Project::locate_path`], and the file's language.
+    pub(crate) fn locate(&self, file: &Path) -> Result<(PathBuf, String, Language), EngineError> {
+        let (abs, rel) = self.locate_path(file);
         let Some(language) = Language::from_path(&abs) else {
             return Err(EngineError::Usage(format!("`{}` is not a file codelaw checks (no known extension)", codelaw_core::normalize_path(file))));
         };
@@ -126,8 +135,10 @@ impl Project {
             layers.iter().filter(|l| l.rules.contains_key(id)).map(|l| (l.source.clone(), l.rules[id].severity().unwrap_or("(options)").to_owned())).collect();
         let applies = self.compiled.iter().find(|c| c.id() == id).is_some_and(|c| c.applies_to_language(language) && c.applies_to_path(&rel));
         let severity = if applies { severity_name(&self.rules.effective(&r, &layers)) } else { "off".into() };
+        let is_match = self.compiled.iter().any(|c| c.id() == id && matches!(c.matcher, crate::Matcher::Match(_)));
+        let matches = if applies && is_match && abs.is_file() { self.explain_match(id, &abs).ok() } else { None };
         let diagnostics = if applies && abs.is_file() { self.check(&[abs])?.diagnostics.into_iter().filter(|d| d.rule == id).collect() } else { Vec::new() };
-        why.for_file = Some(WhyForFile { file: rel, set_by, applies, severity, diagnostics });
+        why.for_file = Some(WhyForFile { file: rel, set_by, applies, severity, diagnostics, matches });
         Ok(why)
     }
 
@@ -156,7 +167,7 @@ impl Project {
     pub fn fix_snippet(&self, file: &Path, code: &str) -> Result<crate::FileFix, EngineError> {
         let (abs, rel, language) = self.locate(file)?;
         let entry = crate::FileEntry { abs, rel, language };
-        let options = crate::FixOptions { unsafe_fixes: false, dry_run: true };
+        let options = crate::FixOptions { unsafe_fixes: false, dry_run: true, trace: false };
         Ok(crate::fix::fix_text(self, &entry, code, &options, self.formats(&entry), false, crate::files::Tree::Disk))
     }
 }

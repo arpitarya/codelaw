@@ -177,19 +177,7 @@ fn new_pass(trace: &mut Option<LoopTrace>) {
 /// counted in the host grammar only; the engine counts embedded regions
 /// too, through [`fix_loop_with`].
 pub fn fix_loop(language: Language, original: &str, collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>) -> LoopOutcome {
-    fix_loop_with(original, |t| errors(language, t), collect)
-}
-
-/// [`fix_loop`] with the syntax-error count supplied: a fix is kept only if
-/// `errors` of the result is no more than `errors` of the original. The
-/// loop ends only when the text offers no fix, which is the idempotence
-/// check of SR-ARCHITECTURE decision 5: one more run changes nothing.
-pub fn fix_loop_with(
-    original: &str,
-    errors: impl Fn(&str) -> usize,
-    collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>,
-) -> LoopOutcome {
-    fix_loop_traced_with(original, errors, collect, &mut None)
+    fix_loop_with(original, |t| errors(language, t), collect, &mut None)
 }
 
 /// [`fix_loop`], recording each step in `trace` when it is `Some`.
@@ -199,10 +187,16 @@ pub fn fix_loop_traced(
     collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>,
     trace: &mut Option<LoopTrace>,
 ) -> LoopOutcome {
-    fix_loop_traced_with(original, |t| errors(language, t), collect, trace)
+    fix_loop_with(original, |t| errors(language, t), collect, trace)
 }
 
-fn fix_loop_traced_with(
+/// The one loop: [`fix_loop`] with the syntax-error count supplied, and
+/// each step recorded in `trace` when it is `Some` (`fix --trace` traces
+/// the very loop `fix` runs). A fix is kept only if `errors` of the result
+/// is no more than `errors` of the original. The loop ends only when the
+/// text offers no fix, which is the idempotence check of SR-ARCHITECTURE
+/// decision 5: one more run changes nothing.
+pub fn fix_loop_with(
     original: &str,
     errors: impl Fn(&str) -> usize,
     mut collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>,

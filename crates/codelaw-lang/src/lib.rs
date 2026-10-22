@@ -34,6 +34,24 @@ pub fn parse_grammar(grammar: Grammar, source: &str) -> Root {
     grammar.ast_grep(source)
 }
 
+/// Replace the bytes `start..end` of a parsed text with `text` and re-parse
+/// incrementally: tree-sitter reuses every subtree the edit did not touch,
+/// and the tree is the one a fresh parse of the new text gives
+/// (SR-ARCHITECTURE decision 23). The range must lie on char boundaries.
+pub fn reparse(root: &mut Root, start: usize, end: usize, text: &str) -> Result<(), String> {
+    let len = root.get_text().len();
+    if start > end || end > len {
+        return Err(format!("edit {start}..{end} is outside the text ({len} bytes)"));
+    }
+    let edit = ast_grep_core::source::Edit::<String> { position: start, deleted_length: end - start, inserted_text: text.as_bytes().to_vec() };
+    root.edit(edit).map(|_| ())
+}
+
+/// The text a parsed root was parsed from.
+pub fn text_of(root: &Root) -> &str {
+    root.get_text()
+}
+
 /// The number of error and missing nodes; the fix verifier compares it
 /// before and after an edit (L4 decision 5).
 pub fn syntax_error_count(root: &Root) -> usize {

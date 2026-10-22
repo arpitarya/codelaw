@@ -309,10 +309,11 @@ impl Graph {
                     self.mark_imported(&t, path);
                     if imported == "*" {
                         self.use_all(&t, &format!("re-exported as a namespace by {path}"), &mut BTreeSet::new());
-                    } else if !self.use_name(&t, imported, &via, seen) && python {
-                        if let Some(sub) = self.resolver.py_submodule(&t, imported) {
-                            self.use_all(&sub, &format!("re-exported by {path}"), &mut BTreeSet::new());
-                        }
+                    } else if !self.use_name(&t, imported, &via, seen)
+                        && python
+                        && let Some(sub) = self.resolver.py_submodule(&t, imported)
+                    {
+                        self.use_all(&sub, &format!("re-exported by {path}"), &mut BTreeSet::new());
                     }
                 }
             } else {
@@ -328,7 +329,7 @@ impl Graph {
                 self.add_use(path, name, site.clone());
                 return true;
             }
-            for imp in facts.imports.iter().filter(|i| i.local.as_deref() == Some(name)) {
+            if let Some(imp) = facts.imports.iter().find(|i| i.local.as_deref() == Some(name)) {
                 let via = Use { how: format!("{} (through {path})", site.how), ..site.clone() };
                 if let Some(t) = self.resolver.resolve_py(path, &imp.source) {
                     self.mark_imported(&t, path);

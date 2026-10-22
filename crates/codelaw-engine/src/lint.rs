@@ -175,7 +175,7 @@ impl Project {
 
     /// An editor's text of a file, through the same skips `check_file`
     /// makes on the file on disk (SR-EDITOR decision 3).
-    pub(crate) fn check_unsaved(&self, entry: &FileEntry, text: &str) -> FileResult {
+    pub(crate) fn check_unsaved(&self, entry: &FileEntry, text: &str, host: Option<&Root>) -> FileResult {
         let layers = self.config.layers_for(&entry.abs);
         let skip = |id: &str, reason: String| FileResult {
             diagnostics: meta_diagnostic(&entry.rel, &layers, id, reason.clone()).into_iter().collect(),
@@ -188,7 +188,7 @@ impl Project {
         if let Some(reason) = self.generated(text) {
             return skip("codelaw/generated", reason);
         }
-        let mut diagnostics = lint_text(self, entry, text, &RunMode::check()).diagnostics;
+        let mut diagnostics = lint_text_with(self, entry, text, &RunMode::check(), host).diagnostics;
         diagnostics.extend(crate::format::check_diagnostic(self, entry, text));
         FileResult { diagnostics, skipped: None }
     }
@@ -207,6 +207,9 @@ impl Project {
             .part(self.config.fingerprint().0)
             .part(codelaw_lang::GRAMMARS_FINGERPRINT)
             .part(codelaw_format::ENGINES_FINGERPRINT)
+            // The file's format options: `.editorconfig` is not in the
+            // config fingerprint.
+            .part(format!("{:?}", self.formatting.options_for(&entry.abs)))
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
             .key();
         // A result that read other files holds only while their answers do.
@@ -305,6 +308,21 @@ pub(crate) fn comment_ranges(root: &Root, text: &str) -> Vec<(usize, usize)> {
 
 /// Lint one file's text.
 pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: &RunMode<'_>) -> LintOutput {
+    lint_text_with(project, entry, text, mode, None)
+}
+
+/// The host tree of `text`: a warm process's tree of it when it has one
+/// (SR-ARCHITECTURE decision 23), otherwise a fresh parse. A tree of any
+/// other text or grammar is never used, so the result is the same either way.
+fn host_tree(entry: &FileEntry, text: &str, host: Option<&Root>) -> Root {
+    match host {
+        Some(root) if *root.lang() == Grammar::for_language(entry.language) && codelaw_lang::text_of(root) == text => root.clone(),
+        _ => codelaw_lang::parse(entry.language, text),
+    }
+}
+
+/// [`lint_text`], reusing `host` as the parse of `text` when it is one.
+pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, mode: &RunMode<'_>, host: Option<&Root>) -> LintOutput {
     let layers = project.config.layers_for(&entry.abs);
     let only = project.options.rules.as_ref();
     let active: Vec<(usize, &CompiledRule, RuleConfig)> = project
@@ -330,7 +348,7 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
         // give a reason (SR-LINTER decision 6).
         let mut diagnostics = Vec::new();
         if text.contains(suppress::MARKER) {
-            let root = codelaw_lang::parse(entry.language, text);
+            let root = host_tree(entry, text, host);
             let comments = comment_ranges(&root, text);
             let index = LineIndex::new(text);
             apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &[], &mut diagnostics);
@@ -340,7 +358,7 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
 
     let host_root = {
         let _timed = project.timings.as_ref().map(|t| t.guard(Phase::Parse));
-        codelaw_lang::parse(entry.language, text)
+        host_tree(entry, text, host)
     };
     let mut units: Vec<Unit> = Vec::new();
     if region_rules_exist {
@@ -348,9 +366,13 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
             if !language_enabled(project, &entry.abs, region.language) {
                 continue;
             }
+            // A `target:` rule's paths are about a whole file; inside another
+            // file's region (front matter, a code block) it runs only where
+            // its `host:` names that file's language (SR-RULE-FORMAT 3e).
             let rules: Vec<_> = active
                 .iter()
                 .filter(|(_, r, _)| r.applies_to_language(region.language) && r.loaded.rule.host.is_none_or(|h| h == entry.language))
+                .filter(|(_, r, _)| !matches!(r.matcher, Matcher::Target(_)) || r.loaded.rule.host.is_some())
                 .cloned()
                 .collect();
             if rules.is_empty() {
@@ -664,8 +686,9 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
     }
 
     let mut out = Vec::new();
-    // The data tree, built once for every `target:` rule of the unit.
-    let mut data_tree: Option<Option<codelaw_match::data::DataTree>> = None;
+    // The data tree, built once for every `target:` rule of the unit; a
+    // build that panics fails each of them (decision 25).
+    let mut data_tree: Option<Result<Option<codelaw_match::data::DataTree>, String>> = None;
     for (slot, (index, rule, _)) in unit.rules.iter().enumerate() {
         if let Some(why) = &failed[slot] {
             out.push(internal_error(*index, 0, 0, rule.id(), why));
@@ -740,9 +763,17 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
             Matcher::Graph(_) => {}
             Matcher::Target(t) => {
                 let tree = data_tree.get_or_insert_with(|| {
-                    catch_unwind(AssertUnwindSafe(|| codelaw_match::data::build(unit.language, unit.root.root().get_inner_node(), &unit.text))).ok().flatten()
+                    catch_unwind(AssertUnwindSafe(|| codelaw_match::data::build(unit.language, unit.root.root().get_inner_node(), &unit.text)))
+                        .map_err(|p| format!("the data tree failed: {}", panic_message(p.as_ref())))
                 });
-                let Some(tree) = tree.as_ref() else { continue };
+                let tree = match tree {
+                    Ok(Some(t)) => &*t,
+                    Ok(None) => continue,
+                    Err(why) => {
+                        out.push(internal_error(*index, 0, 0, rule.id(), why));
+                        continue;
+                    }
+                };
                 let found = match catch_unwind(AssertUnwindSafe(|| t.check(tree))) {
                     Ok(f) => f,
                     Err(p) => {
