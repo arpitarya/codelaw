@@ -50,7 +50,7 @@ here. Read that record before changing anything below it.
 🟢 **W-11** `agent` Project graph and `graph:` rules built and verified on `main` 2026-10-22, with the six `node/` import rules; left: judge the corpus false-positive rate (step 4). Filed by Arpit (Cowork). [detail](open/W-11-project-graph.md)
 🟢 **W-15** `agent` Warm processes landed and verified 2026-10-22: rule-set cache, sockets, `--prefer-warm`, the daemon, incremental re-parse; left: the `[lsp] tree_cache` bound. Filed by Arpit (Cowork). [detail](open/W-15-warm-processes.md)
 🔴 **W-21** `agent` Engine gaps: tagged templates, native-rule file context and three rules landed on `main` 2026-10-22; modern CSS needs a `tree-sitter-css` fork, the decider's call (inbox). Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
-🟢 **W-13** `agent` Build baselines, deprecations, `--as-of` and `--changed-since`/`--staged`; W-11's graph, which `graph/no-deprecated-usage` needs, landed on `main` 2026-10-22. Filed by Arpit (Cowork). [detail](open/W-13-baseline-and-time.md)
+🟢 **W-13** `agent` Baselines, deprecations, `--as-of`, `--changed-since`/`--staged` built 2026-10-22 (`W-13-baseline`); all DoD met, veto result in SR-BASELINE. Left: function touch scope, `rewrite` fix, LSP. Filed by Arpit (Cowork). [detail](open/W-13-baseline-and-time.md)
 
 ### testing
 

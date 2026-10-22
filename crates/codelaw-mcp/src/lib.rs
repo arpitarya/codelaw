@@ -51,6 +51,9 @@ fn object(props: Value, required: &[&str]) -> Value {
 const PATHS: &str = "Files and folders, relative to the folder the server runs in; the project root when empty.";
 const RULE: &str = "Only these rule ids (as `--rule`).";
 const LANG: &str = "Only these languages (as `--lang`), e.g. `typescript`, `python`.";
+const AS_OF: &str = "Judge baseline and deprecation deadlines on this date, YYYY-MM-DD (as `--as-of`); `HEAD`'s commit date by default.";
+const CHANGED_SINCE: &str = "Files changed since the merge base with this git ref count as touched (as `--changed-since`).";
+const STAGED: &str = "Files in the git index count as touched (as `--staged`).";
 
 /// SR-CLI-MCP decision 5's tools, each described by when to call it
 /// (decision 7).
@@ -83,7 +86,19 @@ Returns the same JSON as `codelaw check <path> --format json` would for a file h
         name: "check_paths",
         description: "Call AFTER you write: checks files and folders and returns every finding with its fix — `auto` edits, `suggest` edits to show as a diff, \
 or `manual` steps. Same JSON as `codelaw check --format json`.",
-        schema: || object(json!({ "paths": strings(PATHS), "rule": strings(RULE), "lang": strings(LANG) }), &[]),
+        schema: || {
+            object(
+                json!({
+                    "paths": strings(PATHS),
+                    "rule": strings(RULE),
+                    "lang": strings(LANG),
+                    "as_of": string(AS_OF),
+                    "changed_since": string(CHANGED_SINCE),
+                    "staged": boolean(STAGED),
+                }),
+                &[],
+            )
+        },
     },
     Tool {
         name: "fix_paths",
@@ -97,6 +112,9 @@ to show the user as a diff; apply them only once accepted, by calling again with
                     "dry_run": boolean("Compute the fixes but write nothing (as `--dry-run`)."),
                     "rule": strings(RULE),
                     "lang": strings(LANG),
+                    "as_of": string(AS_OF),
+                    "changed_since": string(CHANGED_SINCE),
+                    "staged": boolean(STAGED),
                 }),
                 &[],
             )
@@ -181,6 +199,15 @@ impl ArgsView<'_> {
     fn paths(&self) -> Result<Vec<PathBuf>, String> {
         Ok(self.list("paths")?.into_iter().map(PathBuf::from).collect())
     }
+    /// `check_paths` and `fix_paths`: `--lang`, `--rule`, and the time
+    /// and change-set inputs `--as-of`, `--changed-since`, `--staged`.
+    fn run_options(&self) -> Result<EngineOptions, String> {
+        let mut o = EngineOptions::with_filters(&self.list("lang")?, &self.list("rule")?)?;
+        o.as_of = self.str("as_of")?.or(o.as_of);
+        o.changed_since = self.str("changed_since")?;
+        o.staged = self.flag("staged")?;
+        Ok(o)
+    }
 }
 
 fn err(e: EngineError) -> String {
@@ -219,12 +246,12 @@ pub fn call_tool(name: &str, args: &Map<String, Value>) -> Result<Value, String>
         }
         "check_paths" => {
             let paths = a.paths()?;
-            let mut p = project(&paths, EngineOptions::with_filters(&a.list("lang")?, &a.list("rule")?)?)?;
+            let mut p = project(&paths, a.run_options()?)?;
             Ok(codelaw_report::check_json(&p.check(&paths).map_err(err)?))
         }
         "fix_paths" => {
             let paths = a.paths()?;
-            let mut p = project(&paths, EngineOptions::with_filters(&a.list("lang")?, &a.list("rule")?)?)?;
+            let mut p = project(&paths, a.run_options()?)?;
             let options = FixOptions { unsafe_fixes: a.flag("unsafe")?, dry_run: a.flag("dry_run")?, trace: false };
             Ok(codelaw_report::fix_json(&p.fix(&paths, &options).map_err(err)?))
         }

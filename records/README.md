@@ -126,7 +126,7 @@ Start from `TEMPLATE.md`.
 | [0101](0101_rule-packs.md) | **SR-RULE-PACKS** | Five first-party rule packs on npm and PyPI apart from the engine; team packs; project rules in `.codelaw/rules` | accepted | partly |
 | [0102](0102_agent-surfaces.md) | **SR-AGENT-SURFACES** | Skills, steering, instructions, agent files and hooks, generated from one source | accepted | no |
 | [0103](0103_project-graph.md) | **SR-PROJECT-GRAPH** | A whole-repo symbol graph for cross-file rules — unused exports first | accepted | no |
-| [0104](0104_baseline-and-deprecations.md) | **SR-BASELINE** | Grandfather violations with a deadline and a touch policy; the deprecations registry | accepted | no |
+| [0104](0104_baseline-and-deprecations.md) | **SR-BASELINE** | Grandfather violations with a deadline and a touch policy; the deprecations registry | accepted | partly |
 | [0105](0105_formatter.md) | **SR-FORMATTER** | codelaw is a linter and a formatter — embedded engines, layout owned by the formatter | accepted | no |
 | [0106](0106_linter.md) | **SR-LINTER** | The linter — nine languages, file/project/adapter rules, embedded code, one diagnostic stream | accepted | partly |
 | [0107](0107_packages.md) | **SR-PACKAGES** | What goes into which package — 20 internal crates; npm `codelaw` + 8 `@codelaw/cli-*`; PyPI `codelaw`; five rule packs on both; the editor extension | accepted | partly |
@@ -172,6 +172,7 @@ directions.
 | `crates/codelaw-semantic` | SR-ARCHITECTURE | decision 15a |
 | `crates/codelaw-match` | SR-LINTER | decision 2: file-scope `match:` rules |
 | `crates/codelaw-adapters` | SR-LINTER | decision 2: the adapters' manifests, runner and output mapping |
+| `crates/codelaw-baseline` | SR-BASELINE | decisions 1, 2, 5 and 6: the baseline files, what a finding becomes under them, the ratchet and the deprecations registry |
 | `crates/codelaw-native` | SR-ARCHITECTURE | decision 15b |
 | `crates/codelaw-fix` | SR-ARCHITECTURE | decisions 5 and 18: the apply loop, verifier and external fixers |
 | `crates/codelaw-format` | SR-FORMATTER | decisions 2, 4, 5 and 7: the embedded engines, their options and the verifier; `shims/option-ext` is SR-PACKAGES decision 1's L2 patch |
@@ -227,6 +228,8 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 | `crates/codelaw-fix/src/structured.rs` | SR-RULE-FORMAT | decisions 3c and 3e: a `target:` rule's fix steps and their verification |
 | `crates/codelaw-adapters` | SR-ARCHITECTURE | decision 19: the adapter contract (lookup, versions, process handling, cache key) the crate implements |
 | `crates/codelaw-engine/src/adapters.rs` | SR-LINTER | decision 2: which adapters run, the per-tool mapping and the ported-rule dedupe |
+| `crates/codelaw-engine/src/baseline.rs` | SR-BASELINE | decisions 2–6 and 8: the as-of date, the change set, `graph/no-deprecated-usage` and the baseline stage |
+| `crates/codelaw-cli/src/baseline_cmd.rs` | SR-BASELINE | decisions 5 and 6: `baseline add`, `prune`, `check` and `deprecate` |
 | `scripts/check-work-system.py` | SR-WORK-OWNERSHIP | decision 2: its `owns:` ↔ Ownership-table check |
 | `scripts/check-work-system.py` | SR-WORK-REGISTRY | decisions 5–8: its registry check |
 | `scripts/check-work-system.py` | SR-WORK-ARCHIVE | decision 1: its one-`archive/` check |

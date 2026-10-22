@@ -10,6 +10,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 - `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` and the GitHub issue and pull-request templates.
 - **The formatter:** `codelaw format [--check] [--diff]` for all nine languages, with six engines compiled in: Biome, Ruff's formatter, pretty_yaml, taplo, dprint-plugin-markdown and markup_fmt. `fix` now ends with a format. `check` reports unformatted files as `format/unformatted` (`auto`). A format that would not parse, would change again on a second run, or would change a JSON/YAML/TOML value is refused and reported as `format/failed`. Line endings are kept unless `[format] end_of_line` is set.
 - **`codelaw mcp`**, the MCP server for agents, and **`codelaw lsp`**, the language server: diagnostics, quick fixes, fix all, hovers and document formatting.
+- **Baselines and deprecations:** `codelaw baseline add|prune|check` grandfathers a rule's existing findings per file, with a deadline (`until`), a touch policy (`on_touch`) and a ratchet that lets counts only go down; `codelaw deprecate` and `.codelaw/deprecations.toml` drive the engine's own `graph/no-deprecated-usage`. Deadlines are judged on `HEAD`'s commit date or `--as-of`, never the clock; `--changed-since <ref>` and `--staged` say which files count as touched.
 
 ### Changed
 

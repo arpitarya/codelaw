@@ -124,18 +124,26 @@ impl Project {
 
     /// Run every active project rule over the sources.
     pub(crate) fn run_graph_rules(&self, sources: &[Source], config: GraphConfig) -> Vec<Diagnostic> {
+        if self.graph_rules().is_empty() {
+            return Vec::new();
+        }
+        let graph = self.build_graph(sources, config);
+        self.run_graph_rules_on(&graph, sources)
+    }
+
+    /// Run every active project rule over a linked graph of the sources.
+    pub(crate) fn run_graph_rules_on(&self, graph: &Graph, sources: &[Source]) -> Vec<Diagnostic> {
         let rules = self.graph_rules();
         if rules.is_empty() {
             return Vec::new();
         }
-        let graph = self.build_graph(sources, config);
         let by_rel: BTreeMap<&str, &Source> = sources.iter().map(|s| (s.rel.as_str(), s)).collect();
         let mut per_file: BTreeMap<String, Vec<Diagnostic>> = BTreeMap::new();
         for (_, rule) in rules {
             let Matcher::Graph(g) = &rule.matcher else { continue };
             let languages = &rule.loaded.rule.languages;
             let template = rule.loaded.rule.block.message.clone().unwrap_or_else(|| rule.loaded.rule.title.clone());
-            for f in codelaw_graph::run(g, &graph, languages) {
+            for f in codelaw_graph::run(g, graph, languages) {
                 if !rule.applies_to_path(&f.file) {
                     continue;
                 }
@@ -188,15 +196,8 @@ impl Project {
         }
         let mut out = Vec::new();
         for (file, mut diags) in per_file {
-            let src = by_rel[file.as_str()];
-            if let Some(language) = src.language {
-                // `codelaw-ignore graph/…: reason` works as for file rules.
-                let root = codelaw_lang::parse(language, &src.text);
-                let comments = comment_ranges(&root, &src.text);
-                let index = LineIndex::new(&src.text);
-                let sups = suppress::find(&src.text, &comments, &index);
-                diags.retain(|d| !sups.iter().any(|s| s.reason.is_some() && s.target_line == d.start.line && s.rules.contains(&d.rule)));
-            }
+            let sups = suppressions(by_rel[file.as_str()]);
+            diags.retain(|d| !suppressed(&sups, d));
             out.extend(diags);
         }
         out
@@ -296,6 +297,20 @@ impl Project {
         v.sort_by(|a, b| a.rel.cmp(&b.rel));
         v
     }
+}
+
+/// The `codelaw-ignore` comments of a source: `codelaw-ignore graph/…:
+/// reason` works for project rules as for file rules.
+pub(crate) fn suppressions(src: &Source) -> Vec<suppress::Suppression> {
+    let Some(language) = src.language else { return Vec::new() };
+    let root = codelaw_lang::parse(language, &src.text);
+    let comments = comment_ranges(&root, &src.text);
+    let index = LineIndex::new(&src.text);
+    suppress::find(&src.text, &comments, &index)
+}
+
+pub(crate) fn suppressed(sups: &[suppress::Suppression], d: &Diagnostic) -> bool {
+    sups.iter().any(|s| s.reason.is_some() && s.target_line == d.start.line && s.rules.contains(&d.rule))
 }
 
 /// Whether a project-relative path is inside one of the checked paths.

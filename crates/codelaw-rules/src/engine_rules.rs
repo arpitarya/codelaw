@@ -93,6 +93,23 @@ pub const ENGINE_RULES: &[EngineRule] = &[
         steps: &[],
     },
     EngineRule {
+        id: "graph/no-deprecated-usage",
+        title: "A deprecated symbol is used",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &[
+            "Replace the use with the replacement `.codelaw/deprecations.toml` names (or the deprecation marker's message gives).",
+            "An existing use may stay until its deadline only through `.codelaw/baseline/graph--no-deprecated-usage.toml`, which a person adds with `codelaw baseline add`.",
+        ],
+    },
+    EngineRule {
+        id: "codelaw/stale-baseline",
+        title: "A baseline entry allows more findings than its file has",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &["Run `codelaw baseline prune` (or `codelaw fix`, which prunes too) to lower the entry; lowering is always safe."],
+    },
+    EngineRule {
         id: "codelaw/unknown-suppression",
         title: "A `codelaw-ignore` comment names a rule that does not exist",
         severity: Severity::Error,

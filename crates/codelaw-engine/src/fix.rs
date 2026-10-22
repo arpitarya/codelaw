@@ -78,6 +78,8 @@ pub struct FixReport {
     /// With [`FixOptions::trace`]: every file the loop offered a fix in, or
     /// the format step changed, sorted.
     pub traces: Vec<FileTrace>,
+    /// The baseline files `fix` lowered (SR-BASELINE decision 5), sorted.
+    pub pruned: Vec<String>,
 }
 
 impl FixReport {
@@ -349,9 +351,42 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
     if !project.rules.has_rules() {
         report.check.diagnostics.push(crate::lint::no_rules(project));
     }
+    let scopes = crate::project::scopes(project.root(), paths);
+    let mut sources = None;
     if !project.graph_rules().is_empty() {
-        fix_project_rules(project, paths, options, &mut report)?;
+        sources = Some(fix_project_rules(project, paths, options, &mut report)?);
     }
+    // `graph/no-deprecated-usage` on the fixed texts; its fix is manual.
+    let mut deprecated = Vec::new();
+    if project.deprecations_on() {
+        let sources = match sources {
+            Some(s) => s,
+            None => {
+                let mut s = project.graph_sources()?;
+                for f in &report.files {
+                    if let Some(x) = s.iter_mut().find(|x| x.rel == f.file) {
+                        x.text = f.fixed.clone();
+                    }
+                }
+                s
+            }
+        };
+        let graph = project.build_graph(&sources, project.graph_config()?);
+        deprecated = project.deprecated_occurrences(&graph, &sources).into_iter().filter(|o| crate::project::within(&o.diag.file, &scopes)).collect();
+    }
+    let ran = crate::baseline::Ran {
+        files: files.iter().filter(|e| !skipped.iter().any(|s| s.file == e.rel)).map(|e| e.rel.clone()).collect(),
+        scopes,
+        project: true,
+    };
+    // `fix` lowers the baseline to what is left: never blocked by
+    // bookkeeping (SR-BASELINE decision 5).
+    if !options.dry_run && !project.baselines.is_empty() {
+        let mut occ: Vec<codelaw_baseline::Occurrence> = report.check.diagnostics.iter().cloned().map(codelaw_baseline::Occurrence::plain).collect();
+        occ.extend(deprecated.iter().cloned());
+        report.pruned = project.prune_with(&codelaw_baseline::counts(&occ), &ran)?;
+    }
+    project.apply_baselines(&mut report.check, deprecated, &ran);
     report.check.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
     // The same dedupe as `check`, so both report one diagnostic per finding.
     crate::dedup_diagnostics(&mut report.check.diagnostics);
@@ -363,7 +398,7 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
 
 /// Project-rule fixes, after every file's own (SR-PROJECT-GRAPH decision 6):
 /// relink, apply, repeat, then report what the graph still finds.
-fn fix_project_rules(project: &mut Project, paths: &[PathBuf], options: &FixOptions, report: &mut FixReport) -> Result<(), EngineError> {
+fn fix_project_rules(project: &mut Project, paths: &[PathBuf], options: &FixOptions, report: &mut FixReport) -> Result<Vec<crate::project::Source>, EngineError> {
     let config = project.graph_config()?;
     let mut sources = project.graph_sources()?;
     // A dry run left the disk as it was: start from the fixed texts.
@@ -412,5 +447,5 @@ fn fix_project_rules(project: &mut Project, paths: &[PathBuf], options: &FixOpti
     report.files.sort_by(|a, b| a.file.cmp(&b.file));
     let remaining = project.run_graph_rules(&sources, config);
     report.check.diagnostics.extend(remaining.into_iter().filter(|d| crate::project::within(&d.file, &scopes)));
-    Ok(())
+    Ok(sources)
 }

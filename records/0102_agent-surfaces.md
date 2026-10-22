@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-agents
   - agents
 laws: [L0, L3, L4, L5, L6]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-22T18:30:00Z
 content_sha: ""
 ---
 
@@ -127,7 +127,7 @@ Each agent reads a different set of files from a different place. Maintaining th
   - `[agents] command`: how a hook or an MCP registration starts codelaw. Unset, it is the repo's own install: `npx --no-install codelaw` beside a `package.json`, `uv run codelaw` beside a `uv.lock`, else `codelaw`.
 - **`codelaw hook [paths]`** is the post-edit hook of every row of the matrix.
   - The files are its arguments, or, with none, the ones the agent's hook payload on stdin names: `tool_input.file_path` / `path` (Claude Code, Codex), the files an `apply_patch` envelope adds or updates (Codex), or `toolArgs` (Copilot). A deleted file, or one with no [L3](0005_LAW-3-languages.md) extension, is ignored.
-  - It runs `codelaw fix` on them with `auto` fixes only, format step included ([L8](0010_LAW-8-performance-budgets.md) `fix_one_file`; [L4](0006_LAW-4-every-rule-has-a-fix.md) decision 8). It is the same engine call, so the bytes are `fix`'s ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 5).
+  - It runs `codelaw fix` on them with `auto` fixes only, format step included ([L8](0010_LAW-8-performance-budgets.md) `fix_one_file`; [L4](0006_LAW-4-every-rule-has-a-fix.md) decision 8). It is the same engine call, so the bytes are `fix`'s ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 5). The files it was given count as touched, so a grandfathered finding in one gets the verdict CI would give it ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 3 and 8).
   - Nothing left: exit `0`, with the auto-fix notes on stdout. An error or warning left: exit `2`, with the fixes applied and up to 20 findings, each with its next step (a `suggest` diff to show, or the `manual` steps), on stderr. Exit 2 with stderr is how Claude Code and Codex hand a `PostToolUse` result back to the agent. A config or rule error is also exit `2`, as `error: …`.
 - **A pre-write mode** ([W-05](../work/open/W-05-write-time-guidance.md)'s `hook --pre`) would be a flag of the same command.
 

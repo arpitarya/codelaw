@@ -3,12 +3,14 @@
 //! protocol and these functions (decision 2).
 
 mod adapters;
+mod baseline;
 mod compile;
 mod debug;
 mod discover;
 mod files;
 mod fix;
 mod format;
+mod git;
 mod incremental;
 mod lint;
 mod query;
@@ -16,6 +18,7 @@ mod project;
 mod suppress;
 mod timings;
 
+pub use baseline::{AsOf, BaselineAdd, Ratchet};
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
 pub use fix::{FileFix, FileTrace, FixOptions, FixReport};
@@ -62,6 +65,18 @@ pub struct EngineOptions {
     /// `PATH`, where an adapter is looked for after the project's
     /// `node_modules/.bin` and `.venv/bin`.
     pub path_env: Option<std::ffi::OsString>,
+    /// `--as-of`: the date deadlines are judged on (SR-BASELINE decision 4).
+    pub as_of: Option<String>,
+    /// `CODELAW_AS_OF`, used when `--as-of` is not given.
+    pub as_of_env: Option<String>,
+    /// `--changed-since <ref>`: the files changed since the merge base
+    /// count as touched (SR-BASELINE decision 3).
+    pub changed_since: Option<String>,
+    /// `--staged`: the files in the index count as touched.
+    pub staged: bool,
+    /// Files that count as touched whatever the change set says: the
+    /// files an agent hook was given.
+    pub touched_paths: Vec<PathBuf>,
 }
 
 impl EngineOptions {
@@ -73,6 +88,7 @@ impl EngineOptions {
             site_packages_env: var("CODELAW_SITE_PACKAGES"),
             virtual_env: var("VIRTUAL_ENV"),
             path_env: std::env::var_os("PATH"),
+            as_of_env: var("CODELAW_AS_OF"),
             ..Default::default()
         }
     }
@@ -120,6 +136,9 @@ pub struct CheckReport {
     pub skipped: Vec<Skipped>,
     pub files_checked: usize,
     pub warnings: Vec<String>,
+    /// The as-of line (`as-of 2026-10-18 (HEAD commit date)`), when a
+    /// baseline or a deprecation was in play (SR-BASELINE decision 4).
+    pub as_of: Option<AsOf>,
 }
 
 impl CheckReport {
@@ -151,6 +170,14 @@ pub struct Project {
     timings: Option<timings::Timings>,
     /// The adapters found installed, looked up on first use.
     adapters: std::sync::OnceLock<codelaw_adapters::Resolved>,
+    /// `.codelaw/baseline/*.toml`, read at load (SR-BASELINE).
+    pub baselines: codelaw_baseline::Baselines,
+    /// The deprecations registry and `[deprecation]`, when the project
+    /// runs `graph/no-deprecated-usage`.
+    deprecations: Option<baseline::Deprecations>,
+    /// The as-of date and the change set, read on first use.
+    as_of: std::sync::OnceLock<AsOf>,
+    touched: std::sync::OnceLock<(BTreeSet<String>, Vec<String>)>,
 }
 
 fn pool(threads: Option<usize>) -> rayon::ThreadPool {
@@ -183,6 +210,7 @@ impl Project {
 
     /// A project from a rule set built elsewhere (the rule tester).
     pub fn from_parts(mut config: Config, rules: RuleSet, options: EngineOptions) -> Result<Project, EngineError> {
+        baseline::check_dates(&options)?;
         if let Some(only) = &options.rules {
             for id in only {
                 if rules.get(id).is_none() && codelaw_rules::engine_rule(id).is_none() {
@@ -212,9 +240,25 @@ impl Project {
         if let Err(e) = codelaw_adapters::selected(config.adapters_enabled()) {
             return Err(EngineError::Config(codelaw_config::ConfigError::new(config.files.first().map(|f| f.path.clone()), e)));
         }
+        let (baselines, deprecations) = baseline::load(&config)?;
         let pool = pool(options.threads);
         let adapters = std::sync::OnceLock::new();
-        Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool, timings, adapters })
+        Ok(Project {
+            config,
+            rules,
+            compiled,
+            options,
+            cache,
+            warnings,
+            formatting,
+            pool,
+            timings,
+            adapters,
+            baselines,
+            deprecations,
+            as_of: std::sync::OnceLock::new(),
+            touched: std::sync::OnceLock::new(),
+        })
     }
 
     pub fn root(&self) -> &Path {
@@ -223,6 +267,16 @@ impl Project {
 
     /// Check files and folders (the project root when `paths` is empty).
     pub fn check(&mut self, paths: &[PathBuf]) -> Result<CheckReport, EngineError> {
+        let (mut report, deprecated, ran) = self.check_raw(paths)?;
+        self.apply_baselines(&mut report, deprecated, &ran);
+        report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+        dedup_diagnostics(&mut report.diagnostics);
+        Ok(report)
+    }
+
+    /// `check` before the baseline: every finding, the uses of deprecated
+    /// symbols apart, and what the run saw completely.
+    pub(crate) fn check_raw(&mut self, paths: &[PathBuf]) -> Result<(CheckReport, Vec<codelaw_baseline::Occurrence>, baseline::Ran), EngineError> {
         let discovering = self.timings.is_some().then(std::time::Instant::now);
         let (files, mut skipped, warnings) = discover::discover(self, paths)?;
         if let (Some(t), Some(start)) = (&self.timings, discovering) {
@@ -245,12 +299,19 @@ impl Project {
         if !self.rules.has_rules() {
             report.diagnostics.push(lint::no_rules(self));
         }
+        let scopes = project::scopes(self.root(), paths);
         // Project rules see the whole root, and report inside `paths`.
-        if !self.graph_rules().is_empty() {
+        let graph_rules = !self.graph_rules().is_empty();
+        let deprecations = self.deprecations_on();
+        let mut deprecated = Vec::new();
+        if graph_rules || deprecations {
             let config = self.graph_config()?;
             let sources = self.graph_sources()?;
-            let scopes = project::scopes(self.root(), paths);
-            report.diagnostics.extend(self.run_graph_rules(&sources, config).into_iter().filter(|d| project::within(&d.file, &scopes)));
+            let graph = self.build_graph(&sources, config);
+            report.diagnostics.extend(self.run_graph_rules_on(&graph, &sources).into_iter().filter(|d| project::within(&d.file, &scopes)));
+            if deprecations {
+                deprecated = self.deprecated_occurrences(&graph, &sources).into_iter().filter(|o| project::within(&o.diag.file, &scopes)).collect();
+            }
         }
         // The adapters (SR-ARCHITECTURE decision 4, step 5).
         if self.adapters_on() {
@@ -258,12 +319,13 @@ impl Project {
             report.diagnostics.append(&mut run.diagnostics);
             report.warnings.append(&mut run.warnings);
         }
+        let ran = baseline::Ran { files: checked.iter().map(|e| e.rel.clone()).collect(), scopes, project: true };
         report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
         dedup_diagnostics(&mut report.diagnostics);
         skipped.sort();
         report.skipped = skipped;
         self.cache.prune(self.config.cache_max_size());
-        Ok(report)
+        Ok((report, deprecated, ran))
     }
 
     /// Check one file's text as if it were at `rel_path` (MCP

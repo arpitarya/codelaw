@@ -353,6 +353,8 @@ pub fn run(rule: &GraphRule, graph: &Graph, languages: &[Language]) -> Vec<Graph
     match &rule.query {
         Query::UnusedExports { kinds, tags, .. } => unused_exports(rule, graph, languages, kinds, tags),
         Query::UnusedCssClasses => unused_css(rule, graph, languages),
+        // The engine runs `graph/no-deprecated-usage` itself, with the
+        // registry and the baseline (SR-BASELINE; the `deprecated` module).
         Query::DeprecatedUsage => Vec::new(),
         Query::Imports { forms, check } => imports(graph, languages, forms, *check),
     }

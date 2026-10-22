@@ -2,6 +2,7 @@
 //! `codelaw-engine` and prints the result; no logic lives here
 //! (SR-ARCHITECTURE decision 2, SR-CLI-MCP decision 6).
 
+mod baseline_cmd;
 mod format_cmd;
 mod graph_cmd;
 mod config_cmd;
@@ -76,6 +77,13 @@ enum Command {
     Hook(codelaw_agents::HookArgs),
     /// Write every agent's files from the rules and skills, or with --check report drift.
     SyncAgents(codelaw_agents::SyncArgs),
+    /// Grandfather a rule's existing findings, lower the counts, or check the ratchet (SR-BASELINE).
+    Baseline {
+        #[command(subcommand)]
+        action: baseline_cmd::BaselineAction,
+    },
+    /// Deprecate a symbol: write the registry entry and baseline every current use (SR-BASELINE decision 6).
+    Deprecate(baseline_cmd::DeprecateArgs),
     /// An opt-in warm process that serves `--prefer-warm` runs (SR-ARCHITECTURE decision 22).
     Daemon {
         #[command(subcommand)]
@@ -112,6 +120,15 @@ pub struct Common {
     /// running for this project; otherwise run here. The output is the same.
     #[arg(long)]
     prefer_warm: bool,
+    /// Judge deadlines on this date (YYYY-MM-DD) instead of `HEAD`'s commit date.
+    #[arg(long, value_name = "DATE")]
+    as_of: Option<String>,
+    /// Files changed since the merge base with this ref count as touched (needs git).
+    #[arg(long, value_name = "REF")]
+    changed_since: Option<String>,
+    /// Files in the index count as touched (needs git).
+    #[arg(long)]
+    staged: bool,
 }
 
 #[derive(Args)]
@@ -279,6 +296,10 @@ pub fn engine_options_in(common: &Common, env: EngineOptions) -> Result<EngineOp
     o.threads = common.threads;
     o.no_cache = common.no_cache;
     o.timings = common.timings;
+    // The time and the change set are inputs (L5 decision 2).
+    o.as_of = common.as_of.clone().or(o.as_of);
+    o.changed_since = common.changed_since.clone();
+    o.staged = common.staged;
     Ok(o)
 }
 
@@ -373,6 +394,9 @@ fn fix(args: FixArgs, ctx: &Ctx) -> Option<Output> {
                 };
                 let applied: Vec<String> = f.applied.iter().map(|(r, n)| format!("{r} ×{n}")).collect();
                 out.stdout.push_str(&format!("{verb} {} ({})\n", f.file, applied.join(", ")));
+            }
+            for b in &report.pruned {
+                out.stdout.push_str(&format!("pruned {b}\n"));
             }
             out.stdout.push_str(&codelaw_report::fix_text(&report, ctx.color));
         }
@@ -521,6 +545,8 @@ fn main() -> ExitCode {
                 Err(e) => fail(e),
             }
         }
+        Command::Baseline { action } => baseline_cmd::baseline(action),
+        Command::Deprecate(a) => baseline_cmd::deprecate(a),
         Command::Daemon { action } => warm::daemon(action),
         Command::Hook(a) => codelaw_agents::hook(a),
         Command::SyncAgents(a) => codelaw_agents::sync_agents(a),

@@ -124,14 +124,20 @@ fn summary_json(report: &CheckReport) -> Value {
 
 /// The `--format json` object for `check`.
 pub fn check_json(report: &CheckReport) -> Value {
-    json!({
+    let mut v = json!({
         "schema_version": SCHEMA_VERSION,
         "codelaw_version": codelaw_core::VERSION,
         "summary": summary_json(report),
         "diagnostics": report.diagnostics.iter().map(diagnostic_json).collect::<Vec<_>>(),
         "skipped": report.skipped.iter().map(|s| json!({ "file": s.file, "reason": s.reason })).collect::<Vec<_>>(),
         "warnings": report.warnings,
-    })
+    });
+    // Only when a baseline or a deprecation was in play (SR-BASELINE
+    // decision 4): the date deadlines were judged on, and its source.
+    if let Some(a) = &report.as_of {
+        v["as_of"] = json!({ "date": a.date.map(|d| d.to_string()), "source": a.source });
+    }
+    v
 }
 
 /// The `--format json` object for `fix`: the check shape plus what changed.
@@ -143,6 +149,9 @@ pub fn fix_json(report: &FixReport) -> Value {
         .map(|f| json!({ "file": f.file, "applied": f.applied, "passes": f.passes, "written": f.written }))
         .collect::<Vec<_>>()
         .into();
+    if !report.pruned.is_empty() {
+        v["pruned"] = json!(report.pruned);
+    }
     v
 }
 
@@ -226,6 +235,9 @@ pub fn fix_text(report: &FixReport, color: bool) -> String {
 fn text(report: &CheckReport, color: bool, fixed: Option<usize>) -> String {
     let paint = Paint(color);
     let mut out = String::new();
+    if let Some(a) = &report.as_of {
+        out.push_str(&format!("{}\n", a.line()));
+    }
     for w in &report.warnings {
         out.push_str(&format!("{} {w}\n", paint.wrap("33", "warning:")));
     }
@@ -270,6 +282,9 @@ fn text(report: &CheckReport, color: bool, fixed: Option<usize>) -> String {
 /// Compact lines for hooks: one per diagnostic, with what to do next.
 pub fn check_agent(report: &CheckReport) -> String {
     let mut out = String::new();
+    if let Some(a) = &report.as_of {
+        out.push_str(&format!("{}\n", a.line()));
+    }
     for d in &report.diagnostics {
         let next = match d.fix {
             FixClass::Auto if !d.edits.is_empty() => "fix: auto (`codelaw fix`)".to_owned(),
@@ -329,6 +344,7 @@ mod tests {
             skipped: vec![Skipped { file: "x.js".into(), reason: "not valid UTF-8".into() }],
             files_checked: 1,
             warnings: vec![],
+            as_of: None,
         };
         let v = check_json(&r);
         assert_eq!(v["schema_version"], 1);
@@ -347,6 +363,7 @@ mod tests {
             skipped: vec![Skipped { file: "x.js".into(), reason: "r".into() }],
             files_checked: 1,
             warnings: vec![],
+            as_of: None,
         };
         let t = check_text(&r, false);
         assert!(t.contains("src/a.js\n  1:1  error  Use ===  a/e [auto]"), "{t}");

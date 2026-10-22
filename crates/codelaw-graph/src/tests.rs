@@ -232,3 +232,46 @@ fn deterministic() {
     let b = run(&unused_rule(), &graph(&rev, GraphConfig::default()), ALL);
     assert_eq!(a, b);
 }
+
+#[test]
+fn deprecated_uses_by_identity() {
+    let files = [
+        ("packages/utils/package.json", r#"{"name":"@acme/utils","private":true,"main":"src/index.ts"}"#),
+        ("packages/utils/src/index.ts", "export * from './date';\n"),
+        ("packages/utils/src/date.ts", "/** @deprecated use formatISO */\nexport function formatDate(d: Date) { return d.toISOString(); }\nexport function formatISO(d: Date) { return d.toISOString(); }\n"),
+        ("packages/web/package.json", r#"{"name":"web","private":true}"#),
+        ("packages/web/src/a.ts", "import { formatDate as fd } from \"@acme/utils\";\nfd(new Date());\nfd(new Date());\n"),
+        ("packages/web/src/b.ts", "function formatDate() {}\nformatDate();\n"),
+        ("packages/web/src/c.ts", "import { format } from \"date-fns\";\nformat(1);\n"),
+    ];
+    let g = graph(&files, GraphConfig::default());
+    let (module, name) = deprecated::declared(&g, "@acme/utils#formatDate").unwrap();
+    assert_eq!((module.as_str(), name.as_str()), ("packages/utils/src/date.ts", "formatDate"));
+    let uses = deprecated::uses_of_decl(&g, &module, &name, "@acme/utils#formatDate");
+    // Two reads through the alias in a.ts; b.ts's own `formatDate` is not it.
+    assert_eq!(uses.iter().map(|u| u.file.as_str()).collect::<Vec<_>>(), vec!["packages/web/src/a.ts", "packages/web/src/a.ts"]);
+    let marked = deprecated::marked(&g);
+    assert_eq!(marked.len(), 1);
+    assert_eq!(marked[0].symbol, "packages/utils/src/date.ts#formatDate");
+    assert_eq!(marked[0].message, "use formatISO");
+    // A package outside the project: by its import specifier.
+    assert!(deprecated::declared(&g, "date-fns#format").is_none());
+    let ext = deprecated::uses_of_external(&g, "date-fns#format");
+    assert_eq!(ext.len(), 1);
+    assert_eq!(ext[0].file, "packages/web/src/c.ts");
+}
+
+#[test]
+fn deprecated_python_alias() {
+    let files = [
+        ("acme/__init__.py", ""),
+        ("acme/billing/__init__.py", ""),
+        ("acme/billing/legacy.py", "def compute_tax(x):\n    return x\n"),
+        ("app/billing.py", "from acme.billing.legacy import compute_tax as ct\nct(1)\n"),
+    ];
+    let g = graph(&files, GraphConfig::default());
+    let (module, name) = deprecated::declared(&g, "acme.billing.legacy:compute_tax").unwrap();
+    let uses = deprecated::uses_of_decl(&g, &module, &name, "acme.billing.legacy:compute_tax");
+    assert_eq!(uses.len(), 1);
+    assert_eq!(uses[0].file, "app/billing.py");
+}
