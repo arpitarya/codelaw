@@ -184,6 +184,9 @@ impl Project {
             .part(self.config.fingerprint().0)
             .part(codelaw_lang::GRAMMARS_FINGERPRINT)
             .part(codelaw_format::ENGINES_FINGERPRINT)
+            // The file's format options: `.editorconfig` is not in the
+            // config fingerprint.
+            .part(format!("{:?}", self.formatting.options_for(&entry.abs)))
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
             .key();
         let cached = self.cache.get::<Vec<Diagnostic>>(&key);

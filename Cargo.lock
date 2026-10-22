@@ -1088,6 +1088,7 @@ dependencies = [
  "codelaw-core",
  "dprint-core",
  "dprint-plugin-markdown",
+ "globset",
  "markup_fmt",
  "pretty_yaml",
  "ruff_formatter",

@@ -418,7 +418,7 @@ fn to_lsp(doc: &Doc, entry: Option<&FileEntry>, root: Option<&Path>, diagnostics
 /// Saving these changes what every file's verdict may be.
 fn reloads(path: &Path) -> bool {
     let name = path.file_name().and_then(|n| n.to_str()).unwrap_or_default();
-    matches!(name, "codelaw.toml" | "pyproject.toml" | "package.json")
+    matches!(name, "codelaw.toml" | "pyproject.toml" | "package.json" | ".editorconfig")
         || path.components().any(|c| c.as_os_str() == ".codelaw")
         || (name.ends_with(".md") && path.components().any(|c| c.as_os_str() == "rules"))
 }

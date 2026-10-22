@@ -14,6 +14,8 @@ serde_json.workspace = true
 serde-saphyr.workspace = true
 toml.workspace = true
 anyhow = "1"
+# `.editorconfig` section globs (decision 5).
+globset.workspace = true
 # Biome 2.5.15 (tag `@biomejs/biome@2.5.15`): the crates.io copies are stale.
 biome_formatter = { git = "https://github.com/biomejs/biome", rev = "0b4c11f553a7e702f9851af139662e1de45dc131" }
 biome_languages = { git = "https://github.com/biomejs/biome", rev = "0b4c11f553a7e702f9851af139662e1de45dc131", features = ["lang_js", "lang_json", "lang_css"] }

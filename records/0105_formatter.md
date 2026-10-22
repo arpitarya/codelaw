@@ -114,6 +114,9 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    ```
    - **Defaults:** Prettier's for JS/TS/JSON/CSS/HTML/YAML/Markdown; Black/Ruff's for Python. One exception: `end_of_line` unset keeps each file's dominant line ending, because only a set `end_of_line` may change one ([SR-ARCHITECTURE](0108_architecture.md) decision 9).
    - **`.editorconfig` is always read** as the base layer; `codelaw.toml` wins over it.
+     - **Which files:** as the EditorConfig specification says, the `.editorconfig` in the file's folder and in each folder above it, up to one with `root = true`; the nearer file and the later section win. Each folder's file is read once per run (`crates/codelaw-format/src/editorconfig.rs` parses, `codelaw-engine` caches), and a file's resolved options are part of its cache key. A project with no folder on disk (the rule tester's) reads none.
+     - **Which properties:** `indent_style` → `indent_style`; `indent_size` (or `tab_width` when it is `tab` or unset) → `indent_width` and `[format.python] indent_width`; `end_of_line` (`lf`, `crlf`) → `end_of_line`; `max_line_length` → `line_width` and `[format.python] line_width`. A value out of the key's range, `cr` or `off` is ignored, and `unset` removes a property.
+     - **What wins:** a key `[format]` (or `[format.python]`) sets is never changed by `.editorconfig`. Section globs go through `globset` (MIT / Unlicense), already a dependency of the engine.
    - **Migrating from existing configs:** `codelaw format --import-config` reads `.prettierrc*`, `[tool.ruff.format]` and `[tool.black]` once and writes the equivalent `[format]` keys. From then on, `codelaw.toml` is the only source.
 
 6. **Ignore markers.**
@@ -144,7 +147,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 ### What is built
 
-Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`; decision 6's markers in every engine. **Not built yet, `W-23`:** decision 5's `.editorconfig` layer and `--import-config`; decision 8's range formatting. The agent hook is `W-10`'s.
+Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`; decision 5's `.editorconfig` layer; decision 6's markers in every engine. **Not built yet, `W-23`:** decision 5's `--import-config`; decision 8's range formatting. The agent hook is `W-10`'s.
 
 ### Consequences
 

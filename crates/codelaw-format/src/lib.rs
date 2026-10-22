@@ -4,6 +4,7 @@
 //! The linter owns meaning; this crate owns layout. Every engine is
 //! compiled in and none is run as a program (L5, L6 decision 3).
 
+pub mod editorconfig;
 mod engines;
 mod markers;
 mod options;
