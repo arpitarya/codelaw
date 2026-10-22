@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-21/22 — W-07 and W-09 landed; the WIP branches merged into main as-is  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *finish the agent-closable items from the 2026-10-20 state, one branch each, W-07 first*; then *"Merge everything to main. And then pull the latest main changes."* — and, asked whether that meant the unfinished `wip/*` branches, *"Merge them all as-is now."*
+- **Done:** W-07 (formatter) and W-09 (LSP formatting) built from `wip/W-07-formatter`, merged `2404619`, both archived; `law-gate.py` lists nothing; W-23, B-043, B-044 filed. Then the seven `wip/*` commits merged into `main` unfinished (`2eb0f3e`…`db4bde7`), the merges repaired (`7498d1d`, `895324a`), the queue updated (`665c5e3`); pushed.
+- **Decided / left open:** `end_of_line` unset keeps line endings (SR-ARCHITECTURE decision 9 over the WIP's LF default). `main` does not build whole: `codelaw-agents` (W-10) lacks `hook` and `sync`; 3 WIP tests fail. W-20 asks whether npm's Artistic-2.0 passes L2.
+- **Mistakes:** three as-is merges (W-12, W-16, W-20) were first committed with conflict markers, because zsh did not split a file list in the resolve loop; caught by grepping for markers before pushing, resolved in `7498d1d`. The W-20 keep-both resolution dropped a closing brace; fixed in `895324a`.
+- **Next:** write W-10's `hook` and `sync` modules so `main` builds.
+
+---
+
 ## 2026-10-20 — parallel lanes on W-07–W-22; W-08, W-09, W-17, W-18, W-22 landed  ·  Claude Code cloud (Opus 5.5)
 
 - **Asked:** *"list all the open items"*, then *"implement all open items … in parallel … merge everything to main"*, then *"Whatever is done is done. Merge commit everything, merge everything to main. And stop the work."*
