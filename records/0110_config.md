@@ -79,7 +79,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 2. **Finding it:** walk up from each file to the nearest folder with a home.
    - **Monorepos:** the topmost config is the root. A nested config (for example in `packages/web/`) **inherits** the root and overrides it, unless it sets `root = true`, which makes that folder a separate project with its own graph and baseline ([SR-ARCHITECTURE](0108_architecture.md) decision 17).
    - **Globs** in `include`, `exclude` and `[[overrides]]` are relative to the directory of the config file that declares them ([SR-ARCHITECTURE](0108_architecture.md) decision 11).
-   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]`, `[markdown]` and `[daemon]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
+   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]`, `[markdown]`, `[daemon]` and `[lsp]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
    - **A nested `root = true` project** is checked by running codelaw in its folder; a run from the parent skips its files and says so.
 3. **Sections and owners.** The top-level keys belong to this record:
    - `extends`, `languages`, `include`, `exclude`, `rules_dir`;
@@ -92,7 +92,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
    `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11).
 
-   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]` is validated by the loader since W-14, like `[fix]` and `[lint]`; `[format]`, `[graph]`, `[baseline]`, `[agents]`, `[daemon]` and `[lsp]` are still read as tables.
+   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]` and `[lsp]` are validated by the loader like `[fix]` and `[lint]`; `[format]`, `[graph]` and `[baseline]` are still read as tables.
 4. **Precedence, last wins:**
    1. Built-in defaults.
    2. `.editorconfig` (formatter keys only).

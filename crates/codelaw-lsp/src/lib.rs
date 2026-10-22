@@ -14,7 +14,9 @@
 //! syntax tree between them: an edit re-parses only what it touched and
 //! re-runs that file's rules (SR-EDITOR decision 2, SR-ARCHITECTURE
 //! decision 23). The tree is the one a fresh parse gives, so the verdict is
-//! the same; a document's tree is dropped when it closes (decision 24).
+//! the same. A closed document's tree goes to its project's [`TreeCache`]
+//! of the `[lsp] tree_cache` most recently touched closed files, and a
+//! reopened file whose text is unchanged gets it back (decision 24).
 //!
 //! Not yet here, and why: project rules and workspace diagnostics (the
 //! graph is not built), pull diagnostics. The warm-process socket of
@@ -26,7 +28,7 @@ pub mod position;
 pub mod uri;
 
 use codelaw_core::{Diagnostic, FixClass, Severity};
-use codelaw_engine::{DocumentTree, EngineOptions, FileEntry, Project};
+use codelaw_engine::{DocumentTree, EngineOptions, FileEntry, Project, TreeCache};
 use lsp_server::{Connection, ErrorCode, Message, Notification, Request, Response};
 use lsp_types::notification::{
     DidChangeTextDocument, DidChangeWatchedFiles, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument, LogMessage, Notification as _,
@@ -175,11 +177,14 @@ struct Server<'c> {
     /// Loaded projects by their config folder; an `Err` is a config or
     /// rule that does not load, reported once until something changes.
     projects: HashMap<PathBuf, Result<Project, String>>,
+    /// The trees of closed documents, by project key, each bounded by its
+    /// project's `[lsp] tree_cache` (SR-ARCHITECTURE decision 24).
+    closed: HashMap<PathBuf, TreeCache>,
 }
 
 impl<'c> Server<'c> {
     fn new(connection: &'c Connection, roots: Vec<PathBuf>) -> Self {
-        Server { connection, roots, docs: HashMap::new(), projects: HashMap::new() }
+        Server { connection, roots, docs: HashMap::new(), projects: HashMap::new(), closed: HashMap::new() }
     }
 
     fn send(&self, msg: impl Into<Message>) -> Result<(), Error> {
@@ -230,6 +235,11 @@ impl<'c> Server<'c> {
             DidCloseTextDocument::METHOD => {
                 let p: DidCloseTextDocumentParams = serde_json::from_value(n.params)?;
                 if let Some(doc) = self.docs.remove(p.text_document.uri.as_str()) {
+                    if let (Some((pk, _)), Some(tree)) = (&doc.target, doc.tree)
+                        && let Some(cache) = self.closed.get_mut(pk)
+                    {
+                        cache.put(doc.uri.as_str().to_owned(), tree);
+                    }
                     self.notify::<PublishDiagnostics>(PublishDiagnosticsParams { uri: doc.uri, diagnostics: vec![], version: None })?;
                 }
             }
@@ -276,6 +286,10 @@ impl<'c> Server<'c> {
             let loaded = Project::from_config(config, options).map_err(|e| e.to_string());
             match &loaded {
                 Ok(p) => {
+                    // A reload keeps the closed trees, under the bound the
+                    // config gives now.
+                    let bound = p.config.lsp_tree_cache();
+                    self.closed.entry(key.clone()).or_insert_with(|| TreeCache::new(bound)).set_capacity(bound);
                     for w in &p.warnings {
                         self.log(MessageType::WARNING, format!("codelaw: {w}"))?;
                     }
@@ -308,10 +322,12 @@ impl<'c> Server<'c> {
         let doc = self.docs.get_mut(key).expect("an open document");
         let project = target.as_ref().and_then(|(pk, _)| self.projects[pk].as_ref().ok());
         let diagnostics = match (&target, project) {
-            (Some((_, entry)), Some(project)) => {
+            (Some((pk, entry)), Some(project)) => {
                 // The kept tree when it is of this text and language; the
-                // engine checks that too, so a stale tree never shows.
-                let kept = doc.tree.take();
+                // engine checks that too, so a stale tree never shows. A
+                // document just reopened takes its tree from the closed
+                // files' cache.
+                let kept = doc.tree.take().or_else(|| self.closed.get_mut(pk).and_then(|c| c.take(key)));
                 let body = doc.body().0;
                 let tree = match kept {
                     Some(t) if t.language() == entry.language && t.text() == body => t,
@@ -543,3 +559,9 @@ fn explain(project: Option<&Project>, d: &Diagnostic) -> String {
     }
     s
 }
+
+// The server's own unit tests write a fixture repo, so they live outside
+// `src/`, which `tests/server.rs` checks has no write path.
+#[cfg(test)]
+#[path = "../tests/unit/tree_cache.rs"]
+mod tests;

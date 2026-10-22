@@ -222,9 +222,12 @@
     },
     "lsp": {
       "x-codelaw-record": "SR-ARCHITECTURE",
-      "x-codelaw-validated": false,
-      "description": "The language server (SR-ARCHITECTURE decision 24). Its keys are validated once the server is built.",
-      "type": "object"
+      "description": "Warm processes' memory bound (SR-ARCHITECTURE decision 24). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tree_cache": { "type": "integer", "minimum": 0, "description": "How many closed files' syntax trees a warm process keeps, most recently touched first; open files always keep theirs. 256 by default; 0 keeps none." }
+      }
     }
   }
 }
