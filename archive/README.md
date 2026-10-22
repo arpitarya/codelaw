@@ -36,6 +36,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 | [`W-10-agent-surfaces.md`](open/W-10-agent-surfaces.md) | 2026-10-22 | `crates/codelaw-agents` and `agents/`; [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | [`W-12-structured-file-rules.md`](open/W-12-structured-file-rules.md) | 2026-10-22 | `crates/codelaw-match` (`data`, `target`, `schema`) and `crates/codelaw-fix/src/structured.rs`; [SR-RULE-FORMAT](../records/0112_rule-format.md) decision 3e |
 | [`W-14-adapters.md`](open/W-14-adapters.md) | 2026-10-22 | `crates/codelaw-adapters` and `crates/codelaw-engine/src/adapters.rs`; [SR-LINTER](../records/0106_linter.md) decision 2 and [SR-ARCHITECTURE](../records/0108_architecture.md) decision 19 |
+| [`W-15-warm-processes.md`](open/W-15-warm-processes.md) | 2026-10-22 | `crates/codelaw-cli/src/warm.rs`, `crates/codelaw-engine/src/incremental.rs`, the LSP's tree cache; [SR-ARCHITECTURE](../records/0108_architecture.md) decisions 21–24 |
 | [`W-16-commands-and-api.md`](open/W-16-commands-and-api.md) | 2026-10-22 | `crates/codelaw-cli`, `codelaw.schema.json` and the npm/Python API; [SR-CLI-MCP](../records/0115_cli-and-mcp.md), [SR-CONFIG](../records/0110_config.md) and [SR-PACKAGES](../records/0107_packages.md) |
 | [`W-22-record-drift.md`](open/W-22-record-drift.md) | 2026-10-20 | [SR-RULE-PACKS](../records/0101_rule-packs.md), [SR-PACKAGES](../records/0107_packages.md) decision 9, [SR-ARCHITECTURE](../records/0108_architecture.md) decision 1 |
 
