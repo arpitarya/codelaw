@@ -27,6 +27,9 @@ biome_css_parser = { git = "https://github.com/biomejs/biome", rev = "0b4c11f553
 ruff_formatter = "=0.0.18"
 ruff_python_formatter = "=0.0.18"
 ruff_python_parser = "=0.0.18"
+# The statement tree the ignore markers need (decision 6).
+ruff_python_ast = "=0.0.18"
+ruff_text_size = "=0.0.18"
 pretty_yaml = "=0.6.0"
 taplo = { version = "=0.14.0", default-features = false }
 dprint-plugin-markdown = "=0.26.0"

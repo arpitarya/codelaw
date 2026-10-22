@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-format
   - scripts/format-parity.py
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -118,6 +118,16 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    - **codelaw's own:** `// codelaw-format-ignore` and `# codelaw-format-ignore` skip the next node.
    - **Honoured for compatibility:** `// prettier-ignore`, `<!-- prettier-ignore -->`, and Ruff/Black's `# fmt: off` / `# fmt: on` and `# fmt: skip`.
    - **Whole files:** `[format] exclude`.
+   - **How every engine honours them** (`crates/codelaw-format/src/markers.rs`). A marker is a comment in the language's own syntax (`//` or `/* */` in JS/TS/JSON, `/* */` in CSS, `#` in Python/YAML/TOML, `<!-- -->` in Markdown/HTML) whose text starts with the marker word.
+
+     | engine | how |
+     |---|---|
+     | Biome (JS · TS · JSON · CSS) | the marker is rewritten to Biome's own `biome-ignore format: codelaw` before formatting and restored after |
+     | pretty_yaml · dprint-plugin-markdown · markup_fmt | each is configured with `prettier-ignore` as its directive; `codelaw-format-ignore` is rewritten to it and restored. Markdown also takes `<!-- prettier-ignore-start -->` … `<!-- prettier-ignore-end -->` |
+     | Ruff (Python) | Ruff's own `# fmt:` pragmas work as they are. An own-line marker followed at its own indentation by a statement becomes `# fmt: off`, and a `# fmt: on` follows that statement; both are undone after. A marker inside an expression, or with no statement after it at its level, skips nothing |
+     | taplo (TOML) | taplo has no directive: the file is formatted, then the next entry, table header or array element after each marker is put back as it was written |
+
+     Restoring goes by order: a marker the engine drops or moves fails the file with `format-engine`, so a fenced-off node is never reformatted silently. pretty_yaml applies a marker before a block's first entry to the whole block, not only that entry. The statement tree comes from `ruff_python_ast` and `ruff_text_size` (MIT, `=0.0.18`, the same Ruff release as the formatter).
 
 7. **Deterministic and stable ([L5](0007_LAW-5-no-model-in-the-engine.md)).**
    - The same input and the same codelaw version always give byte-identical output.
@@ -132,7 +142,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 ### What is built
 
-Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. **Not built yet, `W-23`:** decision 3 (the layout-rule refusal in `codelaw test`); decision 5's `.editorconfig` layer and `--import-config`; decision 6's markers, of which only Ruff's own `# fmt: off`/`# fmt: on`/`# fmt: skip` work today; decision 8's range formatting. The agent hook is `W-10`'s.
+Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 6's markers in every engine. **Not built yet, `W-23`:** decision 3 (the layout-rule refusal in `codelaw test`); decision 5's `.editorconfig` layer and `--import-config`; decision 8's range formatting. The agent hook is `W-10`'s.
 
 ### Consequences
 
