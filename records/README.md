@@ -180,7 +180,7 @@ directions.
 | `crates/codelaw-lsp` | SR-EDITOR | decisions 1–3: the language server |
 | `crates/codelaw-mcp` | SR-CLI-MCP | decisions 5–6: the MCP server and its parity with the CLI |
 | `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
-| `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced, for the Cargo manifest |
+| `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced: the Cargo packages, the npm lockfiles and the build tools |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
 | `fixtures/l3` | SR-LAW-3 | the fixture matrix |
 | `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the five first-party packs' rules, presets and data |
