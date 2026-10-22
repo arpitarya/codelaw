@@ -17,7 +17,7 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | L5 network fence: the engine runs with networking denied | L5 checked | ✅ |
-| 2 | L2 licence check over the npm and PyPI build tools | L2 checked beyond Cargo | ✅ (npm's licence: 🔴 the decider rules) |
+| 2 | L2 licence check over the npm and PyPI build tools | L2 checked beyond Cargo | ✅ (npm's Artistic-2.0 ruled permissive, 2026-10-22) |
 | 3 | `init` writes only the paths SR-CONSUMER-LAYOUT lists | the consumer tree checked | ✅ |
 | 4 | Rule promotion: stable only after all four test levels, incl. a corpus run | SR-RULE-AUTHORING checked | ⏳ the runner and the gate are done; the pinned corpus and its CI job are not |
 | 5 | Work-system tests: queue rows, owns ↔ ownership, the registry, lost `W-nn`s, a second `archive/` | the work system checked | ✅ (today's queue fails it until its rows are fixed) |
@@ -35,14 +35,14 @@ Each check below runs in `cargo test` or `ci.yml` and fails on a violation.
 | DoD | what | state |
 |---|---|---|
 | 1 · L5 | A test runs `check` and `fix` with networking denied and expects identical output (SR-LAW-5). | ✅ `tests/network_fence.rs`; required in CI |
-| 2 · L2 | The licence check covers the npm/PyPI build tools as well as Cargo. | ✅ `tests/licences.rs`; npm's Artistic-2.0 awaits the decider |
+| 2 · L2 | The licence check covers the npm/PyPI build tools as well as Cargo. | ✅ `tests/licences.rs`; npm's Artistic-2.0 allowed by the decider, 2026-10-22 |
 | 3 · init | An `init` fixture compares `git status` with SR-CONSUMER-LAYOUT §1. | ✅ `tests/consumer_layout.rs` |
 | 4 · promotion | `codelaw test --corpus` and a CI job that promotes a rule to `stable` only after levels 1–4. | ⏳ `--corpus` and the `stable` gate done; the pinned corpus and the CI job not built |
 | 5 · work system | Tests for SR-WORK-OPEN-QUEUE rows (13–19, 42, 45), SR-WORK-OWNERSHIP decision 2, SR-WORK-REGISTRY decisions 5–8, lost `W-nn`s (the record's own check command misreports: `ls a b` fails when either is missing), one `archive/`. | ✅ `scripts/check-work-system.py`, in CI |
 
 ## Blockers
 
-- **The decider:** whether npm's `Artistic-2.0` passes L2. It is OSI-approved and not copyleft by SR-LAW-2 decision 2's test, but not among that decision's examples. `licences.rs` lists it in `AWAITING_RULING`, prints it on every run and refuses the list growing. Nothing else waits on it.
+None. npm's `Artistic-2.0` was ruled permissive by the decider, 2026-10-22: SR-LAW-2 decision 2 names it, `licences.rs` allows it and `AWAITING_RULING` is empty.
 
 ## What landed (2026-10-22, branch `W-20-conformance`)
 

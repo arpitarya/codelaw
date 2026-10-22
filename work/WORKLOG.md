@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-22 — npm's Artistic-2.0 ruled permissive  ·  Claude Code (Opus 5.5)
+
+- **Asked:** the decider, asked whether they had ruled on npm's licence: *"Yes, I ruled it."*
+- **Done:** the ruling recorded: SR-LAW-2 decision 2 names Artistic-2.0 (it conditions only a redistributed modified copy of the package itself, so nothing that uses or aggregates npm carries its terms); `licences.rs` allows it and `AWAITING_RULING` is empty and may not grow without the decider; W-20 step 2 and its inbox row closed.
+- **Decided / left open:** the ruling is the decider's, 2026-10-22. The edits that record it were found uncommitted in the main checkout; the decider confirmed them.
+- **Mistakes:** none.
+- **Next:** merge W-11, W-13 and W-19.
+
+---
+
 ## 2026-10-22 — W-21 and W-23 finished and merged  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"continue"* (same session as the entry below).

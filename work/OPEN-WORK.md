@@ -28,8 +28,6 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 | | |
 | 🔴 Give the `npm` and `pypi` environments one tag rule `v*` and no branch rule (GitHub Settings → Environments; [`RELEASING.md`](../RELEASING.md) step 5) | 2026-10-20 | 0 d |
 | ↳ **blocks:** W-18 | | |
-| 🔴 Whether npm's licence, `Artistic-2.0`, passes L2: OSI-approved and not copyleft by SR-LAW-2 decision 2's test, but not among its examples; `licences.rs` lists it as awaiting a ruling ([W-20](open/W-20-conformance-tests.md)) | 2026-10-22 | 0 d |
-| ↳ **blocks:** W-20 step 2's last line | | |
 | 🔴 Two pack rules fail the layout check: `js/no-irregular-whitespace` (a layout rule: Biome turns its no-break space into a space) and `css/media-query-no-invalid` (Biome's `not (` makes an invalid query valid). Drop, rewrite or exempt each ([W-23](open/W-23-formatter-rest.md)) | 2026-10-22 | 0 d |
 | ↳ **blocks:** W-23 DoD 1 · `codelaw test packs/js` and `packs/css` pass | | |
 | 🔴 Modern CSS needs `tree-sitter-css` changed: fork it in-tree (parser regenerated with the MIT tree-sitter CLI) or patch upstream and wait; either is an L2 check and a record ([W-21](open/W-21-pack-engine-gaps.md)) | 2026-10-22 | 0 d |
@@ -54,7 +52,7 @@ here. Read that record before changing anything below it.
 ### testing
 
 🔴 **W-18** `agent` CI and release hardened 2026-10-20 (pipefail, SHA-pinned actions, pinned npm, verified `SHA256SUMS` + attestation, eight-platform smoke job); left: the tag-only environment rule (decider, inbox) and the staging-index install. Filed by Arpit (Cowork). [detail](open/W-18-release-hardening.md)
-🔴 **W-20** `agent` Conformance tests landed and verified 2026-10-22 (L5 fence, L2 over npm/PyPI tools, `init` paths, promotion gate, work-system checks); left: the pinned corpus and its CI job, and npm's licence ruling (inbox). Filed by Arpit (Cowork). [detail](open/W-20-conformance-tests.md)
+🟢 **W-20** `agent` Conformance tests landed and verified 2026-10-22 (L5 fence, L2 over npm/PyPI tools, `init` paths, promotion gate, work-system checks); npm's Artistic-2.0 ruled permissive 2026-10-22; left: the pinned corpus and its CI job. Filed by Arpit (Cowork). [detail](open/W-20-conformance-tests.md)
 🟢 **W-19** `agent` Build `codelaw bench`, measure every target, propose L8's budgets, add the CI perf gate. Filed by Arpit (Cowork). [detail](open/W-19-performance-budgets.md)
 
 ### record update

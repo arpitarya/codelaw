@@ -10,7 +10,7 @@ feature: the licence and cost of every dependency
 owns:
   - crates/codelaw-cli/tests/licences.rs
 laws: [L0, L2]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-22T06:25:00Z
 content_sha: ""
 ---
 
@@ -74,7 +74,10 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
 2. **Every dependency is permissive.** Its licence imposes no obligation to
    release a combined or derived work under the same terms. Allowed examples:
    MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Zlib, 0BSD,
-   Unicode-3.0. **Copyleft is refused, strong or weak:** GPL, AGPL, LGPL,
+   Unicode-3.0, Artistic-2.0. Artistic-2.0 conditions only a *modified copy
+   of the package itself* that is redistributed (share the changes or rename
+   it); nothing that uses or aggregates it carries its terms, so it passes —
+   the decider's ruling, 2026-10-22, for npm (W-20). **Copyleft is refused, strong or weak:** GPL, AGPL, LGPL,
    MPL, EPL, CDDL, EUPL, OSL, and any licence of that kind.
 3. **Refused outright:** paid or commercial licences, proprietary code,
    freemium tiers, source-available licences (BSL, SSPL, Commons Clause,
@@ -105,10 +108,10 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
     `package.json` dependencies, and each one found must be declared in its
     `BUILD_TOOLS` table with its licence, its source and what it installs in
     turn. An undeclared install, or a declared one nothing installs, fails.
-- **Awaiting a ruling:** npm itself is `Artistic-2.0` — OSI-approved and not
-  copyleft by decision 2's test, but not among decision 2's examples. The
-  test lists it in `AWAITING_RULING`, prints it on every run, and refuses the
-  list growing; whether it passes is the decider's (W-20).
+- **npm itself is `Artistic-2.0`,** allowed by decision 2 since the
+  decider's ruling of 2026-10-22: codelaw runs npm to publish and ships none
+  of it. `licences.rs` keeps an `AWAITING_RULING` list for the next licence
+  decision 2 does not name; it is empty and may not grow without the decider.
 - **The staging index the install smoke uses** (W-18, 2026-10-22) is built,
   not adopted: `scripts/staging-index.py` is the Python standard library only,
   so it adds nothing to vet. Its one installed tool, `uv` (`MIT OR Apache-2.0`,
@@ -134,6 +137,10 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
 
 - The decider's ruling, 2026-10-18 — [`work/WORKLOG.md`](../work/WORKLOG.md),
   the entry of that date titled *law L2 filed*.
+- The decider's ruling, 2026-10-22, that npm's `Artistic-2.0` passes decision 2
+  — [`work/WORKLOG.md`](../work/WORKLOG.md), the entry of that date titled
+  *npm's Artistic-2.0 ruled permissive*.
+- Artistic License 2.0 — https://opensource.org/license/artistic-2-0
 - The OSI-approved licence list — https://opensource.org/licenses
 
 ### Veto condition

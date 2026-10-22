@@ -23,6 +23,9 @@ const ALLOWED: &[&str] = &[
     "Unicode-DFS-2016",
     "Unlicense",
     "BSL-1.0",
+    // Conditions only a redistributed modified copy of the package itself;
+    // the decider ruled it permissive, 2026-10-22 (npm, W-20).
+    "Artistic-2.0",
 ];
 
 fn tokens(expr: &str) -> Vec<String> {
@@ -218,12 +221,10 @@ const BUILD_TOOLS: &[BuildTool] = &[
 ];
 
 /// Build tools whose licence the allow-list does not name and the decider
-/// has not ruled on yet. Each is printed on every run, and the list may only
-/// shrink. npm's Artistic-2.0 is OSI-approved and asks no derived work to
-/// carry its terms (decision 2's test), but it is not among decision 2's
-/// examples, so whether it passes is the decider's call (W-20).
-const AWAITING_RULING: &[(&str, &str)] =
-    &[("npm", "Artistic-2.0 — OSI-approved and not copyleft by decision 2's test, but not on its list: the decider rules (W-20)")];
+/// has not ruled on yet. Each is printed on every run. Empty since npm's
+/// Artistic-2.0 was ruled permissive (2026-10-22, W-20); an entry is the
+/// decider's to add.
+const AWAITING_RULING: &[(&str, &str)] = &[];
 
 fn repo_root() -> std::path::PathBuf {
     std::path::Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().to_path_buf()
@@ -435,8 +436,8 @@ fn every_build_tool_is_declared_and_free_and_permissive() {
         }
     }
     assert!(refused.is_empty(), "L2 refuses:\n{}", refused.join("\n"));
-    // It held one entry, npm, when W-20 opened it; a new one is the decider's to add.
-    assert!(AWAITING_RULING.len() <= 1, "AWAITING_RULING may only shrink: {AWAITING_RULING:?}");
+    // Empty since the npm ruling (2026-10-22); a new entry is the decider's to add.
+    assert!(AWAITING_RULING.is_empty(), "AWAITING_RULING grew without the decider: {AWAITING_RULING:?}");
     for (name, _) in AWAITING_RULING {
         let t = BUILD_TOOLS.iter().find(|t| t.name == *name).expect("an awaited tool is declared");
         assert!(!expression_allowed(t.licence), "`{name}` passes now: remove it from AWAITING_RULING");
