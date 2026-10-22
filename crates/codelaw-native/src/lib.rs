@@ -300,6 +300,7 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &html_rules::NoInlineScript,
     &html_rules::NoInlineStyle,
     &html_document::NoMissingReferences,
+    &html_document::NoUtf8Bom,
     &html_rules::NoMultipleMain,
     &html_rules::NoRawCharacters,
     &html_a11y::NoRedundantAriaLabel,
@@ -367,8 +368,10 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &data_md::NoInlineHtml,
     &data_md::NoReversedLinks,
     &data_md::ReferenceLinksImages,
+    &data_md::RelativeLinks,
     &data_md::SingleH1,
     &data_md::TableColumnCount,
+    &node::Hashbang,
     &node::NoDeprecatedApi,
     &python_bugbear::AbstractBaseClassWithoutAbstractMethod,
     &python_isort::AllSorted,
@@ -517,6 +520,45 @@ pub fn lookup(id: &str) -> Option<&'static dyn NativeRule> {
         return Some(r);
     }
     REGISTRY.iter().copied().find(|r| r.id() == id)
+}
+
+/// A file and a fixed set of neighbours, for the tests of rules that read
+/// them.
+#[cfg(test)]
+pub(crate) struct MemoryFiles {
+    path: String,
+    bytes: Vec<u8>,
+    files: Vec<(String, String)>,
+}
+
+#[cfg(test)]
+impl MemoryFiles {
+    pub fn new(path: &str, source: &str, files: &[(&str, &str)]) -> Self {
+        MemoryFiles { path: path.into(), bytes: source.as_bytes().to_vec(), files: files.iter().map(|(p, t)| (p.to_string(), t.to_string())).collect() }
+    }
+}
+
+#[cfg(test)]
+impl FileContext for MemoryFiles {
+    fn path(&self) -> &str {
+        &self.path
+    }
+    fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+    fn exists(&self, path: &str) -> bool {
+        path.is_empty() || path == self.path || self.is_dir(path) || self.files.iter().any(|(p, _)| p == path)
+    }
+    fn is_dir(&self, path: &str) -> bool {
+        let dir = format!("{path}/");
+        path.is_empty() || self.path.starts_with(&dir) || self.files.iter().any(|(p, _)| p.starts_with(&dir))
+    }
+    fn read(&self, path: &str) -> Option<String> {
+        self.files.iter().find(|(p, _)| p == path).map(|(_, t)| t.clone())
+    }
+    fn list(&self, _: &str) -> Option<Vec<String>> {
+        None
+    }
 }
 
 #[cfg(test)]

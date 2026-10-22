@@ -5,6 +5,7 @@
 
 use crate::compile::{CompiledRule, Matcher};
 use crate::discover::{FileEntry, language_enabled};
+use crate::files::{Asked, ProjectFile, Tree};
 use crate::timings::Phase;
 use crate::{Project, suppress};
 use codelaw_cache::KeyBuilder;
@@ -31,11 +32,23 @@ pub(crate) struct RunMode<'a> {
     pub external_fixers: bool,
     /// Fix candidates the fix loop refused: reported as `manual`.
     pub refused: Option<&'a BTreeSet<String>>,
+    /// The file on disk starts with a byte-order mark, which the text does
+    /// not hold (native rules see it in the bytes, decision 15b).
+    pub bom: bool,
+    /// Where native rules see the files around this one.
+    pub tree: Tree<'a>,
 }
 
 impl RunMode<'static> {
     pub fn check() -> Self {
-        RunMode { external_fixers: false, refused: None }
+        RunMode { external_fixers: false, refused: None, bom: false, tree: Tree::Disk }
+    }
+}
+
+impl RunMode<'_> {
+    /// The same pass for a file with a byte-order mark, or without.
+    pub fn with_bom(self, bom: bool) -> Self {
+        RunMode { bom, ..self }
     }
 }
 
@@ -44,6 +57,16 @@ pub(crate) struct LintOutput {
     pub diagnostics: Vec<Diagnostic>,
     /// Fixable diagnostics as candidates, in diagnostic order.
     pub candidates: Vec<(Candidate, FixClass)>,
+    /// What native rules asked about other files: a cached result holds
+    /// only while every answer does.
+    pub asked: Vec<Asked>,
+}
+
+/// One file's cached lint result.
+#[derive(serde::Serialize, serde::Deserialize)]
+struct CachedFile {
+    diagnostics: Vec<Diagnostic>,
+    asked: Vec<Asked>,
 }
 
 /// A raw finding in host coordinates, before it becomes a diagnostic.
@@ -175,7 +198,7 @@ impl Project {
             Ok(f) => f,
             Err(skipped) => return skipped,
         };
-        let key = KeyBuilder::new("file")
+        let key = KeyBuilder::new("file+asked")
             .part(&entry.rel)
             .part(if file.bom { "bom" } else { "" })
             .part(entry.language.name())
@@ -189,17 +212,18 @@ impl Project {
             .part(format!("{:?}", self.formatting.options_for(&entry.abs)))
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
             .key();
-        let cached = self.cache.get::<Vec<Diagnostic>>(&key);
+        // A result that read other files holds only while their answers do.
+        let cached = self.cache.get::<CachedFile>(&key).filter(|c| crate::files::still_holds(self.root(), &c.asked));
         if let Some(t) = &self.timings {
             t.cache(cached.is_some());
         }
         let mut diagnostics = match cached {
-            Some(d) => d,
+            Some(c) => c.diagnostics,
             None => {
-                let mut out = lint_text(self, entry, &file.text, &RunMode::check());
+                let mut out = lint_text(self, entry, &file.text, &RunMode::check().with_bom(file.bom));
                 out.diagnostics.extend(crate::format::check_diagnostic(self, entry, &file.text));
                 if !out.diagnostics.iter().any(|d| d.rule == "codelaw/internal-error") {
-                    self.cache.put(&key, &out.diagnostics);
+                    self.cache.put(&key, &CachedFile { diagnostics: out.diagnostics.clone(), asked: out.asked });
                 }
                 out.diagnostics
             }
@@ -256,6 +280,20 @@ fn with_line_endings(mut edits: Vec<TextEdit>, crlf: bool) -> Vec<TextEdit> {
     edits
 }
 
+/// What a project extracts as embedded regions (SR-LINTER decision 3).
+pub(crate) fn region_options(project: &Project) -> RegionOptions {
+    RegionOptions { lint_code_blocks: project.config.lint_code_blocks(), tagged_templates: project.config.tagged_templates() }
+}
+
+/// Whether a host language can hold regions under these options.
+pub(crate) fn has_regions(language: Language, opts: RegionOptions) -> bool {
+    match language {
+        Language::Html | Language::Markdown => true,
+        Language::Javascript | Language::Jsx | Language::Typescript | Language::Tsx => opts.tagged_templates,
+        _ => false,
+    }
+}
+
 pub(crate) fn comment_ranges(root: &Root, text: &str) -> Vec<(usize, usize)> {
     let mut out = Vec::new();
     for n in root.root().dfs() {
@@ -298,7 +336,8 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
         .collect();
 
     let host_rules: Vec<_> = active.iter().filter(|(_, r, _)| r.applies_to_language(entry.language) && r.loaded.rule.host.is_none()).cloned().collect();
-    let may_have_regions = matches!(entry.language, Language::Html | Language::Markdown);
+    let opts = region_options(project);
+    let may_have_regions = has_regions(entry.language, opts);
     let region_rules_exist = may_have_regions
         && active.iter().any(|(_, r, _)| {
             r.loaded.rule.languages.iter().any(|l| *l != entry.language)
@@ -314,7 +353,7 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
             let index = LineIndex::new(text);
             apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &[], &mut diagnostics);
         }
-        return LintOutput { diagnostics, candidates: Vec::new() };
+        return LintOutput { diagnostics, candidates: Vec::new(), asked: Vec::new() };
     }
 
     let host_root = {
@@ -323,7 +362,6 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
     };
     let mut units: Vec<Unit> = Vec::new();
     if region_rules_exist {
-        let opts = RegionOptions { lint_code_blocks: project.config.lint_code_blocks() };
         for region in codelaw_lang::regions(entry.language, &host_root, text, opts) {
             if !language_enabled(project, &entry.abs, region.language) {
                 continue;
@@ -355,26 +393,34 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
     units.insert(0, Unit { language: entry.language, grammar: Grammar::for_language(entry.language), root: host_root, text: host_text, region: None, rules: host_rules });
 
     let crlf = dominant_crlf(text);
+    // Every unit, regions included, sees the host file (decision 15b).
+    let file = ProjectFile::new(&entry.rel, text, mode.bom, project.root(), mode.tree);
     let mut findings: Vec<Finding> = Vec::new();
     let mut comments: Vec<(usize, usize)> = Vec::new();
     for unit in &units {
-        let unit_findings = run_unit(project, entry, unit, mode);
-        let map = |o: usize| match &unit.region {
-            Some(r) => r.to_host(o),
-            None => Some(o),
+        let unit_findings = run_unit(project, entry, unit, mode, &file);
+        // A region's offsets map back to the host; nothing inside a hole
+        // (a template's `${…}`) does, and no edit may reach into one.
+        let span = |s: usize, e: usize| match &unit.region {
+            Some(r) => r.span_to_host(s, e),
+            None => Some((s, e)),
+        };
+        let edit_span = |s: usize, e: usize| match &unit.region {
+            Some(r) => r.edit_to_host(s, e),
+            None => Some((s, e)),
         };
         for c in comment_ranges(&unit.root, &unit.text) {
-            if let (Some(s), Some(e)) = (map(c.0), map(c.1)) {
-                comments.push((s, e));
+            if let Some(m) = span(c.0, c.1) {
+                comments.push(m);
             }
         }
         for mut f in unit_findings {
-            let (Some(s), Some(e)) = (map(f.start), map(f.end)) else { continue };
+            let Some((s, e)) = span(f.start, f.end) else { continue };
             f.start = s;
             f.end = e;
             if let Some(edits) = f.edits.take() {
                 let mapped: Option<Vec<TextEdit>> =
-                    edits.into_iter().map(|ed| Some(TextEdit::new(map(ed.start)?, map(ed.end)?, ed.text))).collect();
+                    edits.into_iter().map(|ed| edit_span(ed.start, ed.end).map(|(s, e)| TextEdit::new(s, e, ed.text))).collect();
                 match mapped {
                     Some(m) => f.edits = Some(with_line_endings(m, crlf)),
                     None => f.note = Some("fix-outside-region".into()),
@@ -464,7 +510,7 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
         .filter(|d| d.fix != FixClass::Manual && !d.edits.is_empty())
         .map(|d| (Candidate { rule: d.rule.clone(), edits: d.edits.clone() }, d.fix))
         .collect();
-    LintOutput { diagnostics, candidates }
+    LintOutput { diagnostics, candidates, asked: file.asked() }
 }
 #[allow(clippy::too_many_arguments)]
 fn apply_suppressions(
@@ -549,7 +595,7 @@ fn panic_message(p: &(dyn std::any::Any + Send)) -> String {
 
 /// Walk one unit once, dispatching each node to the rules whose kinds
 /// match (decision 15); a rule that panics is isolated (decision 25).
-fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMode<'_>) -> Vec<Finding> {
+fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMode<'_>, file: &ProjectFile<'_>) -> Vec<Finding> {
     if unit.rules.is_empty() {
         return Vec::new();
     }
@@ -625,7 +671,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 }
                 Matcher::Native(nr) => {
                     let options = if cfg.options.is_empty() { &empty } else { &cfg.options };
-                    let ctx = NativeContext { source: &unit.text, language: unit.language, semantic: semantic.as_ref(), options, data: &rule.loaded.data, file: &codelaw_native::DetachedFile::default() };
+                    let ctx = NativeContext { source: &unit.text, language: unit.language, semantic: semantic.as_ref(), options, data: &rule.loaded.data, file };
                     let out = &mut native[slot];
                     if let Err(p) = catch_unwind(AssertUnwindSafe(|| nr.check(node.clone(), &ctx, out))) {
                         failed[slot] = Some(panic_message(p.as_ref()));

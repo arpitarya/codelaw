@@ -1,6 +1,7 @@
-description = "eslint-plugin-n 18.5.0 recommended-module: the rules that need no package.json, and the import rules on the project graph, reimplemented"
+description = "eslint-plugin-n 18.5.0 recommended-module: the rules that need no package.json, hashbang on package.json's bin, and the import rules on the project graph, reimplemented"
 
 [rules]
+"node/hashbang" = "error"
 "node/no-deprecated-api" = "error"
 "node/no-exports-assign" = "error"
 "node/no-process-exit" = "error"

@@ -266,7 +266,7 @@ impl Project {
     pub fn check_files(&self, files: &[(String, Language, String)]) -> Vec<Diagnostic> {
         let mut out = Vec::new();
         for (rel, language, text) in files {
-            out.extend(self.check_source(rel, *language, text).into_iter().filter(|d| d.rule != "codelaw/no-rules"));
+            out.extend(self.check_source_in(rel, *language, text, crate::files::Tree::Memory(files)).into_iter().filter(|d| d.rule != "codelaw/no-rules"));
         }
         let sources = self.virtual_sources(files);
         out.extend(self.run_graph_rules(&sources, self.graph_config().unwrap_or_default()));
@@ -277,7 +277,7 @@ impl Project {
     /// Fix an in-memory set of files; nothing is written.
     pub fn fix_files(&self, files: &[(String, Language, String)], unsafe_fixes: bool) -> Vec<(String, String)> {
         let mut texts: Vec<(String, Language, String)> =
-            files.iter().map(|(rel, l, t)| (rel.clone(), *l, self.fix_source(rel, *l, t, unsafe_fixes).fixed)).collect();
+            files.iter().map(|(rel, l, t)| (rel.clone(), *l, self.fix_source_in(rel, *l, t, unsafe_fixes, crate::files::Tree::Memory(files)).fixed)).collect();
         let mut sources = self.virtual_sources(&texts);
         self.fix_graph(&mut sources, &self.graph_config().unwrap_or_default(), unsafe_fixes, 10);
         for (rel, _, text) in texts.iter_mut() {

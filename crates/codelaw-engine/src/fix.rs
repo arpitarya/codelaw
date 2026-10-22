@@ -7,13 +7,13 @@
 //! verification is rolled back while the lint fixes are kept.
 
 use crate::discover::FileEntry;
+use crate::files::Tree;
 use crate::lint::{FileResult, RunMode, lint_text, meta_diagnostic};
 use crate::{CheckReport, EngineError, Project};
 use codelaw_cache::hash_bytes;
 use codelaw_core::{Diagnostic, FixClass};
-use codelaw_core::Language;
 use codelaw_fix::{Failure, LoopTrace, fix_loop_with};
-use codelaw_lang::{Grammar, RegionOptions};
+use codelaw_lang::Grammar;
 use rayon::prelude::*;
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -93,8 +93,8 @@ impl FixReport {
 pub(crate) fn syntax_errors(project: &Project, entry: &FileEntry, text: &str) -> usize {
     let root = codelaw_lang::parse(entry.language, text);
     let mut n = codelaw_lang::syntax_error_count(&root);
-    if matches!(entry.language, Language::Html | Language::Markdown) {
-        let opts = RegionOptions { lint_code_blocks: project.config.lint_code_blocks() };
+    let opts = crate::lint::region_options(project);
+    if crate::lint::has_regions(entry.language, opts) {
         for region in codelaw_lang::regions(entry.language, &root, text, opts) {
             if region.grammar == Grammar::for_language(region.language) {
                 n += codelaw_lang::syntax_error_count(&codelaw_lang::parse_grammar(region.grammar, &region.text));
@@ -109,9 +109,14 @@ pub(crate) fn firing(diagnostics: &[Diagnostic]) -> BTreeSet<String> {
     diagnostics.iter().filter(|d| !d.rule.starts_with("codelaw/")).map(|d| d.rule.clone()).collect()
 }
 
+/// A lint pass of the fix loop.
+fn mode<'a>(external_fixers: bool, refused: &'a BTreeSet<String>, bom: bool, tree: Tree<'a>) -> RunMode<'a> {
+    RunMode { external_fixers, refused: Some(refused), bom, tree }
+}
+
 /// Fix one file's text, then, with `format`, format it (decision 4 of
 /// SR-FORMATTER; `fix_source` and the rule tester don't).
-pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options: &FixOptions, format: bool) -> FileFix {
+pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options: &FixOptions, format: bool, bom: bool, tree: Tree<'_>) -> FileFix {
     let wanted = |class: FixClass| class == FixClass::Auto || (options.unsafe_fixes && class == FixClass::Suggest);
     let mut before: Option<BTreeSet<String>> = None;
     // Each run records its own trace; the one kept is the run whose result
@@ -122,7 +127,7 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
             text,
             |t| syntax_errors(project, entry, t),
             |current, refused| {
-                let out = lint_text(project, entry, current, &RunMode { external_fixers: true, refused: Some(refused) });
+                let out = lint_text(project, entry, current, &mode(true, refused, bom, tree));
                 if before.is_none() {
                     *before = Some(firing(&out.diagnostics));
                 }
@@ -139,7 +144,7 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
     let mut denied: BTreeSet<String> = BTreeSet::new();
     let mut trace = new_trace();
     let mut outcome = run(&denied, &mut before, &mut trace);
-    let mut remaining = lint_text(project, entry, &outcome.text, &RunMode { external_fixers: false, refused: Some(&outcome.refused) }).diagnostics;
+    let mut remaining = lint_text(project, entry, &outcome.text, &mode(false, &outcome.refused, bom, tree)).diagnostics;
     let before = before.unwrap_or_default();
     let new_rules = |remaining: &[Diagnostic]| firing(remaining).difference(&before).next().is_some();
     if new_rules(&remaining) {
@@ -150,7 +155,7 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
             d.insert(culprit.clone());
             let mut t = new_trace();
             let o = run(&d, &mut None, &mut t);
-            let r = lint_text(project, entry, &o.text, &RunMode { external_fixers: false, refused: Some(&o.refused) }).diagnostics;
+            let r = lint_text(project, entry, &o.text, &mode(false, &o.refused, bom, tree)).diagnostics;
             if !new_rules(&r) {
                 denied = d;
                 (outcome, remaining, trace) = (o, r, t);
@@ -162,7 +167,7 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
             denied.extend(applied);
             trace = new_trace();
             outcome = run(&denied, &mut None, &mut trace);
-            remaining = lint_text(project, entry, &outcome.text, &RunMode { external_fixers: false, refused: Some(&outcome.refused) }).diagnostics;
+            remaining = lint_text(project, entry, &outcome.text, &mode(false, &outcome.refused, bom, tree)).diagnostics;
         }
         for rule in &denied {
             outcome.failed.insert((rule.clone(), Failure::VerifyFailed));
@@ -177,7 +182,7 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
                 fixed = out;
                 formatted = true;
                 *applied.entry(crate::format::UNFORMATTED.to_owned()).or_default() += 1;
-                remaining = lint_text(project, entry, &fixed, &RunMode { external_fixers: false, refused: Some(&outcome.refused) }).diagnostics;
+                remaining = lint_text(project, entry, &fixed, &mode(false, &outcome.refused, bom, tree)).diagnostics;
             }
             Ok(_) => {}
             Err(e) => remaining.extend(crate::format::failed(project, entry, &e)),
@@ -289,7 +294,7 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
                     Ok(f) => f,
                     Err(skip) => return (None, skip),
                 };
-                let mut fix = fix_text(this, entry, &file.text, options, this.formats(entry));
+                let mut fix = fix_text(this, entry, &file.text, options, this.formats(entry), file.bom, Tree::Disk);
                 let mut diagnostics = std::mem::take(&mut fix.remaining);
                 if fix.changed() && !options.dry_run {
                     match safe_write(&entry.abs, &file.bytes, &fix.fixed, file.bom) {
@@ -297,7 +302,7 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
                         Err(why) => {
                             // The disk still holds the original, so report what
                             // the original has, not what the fixes would leave.
-                            diagnostics = lint_text(this, entry, &file.text, &RunMode::check()).diagnostics;
+                            diagnostics = lint_text(this, entry, &file.text, &RunMode::check().with_bom(file.bom)).diagnostics;
                             let layers = this.config.layers_for(&entry.abs);
                             let (id, message) = match why {
                                 WriteError::Changed => {

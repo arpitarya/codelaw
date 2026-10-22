@@ -10,7 +10,7 @@ mod regions;
 
 pub use ast_grep_core::Language as AgLanguage;
 pub use grammar::Grammar;
-pub use regions::{Region, RegionOptions, regions};
+pub use regions::{Hole, Region, RegionOptions, regions};
 
 use ast_grep_core::tree_sitter::{LanguageExt, StrDoc};
 use ast_grep_core::{AstGrep, Node};

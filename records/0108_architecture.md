@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-22T18:00:00Z
 content_sha: ""
 ---
 
@@ -121,6 +121,8 @@ The decider asked for the architecture to be designed and its gaps filled. The f
   - **An unknown id refuses the rule at load,** naming the pack's `min_codelaw`.
   - **Same discipline as every rule:** a native rule declares the node kinds it needs (decision 15), is isolated on panic (decision 25) and is deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)).
   - **What it reads:** the file, its semantic model, the rule's options and the pack's data tables (decision 15c).
+  - **What it sees of the file beyond its text:** its project-relative path, its bytes as they are on disk (a byte-order mark included, which the text never holds), and a read-only view of the project's files — whether a path exists or is a folder, a file's text, a folder's listing. Paths are `/`-separated and relative to the project root; a path with a `..`, `.` or empty segment answers "no", so nothing outside the root is read. An embedded region sees its host file. `check_files` and `codelaw test` answer from the in-memory set, never the disk.
+  - **Cached results stay honest:** every question a rule asks about another file is stored with a hash of its answer in the file's cached result, and the result is reused only while every answer still holds ([SR-CACHE](0109_cache.md) §1), so a link checked against a missing file is checked again once the file exists. *(W-21, 2026-10-22.)*
   - **Only first-party packs** and ejected copies of their rules may use `native:` ([SR-RULE-PACKS](0101_rule-packs.md) decision 10).
 
 15c. **Rule packs and data tables.** Rules come from the packs resolved by [SR-RULE-PACKS](0101_rule-packs.md) decision 4, plus local rules. The engine embeds only its own (`codelaw/*` diagnostics and `graph/no-deprecated-usage`).

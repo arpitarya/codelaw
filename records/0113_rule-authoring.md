@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-test
   - crates/codelaw-cli/tests/promotion.rs
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-22T18:00:00Z
 content_sha: ""
 ---
 
@@ -87,6 +87,8 @@ The decider asked that rules can be written manually or by an AI agent with a sk
    | cases | `<name>.cases.md` | exact diagnostics (`line:col rule`) and exact fixed output, per case |
    | invariants | frontmatter `invariant:` plus the built-ins | still parses · only the fix's range changed · deterministic · isolated across languages · rule-specific (e.g. `exports-unchanged`) |
    | corpus | `codelaw test --corpus` (codelaw's CI) | real pinned repos: invariants hold, finding counts are snapshotted, and the repo still builds and passes its own tests after fixes |
+
+   A file-scope rule's snippet whose first line names a file (`// path`, `# path` or `<!-- path -->`) is checked as a set of files too, so a native rule that reads the files around it (path, bytes, neighbours: [SR-ARCHITECTURE](0108_architecture.md) decision 15b) is tested on a virtual repo; "still parses" then counts each file in its own language. *(W-21, 2026-10-22.)*
 
 5. **Bugs become cases first.** A false positive or negative is fixed by adding the failing case, then changing the rule. The `codelaw-debug-rule` skill enforces that order.
 6. **Lifecycle.** A new rule starts `stability: preview` and becomes `stable` after a corpus run with no unexpressible false positives ([SR-RULE-PACKS](0101_rule-packs.md) decision 9).

@@ -1056,6 +1056,7 @@ dependencies = [
  "globset",
  "ignore",
  "rayon",
+ "serde",
  "serde_json",
 ]
 

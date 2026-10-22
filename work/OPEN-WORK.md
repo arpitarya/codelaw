@@ -45,7 +45,7 @@ here. Read that record before changing anything below it.
 🟢 **W-23** `agent` Finish SR-FORMATTER: steps 1, 2 and 4 landed 2026-10-22; `--import-config` and LSP range formatting are written but uncommitted and unbuilt in its worktree. Filed by Arpit (Claude Code). [detail](open/W-23-formatter-rest.md)
 🟢 **W-11** `agent` Project graph and `graph:` rules built and verified on `main` 2026-10-22, with the six `node/` import rules; left: judge the corpus false-positive rate (step 4). Filed by Arpit (Cowork). [detail](open/W-11-project-graph.md)
 🟢 **W-15** `agent` Warm processes landed and verified 2026-10-22: rule-set cache, sockets, `--prefer-warm`, the daemon, incremental re-parse; left: the `[lsp] tree_cache` bound. Filed by Arpit (Cowork). [detail](open/W-15-warm-processes.md)
-🟢 **W-21** `agent` Close the engine gaps holding rules out of the packs: tagged templates, native-rule file context, modern CSS. Three rules and a file-context module are written but uncommitted and unbuilt in its worktree. Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
+🟢 **W-21** `agent` Close the engine gaps holding rules out of the packs. Templates, file context and three rules are green on branch `W-21-pack-gaps`, unmerged; modern CSS needs a grammar fork, the decider's call. Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
 🟡 **W-13** `agent` Build baselines, deprecations, `--as-of` and `--changed-since`/`--staged`; waiting on W-11 for `graph/no-deprecated-usage`. Filed by Arpit (Cowork). [detail](open/W-13-baseline-and-time.md)
 
 ### testing

@@ -960,6 +960,71 @@ impl NativeRule for LinkFragments {
     }
 }
 
+/// A link destination that names a file of the project: no scheme, no
+/// protocol-relative `//`, not an in-page `#fragment`, no template syntax.
+/// Returns it without its `?query` and `#fragment`, percent-decoded.
+fn relative_target(dest: &str) -> Option<String> {
+    let d = dest.trim().trim_start_matches('<').trim_end_matches('>').trim();
+    if d.is_empty() || d.starts_with('#') || d.starts_with("//") || ["{{", "${", "<%", "{%"].iter().any(|t| d.contains(t)) {
+        return None;
+    }
+    // `scheme:` (`https:`, `mailto:`, `data:`); a Windows drive is not a link.
+    if let Some(colon) = d.find(':') {
+        let scheme = &d[..colon];
+        if scheme.len() > 1 && scheme.chars().next().is_some_and(|c| c.is_ascii_alphabetic()) && scheme.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '+' | '-' | '.')) {
+            return None;
+        }
+    }
+    let path = d.split(['#', '?']).next().unwrap_or("");
+    if path.is_empty() {
+        return None;
+    }
+    Some(percent_decode(path))
+}
+
+pub struct RelativeLinks;
+
+impl NativeRule for RelativeLinks {
+    fn id(&self) -> &'static str {
+        "md/relative-links"
+    }
+    fn languages(&self) -> &'static [Language] {
+        MD
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["document"]
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let doc = node.get_inner_node();
+        let src = ctx.source;
+        if !src.contains("](") && !src.contains("]:") {
+            return;
+        }
+        let from = ctx.file.path();
+        let mut check = |dest: &str, start: usize, end: usize| {
+            let Some(target) = relative_target(dest) else { return };
+            // A link that leaves the project can't be checked from inside it.
+            let Some(path) = crate::resolve_path(from, &target) else { return };
+            if !ctx.file.exists(&path) {
+                out.push(finding(start, end, format!("Relative link to `{target}`, which doesn't exist (`{}`)", if path.is_empty() { "." } else { &path })));
+            }
+        };
+        for (base, tree) in inline_trees(doc, src, &["]("]) {
+            let isrc = tree.get_text();
+            for n in preorder(tree.root().get_inner_node()).into_iter().filter(|n| matches!(n.kind(), "inline_link" | "image")) {
+                if let Some(d) = named_children(n).into_iter().find(|c| c.kind() == "link_destination") {
+                    check(text(d, isrc), base + n.start_byte(), base + n.end_byte());
+                }
+            }
+        }
+        for d in definitions(doc, src) {
+            if let Some(dest) = &d.dest {
+                check(dest, d.start, d.end);
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1026,5 +1091,44 @@ mod tests {
         assert_eq!(found(&LinkImageReferenceDefinitions, src), ["[unused]: z", "[one]: w"]);
         let src = "# My Title\n\n## Usage: `x`\n\n## Usage: `x`\n\n<a id=\"custom\"></a>\n\n[1](#my-title) [2](#usage-x-1) [3](#nope) [4](#My-Title) [5](#custom) [6](#L10) [7](#top)\n";
         assert_eq!(found(&LinkFragments, src), ["[3](#nope)", "[4](#My-Title)"]);
+    }
+
+    /// A file that sees a fixed set of neighbours.
+    struct Tree(&'static str, &'static [&'static str]);
+
+    impl crate::FileContext for Tree {
+        fn path(&self) -> &str {
+            self.0
+        }
+        fn bytes(&self) -> &[u8] {
+            b""
+        }
+        fn exists(&self, path: &str) -> bool {
+            path.is_empty() || self.1.iter().any(|f| *f == path || f.starts_with(&format!("{path}/")))
+        }
+        fn is_dir(&self, path: &str) -> bool {
+            path.is_empty() || self.1.iter().any(|f| f.starts_with(&format!("{path}/")))
+        }
+        fn read(&self, _: &str) -> Option<String> {
+            None
+        }
+        fn list(&self, _: &str) -> Option<Vec<String>> {
+            None
+        }
+    }
+
+    #[test]
+    fn relative_links_need_the_file() {
+        let src = "# A\n\n[1](b.md) [2](./c.md#x) [3](../README.md) [4](https://x.org/y.md) [5](#a) [6](sub/) ![7](img/z.png) [8](/docs/b.md?raw=1) [9](../../out.md) [10](mailto:a@b.c) [11](<b%20c.md>)\n\n[ref]: missing.md\n";
+        let root = codelaw_lang::parse(Language::Markdown, src);
+        let options = BTreeMap::new();
+        let data = BTreeMap::new();
+        let file = Tree("docs/a.md", &["docs/a.md", "docs/b.md", "README.md", "docs/sub/x.md", "docs/b c.md"]);
+        let ctx = NativeContext { source: src, language: Language::Markdown, semantic: None, options: &options, data: &data, file: &file };
+        let mut out = Vec::new();
+        RelativeLinks.check(root.root(), &ctx, &mut out);
+        let got: Vec<&str> = out.iter().map(|f| &src[f.start..f.end]).collect();
+        assert_eq!(got, ["[2](./c.md#x)", "![7](img/z.png)", "[ref]: missing.md"]);
+        assert!(out[0].message.contains("`./c.md`") && out[0].message.contains("`docs/c.md`"), "{}", out[0].message);
     }
 }

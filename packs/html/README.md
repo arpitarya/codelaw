@@ -14,7 +14,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 | preset | rules | ported from |
 |---|---|---|
-| `html/recommended` | 63 | html-validate 11.16.4 `html-validate:recommended`, without its layout rules and without the cosmetic rules its `prettier` and `browser` presets switch off (see below) |
+| `html/recommended` | 64 | html-validate 11.16.4 `html-validate:recommended`, without its layout rules and without the cosmetic rules its `prettier` and `browser` presets switch off (see below) |
 | `html/a11y` | 26 | html-validate 11.16.4 `html-validate:a11y`: every rule it turns on |
 | `html/document` | 5 | html-validate 11.16.4 `html-validate:document`: checks that only make sense for a complete page |
 | `html/conventions` | 3 | opt-in: the starter rule `html/target-blank-rel`, and HTMLHint's `inline-style-disabled` and `inline-script-disabled` |
@@ -29,7 +29,7 @@ is a `native:` rule, sharing one model of the document
 HTML's implied end tags, so the model rebuilds the element tree the way a
 browser (and html-validate) does, from the element table in `data/`.
 
-Fix classes: 10 `auto`, 11 `suggest`, 50 `manual`.
+Fix classes: 10 `auto`, 11 `suggest`, 51 `manual`.
 
 ## Rules
 
@@ -80,6 +80,7 @@ Fix classes: 10 `auto`, 11 `suggest`, 50 `manual`.
 | `html/no-implicit-close` | suggest | html-validate/no-implicit-close | recommended |
 | `html/no-implicit-input-type` | suggest | html-validate/no-implicit-input-type | recommended |
 | `html/no-multiple-main` | manual | html-validate/no-multiple-main | recommended |
+| `html/no-utf8-bom` | manual | html-validate/no-utf8-bom | recommended |
 | `html/no-raw-characters` | auto | html-validate/no-raw-characters, htmlhint/spec-char-escape | recommended |
 | `html/no-redundant-aria-label` | auto | html-validate/no-redundant-aria-label | recommended, a11y |
 | `html/no-redundant-for` | auto | html-validate/no-redundant-for | recommended, a11y |
@@ -124,7 +125,6 @@ its WCAG technique rules, which are named for what they check
 | html-validate `attr-delimiter`, `attr-spacing`, `no-trailing-whitespace` | never: layout — whitespace belongs to the formatter |
 | html-validate `attr-quotes`, `doctype-style` | never: layout — quoting and the doctype's case belong to the formatter (also switched off by its `prettier` preset) |
 | html-validate `attribute-boolean-style`, `attribute-empty-style`, `void-style`, `no-self-closing` | never: cosmetic — how `disabled`, `alt=""` and void tags are spelled is the formatter's call (switched off by its `browser` and `prettier` presets) |
-| html-validate `no-utf8-bom` | the engine reads past a BOM and the fixer writes it back, so a rule never sees one; needs an engine hook for the raw bytes |
 | html-validate `deprecated-rule`, `no-unused-disable` | about html-validate's own configuration and inline directives; codelaw reports its own |
 | html-validate `svg-focusable` | switched off in every upstream preset (it only matters for Internet Explorer) |
 | html-validate `no-inline-style` in `recommended` | moved to the opt-in `html/conventions`: its `browser` preset switches it off, and it is a style policy, not a correctness check |
@@ -145,6 +145,7 @@ its WCAG technique rules, which are named for what they check
 | `html/prefer-tbody` | the fix wraps the rows when they are next to each other; otherwise the rule only reports |
 | `html/heading-level` | sectioning roots are matched by tag or `[attr="value"]` selectors only |
 | `html/require-sri` | no `include`/`exclude` URL options yet |
+| `html/no-utf8-bom` | `manual`: the mark is in the file's bytes, outside the text a fix edits; only the file itself is checked, not an HTML region of another file |
 
 ## Data
 
