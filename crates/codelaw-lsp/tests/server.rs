@@ -79,6 +79,9 @@ impl Client {
         let mut c = Client { conn, server: Some(handle), next: 0, inbox: vec![] };
         let init = c.request("initialize", json!({ "capabilities": {}, "processId": null, "workspaceFolders": [{ "uri": uri(root), "name": "repo" }] }));
         assert_eq!(init["capabilities"]["positionEncoding"], "utf-16");
+        // SR-EDITOR decision 1: whole-document and range formatting.
+        assert_eq!(init["capabilities"]["documentFormattingProvider"], true);
+        assert_eq!(init["capabilities"]["documentRangeFormattingProvider"], true);
         c.notify("initialized", json!({}));
         c
     }
@@ -245,6 +248,29 @@ fn formatting_is_one_edit_to_what_format_writes_and_nothing_is_written() {
     let again = c.request("textDocument/formatting", json!({ "textDocument": { "uri": u }, "options": { "tabSize": 2, "insertSpaces": true } }));
     assert_eq!(again, json!([]));
 
+    assert_eq!(snapshot(&root), before, "the language server wrote to disk");
+    c.shutdown();
+    let _ = fs::remove_dir_all(&root);
+}
+
+/// SR-FORMATTER decision 8, SR-EDITOR decision 1: range formatting is
+/// advertised, formats only the selected lines, and writes nothing.
+#[test]
+fn range_formatting_changes_only_the_selection_and_nothing_is_written() {
+    let root = repo("range");
+    let path = root.join("src/two.js");
+    let text = "let a=1\nlet b=2\nlet c=3\n";
+    fs::write(&path, text).unwrap();
+    let before = snapshot(&root);
+    let u = uri(&path);
+    let mut c = Client::start(&root);
+    c.open(&u, "javascript", text);
+    let range = |l0: u32, l1: u32| json!({ "start": { "line": l0, "character": 0 }, "end": { "line": l1, "character": 3 } });
+    let opts = json!({ "tabSize": 2, "insertSpaces": true });
+    let edits = c.request("textDocument/rangeFormatting", json!({ "textDocument": { "uri": u }, "range": range(1, 1), "options": opts }));
+    assert_eq!(apply(text, edits.as_array().unwrap()), "let a=1\nlet b = 2;\nlet c=3\n");
+    let all = c.request("textDocument/rangeFormatting", json!({ "textDocument": { "uri": u }, "range": range(0, 2), "options": opts }));
+    assert_eq!(apply(text, all.as_array().unwrap()), "let a = 1;\nlet b = 2;\nlet c = 3;\n");
     assert_eq!(snapshot(&root), before, "the language server wrote to disk");
     c.shutdown();
     let _ = fs::remove_dir_all(&root);

@@ -13,3 +13,6 @@ codelaw-engine.workspace = true
 lsp-server.workspace = true
 lsp-types.workspace = true
 serde_json.workspace = true
+# Range formatting's line diff (SR-FORMATTER decision 8); the CLI's
+# `format --diff` pins the same version. Apache-2.0.
+similar = "=2.7.0"
