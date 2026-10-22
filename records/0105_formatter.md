@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-format
   - scripts/format-parity.py
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-22T18:00:00Z
 content_sha: ""
 ---
 
@@ -118,6 +118,10 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
      - **Which properties:** `indent_style` → `indent_style`; `indent_size` (or `tab_width` when it is `tab` or unset) → `indent_width` and `[format.python] indent_width`; `end_of_line` (`lf`, `crlf`) → `end_of_line`; `max_line_length` → `line_width` and `[format.python] line_width`. A value out of the key's range, `cr` or `off` is ignored, and `unset` removes a property.
      - **What wins:** a key `[format]` (or `[format.python]`) sets is never changed by `.editorconfig`. Section globs go through `globset` (MIT / Unlicense), already a dependency of the engine.
    - **Migrating from existing configs:** `codelaw format --import-config` reads `.prettierrc*`, `[tool.ruff.format]` and `[tool.black]` once and writes the equivalent `[format]` keys. From then on, `codelaw.toml` is the only source.
+     - **What is read** (`crates/codelaw-format/src/import.rs` translates; `codelaw-cli` reads and writes): in the project root, `.prettierrc` (JSON or YAML), `.prettierrc.json`, `.yaml`, `.yml`, `.json5`, `.toml`, and `package.json`'s `"prettier"` object; `pyproject.toml`'s `[tool.ruff]`, `[tool.ruff.format]` and `[tool.black]`. A Prettier config that is a program (`.prettierrc.js`, `prettier.config.*`, …) is never run ([L5](0007_LAW-5-no-model-in-the-engine.md)) and is listed as not imported, as is a string naming a shared config package (an error).
+     - **The mapping:** `printWidth` → `line_width`, `tabWidth` → `indent_width`, `useTabs` → `indent_style`, `endOfLine` (`lf`, `crlf`) → `end_of_line`, `singleQuote` → `quote_style`, `semi` → `semicolons`, `trailingComma` → `trailing_commas`. Ruff's `line-length` and `indent-width` (top-level `[tool.ruff]`, where Ruff keeps them, not `[tool.ruff.format]`) and Black's `line-length` → `[format.python]`. Ruff's `[tool.ruff.format]` options have no `[format]` key, so codelaw keeps Ruff's defaults for them. Every setting with no key is printed as `not imported: …`, never guessed at.
+     - **Order and once:** the first source to give a key keeps it (Prettier's files in the order above, Ruff before Black). A key the config already sets is kept as written and printed as `kept`; so a second run writes nothing. Nothing is formatted.
+     - **Where it writes:** the project's config — `codelaw.toml`, or `[tool.codelaw.format]` when the config lives in `pyproject.toml`; a project with none gets `codelaw.toml`. A config in `package.json` is refused with exit `2` (the command writes TOML). The rest of the file is kept byte for byte through `toml_edit` (MIT OR Apache-2.0).
 
 6. **Ignore markers.**
    - **codelaw's own:** `// codelaw-format-ignore` and `# codelaw-format-ignore` skip the next node.
@@ -140,14 +144,14 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    - Already-formatted files are skipped using the content-hash cache.
 
 8. **Every surface.**
-   - **LSP:** document and range formatting, and format-on-save. Document formatting is built; range formatting is not (`W-23`).
+   - **LSP:** document and range formatting, and format-on-save. Range formatting formats and verifies the whole document as document formatting does — the engines format whole files — then returns only the changed runs of a line diff (`similar`, Apache-2.0, the CLI's `=2.7.0` pin) that touch the selection's lines; a run that maps line for line is split per line, so a selection takes only its own lines. A selection ending at column 0 does not take that line. A document already formatted gets no edits.
    - **Agent hook ([SR-AGENT-SURFACES](0102_agent-surfaces.md)):** runs `fix` then `format` on the edited file, so an agent never hand-formats and never fights the formatter.
    - **MCP:** a `format_snippet` tool: the bytes `fix <path>` would write, format step included.
    - **Generated agent instructions** say "don't format by hand; codelaw formats on save".
 
 ### What is built
 
-Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`; decision 5's `.editorconfig` layer; decision 6's markers in every engine. **Not built yet, `W-23`:** decision 5's `--import-config`; decision 8's range formatting. The agent hook is `W-10`'s.
+Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`; decision 5's `.editorconfig` layer and `--import-config`; decision 6's markers in every engine; decision 8's LSP range formatting. The agent hook is `W-10`'s; nothing else in this record is missing.
 
 ### Consequences
 

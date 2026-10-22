@@ -90,13 +90,11 @@ impl Imported {
         if let Some(ruff) = tool.and_then(|t| t.get("ruff")).and_then(Value::as_table) {
             let source = "pyproject.toml [tool.ruff]";
             let mut read = false;
-            for (k, v) in ruff {
-                match k.as_str() {
-                    "line-length" => self.set("python.line_width", width(v).ok_or(format!("{source}: line-length is not a number"))?),
-                    "indent-width" => self.set("python.indent_width", width(v).ok_or(format!("{source}: indent-width is not a number"))?),
-                    _ => continue,
+            for (k, key) in [("line-length", "python.line_width"), ("indent-width", "python.indent_width")] {
+                if let Some(v) = ruff.get(k) {
+                    self.set(key, width(v).ok_or(format!("{source}: {k} is not a number"))?);
+                    read = true;
                 }
-                read = true;
             }
             if read {
                 self.sources.push(source.into());

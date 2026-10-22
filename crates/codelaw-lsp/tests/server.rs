@@ -79,6 +79,9 @@ impl Client {
         let mut c = Client { conn, server: Some(handle), next: 0, inbox: vec![] };
         let init = c.request("initialize", json!({ "capabilities": {}, "processId": null, "workspaceFolders": [{ "uri": uri(root), "name": "repo" }] }));
         assert_eq!(init["capabilities"]["positionEncoding"], "utf-16");
+        // SR-EDITOR decision 1: whole-document and range formatting.
+        assert_eq!(init["capabilities"]["documentFormattingProvider"], true);
+        assert_eq!(init["capabilities"]["documentRangeFormattingProvider"], true);
         c.notify("initialized", json!({}));
         c
     }

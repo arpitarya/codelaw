@@ -5,7 +5,7 @@ description: "Claude Code, 2026-10-21: what W-07 left of SR-FORMATTER — the la
 item: W-23
 filed: 2026-10-21
 filed_by: "Arpit (Claude Code, Opus 5.5)"
-updated: 2026-10-21
+updated: 2026-10-22
 updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: agent
 ---
@@ -18,9 +18,9 @@ ball: agent
 |---|---|---|---|
 | 1 | `codelaw test` refuses a rule whose fix only changes layout: `format(Don't) == format(Do)` | decision 3: the linter and the formatter never fight | ✅ 2026-10-22 |
 | 2 | Read `.editorconfig` as the base layer under `[format]` | decision 5 | ✅ 2026-10-22 |
-| 3 | `codelaw format --import-config`: `.prettierrc*`, `[tool.ruff.format]`, `[tool.black]` → `[format]` keys | decision 5's migration | 🟡 written, uncommitted and unbuilt in the W-23 worktree |
+| 3 | `codelaw format --import-config`: `.prettierrc*`, `[tool.ruff.format]`, `[tool.black]` → `[format]` keys | decision 5's migration | ✅ 2026-10-22 |
 | 4 | Honour `codelaw-format-ignore` and `prettier-ignore` in every engine (Ruff's `# fmt:` markers already work) | decision 6 | ✅ 2026-10-22 |
-| 5 | LSP `textDocument/rangeFormatting` | decision 8, SR-EDITOR decision 1 | 🟡 written, uncommitted and unbuilt in the W-23 worktree |
+| 5 | LSP `textDocument/rangeFormatting` | decision 8, SR-EDITOR decision 1 | ✅ 2026-10-22 |
 
 **Found by W-07, 2026-10-21:** W-07's definition of done covered the engines, the command, verification, the L7 test, the gate and the parity diff. SR-FORMATTER also decides these five, and none was built.
 
@@ -34,11 +34,11 @@ Every decision of SR-FORMATTER is built, and its "What is built" section lists n
 
 | DoD | what | state |
 |---|---|---|
-| 1 · layout rules | A rule test with `format(Don't) == format(Do)` fails, with a message naming decision 3; the five packs still pass. | ⏳ |
-| 2 · editorconfig | `indent_style`, `indent_size`, `end_of_line`, `max_line_length` from `.editorconfig` apply; `codelaw.toml` wins. Tested. | ⏳ |
-| 3 · import | `--import-config` writes the `[format]` keys once; a round-trip test per source format. | ⏳ |
-| 4 · markers | Per engine, a test where `codelaw-format-ignore` and `prettier-ignore` leave the next node byte-identical. | ⏳ |
-| 5 · range | `documentRangeFormattingProvider` advertised; a server test; nothing written. | ⏳ |
+| 1 · layout rules | A rule test with `format(Don't) == format(Do)` fails, with a message naming decision 3; the five packs still pass. | 🟡 the refusal is built and tested; the python, data and html packs pass, but `js/no-irregular-whitespace` and `css/media-query-no-invalid` fail it and wait on the decider (SR-FORMATTER decision 3) |
+| 2 · editorconfig | `indent_style`, `indent_size`, `end_of_line`, `max_line_length` from `.editorconfig` apply; `codelaw.toml` wins. Tested. | ✅ 2026-10-22 |
+| 3 · import | `--import-config` writes the `[format]` keys once; a round-trip test per source format. | ✅ 2026-10-22 — `import_config_round_trips_each_source` (`.prettierrc` JSON, `.prettierrc.yaml`, `.prettierrc.toml`, `package.json`, Ruff, Black) |
+| 4 · markers | Per engine, a test where `codelaw-format-ignore` and `prettier-ignore` leave the next node byte-identical. | ✅ 2026-10-22 |
+| 5 · range | `documentRangeFormattingProvider` advertised; a server test; nothing written. | ✅ 2026-10-22 — `range_formatting_changes_only_the_selection_and_nothing_is_written`; the capability is asserted at `initialize` |
 
 ## Blockers
 

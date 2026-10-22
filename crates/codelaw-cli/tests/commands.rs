@@ -34,13 +34,13 @@ fn import_config_round_trips_each_source() {
     for (name, file, text) in sources {
         let d = temp(&format!("import-{name}"));
         fs::write(d.join(file), text).unwrap();
-        fs::write(d.join("codelaw.toml"), "# mine\n[files]\nexclude = []\n").unwrap();
+        fs::write(d.join("codelaw.toml"), "# mine\n[files]\nfollow_symlinks = false\n").unwrap();
         let (code, out, err) = codelaw(&d, &["format", "--import-config"]);
         assert_eq!(code, 0, "{name}: {out}{err}");
         let o = read(&d);
         assert_eq!((o.line_width, o.quote_style, o.semicolons, o.trailing_commas), (100, QuoteStyle::Single, Semicolons::AsNeeded, TrailingCommas::Es5), "{name}");
         let written = fs::read_to_string(d.join("codelaw.toml")).unwrap();
-        assert!(written.starts_with("# mine\n[files]\nexclude = []\n"), "{name}: {written}");
+        assert!(written.starts_with("# mine\n[files]\nfollow_symlinks = false\n"), "{name}: {written}");
         // Once: a second run writes nothing.
         let (code, out, _) = codelaw(&d, &["format", "--import-config"]);
         assert_eq!(code, 0);
