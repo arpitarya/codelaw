@@ -9,7 +9,11 @@ default = true
 languages = ["python"]
 version_args = ["--version"]
 args = ["check", "--output-format=json", "--no-cache", "--no-fix", "--exit-zero", "--force-exclude"]
-# The fixtures were captured from 0.16.9; Ruff's minor releases change rules.
+# The fixtures were captured from 0.16.9 (tests/fixtures/ruff); Ruff's minor
+# releases change rules.
 tested = ">=0.16.9, <0.17.0"
 output = "ruff"
 ported_prefix = "ruff/"
+# The files whose content enters each cache key (SR-ARCHITECTURE decision 19),
+# looked for in every folder from the file's up to the project root.
+config_files = ["ruff.toml", ".ruff.toml", "pyproject.toml"]

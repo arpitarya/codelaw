@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-22 — the agent branches merged into main and verified clean  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"continue"* — merge each agent branch, then one clean verification run.
+- **Done:** freed 25 GB (the full disk had stopped the agents); committed the agents' unfinished-but-complete work (W-14, W-15, W-11, with W-11's record text written here); merged W-12, W-14, W-15, W-20, W-11 and W-23's committed part into `main` (the W-15 merge kept its `Output`/`Ctx` CLI shape with W-16's `fix --trace`/`format --format json` and W-14's `--no-adapters`); fixed what the merge exposed (two compile errors, a clippy lint, `daemon status` hanging on a silent socket, the warm tests' teardown). `main` `f67746d`: clippy clean, 385 tests pass. Closed W-14; archived W-10, W-12, W-16 (their branches had moved the files but left the rows).
+- **Decided / left open:** W-21's and W-23's remaining work is uncommitted and unbuilt in their worktrees, not merged. npm's `Artistic-2.0` licence put to the decider (W-20).
+- **Mistakes:** none new; the agents' runs had been unverified because the disk filled, and the verification here found one real bug (`daemon status`).
+- **Next:** finish W-21 and W-23 from their worktrees (build, records, commit, merge).
+
 ## 2026-10-21/22 — W-07 and W-09 landed; the WIP branches merged into main as-is  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *finish the agent-closable items from the 2026-10-20 state, one branch each, W-07 first*; then *"Merge everything to main. And then pull the latest main changes."* — and, asked whether that meant the unfinished `wip/*` branches, *"Merge them all as-is now."*

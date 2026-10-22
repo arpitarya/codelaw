@@ -109,10 +109,21 @@ fn fence() -> Result<Vec<String>, String> {
     }
     if cfg!(target_os = "macos") {
         let prefix = v(&["sandbox-exec", "-p", "(version 1)(allow default)(deny network*)"]);
-        return match runs(&prefix, "true", &[]) {
-            Some(_) => Ok(prefix),
-            None => Err("sandbox-exec refused the deny-network profile".into()),
-        };
+        if runs(&prefix, "true", &[]).is_none() {
+            return Err("sandbox-exec refused the deny-network profile".into());
+        }
+        // Proven, not assumed: a port this test listens on is reachable
+        // outside the fence and refused inside it.
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port().to_string();
+        let probe = ["-z", "-w", "2", "127.0.0.1", port.as_str()];
+        let open = Command::new("nc").args(probe).output().map(|o| o.status.success());
+        if open.as_ref().is_ok_and(|ok| *ok) {
+            assert!(runs(&prefix, "nc", &probe).is_none(), "`{}` let a connection to 127.0.0.1:{port} through", prefix.join(" "));
+        } else {
+            eprintln!("note: `nc` cannot reach this test's own port, so the fence is assumed, not proven ({open:?})");
+        }
+        return Ok(prefix);
     }
     Err(format!("{} has no unprivileged way to deny a process the network", std::env::consts::OS))
 }

@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "cross-file analysis"
 owns: []
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-18T16:45:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -121,7 +121,7 @@ A symbol reachable from an entry point is **never** unused:
 | `package.json` | `main`, `module`, `exports`, `types`, `bin`; a package not marked `"private": true` keeps its whole public export surface |
 | `pyproject.toml` | `[project.scripts]`, `[project.entry-points]`, `__main__.py` |
 | Framework presets | Next.js routes, Stencil `@Component` classes, Storybook stories, Jest/Vitest test files, `*.config.*` files, pytest tests and `conftest.py` |
-| Decorator registration | Functions decorated with configured registrars (`app.get`, `router.post`, `pytest.fixture`, `click.command`, …) count as used |
+| Decorator registration | Functions decorated with configured registrars (`app.get`, `router.post`, `pytest.fixture`, `click.command`, Flask's request, error and template hooks such as `bp.before_app_request`, …) count as used |
 | Config | `[graph] entry = ["scripts/**/*.ts"]` |
 
 #### 4. Dynamic code is reported honestly, never guessed
@@ -205,6 +205,8 @@ console.log(formatDate(new Date()));
 ```
 ````
 
+- **Import queries:** `graph: import: { form: [import, export, dynamic, require], resolves | declared | published: false }` reports import specifiers rather than symbols; it backs the six `node/no-{missing,extraneous,unpublished}-{import,require}` rules (W-11). The graph never reads `node_modules`: `resolves: false` judges only the project's own paths (relative, absolute, tsconfig `paths`) that are extensionless or JavaScript/TypeScript; `declared: false` reads the nearest `package.json`, and a type-only import is satisfied by its `@types/` package; `published: false` applies only to a package that is not `private` and lists `files`.
+- **Files outside `[files]` or `languages`** are still read for their uses, so an export they import is not reported; findings are reported only in files the config lets be checked.
 - **Multi-file examples** use a `files` fence: one block holding several `// path` sections. `codelaw test` builds a small virtual repo from it.
 - **Debugging:**
   - `codelaw graph refs @acme/utils#parseDate` lists every reference and the entry points it can reach;
@@ -225,7 +227,7 @@ packages/legacy/src/plugins.py:14:1  info  graph/no-unused-exports  `register` l
 - **A cache and incremental relinking are required** to keep hook latency down.
 - **Without types, method-level usage is out of scope.** The design prefers missing a finding to reporting a false one.
 - **Dynamic code yields `info`-level "uncertain" results**, never errors.
-- **The false-positive rate is unmeasured:** `W-11`.
+- **The false-positive rate is unmeasured:** `W-11`. A first corpus pass (flask, httpx, zustand, excalidraw, fastapi-template, 2026-10-22) found Flask's hook decorators unregistered, now default registrars; the rate itself is not yet judged.
 
 ### Alternatives considered
 

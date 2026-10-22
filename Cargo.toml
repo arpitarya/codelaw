@@ -22,11 +22,13 @@ codelaw-match = { path = "crates/codelaw-match" }
 codelaw-native = { path = "crates/codelaw-native" }
 codelaw-fix = { path = "crates/codelaw-fix" }
 codelaw-graph = { path = "crates/codelaw-graph" }
+codelaw-adapters = { path = "crates/codelaw-adapters" }
 codelaw-engine = { path = "crates/codelaw-engine" }
 codelaw-report = { path = "crates/codelaw-report" }
 codelaw-test = { path = "crates/codelaw-test" }
 codelaw-lsp = { path = "crates/codelaw-lsp" }
 codelaw-mcp = { path = "crates/codelaw-mcp" }
+codelaw-agents = { path = "crates/codelaw-agents" }
 codelaw-format = { path = "crates/codelaw-format" }
 
 # Grammars and matcher: pinned (SR-ARCHITECTURE decision 3). All MIT.

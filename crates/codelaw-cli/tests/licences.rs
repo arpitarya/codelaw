@@ -127,27 +127,44 @@ fn every_cargo_dependency_is_free_and_permissive() {
     assert!(refused.is_empty(), "L2 refuses:\n{}", refused.join("\n"));
 }
 
-/// The editor extension's npm lockfile (SR-EDITOR decision 4): runtime and
-/// dev dependencies alike (decision 4).
+/// Every npm lockfile under the build's folders — the editor extension's
+/// (SR-EDITOR decision 4) today: runtime and dev dependencies alike
+/// (decision 4). The `package.json` beside a lockfile is read through it,
+/// since the lockfile carries each resolved version's licence, so the
+/// build-tool scan below skips that `package.json`.
 #[test]
-fn every_npm_dependency_of_the_extension_is_free_and_permissive() {
-    let lock = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packaging/vscode/package-lock.json");
-    let lock: Value = serde_json::from_str(&std::fs::read_to_string(&lock).expect("packaging/vscode/package-lock.json")).unwrap();
+fn every_npm_lockfile_dependency_is_free_and_permissive() {
+    let locks: Vec<std::path::PathBuf> = build_files().into_iter().filter(|p| p.file_name().is_some_and(|n| n == "package-lock.json")).collect();
+    assert!(locks.iter().any(|l| l.ends_with("packaging/vscode/package-lock.json")), "the scan no longer sees the extension's lockfile: {locks:?}");
     let mut refused = Vec::new();
-    let mut checked = 0;
-    for (path, p) in lock["packages"].as_object().unwrap() {
-        if path.is_empty() {
-            continue;
+    for lock_path in &locks {
+        let at = lock_path.strip_prefix(repo_root()).unwrap().to_string_lossy().replace('\\', "/");
+        let lock: Value = serde_json::from_str(&std::fs::read_to_string(lock_path).unwrap()).unwrap();
+        // A dependency package.json names and the lockfile lacks would go unchecked.
+        let manifest = std::fs::read_to_string(lock_path.with_file_name("package.json")).expect("a lockfile sits beside its package.json");
+        let manifest: Value = serde_json::from_str(&manifest).unwrap();
+        for k in ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"] {
+            for name in manifest.get(k).and_then(|d| d.as_object()).into_iter().flat_map(|d| d.keys()) {
+                if lock["packages"][format!("node_modules/{name}")].is_null() {
+                    refused.push(format!("{at}: `{name}` is in package.json and not resolved in the lockfile"));
+                }
+            }
         }
-        checked += 1;
-        let name = format!("{path} {}", p["version"].as_str().unwrap_or("?"));
-        match p["license"].as_str() {
-            Some(l) if expression_allowed(l) => {}
-            Some(l) => refused.push(format!("{name}: `{l}`")),
-            None => refused.push(format!("{name}: no licence expression")),
+        let mut checked = 0;
+        for (path, p) in lock["packages"].as_object().unwrap() {
+            if path.is_empty() {
+                continue;
+            }
+            checked += 1;
+            let name = format!("{at}: {path} {}", p["version"].as_str().unwrap_or("?"));
+            match p["license"].as_str() {
+                Some(l) if expression_allowed(l) => {}
+                Some(l) => refused.push(format!("{name}: `{l}`")),
+                None => refused.push(format!("{name}: no licence expression")),
+            }
         }
+        assert!(checked >= 5, "only {checked} npm packages seen in {at}");
     }
-    assert!(checked >= 5, "only {checked} npm packages seen");
     assert!(refused.is_empty(), "L2 refuses:\n{}", refused.join("\n"));
 }
 
@@ -179,6 +196,16 @@ const BUILD_TOOLS: &[BuildTool] = &[
     },
     BuildTool { registry: "pypi", name: "tomli", licence: "MIT", requires: &[], extras: &[], source: "https://pypi.org/project/tomli/ (maturin needs it below Python 3.11)" },
     BuildTool { registry: "pypi", name: "ziglang", licence: "MIT", requires: &[], extras: &[], source: "https://pypi.org/pypi/ziglang/json (license_expression)" },
+    // The staging-index smoke (scripts/smoke.sh, W-18): `uv publish` and `uvx`. The
+    // index itself is scripts/staging-index.py, the standard library only.
+    BuildTool {
+        registry: "pypi",
+        name: "uv",
+        licence: "MIT OR Apache-2.0",
+        requires: &[],
+        extras: &[],
+        source: "https://pypi.org/pypi/uv/0.11.3/json (license_expression; no requires_dist)",
+    },
     BuildTool {
         registry: "npm",
         name: "npm",
@@ -274,9 +301,22 @@ fn installs(text: &str) -> Vec<Install> {
     let joined = text.replace("\\\r\n", " ").replace("\\\n", " ");
     let mut out = Vec::new();
     for line in joined.lines() {
+        // A comment names commands; it runs none.
+        if line.trim_start().starts_with('#') {
+            continue;
+        }
         let line = expand_expressions(line);
         for cmd in line.split(['&', ';', '|', '(', ')']) {
-            let t: Vec<&str> = cmd.split_whitespace().collect();
+            let mut t: Vec<&str> = cmd.split_whitespace().collect();
+            // A redirection or a trailing comment ends the arguments.
+            if let Some(end) = t.iter().position(|a| a.starts_with(['>', '<', '#']) || a.starts_with("2>")) {
+                t.truncate(end);
+            }
+            // `echo "… pip install …"` prints the words; it installs nothing.
+            let first = t.iter().position(|w| !["{", "then", "do", "else", "!"].contains(w));
+            if first.is_some_and(|f| ["echo", "printf"].contains(&t[f])) {
+                continue;
+            }
             for (i, tok) in t.iter().enumerate() {
                 let tool = tok.trim_matches('"').rsplit('/').next().unwrap_or(tok);
                 let next = t.get(i + 1).copied().unwrap_or("");
@@ -308,7 +348,9 @@ fn manifest_deps(path: &std::path::Path, text: &str) -> Vec<Install> {
                 out.extend(r.as_str().and_then(|r| package_of("pypi", r)));
             }
         }
-    } else if path.file_name().is_some_and(|n| n == "package.json") {
+    } else if path.file_name().is_some_and(|n| n == "package.json") && !path.with_file_name("package-lock.json").is_file() {
+        // With a lockfile beside it, `every_npm_lockfile_dependency_is_free_and_permissive`
+        // reads every resolved package and its licence instead.
         let v: Value = serde_json::from_str(text).expect("package.json parses");
         for k in ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"] {
             for name in v.get(k).and_then(|d| d.as_object()).into_iter().flat_map(|d| d.keys()) {
@@ -333,6 +375,12 @@ fn the_install_scanner_reads_what_the_build_writes() {
     assert_eq!(names("npm i --no-save \\\n  \"$dist\"/npm/codelaw-[0-9]*.tgz @scope/tool@1"), ["npm:@scope/tool"]);
     assert_eq!(names("\"$work/venv/bin/pip\" install -q --no-index \"$dist\"/pypi/codelaw-*.whl"), Vec::<String>::new());
     assert_eq!(names("python3 -m pip install Foo_Bar>=2 codelaw-rules-js"), ["pypi:foo-bar"]);
+    assert_eq!(names("\"$tbin/python\" -m pip install -q --disable-pip-version-check \"uv==$UV_VERSION\""), ["pypi:uv"]);
+    assert_eq!(names("npm_config_cache=\"$c\" npx --yes --loglevel=error codelaw --version"), Vec::<String>::new());
+    // What the scan once misread in scripts/smoke.sh: prose, a redirection, a nested `$(…)`.
+    assert_eq!(names(r#"[ "$k" = "$h" ] || { echo "✗ cannot run here: npm and pip install for the host" >&2; exit 1; }"#), Vec::<String>::new());
+    assert_eq!(names("  # pip install from-a-comment\npip install -q tool >/dev/null"), ["pypi:tool"]);
+    assert_eq!(names(r#""$v/python" -m pip install -q --find-links "$(native "$d/pypi")" codelaw codelaw-rules-data"#), Vec::<String>::new());
 }
 
 #[test]
@@ -387,6 +435,8 @@ fn every_build_tool_is_declared_and_free_and_permissive() {
         }
     }
     assert!(refused.is_empty(), "L2 refuses:\n{}", refused.join("\n"));
+    // It held one entry, npm, when W-20 opened it; a new one is the decider's to add.
+    assert!(AWAITING_RULING.len() <= 1, "AWAITING_RULING may only shrink: {AWAITING_RULING:?}");
     for (name, _) in AWAITING_RULING {
         let t = BUILD_TOOLS.iter().find(|t| t.name == *name).expect("an awaited tool is declared");
         assert!(!expression_allowed(t.licence), "`{name}` passes now: remove it from AWAITING_RULING");

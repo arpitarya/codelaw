@@ -131,7 +131,7 @@ fn editorconfig_is_the_base_layer_under_format() {
 fn dry_run_writes_nothing() {
     let r = Repo::new("dry");
     r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("a.js", "a == b;\n");
-    let report = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false }).unwrap();
+    let report = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false, trace: false }).unwrap();
     assert_eq!(report.files[0].fixed, "a === b;\n");
     assert!(!report.files[0].written);
     assert_eq!(r.read("a.js"), "a == b;\n");
@@ -206,7 +206,7 @@ fn native_rule_from_a_first_party_pack() {
     let d = r.check();
     assert_eq!(summary(&d), ["a.js:3:3 js/no-unreachable suggest"]);
     assert!(d[0].message.starts_with("Unreachable code"));
-    let fixed = r.project().unwrap().fix(&[], &FixOptions { unsafe_fixes: true, dry_run: false }).unwrap();
+    let fixed = r.project().unwrap().fix(&[], &FixOptions { unsafe_fixes: true, dry_run: false, trace: false }).unwrap();
     assert_eq!(fixed.files.len(), 1);
     assert_eq!(r.read("a.js"), "function f() {\n  return 1;\n}\n");
 }
@@ -628,7 +628,65 @@ fn bom_offsets_are_file_offsets_and_fix_reports_like_check() {
     assert_eq!(a.edits[0].start, b.edits[0].start + 3);
     let bytes = fs::read(r.0.join("a.js")).unwrap();
     assert_eq!(&bytes[a.start_byte..a.end_byte], b"a == b");
-    let dry = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false }).unwrap();
+    let dry = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false, trace: false }).unwrap();
     assert_eq!(dry.fixed_count(), 2);
     assert!(dry.check.diagnostics.is_empty(), "{:?}", dry.check.diagnostics);
+}
+
+/// `target:` + `assert:` rules through check and fix (SR-RULE-FORMAT
+/// decision 3e): `when`/`else` picks the steps, and every byte outside the
+/// edit is kept.
+#[test]
+fn target_rules_check_and_fix_json_yaml_and_toml() {
+    let r = Repo::new("target");
+    let strict = rule(
+        "acme/strict",
+        &[Language::Json, Language::Yaml, Language::Toml],
+        "auto",
+        "target: options\nassert: { path: { strict: { present: true, equals: true } } }\nmessage: \"`$PATH` turns on `strict`\"\nfix:\n  - when: { path: { strict: { present: true } } }\n    then: [{ ensure-key: { key: strict, value: true } }]\n    else: [{ ensure-key: { key: strict, value: true } }, sort-keys]",
+        &[
+            (Language::Json, "{ \"options\": {} }", "{ \"options\": { \"strict\": true } }"),
+            (Language::Yaml, "options: {}", "options: { strict: true }"),
+            (Language::Toml, "[options]", "[options]\nstrict = true"),
+        ],
+    );
+    r.file(".codelaw/rules/acme/strict.md", &strict)
+        .file("a.json", "{\n  \"options\": {\n    \"strict\": false\n  }\n}\n")
+        .file("b.yaml", "# top\noptions:\n  # z comes first here\n  z: 1\n  a: 2 # two\nother: x\n")
+        .file("c.toml", "name = \"x\"\n\n[other]\nb = 1\n")
+        .file("d.json", "{\n  \"options\": {\n    \"strict\": true\n  }\n}\n");
+    let d = r.check();
+    // The rule file's own front matter is YAML too, but a `target:` rule
+    // without `host:` reads whole files only.
+    assert_eq!(summary(&d), ["a.json:2:3 acme/strict auto", "b.yaml:2:1 acme/strict auto", "c.toml:1:1 acme/strict auto"], "{:?}", d.iter().map(|d| &d.note).collect::<Vec<_>>());
+    assert_eq!(d[0].message, "`options` turns on `strict`");
+    r.project().unwrap().fix(&[], &FixOptions::default()).unwrap();
+    assert_eq!(r.read("a.json"), "{\n  \"options\": {\n    \"strict\": true\n  }\n}\n");
+    // `else`: the key is written and the keys sorted, each comment moving
+    // with its key; the rest of the file is as it was.
+    assert_eq!(r.read("b.yaml"), "# top\noptions:\n  a: 2 # two\n  strict: true\n  # z comes first here\n  z: 1\nother: x\n");
+    assert_eq!(r.read("c.toml"), "name = \"x\"\n\n[other]\nb = 1\n\n[options]\nstrict = true\n");
+    assert!(r.check().is_empty());
+}
+
+/// A `target:` fix that cannot be verified is reported `manual` with the
+/// reason in its note, and a `target:` rule for another language is refused.
+#[test]
+fn target_rules_refuse_what_they_cannot_do() {
+    let r = Repo::new("targetrefuse");
+    let sorted = rule(
+        "acme/sorted",
+        &[Language::Json],
+        "auto",
+        "target: deps\nassert: { sorted: true }\nmessage: Sort `$PATH`\nfix: [sort-keys]",
+        &[(Language::Json, "{ \"deps\": { \"b\": 1, \"a\": 2 } }", "{ \"deps\": { \"a\": 2, \"b\": 1 } }")],
+    );
+    r.file(".codelaw/rules/acme/sorted.md", &sorted).file("a.json", "{ \"deps\": { \"b\": 1, /* keep */ \"a\": 2 } }\n");
+    let d = r.check();
+    assert_eq!(summary(&d), ["a.json:1:3 acme/sorted manual"]);
+    assert!(d[0].note.as_deref().is_some_and(|n| n.contains("comments")), "{:?}", d[0].note);
+    let js = rule("acme/js-target", &[Language::Javascript], "manual", "target: x\nassert: { present: true }\nmessage: m", &[(Language::Javascript, "a;", "b;")]);
+    r.file(".codelaw/rules/acme/js-target.md", &js);
+    let Err(EngineError::Load(e)) = r.project() else { panic!("a `target:` rule for JavaScript loaded") };
+    assert!(e.iter().any(|e| e.message.contains("`target:` rules read JSON, YAML and TOML")), "{e:?}");
 }

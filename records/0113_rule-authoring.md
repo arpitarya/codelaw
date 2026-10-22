@@ -9,6 +9,7 @@ date: 2026-10-18
 feature: "rule authoring, debugging and testing"
 owns:
   - crates/codelaw-test
+  - crates/codelaw-cli/tests/promotion.rs
 laws: [L0, L3, L4, L5]
 timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
@@ -94,6 +95,8 @@ The decider asked that rules can be written manually or by an AI agent with a sk
 
 - **Every rule carries tests by construction,** so writing one takes longer than a bare pattern.
 - **Agent-written rules are only as good as their examples;** human review of the examples is the real gate.
+- **Level 4 today:** `codelaw test [target] --corpus <dir>` runs levels 1–3 and then every rule over every file under `<dir>` the engine reads: two runs agree, and each fix still parses, is a fixpoint and keeps the rule's `invariant:`. `--snapshot <file>` compares each rule's finding count with a `[findings]` TOML table, and a count that moved or is missing fails; `--update-snapshot` writes it. A pack's counts live in `packs/<pack>/corpus.toml`, and `crates/codelaw-cli/tests/promotion.rs` refuses a pack rule marked `stable` whose id has no count there (decision 6).
+- **Not built yet (W-20):** the pinned corpus itself — which repositories, at which commits, per pack — and the CI job that checks them out and runs `--corpus` with each pack's snapshot; and the corpus row's "the repo still builds and passes its own tests after fixes", which needs each corpus repo's build and test commands. Until then the gate stops a `stable` rule without a count, and a count is only as good as the run that wrote it. No pack rule is `stable` today.
 
 ### Alternatives considered
 
@@ -110,7 +113,7 @@ The decider asked that rules can be written manually or by an AI agent with a sk
 
 **Reopen this decision if:** a rule can reach `stable` without passing all four levels, or an agent-written rule merges without a green `codelaw test`.
 
-**How to check it:** the CI job that promotes a rule to `stable` runs all four levels (`W-20`).
+**How to check it:** `cargo test -p codelaw-cli --test promotion` (level 4 runs, and no `stable` pack rule lacks a corpus count); the CI job that runs all four levels over the pinned corpus is still owed (`W-20`).
 
 ---
 

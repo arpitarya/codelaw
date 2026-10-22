@@ -156,6 +156,7 @@ directions.
 |---|---|---|
 | `scripts/sr-guard.sh` | SR-WORK-OWNERSHIP | the guard is the executable form of decisions 3 and 6 |
 | `scripts/check-open-work-inbox.py` | SR-WORK-OPEN-QUEUE | rule 45a's check |
+| `scripts/check-work-system.py` | SR-WORK-OPEN-QUEUE | the row, inbox and lost-id checks; it also runs the ownership, registry and archive checks |
 | `scripts/build-packs.py` | SR-PACKAGES | decision 9: the pack tarballs and wheels, built from `packs/` |
 | `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | rule 45a, in-session |
 | `.claude/hooks/inject-inbox.sh` | SR-WORK-BLOCKERS | decision 7 |
@@ -170,6 +171,7 @@ directions.
 | `crates/codelaw-rules` | SR-RULE-FORMAT | decisions 1–7: the rule-file parser and its load checks |
 | `crates/codelaw-semantic` | SR-ARCHITECTURE | decision 15a |
 | `crates/codelaw-match` | SR-LINTER | decision 2: file-scope `match:` rules |
+| `crates/codelaw-adapters` | SR-LINTER | decision 2: the adapters' manifests, runner and output mapping |
 | `crates/codelaw-native` | SR-ARCHITECTURE | decision 15b |
 | `crates/codelaw-fix` | SR-ARCHITECTURE | decisions 5 and 18: the apply loop, verifier and external fixers |
 | `crates/codelaw-format` | SR-FORMATTER | decisions 2, 4, 5 and 7: the embedded engines, their options and the verifier; `shims/option-ext` is SR-PACKAGES decision 1's L2 patch |
@@ -179,8 +181,13 @@ directions.
 | `crates/codelaw-cli` | SR-CLI-MCP | decisions 1–3 |
 | `crates/codelaw-lsp` | SR-EDITOR | decisions 1–3: the language server |
 | `crates/codelaw-mcp` | SR-CLI-MCP | decisions 5–6: the MCP server and its parity with the CLI |
+| `crates/codelaw-agents` | SR-AGENT-SURFACES | decisions 1, 2 and 6: hook mode, `sync-agents` and the compiled-in skills |
+| `agents` | SR-AGENT-SURFACES | decisions 1, 4 and 5: the skill sources, the custom agent and the trigger evals |
 | `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
-| `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced, for the Cargo manifest |
+| `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced: the Cargo packages, the npm lockfiles and the build tools |
+| `crates/codelaw-cli/tests/network_fence.rs` | SR-LAW-5 | how L5 is enforced: the network fence (a different decision from the CLI's) |
+| `crates/codelaw-cli/tests/consumer_layout.rs` | SR-CONSUMER-LAYOUT | the veto's `init` check against §1's tree (a different decision from the CLI's) |
+| `crates/codelaw-cli/tests/promotion.rs` | SR-RULE-AUTHORING | decisions 4 and 6: level 4 and the `stable` gate (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
 | `fixtures/l3` | SR-LAW-3 | the fixture matrix |
 | `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the five first-party packs' rules, presets and data |
@@ -192,6 +199,7 @@ directions.
 | `scripts/law-gate.py` | SR-PACKAGES | decision 11: refuses a release while the engine lacks `format`, `mcp` or `lsp` (L6 decision 3, L7) |
 | `scripts/package.py` | SR-PACKAGES | decision 11: assembles every package and runs the release checks |
 | `scripts/smoke.sh` | SR-PACKAGES | decision 11: the npm-vs-PyPI install smoke |
+| `scripts/staging-index.py` | SR-PACKAGES | decision 11: the localhost staging index the install smoke publishes to and installs from |
 | `scripts/withdraw.sh` | SR-PACKAGES | decision 12 |
 | `scripts/npm-trust.sh` | SR-PACKAGES | decision 11: the one-time npm trusted-publisher setup |
 | `.github/workflows` | SR-PACKAGES | decision 11: build once in CI, publish as built |
@@ -213,5 +221,14 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 | `crates/codelaw-rules` | SR-RULE-PACKS | pack layout, resolution, presets and precedence (decisions 3–5, 10–14) are the loader's |
 | `crates/codelaw-cli/src/init.rs` | SR-RULE-PACKS | decision 6 is what `codelaw init` does |
 | `crates/codelaw-engine/src/suppress.rs` | SR-LINTER | decision 6: the suppression syntax and what it covers |
+| `crates/codelaw-match/src/data.rs` | SR-RULE-FORMAT | decision 3e: the data tree a `target:` rule reads |
+| `crates/codelaw-match/src/target.rs` | SR-RULE-FORMAT | decision 3e: `target:` paths and `assert:` checks |
+| `crates/codelaw-match/src/schema.rs` | SR-RULE-FORMAT | decision 3e: the `schema:` check and its departures from draft-07 |
+| `crates/codelaw-fix/src/structured.rs` | SR-RULE-FORMAT | decisions 3c and 3e: a `target:` rule's fix steps and their verification |
+| `crates/codelaw-adapters` | SR-ARCHITECTURE | decision 19: the adapter contract (lookup, versions, process handling, cache key) the crate implements |
+| `crates/codelaw-engine/src/adapters.rs` | SR-LINTER | decision 2: which adapters run, the per-tool mapping and the ported-rule dedupe |
+| `scripts/check-work-system.py` | SR-WORK-OWNERSHIP | decision 2: its `owns:` ↔ Ownership-table check |
+| `scripts/check-work-system.py` | SR-WORK-REGISTRY | decisions 5–8: its registry check |
+| `scripts/check-work-system.py` | SR-WORK-ARCHIVE | decision 1: its one-`archive/` check |
 
 <!-- DESCRIBES-TABLE-END -->

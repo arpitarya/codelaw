@@ -128,6 +128,42 @@ pub struct ImportFact {
     pub type_only: bool,
 }
 
+/// How a JS/TS file names a module (the `node/` import rules).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum SpecForm {
+    /// `import … from "x"`, `import "x"`, `import x = require("x")`.
+    Import,
+    /// `export … from "x"`.
+    Export,
+    /// `import("x")` with a literal.
+    Dynamic,
+    /// `require("x")` with a literal.
+    Require,
+}
+
+impl SpecForm {
+    pub fn parse(s: &str) -> Option<SpecForm> {
+        Some(match s {
+            "import" => SpecForm::Import,
+            "export" => SpecForm::Export,
+            "dynamic" => SpecForm::Dynamic,
+            "require" => SpecForm::Require,
+            _ => return None,
+        })
+    }
+}
+
+/// One module specifier written in a JS/TS file.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Specifier {
+    pub spec: String,
+    /// The string literal.
+    pub span: Span,
+    pub form: SpecForm,
+    /// `import type` / `export type`: erased at build time.
+    pub type_only: bool,
+}
+
 /// `import("x")`, `require("x")`, `importlib.import_module("x")`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DynamicImport {
@@ -165,6 +201,8 @@ pub struct FileFacts {
     pub class_prefixes: Vec<String>,
     /// HTML `<script src>` / `<link href>` targets.
     pub links: Vec<String>,
+    /// JS/TS: every module specifier, in source order.
+    pub specifiers: Vec<Specifier>,
 }
 
 /// The facts of one file, or `None` for a language the graph doesn't read.
@@ -511,7 +549,7 @@ impl<'a> Extractor<'a> {
     fn members(&self, uses: &[Span], expected: &[String]) -> Option<Vec<Member>> {
         let mut out = Vec::new();
         for &(s, e) in uses {
-            let Some(node) = self.root.descendant_for_byte_range(s, e) else { return None };
+            let node = self.root.descendant_for_byte_range(s, e)?;
             let mut chain: Vec<(String, Span)> = Vec::new();
             let mut cur = node;
             while let Some(p) = cur.parent() {
@@ -547,7 +585,7 @@ impl<'a> Extractor<'a> {
                 None => return None,
             }
         }
-        out.sort_by(|a, b| a.span.cmp(&b.span));
+        out.sort_by_key(|a| a.span);
         Some(out)
     }
 
@@ -586,6 +624,7 @@ impl<'a> Extractor<'a> {
         while let Some(n) = stack.pop() {
             match n.kind() {
                 "call_expression" | "call" => self.call(n),
+                "import_statement" | "export_statement" if !self.python => self.statement_source(n),
                 "string_fragment" | "string_content" => {
                     let t = self.t(n);
                     push_tokens(self.f, t);
@@ -606,6 +645,22 @@ impl<'a> Extractor<'a> {
         }
     }
 
+    /// The `from "x"` of an import or export statement, and the
+    /// `require("x")` of `import x = require("x")`.
+    fn statement_source(&mut self, n: Node<'_>) {
+        let form = if n.kind() == "import_statement" { SpecForm::Import } else { SpecForm::Export };
+        let type_only = children(n).iter().any(|c| c.kind() == "type");
+        let mut sources: Vec<Node<'_>> = n.child_by_field_name("source").into_iter().collect();
+        for c in named_children(n).into_iter().filter(|c| c.kind() == "import_require_clause") {
+            sources.extend(c.child_by_field_name("source"));
+        }
+        for s in sources {
+            if let Some(spec) = self.string_literal(s) {
+                self.f.specifiers.push(Specifier { spec, span: (s.start_byte(), s.end_byte()), form, type_only });
+            }
+        }
+    }
+
     fn call(&mut self, n: Node<'_>) {
         let Some(func) = n.child_by_field_name("function") else { return };
         let fname = self.t(func);
@@ -618,6 +673,10 @@ impl<'a> Extractor<'a> {
         let Some(arg) = n.child_by_field_name("arguments").and_then(|a| a.named_child(0)) else { return };
         let span = (n.start_byte(), n.end_byte());
         if let Some(lit) = self.string_literal(arg) {
+            if !self.python {
+                let form = if is_require { SpecForm::Require } else { SpecForm::Dynamic };
+                self.f.specifiers.push(Specifier { spec: lit.clone(), span: (arg.start_byte(), arg.end_byte()), form, type_only: false });
+            }
             self.f.dynamic_imports.push(DynamicImport { spec: lit, prefix: false, span });
             return;
         }

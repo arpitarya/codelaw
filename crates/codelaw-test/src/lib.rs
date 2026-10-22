@@ -7,7 +7,10 @@
 //! - **cases:** each `<name>.cases.md` case gives exactly its `expect`
 //!   diagnostics and its `fixed` output;
 //! - **invariants:** a fix still parses and is deterministic, plus the
-//!   rule's own `invariant:` (`exports-unchanged`).
+//!   rule's own `invariant:` (`exports-unchanged`);
+//! - **corpus:** over real files (`codelaw test --corpus <dir>`), the
+//!   invariants hold on every file, and the finding count is what the corpus
+//!   snapshot records ([`corpus_rule`]).
 
 use codelaw_cache::Key;
 use codelaw_config::{Config, RuleConfig};
@@ -15,8 +18,8 @@ use codelaw_core::{FixClass, Language};
 use codelaw_engine::{EngineOptions, Project};
 use codelaw_format::FormatOptions;
 use codelaw_rules::{LanguageExamples, LoadedRule, RuleSet, Scope, Snippet};
-use std::collections::BTreeSet;
-use std::path::PathBuf;
+use std::collections::{BTreeMap, BTreeSet};
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -24,6 +27,7 @@ pub enum Level {
     Examples,
     Cases,
     Invariants,
+    Corpus,
 }
 
 impl Level {
@@ -32,6 +36,7 @@ impl Level {
             Level::Examples => "examples",
             Level::Cases => "cases",
             Level::Invariants => "invariants",
+            Level::Corpus => "corpus",
         }
     }
 }
@@ -326,10 +331,8 @@ fn header_path(line: &str) -> Option<String> {
         r.strip_suffix("-->")?
     } else if let Some(r) = t.strip_prefix("/*") {
         r.strip_suffix("*/")?
-    } else if let Some(r) = t.strip_prefix('#') {
-        r
     } else {
-        return None;
+        t.strip_prefix('#')?
     };
     let p = inner.trim();
     if p.is_empty() || p.contains(char::is_whitespace) || !p.contains('.') {
@@ -381,6 +384,136 @@ pub fn test_rule(loaded: &LoadedRule, case: Option<&str>) -> RuleReport {
     }
     t.cases(case);
     t.report
+}
+
+/// Level 4 over one corpus: what a rule found there, and its invariants'
+/// report.
+#[derive(Clone, Debug)]
+pub struct CorpusReport {
+    pub report: RuleReport,
+    pub findings: usize,
+}
+
+fn hits(p: &Project, id: &str, path: &str, language: Language, text: &str) -> Vec<(u32, u32)> {
+    p.check_source(path, language, text).into_iter().filter(|d| d.rule == id).map(|d| (d.start.line, d.start.column)).collect()
+}
+
+/// Level 4 (SR-RULE-AUTHORING decision 4): run `loaded` over `files` — each
+/// `(path relative to the corpus root, language, text)` — and hold every
+/// file it fires on to the invariants: two runs agree, and the fix still
+/// parses, is a fixpoint and keeps the rule's own `invariant:`. The finding
+/// count is what the corpus snapshot records.
+pub fn corpus_rule(loaded: &LoadedRule, files: &[(String, Language, String)]) -> CorpusReport {
+    let report = RuleReport {
+        id: loaded.rule.id.clone(),
+        source: loaded.source.label(),
+        path: loaded.rule.path.clone(),
+        checks: 0,
+        failures: Vec::new(),
+    };
+    let mut t = Tester { loaded, plain: project_for(loaded, true), with_globs: None, report };
+    let id = loaded.rule.id.clone();
+    if t.project_scope() {
+        let run = |p: &Project| -> Vec<(String, u32, u32)> {
+            p.check_files(files).into_iter().filter(|d| d.rule == id).map(|d| (d.file, d.start.line, d.start.column)).collect()
+        };
+        t.report.checks += 1;
+        let first = run(&t.plain);
+        if run(&t.plain) != first {
+            t.fail(Level::Corpus, "the corpus".into(), "two runs disagree".into());
+        }
+        return CorpusReport { findings: first.len(), report: t.report };
+    }
+    let fixable = loaded.rule.fix != FixClass::Manual;
+    let mut findings = 0;
+    for (path, language, text) in files {
+        let first = hits(&t.plain, &id, path, *language, text);
+        if first.is_empty() {
+            continue;
+        }
+        findings += first.len();
+        t.report.checks += 1;
+        if hits(&t.plain, &id, path, *language, text) != first {
+            t.fail(Level::Corpus, path.clone(), "two runs disagree".into());
+        }
+        if !fixable {
+            continue;
+        }
+        let fixed = t.plain.fix_source(path, *language, text, true).fixed;
+        if fixed == *text {
+            continue;
+        }
+        t.report.checks += 2;
+        if t.plain.fix_source(path, *language, &fixed, true).fixed != fixed {
+            t.fail(Level::Corpus, path.clone(), "the fixed file is not a fixpoint".into());
+        }
+        let before = codelaw_lang::syntax_error_count(&codelaw_lang::parse(*language, text));
+        let after = codelaw_lang::syntax_error_count(&codelaw_lang::parse(*language, &fixed));
+        if after > before {
+            t.fail(Level::Corpus, path.clone(), "the fix adds a syntax error".into());
+        }
+        if loaded.rule.invariants.iter().any(|i| i == "exports-unchanged") {
+            t.report.checks += 1;
+            if Tester::exports(*language, text) != Tester::exports(*language, &fixed) {
+                t.fail(Level::Corpus, path.clone(), "`exports-unchanged`: the fix changes what the module exports".into());
+            }
+        }
+    }
+    CorpusReport { report: t.report, findings }
+}
+
+/// Every file under `dir` the engine has a language for, as `(path relative
+/// to dir, language, text)` in path order; `.git`, `node_modules`, `.venv`
+/// and the cache skipped, `.gitignore` not read (a corpus is what it is).
+pub fn corpus_files(dir: &Path) -> std::io::Result<Vec<(String, Language, String)>> {
+    let mut out = Vec::new();
+    let walk = ignore::WalkBuilder::new(dir)
+        .standard_filters(false)
+        .filter_entry(|e| !codelaw_config::DEFAULT_EXCLUDES.iter().any(|x| e.file_name() == *x))
+        .build();
+    for e in walk {
+        let e = e.map_err(std::io::Error::other)?;
+        if !e.file_type().is_some_and(|t| t.is_file()) {
+            continue;
+        }
+        let Some(language) = Language::from_path(e.path()) else { continue };
+        // A file that is not UTF-8 is not source the engine reads.
+        let Ok(text) = std::fs::read_to_string(e.path()) else { continue };
+        let rel = e.path().strip_prefix(dir).unwrap_or(e.path());
+        out.push((codelaw_core::normalize_path(rel), language, text));
+    }
+    out.sort_by(|a, b| a.0.cmp(&b.0));
+    Ok(out)
+}
+
+/// The corpus snapshot: `[findings]`, each rule id's count on the corpus.
+pub fn read_snapshot(text: &str) -> Result<BTreeMap<String, usize>, String> {
+    let v: toml::Table = toml::from_str(text).map_err(|e| e.to_string())?;
+    let mut out = BTreeMap::new();
+    for (id, n) in v.get("findings").and_then(|f| f.as_table()).ok_or("no `[findings]` table")? {
+        let n = n.as_integer().and_then(|n| usize::try_from(n).ok()).ok_or(format!("`{id}` is not a count"))?;
+        out.insert(id.clone(), n);
+    }
+    Ok(out)
+}
+
+pub fn write_snapshot(reports: &[CorpusReport]) -> String {
+    let mut out = String::from("# `codelaw test --corpus` finding counts (SR-RULE-AUTHORING decision 4).\n# Rewrite with --update-snapshot, and review the change.\n\n[findings]\n");
+    for r in reports {
+        out.push_str(&format!("{:?} = {}\n", r.report.id, r.findings));
+    }
+    out
+}
+
+/// A count that differs from the snapshot, or is missing from it, fails.
+pub fn compare_snapshot(reports: &mut [CorpusReport], snapshot: &BTreeMap<String, usize>) {
+    for r in reports {
+        match snapshot.get(&r.report.id) {
+            Some(n) if *n == r.findings => {}
+            Some(n) => r.report.failures.push(Failure { level: Level::Corpus, at: "snapshot".into(), message: format!("{} findings; the snapshot says {n}", r.findings) }),
+            None => r.report.failures.push(Failure { level: Level::Corpus, at: "snapshot".into(), message: format!("{} findings, and no count in the snapshot", r.findings) }),
+        }
+    }
 }
 
 /// Test rules in id order.

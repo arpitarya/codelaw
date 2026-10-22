@@ -181,6 +181,8 @@ dir = ".codelaw/cache"
 max_size = 512000000
 [fix]
 external_timeout = "500ms"
+[daemon]
+idle_timeout = 1800
 [lint]
 tagged_templates = true
 [markdown]

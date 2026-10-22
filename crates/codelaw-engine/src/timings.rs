@@ -15,10 +15,13 @@ pub enum Phase {
     Semantic,
     Rules,
     Suppress,
+    /// The formatter engine, wherever it runs: `format`, the format step
+    /// of `fix`, and `check`'s `format/unformatted`.
+    Format,
 }
 
 impl Phase {
-    pub const ALL: [Phase; 7] = [Phase::Compile, Phase::Discover, Phase::Read, Phase::Parse, Phase::Semantic, Phase::Rules, Phase::Suppress];
+    pub const ALL: [Phase; 8] = [Phase::Compile, Phase::Discover, Phase::Read, Phase::Parse, Phase::Semantic, Phase::Rules, Phase::Suppress, Phase::Format];
 
     pub fn name(self) -> &'static str {
         match self {
@@ -29,6 +32,7 @@ impl Phase {
             Phase::Semantic => "semantic",
             Phase::Rules => "rules",
             Phase::Suppress => "suppress",
+            Phase::Format => "format",
         }
     }
 }
@@ -49,7 +53,7 @@ impl Clock {
 /// The counters of one run, shared by every worker thread.
 pub struct Timings {
     started: Instant,
-    phases: [Clock; 7],
+    phases: [Clock; 8],
     rules: Vec<Clock>,
     cache_hits: AtomicU64,
     cache_misses: AtomicU64,

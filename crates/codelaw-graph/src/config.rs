@@ -21,6 +21,28 @@ pub const DEFAULT_REGISTRARS: &[&str] = &[
     "*.middleware",
     "*.exception_handler",
     "*.on_event",
+    // Flask's request and app hooks (the W-11 corpus run, `flask`).
+    "*.before_request",
+    "*.before_app_request",
+    "*.after_request",
+    "*.after_app_request",
+    "*.teardown_request",
+    "*.teardown_app_request",
+    "*.teardown_appcontext",
+    "*.errorhandler",
+    "*.app_errorhandler",
+    "*.context_processor",
+    "*.app_context_processor",
+    "*.shell_context_processor",
+    "*.template_filter",
+    "*.app_template_filter",
+    "*.template_global",
+    "*.app_template_global",
+    "*.template_test",
+    "*.app_template_test",
+    "*.url_value_preprocessor",
+    "*.url_defaults",
+    "*.listens_for",
     "*.command",
     "*.group",
     "*.callback",
@@ -124,6 +146,7 @@ mod tests {
         assert!(c.is_registrar("app.get"));
         assert!(c.is_registrar("api.router.post"));
         assert!(c.is_registrar("pytest.fixture"));
+        assert!(c.is_registrar("bp.before_app_request"));
         assert!(!c.is_registrar("get"));
         assert!(!c.is_registrar("functools.lru_cache"));
     }

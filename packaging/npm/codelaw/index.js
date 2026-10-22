@@ -80,6 +80,13 @@ export function fix(paths = [], options = {}) {
   return run([...a, "--", ...paths]);
 }
 
+/** `codelaw format --format json` (`--check`: write nothing); returns the report. */
+export function format(paths = [], options = {}) {
+  const a = ["format", "--format", "json", ...common(options)];
+  if (options.check) a.push("--check");
+  return run([...a, "--", ...paths]);
+}
+
 /** `codelaw rules --for <path> --format json`; returns the rules that apply to the file, with their severity. */
 export function rulesFor(path) {
   return run(["rules", "--for", path, "--format", "json"]);

@@ -12,7 +12,7 @@ use crate::{CheckReport, EngineError, Project};
 use codelaw_cache::hash_bytes;
 use codelaw_core::{Diagnostic, FixClass};
 use codelaw_core::Language;
-use codelaw_fix::{Failure, fix_loop_with};
+use codelaw_fix::{Failure, LoopTrace, fix_loop_with};
 use codelaw_lang::{Grammar, RegionOptions};
 use rayon::prelude::*;
 use std::collections::{BTreeMap, BTreeSet};
@@ -24,6 +24,23 @@ pub struct FixOptions {
     pub unsafe_fixes: bool,
     /// `--dry-run`: compute, don't write.
     pub dry_run: bool,
+    /// `--trace`: record each pass of the loop in [`FileFix::trace`].
+    pub trace: bool,
+}
+
+/// One file's `fix --trace` (SR-RULE-AUTHORING decision 3): the passes of
+/// the loop whose result `fix` keeps, the rules verification refused, and
+/// whether the format step changed the layout.
+#[derive(Clone, Debug)]
+pub struct FileTrace {
+    pub file: String,
+    pub trace: LoopTrace,
+    /// Rules whose fixes made a rule fire that did not fire on the
+    /// original; the loop above ran without them (SR-ARCHITECTURE
+    /// decision 5).
+    pub verify_refused: Vec<String>,
+    pub formatted: bool,
+    pub changed: bool,
 }
 
 /// One file's fix.
@@ -40,6 +57,8 @@ pub struct FileFix {
     pub written: bool,
     /// The format step changed the layout.
     pub formatted: bool,
+    /// With [`FixOptions::trace`]: how the fix loop got here.
+    pub trace: Option<FileTrace>,
 }
 
 impl FileFix {
@@ -56,6 +75,9 @@ pub struct FixReport {
     pub check: CheckReport,
     /// `--dry-run`: nothing was meant to be written.
     pub dry_run: bool,
+    /// With [`FixOptions::trace`]: every file the loop offered a fix in, or
+    /// the format step changed, sorted.
+    pub traces: Vec<FileTrace>,
 }
 
 impl FixReport {
@@ -68,7 +90,7 @@ impl FixReport {
 /// Syntax errors in a file's host and in every embedded region a fix can
 /// reach, so a fix that breaks the JavaScript inside a `<script>` or a
 /// Markdown fence is refused like one that breaks the host (L4 decision 5).
-fn syntax_errors(project: &Project, entry: &FileEntry, text: &str) -> usize {
+pub(crate) fn syntax_errors(project: &Project, entry: &FileEntry, text: &str) -> usize {
     let root = codelaw_lang::parse(entry.language, text);
     let mut n = codelaw_lang::syntax_error_count(&root);
     if matches!(entry.language, Language::Html | Language::Markdown) {
@@ -83,7 +105,7 @@ fn syntax_errors(project: &Project, entry: &FileEntry, text: &str) -> usize {
 }
 
 /// The rules with a finding, engine diagnostics aside.
-fn firing(diagnostics: &[Diagnostic]) -> BTreeSet<String> {
+pub(crate) fn firing(diagnostics: &[Diagnostic]) -> BTreeSet<String> {
     diagnostics.iter().filter(|d| !d.rule.starts_with("codelaw/")).map(|d| d.rule.clone()).collect()
 }
 
@@ -92,7 +114,10 @@ fn firing(diagnostics: &[Diagnostic]) -> BTreeSet<String> {
 pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options: &FixOptions, format: bool) -> FileFix {
     let wanted = |class: FixClass| class == FixClass::Auto || (options.unsafe_fixes && class == FixClass::Suggest);
     let mut before: Option<BTreeSet<String>> = None;
-    let run = |denied: &BTreeSet<String>, before: &mut Option<BTreeSet<String>>| {
+    // Each run records its own trace; the one kept is the run whose result
+    // `fix` keeps.
+    let new_trace = || options.trace.then(LoopTrace::default);
+    let run = |denied: &BTreeSet<String>, before: &mut Option<BTreeSet<String>>, trace: &mut Option<LoopTrace>| {
         fix_loop_with(
             text,
             |t| syntax_errors(project, entry, t),
@@ -103,6 +128,7 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
                 }
                 out.candidates.into_iter().filter(|(c, class)| wanted(*class) && !denied.contains(&c.rule)).map(|(c, _)| c).collect()
             },
+            trace,
         )
     };
     // Verify (decision 5): the result parses (the loop refuses any fix that
@@ -111,7 +137,8 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
     // A rule whose fixes make a new rule fire is refused, and the loop runs
     // again without it.
     let mut denied: BTreeSet<String> = BTreeSet::new();
-    let mut outcome = run(&denied, &mut before);
+    let mut trace = new_trace();
+    let mut outcome = run(&denied, &mut before, &mut trace);
     let mut remaining = lint_text(project, entry, &outcome.text, &RunMode { external_fixers: false, refused: Some(&outcome.refused) }).diagnostics;
     let before = before.unwrap_or_default();
     let new_rules = |remaining: &[Diagnostic]| firing(remaining).difference(&before).next().is_some();
@@ -121,18 +148,20 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
         for culprit in &applied {
             let mut d = denied.clone();
             d.insert(culprit.clone());
-            let o = run(&d, &mut None);
+            let mut t = new_trace();
+            let o = run(&d, &mut None, &mut t);
             let r = lint_text(project, entry, &o.text, &RunMode { external_fixers: false, refused: Some(&o.refused) }).diagnostics;
             if !new_rules(&r) {
                 denied = d;
-                (outcome, remaining) = (o, r);
+                (outcome, remaining, trace) = (o, r, t);
                 found = true;
                 break;
             }
         }
         if !found {
             denied.extend(applied);
-            outcome = run(&denied, &mut None);
+            trace = new_trace();
+            outcome = run(&denied, &mut None, &mut trace);
             remaining = lint_text(project, entry, &outcome.text, &RunMode { external_fixers: false, refused: Some(&outcome.refused) }).diagnostics;
         }
         for rule in &denied {
@@ -176,6 +205,13 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
         }
     }
     remaining.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+    let trace = trace.map(|trace| FileTrace {
+        file: entry.rel.clone(),
+        trace,
+        verify_refused: denied.into_iter().collect(),
+        formatted,
+        changed: fixed != text,
+    });
     FileFix {
         file: entry.rel.clone(),
         original: text.to_owned(),
@@ -185,6 +221,7 @@ pub(crate) fn fix_text(project: &Project, entry: &FileEntry, text: &str, options
         remaining,
         written: false,
         formatted,
+        trace,
     }
 }
 
@@ -290,9 +327,19 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
             Some(s) => skipped.push(s),
             None => report.check.files_checked += 1,
         }
-        if let Some(f) = fix.filter(|f| f.changed()) {
+        let Some(mut f) = fix else { continue };
+        if let Some(t) = f.trace.take().filter(|t| !t.trace.passes.is_empty() || t.formatted) {
+            report.traces.push(t);
+        }
+        if f.changed() {
             report.files.push(f);
         }
+    }
+    // The adapters (SR-ARCHITECTURE decision 19) after every file's own
+    // fixes, so they see the files codelaw wrote.
+    if project.adapters_on() {
+        let checked: Vec<&FileEntry> = files.iter().filter(|e| !skipped.iter().any(|s| s.file == e.rel)).collect();
+        crate::adapters::fix(project, &checked, options, &mut report);
     }
     if !project.rules.has_rules() {
         report.check.diagnostics.push(crate::lint::no_rules(project));
@@ -305,6 +352,7 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
     crate::dedup_diagnostics(&mut report.check.diagnostics);
     skipped.sort();
     report.check.skipped = skipped;
+    report.traces.sort_by(|a, b| a.file.cmp(&b.file));
     Ok(report)
 }
 
@@ -352,6 +400,7 @@ fn fix_project_rules(project: &mut Project, paths: &[PathBuf], options: &FixOpti
                 remaining: Vec::new(),
                 written,
                 formatted: false,
+                trace: None,
             }),
         }
     }

@@ -10,7 +10,7 @@ feature: the licence and cost of every dependency
 owns:
   - crates/codelaw-cli/tests/licences.rs
 laws: [L0, L2]
-timestamp: 2026-10-18T13:30:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -92,12 +92,29 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
 
 ### Consequences
 
-- **Judgment today:** no manifest exists yet and no licence check runs —
-  backlog row W-20 (`ungated`). The check is owed the day the first manifest
-  lands.
-- **The editor extension's npm lockfile** (`packaging/vscode/package-lock.json`)
-  is checked by `crates/codelaw-cli/tests/licences.rs`, beside the Cargo
-  manifest, runtime and dev dependencies alike (decision 4).
+- **How L2 is enforced:** `crates/codelaw-cli/tests/licences.rs`, in
+  `cargo test`, over three scopes (decision 4):
+  - every resolved Cargo package, transitive ones included, every platform's;
+  - every npm lockfile under `.github/workflows`, `scripts/` and `packaging/`
+    — the editor extension's `packaging/vscode/package-lock.json` today —
+    runtime and dev dependencies alike, and every dependency its
+    `package.json` names must be resolved in it;
+  - every npm and PyPI package the build, the CI and the release install:
+    the test scans those folders for install commands (`pip install`,
+    `npm i`, `npx`, …) and for `pyproject.toml` / lockfile-less
+    `package.json` dependencies, and each one found must be declared in its
+    `BUILD_TOOLS` table with its licence, its source and what it installs in
+    turn. An undeclared install, or a declared one nothing installs, fails.
+- **Awaiting a ruling:** npm itself is `Artistic-2.0` — OSI-approved and not
+  copyleft by decision 2's test, but not among decision 2's examples. The
+  test lists it in `AWAITING_RULING`, prints it on every run, and refuses the
+  list growing; whether it passes is the decider's (W-20).
+- **The staging index the install smoke uses** (W-18, 2026-10-22) is built,
+  not adopted: `scripts/staging-index.py` is the Python standard library only,
+  so it adds nothing to vet. Its one installed tool, `uv` (`MIT OR Apache-2.0`,
+  no dependencies), is declared in `licences.rs`'s `BUILD_TOOLS`. A third-party
+  local registry (Verdaccio and the like) would bring a transitive npm tree that
+  decision 4 makes in scope.
 - Weak copyleft (MPL, EPL) is refused too, so some ecosystem crates are
   unavailable; the answer is a permissive alternative or building it.
 - The parsing stack named in `docs/DESIGN.md` — tree-sitter and
@@ -124,7 +141,7 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
 **Reopen this decision if:** any resolved dependency carries a licence that is
 not both OSI-approved and permissive.
 
-**How to check it:** `ls Cargo.lock package-lock.json pnpm-lock.yaml uv.lock poetry.lock 2>/dev/null || echo "no dependencies yet"` — once a lockfile exists, the licence check W-20 names.
+**How to check it:** `cargo test -p codelaw-cli --test licences` — every test passes, and the `⚠ L2` lines it prints name what still awaits a ruling.
 
 ---
 

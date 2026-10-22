@@ -10,7 +10,7 @@ feature: "the rule file"
 owns:
   - crates/codelaw-rules
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -124,8 +124,17 @@ The decider asked for a record of the rule-file template. The format so far exis
    - `collect-into-block`: `block` with `$$$NAMES`, `type_block` with `$$$TYPE_NAMES`, and `position`; computed once over every match in the file, so each diagnostic carries the whole edit set;
    - `move-to`: `end-of-file`, `start-of-file` or `after-imports`;
    - `rename-symbol-local`: renames a symbol and its references in the file, and is refused for an exported symbol;
-   - `sort-keys` and `ensure-key` (for `target:` rules) and `when`/`else` branches.
+   - `sort-keys` and `ensure-key` (for `target:` rules) and `when`/`else` branches; a `target:` rule's `replace` and `remove` act on its target (decision 3e).
 3d. **YAML 1.2.** The frontmatter and the `codelaw` block are read as YAML 1.2, as ast-grep reads its rules: `on`, `n` and `yes` are strings. A key written twice in one mapping is a load error.
+3e. **`target:` + `assert:` rules** (W-12; `crates/codelaw-match` `data`, `target` and `schema`, `crates/codelaw-fix` `structured`). They read the **data tree** of a JSON, YAML or TOML file: its values, each with the span it was written at, built from the syntax tree already parsed. YAML is read as YAML 1.2, an alias as its anchor's value and a `<<` key as a merge; TOML dates and times are strings. A rule for any other language is a load error. The rule runs once per file, not per node; inside another file's region (front matter, a code block) it runs only when its `host:` names that file's language.
+   - **`target:`** is a path or a list of them: keys separated by `.` (`compilerOptions.strict`), a quoted key (`"a.b"`, `["a.b"]`), an index (`steps[0]`) and `*` or `[*]` for every member or item. `$` is the document's root. Each YAML document is checked on its own. A path that stops at a missing key, with only keys after it, is still a target, so `present: true` can fail there. A place two paths reach is checked once.
+   - **`assert:`** is a map of checks, all of which must hold: `present` (`true`/`false`), `type` (a JSON type name or a list; an integer is a number), `equals`, `one-of`, `matches` (a regular expression, on strings), `sorted` (`true`, or `{ first: [<key>…] }` to put those keys first; object keys, or an array whose items are all strings, by code point), `schema: <data table>` (below), `path: { <path>: <assertion> }` (below the target, or from the root with `$.`), and `not`, `all`, `any`. Every check but `present: true` holds where the value is missing. An unknown check is a load error.
+   - **`schema:`** validates against a JSON Schema (draft-07) in the pack's `data/`. Nothing is fetched ([L5](0007_LAW-5-no-model-in-the-engine.md)): a `$ref` to another file accepts any value. Three departures, each toward fewer false reports: `oneOf` holds when at least one branch does; a `pattern` the `regex` crate can't compile (look-around, back-references) accepts; a YAML key with no value isn't checked. `format` is an annotation, as draft-07 allows. Each schema error is its own diagnostic, at the key or value it is about.
+   - **Where it reports:** the key of the member the target is, else the value's first character; for a missing key, its deepest existing parent.
+   - **`message:`** interpolates `$PATH` (`jobs.build.steps[0]`), `$KEY` (the last key), `$VALUE` (the value as written) and `$ERROR` (a schema's reason).
+   - **`fix:`** is a list of steps: `sort-keys` (takes `sorted:`'s argument), `ensure-key: { key?, value }` (gives the target, or the key path below it, that value: written in with any missing parents where absent, replaced where different), `replace: <template>`, `remove` (the target with its key and separator), and `when: <assertion>` with `then:` and/or `else:` steps. The steps run in order, each on the text the one before left, so `[ensure-key, sort-keys]` sorts the key it wrote; a step with nothing to do (a sort already in order, a value already equal) is skipped, and nothing after `remove` may act on the target. The fix is one edit. `external` is not a `target:` fix.
+   - **What a fix keeps:** every byte outside its edit; a line item moves with the comment lines directly above it at its indentation; a bracketed container with a comment between its items is not sorted (the comment would be left behind), and the diagnostic is `manual` with the reason in its note.
+   - **Verified before it is offered,** beyond decision 5 of [SR-ARCHITECTURE](0108_architecture.md): the file has no more syntax errors than before, the assertion now holds at the target, and the data outside the paths the steps changed is equal (a sort only reorders). A fix that fails any of these is not offered.
 4. **Body sections, in this order:**
    1. One summary paragraph.
    2. `**Why:**`

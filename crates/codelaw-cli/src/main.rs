@@ -9,6 +9,7 @@ mod init;
 mod match_cmd;
 mod rules_cmd;
 mod tree;
+mod warm;
 
 use clap::{Args, Parser, Subcommand};
 use codelaw_core::Language;
@@ -71,6 +72,15 @@ enum Command {
     },
     /// Serve the MCP tools to an agent over stdio (SR-CLI-MCP decision 5).
     Mcp,
+    /// Check and fix the files an agent just edited; what is left goes back to it (SR-AGENT-SURFACES).
+    Hook(codelaw_agents::HookArgs),
+    /// Write every agent's files from the rules and skills, or with --check report drift.
+    SyncAgents(codelaw_agents::SyncArgs),
+    /// An opt-in warm process that serves `--prefer-warm` runs (SR-ARCHITECTURE decision 22).
+    Daemon {
+        #[command(subcommand)]
+        action: warm::DaemonAction,
+    },
 }
 
 #[derive(Subcommand)]
@@ -98,6 +108,10 @@ pub struct Common {
     /// Print where the time went: each phase and the slowest rules.
     #[arg(long)]
     timings: bool,
+    /// Run in a warm `lsp`, `mcp` or `daemon` of this version when one is
+    /// running for this project; otherwise run here. The output is the same.
+    #[arg(long)]
+    prefer_warm: bool,
 }
 
 #[derive(Args)]
@@ -112,6 +126,10 @@ struct CheckArgs {
     /// Fail when there are more warnings than this.
     #[arg(long)]
     max_warnings: Option<usize>,
+    /// Don't run the installed external linters (oxlint, Ruff, stylelint,
+    /// html-validate) this command runs otherwise.
+    #[arg(long)]
+    no_adapters: bool,
 }
 
 #[derive(Args)]
@@ -133,6 +151,10 @@ struct FixArgs {
     format: String,
     #[arg(long)]
     max_warnings: Option<usize>,
+    /// Don't run the installed external linters (oxlint, Ruff, stylelint,
+    /// html-validate) this command runs otherwise.
+    #[arg(long)]
+    no_adapters: bool,
 }
 
 #[derive(Args)]
@@ -143,6 +165,16 @@ struct TestArgs {
     /// Only the case with this title.
     #[arg(long)]
     case: Option<String>,
+    /// Level 4 as well: run the rules over every file under this folder (a
+    /// pinned corpus checkout) and hold each file to the invariants.
+    #[arg(long, value_name = "DIR")]
+    corpus: Option<PathBuf>,
+    /// The finding counts the corpus run must give (a TOML file).
+    #[arg(long, value_name = "FILE", requires = "corpus")]
+    snapshot: Option<PathBuf>,
+    /// Write the counts to --snapshot instead of comparing them.
+    #[arg(long, requires = "snapshot")]
+    update_snapshot: bool,
 }
 
 pub fn color() -> bool {
@@ -154,8 +186,76 @@ pub fn fail(e: impl std::fmt::Display) -> ExitCode {
     ExitCode::from(2)
 }
 
+/// What a command takes from the process it runs for: the environment
+/// (SR-CONFIG decision 4) and whether its stdout is a terminal. A warm
+/// process runs a command with its client's, never its own
+/// (SR-ARCHITECTURE decision 21).
+#[derive(Clone, Debug, Default)]
+pub struct Ctx {
+    pub color: bool,
+    pub env: EngineOptions,
+    /// Running in a warm process for a client.
+    pub warm: bool,
+}
+
+impl Ctx {
+    pub fn here() -> Ctx {
+        Ctx { color: color(), env: EngineOptions::from_env(), warm: false }
+    }
+}
+
+/// What a command prints and its exit code: the same bytes whether it ran
+/// here or in a warm process.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Output {
+    pub stdout: String,
+    pub stderr: String,
+    pub code: u8,
+}
+
+impl Output {
+    pub fn fail(e: impl std::fmt::Display) -> Output {
+        Output { stderr: format!("error: {e}\n"), code: 2, ..Default::default() }
+    }
+
+    pub fn emit(self) -> ExitCode {
+        use std::io::Write;
+        let _ = std::io::stdout().write_all(self.stdout.as_bytes());
+        let _ = std::io::stdout().flush();
+        let _ = std::io::stderr().write_all(self.stderr.as_bytes());
+        ExitCode::from(self.code)
+    }
+}
+
+/// Run a command here, or with `--prefer-warm` in a warm process when one
+/// serves it (SR-ARCHITECTURE decision 21).
+fn run(prefer_warm: bool, paths: &[PathBuf], local: impl FnOnce(&Ctx) -> Output) -> ExitCode {
+    let ctx = Ctx::here();
+    if prefer_warm && let Some(out) = warm::client(paths, &ctx) {
+        return out.emit();
+    }
+    local(&ctx).emit()
+}
+
+/// A command line a warm process was sent, run as this binary runs it, or
+/// `None` when it runs only in its own process.
+pub fn serve_command(argv: &[String], ctx: &Ctx) -> Option<Output> {
+    let cli = Cli::try_parse_from(argv).ok()?;
+    match cli.command {
+        Command::Check(a) => Some(check(a, ctx)),
+        Command::Fix(a) => fix(a, ctx),
+        Command::Format(a) => Some(format_cmd::format(a, ctx)),
+        _ => None,
+    }
+}
+
 pub fn engine_options(common: &Common) -> Result<EngineOptions, String> {
-    let mut o = EngineOptions::from_env();
+    engine_options_in(common, EngineOptions::from_env())
+}
+
+/// The flags of `common` over the options the environment gives.
+pub fn engine_options_in(common: &Common, env: EngineOptions) -> Result<EngineOptions, String> {
+    let mut o = env;
     if !common.lang.is_empty() {
         let mut set = BTreeSet::new();
         for l in &common.lang {
@@ -194,59 +294,71 @@ pub fn format(s: &str) -> Result<Format, String> {
     Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif or agent)"))
 }
 
-fn check(args: CheckArgs) -> ExitCode {
+fn check(args: CheckArgs, ctx: &Ctx) -> Output {
     let fmt = match format(&args.format) {
         Ok(f) => f,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
-    let options = match engine_options(&args.common) {
+    let mut options = match engine_options_in(&args.common, ctx.env.clone()) {
         Ok(o) => o,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
+    // The CLI is the one surface that runs adapters (SR-ARCHITECTURE decision 19).
+    options.adapters = !args.no_adapters;
     let mut project = match load(&args.paths, options) {
         Ok(p) => p,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
     let report = match project.check(&args.paths) {
         Ok(r) => r,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
+    let mut out = Output::default();
     match fmt {
-        Format::Text => print!("{}", codelaw_report::check_text(&report, color())),
-        Format::Json => println!("{}", serde_json::to_string_pretty(&with_timings(codelaw_report::check_json(&report), &project)).expect("json")),
-        Format::Sarif => println!("{}", serde_json::to_string_pretty(&codelaw_report::check_sarif(&report, &project)).expect("json")),
-        Format::Agent => print!("{}", codelaw_report::check_agent(&report)),
+        Format::Text => out.stdout.push_str(&codelaw_report::check_text(&report, ctx.color)),
+        Format::Json => out.stdout = json_line(&with_timings(codelaw_report::check_json(&report), &project)),
+        Format::Sarif => out.stdout = json_line(&codelaw_report::check_sarif(&report, &project)),
+        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent(&report)),
     }
-    print_timings(&project, fmt);
-    ExitCode::from(codelaw_report::exit_code(&report, args.max_warnings) as u8)
+    timings(&project, fmt, &mut out);
+    out.code = codelaw_report::exit_code(&report, args.max_warnings) as u8;
+    out
 }
 
-fn fix(args: FixArgs) -> ExitCode {
+/// A JSON value as `println!` of its pretty form prints it.
+fn json_line(v: &serde_json::Value) -> String {
+    serde_json::to_string_pretty(v).expect("json") + "\n"
+}
+
+/// `None` in a warm process when the run may start an external fixer, which
+/// would inherit the warm process's environment rather than the client's
+/// (SR-ARCHITECTURE decisions 18 and 21): the client runs it itself.
+fn fix(args: FixArgs, ctx: &Ctx) -> Option<Output> {
     let fmt = match format(&args.format) {
         Ok(f) => f,
-        Err(e) => return fail(e),
+        Err(e) => return Some(Output::fail(e)),
     };
-    let options = match engine_options(&args.common) {
+    let mut options = match engine_options_in(&args.common, ctx.env.clone()) {
         Ok(o) => o,
-        Err(e) => return fail(e),
+        Err(e) => return Some(Output::fail(e)),
     };
+    // The CLI is the one surface that runs adapters (SR-ARCHITECTURE decision 19).
+    options.adapters = !args.no_adapters;
     let mut project = match load(&args.paths, options) {
         Ok(p) => p,
-        Err(e) => return fail(e),
+        Err(e) => return Some(Output::fail(e)),
     };
-    // The trace runs in memory first, so it sees the files before any write.
-    let trace = if args.trace {
-        match project.trace_fix(&args.paths, &FixOptions { unsafe_fixes: args.unsafe_fixes, dry_run: true }) {
-            Ok(t) => Some(t),
-            Err(e) => return fail(e),
-        }
-    } else {
-        None
-    };
-    let report = match project.fix(&args.paths, &FixOptions { unsafe_fixes: args.unsafe_fixes, dry_run: args.dry_run }) {
+    if ctx.warm && project.runs_external_fixers() {
+        return None;
+    }
+    // One run: `--trace` records the loop `fix` runs, and writes what it
+    // writes (nothing with `--dry-run`).
+    let report = match project.fix(&args.paths, &FixOptions { unsafe_fixes: args.unsafe_fixes, dry_run: args.dry_run, trace: args.trace }) {
         Ok(r) => r,
-        Err(e) => return fail(e),
+        Err(e) => return Some(Output::fail(e)),
     };
+    let trace = args.trace.then_some(&report.traces);
+    let mut out = Output::default();
     match fmt {
         Format::Text => {
             for f in &report.files {
@@ -260,32 +372,33 @@ fn fix(args: FixArgs) -> ExitCode {
                     "not written"
                 };
                 let applied: Vec<String> = f.applied.iter().map(|(r, n)| format!("{r} ×{n}")).collect();
-                println!("{verb} {} ({})", f.file, applied.join(", "));
+                out.stdout.push_str(&format!("{verb} {} ({})\n", f.file, applied.join(", ")));
             }
-            print!("{}", codelaw_report::fix_text(&report, color()));
+            out.stdout.push_str(&codelaw_report::fix_text(&report, ctx.color));
         }
         Format::Json => {
             let mut v = with_timings(codelaw_report::fix_json(&report), &project);
-            if let Some(t) = &trace {
+            if let Some(t) = trace {
                 v["trace"] = codelaw_report::trace_json(t);
             }
-            println!("{}", serde_json::to_string_pretty(&v).expect("json"));
+            out.stdout = json_line(&v);
         }
-        Format::Sarif => println!("{}", serde_json::to_string_pretty(&codelaw_report::check_sarif(&report.check, &project)).expect("json")),
-        Format::Agent => print!("{}", codelaw_report::check_agent(&report.check)),
+        Format::Sarif => out.stdout = json_line(&codelaw_report::check_sarif(&report.check, &project)),
+        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent(&report.check)),
     }
     // Text: on stdout after the report; SARIF and agent: on stderr.
-    match (&trace, fmt) {
-        (Some(t), Format::Text) => print!("{}", codelaw_report::trace_text(t)),
-        (Some(t), Format::Sarif | Format::Agent) => eprint!("{}", codelaw_report::trace_text(t)),
+    match (trace, fmt) {
+        (Some(t), Format::Text) => out.stdout.push_str(&codelaw_report::trace_text(t)),
+        (Some(t), Format::Sarif | Format::Agent) => out.stderr.push_str(&codelaw_report::trace_text(t)),
         _ => {}
     }
-    print_timings(&project, fmt);
-    ExitCode::from(codelaw_report::exit_code(&report.check, args.max_warnings) as u8)
+    timings(&project, fmt, &mut out);
+    out.code = codelaw_report::exit_code(&report.check, args.max_warnings) as u8;
+    Some(out)
 }
 
 /// `--timings` in JSON output: a `timings` field.
-fn with_timings(mut v: serde_json::Value, project: &Project) -> serde_json::Value {
+pub fn with_timings(mut v: serde_json::Value, project: &Project) -> serde_json::Value {
     if let Some(t) = project.timings() {
         v["timings"] = codelaw_report::timings_json(&t);
     }
@@ -293,9 +406,9 @@ fn with_timings(mut v: serde_json::Value, project: &Project) -> serde_json::Valu
 }
 
 /// `--timings` beside the other formats: on stderr, so stdout stays parseable.
-fn print_timings(project: &Project, fmt: Format) {
+fn timings(project: &Project, fmt: Format, out: &mut Output) {
     if let Some(t) = project.timings().filter(|_| fmt != Format::Json) {
-        eprint!("{}", codelaw_report::timings_text(&t));
+        out.stderr.push_str(&codelaw_report::timings_text(&t));
     }
 }
 
@@ -307,9 +420,37 @@ fn test(args: TestArgs) -> ExitCode {
     if rules.is_empty() {
         return fail("no rules to test");
     }
-    let reports = codelaw_test::test_rules(rules.iter(), args.case.as_deref());
+    let mut reports = codelaw_test::test_rules(rules.iter(), args.case.as_deref());
     if args.case.is_some() && reports.iter().all(|r| r.checks == 0) {
         return fail(format!("no case titled `{}`", args.case.unwrap_or_default()));
+    }
+    if let Some(dir) = &args.corpus {
+        // Level 4 (SR-RULE-AUTHORING decision 4), after levels 1–3.
+        let files = match codelaw_test::corpus_files(dir) {
+            Ok(f) if f.is_empty() => return fail(format!("{}: no file the engine reads", dir.display())),
+            Ok(f) => f,
+            Err(e) => return fail(format!("{}: {e}", dir.display())),
+        };
+        let mut corpus: Vec<codelaw_test::CorpusReport> = rules.iter().map(|r| codelaw_test::corpus_rule(r, &files)).collect();
+        corpus.sort_by(|a, b| a.report.id.cmp(&b.report.id));
+        match (&args.snapshot, args.update_snapshot) {
+            (Some(path), true) => {
+                if let Err(e) = std::fs::write(path, codelaw_test::write_snapshot(&corpus)) {
+                    return fail(format!("{}: {e}", path.display()));
+                }
+            }
+            (Some(path), false) => match std::fs::read_to_string(path).map_err(|e| e.to_string()).and_then(|t| codelaw_test::read_snapshot(&t)) {
+                Ok(snapshot) => codelaw_test::compare_snapshot(&mut corpus, &snapshot),
+                Err(e) => return fail(format!("{}: {e}", path.display())),
+            },
+            (None, _) => {}
+        }
+        for (r, c) in reports.iter_mut().zip(&corpus) {
+            r.checks += c.report.checks;
+            r.failures.extend(c.report.failures.iter().cloned());
+        }
+        let findings: usize = corpus.iter().map(|c| c.findings).sum();
+        println!("corpus: {} files · {findings} findings", files.len());
     }
     print!("{}", codelaw_test::render(&reports, color()));
     if reports.iter().all(|r| r.passed()) { ExitCode::SUCCESS } else { ExitCode::from(1) }
@@ -353,9 +494,10 @@ fn cache(action: CacheAction) -> ExitCode {
 fn main() -> ExitCode {
     let cli = Cli::parse();
     match cli.command {
-        Command::Check(a) => check(a),
-        Command::Fix(a) => fix(a),
-        Command::Format(a) => format_cmd::format(a),
+        Command::Check(a) => run(a.common.prefer_warm, &a.paths.clone(), |ctx| check(a, ctx)),
+        // Only a warm process declines a fix; here it always runs.
+        Command::Fix(a) => run(a.common.prefer_warm, &a.paths.clone(), |ctx| fix(a, ctx).unwrap_or_default()),
+        Command::Format(a) => run(a.prefer_warm(), &a.paths.clone(), |ctx| format_cmd::format(a, ctx)),
         Command::Test(a) => test(a),
         Command::Rules(a) => rules_cmd::rules(a),
         Command::Explain { id, format } => rules_cmd::explain(&id, &format),
@@ -363,13 +505,24 @@ fn main() -> ExitCode {
         Command::Match(a) => match_cmd::run(a),
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
-        Command::Lsp { .. } => codelaw_lsp::run_stdio().map_or_else(fail, |()| ExitCode::SUCCESS),
+        Command::Lsp { .. } => {
+            // A warm process for `--prefer-warm` runs for as long as the
+            // editor's session (SR-ARCHITECTURE decision 21).
+            let _warm = warm::serve_in_background(warm::Kind::Lsp);
+            codelaw_lsp::run_stdio().map_or_else(fail, |()| ExitCode::SUCCESS)
+        }
         Command::Graph(a) => graph_cmd::graph(a),
         Command::Config(a) => config_cmd::run(a),
         Command::Cache { action } => cache(action),
-        Command::Mcp => match codelaw_mcp::serve(std::io::stdin().lock(), std::io::stdout().lock()) {
-            Ok(()) => ExitCode::SUCCESS,
-            Err(e) => fail(e),
-        },
+        Command::Mcp => {
+            let _warm = warm::serve_in_background(warm::Kind::Mcp);
+            match codelaw_mcp::serve(std::io::stdin().lock(), std::io::stdout().lock()) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(e) => fail(e),
+            }
+        }
+        Command::Daemon { action } => warm::daemon(action),
+        Command::Hook(a) => codelaw_agents::hook(a),
+        Command::SyncAgents(a) => codelaw_agents::sync_agents(a),
     }
 }

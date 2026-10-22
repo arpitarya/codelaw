@@ -10,7 +10,7 @@ feature: "configuration"
 owns:
   - crates/codelaw-config
 laws: [L0, L3, L5, L7]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -79,7 +79,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 2. **Finding it:** walk up from each file to the nearest folder with a home.
    - **Monorepos:** the topmost config is the root. A nested config (for example in `packages/web/`) **inherits** the root and overrides it, unless it sets `root = true`, which makes that folder a separate project with its own graph and baseline ([SR-ARCHITECTURE](0108_architecture.md) decision 17).
    - **Globs** in `include`, `exclude` and `[[overrides]]` are relative to the directory of the config file that declares them ([SR-ARCHITECTURE](0108_architecture.md) decision 11).
-   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]` and `[markdown]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
+   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]`, `[markdown]` and `[daemon]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
    - **A nested `root = true` project** is checked by running codelaw in its folder; a run from the parent skips its files and says so.
 3. **Sections and owners.** The top-level keys belong to this record:
    - `extends`, `languages`, `include`, `exclude`, `rules_dir`;
@@ -92,7 +92,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
    `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11).
 
-   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change.
+   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]` is validated by the loader since W-14, like `[fix]` and `[lint]`; `[format]`, `[graph]`, `[baseline]`, `[agents]`, `[daemon]` and `[lsp]` are still read as tables.
 4. **Precedence, last wins:**
    1. Built-in defaults.
    2. `.editorconfig` (formatter keys only).
@@ -109,7 +109,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 6. **The schema ships with codelaw.** `codelaw.schema.json` is in the npm package and available as `codelaw config --schema`, so TOML and JSON editors offer completion and validation.
 7. **Traceable.** `codelaw config --print [--for <file>]` prints the resolved configuration for a file, with the source of each value (default, `.editorconfig`, file:line, override #n, env or flag).
 8. **Creating it.**
-   - `codelaw init` writes a minimal `codelaw.toml`: `extends` with the `recommended` presets of the rule packs it installs for the languages it detects ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and nothing else.
+   - `codelaw init` writes a minimal `codelaw.toml`: `extends` with the `recommended` presets of the rule packs it installs for the languages it detects ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and nothing else; with `--agents`, also the `[agents]` section naming them ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 6).
    - `codelaw format --import-config` converts Prettier, Ruff or Black configs ([SR-FORMATTER](0105_formatter.md) decision 5).
 9. **Deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)):** the resolved config is a pure function of the files, environment and flags. Its hash is part of every cache key ([SR-CACHE](0109_cache.md)).
 
@@ -134,7 +134,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
 **Reopen this decision if:** a key is accepted that no record defines, or `config --print` can't name a value's source.
 
-**How to check it:** the schema test: every key in `codelaw.schema.json` is defined in exactly one record, and every record-defined key is in the schema (`W-16`).
+**How to check it:** the schema test, `cargo test -p codelaw-config --test schema`: every key in `codelaw.schema.json` is defined in exactly one record, every record-defined key is in the schema, and the schema and the loader accept the same keys. It compiles the schema with `boon` (MIT OR Apache-2.0), a dev-dependency only, taken in for this test and SR-CLI-MCP's SARIF check.
 
 ---
 

@@ -114,6 +114,13 @@ fn folders_down_to(dir: &Path, root: &Path) -> Vec<PathBuf> {
 }
 
 pub(crate) fn discover(project: &mut Project, paths: &[PathBuf]) -> Result<Discovered, EngineError> {
+    discover_with(project, paths, true)
+}
+
+/// `filtered: false` keeps the files `[files]` and `languages` leave out:
+/// the project graph reads them for their uses and resolves imports to
+/// them, and reports nothing in them (SR-PROJECT-GRAPH decision 1).
+pub(crate) fn discover_with(project: &mut Project, paths: &[PathBuf], filtered: bool) -> Result<Discovered, EngineError> {
     let root = project.config.root_dir.clone();
     let roots: Vec<PathBuf> = if paths.is_empty() {
         vec![root.clone()]
@@ -252,15 +259,17 @@ pub(crate) fn discover(project: &mut Project, paths: &[PathBuf]) -> Result<Disco
             }
             continue;
         };
-        if !project.config.is_included(&abs) {
-            continue;
-        }
-        if !language_enabled(project, &abs, language) {
+        if filtered && !reported(project, &abs, language) {
             continue;
         }
         files.push(FileEntry { rel: rel_path(&abs, &root), abs, language });
     }
     Ok((files, skipped, warnings))
+}
+
+/// Whether `[files]` and `languages` let a file be checked.
+pub(crate) fn reported(project: &Project, abs: &Path, language: Language) -> bool {
+    project.config.is_included(abs) && language_enabled(project, abs, language)
 }
 
 /// `languages` in config and `--lang` on the command line (L3 decision 4).

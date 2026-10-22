@@ -1,22 +1,37 @@
 #!/usr/bin/env bash
 # The install smoke (L6 "How L6 is enforced": install matrix, runtime fence,
-# pack parity) on ONE platform, from the assembled dist/ and NO registry:
-#   - npm: codelaw + @codelaw/cli-<KEY> + @codelaw/rules-data, run with no Python on PATH
-#   - PyPI: codelaw + codelaw-rules-data in a fresh venv, pip reading dist/pypi as its
-#     only index and choosing the wheel for this machine, run with no Node on PATH
+# pack parity) on ONE platform, from a STAGING INDEX (W-18): the assembled dist/
+# is published to a throwaway npm registry and PyPI simple index on 127.0.0.1
+# (scripts/staging-index.py, the standard library only), then installed from it
+# exactly as a user installs codelaw. Nothing is published anywhere else.
+#   - publish: `npm publish` each tarball; `uv publish` each wheel (the legacy upload API)
+#   - npm: codelaw and @codelaw/rules-data, by name (npm picks @codelaw/cli-<KEY> itself),
+#     run with no Python on PATH; codelaw --version through npx, from an empty folder
+#   - PyPI: codelaw and codelaw-rules-data, by name, into a fresh venv with the staging index
+#     as its only index, run with no Node on PATH; codelaw --version through uvx
 #   - the same project checked by both: the JSON reports must be byte-equal,
 #     and must contain diagnostics, so two empty runs can't pass
 # ci.yml's `smoke` job runs it on each of the eight platforms (W-18).
 # Usage: scripts/smoke.sh DIST [KEY]    KEY defaults to this machine's, e.g. linux-x64-gnu
+# Needs node, npm and python3 (>= 3.11, the wheel's floor); installs uv (UV_VERSION) into a
+# throwaway venv. Every cache and config it uses is under its temp folder.
 set -euo pipefail
 dist="$(cd "${1:?usage: smoke.sh DIST [KEY]}" && pwd)"
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" # not git: a container's mount is not "safe" to git
 here="$(node -p 'const h = process.report.getReport().header; process.platform + "-" + process.arch + (process.platform === "linux" ? (h.glibcVersionRuntime ? "-gnu" : "-musl") : "")')"
 key="${2:-$here}"
-[ "$key" = "$here" ] || { echo "✗ smoke.sh $key cannot run on a $here machine: npm and pip install for the host" >&2; exit 1; }
+[ "$key" = "$here" ] || { echo "✗ smoke.sh $key cannot run on a $here machine: npm and pip pick the package for the host" >&2; exit 1; }
 case "$key" in win32-*) win=1 ;; *) win=0 ;; esac
+UV_VERSION=0.11.3 # MIT OR Apache-2.0; declared in crates/codelaw-cli/tests/licences.rs (L2)
 work="$(mktemp -d)"
-trap 'rm -rf "$work"' EXIT
+index_pid=""
+stop() { # the script's own status, whatever stopping the index returns
+  local st=$?
+  if [ -n "$index_pid" ]; then kill "$index_pid" 2>/dev/null || true; wait "$index_pid" 2>/dev/null || true; fi
+  rm -rf "$work"
+  exit "$st"
+}
+trap stop EXIT
 
 native() { # a path as the native program it is handed to reads it
   if [ "$win" = 1 ]; then cygpath -w "$1"; else echo "$1"; fi
@@ -52,12 +67,39 @@ fenced() { # run "$@" with only PATH (and, on Windows, the SYSTEMROOT every proc
   else env -i PATH="$path" "$@"; fi
 }
 
+# ── the staging index: publish every file of dist/ to it ──
+if [ "$win" = 1 ]; then py=python; vbin="$work/venv/Scripts"; tbin="$work/tools/Scripts"; else py=python3; vbin="$work/venv/bin"; tbin="$work/tools/bin"; fi
+"$py" -m venv "$work/tools" # uv, kept out of the venv under test
+"$tbin/python" -m pip install -q --disable-pip-version-check "uv==$UV_VERSION"
+"$py" "$(native "$root/scripts/staging-index.py")" "$(native "$work/index")" --port-file "$(native "$work/index.url")" 2>"$work/index.log" &
+index_pid=$!
+for _ in $(seq 1 100); do [ -s "$work/index.url" ] && break; kill -0 "$index_pid" 2>/dev/null || break; sleep 0.1; done
+[ -s "$work/index.url" ] || { echo "✗ the staging index did not start" >&2; cat "$work/index.log" >&2; exit 1; }
+url="$(cat "$work/index.url")"
+tgz="$(basename "$(ls "$dist"/npm/codelaw-[0-9]*.tgz)")"; version="${tgz#codelaw-}"; version="${version%.tgz}"
+pre=""; case "$version" in *-*) pre=1 ;; esac # a pre-release: npm's `next`, pip --pre, uv --prerelease
+# npm reads only this config: the staging registry for every scope, a cache of its own
+cat >"$work/npmrc" <<EOF
+registry=$url/
+${url#http:}/:_authToken=staging
+cache=$(native "$work/npm-cache")
+tag=$([ -n "$pre" ] && echo next || echo latest)
+audit=false
+fund=false
+update-notifier=false
+EOF
+npm_config_userconfig="$(native "$work/npmrc")"
+export npm_config_userconfig
+# publishing caches each tarball by its digest: a cache of its own, so every install downloads from the index
+for t in "$dist"/npm/*.tgz; do npm publish "$t" --access public --loglevel=error --cache "$(native "$work/npm-publish-cache")" >/dev/null; done
+UV_NO_CONFIG=1 "$tbin/uv" publish -q --publish-url "$url/legacy/" --username staging --password staging --trusted-publishing never "$dist"/pypi/*.whl
+
 # ── npm ──
 project "$work/npm"
 (cd "$work/npm" && cp package.json package.json.orig &&
-  npm i --omit=optional --no-audit --no-fund --no-package-lock --no-save --loglevel=error \
-    "$dist"/npm/codelaw-[0-9]*.tgz "$dist"/npm/codelaw-cli-"$key"-[0-9]*.tgz "$dist"/npm/codelaw-rules-data-*.tgz &&
+  npm i --no-audit --no-fund --no-package-lock --no-save --loglevel=error codelaw @codelaw/rules-data &&
   mv package.json.orig package.json)
+[ -d "$work/npm/node_modules/@codelaw/cli-$key" ] || { echo "✗ npm did not pick @codelaw/cli-$key from the staging index" >&2; ls "$work/npm/node_modules/@codelaw" >&2; exit 1; }
 np="$(bare_path npm)"
 if [ "$win" = 1 ]; then # npm's .bin shims need a POSIX shell; run the launcher they call
   (cd "$work/npm" && fenced "$np" "$np/node.exe" "$(native "$work/npm/node_modules/codelaw/bin/codelaw.js")" check --format json --no-cache >"$work/npm.json") || [ $? = 1 ]
@@ -69,12 +111,25 @@ fi
 
 # ── PyPI ──
 project "$work/pypi"
-if [ "$win" = 1 ]; then py=python; vbin="$work/venv/Scripts"; else py=python3; vbin="$work/venv/bin"; fi
 "$py" -m venv "$work/venv"
-"$vbin/python" -m pip install -q --no-index --disable-pip-version-check --find-links "$(native "$dist/pypi")" codelaw codelaw-rules-data
+"$vbin/python" -m pip install -q --isolated --no-cache-dir --disable-pip-version-check --index-url "$url/simple/" ${pre:+--pre} codelaw codelaw-rules-data
 (cd "$work/pypi" && fenced "$(bare_path pypi)" VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" check --format json --no-cache >"$work/pypi.json") || [ $? = 1 ]
 # the Python API, through the same binary
 (cd "$work/pypi" && "$vbin/python" -c 'import codelaw, json, sys; sys.stdout.write(json.dumps(codelaw.check(no_cache=True)["summary"], separators=(",", ":")))' >"$work/api-pypi.json")
+
+# ── one-shot runs: npx, then uvx, fetch codelaw from the staging index into caches of their own ──
+mkdir -p "$work/once"
+v_npm="$(cd "$work/npm" && node "$(native "$work/npm/node_modules/codelaw/bin/codelaw.js")" --version)"
+v_npx="$(cd "$work/once" && npm_config_cache="$(native "$work/npx-cache")" npx --yes --loglevel=error codelaw --version)"
+v_uvx="$(cd "$work/once" && UV_NO_CONFIG=1 UV_PYTHON_DOWNLOADS=never "$tbin/uvx" -q --isolated --cache-dir "$(native "$work/uv-cache")" \
+  --python "$(native "$tbin/python")" --default-index "$url/simple/" ${pre:+--prerelease=allow} codelaw --version)"
+[ "$v_npm" = "codelaw $version" ] && [ "$v_npx" = "$v_npm" ] && [ "$v_uvx" = "$v_npm" ] ||
+  { echo "✗ --version: npm '$v_npm', npx '$v_npx', uvx '$v_uvx'; expected 'codelaw $version'" >&2; exit 1; }
+# every install downloaded from the index: 3 tarballs for npm, 2 for npx; 2 wheels for pip, 1 for uvx
+served_npm="$(grep -c '"GET /[^ ]*/-/[^ ]*\.tgz HTTP/1.1" 200' "$work/index.log" || true)"
+served_pypi="$(grep -c '"GET /files/[^ ]*\.whl HTTP/1.1" 200' "$work/index.log" || true)"
+[ "$served_npm" -ge 5 ] && [ "$served_pypi" -ge 3 ] ||
+  { echo "✗ the staging index served $served_npm npm tarballs (5 expected) and $served_pypi wheels (3): something installed from elsewhere" >&2; cat "$work/index.log" >&2; exit 1; }
 
 # ── compare ──
 n="$(node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); console.log(r.diagnostics.filter(d => d.rule !== "codelaw/no-rules").length)' "$(native "$work/npm.json")")"
@@ -82,4 +137,4 @@ n="$(node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "
 cmp -s "$work/npm.json" "$work/pypi.json" || { echo "✗ npm and PyPI disagree:" >&2; diff "$work/npm.json" "$work/pypi.json" >&2 || true; exit 1; }
 node -e 'const [a, b, c] = process.argv.slice(1).map(f => JSON.parse(require("fs").readFileSync(f, "utf8"))); const s = JSON.stringify(a.summary); if (s !== JSON.stringify(b) || s !== JSON.stringify(c)) { console.error("✗ an API disagrees with the CLI", s, JSON.stringify(b), JSON.stringify(c)); process.exit(1) }' \
   "$(native "$work/npm.json")" "$(native "$work/api-npm.json")" "$(native "$work/api-pypi.json")"
-echo "✔ $key: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree"
+echo "✔ $key, installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree; codelaw --version is codelaw $version through uvx and through npx; the index served $served_npm tarballs and $served_pypi wheels"

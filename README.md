@@ -354,7 +354,7 @@ flowchart LR
 | `codelaw init` | Detect languages and write `codelaw.toml`, `.codelaw/rules/` and the `.gitignore` line. `--no-install` prints the pack install commands instead of running them |
 | `codelaw rules` | List active rules. `--for <file>` shows the ones that apply to that file. `rules lint` checks rule files |
 | `codelaw explain <id>` | What a rule requires, why, and how to fix it |
-| `codelaw test [rule\|folder]` | Run rules against their own examples |
+| `codelaw test [rule\|folder] [--corpus <dir>]` | Run rules against their own examples; `--corpus` also runs them over real code |
 | `codelaw new-rule <ns/name>` | Write a rule file from the template |
 | `codelaw tree <file>` | Show the syntax tree the engine sees |
 | `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
@@ -410,7 +410,7 @@ No. The pack rules are reimplemented natively in codelaw.
 Fixes run in passes until nothing more changes, up to ten passes. After each pass the file is re-parsed, and a fix that would introduce a syntax error is rolled back. Fixes that could change behaviour are `suggest`, and they only apply with `--unsafe`.
 
 **Why is every rule `preview`?**
-A rule becomes stable after it has been run over real third-party code and compared with the tool it was ported from. The packs have had those corpus runs, but promotion isn't automated yet.
+A rule becomes stable after it has been run over real third-party code and compared with the tool it was ported from. The packs have had those corpus runs by hand; `codelaw test --corpus <dir>` now runs one, but the pinned corpus and the CI job that promotes a rule are not built yet.
 
 **Can I use it in a Python-only repo without Node?**
 Yes. Nothing in codelaw runs Node or Python. Once released, the PyPI package will be a self-contained binary.

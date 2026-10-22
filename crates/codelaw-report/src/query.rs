@@ -47,6 +47,7 @@ pub fn why_json(w: &RuleWhy) -> Value {
             "applies": f.applies,
             "severity": f.severity,
             "diagnostics": f.diagnostics.iter().map(diagnostic_json).collect::<Vec<_>>(),
+            "match": f.matches.as_ref().map(crate::debug::match_nodes_json),
         })
     });
     envelope(json!({
@@ -81,6 +82,15 @@ pub fn why_text(w: &RuleWhy) -> String {
         out.push_str(&format!("  for {}:  {}\n", f.file, if f.applies { f.severity.clone() } else { "does not apply (language or `files`)".into() }));
         for d in &f.diagnostics {
             out.push_str(&format!("  reports:    {}:{} {}\n", d.start.line, d.start.column, d.message));
+        }
+        if let Some(m) = &f.matches {
+            let matched = m.nodes.iter().filter(|(_, _, n)| n.matched).count();
+            out.push_str(&format!(
+                "  match:      {matched} matches among {} candidate nodes; `codelaw match {} {} --explain` shows each clause\n",
+                m.nodes.len(),
+                w.id,
+                m.file
+            ));
         }
     }
     out
