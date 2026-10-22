@@ -26,11 +26,11 @@ use lsp_types::notification::{
     DidChangeTextDocument, DidChangeWatchedFiles, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument, LogMessage, Notification as _,
     PublishDiagnostics, ShowMessage,
 };
-use lsp_types::request::{CodeActionRequest, Formatting, HoverRequest, Request as _};
+use lsp_types::request::{CodeActionRequest, Formatting, HoverRequest, RangeFormatting, Request as _};
 use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams, CodeActionProviderCapability, DiagnosticRelatedInformation,
     DiagnosticSeverity, DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
-    DocumentFormattingParams, Hover, HoverContents, HoverParams, HoverProviderCapability, Location, LogMessageParams, MarkupContent, MarkupKind, MessageType,
+    DocumentFormattingParams, DocumentRangeFormattingParams, Hover, HoverContents, HoverParams, HoverProviderCapability, Location, LogMessageParams, MarkupContent, MarkupKind, MessageType,
     NumberOrString, OneOf, PositionEncodingKind, PublishDiagnosticsParams, Range, ServerCapabilities, ServerInfo, ShowMessageParams,
     TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions, TextEdit, Uri, WorkspaceEdit,
 };
@@ -70,6 +70,7 @@ pub fn capabilities() -> ServerCapabilities {
         })),
         hover_provider: Some(HoverProviderCapability::Simple(true)),
         document_formatting_provider: format::AVAILABLE.then_some(OneOf::Left(true)),
+        document_range_formatting_provider: format::AVAILABLE.then_some(OneOf::Left(true)),
         ..Default::default()
     }
 }
@@ -294,6 +295,7 @@ impl<'c> Server<'c> {
             CodeActionRequest::METHOD => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.code_actions(p))),
             HoverRequest::METHOD => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.hover(p))),
             Formatting::METHOD if format::AVAILABLE => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.formatting(p))),
+            RangeFormatting::METHOD if format::AVAILABLE => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.range_formatting(p))),
             m => return self.send(Response::new_err(id, ErrorCode::MethodNotFound as i32, format!("codelaw lsp does not handle `{m}`"))),
         };
         match result {
@@ -387,6 +389,25 @@ impl<'c> Server<'c> {
         let formatted = format::format_document(project, entry, body)?;
         let idx = Utf16Index::new(&doc.text);
         Some(if formatted == body { vec![] } else { vec![TextEdit { range: idx.range(shift, doc.text.len()), new_text: formatted }] })
+    }
+
+    /// The selection's lines, formatted: the edits of the whole document's
+    /// formatting that touch them (SR-FORMATTER decision 8).
+    fn range_formatting(&self, p: DocumentRangeFormattingParams) -> Option<Vec<TextEdit>> {
+        let doc = self.docs.get(p.text_document.uri.as_str())?;
+        let (project, entry) = self.project_of(doc)?;
+        let (body, shift) = doc.body();
+        let formatted = format::format_document(project, entry, body)?;
+        let idx = Utf16Index::new(&doc.text);
+        let (start, end) = (idx.offset(p.range.start).saturating_sub(shift).min(body.len()), idx.offset(p.range.end).saturating_sub(shift).min(body.len()));
+        let first = body[..start].matches('\n').count();
+        let mut last = body[..end].matches('\n').count();
+        // A selection that ends at the start of a line does not take it.
+        if end > start && body[..end].ends_with('\n') {
+            last -= 1;
+        }
+        let edits = format::range_edits(body, &formatted, first, last.max(first));
+        Some(edits.into_iter().map(|(a, b, new_text)| TextEdit { range: idx.range(a + shift, b + shift), new_text }).collect())
     }
 }
 

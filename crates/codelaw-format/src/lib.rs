@@ -5,6 +5,7 @@
 //! compiled in and none is run as a program (L5, L6 decision 3).
 
 pub mod editorconfig;
+pub mod import;
 mod engines;
 mod markers;
 mod options;

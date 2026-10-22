@@ -996,6 +996,7 @@ dependencies = [
  "codelaw-core",
  "codelaw-engine",
  "codelaw-fix",
+ "codelaw-format",
  "codelaw-graph",
  "codelaw-lang",
  "codelaw-lsp",
@@ -1009,6 +1010,7 @@ dependencies = [
  "serde_json",
  "similar 2.7.0",
  "toml",
+ "toml_edit",
  "tree-sitter",
 ]
 
@@ -3517,6 +3519,7 @@ dependencies = [
  "indexmap",
  "toml_datetime",
  "toml_parser",
+ "toml_writer",
  "winnow 1.0.4",
 ]
 

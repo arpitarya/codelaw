@@ -30,6 +30,10 @@ tree-sitter.workspace = true
 ignore.workspace = true
 # `codelaw format --diff` (SR-FORMATTER decision 1).
 similar = "=2.7.0"
+# `codelaw format --import-config` writes `[format]` into the config, keeping
+# the rest of the file as written (SR-FORMATTER decision 5). MIT OR Apache-2.0.
+toml_edit = "0.25"
+codelaw-format.workspace = true
 
 [dev-dependencies]
 toml.workspace = true

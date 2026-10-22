@@ -16,6 +16,55 @@ fn codelaw(cwd: &Path, args: &[&str]) -> (i32, String, String) {
     (out.status.code().unwrap_or(-1), String::from_utf8(out.stdout).unwrap(), String::from_utf8(out.stderr).unwrap())
 }
 
+/// SR-FORMATTER decision 5: `--import-config` writes the `[format]` keys
+/// once, for each source format, and `[format]` then reads them back.
+#[test]
+fn import_config_round_trips_each_source() {
+    use codelaw_format::{FormatOptions, IndentStyle, QuoteStyle, Semicolons, TrailingCommas};
+    let read = |d: &Path| {
+        let t: toml::Table = toml::from_str(&fs::read_to_string(d.join("codelaw.toml")).unwrap()).unwrap();
+        FormatOptions::from_table(t.get("format").and_then(|f| f.as_table())).unwrap()
+    };
+    let sources: &[(&str, &str, &str)] = &[
+        ("json", ".prettierrc", r#"{"printWidth": 100, "singleQuote": true, "semi": false, "trailingComma": "es5"}"#),
+        ("yaml", ".prettierrc.yaml", "printWidth: 100\nsingleQuote: true\nsemi: false\ntrailingComma: es5\n"),
+        ("toml", ".prettierrc.toml", "printWidth = 100\nsingleQuote = true\nsemi = false\ntrailingComma = \"es5\"\n"),
+        ("pkg", "package.json", r#"{"name": "x", "prettier": {"printWidth": 100, "singleQuote": true, "semi": false, "trailingComma": "es5"}}"#),
+    ];
+    for (name, file, text) in sources {
+        let d = temp(&format!("import-{name}"));
+        fs::write(d.join(file), text).unwrap();
+        fs::write(d.join("codelaw.toml"), "# mine\n[files]\nexclude = []\n").unwrap();
+        let (code, out, err) = codelaw(&d, &["format", "--import-config"]);
+        assert_eq!(code, 0, "{name}: {out}{err}");
+        let o = read(&d);
+        assert_eq!((o.line_width, o.quote_style, o.semicolons, o.trailing_commas), (100, QuoteStyle::Single, Semicolons::AsNeeded, TrailingCommas::Es5), "{name}");
+        let written = fs::read_to_string(d.join("codelaw.toml")).unwrap();
+        assert!(written.starts_with("# mine\n[files]\nexclude = []\n"), "{name}: {written}");
+        // Once: a second run writes nothing.
+        let (code, out, _) = codelaw(&d, &["format", "--import-config"]);
+        assert_eq!(code, 0);
+        assert!(!out.contains("wrote") && out.contains("kept [format] line_width"), "{name}: {out}");
+        assert_eq!(fs::read_to_string(d.join("codelaw.toml")).unwrap(), written);
+        let _ = fs::remove_dir_all(&d);
+    }
+    // Ruff and Black, into `[format.python]`; codelaw.toml's own key wins.
+    for (name, text, width) in [("ruff", "[tool.ruff]\nline-length = 100\nindent-width = 2\n", 100), ("black", "[tool.black]\nline-length = 120\n", 120)] {
+        let d = temp(&format!("import-{name}"));
+        fs::write(d.join("pyproject.toml"), text).unwrap();
+        fs::write(d.join("codelaw.toml"), "[format]\nindent_style = \"tab\"\n").unwrap();
+        fs::write(d.join(".prettierrc"), r#"{"useTabs": false}"#).unwrap();
+        let (code, out, err) = codelaw(&d, &["format", "--import-config"]);
+        assert_eq!(code, 0, "{name}: {out}{err}");
+        let o = read(&d);
+        assert_eq!((o.python_line_width, o.indent_style), (width, IndentStyle::Tab), "{name}: {out}");
+        if name == "ruff" {
+            assert_eq!(o.python_indent_width, 2);
+        }
+        let _ = fs::remove_dir_all(&d);
+    }
+}
+
 #[test]
 fn init_writes_config_rules_folder_and_gitignore() {
     let d = temp("init");
