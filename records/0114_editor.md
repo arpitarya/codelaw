@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-lsp
   - packaging/vscode
 laws: [L0, L3, L5, L6, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -58,7 +58,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
 
 1. **`codelaw lsp`** speaks LSP over stdio from the same binary ([SR-PACKAGES](0107_packages.md) decision 2). It is the crate `codelaw-lsp` on [`lsp-server`](https://crates.io/crates/lsp-server) (rust-analyzer's scaffold, MIT OR Apache-2.0) and [`lsp-types`](https://crates.io/crates/lsp-types) (MIT) — [L2](0004_LAW-2-foss-dependencies.md). `--stdio` is accepted (editors pass it) and is the only transport.
    - **Positions:** UTF-16 (`positionEncoding: utf-16`), converted from the engine's bytes in one module of the crate ([SR-ARCHITECTURE](0108_architecture.md) decision 13).
-   - **Never writes:** fixes and formatting are `WorkspaceEdit`s and `TextEdit`s; the editor writes ([SR-ARCHITECTURE](0108_architecture.md) decision 12). The server reads no cache and writes none.
+   - **Never writes:** fixes and formatting are `WorkspaceEdit`s and `TextEdit`s; the editor writes ([SR-ARCHITECTURE](0108_architecture.md) decision 12). The server's own checks read no cache and write none. The socket `codelaw lsp` registers as a warm process, and any `--prefer-warm` command it serves through it (cache included), are [SR-ARCHITECTURE](0108_architecture.md) decision 21's and live in `codelaw-cli`, so this crate still opens nothing for writing.
    - **Which project:** the config nearest the file, as `codelaw check <file>` finds it; with none, the workspace folder that holds the file.
    - **Diagnostics:** pull and push, with codes linking to rule docs.
    - **Code actions:** `quickfix` for `auto` and `suggest` fixes (`auto` preferred), plus `source.fixAll.codelaw` (the text `codelaw fix` would write, as one edit) and `source.organizeImports` where a rule provides it.
@@ -71,6 +71,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - An edit re-parses incrementally and re-runs that file's rules.
    - Project rules (the graph) re-run on save, or after 300 ms idle.
    - Everything stays warm in memory, within the tree-cache bound of [SR-ARCHITECTURE](0108_architecture.md) decision 24.
+   - **Built (W-15):** incremental sync (`TextDocumentSyncKind::INCREMENTAL`). Each open document keeps its tree as a `DocumentTree`; an edit re-parses through tree-sitter's edit API; a whole-text change, or an edit that moves the byte-order mark, drops the tree; closing the document drops it. Diagnostics equal a fresh parse's. Only open documents keep trees: `[lsp] tree_cache` is not read yet, and graph re-linking waits for project rules in the editor.
    - `lsp_after_edit` is an [L8](0010_LAW-8-performance-budgets.md) budget.
 3. **Same verdicts as the CLI ([L5](0007_LAW-5-no-model-in-the-engine.md)).** The server calls the same engine functions; the editor never shows a result that `codelaw check` wouldn't.
 4. **The VS Code extension `codelaw.codelaw`:**

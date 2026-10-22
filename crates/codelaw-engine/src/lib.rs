@@ -8,6 +8,7 @@ mod debug;
 mod discover;
 mod fix;
 mod format;
+mod incremental;
 mod lint;
 mod query;
 mod project;
@@ -17,6 +18,7 @@ mod timings;
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
 pub use fix::{FileFix, FileTrace, FixOptions, FixReport};
+pub use incremental::DocumentTree;
 pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
 pub use lint::FileResult;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
@@ -136,7 +138,9 @@ pub(crate) fn dedup_diagnostics(d: &mut Vec<Diagnostic>) {
 pub struct Project {
     pub config: Config,
     pub rules: RuleSet,
-    pub compiled: Vec<CompiledRule>,
+    /// Shared with every other load of the same inputs in this process
+    /// (SR-ARCHITECTURE decision 21).
+    pub compiled: std::sync::Arc<Vec<CompiledRule>>,
     pub options: EngineOptions,
     pub cache: DiskCache,
     pub warnings: Vec<String>,
@@ -189,7 +193,7 @@ impl Project {
             }
         }
         let compile_started = std::time::Instant::now();
-        let (compiled, mut warnings) = compile::compile_all(&rules, &config).map_err(EngineError::Load)?;
+        let (compiled, mut warnings) = compile::compile_cached(&rules, &config).map_err(EngineError::Load)?;
         let timings = options.timings.then(|| timings::Timings::new(compiled.len()));
         if let Some(t) = &timings {
             t.add(timings::Phase::Compile, compile_started);
@@ -300,13 +304,23 @@ impl Project {
     /// (SR-EDITOR decision 3). Nothing is read from or written to disk.
     /// `text` has no byte-order mark; offsets are into it.
     pub fn check_document(&self, entry: &FileEntry, text: &str) -> Vec<Diagnostic> {
-        let mut d = self.check_unsaved(entry, text).diagnostics;
+        self.check_document_with(entry, text, None)
+    }
+
+    fn check_document_with(&self, entry: &FileEntry, text: &str, host: Option<&codelaw_lang::Root>) -> Vec<Diagnostic> {
+        let mut d = self.check_unsaved(entry, text, host).diagnostics;
         if !self.rules.has_rules() {
             d.push(lint::no_rules(self));
         }
         d.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
         d.dedup_by(|a, b| a.file == b.file && a.start_byte == b.start_byte && a.end_byte == b.end_byte && a.rule == b.rule);
         d
+    }
+
+    /// Whether `fix` may start an external fixer (decision 18), a command
+    /// that inherits the environment of the process running it.
+    pub fn runs_external_fixers(&self) -> bool {
+        self.compiled.iter().any(|c| c.loaded.external_allowed && matches!(c.fix, Some(codelaw_fix::FixSpec::External(_))))
     }
 
     /// The files a run would check, in order.

@@ -213,7 +213,7 @@ pub struct Config {
 pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codelaw/cache"];
 
 /// Keys a nested config may not set yet; they belong to the root config.
-const ROOT_ONLY: &[&str] = &["extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]"];
+const ROOT_ONLY: &[&str] = &["extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]"];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
     let set = [
@@ -226,6 +226,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.fix != Default::default(),
         raw.lint != Default::default(),
         raw.markdown != Default::default(),
+        raw.daemon != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -391,6 +392,11 @@ impl Config {
     /// Default 60 s per run of an adapter (SR-LINTER decision 2).
     pub fn adapter_timeout(&self) -> Duration {
         self.root_raw().and_then(|r| r.adapters.timeout).map(|d| d.0).unwrap_or(Duration::from_secs(60))
+    }
+
+    /// Default 30 minutes (SR-ARCHITECTURE decision 22).
+    pub fn daemon_idle_timeout(&self) -> Duration {
+        self.root_raw().and_then(|r| r.daemon.idle_timeout).map(|d| d.0).unwrap_or(Duration::from_secs(30 * 60))
     }
 
     pub fn lint_code_blocks(&self) -> bool {

@@ -154,7 +154,7 @@ impl Project {
     /// as codelaw's, with codelaw's fix.
     pub(crate) fn drop_ported(&self, adapter: &mut Vec<Diagnostic>, own: &[Diagnostic]) {
         let mut ported: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
-        for c in &self.compiled {
+        for c in self.compiled.iter() {
             for p in &c.loaded.rule.ported_from {
                 ported.entry(p.as_str()).or_default().insert(c.id());
             }
@@ -282,6 +282,7 @@ fn apply(project: &Project, entry: &FileEntry, all: &[Diagnostic], picks: &[usiz
             remaining: after,
             written: true,
             formatted: false,
+            trace: None,
         }),
     }
     report.files.sort_by(|a, b| a.file.cmp(&b.file));

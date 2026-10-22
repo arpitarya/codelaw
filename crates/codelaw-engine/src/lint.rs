@@ -152,7 +152,7 @@ impl Project {
 
     /// An editor's text of a file, through the same skips `check_file`
     /// makes on the file on disk (SR-EDITOR decision 3).
-    pub(crate) fn check_unsaved(&self, entry: &FileEntry, text: &str) -> FileResult {
+    pub(crate) fn check_unsaved(&self, entry: &FileEntry, text: &str, host: Option<&Root>) -> FileResult {
         let layers = self.config.layers_for(&entry.abs);
         let skip = |id: &str, reason: String| FileResult {
             diagnostics: meta_diagnostic(&entry.rel, &layers, id, reason.clone()).into_iter().collect(),
@@ -165,7 +165,7 @@ impl Project {
         if let Some(reason) = self.generated(text) {
             return skip("codelaw/generated", reason);
         }
-        let mut diagnostics = lint_text(self, entry, text, &RunMode::check()).diagnostics;
+        let mut diagnostics = lint_text_with(self, entry, text, &RunMode::check(), host).diagnostics;
         diagnostics.extend(crate::format::check_diagnostic(self, entry, text));
         FileResult { diagnostics, skipped: None }
     }
@@ -267,6 +267,21 @@ pub(crate) fn comment_ranges(root: &Root, text: &str) -> Vec<(usize, usize)> {
 
 /// Lint one file's text.
 pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: &RunMode<'_>) -> LintOutput {
+    lint_text_with(project, entry, text, mode, None)
+}
+
+/// The host tree of `text`: a warm process's tree of it when it has one
+/// (SR-ARCHITECTURE decision 23), otherwise a fresh parse. A tree of any
+/// other text or grammar is never used, so the result is the same either way.
+fn host_tree(entry: &FileEntry, text: &str, host: Option<&Root>) -> Root {
+    match host {
+        Some(root) if *root.lang() == Grammar::for_language(entry.language) && codelaw_lang::text_of(root) == text => root.clone(),
+        _ => codelaw_lang::parse(entry.language, text),
+    }
+}
+
+/// [`lint_text`], reusing `host` as the parse of `text` when it is one.
+pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, mode: &RunMode<'_>, host: Option<&Root>) -> LintOutput {
     let layers = project.config.layers_for(&entry.abs);
     let only = project.options.rules.as_ref();
     let active: Vec<(usize, &CompiledRule, RuleConfig)> = project
@@ -291,7 +306,7 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
         // give a reason (SR-LINTER decision 6).
         let mut diagnostics = Vec::new();
         if text.contains(suppress::MARKER) {
-            let root = codelaw_lang::parse(entry.language, text);
+            let root = host_tree(entry, text, host);
             let comments = comment_ranges(&root, text);
             let index = LineIndex::new(text);
             apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &[], &mut diagnostics);
@@ -301,7 +316,7 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
 
     let host_root = {
         let _timed = project.timings.as_ref().map(|t| t.guard(Phase::Parse));
-        codelaw_lang::parse(entry.language, text)
+        host_tree(entry, text, host)
     };
     let mut units: Vec<Unit> = Vec::new();
     if region_rules_exist {

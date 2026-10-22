@@ -99,7 +99,7 @@ pub fn run(paths: Vec<PathBuf>, payload: Option<&str>) -> Result<Option<(String,
     let start = first.parent().map(Path::to_path_buf).filter(|p| !p.as_os_str().is_empty()).unwrap_or_else(|| PathBuf::from("."));
     let mut project = Project::load(&start, EngineOptions::from_env()).map_err(|e| e.to_string())?;
     // `auto` only, written: L4 decision 8. `suggest` goes back as a diff.
-    let report = project.fix(&paths, &FixOptions { unsafe_fixes: false, dry_run: false }).map_err(|e| e.to_string())?;
+    let report = project.fix(&paths, &FixOptions { unsafe_fixes: false, dry_run: false, trace: false }).map_err(|e| e.to_string())?;
     let text = codelaw_report::hook_text(&report.files, &report.check);
     Ok(Some((text, codelaw_report::hook_blocks(&report.check))))
 }
