@@ -143,7 +143,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
 
 7. **The linter never judges layout.** A layout-only rule is refused at load ([SR-FORMATTER](0105_formatter.md) decision 3). Adapter rules that only concern layout are switched off by default (for example stylelint's stylistic rules).
 
-8. **Performance budget.** Each file is parsed once per run and shared by every rule, and an unchanged file is served from the cache. The targets are unmeasured until there's an engine (`W-19`):
+8. **Performance budget.** Each file is parsed once per run and shared by every rule, and an unchanged file is served from the cache. The targets below are design targets; `codelaw bench` measures them (`check_warm_10k`, `fix_one_file`), and the first numbers and the proposed budgets are in [SR-LAW-8](0010_LAW-8-performance-budgets.md) §Measurements (`W-19`):
    - warm-cache `check` on 10,000 files: under 2 s;
    - hook mode on one file: under 100 ms.
 

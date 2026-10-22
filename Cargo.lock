@@ -999,6 +999,7 @@ dependencies = [
 name = "codelaw-cli"
 version = "0.1.0"
 dependencies = [
+ "blake3",
  "boon",
  "clap",
  "codelaw-agents",
@@ -1019,6 +1020,7 @@ dependencies = [
  "codelaw-rules",
  "codelaw-test",
  "ignore",
+ "libc",
  "serde_json",
  "similar 2.7.0",
  "toml",

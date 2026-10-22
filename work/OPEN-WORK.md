@@ -53,7 +53,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-18** `agent` CI and release hardened 2026-10-20 (pipefail, SHA-pinned actions, pinned npm, verified `SHA256SUMS` + attestation, eight-platform smoke job); left: the tag-only environment rule (decider, inbox) and the staging-index install. Filed by Arpit (Cowork). [detail](open/W-18-release-hardening.md)
 🟢 **W-20** `agent` Conformance tests landed and verified 2026-10-22 (L5 fence, L2 over npm/PyPI tools, `init` paths, promotion gate, work-system checks); npm's Artistic-2.0 ruled permissive 2026-10-22; left: the pinned corpus and its CI job. Filed by Arpit (Cowork). [detail](open/W-20-conformance-tests.md)
-🟢 **W-19** `agent` Build `codelaw bench`, measure every target, propose L8's budgets, add the CI perf gate. Filed by Arpit (Cowork). [detail](open/W-19-performance-budgets.md)
+🔴 **W-19** `agent` `codelaw bench`, the seeded 10k workload, proposed budgets and the CI perf gate landed 2026-10-22 (measured on a loaded Mac); left: re-measure on CI's runner, then the decider sets the budgets (inbox). Filed by Arpit (Cowork). [detail](open/W-19-performance-budgets.md)
 
 ### record update
 

@@ -3,6 +3,7 @@
 //! (SR-ARCHITECTURE decision 2, SR-CLI-MCP decision 6).
 
 mod baseline_cmd;
+mod bench;
 mod format_cmd;
 mod graph_cmd;
 mod config_cmd;
@@ -84,6 +85,9 @@ enum Command {
     },
     /// Deprecate a symbol: write the registry entry and baseline every current use (SR-BASELINE decision 6).
     Deprecate(baseline_cmd::DeprecateArgs),
+    /// Time every L8 operation on the reference workload and compare each
+    /// with `perf/budgets.toml` (SR-LAW-8).
+    Bench(bench::BenchArgs),
     /// An opt-in warm process that serves `--prefer-warm` runs (SR-ARCHITECTURE decision 22).
     Daemon {
         #[command(subcommand)]
@@ -548,6 +552,7 @@ fn main() -> ExitCode {
         Command::Baseline { action } => baseline_cmd::baseline(action),
         Command::Deprecate(a) => baseline_cmd::deprecate(a),
         Command::Daemon { action } => warm::daemon(action),
+        Command::Bench(a) => bench::bench(a),
         Command::Hook(a) => codelaw_agents::hook(a),
         Command::SyncAgents(a) => codelaw_agents::sync_agents(a),
     }

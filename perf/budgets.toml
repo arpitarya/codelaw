@@ -1,0 +1,66 @@
+# L8's performance budgets (SR-LAW-8). The gate is `codelaw bench --budgets
+# perf/budgets.toml`, run by ci.yml's `perf` job.
+#
+# NOTHING HERE IS SET. Every `budget` is "unset"; only a ruling of the decider
+# sets one (L8 decision 4). Until then the gate reports each p95 and fails
+# nothing (decision 6).
+#
+# How the gate tells a set budget from a proposal:
+#   budget = "unset"        not set: reported, never gated
+#   budget = <number>       SET: a p95 over it fails CI; must also carry
+#                           set_by, set_on and measured_p95 (decision 4)
+#   proposed = <number>     a PROPOSAL awaiting the decider: printed, never
+#                           compared against
+# A set budget is never raised (decision 5): `git log -p perf/budgets.toml`.
+#
+# The proposals below (2026-10-22, W-19) come from a LOADED developer Mac —
+# Apple M4, 10 cores, 16 GiB, with three other agents compiling (load average
+# 10-18) — not from CI's runner. The rule that made them:
+#     proposed = min(SR-ARCHITECTURE decision 29's target, 1.5 x the worst p95
+#                of three 10-run sessions), rounded up
+# It is to be re-applied to the `perf` job's numbers before the decider sets
+# anything (SR-LAW-8 §Measurements).
+
+[reference]
+machine = "unset"
+workload = "codelaw bench --seed 20261018 --files 10000 (digest 8a5682d3ee6bf132)"
+
+[operation.startup]
+unit = "ms"
+budget = "unset"
+proposed = 4 # PROPOSAL: worst p95 2.6 ms on the loaded Mac; target 20 ms
+
+[operation.check_warm_10k]
+unit = "ms"
+budget = "unset"
+proposed = 550 # PROPOSAL: worst p95 366.2 ms; target 2000 ms
+
+[operation.check_cold_10k]
+unit = "ms"
+budget = "unset"
+proposed = 6600 # PROPOSAL: worst p95 4367.9 ms; target 20000 ms
+
+[operation.format_warm_10k]
+unit = "ms"
+budget = "unset"
+proposed = 900 # PROPOSAL: worst p95 587.1 ms; no design target
+
+[operation.fix_one_file]
+unit = "ms"
+budget = "unset"
+proposed = 100 # PROPOSAL: worst p95 66.1 ms; target 100 ms warm (1.5 x = 99.2)
+
+[operation.lsp_after_edit]
+unit = "ms"
+budget = "unset"
+proposed = 3 # PROPOSAL: worst p95 1.5 ms; target 50 ms
+
+[operation.mcp_rules_for_path]
+unit = "ms"
+budget = "unset"
+proposed = 40 # PROPOSAL: worst p95 25.6 ms; no design target
+
+[operation.peak_memory_10k]
+unit = "MiB"
+budget = "unset"
+proposed = 125 # PROPOSAL: worst p95 82.3 MiB; target 1024 MiB
