@@ -149,6 +149,8 @@ fn every_npm_dependency_of_the_extension_is_free_and_permissive() {
     }
     assert!(checked >= 5, "only {checked} npm packages seen");
     assert!(refused.is_empty(), "L2 refuses:\n{}", refused.join("\n"));
+}
+
 /// A package the build installs from npm or PyPI, with the licence its
 /// registry page states for the version the build resolves (decision 1).
 struct BuildTool {
