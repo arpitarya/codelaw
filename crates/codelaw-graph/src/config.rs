@@ -65,6 +65,15 @@ pub const DEFAULT_REGISTRARS: &[&str] = &[
     "*.cli",
     "click.command",
     "click.group",
+    // More Flask blueprint hooks (the W-11 corpus run).
+    "*.app_url_value_preprocessor",
+    "*.app_url_defaults",
+    "*.endpoint",
+    // Django's template library: the module-level `register` is required.
+    "register.filter",
+    "register.simple_tag",
+    "register.inclusion_tag",
+    "register.tag",
     "Component",
     "Injectable",
     "NgModule",
@@ -147,6 +156,8 @@ mod tests {
         assert!(c.is_registrar("api.router.post"));
         assert!(c.is_registrar("pytest.fixture"));
         assert!(c.is_registrar("bp.before_app_request"));
+        assert!(c.is_registrar("register.inclusion_tag"));
+        assert!(!c.is_registrar("other.inclusion_tag"));
         assert!(!c.is_registrar("get"));
         assert!(!c.is_registrar("functools.lru_cache"));
     }

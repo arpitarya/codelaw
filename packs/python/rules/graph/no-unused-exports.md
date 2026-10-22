@@ -19,7 +19,7 @@ Every name a module exports is imported by another module, is reachable from an 
 graph:
   symbol:
     exported: true
-    kind: [function, class, variable, type]
+    kind: [function, class, variable, type, interface, enum]
   unless:
     - reachable_from: entry
     - tagged: [public, keep]

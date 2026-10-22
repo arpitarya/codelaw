@@ -199,7 +199,13 @@ impl Graph {
                 let spec = if l.starts_with('/') || l.starts_with('.') { l.clone() } else { format!("./{l}") };
                 if let Some(f) = join(dirname(path), &spec).or_else(|| crate::resolve::normalize(l.trim_start_matches('/'))) {
                     let f = self.resolver.probe(&f).unwrap_or(f);
-                    self.set_entry(&f, &format!("linked from {path}"));
+                    if self.lang(&f) == Some(FactLang::Css) {
+                        // A linked stylesheet styles this repo's own markup:
+                        // its classes are still checked, unlike an entry's.
+                        self.mark_imported(&Target::File(f), path);
+                    } else {
+                        self.set_entry(&f, &format!("linked from {path}"));
+                    }
                 }
             }
         }
@@ -452,8 +458,9 @@ fn preset_entry(path: &str, lang: Option<FactLang>) -> Option<String> {
     let in_dir = |d: &str| segs[..segs.len() - 1].contains(&d);
     match lang {
         Some(FactLang::Python) => {
-            if name == "conftest.py" || name.starts_with("test_") || name.ends_with("_test.py") || name == "__main__.py" {
-                return Some(format!("pytest / `__main__` preset (`{name}`)"));
+            // unittest discovers `test*.py` (so `tests.py`); pytest also `*_test.py`.
+            if name == "conftest.py" || name.starts_with("test") || name.ends_with("_test.py") || name == "__main__.py" {
+                return Some(format!("pytest / unittest / `__main__` preset (`{name}`)"));
             }
             if name == "manage.py" || name == "setup.py" || name == "noxfile.py" || name == "fabfile.py" || name == "tasks.py" {
                 return Some(format!("tool preset (`{name}`)"));
