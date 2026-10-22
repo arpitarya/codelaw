@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-20: the pipeline defects an independent review foun
 item: W-18
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-20
-updated_by: "Claude Code (Opus 5.5), W-18 implementation"
-ball: agent
+updated: 2026-10-22
+updated_by: "Arpit (Claude Code, Opus 5.5)"
+ball: decider
 ---
 
 # W-18 — Harden CI and the release pipeline
@@ -20,7 +20,7 @@ ball: agent
 | 2 | Pin every action by commit SHA and pin npm's version in the OIDC jobs | no moved tag can publish | ✅ |
 | 3 | Require tag-only deployment rules on the `npm`/`pypi` environments | only a release can publish | ⏳ the decider, in GitHub settings (`RELEASING.md` step 5) |
 | 4 | Verify `SHA256SUMS` before upload; attest the CI build | publish exactly what CI built | ✅ unproven until the first release |
-| 5 | Fix the remaining findings below | the pipeline matches L6 decision 9 and SR-PACKAGES decision 11 | ✅ but row 12's staging index |
+| 5 | Fix the remaining findings below | the pipeline matches L6 decision 9 and SR-PACKAGES decision 11 | ✅ row 12's staging index 2026-10-22: proven on darwin-arm64, the other seven by the first CI run |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
 
@@ -45,15 +45,15 @@ Every finding below is fixed, and the L6 install matrix and runtime fence run on
 | 9 | Any non-pre-release becomes npm `latest`, so a backport (0.1.5 after 0.2.0) demotes the newer line. | `.github/workflows/publish.yml:128` | minor | ✅ 2026-10-20: a version older than npm's `latest` gets `release-<major>.<minor>` |
 | 10 | `actions/checkout` keeps `persist-credentials` (low impact: read-only token). | `.github/workflows/*.yml` | minor | ✅ 2026-10-20: `persist-credentials: false` on all six checkouts |
 | 11 | The unquoted regex `^(Number\.)?NaN$` is YAML 1.2 only; quote it for other tools. | `packs/js/rules/js/use-isnan.md:23` | minor | ✅ 2026-10-20: quoted |
-| 12 | L6's install matrix and L3's runtime fence run on linux-x64 only, from built files not a staging index (was B-009, B-012). | `scripts/smoke.sh · ci.yml` | gap | ⏳ the matrix: ✅ configured — a `smoke` job on all eight platforms (musl in Alpine containers, darwin-x64 on `macos-15-intel`), `smoke.sh DIST [KEY]`, pip reading `dist/pypi` as its only index; only linux-x64-gnu was run here, the rest unverified until CI runs. Still open: a staging index (TestPyPI / a local npm registry) |
+| 12 | L6's install matrix and L3's runtime fence run on linux-x64 only, from built files not a staging index (was B-009, B-012). | `scripts/smoke.sh · scripts/staging-index.py · ci.yml` | gap | ✅ the matrix: a `smoke` job on all eight platforms (musl in Alpine containers, darwin-x64 on `macos-15-intel`), `smoke.sh DIST [KEY]`. ✅ 2026-10-22, the staging index: `scripts/staging-index.py` (standard library only) serves an npm registry and a PyPI simple index on 127.0.0.1; `smoke.sh` publishes all of `dist` to it (`npm publish`, `uv publish`) and installs by name from it — `npm i`, `npx`, `pip install`, `uvx` — with caches and config of its own, and fails unless the index served every download. No remote registry, TestPyPI included. Proven by hand on darwin-arm64 (a `dist` whose other seven binaries were stand-ins; a missing wheel fails it); the eight platforms are proven by the first CI run that carries it. Build tool `uv` 0.11.3 (`MIT OR Apache-2.0`) declared in `licences.rs` |
 
 ## Blockers
 
-None for the code. The environment rules are set by the decider in GitHub settings.
+None for the code. The environment rules are set by the decider in GitHub settings (row 4); with the staging index done (row 12), that is the only step left, so the ball is the decider's.
 
 ## Record affected
 
-[SR-PACKAGES](../../records/0107_packages.md) decisions 9, 11, 12 · [SR-LAW-6](../../records/0008_LAW-6-python-and-node-packages.md) §How L6 is enforced · `RELEASING.md`.
+[SR-PACKAGES](../../records/0107_packages.md) decisions 9, 11, 12 · [SR-LAW-2](../../records/0004_LAW-2-foss-dependencies.md) §Consequences (the staging index's tool) · [SR-LAW-6](../../records/0008_LAW-6-python-and-node-packages.md) §How L6 is enforced · `RELEASING.md`.
 
 ## Hazards
 

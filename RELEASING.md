@@ -27,9 +27,14 @@ Every check `ci.yml` runs on the packages is `scripts/package.py check`:
 only the SR-PACKAGES names (B-020), one version (W-18), zero runtime
 dependencies, the licence in every package, **the same binary on npm and PyPI**
 for each platform, and each pack **byte-equal** on both registries.
-`scripts/smoke.sh` installs them with no registry and checks that npm (no Python
-on `PATH`) and PyPI (no Node on `PATH`) give byte-equal output — on each of the
-eight platforms, the musl two in a clean Alpine container.
+`scripts/smoke.sh` publishes them to a **staging index** — a throwaway npm
+registry and PyPI simple index on `127.0.0.1` (`scripts/staging-index.py`, the
+Python standard library only) — installs `codelaw` from it by name, as a user
+does (npm, npx, pip, uvx), and checks that npm (no Python on `PATH`) and PyPI
+(no Node on `PATH`) give byte-equal output — on each of the eight platforms, the
+musl two in a clean Alpine container. Nothing reaches a real registry before
+`publish.yml`. To run it on your machine, against a `dist` built for it:
+`bash scripts/smoke.sh dist` (needs node, npm and Python 3.11+).
 
 **Hardening (W-18).** Every workflow `run:` is `bash -eo pipefail`. Every action
 is pinned by commit SHA (the comment names the release; bump both together), and
