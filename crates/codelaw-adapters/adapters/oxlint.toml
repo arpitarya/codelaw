@@ -1,0 +1,16 @@
+# oxlint (MIT) — SR-LINTER decision 2: on by default when installed.
+# Its JSON carries no edits, so every finding is `manual` and its steps link
+# the rule's docs (L4 decision 9). Spans are UTF-8 byte offsets.
+name = "oxlint"
+binary = "oxlint"
+licence = "MIT"
+default = true
+languages = ["javascript", "jsx", "typescript", "tsx"]
+version_args = ["--version"]
+args = ["--format=json"]
+# The fixtures were captured from 1.89.0 (tests/fixtures/oxlint).
+tested = ">=1.89.0, <2.0.0"
+output = "oxlint"
+# `eslint(no-debugger)` is `adapter/oxlint/eslint/no-debugger` and is the
+# same finding as a codelaw rule `ported_from: [eslint/no-debugger]`.
+ported_prefix = ""
