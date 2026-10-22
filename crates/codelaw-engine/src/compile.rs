@@ -15,6 +15,8 @@ pub enum Matcher {
     /// One compiled `match:` per grammar the rule's languages parse with.
     Match(Vec<(Grammar, CompiledMatch)>),
     Native(&'static dyn NativeRule),
+    /// A `scope: project` rule (SR-PROJECT-GRAPH decision 6).
+    Graph(codelaw_graph::GraphRule),
     /// A form this version cannot run yet; the reason is warned once.
     Unsupported(&'static str),
 }
@@ -49,7 +51,7 @@ impl CompiledRule {
         match &self.matcher {
             Matcher::Match(per) => per.iter().find(|(g, _)| *g == grammar).map(|(_, m)| m.kinds()),
             Matcher::Native(n) => Some(Some(kind_ids(grammar, n.kinds()))),
-            Matcher::Unsupported(_) => None,
+            Matcher::Graph(_) | Matcher::Unsupported(_) => None,
         }
     }
 
@@ -138,7 +140,13 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
                     continue;
                 }
             },
-            BlockKind::Graph(_) => Matcher::Unsupported("`graph:` rules need the project graph (SR-PROJECT-GRAPH), which this version does not build yet"),
+            BlockKind::Graph(g) => match codelaw_graph::compile(g, rule.block.fix.as_ref()) {
+                Ok(c) => Matcher::Graph(c),
+                Err(e) => {
+                    fail(e);
+                    continue;
+                }
+            },
             BlockKind::Target { .. } => Matcher::Unsupported("`target:` + `assert:` rules are not built yet in this version"),
         };
         if let Matcher::Unsupported(why) = &matcher
@@ -147,6 +155,8 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
             warnings.push(format!("rule `{}` does not run: {why}", rule.id));
         }
         let fix = match &rule.block.fix {
+            // A graph rule's fix compiled with its query.
+            Some(_) if matches!(matcher, Matcher::Graph(_)) => None,
             Some(v) => match parse_fix(v) {
                 Ok(f) => Some(f),
                 Err(e) => {
@@ -161,7 +171,7 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
         let needs_semantic = match &matcher {
             Matcher::Match(per) => per.iter().any(|(_, m)| m.needs_semantic()),
             Matcher::Native(n) => n.needs_semantic(),
-            Matcher::Unsupported(_) => false,
+            Matcher::Graph(_) | Matcher::Unsupported(_) => false,
         } || matches!(&fix, Some(FixSpec::Steps(s)) if s.iter().any(|p| matches!(p, codelaw_fix::Primitive::RenameSymbolLocal { .. })));
         out.push(CompiledRule { loaded: loaded.clone(), matcher, fix, needs_semantic, files, exclude });
     }

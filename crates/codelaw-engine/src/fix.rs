@@ -297,10 +297,65 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
     if !project.rules.has_rules() {
         report.check.diagnostics.push(crate::lint::no_rules(project));
     }
+    if !project.graph_rules().is_empty() {
+        fix_project_rules(project, paths, options, &mut report)?;
+    }
     report.check.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
     // The same dedupe as `check`, so both report one diagnostic per finding.
     crate::dedup_diagnostics(&mut report.check.diagnostics);
     skipped.sort();
     report.check.skipped = skipped;
     Ok(report)
+}
+
+/// Project-rule fixes, after every file's own (SR-PROJECT-GRAPH decision 6):
+/// relink, apply, repeat, then report what the graph still finds.
+fn fix_project_rules(project: &mut Project, paths: &[PathBuf], options: &FixOptions, report: &mut FixReport) -> Result<(), EngineError> {
+    let config = project.graph_config()?;
+    let mut sources = project.graph_sources()?;
+    // A dry run left the disk as it was: start from the fixed texts.
+    for f in &report.files {
+        if let Some(s) = sources.iter_mut().find(|s| s.rel == f.file) {
+            s.text = f.fixed.clone();
+        }
+    }
+    let before: BTreeMap<String, String> = sources.iter().map(|s| (s.rel.clone(), s.text.clone())).collect();
+    let scopes = crate::project::scopes(project.root(), paths);
+    let applied = project.fix_graph(&mut sources, &config, options.unsafe_fixes, 10);
+    for s in &sources {
+        let Some(counts) = applied.get(&s.rel) else { continue };
+        if !crate::project::within(&s.rel, &scopes) {
+            continue;
+        }
+        let original = report.files.iter().find(|f| f.file == s.rel).map(|f| f.original.clone()).unwrap_or_else(|| before[&s.rel].clone());
+        let mut written = false;
+        if !options.dry_run
+            && let Ok(bytes) = std::fs::read(&s.abs)
+        {
+            let bom = bytes.starts_with("\u{feff}".as_bytes());
+            written = safe_write(&s.abs, &bytes, &s.text, bom).is_ok();
+        }
+        match report.files.iter_mut().find(|f| f.file == s.rel) {
+            Some(f) => {
+                f.fixed = s.text.clone();
+                f.written |= written;
+                for (r, n) in counts {
+                    *f.applied.entry(r.clone()).or_default() += n;
+                }
+            }
+            None => report.files.push(FileFix {
+                file: s.rel.clone(),
+                original,
+                fixed: s.text.clone(),
+                passes: 1,
+                applied: counts.clone(),
+                remaining: Vec::new(),
+                written,
+            }),
+        }
+    }
+    report.files.sort_by(|a, b| a.file.cmp(&b.file));
+    let remaining = project.run_graph_rules(&sources, config);
+    report.check.diagnostics.extend(remaining.into_iter().filter(|d| crate::project::within(&d.file, &scopes)));
+    Ok(())
 }

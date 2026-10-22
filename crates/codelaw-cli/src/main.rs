@@ -3,6 +3,7 @@
 //! (SR-ARCHITECTURE decision 2, SR-CLI-MCP decision 6).
 
 mod format_cmd;
+mod graph_cmd;
 mod init;
 mod rules_cmd;
 mod tree;
@@ -55,6 +56,8 @@ enum Command {
         #[arg(long)]
         stdio: bool,
     },
+    /// Query the project graph: `refs`, `why-unused`.
+    Graph(graph_cmd::GraphArgs),
     /// Manage the cache.
     Cache {
         #[command(subcommand)]
@@ -306,6 +309,7 @@ fn main() -> ExitCode {
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
         Command::Lsp { .. } => codelaw_lsp::run_stdio().map_or_else(fail, |()| ExitCode::SUCCESS),
+        Command::Graph(a) => graph_cmd::graph(a),
         Command::Cache { action } => cache(action),
         Command::Mcp => match codelaw_mcp::serve(std::io::stdin().lock(), std::io::stdout().lock()) {
             Ok(()) => ExitCode::SUCCESS,

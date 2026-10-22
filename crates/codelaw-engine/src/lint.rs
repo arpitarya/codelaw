@@ -246,7 +246,7 @@ fn with_line_endings(mut edits: Vec<TextEdit>, crlf: bool) -> Vec<TextEdit> {
     edits
 }
 
-fn comment_ranges(root: &Root, text: &str) -> Vec<(usize, usize)> {
+pub(crate) fn comment_ranges(root: &Root, text: &str) -> Vec<(usize, usize)> {
     let mut out = Vec::new();
     for n in root.root().dfs() {
         let kind = n.kind();
@@ -267,7 +267,7 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
         .iter()
         .enumerate()
         .filter(|(_, r)| only.is_none_or(|o| o.iter().any(|id| id == r.id())))
-        .filter(|(_, r)| !matches!(r.matcher, Matcher::Unsupported(_)))
+        .filter(|(_, r)| !matches!(r.matcher, Matcher::Unsupported(_) | Matcher::Graph(_)))
         .filter(|(_, r)| r.applies_to_path(&entry.rel))
         .filter_map(|(i, r)| project.rules.effective(&r.loaded, &layers).filter(|c| c.severity.is_some()).map(|c| (i, r, c)))
         .collect();
@@ -589,7 +589,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                         failed[slot] = Some(panic_message(p.as_ref()));
                     }
                 }
-                Matcher::Unsupported(_) => {}
+                Matcher::Graph(_) | Matcher::Unsupported(_) => {}
             }
         }
     }
@@ -665,7 +665,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note });
                 }
             }
-            Matcher::Unsupported(_) => {}
+            Matcher::Graph(_) | Matcher::Unsupported(_) => {}
         }
     }
     out
