@@ -75,8 +75,22 @@ Black is recorded in SR-FORMATTER: JS/TS/JSON are 100 % identical, HTML only
 9); the WIP had rewritten CRLF to LF, which matches Prettier but breaks that
 record.
 
-**Next for an agent:** W-10 (agent surfaces) from
-`wip/W-08-mcp-W-10-agent-surfaces`, the W-10 commit only.
+**2026-10-22, the decider:** *"Merge everything to main"* — the seven
+`wip/*` commits (W-10, W-11, W-12, W-14, W-16, W-20, W-21) were merged into
+`main` as they were, unfinished, with the conflicts resolved and the
+merge-caused compile errors fixed. **`main` does not build whole:**
+`crates/codelaw-agents` (W-10) declares modules `hook` and `sync` that were
+never written. Everything else builds; `cargo test --workspace --exclude
+codelaw-agents` is 319 passed, 3 failed — `debug.rs`'s
+`fix_trace_shows_each_pass_and_writes_only_without_dry_run` and
+`rules_for_json_is_the_api_shape` (W-16), and `licences.rs`'s
+`every_build_tool_is_declared_and_free_and_permissive` (W-20). W-14's
+`crates/codelaw-adapters` has only a stub `lib.rs`. Each item is still
+open and is now finished on `main`, not from a branch. W-20 also asks the
+decider whether npm's Artistic-2.0 passes L2.
+
+**Next for an agent:** make `main` build again — W-10's `hook` and `sync`
+modules — then W-10, W-11 and the rest in the order of 2026-10-21.
 
 **Open questions for the decider (from 2026-10-20 agents):** a
 `rustfmt.toml` and a one-time format of the tree (the code isn't
