@@ -179,6 +179,16 @@ const BUILD_TOOLS: &[BuildTool] = &[
     },
     BuildTool { registry: "pypi", name: "tomli", licence: "MIT", requires: &[], extras: &[], source: "https://pypi.org/project/tomli/ (maturin needs it below Python 3.11)" },
     BuildTool { registry: "pypi", name: "ziglang", licence: "MIT", requires: &[], extras: &[], source: "https://pypi.org/pypi/ziglang/json (license_expression)" },
+    // The staging-index smoke (scripts/smoke.sh, W-18): `uv publish` and `uvx`. The
+    // index itself is scripts/staging-index.py, the standard library only.
+    BuildTool {
+        registry: "pypi",
+        name: "uv",
+        licence: "MIT OR Apache-2.0",
+        requires: &[],
+        extras: &[],
+        source: "https://pypi.org/pypi/uv/0.11.3/json (license_expression; no requires_dist)",
+    },
     BuildTool {
         registry: "npm",
         name: "npm",
@@ -333,6 +343,8 @@ fn the_install_scanner_reads_what_the_build_writes() {
     assert_eq!(names("npm i --no-save \\\n  \"$dist\"/npm/codelaw-[0-9]*.tgz @scope/tool@1"), ["npm:@scope/tool"]);
     assert_eq!(names("\"$work/venv/bin/pip\" install -q --no-index \"$dist\"/pypi/codelaw-*.whl"), Vec::<String>::new());
     assert_eq!(names("python3 -m pip install Foo_Bar>=2 codelaw-rules-js"), ["pypi:foo-bar"]);
+    assert_eq!(names("\"$tbin/python\" -m pip install -q --disable-pip-version-check \"uv==$UV_VERSION\""), ["pypi:uv"]);
+    assert_eq!(names("npm_config_cache=\"$c\" npx --yes --loglevel=error codelaw --version"), Vec::<String>::new());
 }
 
 #[test]

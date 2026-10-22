@@ -10,7 +10,7 @@ feature: the licence and cost of every dependency
 owns:
   - crates/codelaw-cli/tests/licences.rs
 laws: [L0, L2]
-timestamp: 2026-10-18T13:30:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -98,6 +98,12 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
 - **The editor extension's npm lockfile** (`packaging/vscode/package-lock.json`)
   is checked by `crates/codelaw-cli/tests/licences.rs`, beside the Cargo
   manifest, runtime and dev dependencies alike (decision 4).
+- **The staging index the install smoke uses** (W-18, 2026-10-22) is built,
+  not adopted: `scripts/staging-index.py` is the Python standard library only,
+  so it adds nothing to vet. Its one installed tool, `uv` (`MIT OR Apache-2.0`,
+  no dependencies), is declared in `licences.rs`'s `BUILD_TOOLS`. A third-party
+  local registry (Verdaccio and the like) would bring a transitive npm tree that
+  decision 4 makes in scope.
 - Weak copyleft (MPL, EPL) is refused too, so some ecosystem crates are
   unavailable; the answer is a permissive alternative or building it.
 - The parsing stack named in `docs/DESIGN.md` — tree-sitter and

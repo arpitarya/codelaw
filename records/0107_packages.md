@@ -16,6 +16,7 @@ owns:
   - scripts/package.py
   - scripts/build-packs.py
   - scripts/smoke.sh
+  - scripts/staging-index.py
   - scripts/law-gate.py
   - scripts/withdraw.sh
   - scripts/npm-trust.sh
@@ -23,7 +24,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -140,7 +141,9 @@ The decider asked for a record of what goes into which package, under the naming
     - **`ci.yml`, every push:** one maturin wheel per platform (decision 5). The npm binary is **taken out of that wheel**, so both registries ship the same bytes for a platform.
     - **`scripts/package.py assemble`** builds the 14 npm tarballs and the five pack wheels from those binaries and `packs/`; nothing is compiled there. With the eight engine wheels that is **20 packages in 27 files** (npm 14 packages, 14 tarballs; PyPI 6 projects, 13 wheels) — docs count packages, and say files when they mean files.
     - **`scripts/package.py check`** refuses the set unless it is exactly §1's names, at one version, with zero runtime dependencies, licensed (decision 10), one binary per platform on both registries, each pack byte-equal on both, and `SHA256SUMS` listing exactly its files with their digests.
-    - **The install smoke** (`scripts/smoke.sh`, [L6](0008_LAW-6-python-and-node-packages.md) §How L6 is enforced) runs on each of the eight platforms in `ci.yml`'s `smoke` job, the musl two in a clean Alpine container; pip installs with `dist/pypi` as its only index, so it picks the wheel itself.
+    - **The install smoke** (`scripts/smoke.sh`, [L6](0008_LAW-6-python-and-node-packages.md) §How L6 is enforced) runs on each of the eight platforms in `ci.yml`'s `smoke` job, the musl two in a clean Alpine container.
+    - **It installs from a staging index (W-18, 2026-10-22).** `scripts/staging-index.py` serves a throwaway npm registry and a PyPI simple index on `127.0.0.1` only, from the Python standard library, so it adds no dependency ([L2](0004_LAW-2-foss-dependencies.md)). The smoke publishes every file of the set to it — `npm publish` for each tarball, `uv publish` for each wheel — then installs `codelaw` and a pack **by name**, as a user does: `npm i` (npm picks `@codelaw/cli-<key>` itself), `npx`, `pip install` (the staging index is pip's only index) and `uvx`. Every npm and uv cache and config it uses is its own, so each install downloads from the index, and the smoke fails unless the index served those downloads. It never publishes to any other registry; TestPyPI is not used.
+    - **Its build tool is `uv`** (`MIT OR Apache-2.0`, no dependencies), pinned in `smoke.sh` and declared with its licence in `crates/codelaw-cli/tests/licences.rs`.
     - **On `main`, `ci.yml` attests every file of the set** (a build-provenance attestation over `SHA256SUMS`).
     - **`scripts/law-gate.py`** refuses a release whose binary has no `format`, `mcp` or `lsp` command ([L7](0009_LAW-7-linter-and-formatter.md); [L6](0008_LAW-6-python-and-node-packages.md) decision 3). `publish.yml`'s gate runs it and stops; `ci.yml` reports it on every push without failing; the decider runs it before the one-time hand publish (`RELEASING.md`).
     - **`publish.yml`, a published GitHub Release only:** it refuses a commit on which `ci.yml` did not succeed on `main`, downloads **that run's** checked set, checks it again, verifies every file against `ci.yml`'s attestation for the release commit on `main`, and uploads it; each upload job re-checks its download against the gate's `SHA256SUMS`. Trusted publishing (OIDC) on both registries; no token exists.

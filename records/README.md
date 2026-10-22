@@ -192,6 +192,7 @@ directions.
 | `scripts/law-gate.py` | SR-PACKAGES | decision 11: refuses a release while the engine lacks `format`, `mcp` or `lsp` (L6 decision 3, L7) |
 | `scripts/package.py` | SR-PACKAGES | decision 11: assembles every package and runs the release checks |
 | `scripts/smoke.sh` | SR-PACKAGES | decision 11: the npm-vs-PyPI install smoke |
+| `scripts/staging-index.py` | SR-PACKAGES | decision 11: the localhost staging index the install smoke publishes to and installs from |
 | `scripts/withdraw.sh` | SR-PACKAGES | decision 12 |
 | `scripts/npm-trust.sh` | SR-PACKAGES | decision 11: the one-time npm trusted-publisher setup |
 | `.github/workflows` | SR-PACKAGES | decision 11: build once in CI, publish as built |
