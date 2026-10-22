@@ -10,7 +10,7 @@ use std::path::PathBuf;
 #[derive(Args)]
 pub struct FormatArgs {
     /// Files and folders; the project root when none.
-    paths: Vec<PathBuf>,
+    pub paths: Vec<PathBuf>,
     #[command(flatten)]
     common: Common,
     /// Change nothing; exit 1 if any file is not formatted.
@@ -43,10 +43,6 @@ pub fn exit_code(report: &FormatReport, check: bool) -> u8 {
 }
 
 impl FormatArgs {
-    pub fn paths(&self) -> &[PathBuf] {
-        &self.paths
-    }
-
     pub fn prefer_warm(&self) -> bool {
         self.common.prefer_warm
     }

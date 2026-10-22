@@ -547,6 +547,8 @@ mod unix {
         let root = codelaw_core::normalize_path(&root);
         let mut any = false;
         for (r, mut stream) in discover(&dir) {
+            // A process that accepts and never answers is listed, not waited on.
+            let _ = stream.set_read_timeout(Some(Duration::from_secs(2)));
             let served = exchange(&mut stream, &json!({ "op": "status" })).and_then(|v| v["served"].as_u64()).unwrap_or(0);
             let serves = if r.any_cwd { "any folder".to_owned() } else { codelaw_core::normalize_path(&r.cwd) };
             println!("{} pid {} codelaw {} served {served} (serves {serves})", r.kind, r.pid, r.version);

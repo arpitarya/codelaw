@@ -125,7 +125,10 @@ impl Daemon {
 
 impl Drop for Daemon {
     fn drop(&mut self) {
-        let _ = run(&self.0, &["daemon", "stop"]);
+        // A test that removed its folder stopped the daemon first.
+        if self.0.exists() {
+            let _ = run(&self.0, &["daemon", "stop"]);
+        }
     }
 }
 
@@ -185,6 +188,7 @@ fn warm_runs_print_what_cold_runs_print_on_every_fixture() {
     same(&root, &root, &["format", "--check"]);
     same(&root, &root, &["format", "--diff"]);
     same(&root, &root, &["fix", "--dry-run", "--format", "json"]);
+    drop(_daemon);
     let _ = fs::remove_dir_all(&root);
 }
 
@@ -205,6 +209,7 @@ fn warm_fix_and_format_write_the_bytes_cold_ones_write() {
         assert_eq!(tree(&cold), tree(&warm), "`codelaw {}` wrote other bytes warm", args.join(" "));
     }
     assert_ne!(tree(&cold), tree(&repo("fix-unfixed", CONFIG)), "fix changed nothing, so the comparison proves nothing");
+    drop(_daemon);
     for d in [cold, warm] {
         let _ = fs::remove_dir_all(d);
     }
@@ -224,6 +229,7 @@ fn the_daemon_reloads_a_changed_rule_and_config() {
     fs::remove_file(rule).unwrap();
     let removed = same(&root, &root, &["check", "--format", "json"]);
     assert_ne!(off, removed, "the rule change shows");
+    drop(_daemon);
     let _ = fs::remove_dir_all(&root);
 }
 
@@ -257,8 +263,9 @@ fn discovery_takes_the_newest_live_socket_of_its_version_and_removes_stale_ones(
     assert_eq!(cold, warm);
     let mut sent = Vec::new();
     while let Ok((mut s, _)) = other.accept() {
-        s.set_nonblocking(false).unwrap();
-        s.set_read_timeout(Some(Duration::from_secs(2))).unwrap();
+        // macOS answers EINVAL here when the client has already closed.
+        let _ = s.set_nonblocking(false);
+        let _ = s.set_read_timeout(Some(Duration::from_secs(2)));
         let mut buf = Vec::new();
         let _ = s.read_to_end(&mut buf);
         sent.extend(buf);
@@ -310,6 +317,7 @@ fn the_daemon_exits_when_idle_and_is_never_started_for_you() {
     assert_eq!(code, Some(2), "{err}");
     assert!(err.contains("no codelaw config"), "{err}");
     let _ = fs::remove_dir_all(&bare);
+    drop(_d);
     let _ = fs::remove_dir_all(&root);
 }
 

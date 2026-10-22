@@ -497,7 +497,7 @@ fn main() -> ExitCode {
         Command::Check(a) => run(a.common.prefer_warm, &a.paths.clone(), |ctx| check(a, ctx)),
         // Only a warm process declines a fix; here it always runs.
         Command::Fix(a) => run(a.common.prefer_warm, &a.paths.clone(), |ctx| fix(a, ctx).unwrap_or_default()),
-        Command::Format(a) => run(a.prefer_warm(), &a.paths().to_vec(), |ctx| format_cmd::format(a, ctx)),
+        Command::Format(a) => run(a.prefer_warm(), &a.paths.clone(), |ctx| format_cmd::format(a, ctx)),
         Command::Test(a) => test(a),
         Command::Rules(a) => rules_cmd::rules(a),
         Command::Explain { id, format } => rules_cmd::explain(&id, &format),
