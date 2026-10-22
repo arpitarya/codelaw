@@ -1228,6 +1228,8 @@ dependencies = [
  "codelaw-lang",
  "codelaw-rules",
  "codelaw-semantic",
+ "ignore",
+ "toml",
 ]
 
 [[package]]

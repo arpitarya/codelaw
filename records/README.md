@@ -184,6 +184,7 @@ directions.
 | `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced: the Cargo packages, the npm lockfiles and the build tools |
 | `crates/codelaw-cli/tests/network_fence.rs` | SR-LAW-5 | how L5 is enforced: the network fence (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/consumer_layout.rs` | SR-CONSUMER-LAYOUT | the veto's `init` check against §1's tree (a different decision from the CLI's) |
+| `crates/codelaw-cli/tests/promotion.rs` | SR-RULE-AUTHORING | decisions 4 and 6: level 4 and the `stable` gate (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
 | `fixtures/l3` | SR-LAW-3 | the fixture matrix |
 | `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the five first-party packs' rules, presets and data |
