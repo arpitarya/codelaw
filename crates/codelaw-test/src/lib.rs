@@ -294,10 +294,8 @@ fn header_path(line: &str) -> Option<String> {
         r.strip_suffix("-->")?
     } else if let Some(r) = t.strip_prefix("/*") {
         r.strip_suffix("*/")?
-    } else if let Some(r) = t.strip_prefix('#') {
-        r
     } else {
-        return None;
+        t.strip_prefix('#')?
     };
     let p = inner.trim();
     if p.is_empty() || p.contains(char::is_whitespace) || !p.contains('.') {
