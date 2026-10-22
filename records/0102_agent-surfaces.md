@@ -120,6 +120,32 @@ Each agent reads a different set of files from a different place. Maintaining th
 - **Task evals:** a fixture repo plus a task with a deterministic pass check. For example, "add a function to `math.ts`" passes when `codelaw check` is clean and the export is in the end block.
 - Evals run in CI against each supported agent where that agent can be run headless.
 
+#### 6. The config and the hook
+
+- **`[agents]`** in the root config, both keys optional and validated at load ([SR-CONFIG](0110_config.md) decision 5):
+  - `[agents] targets`: the agents of the decision-2 matrix (`claude`, `cowork`, `copilot`, `codex`, `kiro`) whose files `sync-agents` writes. Empty by default, and then no agent file exists. An unknown name is an error naming the nearest one. `init --agents <list>` writes it.
+  - `[agents] command`: how a hook or an MCP registration starts codelaw. Unset, it is the repo's own install: `npx --no-install codelaw` beside a `package.json`, `uv run codelaw` beside a `uv.lock`, else `codelaw`.
+- **`codelaw hook [paths]`** is the post-edit hook of every row of the matrix.
+  - The files are its arguments, or, with none, the ones the agent's hook payload on stdin names: `tool_input.file_path` / `path` (Claude Code, Codex), the files an `apply_patch` envelope adds or updates (Codex), or `toolArgs` (Copilot). A deleted file, or one with no [L3](0005_LAW-3-languages.md) extension, is ignored.
+  - It runs `codelaw fix` on them with `auto` fixes only, format step included ([L8](0010_LAW-8-performance-budgets.md) `fix_one_file`; [L4](0006_LAW-4-every-rule-has-a-fix.md) decision 8). It is the same engine call, so the bytes are `fix`'s ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 5).
+  - Nothing left: exit `0`, with the auto-fix notes on stdout. An error or warning left: exit `2`, with the fixes applied and up to 20 findings, each with its next step (a `suggest` diff to show, or the `manual` steps), on stderr. Exit 2 with stderr is how Claude Code and Codex hand a `PostToolUse` result back to the agent. A config or rule error is also exit `2`, as `error: …`.
+- **A pre-write mode** ([W-05](../work/open/W-05-write-time-guidance.md)'s `hook --pre`) would be a flag of the same command.
+
+#### 7. What `sync-agents` writes, file by file
+
+- **Owned files** are written whole, with a "generated, do not edit" note after any frontmatter: the skills, the custom agent, `.kiro/steering/codelaw*.md`, `.github/instructions/codelaw-<lang>.instructions.md`, `.github/hooks/codelaw.json`, `.kiro/hooks/codelaw.json` and the Cowork plugin.
+- **Shared files** are touched only at codelaw's part:
+  - `CLAUDE.md` and `AGENTS.md`: the marker block, replaced in place, or appended when there is none;
+  - `.mcp.json`, `.kiro/settings/mcp.json` (`mcpServers.codelaw`) and `.vscode/mcp.json` (`servers.codelaw`): that one key;
+  - `.claude/settings.json`: the `PostToolUse` entry whose command runs `codelaw … hook`, replaced; every other entry and key is kept.
+  - A shared JSON file that does not parse is an error naming it; codelaw never overwrites it.
+- **Path-scoped files** exist for each language that has an enabled rule; `<lang>` is the `languages:` name (`typescript`, `tsx`, …). A `codelaw-<lang>` file for a language with no rule left, and a `codelaw-*` skill the catalogue no longer has, are removed. The team's own files beside them are never touched.
+- **The Cowork plugin** is `.claude/plugins/codelaw/`: `.claude-plugin/plugin.json`, `skills/`, `hooks/hooks.json` and `.mcp.json`.
+- **The Kiro hook** is `.kiro/hooks/codelaw.json`: a `PostFileSave` trigger on the L3 extensions running `<command> hook {{filePath}}`.
+- **Codex** gets a printed `~/.codex/config.toml` snippet: `[mcp_servers.codelaw]` and a `[[hooks.PostToolUse]]` group.
+- **The skills are compiled into the binary** (`include_str!` of `agents/`), so both packages carry the same ones ([L6](0008_LAW-6-python-and-node-packages.md)).
+- **`sync-agents --check`**: exit `0` when every planned file matches, `1` listing each file that differs or should be removed, `2` on a config, rule or file error. With no `[agents] targets` both forms exit `0` without loading the rules.
+
 ### The skill catalogue
 
 **P1** ships with the MCP server. **P2** follows once rules can be authored outside the codelaw repo. **P3** comes later.
@@ -149,6 +175,8 @@ Each agent reads a different set of files from a different place. Maintaining th
 - **Kiro:** steering with `inclusion: always | fileMatch | manual`; skills in `.kiro/skills/`; Powers bundle MCP servers, steering and hooks ([Kiro guide](https://medium.com/@Sanjjushri/advanced-kiro-steering-strategies-skills-powers-and-production-workflows-b68153ba88c2); [Kiro changelog](https://kiro.dev/changelog/remote-mcp-and-global-steering)).
 - **Copilot:** `AGENTS.md` / `copilot-instructions.md`, `.github/instructions/*.instructions.md` (`applyTo`), `.github/prompts/` (VS Code only), `.github/agents/*.agent.md`, `.github/skills/*/SKILL.md` ([example repo docs](https://forge.saif.com/about/contributing/copilot-skills/)); hooks ([GitHub docs](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/use-hooks)).
 - **Codex:** `PostToolUse` and the other hooks are stable since v0.124 ([Vaughan, Apr 2026](https://codex.danielvaughan.com/2026/04/23/codex-cli-hooks-graduate-stable-v0124-mcp-observation-inline-config/)).
+- **Codex hooks** in `config.toml`: `[[hooks.PostToolUse]]` matcher groups with `[[hooks.PostToolUse.hooks]]` `type = "command"` handlers ([OpenAI docs](https://developers.openai.com/codex/hooks)).
+- **Kiro hooks** in `.kiro/hooks/`: the v1 schema's `trigger` (`PostFileSave`) and `action` (`type: command`), with `{{filePath}}` for file triggers ([Kiro hooks](https://kiro.dev/docs/hooks/)). Older Kiro versions used a `when`/`then` `.kiro.hook` file; decision 7 follows the v1 schema.
 - **Claude Code:** `PostToolUse` hooks, where exit code 2 sends stderr back to the agent ([Anthropic docs](https://docs.anthropic.com/en/docs/claude-code/hooks)).
 - **Prior art for "instruct never blocks; enforce only when exact":** the same principle in Arpit's Fux repo, in the `.claude/hooks/fux-index-hint.sh` header.
 
@@ -156,6 +184,8 @@ Each agent reads a different set of files from a different place. Maintaining th
 
 - **codelaw owns its generated files in consumer repos;** teams must not hand-edit them.
 - **The Cursor and Gemini CLI rows wait for their paths to be verified.**
+- **The Cowork plugin path and the Kiro hook schema (decision 7) are the least verified rows;** the veto check covers them first.
+- **Copilot ignores a `postToolUse` hook's output,** so on Copilot the hook applies `auto` fixes but cannot hand findings back; the always-on block's "run `codelaw check`" carries that.
 - **Evals cost CI time for each agent.**
 
 ### Alternatives considered

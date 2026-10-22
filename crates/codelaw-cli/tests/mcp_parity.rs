@@ -194,6 +194,15 @@ fn parity(name: &str, languages: &[&str]) {
     assert_eq!(mcp_fix, cli_fix, "{name}: fix_paths");
     let fixed = tree_of(&by_cli);
     assert_eq!(tree_of(&by_mcp), fixed, "{name}: fix_paths wrote different bytes");
+    // `codelaw hook` (L5 decision 5): one file at a time, as an agent edits
+    // them, writes what `fix` writes.
+    let by_hook = repo(&format!("{name}-hook"), languages);
+    for file in sources.keys() {
+        let out = command(&by_hook).args(["hook", file]).output().unwrap();
+        let err = String::from_utf8_lossy(&out.stderr);
+        assert!(matches!(out.status.code(), Some(0 | 2)) && !err.starts_with("error:"), "{name}: hook {file}: {err}");
+    }
+    assert_eq!(tree_of(&by_hook), fixed, "{name}: hook wrote different bytes");
     for (file, bytes) in &sources {
         let v: Value = serde_json::from_str(&mcp.call("format_snippet", json!({ "path": file, "code": String::from_utf8(bytes.clone()).unwrap() }))).unwrap();
         assert_eq!(v["code"].as_str().unwrap().as_bytes(), fixed[file].as_slice(), "{name}: format_snippet {file}");
@@ -207,7 +216,7 @@ fn parity(name: &str, languages: &[&str]) {
     );
     assert_eq!(tree_of(&dry), sources, "{name}: a dry run wrote");
 
-    for d in [root, by_cli, by_mcp, dry] {
+    for d in [root, by_cli, by_mcp, by_hook, dry] {
         let _ = fs::remove_dir_all(d);
     }
 }

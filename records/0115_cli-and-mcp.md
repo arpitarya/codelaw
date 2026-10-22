@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-cli
   - crates/codelaw-mcp
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -110,7 +110,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
      | `trace_rule {id, path}` | `rules --why <id> --for <path> --format json`; `match --explain`'s matcher-level trace (W-16) is to return through it |
 
    - The server loads the project per call, so an edited config or rule is seen on the next call; the warm, cached rule set is [SR-ARCHITECTURE](0108_architecture.md) decision 21's (W-15).
-6. **Parity ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A test runs every fixture through the CLI and through MCP and requires identical diagnostics and fixed bytes: `crates/codelaw-cli/tests/mcp_parity.rs` runs each `fixtures/l3` language alone and all together through every tool of decision 5 and its twin, byte for byte, and compares the files `fix` and `fix_paths` write. No logic lives in either surface; both are thin adapters over `codelaw-engine` ([SR-PACKAGES](0107_packages.md)).
+6. **Parity ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A test runs every fixture through the CLI and through MCP and requires identical diagnostics and fixed bytes: `crates/codelaw-cli/tests/mcp_parity.rs` runs each `fixtures/l3` language alone and all together through every tool of decision 5 and its twin, byte for byte, and compares the files `fix`, `fix_paths` and `codelaw hook` (run on each file in turn, as an agent edits) write. No logic lives in either surface; both are thin adapters over `codelaw-engine` ([SR-PACKAGES](0107_packages.md)).
 7. **Agent-friendly by design.**
    - Every MCP tool's description says when to call it.
    - `rules_for_path` returns rule cards under about 60 tokens each, with detail on demand ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 3).

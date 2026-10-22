@@ -1,7 +1,8 @@
 //! `codelaw init` (SR-RULE-PACKS decision 6, SR-CONFIG decision 8,
 //! SR-CONSUMER-LAYOUT decision 8): detect the languages, install their rule
 //! packs with the package manager the repo already uses, and write the
-//! config, the rules folder and the `.gitignore` line.
+//! config, the rules folder and the `.gitignore` line; with `--agents`, the
+//! `[agents] targets` and the agent files (SR-AGENT-SURFACES decision 2).
 
 use crate::fail;
 use clap::Args;
@@ -19,7 +20,7 @@ pub struct InitArgs {
     /// Install every pack from one registry: `npm` or `pypi`.
     #[arg(long)]
     registry: Option<String>,
-    /// Agent files to write (SR-AGENT-SURFACES).
+    /// Agent files to write: claude, cowork, copilot, codex, kiro (SR-AGENT-SURFACES).
     #[arg(long, value_delimiter = ',')]
     agents: Vec<String>,
 }
@@ -113,9 +114,10 @@ fn install_command(root: &Path, registry: Registry, packages: &[&str]) -> Vec<St
 }
 
 pub fn init(args: InitArgs) -> ExitCode {
-    if !args.agents.is_empty() {
-        return fail("`--agents` writes agent files (SR-AGENT-SURFACES), which this version does not build yet");
-    }
+    let targets = match codelaw_agents::parse_targets(&args.agents) {
+        Ok(t) => t,
+        Err(e) => return fail(format!("--agents: {e}")),
+    };
     let forced = match args.registry.as_deref() {
         None => None,
         Some("npm") => Some(Registry::Npm),
@@ -171,6 +173,10 @@ pub fn init(args: InitArgs) -> ExitCode {
     let mut config = String::from("# codelaw configuration — see `codelaw config --print` and SR-CONFIG.\n");
     let quoted: Vec<String> = extends.iter().map(|e| format!("\"{e}\"")).collect();
     config.push_str(&format!("extends = [{}]\n", quoted.join(", ")));
+    if !targets.is_empty() {
+        let names: Vec<String> = targets.iter().map(|t| format!("\"{}\"", t.name())).collect();
+        config.push_str(&format!("\n[agents]\ntargets = [{}]\n", names.join(", ")));
+    }
     let rules_dir = root.join(".codelaw").join("rules");
     let written = std::fs::write(root.join("codelaw.toml"), &config)
         .and_then(|_| std::fs::create_dir_all(&rules_dir))
@@ -197,22 +203,31 @@ pub fn init(args: InitArgs) -> ExitCode {
     println!("wrote codelaw.toml, .codelaw/rules/README.md and the .gitignore line");
 
     let commands: Vec<Vec<String>> = by_registry.iter().map(|(r, pkgs)| install_command(&root, *r, pkgs)).collect();
-    if commands.is_empty() {
-        return ExitCode::SUCCESS;
-    }
-    if args.no_install {
+    if args.no_install && !commands.is_empty() {
         println!("install the rule packs with:");
         for c in &commands {
             println!("  {}", c.join(" "));
         }
-        return ExitCode::SUCCESS;
+    } else {
+        for c in &commands {
+            println!("running: {}", c.join(" "));
+            match Command::new(&c[0]).args(&c[1..]).current_dir(&root).status() {
+                Ok(s) if s.success() => {}
+                Ok(s) => return fail(format!("`{}` exited with {s}; run it by hand once it can succeed", c.join(" "))),
+                Err(e) => return fail(format!("cannot run `{}`: {e}; run it by hand", c.join(" "))),
+            }
+        }
     }
-    for c in &commands {
-        println!("running: {}", c.join(" "));
-        match Command::new(&c[0]).args(&c[1..]).current_dir(&root).status() {
-            Ok(s) if s.success() => {}
-            Ok(s) => return fail(format!("`{}` exited with {s}; run it by hand once it can succeed", c.join(" "))),
-            Err(e) => return fail(format!("cannot run `{}`: {e}; run it by hand", c.join(" "))),
+    // After the packs, so the per-language instructions list their rules.
+    if !targets.is_empty() {
+        match codelaw_agents::write_for_init(&root, &targets, None) {
+            Ok((written, notes)) => {
+                println!("wrote {} agent files for {}", written.len(), targets.iter().map(|t| t.name()).collect::<Vec<_>>().join(", "));
+                for n in notes {
+                    println!("\n{n}");
+                }
+            }
+            Err(e) => return fail(e),
         }
     }
     ExitCode::SUCCESS

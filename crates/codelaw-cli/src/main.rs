@@ -71,6 +71,10 @@ enum Command {
     },
     /// Serve the MCP tools to an agent over stdio (SR-CLI-MCP decision 5).
     Mcp,
+    /// Check and fix the files an agent just edited; what is left goes back to it (SR-AGENT-SURFACES).
+    Hook(codelaw_agents::HookArgs),
+    /// Write every agent's files from the rules and skills, or with --check report drift.
+    SyncAgents(codelaw_agents::SyncArgs),
 }
 
 #[derive(Subcommand)]
@@ -371,5 +375,7 @@ fn main() -> ExitCode {
             Ok(()) => ExitCode::SUCCESS,
             Err(e) => fail(e),
         },
+        Command::Hook(a) => codelaw_agents::hook(a),
+        Command::SyncAgents(a) => codelaw_agents::sync_agents(a),
     }
 }

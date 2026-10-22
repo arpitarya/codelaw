@@ -206,6 +206,10 @@ impl Config {
         push("lint.tagged_templates", v, s);
         let (v, s) = root_key(&["markdown", "lint_code_blocks"], |r| r.markdown.lint_code_blocks.map(|x| json!(x)), json!(false));
         push("markdown.lint_code_blocks", v, s);
+        let (v, s) = root_key(&["agents", "targets"], |r| r.agents.targets.as_ref().map(|x| json!(x)), json!([]));
+        push("agents.targets", v, s);
+        let (v, s) = root_key(&["agents", "command"], |r| r.agents.command.as_ref().map(|x| json!(x)), Value::Null);
+        push("agents.command", v, s);
 
         // The sections not validated yet: shown as written.
         for (name, get) in [
@@ -213,7 +217,6 @@ impl Config {
             ("graph", |r| r.graph.clone()),
             ("baseline", |r| r.baseline.clone()),
             ("adapters", |r| r.adapters.clone()),
-            ("agents", |r| r.agents.clone()),
             ("daemon", |r| r.daemon.clone()),
             ("lsp", |r| r.lsp.clone()),
         ] {

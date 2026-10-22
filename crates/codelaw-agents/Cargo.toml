@@ -13,4 +13,3 @@ codelaw-engine.workspace = true
 codelaw-report.workspace = true
 clap.workspace = true
 serde_json.workspace = true
-toml.workspace = true

@@ -427,19 +427,23 @@ pub fn sync_agents(args: SyncArgs) -> ExitCode {
         eprintln!("error: {e}");
         ExitCode::from(2)
     };
-    let project = match Project::load(Path::new("."), EngineOptions::from_env()) {
-        Ok(p) => p,
+    let config = match codelaw_config::find_config(Path::new(".")) {
+        Ok(c) => c,
         Err(e) => return fail(e.to_string()),
     };
-    let cfg = match AgentsConfig::from_config(&project.config) {
+    let cfg = match AgentsConfig::from_config(&config) {
         Ok(c) => c,
         Err(e) => return fail(e),
     };
     if cfg.targets.is_empty() {
-        // L5 decision 4: no agents, no agent files.
+        // L5 decision 4: no agents, no agent files — and no rules to load.
         println!("no `[agents] targets` in the config: no agent files to write");
         return ExitCode::SUCCESS;
     }
+    let project = match Project::from_config(config, EngineOptions::from_env()) {
+        Ok(p) => p,
+        Err(e) => return fail(e.to_string()),
+    };
     let root = project.root().to_path_buf();
     let plan = match plan(&root, &cfg, &Sources::from_project(&project)) {
         Ok(p) => p,
