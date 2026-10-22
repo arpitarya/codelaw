@@ -10,7 +10,7 @@ feature: "configuration"
 owns:
   - crates/codelaw-config
 laws: [L0, L3, L5, L7]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -134,7 +134,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
 **Reopen this decision if:** a key is accepted that no record defines, or `config --print` can't name a value's source.
 
-**How to check it:** the schema test: every key in `codelaw.schema.json` is defined in exactly one record, and every record-defined key is in the schema (`W-16`).
+**How to check it:** the schema test, `cargo test -p codelaw-config --test schema`: every key in `codelaw.schema.json` is defined in exactly one record, every record-defined key is in the schema, and the schema and the loader accept the same keys. It compiles the schema with `boon` (MIT OR Apache-2.0), a dev-dependency only, taken in for this test and SR-CLI-MCP's SARIF check.
 
 ---
 

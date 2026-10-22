@@ -75,8 +75,9 @@ fn config_print_names_every_source_and_schema_is_the_shipped_one() {
 fn rules_for_json_is_the_api_shape() {
     let d = project("rules");
     let v = json(&d, &["rules", "--for", "a.py", "--format", "json"]);
+    // SR-CLI-MCP decision 4: `rules` gives `for` and `rules[]`.
     assert_eq!(v["schema_version"], 1);
-    assert_eq!(v["file"], "a.py");
+    assert_eq!(v["for"], "a.py");
     let rules = v["rules"].as_array().unwrap();
     assert_eq!(rules.len(), 1, "{v}");
     assert_eq!(rules[0]["id"], "fixture/py-no-print");
@@ -86,6 +87,7 @@ fn rules_for_json_is_the_api_shape() {
     assert_eq!(v["rules"].as_array().unwrap().len(), 0, "off by override: {v}");
     let v = json(&d, &["rules", "--format", "json"]);
     assert_eq!(v["rules"].as_array().unwrap().len(), 2);
+    assert_eq!(v["for"], Value::Null);
     let (_, out, _) = codelaw(&d, &["rules", "--for", "a.py"]);
     assert!(out.starts_with("fixture/py-no-print"), "{out}");
     let _ = fs::remove_dir_all(&d);
@@ -100,6 +102,12 @@ fn match_explain_names_each_clause() {
     assert!(out.ends_with("fixture/js-eqeqeq on a.js: 2 matches among 2 candidate nodes\n"), "{out}");
     let v = json(&d, &["match", "fixture/js-eqeqeq", "a.js", "--format", "json", "--line", "1"]);
     assert_eq!(v["nodes"][1]["captures"]["$A"], "c");
+    // MCP `trace_rule`'s twin carries the same matcher-level trace.
+    let why = json(&d, &["rules", "--why", "fixture/js-eqeqeq", "--for", "a.js", "--format", "json"]);
+    let all = json(&d, &["match", "fixture/js-eqeqeq", "a.js", "--format", "json"]);
+    assert_eq!(why["for"]["match"], all["nodes"], "{why}");
+    let why = json(&d, &["rules", "--why", "fixture/py-no-print", "--for", "a.py", "--format", "json"]);
+    assert!(why["for"]["applies"] == true && why["for"]["match"].is_array(), "{why}");
     let (code, _, err) = codelaw(&d, &["match", "fixture/js-eqeqq", "a.js"]);
     assert_eq!(code, 2);
     assert!(err.contains("did you mean `fixture/js-eqeqeq`?"), "{err}");
@@ -116,14 +124,18 @@ fn fix_trace_shows_each_pass_and_writes_only_without_dry_run() {
     assert_eq!(code, 0, "{out}{err}");
     assert!(out.contains("trace a.js\n  pass 1\n    offered   fixture/js-eqeqeq (1 edits)\n"), "{out}");
     assert!(out.contains("    applied   fixture/js-eqeqeq (1 edits), verified\n"), "{out}");
-    assert!(out.contains("  fixpoint: nothing more to fix\n"), "{out}");
+    assert!(out.contains("  fixpoint: nothing more to fix\n  then the format step: the layout changed"), "{out}");
     assert_eq!(fs::read_to_string(d.join("a.js")).unwrap(), "if (a == b) { f(c == d); }\n", "--dry-run writes nothing");
     let v = json(&d, &["fix", "--trace", "--format", "json", "a.js"]);
     assert_eq!(v["trace"][0]["file"], "a.js");
     assert_eq!(v["trace"][0]["end"], "fixpoint");
+    assert_eq!(v["trace"][0]["formatted"], true);
+    assert_eq!(v["trace"][0]["verify_refused"], serde_json::json!([]));
     let events: Vec<&str> = v["trace"][0]["passes"][0].as_array().unwrap().iter().map(|e| e["event"].as_str().unwrap()).collect();
     assert_eq!(events, ["offered", "offered", "applied", "applied"], "{v}");
-    assert_eq!(fs::read_to_string(d.join("a.js")).unwrap(), "if (a === b) { f(c === d); }\n");
+    // `fix` ends with the format step (SR-FORMATTER decision 4).
+    assert_eq!(fs::read_to_string(d.join("a.js")).unwrap(), "if (a === b) {\n  f(c === d);\n}\n");
+    assert_eq!(v["fixed"][0]["written"], true, "{v}");
     let _ = fs::remove_dir_all(&d);
 }
 

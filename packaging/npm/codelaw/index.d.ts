@@ -1,6 +1,5 @@
 // Types for the codelaw npm API (SR-PACKAGES decision 3). Each call runs the
 // bundled binary and returns its `--format json` report unchanged.
-// `format` joins when the formatter does (W-07).
 
 export type Severity = "error" | "warn" | "info";
 export type FixClass = "auto" | "suggest" | "manual";
@@ -57,6 +56,22 @@ export interface FixOptions extends Options {
   dryRun?: boolean;
 }
 
+export interface FormatOptions extends Options {
+  /** `--check`: report what would be formatted, write nothing. */
+  check?: boolean;
+}
+
+export interface FixReport extends CheckReport {
+  /** Each changed file, the fixes applied per rule, and whether it was written. */
+  fixed: { file: string; applied: Record<string, number>; passes: number; written: boolean }[];
+}
+
+export interface FormatReport extends CheckReport {
+  check: boolean;
+  /** Each file whose layout changed; `written` once the disk holds it. */
+  formatted: { file: string; written: boolean }[];
+}
+
 /** One rule as `rules --for` shows it (SR-CLI-MCP decision 7). */
 export interface RuleCard {
   id: string;
@@ -71,7 +86,8 @@ export interface RuleCard {
 export interface RulesReport {
   schema_version: number;
   codelaw_version: string;
-  file: string | null;
+  /** The file asked about; `null` in a listing of every rule. */
+  for: string | null;
   rules: RuleCard[];
   [key: string]: unknown;
 }
@@ -80,5 +96,6 @@ export const PLATFORMS: readonly string[];
 export function platformKey(): string;
 export function binaryPath(): string;
 export function check(paths?: string[], options?: Options): CheckReport;
-export function fix(paths?: string[], options?: FixOptions): Record<string, unknown>;
+export function fix(paths?: string[], options?: FixOptions): FixReport;
+export function format(paths?: string[], options?: FormatOptions): FormatReport;
 export function rulesFor(path: string): RulesReport;

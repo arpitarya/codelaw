@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -80,6 +80,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
    8. Report ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 4).
 5. **`fix`** per file: run all rules → collect `auto` edits (and `suggest` edits with `--unsafe`) → drop overlapping edits → apply → re-parse → repeat until no edits, at most 10 passes → format ([SR-FORMATTER](0105_formatter.md)) → verify (parses, idempotent, no new rule fires) → write (decision 12). Two rules whose fixes alternate are detected by a repeated file hash and both are reported as `manual` with a `fix-conflict` note.
    - **What verify checks:** *parses* counts syntax errors in the host and in every embedded region (a `<script>`, a Markdown fence), and a fix may not add one; *idempotent* is the fixpoint, since the loop ends only when the result offers no more fixes; *no new rule fires* compares the rules with a finding on the result against the original, engine diagnostics aside. A rule whose fixes make a new rule fire is refused (`manual`, note `fix-verify-failed`) and the loop runs again without it.
+   - **One loop, traced in place:** `codelaw-fix`'s `fix_loop_with` is the only loop; `fix_loop` and `fix_loop_traced` (host grammar only, for the rule tester) call it. `fix --trace` records the passes of the very run whose result `fix` keeps — the engine's, with its embedded-region error count — plus the rules verify refused and whether the format step changed the layout ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 4). It is the same run as `fix`, so it writes what `fix` writes, and nothing with `--dry-run`.
 6. **`format`** is the fix pipeline with the rule steps skipped.
 
 #### C. Files and I/O

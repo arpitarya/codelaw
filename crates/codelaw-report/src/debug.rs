@@ -1,41 +1,12 @@
-//! Output for `rules --for`, `config --print`, `match --explain`,
-//! `fix --trace` and `--timings`: text for people, JSON for the APIs and
-//! MCP (SR-CLI-MCP decisions 4 and 5).
+//! Output for `config --print`, `match --explain`, `fix --trace` and
+//! `--timings`: text for people, JSON for the APIs and MCP (SR-CLI-MCP
+//! decisions 4 and 5). The rule listings are `query.rs`'s.
 
 use crate::SCHEMA_VERSION;
 use codelaw_config::Traced;
-use codelaw_engine::{FileTrace, MatchReport, RuleCard, TimingReport};
+use codelaw_engine::{FileTrace, MatchReport, TimingReport};
 use codelaw_fix::TraceEvent;
 use serde_json::{Value, json};
-
-// ── rules ────────────────────────────────────────────────────────────────
-
-/// `rules [--for <file>]`: one line per rule.
-pub fn rule_cards_text(cards: &[RuleCard]) -> String {
-    let mut out = String::new();
-    for c in cards {
-        let preview = if c.preview { "  (preview)" } else { "" };
-        out.push_str(&format!("{:<40} {:<6} {:<8} {}{preview}\n", c.id, c.severity, c.fix.name(), c.source));
-    }
-    out
-}
-
-/// `rules [--for <file>] --format json`, and `rulesFor` / `rules_for`.
-pub fn rule_cards_json(cards: &[RuleCard], file: Option<&str>) -> Value {
-    json!({
-        "schema_version": SCHEMA_VERSION,
-        "codelaw_version": codelaw_core::VERSION,
-        "file": file,
-        "rules": cards.iter().map(|c| json!({
-            "id": c.id,
-            "title": c.title,
-            "severity": c.severity,
-            "fix": c.fix.name(),
-            "source": c.source,
-            "preview": c.preview,
-        })).collect::<Vec<_>>(),
-    })
-}
 
 // ── config ───────────────────────────────────────────────────────────────
 
@@ -116,14 +87,21 @@ pub fn match_text(report: &MatchReport, explain: bool) -> String {
 }
 
 pub fn match_json(report: &MatchReport) -> Value {
-    let clause = |c: &codelaw_match::ClauseResult| json!({ "clause": c.label, "holds": c.holds, "error": c.error });
     json!({
         "schema_version": SCHEMA_VERSION,
         "codelaw_version": codelaw_core::VERSION,
         "rule": report.rule,
         "file": report.file,
         "language": report.language.name(),
-        "nodes": report.nodes.iter().map(|(s, e, n)| json!({
+        "nodes": match_nodes_json(report),
+    })
+}
+
+/// Every candidate node of a `match --explain`: also `rules --why --for`'s
+/// `for.match` (MCP `trace_rule`, SR-CLI-MCP decision 5).
+pub(crate) fn match_nodes_json(report: &MatchReport) -> Value {
+    let clause = |c: &codelaw_match::ClauseResult| json!({ "clause": c.label, "holds": c.holds, "error": c.error });
+    Value::Array(report.nodes.iter().map(|(s, e, n)| json!({
             "kind": n.kind,
             "range": {
                 "start": { "line": s.line, "column": s.column, "offset": n.start },
@@ -134,8 +112,7 @@ pub fn match_json(report: &MatchReport) -> Value {
             "constraints": n.constraints,
             "predicates": n.predicates.iter().map(clause).collect::<Vec<_>>(),
             "captures": n.captures,
-        })).collect::<Vec<_>>(),
-    })
+        })).collect())
 }
 
 // ── fix --trace ─────────────────────────────────────────────────────────
@@ -176,12 +153,18 @@ pub fn trace_text(traces: &[FileTrace]) -> String {
                 out.push_str(&format!("    {line}\n"));
             }
         }
+        for rule in &t.verify_refused {
+            out.push_str(&format!("  refused   {rule}: its fixes make a rule fire that did not fire before; the passes above ran without it\n"));
+        }
         let end = match t.trace.end {
             codelaw_fix::LoopEnd::Fixpoint => "fixpoint: nothing more to fix",
             codelaw_fix::LoopEnd::Conflict => "stopped: the fixes conflict",
             codelaw_fix::LoopEnd::MaxPasses => "stopped: did not converge",
         };
         out.push_str(&format!("  {end}{}\n", if t.changed { "" } else { " (the file is unchanged)" }));
+        if t.formatted {
+            out.push_str("  then the format step: the layout changed (SR-FORMATTER decision 4)\n");
+        }
     }
     out
 }
@@ -194,6 +177,8 @@ pub fn trace_json(traces: &[FileTrace]) -> Value {
                 "file": t.file,
                 "changed": t.changed,
                 "end": t.trace.end.name(),
+                "verify_refused": t.verify_refused,
+                "formatted": t.formatted,
                 "passes": t.trace.passes.iter().map(|p| p.iter().map(event_json).collect::<Vec<_>>()).collect::<Vec<_>>(),
             })
         })

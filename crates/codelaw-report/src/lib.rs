@@ -5,7 +5,7 @@
 mod debug;
 mod sarif;
 
-pub use debug::{config_json, config_text, match_json, match_text, rule_cards_json, rule_cards_text, timings_json, timings_text, trace_json, trace_text};
+pub use debug::{config_json, config_text, match_json, match_text, timings_json, timings_text, trace_json, trace_text};
 pub use sarif::{SARIF_SCHEMA, check_sarif};
 
 mod hook;
@@ -19,7 +19,7 @@ pub use query::{
 };
 
 use codelaw_core::{Diagnostic, FixClass, Severity};
-use codelaw_engine::{CheckReport, FixReport};
+use codelaw_engine::{CheckReport, FixReport, FormatReport};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
@@ -143,6 +143,17 @@ pub fn fix_json(report: &FixReport) -> Value {
         .map(|f| json!({ "file": f.file, "applied": f.applied, "passes": f.passes, "written": f.written }))
         .collect::<Vec<_>>()
         .into();
+    v
+}
+
+/// The `--format json` object for `format`: the check shape (files
+/// formatted, skipped, `format/failed` and write failures as diagnostics)
+/// plus `formatted[]`, each file whose layout changed — `written` once the
+/// disk holds it, `false` with `--check`.
+pub fn format_json(report: &FormatReport, check: bool) -> Value {
+    let mut v = check_json(&report.check);
+    v["check"] = check.into();
+    v["formatted"] = report.files.iter().map(|f| json!({ "file": f.file, "written": f.written })).collect::<Vec<_>>().into();
     v
 }
 
