@@ -13,3 +13,4 @@ codelaw-lang.workspace = true
 codelaw-rules.workspace = true
 codelaw-semantic.workspace = true
 codelaw-engine.workspace = true
+codelaw-format.workspace = true

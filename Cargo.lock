@@ -1227,6 +1227,7 @@ dependencies = [
  "codelaw-config",
  "codelaw-core",
  "codelaw-engine",
+ "codelaw-format",
  "codelaw-lang",
  "codelaw-rules",
  "codelaw-semantic",
