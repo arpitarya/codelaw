@@ -9,9 +9,12 @@
 //!     else: [{ ensure-key: { key: strict, value: true } }]
 //! ```
 //!
-//! Every edit is confined to the target's text: comments and key order
-//! outside it stay byte for byte, and a sorted container's comments move
-//! with the key they sit above. Each fix is verified before it is offered:
+//! The steps run in order, each on the text the one before it left, so
+//! `[ensure-key, sort-keys]` sorts the key it wrote; the fix is one edit,
+//! from the first byte the steps changed to the last. Every edit is
+//! confined to the target's text: comments and key order outside it stay
+//! byte for byte, and a sorted container's comments move with the key they
+//! sit above. Each fix is verified before it is offered:
 //! the file still parses, the assertion now holds at the target, and the
 //! data outside what the fix set out to change is unchanged.
 
@@ -129,70 +132,140 @@ pub struct DataFixContext<'a> {
 enum Change {
     /// The order of a container's items.
     Order(Vec<Step>),
-    /// The value at a path (written, replaced or removed).
+    /// The value at a path (written or replaced).
     Value(Vec<Step>),
+    /// The value at a path, removed with its key or its place in the array.
+    Removed(Vec<Step>),
 }
 
 /// The edits of a `target:` rule's fix at one slot, verified.
 pub fn data_edits(fix: &[DataStep], ctx: &DataFixContext<'_>, slot: &Slot) -> Result<Vec<TextEdit>, String> {
-    let mut edits = Vec::new();
+    let index = ctx.tree.documents.iter().position(|d| *d == ctx.document).unwrap_or(0);
+    let mut state = State { text: ctx.source.to_owned(), tree: None, document: ctx.document, index, slot: slot.clone(), removed: false };
     let mut changes = Vec::new();
-    run_steps(fix, ctx, slot, &mut edits, &mut changes)?;
-    if edits.is_empty() {
-        return Err("the fix has nothing to change here".into());
-    }
-    edits.sort_by_key(|a| (a.start, a.end));
-    edits.dedup();
+    run_steps(fix, ctx, &mut state, &mut changes)?;
+    let edit = coalesce(ctx.source, &state.text).ok_or("the fix has nothing to change here")?;
+    let edits = vec![edit];
     verify(ctx, slot, &edits, &changes)?;
     Ok(edits)
 }
 
-fn run_steps(steps: &[DataStep], ctx: &DataFixContext<'_>, slot: &Slot, edits: &mut Vec<TextEdit>, changes: &mut Vec<Change>) -> Result<(), String> {
+/// The file as the steps so far left it: its text, data tree (`None` while
+/// it is still the original) and the target in it.
+struct State {
+    text: String,
+    tree: Option<DataTree>,
+    document: NodeId,
+    index: usize,
+    slot: Slot,
+    /// A `remove` step took the target away.
+    removed: bool,
+}
+
+impl State {
+    fn ctx<'s>(&'s self, ctx: &DataFixContext<'s>) -> DataFixContext<'s> {
+        DataFixContext { source: &self.text, language: ctx.language, tree: self.tree.as_ref().unwrap_or(ctx.tree), document: self.document, assert: ctx.assert }
+    }
+
+    /// Apply one step's edit and read the file again, finding the target by
+    /// its path.
+    fn apply(&mut self, language: Language, edit: TextEdit, removing: bool) -> Result<(), String> {
+        let text = apply_edits(&self.text, &[edit])?;
+        if removing {
+            // The path names nothing now, or an array item's neighbour.
+            self.text = text;
+            self.removed = true;
+            return Ok(());
+        }
+        let root = codelaw_lang::parse(language, &text);
+        let tree = codelaw_match::data::build(language, root.root().get_inner_node(), &text).ok_or("no data tree")?;
+        let document = *tree.documents.get(self.index).ok_or("a step removes the document")?;
+        self.slot = resolve(&tree, document, &[], &steps_path(&self.slot.steps)).into_iter().next().ok_or("a step moves the target")?;
+        self.text = text;
+        self.tree = Some(tree);
+        self.document = document;
+        Ok(())
+    }
+}
+
+/// Concrete steps as an absolute path.
+fn steps_path(steps: &[Step]) -> Path {
+    Path { absolute: true, segs: steps.iter().map(|s| match s { Step::Key(k) => Seg::Key(k.clone()), Step::Index(i) => Seg::Index(*i) }).collect() }
+}
+
+/// One edit from the first byte that differs to the last.
+fn coalesce(before: &str, after: &str) -> Option<TextEdit> {
+    if before == after {
+        return None;
+    }
+    let (a, b) = (before.as_bytes(), after.as_bytes());
+    let mut pre = a.iter().zip(b).take_while(|(x, y)| x == y).count();
+    while !before.is_char_boundary(pre) || !after.is_char_boundary(pre) {
+        pre -= 1;
+    }
+    let max = a.len().min(b.len()) - pre;
+    let mut suf = a.iter().rev().zip(b.iter().rev()).take(max).take_while(|(x, y)| x == y).count();
+    while !before.is_char_boundary(a.len() - suf) || !after.is_char_boundary(b.len() - suf) {
+        suf -= 1;
+    }
+    Some(TextEdit::new(pre, a.len() - suf, &after[pre..b.len() - suf]))
+}
+
+fn run_steps(steps: &[DataStep], base: &DataFixContext<'_>, state: &mut State, changes: &mut Vec<Change>) -> Result<(), String> {
     for s in steps {
-        match s {
+        if state.removed {
+            return Err("a step after `remove` has no target left".into());
+        }
+        let ctx = state.ctx(base);
+        let slot = state.slot.clone();
+        let edit = match s {
             DataStep::When { cond, then, otherwise } => {
-                let branch = if cond.holds(ctx.tree, ctx.document, slot, &mut Vec::new()) { then } else { otherwise };
-                run_steps(branch, ctx, slot, edits, changes)?;
+                let branch = if cond.holds(ctx.tree, ctx.document, &slot, &mut Vec::new()) { then } else { otherwise };
+                run_steps(branch, base, state, changes)?;
+                continue;
             }
             DataStep::SortKeys(spec) => {
-                let node = slot.node.ok_or("`sort-keys`: the target is missing")?;
-                edits.push(sort_keys(ctx, node, spec)?);
+                // Nothing to sort where the target is missing or in order.
+                let Some(node) = slot.node else { continue };
+                let Some(edit) = sort_keys(&ctx, node, spec)? else { continue };
                 changes.push(Change::Order(slot.steps.clone()));
+                edit
             }
             DataStep::EnsureKey { key, value } => {
                 let target = match key {
                     None => slot.clone(),
-                    Some(p) => below(ctx, slot, p)?,
+                    Some(p) => below(&ctx, &slot, p)?,
                 };
                 match target.node {
                     Some(n) => {
                         if json_eq(&ctx.tree.to_json(n), value) {
                             continue;
                         }
-                        edits.push(replace_value(ctx, n, &render_inline(ctx.language, value)?)?);
                         changes.push(Change::Value(target.steps.clone()));
+                        replace_value(&ctx, n, &render_inline(ctx.language, value)?)?
                     }
                     None => {
-                        edits.push(insert(ctx, &target, value)?);
                         let kept = target.steps.len() - target.missing.len() + 1;
                         changes.push(Change::Value(target.steps[..kept].to_vec()));
+                        insert(&ctx, &target, value)?
                     }
                 }
             }
             DataStep::Replace(template) => {
                 let n = slot.node.ok_or("`replace`: the target is missing")?;
-                let text = codelaw_match::target::interpolate(template, ctx.tree, slot, ctx.source, None);
-                edits.push(replace_value(ctx, n, &text)?);
+                let text = codelaw_match::target::interpolate(template, ctx.tree, &slot, ctx.source, None);
                 changes.push(Change::Value(slot.steps.clone()));
+                replace_value(&ctx, n, &text)?
             }
             DataStep::Remove => {
                 if slot.node.is_none() {
                     continue;
                 }
-                edits.push(remove(ctx, slot)?);
-                changes.push(Change::Value(slot.steps.clone()));
+                changes.push(Change::Removed(slot.steps.clone()));
+                remove(&ctx, &slot)?
             }
-        }
+        };
+        state.apply(base.language, edit, matches!(s, DataStep::Remove))?;
     }
     Ok(())
 }
@@ -213,7 +286,9 @@ fn below(ctx: &DataFixContext<'_>, slot: &Slot, p: &Path) -> Result<Slot, String
 
 // ---- verification ----
 
-fn without(v: &mut J, steps: &[Step]) {
+/// Leave the value at `steps` out of the comparison: its key goes, and an
+/// array item becomes `null`, or with `shift` gives up its place.
+fn without(v: &mut J, steps: &[Step], shift: bool) {
     let Some((last, init)) = steps.split_last() else {
         *v = J::Null;
         return;
@@ -236,7 +311,13 @@ fn without(v: &mut J, steps: &[Step]) {
         (Step::Key(k), J::Object(o)) => {
             o.remove(k);
         }
-        (Step::Index(i), J::Array(a)) if *i < a.len() => a[*i] = J::Null,
+        (Step::Index(i), J::Array(a)) if *i < a.len() => {
+            if shift {
+                a.remove(*i);
+            } else {
+                a[*i] = J::Null;
+            }
+        }
         _ => {}
     }
 }
@@ -274,26 +355,42 @@ fn verify(ctx: &DataFixContext<'_>, slot: &Slot, edits: &[TextEdit], changes: &[
     let after = codelaw_match::data::build(ctx.language, after_root.root().get_inner_node(), &fixed).ok_or("no data tree")?;
     let index = ctx.tree.documents.iter().position(|d| *d == ctx.document).unwrap_or(0);
     let doc = *after.documents.get(index).ok_or("the fix removes the document")?;
-    let path = Path { absolute: true, segs: slot.steps.iter().map(|s| match s { Step::Key(k) => Seg::Key(k.clone()), Step::Index(i) => Seg::Index(*i) }).collect() };
-    let new_slot = resolve(&after, doc, &[], &path).into_iter().next().ok_or("the fix moves the target")?;
-    if !ctx.assert.holds(&after, doc, &new_slot, &mut Vec::new()) {
-        return Err("the fix does not make the assertion hold".into());
+    // An array item removed leaves its index to the next item: the
+    // assertion was about the item, and the data check below shows it went.
+    let item_removed = changes.iter().any(|c| matches!(c, Change::Removed(s) if s == &slot.steps)) && matches!(slot.steps.last(), Some(Step::Index(_)));
+    if !item_removed {
+        let new_slot = resolve(&after, doc, &[], &steps_path(&slot.steps)).into_iter().next().ok_or("the fix moves the target")?;
+        if !ctx.assert.holds(&after, doc, &new_slot, &mut Vec::new()) {
+            return Err("the fix does not make the assertion hold".into());
+        }
     }
     let mut a = ctx.tree.to_json(ctx.document);
     let mut b = after.to_json(doc);
+    // The values first, so a key written into a container that is also
+    // sorted is not counted as an item the sort added.
     for c in changes {
         match c {
-            Change::Order(steps) => {
-                if sorted_items(at(&a, steps)) != sorted_items(at(&b, steps)) && !at(&a, steps).zip(at(&b, steps)).is_some_and(|(x, y)| json_eq(x, y)) {
-                    return Err("sorting would change the items".into());
-                }
-                without(&mut a, steps);
-                without(&mut b, steps);
-            }
             Change::Value(steps) => {
-                without(&mut a, steps);
-                without(&mut b, steps);
+                without(&mut a, steps, false);
+                without(&mut b, steps, false);
             }
+            Change::Removed(steps) => {
+                without(&mut a, steps, true);
+                // The item after a removed array item has its index now.
+                if !matches!(steps.last(), Some(Step::Index(_))) {
+                    without(&mut b, steps, true);
+                }
+            }
+            Change::Order(_) => {}
+        }
+    }
+    for c in changes {
+        if let Change::Order(steps) = c {
+            if sorted_items(at(&a, steps)) != sorted_items(at(&b, steps)) && !at(&a, steps).zip(at(&b, steps)).is_some_and(|(x, y)| json_eq(x, y)) {
+                return Err("sorting would change the items".into());
+            }
+            without(&mut a, steps, false);
+            without(&mut b, steps, false);
         }
     }
     if !json_eq(&a, &b) {
@@ -615,7 +712,7 @@ fn remove(ctx: &DataFixContext<'_>, slot: &Slot) -> Result<TextEdit, String> {
 
 /// `sort-keys`: one edit spanning the container's items, rewritten in
 /// order; what lies between them stays where it was.
-fn sort_keys(ctx: &DataFixContext<'_>, node: NodeId, spec: &SortSpec) -> Result<TextEdit, String> {
+fn sort_keys(ctx: &DataFixContext<'_>, node: NodeId, spec: &SortSpec) -> Result<Option<TextEdit>, String> {
     let src = ctx.source;
     let n = ctx.tree.node(node);
     let names = SortSpec::names(ctx.tree, node).ok_or("`sort-keys` sorts an object, or an array of strings")?;
@@ -631,14 +728,14 @@ fn sort_keys(ctx: &DataFixContext<'_>, node: NodeId, spec: &SortSpec) -> Result<
     let mut order: Vec<usize> = (0..names.len()).collect();
     order.sort_by(|a, b| spec.key(&names[*a]).cmp(&spec.key(&names[*b])));
     if order.iter().enumerate().all(|(i, o)| i == *o) {
-        return Err("already sorted".into());
+        return Ok(None);
     }
     let line_mode = matches!(n.style, Style::YamlBlockMapping | Style::YamlBlockSequence | Style::TomlSection { .. });
     let inline_mode = matches!(n.style, Style::JsonObject | Style::JsonArray | Style::YamlFlowMapping | Style::YamlFlowSequence | Style::TomlInlineTable | Style::TomlArray);
     if line_mode {
-        sort_lines(src, &spans, &order, n.style == Style::YamlBlockSequence)
+        sort_lines(src, &spans, &order, n.style == Style::YamlBlockSequence).map(Some)
     } else if inline_mode {
-        sort_inline(ctx, &spans, &order)
+        sort_inline(ctx, &spans, &order).map(Some)
     } else {
         Err("`sort-keys`: this container is not written in one place (an alias or merged keys)".into())
     }
