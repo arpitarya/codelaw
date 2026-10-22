@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-22 — W-21 and W-23 finished and merged  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"continue"* (same session as the entry below).
+- **Done:** two agents finished W-21 (steps 1–2) and W-23 (steps 3 and 5) in their worktrees; merged into `main` `2a38ced`: clippy clean, 398 tests pass; pack examples pass but for two layout-check failures.
+- **Decided / left open:** to the decider: the two layout-check rules (W-23 DoD 1) and the `tree-sitter-css` fork (W-21 step 3).
+- **Mistakes:** none.
+- **Next:** the decider's inbox; on the agent side W-11's false-positive judgment, W-15's tree-cache bound, W-13, W-19.
+
+---
+
 ## 2026-10-22 — the agent branches merged into main and verified clean  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"continue"* — merge each agent branch, then one clean verification run.

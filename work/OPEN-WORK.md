@@ -30,6 +30,10 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-18 | | |
 | 🔴 Whether npm's licence, `Artistic-2.0`, passes L2: OSI-approved and not copyleft by SR-LAW-2 decision 2's test, but not among its examples; `licences.rs` lists it as awaiting a ruling ([W-20](open/W-20-conformance-tests.md)) | 2026-10-22 | 0 d |
 | ↳ **blocks:** W-20 step 2's last line | | |
+| 🔴 Two pack rules fail the layout check: `js/no-irregular-whitespace` (a layout rule: Biome turns its no-break space into a space) and `css/media-query-no-invalid` (Biome's `not (` makes an invalid query valid). Drop, rewrite or exempt each ([W-23](open/W-23-formatter-rest.md)) | 2026-10-22 | 0 d |
+| ↳ **blocks:** W-23 DoD 1 · `codelaw test packs/js` and `packs/css` pass | | |
+| 🔴 Modern CSS needs `tree-sitter-css` changed: fork it in-tree (parser regenerated with the MIT tree-sitter CLI) or patch upstream and wait; either is an L2 check and a record ([W-21](open/W-21-pack-engine-gaps.md)) | 2026-10-22 | 0 d |
+| ↳ **blocks:** W-21 step 3 | | |
 
 ---
 
@@ -42,10 +46,10 @@ here. Read that record before changing anything below it.
 🔴 **W-03** `agent` The five rule packs: steps 2–5 done (401 rules), packaging done. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
 
 🔴 **W-06** `agent` README, CHANGELOG, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT landed (filed as W-04; renumbered 2026-10-20, the number was taken by the release pipeline); blocked on the decider placing the `.github/` templates. Filed by Arpit (Cowork). [detail](open/W-06-consumer-readme.md)
-🟢 **W-23** `agent` Finish SR-FORMATTER: all five steps built 2026-10-22 (3 and 5 on branch `W-23-formatter-rest`, not yet merged); DoD 1 waits on the decider for two pack rules that fail the layout check. Filed by Arpit (Claude Code). [detail](open/W-23-formatter-rest.md)
+🔴 **W-23** `agent` Finish SR-FORMATTER: all five steps landed and verified on `main` 2026-10-22; DoD 1 waits on the decider for two pack rules that fail the layout check (inbox). Filed by Arpit (Claude Code). [detail](open/W-23-formatter-rest.md)
 🟢 **W-11** `agent` Project graph and `graph:` rules built and verified on `main` 2026-10-22, with the six `node/` import rules; left: judge the corpus false-positive rate (step 4). Filed by Arpit (Cowork). [detail](open/W-11-project-graph.md)
 🟢 **W-15** `agent` Warm processes landed and verified 2026-10-22: rule-set cache, sockets, `--prefer-warm`, the daemon, incremental re-parse; left: the `[lsp] tree_cache` bound. Filed by Arpit (Cowork). [detail](open/W-15-warm-processes.md)
-🟢 **W-21** `agent` Close the engine gaps holding rules out of the packs. Templates, file context and three rules are green on branch `W-21-pack-gaps`, unmerged; modern CSS needs a grammar fork, the decider's call. Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
+🔴 **W-21** `agent` Engine gaps: tagged templates, native-rule file context and three rules landed on `main` 2026-10-22; modern CSS needs a `tree-sitter-css` fork, the decider's call (inbox). Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
 🟡 **W-13** `agent` Build baselines, deprecations, `--as-of` and `--changed-since`/`--staged`; waiting on W-11 for `graph/no-deprecated-usage`. Filed by Arpit (Cowork). [detail](open/W-13-baseline-and-time.md)
 
 ### testing
