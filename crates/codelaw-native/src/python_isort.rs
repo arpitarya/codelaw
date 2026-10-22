@@ -504,7 +504,7 @@ mod tests {
         let mut data = BTreeMap::new();
         data.insert("python/stdlib".to_owned(), Arc::new(serde_json::json!(["os", "sys", "json", "collections", "typing", "__future__"])));
         let options = BTreeMap::new();
-        let ctx = NativeContext { source: src, language: Language::Python, semantic: None, options: &options, data: &data };
+        let ctx = NativeContext { source: src, language: Language::Python, semantic: None, options: &options, data: &data, file: &crate::DetachedFile::default() };
         let mut out = Vec::new();
         for node in root.root().dfs() {
             if rule.kinds().contains(&node.kind().as_ref()) {

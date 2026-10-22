@@ -976,7 +976,7 @@ mod tests {
             let tree = codelaw_lang::parse_grammar(Grammar::MarkdownInline, &r.text);
             let options = BTreeMap::new();
             let data = BTreeMap::new();
-            let ctx = NativeContext { source: &r.text, language: Language::Markdown, semantic: None, options: &options, data: &data };
+            let ctx = NativeContext { source: &r.text, language: Language::Markdown, semantic: None, options: &options, data: &data, file: &crate::DetachedFile::default() };
             for n in tree.root().dfs() {
                 if rule.kinds().contains(&n.kind().as_ref()) {
                     let mut o = Vec::new();

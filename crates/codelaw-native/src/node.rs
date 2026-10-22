@@ -142,7 +142,7 @@ mod tests {
             Arc::new(serde_json::json!({ "fs": { "exists": "fs.stat" }, "util": { "isArray": "Array.isArray" }, "url": { "parse": "new URL()" }, "crypto": { "createCipher": "crypto.createCipheriv" }, "domain": { "*": "async_hooks" }, "globals": { "Buffer": "Buffer.from" } })),
         );
         let options = BTreeMap::new();
-        let ctx = NativeContext { source: src, language: Language::Javascript, semantic: model.as_ref(), options: &options, data: &data };
+        let ctx = NativeContext { source: src, language: Language::Javascript, semantic: model.as_ref(), options: &options, data: &data, file: &crate::DetachedFile::default() };
         let mut out = Vec::new();
         NoDeprecatedApi.check(root.root(), &ctx, &mut out);
         let mut msgs: Vec<String> = out.into_iter().map(|f| f.message).collect();
