@@ -32,6 +32,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-23 DoD 1 · `codelaw test packs/js` and `packs/css` pass | | |
 | 🔴 Modern CSS needs `tree-sitter-css` changed: fork it in-tree (parser regenerated with the MIT tree-sitter CLI) or patch upstream and wait; either is an L2 check and a record ([W-21](open/W-21-pack-engine-gaps.md)) | 2026-10-22 | 0 d |
 | ↳ **blocks:** W-21 step 3 | | |
+| 🔴 Set L8's budgets: after the `perf` job's first run on `main`, apply min(design target, 1.5 × worst p95) to the CI runner's numbers and rule each `budget` in `perf/budgets.toml`; name the reference machine ([W-19](open/W-19-performance-budgets.md)) | 2026-10-22 | 0 d |
+| ↳ **blocks:** W-19 DoD 3 · the perf gate binding anything | | |
 
 ---
 
@@ -45,9 +47,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-06** `agent` README, CHANGELOG, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT landed (filed as W-04; renumbered 2026-10-20, the number was taken by the release pipeline); blocked on the decider placing the `.github/` templates. Filed by Arpit (Cowork). [detail](open/W-06-consumer-readme.md)
 🔴 **W-23** `agent` Finish SR-FORMATTER: all five steps landed and verified on `main` 2026-10-22; DoD 1 waits on the decider for two pack rules that fail the layout check (inbox). Filed by Arpit (Claude Code). [detail](open/W-23-formatter-rest.md)
-🟢 **W-11** `agent` Graph, `graph:` rules and the six `node/` import rules on `main`; the corpus run (branch `W-11-corpus`): 14 of 145 findings false (9.7%), each expressible by config, so the veto does not hold. Every DoD met; awaits merge. Filed by Arpit (Cowork). [detail](open/W-11-project-graph.md)
 🔴 **W-21** `agent` Engine gaps: tagged templates, native-rule file context and three rules landed on `main` 2026-10-22; modern CSS needs a `tree-sitter-css` fork, the decider's call (inbox). Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
-🟢 **W-13** `agent` Baselines, deprecations, `--as-of`, `--changed-since`/`--staged` built 2026-10-22 (`W-13-baseline`); all DoD met, veto result in SR-BASELINE. Left: function touch scope, `rewrite` fix, LSP. Filed by Arpit (Cowork). [detail](open/W-13-baseline-and-time.md)
 
 ### testing
 

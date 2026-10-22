@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-22 — the green items: W-11, W-13, W-15, W-19 landed  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement all the green items. In parallel"*.
+- **Done:** four agents, one per green agent item (W-05 is Cowork research, rule 37a; W-13 flipped green once W-11's graph landed). Merged into `main` `35a6115`, verified in main's own target: clippy clean, 435 tests. W-11, W-13, W-15 closed and archived; W-19 waits on the decider's budgets.
+- **Decided / left open:** to the decider: L8's budgets (inbox). Optional questions from the agents: W-11's two default gaps (self-aliased private packages; CSS only for linked stylesheets), W-13's `on_touch` default for non-deprecation baselines and `codelaw/stale-baseline` as `manual`, W-15's per-project tree-cache bound.
+- **Mistakes:** one shared `CARGO_TARGET_DIR` for parallel worktrees let cargo link one worktree's crates into another's build (same relative paths, same artifact hashes); agents worked around it and the merged result was verified in main's own target. Next time: one target per worktree.
+- **Next:** the decider's inbox (six rows); W-20's pinned corpus, W-18's staging-index install.
+
+---
+
 ## 2026-10-22 — npm's Artistic-2.0 ruled permissive  ·  Claude Code (Opus 5.5)
 
 - **Asked:** the decider, asked whether they had ruled on npm's licence: *"Yes, I ruled it."*
