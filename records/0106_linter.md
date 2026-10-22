@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-match
   - crates/codelaw-adapters
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-22T18:00:00Z
 content_sha: ""
 ---
 
@@ -109,6 +109,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | JS/TS | `` css`…` `` / `` html`…` `` tagged templates | CSS / HTML, only when `[lint] tagged_templates = true` |
 
    - **Locations map back to the host:** diagnostics report host-file line and column.
+   - **A template's `${…}` is a hole:** the region's text holds a placeholder that keeps it parseable (in CSS chosen by where it stands: a comment, a custom property, a class, `all` in `@media`, a number, `var(--…)`; in HTML `${}`). A finding wholly inside a placeholder is dropped, and a fix whose edit would touch a hole's host code is refused (`fix-outside-region`). Only a plain identifier tag, `css` or `html`, makes a region; each nested template is a region of its own. *(W-21, 2026-10-22.)*
    - **Fixes are applied in the host:** fixes edit the host text and are verified by re-parsing the host.
    - **Rules can target a host:** a rule may say `host: html` to apply only to embedded regions (for example, "no inline `<script>` without `nonce`").
    - **A language switched off is off inside hosts too,** and a region is parsed only when something applies to it ([SR-ARCHITECTURE](0108_architecture.md) decision 16).
