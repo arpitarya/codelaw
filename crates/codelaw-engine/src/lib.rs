@@ -22,7 +22,7 @@ pub use baseline::{AsOf, BaselineAdd, Ratchet};
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
 pub use fix::{FileFix, FileTrace, FixOptions, FixReport};
-pub use incremental::DocumentTree;
+pub use incremental::{DocumentTree, TreeCache};
 pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
 pub use lint::FileResult;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
