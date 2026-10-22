@@ -105,13 +105,13 @@ into a scan anyone can do at task end.
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
-| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-20 | 2026-10-20 — trusted publishing, `dist`, half-published |
+| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-20 | 2026-10-22 — ratchet, deprecations registry (W-13) |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-19 | 2026-10-19 — L6 and SR-RULE-PACKS rows; rule packs in the distribution sketch and the config example |
 | `records/README.md` | a record's state, ownership or number changes | 2026-10-22 | 2026-10-22 — SR-LAW-5 and SR-CONSUMER-LAYOUT own their tests; `scripts/check-work-system.py` and its describers (W-20) |
 | `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-20 | 2026-10-20 — not releasable until W-07–W-09; step 2 runs the law gate |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
 | `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-22 | 2026-10-22 — `codelaw test --corpus` (W-20) |
-| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-20 | 2026-10-20 — Unreleased: the MIT licence |
+| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-20 | 2026-10-22 — Unreleased: baselines and deprecations (W-13) |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
 | `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
 | `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |

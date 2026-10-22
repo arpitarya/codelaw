@@ -7,9 +7,10 @@ description: "A committed, count-based baseline lets existing violations of any 
 status: accepted
 date: 2026-10-18
 feature: "grandfathering violations and deprecations"
-owns: []
+owns:
+  - crates/codelaw-baseline
 laws: [L0, L4, L5]
-timestamp: 2026-10-18T16:45:00Z
+timestamp: 2026-10-22T18:00:00Z
 content_sha: ""
 ---
 
@@ -93,18 +94,25 @@ reason    = "ORD-1432 migration"
 ```
 
 - **Counts per file, not line numbers.** Moving code around doesn't invalidate the baseline; adding a use does.
-- **One file per rule** keeps diffs small and merge conflicts rare. Entries are sorted by file, so the output is deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)).
+- **One file per rule** keeps diffs small and merge conflicts rare. The file name is the rule id with `/` written `--`. Entries are sorted by file, then symbol, so the output is deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)).
+- **Keys:** `file` and `count` are required; `symbol`, `until`, `warn_from` (the start of the warning window), `on_touch` and `reason` are optional. An unknown key, a malformed date or two entries for the same file and symbol make the run fail with exit 2, as a config error does. Dates are `YYYY-MM-DD`, quoted or bare.
+- **Defaults:** an entry without `until`, `warn_from` or `on_touch` inherits the deprecation's; with none there either, `on_touch` is `error` and there is no deadline. `baseline add` writes `on_touch` explicitly.
+- **The engine reads the folder at load,** so a warm process ([SR-ARCHITECTURE](0108_architecture.md) decision 22), which loads per request, serves a changed baseline at once.
 
 #### 2. What each occurrence becomes
 
 | Situation | Result |
 |---|---|
-| Use in a file with no baseline entry, or beyond the file's `count` | **error:** "new use of deprecated `formatDate`; use `formatISO`" |
+| Use in a file with no baseline entry | the rule's own finding, unchanged: for `graph/no-deprecated-usage` an **error** ("`formatDate` is deprecated; use `formatISO` (deadline 2027-03-31)") |
+| More occurrences than the file's `count` | **every occurrence in the file at the rule's own severity**, each saying "4 in this file; the baseline allows 3": counts can't tell which one is new (ESLint's bulk suppressions do the same) |
 | Within allowance, before `warn_from` | **info:** "grandfathered until 2027-03-31 (3 left in this file)"; exit 0 |
 | Within allowance, after `warn_from`, before `until` | **warning:** "expires in 12 days" |
 | After `until` | **error**, everywhere |
 | Within allowance, but **the file is touched** and `on_touch = "error"` | **error for every occurrence in that file:** "you edited this file; migrate its 3 uses of `formatDate` now" |
-| Baseline allows 3, file now has 2 | **error: stale baseline.** `codelaw baseline prune` lowers it (auto, always safe) |
+| Baseline allows 3, file now has 2 | **error, `codelaw/stale-baseline`,** on that file. `codelaw baseline prune` lowers it, and `codelaw fix` prunes too (always safe). An entry is judged stale only when the run saw the whole of its rule in its file: a run of other paths, or `--rule` of another rule, leaves it alone |
+
+- **The order** is the flowchart's: the count first, then the touch, then the dates. A finding past `until` is an error whether or not its file was touched.
+- **Without an as-of date** (no `git`, no `--as-of`), a grandfathered finding stays `info` and the header says deadlines were not evaluated.
 
 #### 3. What "touched" means
 
@@ -117,6 +125,8 @@ A file is touched when it's in the **change set**, and the change set always com
 | Agent hook | The file the agent just edited |
 | Plain `codelaw check` | **Empty:** nothing counts as touched |
 
+- The change sets add up: `--changed-since` and `--staged` together count both. Paths come from `git diff --name-only --relative` run in the project root, so they are project-relative.
+- **Without `git`** or outside a repository, the flag adds a warning saying so, marks nothing as touched, and the rest of the run goes on ([SR-ARCHITECTURE](0108_architecture.md) decision 14).
 - `on_touch_scope = "file"` is the default. `"function"` narrows it to occurrences inside a function whose lines changed in the diff.
 
 #### 4. The clock is an input, never read implicitly ([L5](0007_LAW-5-no-model-in-the-engine.md))
@@ -124,14 +134,18 @@ A file is touched when it's in the **change set**, and the change set always com
 - Deadlines need "today", but reading the wall clock would let the same commit pass yesterday and fail today on two machines.
 - **The as-of date defaults to the commit date of `HEAD`.** The same commit gives the same verdict everywhere: on a laptop, in CI, or in an agent's hook.
 - **`--as-of 2027-04-01`** checks against any date. Use it to see what will break after a deadline before it arrives.
+- **The order:** `--as-of`, then `CODELAW_AS_OF`, then the commit date of `HEAD` (`git log -1 --format=%cI`, the date part, in the committer's own time zone). A malformed date is a usage error, exit 2.
 - **No `git` binary or no repository** (for example, a tarball): `--as-of` or `CODELAW_AS_OF` is required for date-based results ([SR-ARCHITECTURE](0108_architecture.md) decision 14). Without it, deadlines aren't evaluated, and the report says so in its header.
+- **The header:** whenever a baseline or the deprecations registry is in play, `text` and `agent` output open with `as-of 2026-10-18 (HEAD commit date)` (or `as-of: none (<why>); deadlines are not evaluated`), and `json` carries `as_of: { date, source }`. With neither, nothing is read and nothing is printed.
+- **The test:** `crates/codelaw-cli/tests/baseline.rs` checks the same commit with the wall clock in UTC+14 and in UTC−12, which are always on different calendar days, with a deadline between them, and requires byte-identical output.
 
 #### 5. The ratchet: counts only go down
 
 - **Lowering is automatic:** `codelaw fix` and the pre-commit hook run `baseline prune`. Fixing a use is never blocked by bookkeeping.
 - **Raising a count, adding an entry or extending an `until` takes one explicit command:** `codelaw baseline add --rule <id> [--file …] --reason "…"`.
-- **CI enforces it:** `codelaw baseline check --since origin/main` fails if any count rose, any entry was added, or any deadline moved later.
-- **Approval** comes from a `CODEOWNERS` entry on `.codelaw/baseline/`, the platform's own review, with nothing invented.
+- **CI enforces it:** `codelaw baseline check --since origin/main` compares the baseline files at the merge base (read with `git show`) with the working tree, and exits 1 if any count rose, any entry was added, any deadline moved later or was removed, or any `on_touch` got less strict (`error` > `warn` > `keep`). Lowering a count and removing an entry always pass. Without `git` it is a usage error, exit 2.
+- **Approval** comes from a `CODEOWNERS` entry on `.codelaw/baseline/`, the platform's own review, with nothing invented. `baseline check` warns on stderr when no `CODEOWNERS` (`.github/`, the root, `docs/`, `.gitlab/`) assigns an owner to that folder.
+- **`baseline add`** records the rule's current counts for every file (or the `--file`s given), sets `--until`, `--warn-from`, `--on-touch` and `--reason` on the entries it writes, and is the one command that raises a count. `baseline prune [paths]` and `fix` only lower.
 - **Adopting a new rule in a legacy repo:**
   1. `codelaw baseline add --rule js/exports-at-end --until 2027-06-30`
   2. From then on, new violations fail and old ones count down.
@@ -162,25 +176,26 @@ reason      = "Replaced by the new tax engine"
   - JSDoc `@deprecated` on an export;
   - Python `@deprecated(...)` (PEP 702: `warnings.deprecated` from Python 3.13, `typing_extensions` before that).
 
-  A marked symbol with no registry entry gets the `[deprecation]` defaults from `codelaw.toml`. The registry adds deadlines and policy.
+  A marked symbol with no registry entry gets the `[deprecation]` defaults from `codelaw.toml` — `[deprecation] until`, `[deprecation] warn_from` and `[deprecation] on_touch`, the same three keys as an entry — and the marker's message becomes the finding's "Why". The registry adds deadlines and policy.
+- **When the rule runs.** It needs the whole graph, so it runs only when the project asks: a `.codelaw/deprecations.toml`, a `[deprecation]` table, or `graph/no-deprecated-usage` named in `[rules]`. It is an engine rule ([SR-RULE-PACKS](0101_rule-packs.md) decision 1): `codelaw explain` shows it, `--rule` selects it, and `[rules]` sets its severity or turns it `off`. `codelaw-ignore graph/no-deprecated-usage: <reason>` suppresses one use.
+- **What counts as a use:** each read of the imported binding, or the import itself when it is never read; a re-export only passes the name on, and the uses through it are counted where they are. A symbol of a package outside the project (`date-fns#format`) is found by its import specifier.
 - **Identity comes from the [project graph](0103_project-graph.md).** `import { formatDate as fd } from "@acme/utils"`, a barrel re-export, and `from acme.billing.legacy import compute_tax as ct` are all caught. A local function that happens to be named `formatDate` is not.
-- **Fix ([L4](0006_LAW-4-every-rule-has-a-fix.md)):** with a `rewrite`, the fix is `suggest` (a diff, because call semantics may differ). Without one, it's `manual`, and the steps name the replacement and quote `reason`.
+- **Fix ([L4](0006_LAW-4-every-rule-has-a-fix.md)):** with a `rewrite`, the fix is `suggest` (a diff, because call semantics may differ). Without one, it's `manual`, and the steps name the replacement and quote `reason`. The `rewrite` is read and checked but not applied yet, so every finding is `manual` for now.
 - **Seeding the baseline:** `codelaw deprecate @acme/utils#formatDate --replacement … --until …` does two things in one reviewed change:
-  1. writes the registry entry;
-  2. runs `baseline add` for every current use.
+  1. appends the registry entry, leaving the rest of the file as written;
+  2. runs `baseline add` for every current use of that symbol, copying its `until`, `warn_from` and `on_touch` into the entries so the ratchet guards them.
 
 #### 7. Running it
 
 ```
-$ codelaw check --changed-since origin/main
+$ codelaw check --changed-since origin/main --format agent
 as-of 2026-10-18 (HEAD commit date)
-packages/web/src/cart/total.ts:8:10     error  graph/no-deprecated-usage  New use of deprecated `formatDate`; use `formatISO` (deadline 2027-03-31)  [suggest]
-packages/web/src/orders/list.tsx:22:7   error  graph/no-deprecated-usage  File edited: migrate its 3 uses of `formatDate` now (on_touch = error)  [suggest]
-packages/web/src/orders/list.tsx:40:7   error  graph/no-deprecated-usage  …
-packages/web/src/orders/list.tsx:61:12  error  graph/no-deprecated-usage  …
-packages/api/app/billing.py:31:12       info   graph/no-deprecated-usage  Grandfathered until 2027-06-30 (1 left in this file)
-
-4 errors, 1 info
+packages/web/src/cart/total.ts:8:10 graph/no-deprecated-usage `formatDate` is deprecated; use `formatISO` (deadline 2027-03-31) — fix: manual — …
+packages/web/src/orders/list.tsx:22:7 graph/no-deprecated-usage `formatDate` is deprecated; use `formatISO` (deadline 2027-03-31); you edited this file: migrate its 3 occurrences now (on_touch = error) — fix: manual — …
+packages/web/src/orders/list.tsx:40:7 …
+packages/web/src/orders/list.tsx:61:12 …
+packages/api/app/billing.py:31:12 graph/no-deprecated-usage `compute_tax` is deprecated; use `compute` (deadline 2027-06-30); grandfathered until 2027-06-30 (1 left in this file) — fix: manual — …
+4 errors, 0 warnings, 1 infos
 exit 1
 
 $ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
@@ -191,13 +206,14 @@ $ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
 
 - **`rules_for_path`** (MCP) includes the deprecations that apply to the file. For example: "`formatDate` is deprecated, use `formatISO`; this file has 3 grandfathered uses that become errors as soon as you edit it." The agent migrates while it's already in the file, instead of being blocked after.
 - **The hook** treats the agent's edited file as touched, so it gets exactly the CI verdict ([L5](0007_LAW-5-no-model-in-the-engine.md) parity).
+- **MCP:** `check_paths` and `fix_paths` take `as_of`, `changed_since` and `staged`, the twins of the three flags; `check_snippet` applies the baseline to the file's own rules as `check` does ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 5).
 - **No skill may raise a baseline count or extend a deadline** ([SR-AGENT-SURFACES](0102_agent-surfaces.md) §4). Only a person runs `baseline add`.
 
 ### Consequences
 
 - **The baseline is committed and reviewed**, and CODEOWNERS approval on it is a process cost.
 - **As-of defaults to the `HEAD` commit date**, so a long-lived branch sees its own date. Accepted; `--as-of` overrides.
-- **Counts, not locations:** a use removed and another added in the same file net out. Accepted (Notion's trade-off); `W-13` watches it.
+- **Counts, not locations:** a use removed and another added in the same file net out on the count. Accepted (Notion's trade-off). The touch policy is what closes the hole — see the veto condition.
 
 ### Alternatives considered
 
@@ -216,7 +232,9 @@ $ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
 
 **Reopen this decision if:** in practice, a count-based baseline lets a new use slip in by offsetting a removed one.
 
-**How to check it:** `CI history (`W-13`) shows a file whose count held steady while a new use appeared`
+**How to check it:** `cargo test -p codelaw-baseline veto && cargo test -p codelaw-cli --test baseline the_change_set_and_the_ratchet` — each removes one use and adds another in the same file.
+
+**Result (W-13, 2026-10-22):** **yes, under plain `check` the swap passes:** nothing is touched, the count holds, and both occurrences stay grandfathered. **With the file in the change set it fails:** the swap edits the file, so `--changed-since`, `--staged` or the agent hook makes every occurrence an error under the default `on_touch = "error"`. The hole stays open in exactly two cases: an entry with `on_touch = "keep"` (or `"warn"`, which does not fail the run), and a CI that runs `codelaw check` without `--changed-since`. The decision stands; the reopen trigger is now a CI that gates on plain `check`, or a team that sets `keep` widely.
 
 ---
 

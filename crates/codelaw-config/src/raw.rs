@@ -43,6 +43,10 @@ pub struct RawConfig {
     pub format: Option<toml::Table>,
     pub graph: Option<toml::Table>,
     pub baseline: Option<toml::Table>,
+    /// SR-BASELINE decision 6: the policy of a symbol marked deprecated in
+    /// code that the registry does not list. Its values are checked when
+    /// the project loads.
+    pub deprecation: Option<RawDeprecation>,
     #[serde(default)]
     pub adapters: RawAdapters,
     #[serde(default)]
@@ -123,6 +127,15 @@ pub struct RawFix {
 pub struct RawAdapters {
     pub enabled: Option<Vec<String>>,
     pub timeout: Option<Duration>,
+}
+
+/// `[deprecation]`: SR-BASELINE decision 6.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawDeprecation {
+    pub until: Option<String>,
+    pub warn_from: Option<String>,
+    pub on_touch: Option<String>,
 }
 
 /// `[daemon]`: SR-ARCHITECTURE decision 22.

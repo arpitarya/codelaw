@@ -10,7 +10,7 @@ feature: "predefined rules and rule packs"
 owns:
   - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-22T18:00:00Z
+timestamp: 2026-10-22T18:30:00Z
 content_sha: ""
 ---
 
@@ -78,7 +78,7 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
 1. **The engine carries no rules except its own:**
    - the `codelaw/*` meta diagnostics, such as `codelaw/not-utf8`, `codelaw/internal-error` and `codelaw/no-rules` ([SR-ARCHITECTURE](0108_architecture.md));
    - `format/unformatted` and `format/failed`, the formatter's findings in `check` ([SR-FORMATTER](0105_formatter.md) decisions 1 and 4);
-   - `graph/no-deprecated-usage`, which reads the consumer's deprecations registry and belongs to no language ([SR-BASELINE](0104_baseline-and-deprecations.md)).
+   - `graph/no-deprecated-usage`, which reads the consumer's deprecations registry and belongs to no language, and runs only when the project declares deprecations; and `codelaw/stale-baseline`, a baseline entry its file has outgrown ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 2 and 6).
 
    Every other rule codelaw publishes lives in a pack.
 2. **The five first-party packs and their presets** are §1's table.

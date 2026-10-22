@@ -977,6 +977,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "codelaw-baseline"
+version = "0.1.0"
+dependencies = [
+ "codelaw-core",
+ "globset",
+ "toml",
+]
+
+[[package]]
 name = "codelaw-cache"
 version = "0.1.0"
 dependencies = [
@@ -993,6 +1002,7 @@ dependencies = [
  "boon",
  "clap",
  "codelaw-agents",
+ "codelaw-baseline",
  "codelaw-cache",
  "codelaw-config",
  "codelaw-core",
@@ -1044,6 +1054,7 @@ name = "codelaw-engine"
 version = "0.1.0"
 dependencies = [
  "codelaw-adapters",
+ "codelaw-baseline",
  "codelaw-cache",
  "codelaw-config",
  "codelaw-core",

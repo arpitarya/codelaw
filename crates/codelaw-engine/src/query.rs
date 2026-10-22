@@ -157,9 +157,14 @@ impl Project {
         let (abs, rel, language) = self.locate(file)?;
         let mut diagnostics = self.check_source(&rel, language, code);
         // `check` reports an unformatted file too (SR-FORMATTER decision 1).
-        diagnostics.extend(crate::format::check_diagnostic(self, &crate::FileEntry { abs, rel, language }, code));
-        diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
-        Ok(crate::CheckReport { diagnostics, skipped: Vec::new(), files_checked: 1, warnings: self.warnings.clone() })
+        diagnostics.extend(crate::format::check_diagnostic(self, &crate::FileEntry { abs, rel: rel.clone(), language }, code));
+        let mut report = crate::CheckReport { diagnostics, skipped: Vec::new(), files_checked: 1, warnings: self.warnings.clone(), as_of: None };
+        // The file's own rules ran, on this text: the baseline applies to
+        // them as `check` applies it (SR-BASELINE).
+        let ran = crate::baseline::Ran { files: [rel.clone()].into(), scopes: vec![rel], project: false };
+        self.apply_baselines(&mut report, Vec::new(), &ran);
+        report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+        Ok(report)
     }
 
     /// Fix `code` as if it were the text of `file`, applying `auto` fixes

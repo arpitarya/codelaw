@@ -83,7 +83,7 @@ const FALLBACK_STEP: &str = "Make the change by hand; `codelaw explain <rule>` s
 
 /// An engine diagnostic's severity for one file: its default, then the
 /// config layers; `off` is `None`.
-fn meta_severity(layers: &[Layer], id: &str) -> Option<Severity> {
+pub(crate) fn meta_severity(layers: &[Layer], id: &str) -> Option<Severity> {
     let rule = codelaw_rules::engine_rule(id)?;
     let mut severity = Some(rule.severity);
     for l in layers {

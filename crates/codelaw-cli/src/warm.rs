@@ -229,12 +229,12 @@ mod unix {
     }
 
     fn env_json(env: &EngineOptions) -> Value {
-        json!({ "cache_dir": env.cache_dir_env, "site_packages": env.site_packages_env, "virtual_env": env.virtual_env })
+        json!({ "cache_dir": env.cache_dir_env, "site_packages": env.site_packages_env, "virtual_env": env.virtual_env, "as_of": env.as_of_env })
     }
 
     fn env_from(v: &Value) -> EngineOptions {
         let s = |k: &str| v[k].as_str().map(str::to_owned);
-        EngineOptions { cache_dir_env: s("cache_dir"), site_packages_env: s("site_packages"), virtual_env: s("virtual_env"), ..Default::default() }
+        EngineOptions { cache_dir_env: s("cache_dir"), site_packages_env: s("site_packages"), virtual_env: s("virtual_env"), as_of_env: s("as_of"), ..Default::default() }
     }
 
     fn canonical_cwd() -> Option<PathBuf> {

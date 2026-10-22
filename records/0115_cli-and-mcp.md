@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-cli
   - crates/codelaw-mcp
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-22T18:00:00Z
+timestamp: 2026-10-22T18:30:00Z
 content_sha: ""
 ---
 
@@ -69,7 +69,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | rules | `rules [--for <path>] [--why <id>]` · `new-rule` · `rules eject` · `rules lint` · `test [--case <title>] [--corpus <dir> [--snapshot <file> [--update-snapshot]]]` (SR-RULE-AUTHORING decision 4) |
    | debug | `tree` · `match <id> <file> [--explain] [--line N]` · `fix --trace` · `graph refs` · `graph why-unused` |
    | project | `init [--agents …] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print [--for <file>]` · `config --schema` |
-   | baseline | `baseline add` · `baseline prune` · `baseline check` · `deprecate` |
+   | baseline | `baseline add --rule <id> [--file …] [--until] [--warn-from] [--on-touch] [--reason]` · `baseline prune [paths]` · `baseline check --since <ref>` · `deprecate <symbol> [--replacement] [--until] [--warn-from] [--on-touch] [--reason]` ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 5 and 6) |
    | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` ([SR-ARCHITECTURE](0108_architecture.md) decision 22) · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
 
@@ -84,7 +84,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - **`format [paths] [--check] [--diff] [--format text|json] [--import-config]`:** `0` every file is formatted, or was just formatted. `1` with `--check` or `--diff` when a file is not formatted, or when any file could not be formatted or written (`format/failed`, `codelaw/write-failed`). `2` as above. `--check` prints `would format <file>` per file; `--diff` prints a unified diff; neither writes. `--import-config` (not with `--check` or `--diff`) formats nothing: it writes the `[format]` keys read from Prettier's, Ruff's and Black's configs into the project's config, printing `wrote`, `kept` and `not imported` lines, and exits `0`, or `2` when a config cannot be read or written ([SR-FORMATTER](0105_formatter.md) decision 5).
 4. **Output formats:**
    - `text`: grouped, coloured on a TTY, plain otherwise.
-   - `json`: one versioned object (`schema_version`, `codelaw_version`, `summary`, `diagnostics[]` with rule, severity, file, range, message, fix class and edits or steps, `skipped[]` for files not checked and why, and `warnings[]`). A diagnostic's range carries line, column and byte offset; an edit's range is byte offsets. `fix` adds `fixed[]`: each changed file, the fixes applied per rule, and whether it was written. Text output prints a file as `fixed` only once the disk holds the fixed text (`not written` otherwise, `would fix` with `--dry-run`), and the summary counts only those.
+   - `json`: one versioned object (`schema_version`, `codelaw_version`, `summary`, `diagnostics[]` with rule, severity, file, range, message, fix class and edits or steps, `skipped[]` for files not checked and why, and `warnings[]`). A diagnostic's range carries line, column and byte offset; an edit's range is byte offsets. `fix` adds `fixed[]`: each changed file, the fixes applied per rule, and whether it was written; and `pruned[]`, the baseline files it lowered, when there are any. When a baseline or the deprecations registry is in play, `as_of: { date, source }` gives the date deadlines were judged on, and `text` and `agent` output open with the same `as-of …` line ([SR-BASELINE](0104_baseline-and-deprecations.md) decision 4). Text output prints a file as `fixed` only once the disk holds the fixed text (`not written` otherwise, `would fix` with `--dry-run`), and the summary counts only those.
    - `sarif`: SARIF 2.1.0 for code scanning.
    - `agent`: compact, token-budgeted lines for hooks.
 
@@ -111,8 +111,8 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
      | `explain_rule {id}` | `explain <id> --format json` |
      | `list_rules {}` | `rules --format json` |
      | `check_snippet {path, code}` | `check <path> --format json` on a file holding `code` |
-     | `check_paths {paths, rule, lang}` | `check [paths] [--rule] [--lang] --no-adapters --format json` |
-     | `fix_paths {paths, unsafe, dry_run, rule, lang}` | `fix … --no-adapters --format json` |
+     | `check_paths {paths, rule, lang, as_of, changed_since, staged}` | `check [paths] [--rule] [--lang] [--as-of] [--changed-since] [--staged] --no-adapters --format json` |
+     | `fix_paths {paths, unsafe, dry_run, rule, lang, as_of, changed_since, staged}` | `fix … --no-adapters --format json` |
      | `format_snippet {path, code}` | the bytes `fix <path>` writes, format step included, without writing them ([SR-FORMATTER](0105_formatter.md) decision 4) |
      | `dump_tree {path \| code+lang, line}` | `tree … --format json` |
      | `trace_rule {id, path}` | `rules --why <id> --for <path> --format json`; for a `match:` rule its `for.match` is `match --explain`'s matcher-level trace |

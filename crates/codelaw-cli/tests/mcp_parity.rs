@@ -236,6 +236,63 @@ fn cli_and_mcp_agree_on_every_fixture() {
     parity("all", LANGUAGES);
 }
 
+/// SR-BASELINE through both doors: `as_of`, `changed_since` and `staged`
+/// are `--as-of`, `--changed-since` and `--staged`, and a baselined
+/// finding reads the same from `check_paths`, `check_snippet` and
+/// `fix_paths` as from their CLI twins.
+#[test]
+fn baselines_and_time_inputs_agree() {
+    let baselined = |name: &str| {
+        let root = repo(name, &["python"]);
+        fs::create_dir_all(root.join(".codelaw/baseline")).unwrap();
+        fs::write(
+            root.join(".codelaw/baseline/fixture--py-no-print.toml"),
+            "[[allow]]\nfile = \"pkg/mod.py\"\ncount = 1\nuntil = \"2027-03-31\"\nwarn_from = \"2027-03-01\"\non_touch = \"error\"\n",
+        )
+        .unwrap();
+        root
+    };
+    let root = baselined("baseline");
+    let mut mcp = Mcp::start(&root);
+    for date in ["2026-10-18", "2027-03-19", "2027-04-01"] {
+        let checked = mcp.call("check_paths", json!({ "as_of": date }));
+        assert_eq!(checked, cli(&root, &["check", "--as-of", date, "--format", "json"]), "check_paths as_of {date}");
+        assert!(checked.contains(&format!("\"date\": \"{date}\"")), "{checked}");
+    }
+    // Not a git repository: the change set says so, in both.
+    assert_eq!(
+        mcp.call("check_paths", json!({ "as_of": "2026-10-18", "changed_since": "main", "staged": true })),
+        cli(&root, &["check", "--as-of", "2026-10-18", "--changed-since", "main", "--staged", "--format", "json"]),
+        "check_paths changed_since"
+    );
+    let file = "pkg/mod.py";
+    let code = fs::read_to_string(root.join(file)).unwrap();
+    assert_eq!(
+        mcp.call("check_snippet", json!({ "path": file, "code": code })),
+        cli(&root, &["check", file, "--format", "json"]),
+        "check_snippet with a baseline"
+    );
+    assert_eq!(
+        mcp.call("check_paths", json!({ "as_of": "2027-02-30" })),
+        cli(&root, &["check", "--as-of", "2027-02-30", "--format", "json"]),
+        "a bad date is the same error"
+    );
+    let (by_cli, by_mcp) = (baselined("baseline-cli"), baselined("baseline-mcp"));
+    assert_eq!(
+        Mcp::start(&by_mcp).call("fix_paths", json!({ "as_of": "2026-10-18" })),
+        cli(&by_cli, &["fix", "--as-of", "2026-10-18", "--format", "json"]),
+        "fix_paths as_of"
+    );
+    assert_eq!(
+        fs::read(by_mcp.join(".codelaw/baseline/fixture--py-no-print.toml")).ok(),
+        fs::read(by_cli.join(".codelaw/baseline/fixture--py-no-print.toml")).ok(),
+        "the same baseline left"
+    );
+    for d in [root, by_cli, by_mcp] {
+        let _ = fs::remove_dir_all(d);
+    }
+}
+
 #[test]
 fn mcp_errors_match_the_cli() {
     let root = repo("errors", &["javascript"]);

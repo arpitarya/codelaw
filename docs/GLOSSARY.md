@@ -32,6 +32,8 @@ description: "Recurring terms, defined once."
 | pre-write check | `codelaw hook --pre`: the proposed file checked in memory before it reaches disk; only new violations reported (proposed, W-05) |
 | native rule | a rule whose matcher is implemented in the engine in Rust; its Markdown file still carries docs, fix class and examples (SR-ARCHITECTURE decision 15b) |
 | change set | the files counted as touched: from `--changed-since`, `--staged` or the agent hook, never inferred; SR-BASELINE |
+| ratchet | a baseline may only shrink: `fix` and `baseline prune` lower counts, only `baseline add` raises one, and `baseline check --since` fails CI on any loosening; SR-BASELINE decision 5 |
+| deprecations registry | `.codelaw/deprecations.toml`: deprecated symbols, their replacements and deadlines, read by `graph/no-deprecated-usage`; SR-BASELINE decision 6 |
 | predicate | a semantic-model condition on a capture, written under `where:` in a `match:` rule — `unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`; SR-RULE-FORMAT decision 3a |
 | data table | a JSON file in a pack's `data/` (CSS properties, HTML elements, globals), read once and shared by the rules that name it; SR-RULE-PACKS decision 3 |
 | fixpoint | a file the fixes no longer change: the apply loop runs until it reaches one, at most ten passes; SR-ARCHITECTURE decision 5 |

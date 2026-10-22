@@ -18,6 +18,7 @@ codelaw-rules.workspace = true
 codelaw-match.workspace = true
 codelaw-fix.workspace = true
 codelaw-engine.workspace = true
+codelaw-baseline.workspace = true
 codelaw-graph.workspace = true
 codelaw-report.workspace = true
 codelaw-test.workspace = true

@@ -97,7 +97,10 @@ pub fn run(paths: Vec<PathBuf>, payload: Option<&str>) -> Result<Option<(String,
     let paths = checkable(paths);
     let Some(first) = paths.first() else { return Ok(None) };
     let start = first.parent().map(Path::to_path_buf).filter(|p| !p.as_os_str().is_empty()).unwrap_or_else(|| PathBuf::from("."));
-    let mut project = Project::load(&start, EngineOptions::from_env()).map_err(|e| e.to_string())?;
+    // The files the agent just edited are touched: a grandfathered finding
+    // in one gets the verdict CI would give it (SR-BASELINE decision 8).
+    let options = EngineOptions { touched_paths: paths.clone(), ..EngineOptions::from_env() };
+    let mut project = Project::load(&start, options).map_err(|e| e.to_string())?;
     // `auto` only, written: L4 decision 8. `suggest` goes back as a diff.
     let report = project.fix(&paths, &FixOptions { unsafe_fixes: false, dry_run: false, trace: false }).map_err(|e| e.to_string())?;
     let text = codelaw_report::hook_text(&report.files, &report.check);

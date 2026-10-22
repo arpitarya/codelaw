@@ -177,6 +177,28 @@
       "description": "The baseline (SR-BASELINE). Its keys are validated once the baseline is built.",
       "type": "object"
     },
+    "deprecation": {
+      "x-codelaw-record": "SR-BASELINE",
+      "description": "The policy of a symbol marked deprecated in code (JSDoc `@deprecated`, PEP 702) that `.codelaw/deprecations.toml` does not list (SR-BASELINE decision 6). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "until": {
+          "description": "The deadline, YYYY-MM-DD: after it every use is an error.",
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "warn_from": {
+          "description": "From this date, YYYY-MM-DD, a grandfathered use is a warning.",
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "on_touch": {
+          "description": "What a grandfathered use becomes when its file is touched.",
+          "enum": ["error", "warn", "keep"]
+        }
+      }
+    },
     "adapters": {
       "x-codelaw-record": "SR-LINTER",
       "description": "Optional external linters run by `check` and `fix` (SR-LINTER decision 2). Root config only.",

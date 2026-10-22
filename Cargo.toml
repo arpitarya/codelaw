@@ -23,6 +23,7 @@ codelaw-native = { path = "crates/codelaw-native" }
 codelaw-fix = { path = "crates/codelaw-fix" }
 codelaw-graph = { path = "crates/codelaw-graph" }
 codelaw-adapters = { path = "crates/codelaw-adapters" }
+codelaw-baseline = { path = "crates/codelaw-baseline" }
 codelaw-engine = { path = "crates/codelaw-engine" }
 codelaw-report = { path = "crates/codelaw-report" }
 codelaw-test = { path = "crates/codelaw-test" }

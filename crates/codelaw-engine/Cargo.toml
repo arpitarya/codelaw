@@ -18,6 +18,7 @@ codelaw-fix.workspace = true
 codelaw-format.workspace = true
 codelaw-graph.workspace = true
 codelaw-adapters.workspace = true
+codelaw-baseline.workspace = true
 globset.workspace = true
 ignore.workspace = true
 rayon.workspace = true

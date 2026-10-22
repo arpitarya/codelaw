@@ -7,12 +7,14 @@
 //! nothing here reads the disk, the clock or the network.
 
 pub mod config;
+pub mod deprecated;
 pub mod facts;
 pub mod link;
 pub mod query;
 pub mod resolve;
 
 pub use config::GraphConfig;
+pub use deprecated::{DeprecatedUse, Marked};
 pub use facts::{Decl, DeclKind, FactLang, FileFacts, Span, SpecForm, Specifier, extract};
 pub use link::{Graph, GraphInput, Manifest, Module, Use, is_manifest};
 pub use query::{GraphFinding, GraphRule, Query, compile, refs, run, why_unused};
