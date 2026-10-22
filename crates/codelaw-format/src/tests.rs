@@ -102,3 +102,76 @@ fn every_language_has_an_engine() {
         assert!(!engine(l).is_empty());
     }
 }
+
+/// SR-FORMATTER decision 6: in every engine, `codelaw-format-ignore` and
+/// `prettier-ignore` leave the next node byte-identical, the node after it
+/// is still formatted, and the marker itself is kept as written.
+#[test]
+fn ignore_markers_skip_the_next_node_in_every_engine() {
+    // (language, path, the comment with `{}` for the marker, the ignored node, a node after it, how that one formats)
+    let cases: &[(Language, &str, &str, &str, &str, &str)] = &[
+        (Language::Javascript, "a.js", "// {}\n", "const a   =   [1,2,3];\n", "const b={c:1}\n", "const b = { c: 1 };\n"),
+        (Language::Jsx, "a.jsx", "// {}\n", "const x = <div   a='1'>hi</div>;\n", "const y = <b   c='2'/>\n", "const y = <b c=\"2\" />;\n"),
+        (Language::Typescript, "a.ts", "/* {} */\n", "let t:number   =  1;\n", "let u:number=2\n", "let u: number = 2;\n"),
+        (Language::Tsx, "a.tsx", "// {}\n", "let t:number   =  1;\n", "let u:number=2\n", "let u: number = 2;\n"),
+        (Language::Css, "a.css", "/* {} */\n", "a{color:red}\n", "b{color:blue}\n", "b {\n  color: blue;\n}\n"),
+        (Language::Python, "a.py", "# {}\n", "x = [  1,2,\n  3 ]\n", "y = {  'a':1 }\n", "y = {\"a\": 1}\n"),
+        // pretty_yaml: a marker before a block's first entry keeps the whole block.
+        (Language::Yaml, "a.yaml", "x: 0\n# {}\n", "a:   [1,   2]\n", "b:    1\n", "b: 1\n"),
+        (Language::Toml, "a.toml", "# {}\n", "a  =   [1,2]\n", "b=1\n", "b = 1\n"),
+        (Language::Markdown, "a.md", "<!-- {} -->\n", "| a | b |\n|-|-|\n| 1 | 2 |\n", "\n* x\n", "\n- x\n"),
+        (Language::Html, "a.html", "<!-- {} -->\n", "<div   ><p>hi</p>   </div>\n", "<p   >x</p>\n", "<p>x</p>\n"),
+    ];
+    let mut wrong = Vec::new();
+    for (language, path, form, node, after, after_formatted) in cases {
+        for marker in ["codelaw-format-ignore", "prettier-ignore"] {
+            let comment = form.replace("{}", marker);
+            let input = format!("{comment}{node}{after}");
+            let got = match format(*language, path, &input, &FormatOptions::default()) {
+                Ok(g) => g,
+                Err(e) => {
+                    wrong.push(format!("{path} {marker}: {e}"));
+                    continue;
+                }
+            };
+            if !got.starts_with(&format!("{comment}{node}")) || !got.ends_with(after_formatted) {
+                wrong.push(format!("{path} {marker}:\n--- input\n{input}--- got\n{got}"));
+            }
+        }
+    }
+    assert!(wrong.is_empty(), "{}", wrong.join("\n"));
+}
+
+/// JSON allows comments (decision 2's parser options), and so the markers.
+#[test]
+fn ignore_markers_in_json() {
+    for marker in ["codelaw-format-ignore", "prettier-ignore"] {
+        let input = format!("{{\n  // {marker}\n  \"a\":   [1,2],\n  \"b\":[3,4]\n}}\n");
+        let got = fmt(Language::Json, "a.json", &input);
+        assert!(got.contains(&format!("// {marker}\n  \"a\":   [1,2],")), "{got}");
+        assert!(got.contains("\"b\": [3, 4]"), "{got}");
+    }
+}
+
+/// A marker nested in an ignored node, a marker with nothing after it,
+/// and the engines' own directives next to codelaw's.
+#[test]
+fn ignore_markers_edge_cases() {
+    // Python: a marker before a compound statement keeps all of it; a
+    // marker at the end of a block skips nothing; `# fmt: off` still works.
+    let py = "# codelaw-format-ignore\ndef f( a ):\n    # prettier-ignore\n    return [ a ]\n\n\nx = 1\n# fmt: off\ny  =  2\n# fmt: on\nz  =  3\n";
+    let got = fmt(Language::Python, "a.py", py);
+    assert!(got.starts_with("# codelaw-format-ignore\ndef f( a ):\n    # prettier-ignore\n    return [ a ]\n"), "{got}");
+    assert!(got.contains("y  =  2\n") && got.ends_with("z = 3\n"), "{got}");
+    let tail = "def g():\n    x  =  1\n    # codelaw-format-ignore\ny  =  2\n";
+    assert_eq!(fmt(Language::Python, "a.py", tail), "def g():\n    x = 1\n    # codelaw-format-ignore\n\n\ny = 2\n");
+    // JS: Biome's own directive is untouched beside codelaw's.
+    let js = "// biome-ignore format: mine\nconst a  =  1;\n// codelaw-format-ignore\nconst b  =  2;\nconst c  =  3;\n";
+    assert_eq!(fmt(Language::Javascript, "a.js", js), "// biome-ignore format: mine\nconst a  =  1;\n// codelaw-format-ignore\nconst b  =  2;\nconst c = 3;\n");
+    // TOML: a marker inside an array keeps one element.
+    let toml = "a = [\n  # prettier-ignore\n  {x=1},\n  {y=2},\n]\n";
+    let got = fmt(Language::Toml, "a.toml", toml);
+    assert!(got.contains("{x=1}") && got.contains("{ y = 2 }"), "{got}");
+    // A marker in a string is not a marker.
+    assert_eq!(fmt(Language::Javascript, "a.js", "const s='// prettier-ignore'\n"), "const s = \"// prettier-ignore\";\n");
+}

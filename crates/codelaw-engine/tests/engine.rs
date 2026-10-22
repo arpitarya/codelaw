@@ -103,6 +103,30 @@ fn local_rule_check_and_fix() {
     assert!(report.files.is_empty());
 }
 
+/// SR-FORMATTER decision 5: `.editorconfig` is the base layer, the
+/// nearest file and section win, and a key `codelaw.toml` sets wins over it.
+#[test]
+fn editorconfig_is_the_base_layer_under_format() {
+    let r = Repo::new("editorconfig");
+    r.file("codelaw.toml", "[format]\nline_width = 30\n")
+        .file(".editorconfig", "root = true\n[*]\nindent_style = space\nindent_size = 4\nmax_line_length = 120\nend_of_line = crlf\n[*.py]\nindent_size = 2\n")
+        .file("sub/.editorconfig", "[*.js]\nindent_style = tab\n")
+        .file("a.js", "if (a) { b(1) }\n")
+        .file("sub/b.js", "if (a) { b(1) }\n")
+        .file("c.py", "if a:\n    b(1)\n");
+    let p = r.project().unwrap();
+    let a = p.formatting.options_for(&r.0.join("a.js"));
+    assert_eq!((a.indent_width, a.line_width, a.end_of_line), (4, 30, Some(codelaw_format::EndOfLine::Crlf)));
+    assert_eq!(p.formatting.options_for(&r.0.join("sub/b.js")).indent_style, codelaw_format::IndentStyle::Tab);
+    assert_eq!(p.formatting.options_for(&r.0.join("c.py")).python_indent_width, 2);
+    assert_eq!(p.format_source("a.js", Language::Javascript, "if (a) { b(1) }\n").unwrap(), "if (a) {\r\n    b(1);\r\n}\r\n");
+    assert_eq!(p.format_source("sub/b.js", Language::Javascript, "if (a) { b(1) }\n").unwrap(), "if (a) {\r\n\tb(1);\r\n}\r\n");
+    assert_eq!(p.format_source("c.py", Language::Python, "if a:\n    b(1)\n").unwrap(), "if a:\r\n  b(1)\r\n");
+    // `codelaw format` writes what `format_source` gives.
+    r.project().unwrap().format(&[], &Default::default()).unwrap();
+    assert_eq!(r.read("sub/b.js"), "if (a) {\r\n\tb(1);\r\n}\r\n");
+}
+
 #[test]
 fn dry_run_writes_nothing() {
     let r = Repo::new("dry");

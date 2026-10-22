@@ -16,7 +16,8 @@ use codelaw_cache::Key;
 use codelaw_config::{Config, RuleConfig};
 use codelaw_core::{FixClass, Language};
 use codelaw_engine::{EngineOptions, Project};
-use codelaw_rules::{LoadedRule, RuleSet, Scope, Snippet};
+use codelaw_format::FormatOptions;
+use codelaw_rules::{LanguageExamples, LoadedRule, RuleSet, Scope, Snippet};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -246,6 +247,42 @@ impl<'a> Tester<'a> {
                 if !hits.is_empty() {
                     self.fail(Level::Examples, at, format!("fires at {}", hits.join(", ")));
                 }
+            }
+            self.layout_only(ex);
+        }
+    }
+
+    /// A snippet as the formatter lays it out with the defaults, one text
+    /// per file; `None` when a file does not format (it does not parse).
+    fn formatted(language: Language, snippet: &Snippet) -> Option<Vec<String>> {
+        split_files(language, &snippet.code)
+            .into_iter()
+            .map(|f| {
+                let path = if f.header.is_some() { f.path.clone() } else { Self::path(f.language, snippet) };
+                codelaw_format::format(f.language, &path, &f.text, &FormatOptions::default()).ok()
+            })
+            .collect()
+    }
+
+    /// SR-FORMATTER decision 3: a `Don't` that formats to the same text as
+    /// a `Do` (or `Fixed`) differs from it only in layout, so the rule is a
+    /// layout rule, and layout belongs to the formatter.
+    fn layout_only(&mut self, ex: &LanguageExamples) {
+        let l = ex.language;
+        let targets: Vec<(&str, &Snippet, Option<Vec<String>>)> =
+            ex.dos.iter().map(|s| ("Do", s)).chain(ex.fixed.iter().map(|s| ("Fixed", s))).map(|(k, s)| (k, s, Self::formatted(l, s))).collect();
+        for dont in &ex.donts {
+            self.report.checks += 1;
+            let Some(d) = Self::formatted(l, dont) else { continue };
+            if let Some((kind, s, _)) = targets.iter().find(|(_, s, t)| t.as_ref() == Some(&d) && s.code != dont.code) {
+                self.fail(
+                    Level::Examples,
+                    format!("{} Don't (line {})", l.display(), dont.line),
+                    format!(
+                        "a layout rule: formatted, it is identical to the {kind} (line {}), so the two differ only in layout, and layout belongs to the formatter (SR-FORMATTER decision 3)",
+                        s.line
+                    ),
+                );
             }
         }
     }

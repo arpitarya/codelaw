@@ -7,20 +7,31 @@ use crate::fix::{WriteError, safe_write};
 use crate::lint::{FileResult, RunMode, lint_text, meta_diagnostic};
 use crate::{CheckReport, EngineError, Project};
 use codelaw_core::{Diagnostic, LineIndex, TextEdit};
+use codelaw_format::editorconfig::{EditorConfig, Properties};
 use codelaw_format::{FormatError, FormatOptions};
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use rayon::prelude::*;
-use std::collections::BTreeSet;
-use std::path::PathBuf;
+use std::collections::{BTreeSet, HashMap};
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
 
 pub const UNFORMATTED: &str = "format/unformatted";
 pub const FAILED: &str = "format/failed";
 
+/// Each folder's `.editorconfig`, read once (`None`: the folder has none).
+type EditorConfigs = Arc<Mutex<HashMap<PathBuf, Option<Arc<EditorConfig>>>>>;
+
 /// The `[format]` settings of a project.
 #[derive(Clone, Debug)]
 pub struct Formatting {
+    /// `[format]` over the defaults, before any `.editorconfig`.
     pub options: FormatOptions,
+    /// The keys `[format]` sets, which `.editorconfig` does not change.
+    set: BTreeSet<String>,
     exclude: GlobSet,
+    /// `false` for a project with no folder on disk (the rule tester's).
+    read_editorconfig: bool,
+    editorconfigs: EditorConfigs,
 }
 
 impl Formatting {
@@ -35,7 +46,48 @@ impl Formatting {
             b.add(Glob::new(g).map_err(|e| err(format!("[format] exclude: invalid glob `{g}`: {e}")))?);
         }
         let exclude = b.build().map_err(|e| err(format!("[format] exclude: {e}")))?;
-        Ok(Formatting { options, exclude })
+        Ok(Formatting {
+            options,
+            set: FormatOptions::set_keys(table),
+            exclude,
+            read_editorconfig: config.root_dir.is_dir(),
+            editorconfigs: EditorConfigs::default(),
+        })
+    }
+
+    /// The `.editorconfig` of one folder, read and parsed once per run.
+    fn editorconfig(&self, dir: &Path) -> Option<Arc<EditorConfig>> {
+        let mut cache = self.editorconfigs.lock().unwrap_or_else(|e| e.into_inner());
+        cache
+            .entry(dir.to_path_buf())
+            .or_insert_with(|| std::fs::read_to_string(dir.join(".editorconfig")).ok().map(|t| Arc::new(EditorConfig::parse(&t))))
+            .clone()
+    }
+
+    /// The options for one file (SR-FORMATTER decision 5): `.editorconfig`
+    /// as the base layer (the file's folder and each one above it, up to
+    /// one with `root = true`), and `[format]` over it.
+    pub fn options_for(&self, abs: &Path) -> FormatOptions {
+        if !self.read_editorconfig {
+            return self.options.clone();
+        }
+        let mut chain = Vec::new();
+        for dir in abs.ancestors().skip(1) {
+            if let Some(ec) = self.editorconfig(dir) {
+                let root = ec.root;
+                chain.push((dir, ec));
+                if root {
+                    break;
+                }
+            }
+        }
+        let mut props = Properties::default();
+        for (dir, ec) in chain.iter().rev() {
+            if let Ok(rel) = abs.strip_prefix(dir) {
+                ec.apply_to(&codelaw_core::normalize_path(rel), &mut props);
+            }
+        }
+        if props.is_empty() { self.options.clone() } else { props.apply(&self.options, &self.set) }
     }
 }
 
@@ -148,9 +200,10 @@ fn rules_firing(project: &Project, entry: &FileEntry, text: &str) -> BTreeSet<St
 /// Format with the engine's own checks, then the lint check of decision 4:
 /// no rule fires on the result that did not fire before.
 pub(crate) fn verified(project: &Project, entry: &FileEntry, text: &str) -> Result<String, FormatError> {
+    let options = project.formatting.options_for(&entry.abs);
     let out = {
         let _timed = project.timings.as_ref().map(|t| t.guard(crate::timings::Phase::Format));
-        codelaw_format::format(entry.language, &entry.rel, text, &project.formatting.options)?
+        codelaw_format::format(entry.language, &entry.rel, text, &options)?
     };
     if out != text && project.rules.has_rules() {
         let before = rules_firing(project, entry, text);

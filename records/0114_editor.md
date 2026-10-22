@@ -66,7 +66,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - **The same findings as `check`:** an editor's unsaved text gets `format/unformatted` as `check` gives it for the file on disk.
    - **Hover:** on a diagnostic.
    - **Workspace diagnostics:** for project rules.
-   - **Watched files:** config, rules and baseline changes reload live.
+   - **Watched files:** config, rules and baseline changes reload live; so does a saved `.editorconfig`, the base layer of the format options ([SR-FORMATTER](0105_formatter.md) decision 5).
 2. **Incremental.**
    - An edit re-parses incrementally and re-runs that file's rules.
    - Project rules (the graph) re-run on save, or after 300 ms idle.

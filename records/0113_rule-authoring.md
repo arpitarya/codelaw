@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-test
   - crates/codelaw-cli/tests/promotion.rs
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -83,7 +83,7 @@ The decider asked that rules can be written manually or by an AI agent with a sk
 
    | Level | Source | Checks |
    |---|---|---|
-   | examples | the rule's `## Examples` | Don't fires · Do passes · fix(Don't) = Do (or Fixed) · fixpoint, for each language |
+   | examples | the rule's `## Examples` | Don't fires · Do passes · fix(Don't) = Do (or Fixed) · fixpoint, for each language · format(Don't) ≠ format(Do) and format(Fixed): a Don't that the formatter (default options) lays out identically to a Do or Fixed makes the rule a layout rule, refused ([SR-FORMATTER](0105_formatter.md) decision 3) |
    | cases | `<name>.cases.md` | exact diagnostics (`line:col rule`) and exact fixed output, per case |
    | invariants | frontmatter `invariant:` plus the built-ins | still parses · only the fix's range changed · deterministic · isolated across languages · rule-specific (e.g. `exports-unchanged`) |
    | corpus | `codelaw test --corpus` (codelaw's CI) | real pinned repos: invariants hold, finding counts are snapshotted, and the repo still builds and passes its own tests after fixes |
@@ -121,6 +121,6 @@ The decider asked that rules can be written manually or by an AI agent with a sk
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-RULE-FORMAT](0112_rule-format.md)
+**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-FORMATTER](0105_formatter.md) · [SR-RULE-FORMAT](0112_rule-format.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)
