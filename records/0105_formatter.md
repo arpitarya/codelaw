@@ -78,7 +78,10 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 3. **Layout belongs to the formatter, and the rule loader enforces it.** A lint rule whose fix only changes layout is refused. `codelaw test` checks this deterministically: if `format(Don't) == format(Do)`, the rule is a layout rule and fails. This is the formatter-versus-linter fight that ESLint's stylistic rules caused, ruled out by construction.
    - **How:** for every language's examples, each `Don't` is formatted with the default options and compared with each `Do` and `Fixed`, formatted the same way, file by file for a multi-file snippet. Equal texts fail the `Don't` at the examples level with a message naming this decision ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 4). A snippet the formatter cannot format is not compared.
-   - **Measured on the five packs, 2026-10-22:** two rules fail it. `js/no-irregular-whitespace` is a layout rule: Biome turns the no-break space of its `Don't` into a space. `css/media-query-no-invalid` is not: Biome rewrites `@media not(` to `@media not (`, which turns an invalid query into a valid one, so here the formatter changes meaning. Both wait on the decider (`W-23`).
+   - **Measured on the five packs, 2026-10-22:** two rules failed it; the decider ruled both the same day (`W-23`).
+     - `js/no-irregular-whitespace` was half a layout rule: Biome turns a no-break space between tokens into a space. It is narrowed to where the formatter leaves the character — templates, regular expressions, JSX text and comments — with a `suggest` fix that escapes it.
+     - `css/media-query-no-invalid` is not a layout rule: Biome rewrites `@media not(` to `@media not (`, which turns an invalid query into a valid one, so there the formatter changes meaning. Its `Don't` is now a mixed `and`/`or` query the formatter leaves alone, and `not(` is a case in its `.cases.md`; the meaning change is B-045.
+     - All five packs pass.
 
 4. **Order of operations:**
    1. Parse.
@@ -151,7 +154,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 ### What is built
 
-Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`; decision 5's `.editorconfig` layer and `--import-config`; decision 6's markers in every engine; decision 8's LSP range formatting. The agent hook is `W-10`'s; nothing else in this record is missing.
+Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`, with every pack passing it; decision 5's `.editorconfig` layer and `--import-config`; decision 6's markers in every engine; decision 8's LSP range formatting. The agent hook is `W-10`'s; nothing else in this record is missing.
 
 ### Consequences
 

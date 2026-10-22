@@ -27,12 +27,12 @@ The first working engine and rule packs, built from source. Nothing has been pub
 - **Output formats:** `text`, `json` and `agent`.
 - **Rules as Markdown files:** front matter, a `codelaw` matcher and fix block, and `Do` / `Don't` examples that double as tests.
 - **Fix classes:** `auto`, `suggest` and `manual`. Fixes run in passes until nothing more changes, and a fix that would add a syntax error is rolled back.
-- **Five rule packs, 401 rules, all `preview`:**
-  - `js`: 132 rules, from ESLint, typescript-eslint, eslint-plugin-react, react-hooks, eslint-plugin-n and @stencil/eslint-plugin.
-  - `python`: 98 rules, from Ruff's defaults, flake8-bugbear, isort and `RUF022`.
-  - `html`: 71 rules, from html-validate.
-  - `css`: 70 rules, from stylelint's recommended and standard configs.
-  - `data`: 30 rules, JSON/YAML/TOML correctness and markdownlint.
+- **Five rule packs, 419 rules, all `preview`:**
+  - `js`: 140 rules, from ESLint, typescript-eslint, eslint-plugin-react, react-hooks, eslint-plugin-n and @stencil/eslint-plugin.
+  - `python`: 99 rules, from Ruff's defaults, flake8-bugbear, isort and `RUF022`.
+  - `html`: 72 rules, from html-validate.
+  - `css`: 71 rules, from stylelint's recommended and standard configs.
+  - `data`: 37 rules, JSON/YAML/TOML correctness and markdownlint.
 - **Configuration:** `codelaw.toml`, `[tool.codelaw]` in `pyproject.toml`, or `"codelaw"` in `package.json`, with strict validation, `[rules]` and `[[overrides]]`.
 - **Local rules** in `.codelaw/rules/`, picked up with no build step.
 

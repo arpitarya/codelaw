@@ -6,7 +6,7 @@ item: W-23
 filed: 2026-10-21
 filed_by: "Arpit (Claude Code, Opus 5.5)"
 updated: 2026-10-22
-updated_by: "Arpit (Claude Code, Opus 5.5)"
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
@@ -34,7 +34,7 @@ Every decision of SR-FORMATTER is built, and its "What is built" section lists n
 
 | DoD | what | state |
 |---|---|---|
-| 1 · layout rules | A rule test with `format(Don't) == format(Do)` fails, with a message naming decision 3; the five packs still pass. | 🟡 the refusal is built and tested; the python, data and html packs pass, but `js/no-irregular-whitespace` and `css/media-query-no-invalid` fail it and wait on the decider (SR-FORMATTER decision 3) |
+| 1 · layout rules | A rule test with `format(Don't) == format(Do)` fails, with a message naming decision 3; the five packs still pass. | ✅ 2026-10-22 — the decider ruled the two failing rules: `js/no-irregular-whitespace` narrowed to templates, regexes, JSX text and comments (`suggest`, escapes); `css/media-query-no-invalid`'s `Don't` rewritten, `not(` moved to a case (B-045). All five packs pass. |
 | 2 · editorconfig | `indent_style`, `indent_size`, `end_of_line`, `max_line_length` from `.editorconfig` apply; `codelaw.toml` wins. Tested. | ✅ 2026-10-22 |
 | 3 · import | `--import-config` writes the `[format]` keys once; a round-trip test per source format. | ✅ 2026-10-22 — `import_config_round_trips_each_source` (`.prettierrc` JSON, `.prettierrc.yaml`, `.prettierrc.toml`, `package.json`, Ruff, Black) |
 | 4 · markers | Per engine, a test where `codelaw-format-ignore` and `prettier-ignore` leave the next node byte-identical. | ✅ 2026-10-22 |

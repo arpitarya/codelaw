@@ -1,18 +1,19 @@
 ---
 id: js/no-irregular-whitespace
-title: "No irregular whitespace outside strings"
+title: "No irregular whitespace in templates, regular expressions, JSX text or comments"
 languages: [javascript, jsx, typescript, tsx]
-fix: auto
+fix: suggest
+fix_reason: "the escape keeps a template's cooked value but changes the raw string a tagged template such as `String.raw` sees"
 stability: preview
 ported_from: [eslint/no-irregular-whitespace]
 since: 0.1.0
 ---
 
-Code contains only ordinary spaces, tabs and line breaks as whitespace; no-break spaces, zero-width
-spaces and the like appear only inside strings.
+Templates, regular expressions and JSX text spell a no-break space, zero-width space or other
+irregular whitespace as an escape (`\u00A0`, `&#x00A0;`), and comments use ordinary spaces.
 
-**Why:** Irregular whitespace is invisible in most editors and breaks tokens in ways that are hard
-to find.
+**Why:** Irregular whitespace is invisible in most editors. In a template, regular expression or JSX
+text it silently becomes part of the value, so the text looks right and compares wrong.
 
 ```codelaw
 native: js/no-irregular-whitespace
@@ -25,13 +26,13 @@ native: js/no-irregular-whitespace
 #### Don't
 
 ```js
-const total = 1;
+const label = `Total: 1`;
 ```
 
 #### Do
 
 ```js
-const total = 1;
+const label = `Total:\u00A01`;
 ```
 
 ### JSX
@@ -39,13 +40,13 @@ const total = 1;
 #### Don't
 
 ```jsx
-const total = 1;
+const label = <p>Total: 1</p>;
 ```
 
 #### Do
 
 ```jsx
-const total = 1;
+const label = <p>Total:&#x00A0;1</p>;
 ```
 
 ### TypeScript
@@ -53,13 +54,13 @@ const total = 1;
 #### Don't
 
 ```ts
-const total = 1;
+const label = `Total: 1`;
 ```
 
 #### Do
 
 ```ts
-const total = 1;
+const label = `Total:\u00A01`;
 ```
 
 ### TSX
@@ -67,16 +68,20 @@ const total = 1;
 #### Don't
 
 ```tsx
-const total = 1;
+const label = <p>Total: 1</p>;
 ```
 
 #### Do
 
 ```tsx
-const total = 1;
+const label = <p>Total:&#x00A0;1</p>;
 ```
 
 ## Differences from the source
 
-Inside templates, regular expressions and JSX text the character is part of a value, so it is
-reported but not rewritten.
+- **Between tokens the formatter owns it.** ESLint also reports irregular whitespace between tokens;
+  here that is layout, and `codelaw format` replaces it with a space (SR-FORMATTER decision 3), so
+  this rule does not report it.
+- **Strings are skipped**, as ESLint's `skipStrings` default does.
+- **The fix escapes, it doesn't delete:** `\uXXXX` in a template or regular expression, `&#xXXXX;`
+  in JSX text, so the value is unchanged; a comment gets an ordinary space.

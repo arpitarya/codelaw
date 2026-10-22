@@ -30,7 +30,7 @@ native: css/media-query-no-invalid
 #### Don't
 
 ```css
-@media not(min-width: 600px) {
+@media (color) and (hover) or (width >= 600px) {
   a {
     color: red;
   }
@@ -40,7 +40,7 @@ native: css/media-query-no-invalid
 #### Do
 
 ```css
-@media not (min-width: 600px) {
+@media (color) and ((hover) or (width >= 600px)) {
   a {
     color: red;
   }

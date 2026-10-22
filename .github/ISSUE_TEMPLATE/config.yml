@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/arpitarya/codelaw/security/advisories/new
+    about: Please report it privately, never in a public issue. See SECURITY.md.
+  - name: How to write or contribute a rule
+    url: https://github.com/arpitarya/codelaw/blob/main/CONTRIBUTING.md
+    about: The contribution guide, with the rule format and the test loop.

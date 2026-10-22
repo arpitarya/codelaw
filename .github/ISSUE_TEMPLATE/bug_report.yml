@@ -1,0 +1,60 @@
+name: Bug report
+description: A crash, a hang, a wrong exit code, or a fix that breaks a file.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A wrong or noisy finding is a [false positive](https://github.com/arpitarya/codelaw/issues/new?template=false_positive.yml) instead. A security issue goes through [SECURITY.md](https://github.com/arpitarya/codelaw/blob/main/SECURITY.md), never a public issue.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The output of `codelaw --version`.
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How you installed it
+      options:
+        - npm (`npx codelaw` / `npm i codelaw`)
+        - PyPI (`uvx codelaw` / `pip install codelaw`)
+        - Built from source
+        - The VS Code extension
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and architecture
+      placeholder: macOS 15, arm64
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: The command you ran
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: The file, or the smallest part of it that reproduces the problem
+      render: text
+  - type: textarea
+    id: output
+    attributes:
+      label: What happened
+      description: The full output. Run it again with `CODELAW_LOG=debug` if you can.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true

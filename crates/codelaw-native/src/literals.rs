@@ -128,25 +128,46 @@ impl NativeRule for NoIrregularWhitespace {
         &["program"]
     }
     fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
-        // Strings are skipped; in a template, regex or JSX text the character
-        // is part of a value, so it is reported but not rewritten.
-        let mut skip = Vec::new();
-        let mut keep = Vec::new();
+        // Whitespace between tokens is layout and the formatter's (SR-FORMATTER
+        // decision 3). This rule reports the character where the formatter
+        // leaves it: in a template, a regex, JSX text or a comment. A string is
+        // left alone; code inside `${…}` is code again. The innermost of these
+        // nodes around a character decides.
+        let mut spans: Vec<(std::ops::Range<usize>, &'static str)> = Vec::new();
         for n in node.dfs() {
-            let r = n.range();
-            match n.kind().as_ref() {
-                "string" => skip.push(r),
-                "template_string" | "regex" | "jsx_text" => keep.push(r),
-                _ => {}
-            }
+            let kind = match n.kind().as_ref() {
+                "string" => "string",
+                "template_string" => "template",
+                "template_substitution" => "code",
+                "regex" => "regex",
+                "jsx_text" => "jsx",
+                "comment" => "comment",
+                _ => continue,
+            };
+            spans.push((n.range(), kind));
         }
-        for (i, c) in ctx.source.char_indices() {
-            if !IRREGULAR.contains(&c) || skip.iter().any(|r| r.contains(&i)) {
+        let src = ctx.source;
+        for (i, c) in src.char_indices() {
+            if !IRREGULAR.contains(&c) {
                 continue;
             }
+            let Some(kind) = spans.iter().filter(|(r, _)| r.contains(&i)).min_by_key(|(r, _)| r.len()).map(|(_, k)| *k) else {
+                continue;
+            };
             let end = i + c.len_utf8();
-            let edits = if keep.iter().any(|r| r.contains(&i)) { Vec::new() } else { vec![TextEdit::new(i, end, " ")] };
-            out.push(finding(i, end, format!("Irregular whitespace U+{:04X}", c as u32), edits));
+            let code = c as u32;
+            let edit = match kind {
+                // An escape keeps the value; an identity escape `\<c>` becomes the escape.
+                "template" | "regex" => {
+                    let slashes = src[..i].bytes().rev().take_while(|b| *b == b'\\').count();
+                    let start = if slashes % 2 == 1 { i - 1 } else { i };
+                    TextEdit::new(start, end, format!("\\u{code:04X}"))
+                }
+                "jsx" => TextEdit::new(i, end, format!("&#x{code:04X};")),
+                "comment" => TextEdit::new(i, end, " "),
+                _ => continue,
+            };
+            out.push(finding(i, end, format!("Irregular whitespace U+{code:04X}"), vec![edit]));
         }
     }
 }
@@ -339,8 +360,15 @@ mod tests {
     #[test]
     fn sparse_whitespace_multiline() {
         assert_eq!(found(&NoSparseArrays, "a = [1,, 2]; b = [, 1]; c = [1, 2,];"), ["[1,, 2]", "[, 1]"]);
-        let src = "let\u{00A0}x = 1; const s = \"a\u{00A0}b\";";
-        assert_eq!(crate::run(&NoIrregularWhitespace, Language::Javascript, src).len(), 1);
+        // Between tokens (the formatter's), in a string and in `${…}`: not reported.
+        let src = "let\u{00A0}x = 1; const s = \"a\u{00A0}b\"; t = `${\u{00A0}x}`;";
+        assert!(crate::run(&NoIrregularWhitespace, Language::Javascript, src).is_empty());
+        let r = crate::run(&NoIrregularWhitespace, Language::Javascript, "t = `a\u{00A0}b`; r = /a\\\u{00A0}b/; // x\u{00A0}y\n");
+        let edits: Vec<&str> = r.iter().map(|d| d.edits[0].text.as_str()).collect();
+        assert_eq!(edits, ["\\u00A0", "\\u00A0", " "]);
+        assert_eq!(r[1].edits[0].start + 1, r[1].start, "the identity escape's backslash is replaced too");
+        let r = crate::run(&NoIrregularWhitespace, Language::Jsx, "x = <p>a\u{00A0}b</p>;");
+        assert_eq!(r[0].edits[0].text, "&#x00A0;");
         assert_eq!(found(&NoUnexpectedMultiline, "let a = b\n(c || d).go();\nlet e = f\n[1, 2].map(g);\nlet ok = h(\n  1);\n"), ["(", "["]);
         assert!(crate::run(&NoUnexpectedMultiline, Language::Typescript, "check<{\n  a: string;\n}>();\n").is_empty());
     }
