@@ -7,9 +7,11 @@ description: "codelaw ships a catalogue of Agent Skills plus always-on and path-
 status: accepted
 date: 2026-10-18
 feature: "the agent-facing files and skills"
-owns: []
+owns:
+  - crates/codelaw-agents
+  - agents
 laws: [L0, L3, L4, L5, L6]
-timestamp: 2026-10-18T16:45:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
