@@ -156,6 +156,7 @@ directions.
 |---|---|---|
 | `scripts/sr-guard.sh` | SR-WORK-OWNERSHIP | the guard is the executable form of decisions 3 and 6 |
 | `scripts/check-open-work-inbox.py` | SR-WORK-OPEN-QUEUE | rule 45a's check |
+| `scripts/check-work-system.py` | SR-WORK-OPEN-QUEUE | the row, inbox and lost-id checks; it also runs the ownership, registry and archive checks |
 | `scripts/build-packs.py` | SR-PACKAGES | decision 9: the pack tarballs and wheels, built from `packs/` |
 | `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | rule 45a, in-session |
 | `.claude/hooks/inject-inbox.sh` | SR-WORK-BLOCKERS | decision 7 |
@@ -215,5 +216,8 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 | `crates/codelaw-rules` | SR-RULE-PACKS | pack layout, resolution, presets and precedence (decisions 3–5, 10–14) are the loader's |
 | `crates/codelaw-cli/src/init.rs` | SR-RULE-PACKS | decision 6 is what `codelaw init` does |
 | `crates/codelaw-engine/src/suppress.rs` | SR-LINTER | decision 6: the suppression syntax and what it covers |
+| `scripts/check-work-system.py` | SR-WORK-OWNERSHIP | decision 2: its `owns:` ↔ Ownership-table check |
+| `scripts/check-work-system.py` | SR-WORK-REGISTRY | decisions 5–8: its registry check |
+| `scripts/check-work-system.py` | SR-WORK-ARCHIVE | decision 1: its one-`archive/` check |
 
 <!-- DESCRIBES-TABLE-END -->

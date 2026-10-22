@@ -72,8 +72,10 @@ session cite it as current. One frozen tree with a map solves both.
 
 ### Consequences
 
-- Nothing mechanical enforces this record. A second `archive/` directory is
-  caught by nobody — backlog row W-20.
+- Decision 1 is checked in CI (job `lint`) by `scripts/check-work-system.py`:
+  a directory named `archive` anywhere but the root fails it (`.git/`,
+  `target/`, `node_modules/` and worktrees aside). Nothing mechanical enforces
+  the rest of this record.
 - A citation to an archived document is judgment until a link test exists.
 
 ### Alternatives considered
