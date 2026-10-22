@@ -52,7 +52,7 @@ reader, and the rule files, messages and docs are written fresh. Each rule's
 | `css/color-function-notation` | values with `var()` inside the function are skipped |
 | `css/declaration-block-no-redundant-longhand-properties` | reported without a fix |
 | `css/media-feature-name-no-vendor-prefix` | reported without a fix; the advice is `resolution` with `dppx` |
-| `css/media-feature-range-notation` | reported without a fix: tree-sitter-css cannot parse the range syntax, so the engine's syntax guard refuses the rewrite |
+| `css/media-feature-range-notation` | the fix does not merge a `min-` and `max-` pair into one range |
 
 Rules whose data stylelint takes from CSSTree (whose syntax data derives from
 MDN data, CC0-1.0, which is not an OSI licence) use the tables listed under
@@ -121,7 +121,7 @@ MDN data, CC0-1.0, which is not an OSI licence) use the tables listed under
 | `css/length-zero-no-unit` | `length-zero-no-unit` | standard | auto |
 | `css/lightness-notation` | `lightness-notation` | standard | auto |
 | `css/media-feature-name-no-vendor-prefix` | `media-feature-name-no-vendor-prefix` | standard | manual |
-| `css/media-feature-range-notation` | `media-feature-range-notation` | standard | manual |
+| `css/media-feature-range-notation` | `media-feature-range-notation` | standard | auto |
 | `css/number-max-precision` | `number-max-precision` | standard | suggest |
 | `css/property-no-vendor-prefix` | `property-no-vendor-prefix` | standard | suggest |
 | `css/selector-class-pattern` | `selector-class-pattern` | standard | manual |

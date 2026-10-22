@@ -10,7 +10,7 @@ feature: the licence and cost of every dependency
 owns:
   - crates/codelaw-cli/tests/licences.rs
 laws: [L0, L2]
-timestamp: 2026-10-22T06:25:00Z
+timestamp: 2026-10-22T20:00:00Z
 content_sha: ""
 ---
 
@@ -118,6 +118,14 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
   no dependencies), is declared in `licences.rs`'s `BUILD_TOOLS`. A third-party
   local registry (Verdaccio and the like) would bring a transitive npm tree that
   decision 4 makes in scope.
+- **The CSS grammar fork** (W-21, 2026-10-22) is third-party code vendored
+  into the repo, so decision 4 covers it: `tree-sitter-css` 0.25.0, MIT, kept
+  with its upstream `LICENSE` in `crates/codelaw-lang/grammars/tree-sitter-css`
+  ([SR-ARCHITECTURE](0108_architecture.md) decision 3). `licences.rs` sees it
+  as a path crate declaring `MIT`. The tree-sitter CLI that regenerates it
+  (`tree-sitter-cli` 0.25.10, MIT) is a manual step no build, CI or release
+  runs, so it is not in `BUILD_TOOLS`; if a script or workflow ever runs it,
+  it is declared there.
 - Weak copyleft (MPL, EPL) is refused too, so some ecosystem crates are
   unavailable; the answer is a permissive alternative or building it.
 - The parsing stack named in `docs/DESIGN.md` — tree-sitter and
@@ -157,7 +165,7 @@ not both OSI-approved and permissive.
 *Every source this record cites, gathered in one place. An archived document
 is never listed here.*
 
-**Records** — [SR-LAWS](0001_LAWS.md) · [SR-LAW-0](0002_LAW-0-authority.md)
+**Records** — [SR-LAWS](0001_LAWS.md) · [SR-LAW-0](0002_LAW-0-authority.md) · [SR-ARCHITECTURE](0108_architecture.md)
 
 **Project docs**
 

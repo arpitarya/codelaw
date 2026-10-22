@@ -75,8 +75,12 @@ toml = "1.1"
 
 # L2: Biome reaches the MPL-2.0 `option-ext` through `directories`; this MIT
 # stand-in replaces it (SR-FORMATTER decision 2).
+# tree-sitter-css: codelaw's in-tree fork of 0.25.0 (MIT), which reads range
+# media features, `layer` in `@import` and fractional keyframe percentages;
+# dropped once upstream releases the same (SR-ARCHITECTURE decision 3).
 [patch.crates-io]
 option-ext = { path = "crates/codelaw-format/shims/option-ext" }
+tree-sitter-css = { path = "crates/codelaw-lang/grammars/tree-sitter-css" }
 
 [profile.release]
 lto = "thin"

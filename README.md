@@ -183,16 +183,16 @@ Five first-party packs. Each one ships under the same name on both registries: `
 - **Reimplemented, not wrapped.** Each rule is written fresh in codelaw's format, and its `ported_from:` field names the original. You don't need ESLint, Ruff or stylelint installed.
 - **Differences are written down.** Each pack's README lists where a port behaves differently from the original, and which rules weren't ported and why.
 - **Layout rules are left out on purpose.** Indentation, spacing and quotes are the formatter's job (`codelaw format`).
-- **3,937 example checks, all green.** `codelaw test packs/<pack>` runs them.
+- **3,949 example checks, all green.** `codelaw test packs/<pack>` runs them.
 - **`*/conventions` presets are opt-in**: house-style rules such as `js/exports-at-end` and `py/no-print`.
 
 ### Fix classes across all 419 rules
 
 | class | rules | what happens |
 |---|---|---|
-| `auto` | 66 | `codelaw fix` applies it. It's safe and meaning-preserving. |
+| `auto` | 67 | `codelaw fix` applies it. It's safe and meaning-preserving. |
 | `suggest` | 69 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
-| `manual` | 284 | The finding lists numbered steps, for a person or an agent to follow. |
+| `manual` | 283 | The finding lists numbered steps, for a person or an agent to follow. |
 
 ---
 

@@ -1,9 +1,11 @@
 //! The grammars of the L3 languages, behind one ast-grep `Language` type.
 //!
 //! Eight grammars come through `ast-grep-language`; TOML is registered here
-//! as a custom language (SR-LINTER decision 1). Every grammar is pinned in
-//! `Cargo.lock`, and [`GRAMMARS_FINGERPRINT`] joins every cache key
-//! (SR-ARCHITECTURE decision 3).
+//! as a custom language (SR-LINTER decision 1). CSS is codelaw's in-tree
+//! fork of `tree-sitter-css` (`grammars/tree-sitter-css`), patched in by the
+//! workspace manifest. Every grammar is pinned in `Cargo.lock`, and
+//! [`GRAMMARS_FINGERPRINT`] joins every cache key (SR-ARCHITECTURE
+//! decision 3).
 
 mod grammar;
 mod regions;
@@ -22,7 +24,9 @@ pub type Root = AstGrep<StrDoc<Grammar>>;
 pub type SyntaxNode<'r> = Node<'r, StrDoc<Grammar>>;
 
 /// Names every grammar and its pinned version; part of every cache key.
-pub const GRAMMARS_FINGERPRINT: &str = "ast-grep-language=0.51.0;tree-sitter=0.27.0;tree-sitter-toml-ng=0.7.0;tree-sitter-md=0.5.3";
+/// The CSS fork's version carries `+codelaw.N`, bumped with every change to
+/// its `grammar.js`, so a grammar change invalidates cached results.
+pub const GRAMMARS_FINGERPRINT: &str = "ast-grep-language=0.51.0;tree-sitter=0.27.0;tree-sitter-toml-ng=0.7.0;tree-sitter-md=0.5.3;tree-sitter-css=0.25.0+codelaw.1";
 
 /// Parse source text with the grammar for `language`.
 pub fn parse(language: Language, source: &str) -> Root {
@@ -103,6 +107,38 @@ mod tests {
             let root = parse(lang, src);
             assert_eq!(syntax_error_count(&root), 0, "{lang} failed to parse: {}", root.root().get_inner_node().to_sexp());
         }
+    }
+
+    /// The in-tree `tree-sitter-css` fork reads the modern CSS upstream 0.25.0
+    /// rejects; this fails if the `[patch.crates-io]` stops applying.
+    #[test]
+    fn modern_css_parses() {
+        let samples = [
+            "@media (width >= 600px) { a { color: red; } }\n",
+            "@media (400px <= width <= 700px) and (hover) { a { color: red; } }\n",
+            "@media (aspect-ratio > 16/9), not (height < 300px) { a { color: red; } }\n",
+            "@import url(\"a.css\") layer(base.components) screen;\n",
+            "@import \"a.css\" layer;\n",
+            "@keyframes k { from, 12.5% { opacity: 0; } 50% { opacity: 1; } to { opacity: 0; } }\n",
+        ];
+        for src in samples {
+            let root = parse(Language::Css, src);
+            assert_eq!(syntax_error_count(&root), 0, "{src} failed to parse: {}", root.root().get_inner_node().to_sexp());
+        }
+        let range = parse(Language::Css, "@media (width >= 600px) {}\n");
+        assert!(range.root().get_inner_node().to_sexp().contains("range_query"));
+    }
+
+    /// The fingerprint names the CSS fork's version as `Cargo.lock` resolves
+    /// it, so bumping `+codelaw.N` reaches every cache key.
+    #[test]
+    fn fingerprint_names_the_css_fork() {
+        let lock = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../Cargo.lock")).unwrap();
+        let entry = lock.split("[[package]]").find(|p| p.contains("name = \"tree-sitter-css\"")).expect("tree-sitter-css in Cargo.lock");
+        let version = entry.lines().find_map(|l| l.strip_prefix("version = \"")).and_then(|v| v.strip_suffix('"')).unwrap();
+        assert!(version.contains("+codelaw."), "Cargo.lock resolves tree-sitter-css {version}, not the in-tree fork");
+        assert!(!entry.contains("source ="), "the fork is a path crate, not a registry one");
+        assert!(GRAMMARS_FINGERPRINT.contains(&format!("tree-sitter-css={version}")), "GRAMMARS_FINGERPRINT lacks tree-sitter-css={version}");
     }
 
     #[test]

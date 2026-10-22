@@ -14,6 +14,8 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Changed
 
+- **CSS parsing** reads range media features (`@media (400px <= width <= 700px)`), `layer()` in `@import` and fractional keyframe selectors (`12.5%`) without syntax errors, through codelaw's fork of tree-sitter-css 0.25.0. Fixes that write them are no longer refused.
+- `css/media-feature-range-notation` now has an `auto` fix: `(min-width: 600px)` becomes `(width >= 600px)`.
 - `codelaw fix` now formats every file it checks. Set `[format] enabled = false` to keep the old behaviour, or `[format] check = false` to keep formatting out of `check`.
 
 ## 0.1.0 — preview, not published

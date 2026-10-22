@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-22T18:30:00Z
+timestamp: 2026-10-22T20:00:00Z
 content_sha: ""
 ---
 
@@ -66,6 +66,10 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 1. **Layers.** Six layers: **five hold crates** — foundation, inputs, engines, orchestration, surfaces, whose crates are [SR-PACKAGES](0107_packages.md) decision 1 — and the sixth, **distribution** (the npm and PyPI packages, the editor extension, the rule packs), holds no crate: it is built from the binary and `packs/` ([SR-PACKAGES](0107_packages.md) decisions 3–9). A crate depends only on crates in its own layer or the layers above it, with no cycles inside a layer. The layer order of the five crate layers is checked in CI by `crates/codelaw-cli/tests/layers.rs` (`B-020`).
 2. **Everything is a library; surfaces are thin.** `codelaw-engine` exposes `check`, `fix`, `format`, `rules_for`, `explain` and the debug queries as functions over typed inputs. The rule queries (`list_rules`, `rules_for`, `find_rule`, `rule_why`, `check_snippet`, `fix_snippet`) live in `codelaw-engine`'s `query` module and their JSON in `codelaw-report`. The CLI, MCP, LSP and hook crates only translate between their protocol and those functions ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 6, [SR-EDITOR](0114_editor.md) decision 3). For an editor's unsaved text, `entry_for` says whether `check` would check the file and `check_document` checks the text through the same skips and rules, the format check included; neither reads nor writes the file. `format_source` formats a text in memory, verified, as `codelaw format` would write it. `check_snippet` and `fix_snippet` are `check` and `fix` on one text: the first adds the format check, the second ends with the format step. `check_source` and `fix_source` run the rules alone, for the rule tester and the editor's fix-all.
 3. **Pinned grammars and engines.** Every tree-sitter grammar and every formatter engine is vendored at a pinned version in `Cargo.lock`; the grammar and engine versions are part of every cache key ([SR-CACHE](0109_cache.md) decision 2). So are a file's resolved format options, because its `.editorconfig` layer ([SR-FORMATTER](0105_formatter.md) decision 5) is not in the config fingerprint; the engine reads each folder's `.editorconfig` once per run.
+   - **One grammar is a fork.** CSS is codelaw's in-tree fork of `tree-sitter-css` 0.25.0 (MIT), in `crates/codelaw-lang/grammars/tree-sitter-css`. The workspace's `[patch.crates-io]` puts it in place of the crates.io crate `ast-grep-language` pulls in ([SR-PACKAGES](0107_packages.md) decision 1).
+   - **What it adds:** range media features (`(400px <= width <= 700px)`), `layer` / `layer(name)` in `@import`, and fractional keyframe percentages (`12.5%`), which 0.25.0 parses as `ERROR`. On 564 real stylesheets, every tree 0.25.0 parsed without an error came out unchanged (W-21, 2026-10-22).
+   - **How it stays honest:** only `grammar.js` (and its highlight query) is edited by hand; `src/` is regenerated with tree-sitter-cli 0.25.10 by a manual step its README documents, never by the build. Its version is `0.25.0+codelaw.N`, bumped with every grammar change, and `codelaw_lang::GRAMMARS_FINGERPRINT` names it, so a grammar change invalidates the cache; a unit test checks the two agree and that the fork parses the three forms.
+   - **It is temporary.** The same change is prepared as an upstream patch, and the fork is dropped when an upstream release carries it. *(Arpit, 2026-10-22: fork in-tree + upstream patch; drop the fork when upstream releases. W-21.)*
 
 #### B. The pipelines
 
@@ -208,13 +212,14 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 - [tree-sitter](https://tree-sitter.github.io/tree-sitter/): incremental re-parsing on edit.
 - [`ignore` crate](https://docs.rs/ignore): gitignore-aware parallel walking (from ripgrep).
 - [`rayon`](https://docs.rs/rayon): the work-stealing pool.
+- [tree-sitter-css](https://github.com/tree-sitter/tree-sitter-css) and the fork's [`README.md`](../crates/codelaw-lang/grammars/tree-sitter-css/README.md): decision 3's CSS fork, what it changes and how it is regenerated.
 - [`oxc_semantic`](https://docs.rs/oxc_semantic) and [Ruff's semantic model](https://github.com/astral-sh/ruff/tree/main/crates/ruff_python_semantic): the approaches decision 15a ports.
 
 ### Veto condition
 
-**Reopen this decision if:** a crate depends on a crate in a lower layer, a rule re-parses a file, a rule failure aborts a run, or the engine performs any network, model, clock or telemetry call.
+**Reopen this decision if:** a crate depends on a crate in a lower layer, a rule re-parses a file, a rule failure aborts a run, or the engine performs any network, model, clock or telemetry call. **Reopen decision 3's CSS fork if:** a released `tree-sitter-css` parses range media features, `layer()` in `@import` and fractional keyframe percentages (drop the fork), or `Cargo.lock` no longer resolves `tree-sitter-css` to the in-tree `+codelaw` version (the patch stopped applying, e.g. `ast-grep-language` moved off 0.25).
 
-**How to check it:** the layer check (`crates/codelaw-cli/tests/layers.rs`), `codelaw check --timings` showing one parse per file, the rule-panic fixture (`W-17`), and the network fence from SR-LAW-5.
+**How to check it:** the layer check (`crates/codelaw-cli/tests/layers.rs`), `codelaw check --timings` showing one parse per file, the rule-panic fixture (`W-17`), and the network fence from SR-LAW-5. For the fork: `cargo test -p codelaw-lang` (`modern_css_parses`, `fingerprint_names_the_css_fork`) and `cargo search tree-sitter-css` against the upstream release notes.
 
 ---
 
@@ -224,4 +229,6 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 **Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-LINTER](0106_linter.md) · [SR-PACKAGES](0107_packages.md) · [SR-CACHE](0109_cache.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md) · [SR-EDITOR](0114_editor.md) · [SR-CLI-MCP](0115_cli-and-mcp.md)
 
-**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)
+**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [`crates/codelaw-lang/grammars/tree-sitter-css/README.md`](../crates/codelaw-lang/grammars/tree-sitter-css/README.md)
+
+**External** — [tree-sitter-css](https://github.com/tree-sitter/tree-sitter-css)

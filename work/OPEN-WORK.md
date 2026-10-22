@@ -26,8 +26,6 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 | | |
 | 🔴 Create the `npm` and `pypi` environments and give each one tag rule `v*` and no branch rule (GitHub Settings → Environments; [`RELEASING.md`](../RELEASING.md) step 5). Checked 2026-10-22: neither exists yet; an agent's attempt through the browser was refused by the permission check, so it stays the decider's | 2026-10-20 | 2 d |
 | ↳ **blocks:** W-18 | | |
-| 🔴 Modern CSS needs `tree-sitter-css` changed: fork it in-tree (parser regenerated with the MIT tree-sitter CLI) or patch upstream and wait; either is an L2 check and a record ([W-21](open/W-21-pack-engine-gaps.md)) | 2026-10-22 | 0 d |
-| ↳ **blocks:** W-21 step 3 | | |
 | 🔴 Set L8's budgets: after the `perf` job's first run on `main`, apply min(design target, 1.5 × worst p95) to the CI runner's numbers and rule each `budget` in `perf/budgets.toml`; name the reference machine ([W-19](open/W-19-performance-budgets.md)) | 2026-10-22 | 0 d |
 | ↳ **blocks:** W-19 DoD 3 · the perf gate binding anything | | |
 
@@ -41,7 +39,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-03** `agent` The five rule packs: steps 2–5 done (401 rules), packaging done. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
 
-🔴 **W-21** `agent` Engine gaps: tagged templates, native-rule file context and three rules landed on `main` 2026-10-22; modern CSS needs a `tree-sitter-css` fork, the decider's call (inbox). Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
+🟢 **W-21** `agent` Engine gaps: all three steps landed 2026-10-22, the CSS grammar as an in-tree fork (the decider's ruling); left: file the upstream patch, and whether DoD 3 holds while CSS rules read text. Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
 
 ### testing
 

@@ -40,7 +40,7 @@ A README that sells codelaw honestly: what it does today, proved with real outpu
 
 ## Hazards
 
-- The README states counts (419 rules, 3,937 checks, fix-class totals, refreshed 2026-10-22); they go stale when a pack changes — the registry row names that trigger.
+- The README states counts (419 rules, 3,949 checks, fix-class totals, refreshed 2026-10-22); they go stale when a pack changes — the registry row names that trigger.
 
 **Closed 2026-10-22:** the decider asked for the templates to be placed; the 2026-10-20 copies never reached the repo, so they were written again to match `CONTRIBUTING.md`'s template links.
 
