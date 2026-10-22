@@ -1,0 +1,205 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/arpitarya/codelaw/codelaw.schema.json",
+  "title": "codelaw configuration",
+  "description": "codelaw.toml, [tool.codelaw] in pyproject.toml, or \"codelaw\" in package.json (SR-CONFIG). Every key names the one record that defines it in x-codelaw-record.",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "globs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Globs relative to the folder of the config that declares them."
+    },
+    "size": {
+      "description": "Bytes, or a string such as \"1 MiB\" or \"512MB\".",
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "string", "pattern": "^\\s*[0-9]+\\s*(([KkMmGg][Ii]?)?[Bb])?\\s*$" }
+      ]
+    },
+    "duration": {
+      "description": "Seconds, or a string such as \"5s\" or \"500ms\".",
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "string", "pattern": "^\\s*[0-9]+\\s*(ms|s)\\s*$" }
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["error", "warn", "info", "off"]
+    },
+    "ruleSetting": {
+      "description": "A severity, or a severity and options.",
+      "oneOf": [
+        { "$ref": "#/definitions/severity" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "severity": { "$ref": "#/definitions/severity" },
+            "options": { "type": "object" }
+          }
+        }
+      ]
+    },
+    "rules": {
+      "type": "object",
+      "description": "Severity and options per rule id (`<namespace>/<name>`).",
+      "additionalProperties": { "$ref": "#/definitions/ruleSetting" }
+    }
+  },
+  "properties": {
+    "extends": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Presets: `codelaw:<namespace>/<preset>`, or team packs as `npm:`, `pypi:` or `path:`. Root config only.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^(codelaw|npm|pypi|path):" }
+    },
+    "languages": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "The languages checked; all of them when absent. The innermost config that sets it wins.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["javascript", "jsx", "typescript", "tsx", "python", "json", "yaml", "toml", "markdown", "css", "html"]
+      }
+    },
+    "include": { "x-codelaw-record": "SR-CONFIG", "$ref": "#/definitions/globs" },
+    "exclude": { "x-codelaw-record": "SR-CONFIG", "$ref": "#/definitions/globs" },
+    "rules_dir": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "The local rules folder; `.codelaw/rules` by default. Root config only.",
+      "type": "string"
+    },
+    "rules": { "x-codelaw-record": "SR-CONFIG", "$ref": "#/definitions/rules" },
+    "overrides": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Per-glob rule settings, applied in file order after [rules].",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["files"],
+        "properties": {
+          "files": { "$ref": "#/definitions/globs" },
+          "exclude": { "$ref": "#/definitions/globs" },
+          "rules": { "$ref": "#/definitions/rules" }
+        }
+      }
+    },
+    "root": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Make this folder a separate project with its own graph and baseline.",
+      "type": "boolean"
+    },
+    "requires": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "A version range, e.g. \">=0.4\"; an older codelaw refuses to run.",
+      "type": "string"
+    },
+    "preview": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Run preview rules (SR-RULE-PACKS decision 9). Root config only.",
+      "type": "boolean"
+    },
+    "allow_pack_fixers": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Packs whose external fixers may run (SR-RULE-PACKS decision 12). Root config only.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "files": {
+      "x-codelaw-record": "SR-ARCHITECTURE",
+      "description": "Discovery, encoding and size (SR-ARCHITECTURE decisions 7 and 10). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "follow_symlinks": { "type": "boolean", "description": "Follow symlinks during discovery; off by default." },
+        "generated_markers": { "type": "array", "items": { "type": "string" }, "description": "Markers besides `@generated` that mark a file generated." },
+        "lint_generated": { "type": "boolean", "description": "Check generated files too; off by default." },
+        "max_file_size": { "$ref": "#/definitions/size", "description": "Larger files are skipped; 1 MiB by default." }
+      }
+    },
+    "cache": {
+      "x-codelaw-record": "SR-CACHE",
+      "description": "The result cache (SR-CACHE decisions 3, 6 and 9). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "description": "On by default; `--no-cache` turns it off for one run." },
+        "dir": { "type": "string", "description": "`.codelaw/cache` by default; `CODELAW_CACHE_DIR` overrides it." },
+        "max_size": { "$ref": "#/definitions/size", "description": "512 MB by default." }
+      }
+    },
+    "fix": {
+      "x-codelaw-record": "SR-ARCHITECTURE",
+      "description": "The fix pipeline (SR-ARCHITECTURE decision 18). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "external_timeout": { "$ref": "#/definitions/duration", "description": "Per file, for an external fixer; 5 s by default." }
+      }
+    },
+    "lint": {
+      "x-codelaw-record": "SR-LINTER",
+      "description": "The linter (SR-LINTER decision 3). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tagged_templates": { "type": "boolean", "description": "Lint css`…` and html`…` tagged templates as CSS and HTML; off by default." }
+      }
+    },
+    "markdown": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Markdown (L3 decision 8). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lint_code_blocks": { "x-codelaw-record": "SR-LAW-3", "type": "boolean", "description": "Lint fenced code blocks with their own language's rules; off by default." }
+      }
+    },
+    "format": {
+      "x-codelaw-record": "SR-FORMATTER",
+      "x-codelaw-validated": false,
+      "description": "The formatter (SR-FORMATTER). Its keys are validated once the formatter is built.",
+      "type": "object"
+    },
+    "graph": {
+      "x-codelaw-record": "SR-PROJECT-GRAPH",
+      "x-codelaw-validated": false,
+      "description": "The project graph (SR-PROJECT-GRAPH). Its keys are validated once the graph is built.",
+      "type": "object"
+    },
+    "baseline": {
+      "x-codelaw-record": "SR-BASELINE",
+      "x-codelaw-validated": false,
+      "description": "The baseline (SR-BASELINE). Its keys are validated once the baseline is built.",
+      "type": "object"
+    },
+    "adapters": {
+      "x-codelaw-record": "SR-LINTER",
+      "x-codelaw-validated": false,
+      "description": "Optional external linters (SR-LINTER decision 2). Its keys are validated once adapters are built.",
+      "type": "object"
+    },
+    "agents": {
+      "x-codelaw-record": "SR-AGENT-SURFACES",
+      "x-codelaw-validated": false,
+      "description": "Agent surfaces (SR-AGENT-SURFACES). Its keys are validated once they are built.",
+      "type": "object"
+    },
+    "daemon": {
+      "x-codelaw-record": "SR-ARCHITECTURE",
+      "x-codelaw-validated": false,
+      "description": "The daemon (SR-ARCHITECTURE decision 22). Its keys are validated once the daemon is built.",
+      "type": "object"
+    },
+    "lsp": {
+      "x-codelaw-record": "SR-ARCHITECTURE",
+      "x-codelaw-validated": false,
+      "description": "The language server (SR-ARCHITECTURE decision 24). Its keys are validated once the server is built.",
+      "type": "object"
+    }
+  }
+}

@@ -161,3 +161,34 @@ fn external_fixer_contract() {
     assert!(run_external(&slow_tree).unwrap_err().contains("timed out"));
     assert!(started.elapsed() < std::time::Duration::from_secs(10), "{:?}", started.elapsed());
 }
+
+#[test]
+fn the_trace_names_every_step() {
+    let block = "match:\n  kind: identifier\n  regex: ^[ab]$\nmessage: flip\nfix: \"x\"";
+    let (_, compiled) = matcher(Language::Javascript, block);
+    let mut trace = Some(crate::LoopTrace::default());
+    let out = crate::fix_loop_traced(
+        Language::Javascript,
+        "a;\n",
+        |text, _| {
+            let root = codelaw_lang::parse(Language::Javascript, text);
+            find(Language::Javascript, &compiled, &root, text)
+                .into_iter()
+                .map(|m| Candidate { rule: "t/r".into(), edits: vec![TextEdit::new(m.start, m.end, if &text[m.start..m.end] == "a" { "b" } else { "a" })] })
+                .collect()
+        },
+        &mut trace,
+    );
+    use crate::TraceEvent::*;
+    let trace = trace.unwrap();
+    assert_eq!(out.text, "b;\n");
+    assert_eq!(trace.end, crate::LoopEnd::Conflict);
+    let r = || "t/r".to_string();
+    assert_eq!(
+        trace.passes,
+        vec![
+            vec![Offered { rule: r(), edits: 1 }, Applied { rule: r(), edits: 1 }],
+            vec![Offered { rule: r(), edits: 1 }, Applied { rule: r(), edits: 1 }, Refused { rule: r(), why: Failure::Conflict }],
+        ]
+    );
+}

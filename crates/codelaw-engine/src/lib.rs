@@ -3,6 +3,7 @@
 //! protocol and these functions (decision 2).
 
 mod compile;
+mod debug;
 mod discover;
 mod fix;
 mod format;
@@ -10,13 +11,20 @@ mod lint;
 mod query;
 mod project;
 mod suppress;
+mod timings;
 
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
 pub use fix::{FileFix, FixOptions, FixReport};
+<<<<<<< HEAD
 pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
 pub use lint::FileResult;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
+=======
+pub use debug::{FileTrace, MatchReport, RuleCard};
+pub use lint::FileResult;
+pub use timings::{PhaseTiming, RuleTiming, TimingReport};
+>>>>>>> origin/wip/W-16-commands-api
 
 use codelaw_cache::DiskCache;
 use codelaw_config::{Config, ConfigError};
@@ -39,6 +47,8 @@ pub struct EngineOptions {
     pub threads: Option<usize>,
     /// `--no-cache`.
     pub no_cache: bool,
+    /// `--timings`: measure each phase and rule.
+    pub timings: bool,
     /// `CODELAW_CACHE_DIR`.
     pub cache_dir_env: Option<String>,
     /// `CODELAW_SITE_PACKAGES`, set by the Python launcher.
@@ -128,6 +138,7 @@ pub struct Project {
     /// `[format]` (SR-FORMATTER decision 5).
     pub formatting: Formatting,
     pool: rayon::ThreadPool,
+    timings: Option<timings::Timings>,
 }
 
 fn pool(threads: Option<usize>) -> rayon::ThreadPool {
@@ -170,7 +181,12 @@ impl Project {
                 }
             }
         }
+        let compile_started = std::time::Instant::now();
         let (compiled, mut warnings) = compile::compile_all(&rules, &config).map_err(EngineError::Load)?;
+        let timings = options.timings.then(|| timings::Timings::new(compiled.len()));
+        if let Some(t) = &timings {
+            t.add(timings::Phase::Compile, compile_started);
+        }
         warnings.append(&mut config.warnings);
         warnings.extend(rules.warnings.iter().cloned());
         let cache = if options.no_cache || !config.cache_enabled() {
@@ -180,7 +196,11 @@ impl Project {
         };
         let formatting = Formatting::from_config(&config)?;
         let pool = pool(options.threads);
+<<<<<<< HEAD
         Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool })
+=======
+        Ok(Project { config, rules, compiled, options, cache, warnings, pool, timings })
+>>>>>>> origin/wip/W-16-commands-api
     }
 
     pub fn root(&self) -> &Path {
@@ -189,7 +209,11 @@ impl Project {
 
     /// Check files and folders (the project root when `paths` is empty).
     pub fn check(&mut self, paths: &[PathBuf]) -> Result<CheckReport, EngineError> {
+        let discovering = self.timings.is_some().then(std::time::Instant::now);
         let (files, mut skipped, warnings) = discover::discover(self, paths)?;
+        if let (Some(t), Some(start)) = (&self.timings, discovering) {
+            t.add(timings::Phase::Discover, start);
+        }
         let mut report = CheckReport { warnings: self.warnings.clone(), ..Default::default() };
         report.warnings.extend(warnings);
         let this = &*self;

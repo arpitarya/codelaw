@@ -39,6 +39,7 @@ rules = { "js/exports-at-end" = "off" }
 [adapters] # SR-LINTER        [agents]   # SR-AGENT-SURFACES
 [cache]    # SR-CACHE        [files]    # SR-ARCHITECTURE (discovery, encoding, size)
 [daemon]   # SR-ARCHITECTURE  [lsp]      # SR-ARCHITECTURE
+[fix]      # SR-ARCHITECTURE  [markdown] # SR-CONFIG (its one key is L3's)
 ```
 
 ```mermaid

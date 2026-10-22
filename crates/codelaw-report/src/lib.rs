@@ -1,5 +1,12 @@
 //! Output formats and exit codes (SR-CLI-MCP decisions 3 and 4). Every
 //! format carries the L4 fix fields: the class, and the edits or the steps.
+//! SARIF is `sarif.rs`; the debug commands' output is `debug.rs`.
+
+mod debug;
+mod sarif;
+
+pub use debug::{config_json, config_text, match_json, match_text, rules_json, rules_text, timings_json, timings_text, trace_json, trace_text};
+pub use sarif::{SARIF_SCHEMA, check_sarif};
 
 mod hook;
 mod query;
@@ -24,6 +31,7 @@ pub const SCHEMA_VERSION: u32 = 1;
 pub enum Format {
     Text,
     Json,
+    Sarif,
     Agent,
 }
 
@@ -32,6 +40,7 @@ impl Format {
         Some(match s {
             "text" => Format::Text,
             "json" => Format::Json,
+            "sarif" => Format::Sarif,
             "agent" => Format::Agent,
             _ => return None,
         })

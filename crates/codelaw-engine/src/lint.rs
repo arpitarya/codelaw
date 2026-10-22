@@ -5,6 +5,7 @@
 
 use crate::compile::{CompiledRule, Matcher};
 use crate::discover::{FileEntry, language_enabled};
+use crate::timings::Phase;
 use crate::{Project, suppress};
 use codelaw_cache::KeyBuilder;
 use codelaw_config::{Layer, RuleConfig};
@@ -15,6 +16,7 @@ use codelaw_match::{Match, interpolate};
 use codelaw_native::{NativeContext, NativeFinding};
 use std::collections::BTreeSet;
 use std::panic::{AssertUnwindSafe, catch_unwind};
+use std::time::Instant;
 
 /// The diagnostics of one file, or why it was skipped.
 #[derive(Clone, Debug, Default)]
@@ -108,6 +110,7 @@ impl Project {
     /// Read a file, or say why it is skipped (SR-ARCHITECTURE decisions 8
     /// and 10).
     pub(crate) fn read_entry(&self, entry: &FileEntry) -> Result<ReadFile, FileResult> {
+        let _timed = self.timings.as_ref().map(|t| t.guard(Phase::Read));
         let layers = self.config.layers_for(&entry.abs);
         let skip = |id: &str, reason: String| FileResult {
             diagnostics: meta_diagnostic(&entry.rel, &layers, id, reason.clone()).into_iter().collect(),
@@ -183,6 +186,7 @@ impl Project {
             .part(codelaw_format::ENGINES_FINGERPRINT)
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
             .key();
+<<<<<<< HEAD
         let mut diagnostics = match self.cache.get::<Vec<Diagnostic>>(&key) {
             Some(d) => d,
             None => {
@@ -196,6 +200,14 @@ impl Project {
         };
         if file.bom {
             shift_for_bom(&mut diagnostics);
+=======
+        let cached = self.cache.get::<Vec<Diagnostic>>(&key);
+        if let Some(t) = &self.timings {
+            t.cache(cached.is_some());
+        }
+        if let Some(d) = cached {
+            return FileResult { diagnostics: d, skipped: None };
+>>>>>>> origin/wip/W-16-commands-api
         }
         FileResult { diagnostics, skipped: None }
     }
@@ -292,7 +304,10 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
         return LintOutput { diagnostics, candidates: Vec::new() };
     }
 
-    let host_root = codelaw_lang::parse(entry.language, text);
+    let host_root = {
+        let _timed = project.timings.as_ref().map(|t| t.guard(Phase::Parse));
+        codelaw_lang::parse(entry.language, text)
+    };
     let mut units: Vec<Unit> = Vec::new();
     if region_rules_exist {
         let opts = RegionOptions { lint_code_blocks: project.config.lint_code_blocks() };
@@ -312,7 +327,10 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
             if rules.is_empty() {
                 continue;
             }
-            let root = codelaw_lang::parse_grammar(region.grammar, &region.text);
+            let root = {
+                let _timed = project.timings.as_ref().map(|t| t.guard(Phase::Parse));
+                codelaw_lang::parse_grammar(region.grammar, &region.text)
+            };
             units.push(Unit { language: region.language, grammar: region.grammar, root, text: region.text.clone(), region: Some(region), rules });
         }
     }
@@ -420,7 +438,14 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
         });
     }
 
+<<<<<<< HEAD
     apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &ran, &mut diagnostics);
+=======
+    {
+        let _timed = project.timings.as_ref().map(|t| t.guard(Phase::Suppress));
+        apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &active, &mut diagnostics);
+    }
+>>>>>>> origin/wip/W-16-commands-api
     let candidates = diagnostics
         .iter()
         .filter(|d| d.fix != FixClass::Manual && !d.edits.is_empty())
@@ -516,6 +541,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
         return Vec::new();
     }
     let grammar = unit.grammar;
+<<<<<<< HEAD
     let n = unit.rules.len();
     let mut failed: Vec<Option<String>> = vec![None; n];
     let semantic = if unit.rules.iter().any(|(_, r, _)| r.needs_semantic) {
@@ -533,9 +559,16 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 None
             }
         }
+=======
+    let timings = project.timings.as_ref();
+    let semantic = if unit.rules.iter().any(|(_, r, _)| r.needs_semantic) {
+        let _timed = timings.map(|t| t.guard(Phase::Semantic));
+        catch_unwind(AssertUnwindSafe(|| codelaw_semantic::build(unit.language, &unit.root, &unit.text))).ok().flatten()
+>>>>>>> origin/wip/W-16-commands-api
     } else {
         None
     };
+    let _timed = timings.map(|t| t.guard(Phase::Rules));
     let mut by_kind: Vec<Vec<usize>> = Vec::new();
     let mut any_kind: Vec<usize> = Vec::new();
     for (slot, (_, rule, _)) in unit.rules.iter().enumerate() {
@@ -567,7 +600,8 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
             if failed[slot].is_some() {
                 continue;
             }
-            let (_, rule, cfg) = &unit.rules[slot];
+            let (index, rule, cfg) = &unit.rules[slot];
+            let started = timings.map(|_| Instant::now());
             match &rule.matcher {
                 Matcher::Match(_) => {
                     let cm = rule.compiled_match(grammar).expect("dispatched for this grammar");
@@ -595,6 +629,9 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 Matcher::Target(_) | Matcher::Unsupported(_) => {}
 >>>>>>> origin/wip/W-12-structured-rules
             }
+            if let (Some(t), Some(s)) = (timings, started) {
+                t.rule(*index, s);
+            }
         }
     }
 
@@ -606,6 +643,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
             out.push(internal_error(*index, 0, 0, rule.id(), why));
             continue;
         }
+        let started = timings.map(|_| Instant::now());
         let ctx = FixContext { source: &unit.text, root: &unit.root, language: unit.language, semantic: semantic.as_ref() };
         let wants_fix = rule.loaded.rule.fix != FixClass::Manual;
         match &rule.matcher {
@@ -705,6 +743,9 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
             }
             Matcher::Unsupported(_) => {}
 >>>>>>> origin/wip/W-12-structured-rules
+        }
+        if let (Some(t), Some(s)) = (timings, started) {
+            t.rule(*index, s);
         }
     }
     out

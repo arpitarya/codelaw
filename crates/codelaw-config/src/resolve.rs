@@ -37,7 +37,7 @@ pub struct ConfigFile {
     pub text: String,
     include: Option<GlobSet>,
     exclude: GlobSet,
-    overrides: Vec<(GlobSet, GlobSet)>,
+    pub(crate) overrides: Vec<(GlobSet, GlobSet)>,
 }
 
 /// One layer of rule settings that applies to a file.
@@ -122,7 +122,7 @@ impl ConfigFile {
     }
 
     /// The path of `file` relative to this config's folder, if under it.
-    fn relative<'p>(&self, file: &'p Path) -> Option<&'p Path> {
+    pub(crate) fn relative<'p>(&self, file: &'p Path) -> Option<&'p Path> {
         file.strip_prefix(&self.dir).ok()
     }
 }
