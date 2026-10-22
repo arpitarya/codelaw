@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-cli
   - crates/codelaw-mcp
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -70,7 +70,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | debug | `tree` · `match --explain` · `fix --trace` · `graph refs` · `graph why-unused` |
    | project | `init [--agents …] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print` · `config --schema` |
    | baseline | `baseline add` · `baseline prune` · `baseline check` · `deprecate` |
-   | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` · `hook` |
+   | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` ([SR-ARCHITECTURE](0108_architecture.md) decision 22) · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
 
 2. **Common flags:**
@@ -78,7 +78,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - `--changed-since <ref>`, `--staged`, `--as-of <date>`;
    - `--format text|json|sarif|agent`;
    - `--unsafe` (apply `suggest` fixes), `--dry-run`;
-   - `--threads N`, `--no-cache`, `--timings`, `--max-warnings N`, `--prefer-warm` (use a running `lsp`/`mcp`/`daemon` of the same version; [SR-ARCHITECTURE](0108_architecture.md) decision 21).
+   - `--threads N`, `--no-cache`, `--timings`, `--max-warnings N`, `--prefer-warm` (use a running `lsp`/`mcp`/`daemon` of the same version; [SR-ARCHITECTURE](0108_architecture.md) decision 21). Every command with the common flags accepts it; `check`, `fix` and `format` are served warm, the rest run in-process; output is printed at the end, stdout then stderr.
 3. **Exit codes:** `0` no errors · `1` errors remain · `2` config, rule or usage error.
    - **`format [paths] [--check] [--diff]`:** `0` every file is formatted, or was just formatted. `1` with `--check` or `--diff` when a file is not formatted, or when any file could not be formatted or written (`format/failed`, `codelaw/write-failed`). `2` as above. `--check` prints `would format <file>` per file; `--diff` prints a unified diff; neither writes.
 4. **Output formats:**
@@ -109,7 +109,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
      | `dump_tree {path \| code+lang, line}` | `tree … --format json` |
      | `trace_rule {id, path}` | `rules --why <id> --for <path> --format json`; `match --explain`'s matcher-level trace (W-16) is to return through it |
 
-   - The server loads the project per call, so an edited config or rule is seen on the next call; the warm, cached rule set is [SR-ARCHITECTURE](0108_architecture.md) decision 21's (W-15).
+   - The server loads the project per call, so an edited config or rule is seen on the next call; the compiled rule set is reused from memory while it is unchanged ([SR-ARCHITECTURE](0108_architecture.md) decision 21). `mcp` and `lsp` register as warm processes for their folder; the socket thread never writes to stdout.
 6. **Parity ([L5](0007_LAW-5-no-model-in-the-engine.md)).** A test runs every fixture through the CLI and through MCP and requires identical diagnostics and fixed bytes: `crates/codelaw-cli/tests/mcp_parity.rs` runs each `fixtures/l3` language alone and all together through every tool of decision 5 and its twin, byte for byte, and compares the files `fix` and `fix_paths` write. No logic lives in either surface; both are thin adapters over `codelaw-engine` ([SR-PACKAGES](0107_packages.md)).
 7. **Agent-friendly by design.**
    - Every MCP tool's description says when to call it.

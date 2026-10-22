@@ -202,6 +202,8 @@ impl Config {
         push("cache.max_size", size(self.cache_max_size()), s);
         let (_, s) = root_key(&["fix", "external_timeout"], |r| r.fix.external_timeout.map(|_| Value::Null), Value::Null);
         push("fix.external_timeout", duration(self.external_timeout()), s);
+        let (_, s) = root_key(&["daemon", "idle_timeout"], |r| r.daemon.idle_timeout.map(|_| Value::Null), Value::Null);
+        push("daemon.idle_timeout", duration(self.daemon_idle_timeout()), s);
         let (v, s) = root_key(&["lint", "tagged_templates"], |r| r.lint.tagged_templates.map(|x| json!(x)), json!(false));
         push("lint.tagged_templates", v, s);
         let (v, s) = root_key(&["markdown", "lint_code_blocks"], |r| r.markdown.lint_code_blocks.map(|x| json!(x)), json!(false));
@@ -214,7 +216,6 @@ impl Config {
             ("baseline", |r| r.baseline.clone()),
             ("adapters", |r| r.adapters.clone()),
             ("agents", |r| r.agents.clone()),
-            ("daemon", |r| r.daemon.clone()),
             ("lsp", |r| r.lsp.clone()),
         ] {
             for f in &chain {

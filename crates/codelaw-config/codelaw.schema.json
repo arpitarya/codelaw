@@ -191,9 +191,12 @@
     },
     "daemon": {
       "x-codelaw-record": "SR-ARCHITECTURE",
-      "x-codelaw-validated": false,
-      "description": "The daemon (SR-ARCHITECTURE decision 22). Its keys are validated once the daemon is built.",
-      "type": "object"
+      "description": "The opt-in warm daemon (SR-ARCHITECTURE decision 22). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "idle_timeout": { "$ref": "#/definitions/duration", "description": "The daemon exits after this long without a request; 30 minutes (1800 s) by default." }
+      }
     },
     "lsp": {
       "x-codelaw-record": "SR-ARCHITECTURE",

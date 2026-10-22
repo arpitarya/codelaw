@@ -1,10 +1,9 @@
 //! `codelaw format [--check] [--diff] <paths>` (SR-FORMATTER decision 1).
 
-use crate::{Common, color, engine_options, fail, load};
+use crate::{Common, Ctx, Output, engine_options_in, load};
 use clap::Args;
 use codelaw_engine::{FormatReport, FormatRunOptions};
 use std::path::PathBuf;
-use std::process::ExitCode;
 
 #[derive(Args)]
 pub struct FormatArgs {
@@ -38,38 +37,50 @@ pub fn exit_code(report: &FormatReport, check: bool) -> u8 {
     }
 }
 
-pub fn format(args: FormatArgs) -> ExitCode {
-    let options = match engine_options(&args.common) {
+impl FormatArgs {
+    pub fn paths(&self) -> &[PathBuf] {
+        &self.paths
+    }
+
+    pub fn prefer_warm(&self) -> bool {
+        self.common.prefer_warm
+    }
+}
+
+pub fn format(args: FormatArgs, ctx: &Ctx) -> Output {
+    let options = match engine_options_in(&args.common, ctx.env.clone()) {
         Ok(o) => o,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
     let mut project = match load(&args.paths, options) {
         Ok(p) => p,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
     let check = args.check || args.diff;
     let report = match project.format(&args.paths, &FormatRunOptions { check }) {
         Ok(r) => r,
-        Err(e) => return fail(e),
+        Err(e) => return Output::fail(e),
     };
+    let mut out = Output::default();
     for f in &report.files {
         if args.diff {
-            print!("{}", unified_diff(&f.file, &f.original, &f.formatted));
+            out.stdout.push_str(&unified_diff(&f.file, &f.original, &f.formatted));
         } else if args.check {
-            println!("would format {}", f.file);
+            out.stdout.push_str(&format!("would format {}\n", f.file));
         } else if f.written {
-            println!("formatted {}", f.file);
+            out.stdout.push_str(&format!("formatted {}\n", f.file));
         }
     }
     if !report.check.diagnostics.is_empty() {
-        print!("{}", codelaw_report::check_text(&report.check, color()));
+        out.stdout.push_str(&codelaw_report::check_text(&report.check, ctx.color));
     }
     let n = report.files.len();
     let files = report.check.files_checked;
-    match (check, n) {
-        (_, 0) => eprintln!("{files} files already formatted"),
-        (true, _) => eprintln!("{n} of {files} files would be formatted"),
-        (false, _) => eprintln!("formatted {n} of {files} files"),
-    }
-    ExitCode::from(exit_code(&report, check))
+    out.stderr = match (check, n) {
+        (_, 0) => format!("{files} files already formatted\n"),
+        (true, _) => format!("{n} of {files} files would be formatted\n"),
+        (false, _) => format!("formatted {n} of {files} files\n"),
+    };
+    out.code = exit_code(&report, check);
+    out
 }

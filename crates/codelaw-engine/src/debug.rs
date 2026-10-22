@@ -74,7 +74,7 @@ impl Project {
         };
         let layers = target.as_ref().map(|(abs, _, _)| self.config.layers_for(abs));
         let mut out = Vec::new();
-        for c in &self.compiled {
+        for c in self.compiled.iter() {
             let r = &c.loaded;
             let severity = match (&target, &layers) {
                 (Some((_, rel, language)), Some(layers)) => {
@@ -107,7 +107,7 @@ impl Project {
         let abs = file.map(|f| self.locate_path(f).0);
         let mut out = self.config.trace(abs.as_deref(), env);
         let layers = self.config.layers_for(abs.as_deref().unwrap_or(self.root()));
-        for c in &self.compiled {
+        for c in self.compiled.iter() {
             let r = &c.loaded;
             let id = &r.rule.id;
             let effective = self.rules.effective(r, &layers);
