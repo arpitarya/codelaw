@@ -31,6 +31,9 @@ tree-sitter.workspace = true
 ignore.workspace = true
 # `codelaw format --diff` (SR-FORMATTER decision 1).
 similar = "=2.7.0"
+# `codelaw bench` (SR-LAW-8): the workload's digest, and the peak memory of a child (`wait4`).
+blake3.workspace = true
+libc.workspace = true
 # `codelaw format --import-config` writes `[format]` into the config, keeping
 # the rest of the file as written (SR-FORMATTER decision 5). MIT OR Apache-2.0.
 toml_edit = "0.25"

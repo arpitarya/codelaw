@@ -110,7 +110,7 @@ into a scan anyone can do at task end.
 | `records/README.md` | a record's state, ownership or number changes | 2026-10-22 | 2026-10-22 — SR-LAW-5 and SR-CONSUMER-LAYOUT own their tests; `scripts/check-work-system.py` and its describers (W-20) |
 | `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-20 | 2026-10-20 — not releasable until W-07–W-09; step 2 runs the law gate |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-22 | 2026-10-22 — `codelaw test --corpus` (W-20) |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-22 | 2026-10-22 — `codelaw bench` (W-19) |
 | `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-20 | 2026-10-20 — Unreleased: the MIT licence |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
 | `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |

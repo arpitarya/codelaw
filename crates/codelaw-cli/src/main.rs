@@ -2,6 +2,7 @@
 //! `codelaw-engine` and prints the result; no logic lives here
 //! (SR-ARCHITECTURE decision 2, SR-CLI-MCP decision 6).
 
+mod bench;
 mod format_cmd;
 mod graph_cmd;
 mod config_cmd;
@@ -76,6 +77,9 @@ enum Command {
     Hook(codelaw_agents::HookArgs),
     /// Write every agent's files from the rules and skills, or with --check report drift.
     SyncAgents(codelaw_agents::SyncArgs),
+    /// Time every L8 operation on the reference workload and compare each
+    /// with `perf/budgets.toml` (SR-LAW-8).
+    Bench(bench::BenchArgs),
     /// An opt-in warm process that serves `--prefer-warm` runs (SR-ARCHITECTURE decision 22).
     Daemon {
         #[command(subcommand)]
@@ -522,6 +526,7 @@ fn main() -> ExitCode {
             }
         }
         Command::Daemon { action } => warm::daemon(action),
+        Command::Bench(a) => bench::bench(a),
         Command::Hook(a) => codelaw_agents::hook(a),
         Command::SyncAgents(a) => codelaw_agents::sync_agents(a),
     }

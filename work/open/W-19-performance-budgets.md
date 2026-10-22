@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-20: L8's budgets, which are all unset because nothi
 item: W-19
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-20
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-22
+updated_by: "Claude Code (Opus 5.5), subagent on branch W-19-bench"
 ball: agent
 ---
 
@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Build `codelaw bench` and the reference workload | a repeatable measurement | ⏳ |
-| 2 | Measure the SR-LINTER and SR-ARCHITECTURE targets (warm/cold 10k files, one-file hook, fix, LSP edit, startup, peak memory) | numbers to set budgets from | ⏳ |
-| 3 | Propose `perf/budgets.toml` values | the decider sets the budgets | ⏳ |
-| 4 | Add the CI perf gate | a budget is never exceeded | ⏳ |
+| 1 | Build `codelaw bench` and the reference workload | a repeatable measurement | ✅ 2026-10-22 |
+| 2 | Measure the SR-LINTER and SR-ARCHITECTURE targets (warm/cold 10k files, one-file hook, fix, LSP edit, startup, peak memory) | numbers to set budgets from | 🟡 measured on a loaded dev Mac; CI's runner still to measure |
+| 3 | Propose `perf/budgets.toml` values | the decider sets the budgets | 🔴 proposals written; the ruling is the decider's |
+| 4 | Add the CI perf gate | a budget is never exceeded | ✅ 2026-10-22 |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
 
@@ -33,23 +33,25 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · bench | `codelaw bench` runs the reference workload and prints each budgeted operation. | ⏳ |
-| 2 · measure | Every target in SR-ARCHITECTURE decision 29 and SR-LINTER decision 8 is measured on named hardware. | ⏳ |
-| 3 · propose | A budget proposal goes to the decider (inbox row). | ⏳ |
-| 4 · gate | CI compares each run against `perf/budgets.toml` ([L8](../../records/0010_LAW-8-performance-budgets.md) decision 7). | ⏳ |
+| 1 · bench | `codelaw bench` runs the reference workload and prints each budgeted operation. | ✅ 2026-10-22 — [SR-CLI-MCP](../../records/0115_cli-and-mcp.md) decision 10; `crates/codelaw-cli/src/bench/`, `tests/bench.rs` |
+| 2 · measure | Every target in SR-ARCHITECTURE decision 29 and SR-LINTER decision 8 is measured on named hardware. | 🟡 2026-10-22 on an Apple M4 / 16 GiB Mac under load ([SR-LAW-8](../../records/0010_LAW-8-performance-budgets.md) §Measurements); the CI runner's numbers come from the `perf` job's first run on `main` |
+| 3 · propose | A budget proposal goes to the decider (inbox row). | 🔴 `proposed` values in `perf/budgets.toml`, by the rule min(design target, 1.5 × worst p95); the inbox row asks the decider to rule once the CI numbers are in |
+| 4 · gate | CI compares each run against `perf/budgets.toml` ([L8](../../records/0010_LAW-8-performance-budgets.md) decision 7). | ✅ 2026-10-22 — `ci.yml` `perf`; fails only on a set budget (`budget = <number>`), reports `unset` ones |
 
 ## Blockers
 
-None to measure; setting the budgets is the decider's.
+The budgets are the decider's to set (L8 decision 4), from the CI runner's numbers. The three pinned real repos and the reference machine of L8 decision 2 are the decider's to name.
 
 ## Record affected
 
-[SR-LAW-8](../../records/0010_LAW-8-performance-budgets.md) · [SR-ARCHITECTURE](../../records/0108_architecture.md) decision 29 · [SR-LINTER](../../records/0106_linter.md) decision 8.
+[SR-LAW-8](../../records/0010_LAW-8-performance-budgets.md) · [SR-ARCHITECTURE](../../records/0108_architecture.md) decision 29 · [SR-LINTER](../../records/0106_linter.md) decision 8 · [SR-CLI-MCP](../../records/0115_cli-and-mcp.md) decision 10 · [SR-PACKAGES](../../records/0107_packages.md) decision 11.
 
 ## Hazards
 
-- **A loaded machine produces a clean, localised anomaly** (LESSONS): say what else is running when measuring.
+- **A loaded machine produces a clean, localised anomaly** (LESSONS). The 2026-10-22 numbers were taken with three other agents compiling (load average 10–18 on 10 cores); `check_cold_10k`'s p95 varied 3.4–4.4 s across sessions.
+- **The shared cargo target** (`target-agents`) lets one worktree's build overwrite another's `codelaw` binary and crate artifacts. Measure a copy of the binary, never the target's own.
 
 ## Reference
 
 - [`work/OPEN-WORK.md`](../OPEN-WORK.md): this item's row.
+- [`fixtures/perf/README.md`](../../fixtures/perf/README.md): the workload.

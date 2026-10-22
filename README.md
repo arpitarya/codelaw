@@ -358,6 +358,7 @@ flowchart LR
 | `codelaw new-rule <ns/name>` | Write a rule file from the template |
 | `codelaw tree <file>` | Show the syntax tree the engine sees |
 | `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
+| `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set ([L8](records/0010_LAW-8-performance-budgets.md)) |
 
 **Exit codes:** `0` clean · `1` findings remain · `2` config or rule error.
 
