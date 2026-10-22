@@ -511,7 +511,7 @@ impl<'a> Extractor<'a> {
     fn members(&self, uses: &[Span], expected: &[String]) -> Option<Vec<Member>> {
         let mut out = Vec::new();
         for &(s, e) in uses {
-            let Some(node) = self.root.descendant_for_byte_range(s, e) else { return None };
+            let node = self.root.descendant_for_byte_range(s, e)?;
             let mut chain: Vec<(String, Span)> = Vec::new();
             let mut cur = node;
             while let Some(p) = cur.parent() {
@@ -547,7 +547,7 @@ impl<'a> Extractor<'a> {
                 None => return None,
             }
         }
-        out.sort_by(|a, b| a.span.cmp(&b.span));
+        out.sort_by_key(|a| a.span);
         Some(out)
     }
 
