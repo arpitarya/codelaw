@@ -972,7 +972,6 @@ dependencies = [
  "codelaw-report",
  "codelaw-rules",
  "serde_json",
- "toml",
 ]
 
 [[package]]
@@ -991,6 +990,7 @@ version = "0.1.0"
 dependencies = [
  "boon",
  "clap",
+ "codelaw-agents",
  "codelaw-cache",
  "codelaw-config",
  "codelaw-core",

@@ -27,6 +27,7 @@ codelaw-report = { path = "crates/codelaw-report" }
 codelaw-test = { path = "crates/codelaw-test" }
 codelaw-lsp = { path = "crates/codelaw-lsp" }
 codelaw-mcp = { path = "crates/codelaw-mcp" }
+codelaw-agents = { path = "crates/codelaw-agents" }
 codelaw-format = { path = "crates/codelaw-format" }
 
 # Grammars and matcher: pinned (SR-ARCHITECTURE decision 3). All MIT.

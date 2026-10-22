@@ -103,7 +103,7 @@ The decider asked for a record of what goes into which package, under the naming
 
    The workspace's `Cargo.toml` may carry a `[patch.crates-io]` only to replace a transitive crate that fails [L2](0004_LAW-2-foss-dependencies.md) with a permissive stand-in kept under `crates/`. The record that takes in the dependency that pulls it names it. Today there is one: `option-ext`, for Biome ([SR-FORMATTER](0105_formatter.md) decision 2).
 
-2. **The binary** links every crate. A single `codelaw` executable serves the CLI, `codelaw lsp` and `codelaw mcp`, with no second executable.
+2. **The binary** links every crate. A single `codelaw` executable serves the CLI, `codelaw lsp`, `codelaw mcp`, `codelaw hook` and `codelaw sync-agents`, with no second executable; the agent skills are compiled into it ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 7).
 3. **npm `codelaw`** contains:
    - `bin/codelaw.js`: picks the right `@codelaw/cli-*` package for the platform and runs the binary;
    - `index.js` and `index.d.ts`: `check`, `fix`, `format`, `rulesFor`, each returning the `--format json` shape of `check`, `fix`, `format` and `rules --for <path>` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 4), unchanged; options are the flags (`lang`, `rule`, `threads`, `noCache`; `unsafe` and `dryRun` on `fix`; `check` on `format`). `crates/codelaw-cli/tests/api.rs` runs this API and decision 5's against the binary and requires the same JSON from both;

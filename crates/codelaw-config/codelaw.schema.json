@@ -185,9 +185,22 @@
     },
     "agents": {
       "x-codelaw-record": "SR-AGENT-SURFACES",
-      "x-codelaw-validated": false,
-      "description": "Agent surfaces (SR-AGENT-SURFACES). Its keys are validated once they are built.",
-      "type": "object"
+      "description": "Agent surfaces (SR-AGENT-SURFACES decision 6): the agents `codelaw sync-agents` writes files for.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "targets": {
+          "type": "array",
+          "items": { "enum": ["claude", "cowork", "copilot", "codex", "kiro"] },
+          "uniqueItems": true,
+          "description": "The agents whose files `codelaw sync-agents` writes; none by default, and then no agent file exists."
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1,
+          "description": "How hooks and MCP registrations start codelaw; detected from the repo when unset (`npx --no-install codelaw`, `uv run codelaw` or `codelaw`)."
+        }
+      }
     },
     "daemon": {
       "x-codelaw-record": "SR-ARCHITECTURE",

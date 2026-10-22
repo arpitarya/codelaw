@@ -156,3 +156,161 @@ fn explain_tree_and_rules_why() {
     assert!(out.starts_with("a.py:1:1 fixture/py-no-print print(1) in library code — fix: manual — Change it by hand."), "{out}");
     let _ = fs::remove_dir_all(&d);
 }
+
+/// Every file under `dir`, relative to `root`, sorted; `node_modules` aside.
+fn all_files(root: &Path, dir: &Path, out: &mut Vec<String>) {
+    for e in fs::read_dir(dir).unwrap().flatten() {
+        let p = e.path();
+        if p.is_dir() {
+            if p.file_name().is_some_and(|n| n == "node_modules") {
+                continue;
+            }
+            all_files(root, &p, out);
+        } else {
+            out.push(p.strip_prefix(root).unwrap().to_string_lossy().replace('\\', "/"));
+        }
+    }
+    out.sort();
+}
+
+fn tree(root: &Path) -> Vec<String> {
+    let mut v = Vec::new();
+    all_files(root, root, &mut v);
+    v
+}
+
+/// SR-CONSUMER-LAYOUT decisions 4, 5 and 8 with SR-AGENT-SURFACES
+/// decisions 1 and 2: `init --agents` writes only the tree's paths,
+/// `sync-agents --check` fails on drift inside the markers and on nothing
+/// outside them, and with no agents no agent file exists.
+#[test]
+fn init_agents_writes_the_layout_and_sync_keeps_it() {
+    let d = temp("agents");
+    fs::write(d.join("package.json"), r#"{"name":"x"}"#).unwrap();
+    fs::create_dir_all(d.join("src")).unwrap();
+    fs::write(d.join("src/a.ts"), "export const a = 1;\n").unwrap();
+    fs::write(d.join("CLAUDE.md"), "# Team\n\nOur notes.\n").unwrap();
+    // The packs `npm install` would add (`--no-install` here).
+    let packs = Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().join("packs");
+    copy_dir(&packs.join("js"), &d.join("node_modules/@codelaw/rules-js"));
+    copy_dir(&packs.join("data"), &d.join("node_modules/@codelaw/rules-data"));
+    let before = tree(&d);
+    let (code, out, err) = codelaw(&d, &["init", "--no-install", "--agents", "kiro,claude,cowork,copilot,codex"]);
+    assert_eq!(code, 0, "{out}{err}");
+    assert!(out.contains("~/.codex/config.toml") && out.contains("[mcp_servers.codelaw]"), "Codex's user config is printed: {out}");
+    let config = fs::read_to_string(d.join("codelaw.toml")).unwrap();
+    assert!(config.ends_with("\n[agents]\ntargets = [\"claude\", \"cowork\", \"copilot\", \"codex\", \"kiro\"]\n"), "{config}");
+    // SR-CONSUMER-LAYOUT §1: the paths init may add.
+    let allowed = ["codelaw.toml", ".gitignore", "AGENTS.md", "CLAUDE.md", ".mcp.json", ".vscode/mcp.json", ".codelaw/", ".claude/", ".kiro/", ".github/", ".agents/"];
+    for f in tree(&d).iter().filter(|f| !before.contains(f)) {
+        assert!(allowed.iter().any(|a| f == a || (a.ends_with('/') && f.starts_with(a))), "init wrote {f}, which SR-CONSUMER-LAYOUT §1 does not list");
+    }
+    for skills in [".claude/skills", ".github/skills", ".agents/skills", ".kiro/skills", ".claude/plugins/codelaw/skills"] {
+        assert!(d.join(skills).join("codelaw-fix/SKILL.md").is_file(), "{skills}");
+    }
+    for f in [
+        ".claude/settings.json",
+        ".claude/agents/codelaw-rule-author.md",
+        ".github/agents/codelaw-rule-author.agent.md",
+        ".github/hooks/codelaw.json",
+        ".vscode/mcp.json",
+        ".kiro/steering/codelaw.md",
+        ".kiro/hooks/codelaw.json",
+        ".kiro/settings/mcp.json",
+        ".mcp.json",
+        "AGENTS.md",
+    ] {
+        assert!(d.join(f).is_file(), "{f}");
+    }
+    let hook = fs::read_to_string(d.join(".claude/settings.json")).unwrap();
+    assert!(hook.contains("\"npx --no-install codelaw hook\""), "beside a package.json the hook runs the repo's install: {hook}");
+
+    let (code, out, _) = codelaw(&d, &["sync-agents", "--check"]);
+    assert_eq!(code, 0, "init's files are what sync-agents writes: {out}");
+    // The team's text outside the markers is theirs.
+    let claude = fs::read_to_string(d.join("CLAUDE.md")).unwrap();
+    assert!(claude.starts_with("# Team\n\nOur notes.\n\n<!-- codelaw:begin -->\n"), "{claude}");
+    let claude = format!("{claude}\nMore team text.\n").replace("Our notes.", "Our notes, edited.");
+    fs::write(d.join("CLAUDE.md"), &claude).unwrap();
+    let (code, out, _) = codelaw(&d, &["sync-agents", "--check"]);
+    assert_eq!(code, 0, "{out}");
+    // An edit inside the markers, or to a generated file, is drift.
+    fs::write(d.join("CLAUDE.md"), claude.replace("Ask before you write.", "Write first.")).unwrap();
+    fs::write(d.join(".github/skills/codelaw-fix/SKILL.md"), "edited").unwrap();
+    let (code, out, _) = codelaw(&d, &["sync-agents", "--check"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(out.contains("out of date: CLAUDE.md") && out.contains("out of date: .github/skills/codelaw-fix/SKILL.md"), "{out}");
+    let (code, out, err) = codelaw(&d, &["sync-agents"]);
+    assert_eq!(code, 0, "{out}{err}");
+    assert_eq!(fs::read_to_string(d.join("CLAUDE.md")).unwrap(), claude, "sync restores the block and keeps the team's edits");
+    assert_eq!(codelaw(&d, &["sync-agents", "--check"]).0, 0);
+    // A stale codelaw skill is removed; the team's own skill stays.
+    fs::create_dir_all(d.join(".claude/skills/codelaw-gone")).unwrap();
+    fs::write(d.join(".claude/skills/codelaw-gone/SKILL.md"), "old").unwrap();
+    fs::create_dir_all(d.join(".claude/skills/team-skill")).unwrap();
+    fs::write(d.join(".claude/skills/team-skill/SKILL.md"), "ours").unwrap();
+    assert_eq!(codelaw(&d, &["sync-agents", "--check"]).0, 1);
+    assert_eq!(codelaw(&d, &["sync-agents"]).0, 0);
+    assert!(!d.join(".claude/skills/codelaw-gone").exists() && d.join(".claude/skills/team-skill/SKILL.md").is_file());
+    // An unknown agent names the nearest one, in init and in the config.
+    let (code, _, err) = codelaw(&d, &["init", "--agents", "claud"]);
+    assert_eq!(code, 2);
+    assert!(err.contains("did you mean `claude`?"), "{err}");
+    fs::write(d.join("codelaw.toml"), "[agents]\ntargets = [\"copilt\"]\n").unwrap();
+    let (code, _, err) = codelaw(&d, &["sync-agents"]);
+    assert_eq!(code, 2);
+    assert!(err.contains("did you mean `copilot`?"), "{err}");
+    fs::write(d.join("codelaw.toml"), "[agents]\ntarget = [\"claude\"]\n").unwrap();
+    assert_eq!(codelaw(&d, &["sync-agents"]).0, 2, "an unknown key in [agents] is a config error");
+    let _ = fs::remove_dir_all(&d);
+
+    // L5 decision 4: no `--agents`, no agent file.
+    let d = temp("no-agents");
+    fs::write(d.join("a.md"), "# A\n").unwrap();
+    assert_eq!(codelaw(&d, &["init", "--no-install"]).0, 0);
+    assert_eq!(tree(&d), [".codelaw/rules/README.md", ".gitignore", "a.md", "codelaw.toml"]);
+    let (code, out, _) = codelaw(&d, &["sync-agents", "--check"]);
+    assert_eq!(code, 0, "{out}");
+    let _ = fs::remove_dir_all(&d);
+}
+
+/// SR-AGENT-SURFACES decision 6: the hook reads the agent's payload, fixes
+/// what is `auto`, and sends what is left back with exit 2.
+#[test]
+fn hook_fixes_the_edited_file_and_returns_what_is_left() {
+    use std::io::Write;
+    let d = temp("hook");
+    let pack = Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().join("packs/js");
+    copy_dir(&pack, &d.join("node_modules/@codelaw/rules-js"));
+    fs::write(d.join("codelaw.toml"), "extends = [\"codelaw:js/recommended\"]\npreview = true\n").unwrap();
+    fs::write(d.join("a.js"), "let a   = 1\nfor (let i = 0; i < 10; i--) { a++; }\n").unwrap();
+    fs::write(d.join("b.js"), "export const b = 1;\n").unwrap();
+    let payload = format!(r#"{{"cwd":"{}","tool_name":"Write","tool_input":{{"file_path":"a.js"}}}}"#, d.display());
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codelaw"))
+        .arg("hook")
+        .current_dir(&d)
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    child.stdin.take().unwrap().write_all(payload.as_bytes()).unwrap();
+    let out = child.wait_with_output().unwrap();
+    let err = String::from_utf8(out.stderr).unwrap();
+    assert_eq!(out.status.code(), Some(2), "{err}");
+    assert!(err.contains("codelaw auto-fixed a.js: format/unformatted ×1"), "{err}");
+    assert!(err.contains("a.js:2:1 error js/for-direction") && err.contains("fix: manual — 1."), "{err}");
+    assert!(err.contains("never suppress or disable a rule"), "{err}");
+    let fixed = fs::read_to_string(d.join("a.js")).unwrap();
+    assert!(fixed.starts_with("let a = 1;\n"), "{fixed}");
+    // The same bytes `codelaw fix` writes (L5 decision 5).
+    fs::write(d.join("c.js"), "let a   = 1\nfor (let i = 0; i < 10; i--) { a++; }\n").unwrap();
+    codelaw(&d, &["fix", "c.js"]);
+    assert_eq!(fs::read_to_string(d.join("c.js")).unwrap(), fixed);
+    // A clean file: exit 0, nothing to say; a file codelaw does not check: exit 0.
+    let (code, out, err) = codelaw(&d, &["hook", "b.js"]);
+    assert_eq!((code, out.as_str(), err.as_str()), (0, "", ""));
+    fs::write(d.join("x.rs"), "fn main() {}\n").unwrap();
+    assert_eq!(codelaw(&d, &["hook", "x.rs"]).0, 0);
+    let _ = fs::remove_dir_all(&d);
+}
