@@ -16,11 +16,11 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | `codelaw test` refuses a rule whose fix only changes layout: `format(Don't) == format(Do)` | decision 3: the linter and the formatter never fight | ⏳ |
-| 2 | Read `.editorconfig` as the base layer under `[format]` | decision 5 | ⏳ |
-| 3 | `codelaw format --import-config`: `.prettierrc*`, `[tool.ruff.format]`, `[tool.black]` → `[format]` keys | decision 5's migration | ⏳ |
-| 4 | Honour `codelaw-format-ignore` and `prettier-ignore` in every engine (Ruff's `# fmt:` markers already work) | decision 6 | ⏳ |
-| 5 | LSP `textDocument/rangeFormatting` | decision 8, SR-EDITOR decision 1 | ⏳ |
+| 1 | `codelaw test` refuses a rule whose fix only changes layout: `format(Don't) == format(Do)` | decision 3: the linter and the formatter never fight | ✅ 2026-10-22 |
+| 2 | Read `.editorconfig` as the base layer under `[format]` | decision 5 | ✅ 2026-10-22 |
+| 3 | `codelaw format --import-config`: `.prettierrc*`, `[tool.ruff.format]`, `[tool.black]` → `[format]` keys | decision 5's migration | 🟡 written, uncommitted and unbuilt in the W-23 worktree |
+| 4 | Honour `codelaw-format-ignore` and `prettier-ignore` in every engine (Ruff's `# fmt:` markers already work) | decision 6 | ✅ 2026-10-22 |
+| 5 | LSP `textDocument/rangeFormatting` | decision 8, SR-EDITOR decision 1 | 🟡 written, uncommitted and unbuilt in the W-23 worktree |
 
 **Found by W-07, 2026-10-21:** W-07's definition of done covered the engines, the command, verification, the L7 test, the gate and the parity diff. SR-FORMATTER also decides these five, and none was built.
 

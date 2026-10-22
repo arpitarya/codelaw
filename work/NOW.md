@@ -3,4 +3,4 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-active — 2026-10-22: W-18, W-16 and W-10 merged into local main (not pushed); seven agents still running (W-11/13, W-12, W-14, W-15, W-20, W-21, W-23). Next: merge each, then one clean verification run.
+active — 2026-10-22: every committed agent branch is merged into local main (not pushed) and verified (clippy clean, 385 tests). Next: finish W-21 and W-23 from their worktrees, where their last work is uncommitted and unbuilt.

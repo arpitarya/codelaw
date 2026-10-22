@@ -34,11 +34,11 @@ Installed adapters run from the CLI and CI only, and their findings merge, dedup
 |---|---|---|
 | 1 · manifests | One manifest per adapter, with its tested version range. | ✅ `tests/manifests.rs` |
 | 2 · mapping | Fixtures per adapter: output → diagnostics with a fix class. | ✅ `tests/mapping.rs` (real output of the four pinned tools); `tests/run.rs` replays it through a stand-in program and runs each real tool where installed (all four checked here through `npx`/`uvx` wrappers) |
-| 3 · fences | Never run in hook or LSP mode; never bundled; each passes L2 (yamllint stays out). | ✅ in code and `crates/codelaw-cli/tests/adapters.rs`; the full workspace test and clippy run is still owed (the disk filled, see below) |
+| 3 · fences | Never run in hook or LSP mode; never bundled; each passes L2 (yamllint stays out). | ✅ in code and `crates/codelaw-cli/tests/adapters.rs`; the full workspace test (385 tests) and clippy run passed on merged `main`, 2026-10-22 |
 
 ## Blockers
 
-None. **Verification owed (2026-10-22):** the crate's own tests (21) and `crates/codelaw-cli/tests/adapters.rs` (4) pass; the full `cargo test --workspace --exclude codelaw-agents` and clippy runs failed to link with "No space left on device" and were not retried.
+None. **Verified (2026-10-22):** merged into `main`; the full workspace test (385 tests) and `clippy -D warnings` pass. Closed.
 
 ## Record affected
 

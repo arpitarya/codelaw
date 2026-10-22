@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Cache the compiled rule set by the hash of every rule file, data table and the config | rules are compiled on every run today | ⏳ |
-| 2 | Register warm sockets (`.codelaw/cache/run/<pid>.sock`) from lsp, mcp and daemon; `--prefer-warm` | one-shot runs reuse a warm process | ⏳ |
-| 3 | Add `codelaw daemon start|stop` with idle timeout and reload | opt-in warm process | ⏳ |
-| 4 | Re-parse incrementally on edit; bound the tree cache | SR-ARCHITECTURE decisions 23–24 | ⏳ |
+| 1 | Cache the compiled rule set by the hash of every rule file, data table and the config | rules are compiled on every run today | ✅ 2026-10-22 |
+| 2 | Register warm sockets (`.codelaw/cache/run/<pid>.sock`) from lsp, mcp and daemon; `--prefer-warm` | one-shot runs reuse a warm process | ✅ 2026-10-22 |
+| 3 | Add `codelaw daemon start|stop` with idle timeout and reload | opt-in warm process | ✅ 2026-10-22 |
+| 4 | Re-parse incrementally on edit; bound the tree cache | SR-ARCHITECTURE decisions 23–24 | 🟡 re-parse ✅ 2026-10-22; `[lsp] tree_cache` (the LRU bound) not read yet |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
 
@@ -33,14 +33,14 @@ A warm process serves hook and `--prefer-warm` runs with identical output to a c
 
 | DoD | what | state |
 |---|---|---|
-| 1 · rule-set cache | Compiled rules cached (SR-ARCHITECTURE decision 15, 15c). | ⏳ |
-| 2 · sockets | Discovery picks the newest live socket of the same version; stale ones are removed (fixture). | ⏳ |
-| 3 · daemon | Opt-in, 30-minute idle exit, reloads config/rules/baseline. | ⏳ |
-| 4 · parity | Warm and cold runs give byte-identical output on every fixture. | ⏳ |
+| 1 · rule-set cache | Compiled rules cached (SR-ARCHITECTURE decision 15, 15c). | ✅ |
+| 2 · sockets | Discovery picks the newest live socket of the same version; stale ones are removed (fixture). | ✅ `tests/warm.rs` |
+| 3 · daemon | Opt-in, 30-minute idle exit, reloads config/rules/baseline. | ✅ `tests/warm.rs` (baseline: none exists yet, W-13) |
+| 4 · parity | Warm and cold runs give byte-identical output on every fixture. | ✅ `tests/warm.rs` |
 
 ## Blockers
 
-None for the cache and daemon; the LSP as a warm process needs W-09.
+None. **2026-10-22:** merged into `main` and verified (the merge found `daemon status` hanging on a socket that never answers; fixed). Left: the `[lsp] tree_cache` bound of decision 24.
 
 ## Record affected
 
