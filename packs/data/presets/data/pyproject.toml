@@ -3,3 +3,4 @@ description = "Starter rules for pyproject.toml"
 [rules]
 "toml/deps-sorted" = "warn"
 "toml/pyproject-requires-python" = "warn"
+"toml/pyproject-schema" = "error"

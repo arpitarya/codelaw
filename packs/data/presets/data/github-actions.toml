@@ -1,4 +1,6 @@
 description = "Starter rules for GitHub Actions workflows and composite actions"
 
 [rules]
+"yaml/gha-action-schema" = "error"
 "yaml/gha-pin-sha" = "warn"
+"yaml/gha-workflow-schema" = "error"

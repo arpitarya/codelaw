@@ -17,16 +17,18 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 |---|---|---|
 | `data/recommended` | 6 | correctness for JSON, YAML and TOML: keys defined twice in each, YAML aliases without an anchor, and the YAML scalars that YAML 1.1 and 1.2 read differently |
 | `md/recommended` | 16 | the non-layout rules of markdownlint 0.42.0's default set |
-| `data/package-json` | 2 | `json/package-scripts-sorted`, `json/package-engines` — `files: **/package.json` |
-| `data/tsconfig` | 1 | `json/tsconfig-strict` — `files: **/tsconfig.json`, `**/tsconfig.*.json` |
-| `data/pyproject` | 2 | `toml/deps-sorted`, `toml/pyproject-requires-python` — `files: **/pyproject.toml` |
-| `data/github-actions` | 1 | `yaml/gha-pin-sha` — workflows and composite actions |
+| `data/package-json` | 4 | `json/package-scripts-sorted`, `json/package-deps-sorted`, `json/package-engines`, `json/package-json-schema` — `files: **/package.json` |
+| `data/tsconfig` | 2 | `json/tsconfig-strict`, `json/tsconfig-schema` — `files: **/tsconfig.json`, `**/tsconfig.*.json` |
+| `data/pyproject` | 3 | `toml/deps-sorted`, `toml/pyproject-requires-python`, `toml/pyproject-schema` — `files: **/pyproject.toml` |
+| `data/github-actions` | 3 | `yaml/gha-pin-sha`, `yaml/gha-workflow-schema`, `yaml/gha-action-schema` — workflows and composite actions |
 | `data/conventions` | 2 | opt-in house style: `yaml/document-start`, `md/no-inline-html` |
 
-30 rules: 7 `auto`, 5 `suggest`, 18 `manual`. Every rule is
+36 rules: 8 `auto`, 5 `suggest`, 23 `manual`. Every rule is
 **reimplemented**, not vendored: the checks, messages and docs are written
 fresh, and each ported rule's `ported_from:` names its source. Rules that need
-more than a pattern are native rules in `crates/codelaw-native/src/data_*.rs`.
+more than a pattern are native rules in `crates/codelaw-native/src/data_*.rs`;
+rules about a path in a JSON, YAML or TOML file are `target:` + `assert:` rules
+(SR-RULE-FORMAT decision 3e).
 
 The starter-catalogue rules are all here under their starter ids:
 `json/package-scripts-sorted`, `json/package-engines`, `json/tsconfig-strict`,
@@ -56,6 +58,11 @@ The starter-catalogue rules are all here under their starter ids:
 | `md/link-image-reference-definitions` | markdownlint MD053 | auto |
 | `md/table-column-count` | markdownlint MD056 | manual |
 | `md/descriptive-link-text` | markdownlint MD059 | manual |
+| `json/package-json-schema` | SchemaStore `package.json` | manual |
+| `json/tsconfig-schema` | SchemaStore `tsconfig.json` | manual |
+| `toml/pyproject-schema` | SchemaStore `pyproject.json` | manual |
+| `yaml/gha-workflow-schema` | SchemaStore `github-workflow.json` | manual |
+| `yaml/gha-action-schema` | SchemaStore `github-action.json` | manual |
 
 The JSON, YAML and TOML rules come from the formats' specifications (RFC 8259,
 YAML 1.2.2 and its YAML 1.1 differences, TOML 1.0.0) and the Python packaging
@@ -80,13 +87,14 @@ One rule name coincides with one of yamllint's — `yaml/document-start` and its
 | `yaml/no-ambiguous-booleans` | `y` and `n` aren't reported: common YAML 1.1 loaders (PyYAML, Psych) read them as strings |
 | `json/package-scripts-sorted` | a `scripts` object that uses `npm-run-all`, `run-s` or `run-p` is left alone, as sort-package-json does, because those runners expand `build:*` in written order |
 | `json/tsconfig-strict` | a config that `extends` another and doesn't set `strict` is left alone |
+| the five `*-schema` rules | a `$ref` to another SchemaStore file accepts any value (nothing is fetched); `oneOf` is read as `anyOf`; a `pattern` the engine's regular expressions can't read (look-around, back-references) accepts any value; `format` isn't checked; a YAML key with no value isn't checked |
+| `json/package-deps-sorted` | names compare by code point, not by locale as npm's `localeCompare` does; the two orders differ only where names differ by `_` against `-` or `.`, or by capitals, which new npm names cannot have |
 
 ## Not ported, and why
 
 | rule | why |
 |---|---|
 | `md/relative-links` (starter) | needs the file system: a native rule sees one file's text, not its path or the files around it |
-| JSON Schema validation against SchemaStore (`package.json`, `tsconfig.json`, `pyproject.toml`, workflows) | needs the structured-file engine (`target:` + `assert:`, W-12) or a native JSON Schema validator for the keywords those schemas use (`$ref`, `oneOf`/`anyOf`, `patternProperties`, `if`/`then`), plus the schemas shipped in `data/`; neither exists yet |
 | markdownlint MD043 `required-headings` | does nothing until configured with a heading list; a later version |
 | markdownlint MD044 `proper-names` | does nothing until configured with a list of names; a later version |
 | markdownlint MD054 `link-image-style` | every style is allowed by default, so the default set does nothing; a style choice |
@@ -98,8 +106,21 @@ One rule name coincides with one of yamllint's — `yaml/document-start` and its
 - YAML 1.2.2 and YAML 1.1 (the type repository's `bool`, `int` and base-60 forms) — the ambiguity rules.
 - TOML 1.0.0 — `toml/no-duplicate-keys`.
 - PEP 503, PEP 621 — `toml/deps-sorted`, `toml/pyproject-requires-python`.
-- sort-package-json (MIT) — the `pre`/`post` grouping and the `npm-run-all` exemption of `json/package-scripts-sorted`.
+- sort-package-json (MIT) — the `pre`/`post` grouping and the `npm-run-all` exemption of `json/package-scripts-sorted`, and the sorted dependency lists of `json/package-deps-sorted`.
+- SchemaStore (Apache-2.0), as served at `json.schemastore.org` on 2026-10-20 — the five schemas in `data/schemas/`.
 
 ## Data
 
-None: no rule in this pack reads a data table.
+| table | from | read by |
+|---|---|---|
+| `schemas/package` | SchemaStore `package.json` | `json/package-json-schema` |
+| `schemas/tsconfig` | SchemaStore `tsconfig.json` | `json/tsconfig-schema` |
+| `schemas/pyproject` | SchemaStore `pyproject.json` | `toml/pyproject-schema` |
+| `schemas/github-workflow` | SchemaStore `github-workflow.json` | `yaml/gha-workflow-schema` |
+| `schemas/github-action` | SchemaStore `github-action.json` | `yaml/gha-action-schema` |
+
+Each is the SchemaStore schema with its annotation-only keywords removed
+(`description`, `markdownDescription`, `title`, `default`, `examples`,
+`$comment`, `deprecationMessage` and the editor-specific `x-*`, `tsType` and
+`allowTrailingCommas` keys) and written without whitespace; every validation
+keyword is kept as published. The NOTICE carries SchemaStore's licence.

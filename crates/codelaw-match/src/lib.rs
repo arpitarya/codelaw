@@ -13,9 +13,13 @@
 //!   $REF: { undeclared: { globals: [window], tables: [globals/browser] } }
 //! ```
 
+pub mod data;
 mod predicate;
+pub mod schema;
+pub mod target;
 
 pub use predicate::{Predicate, parse_predicates};
+pub use target::{CompiledTarget, Pred, Slot, TargetFinding, compile_target};
 
 use ast_grep_config::{DeserializeEnv, RuleCore, SerializableRuleCore};
 use ast_grep_core::Matcher;
