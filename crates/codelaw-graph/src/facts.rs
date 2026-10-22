@@ -328,6 +328,9 @@ impl<'a> Extractor<'a> {
         self.decls(&skip);
         self.exports();
         self.imports(&skip);
+        if !self.python {
+            self.augmentations();
+        }
         self.walk(self.root);
         if self.python {
             for n in named_children(self.root) {
@@ -542,6 +545,36 @@ impl<'a> Extractor<'a> {
             };
             let members = if local.is_some() { self.members(&uses, &expected) } else { Some(Vec::new()) };
             self.f.imports.push(ImportFact { source: i.source.clone(), kind, local, span: (i.start, i.end), uses, members, type_only: i.type_only });
+        }
+    }
+
+    /// `declare module "./x" { interface I { … } }` merges into `./x`'s
+    /// `I`: a use of it, as a type-only named import.
+    fn augmentations(&mut self) {
+        for top in named_children(self.root) {
+            let decl = if top.kind() == "export_statement" { top.child_by_field_name("declaration") } else { Some(top) };
+            let Some(module) = decl.filter(|d| d.kind() == "ambient_declaration").and_then(|d| d.named_child(0)).filter(|m| m.kind() == "module") else {
+                continue;
+            };
+            let Some(source) = module.child_by_field_name("name").and_then(|n| self.string_literal(n)) else { continue };
+            let Some(body) = module.child_by_field_name("body") else { continue };
+            for stmt in named_children(body) {
+                let d = if stmt.kind() == "export_statement" { stmt.child_by_field_name("declaration") } else { Some(stmt) };
+                let Some(d) = d.filter(|d| matches!(d.kind(), "interface_declaration" | "class_declaration" | "enum_declaration" | "module" | "internal_module")) else {
+                    continue;
+                };
+                let Some(name) = d.child_by_field_name("name") else { continue };
+                let span = (name.start_byte(), name.end_byte());
+                self.f.imports.push(ImportFact {
+                    source: source.clone(),
+                    kind: ImportKind::Named(self.t(name).to_owned()),
+                    local: None,
+                    span,
+                    uses: vec![span],
+                    members: Some(Vec::new()),
+                    type_only: true,
+                });
+            }
         }
     }
 

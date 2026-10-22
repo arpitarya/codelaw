@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "cross-file analysis"
 owns: []
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-22T15:30:00Z
 content_sha: ""
 ---
 
@@ -103,13 +103,15 @@ Every rule so far reads one file at a time. Unused exports, unused dependencies,
   - `package.json` `exports`, `main`, `module` and `types`;
   - tsconfig `paths`, `baseUrl` and project references.
 
-  Workspace package names resolve to the **local source**, not `node_modules`. This uses `oxc_resolver` (Rust, MIT, enhanced-resolve compatible).
+  Workspace package names resolve to the **local source**, not `node_modules`. The resolver is `codelaw-graph`'s own and works over the project's file set without reading the disk, so the graph stays a pure function of the files and a rule test's virtual repo resolves exactly as a checkout does; `oxc_resolver` (Rust, MIT) was the planned choice and is not a dependency, because it reads the disk.
 - **Python** resolves:
   - package roots (detects `src/` layouts);
   - `__init__.py` and namespace packages;
   - relative imports;
   - `from x import *` through `__all__`.
 - **Namespace imports** (`import * as ns`, `import mod`): `ns.x` counts as a use of `x`. If `ns` itself is passed around, every member counts as used, which is the conservative choice.
+- **Module augmentation** (`declare module "./x" { interface I { … } }`) merges into `./x`'s `I`, so it counts as a use of `I`, like a type-only import.
+- **A stylesheet linked from HTML** (`<link href>`) is imported by that page, not an entry: its classes are still checked by `graph/no-unused-css-classes`.
 - **Out of scope for v1:** class members and methods. `obj.method()` can't be resolved without types. Only top-level symbols are tracked.
 
 #### 3. Entry points: things used from outside the repo
@@ -120,8 +122,8 @@ A symbol reachable from an entry point is **never** unused:
 |---|---|
 | `package.json` | `main`, `module`, `exports`, `types`, `bin`; a package not marked `"private": true` keeps its whole public export surface |
 | `pyproject.toml` | `[project.scripts]`, `[project.entry-points]`, `__main__.py` |
-| Framework presets | Next.js routes, Stencil `@Component` classes, Storybook stories, Jest/Vitest test files, `*.config.*` files, pytest tests and `conftest.py` |
-| Decorator registration | Functions decorated with configured registrars (`app.get`, `router.post`, `pytest.fixture`, `click.command`, Flask's request, error and template hooks such as `bp.before_app_request`, …) count as used |
+| Framework presets | Next.js routes, Stencil `@Component` classes, Storybook stories, Jest/Vitest test files, `*.config.*` files, pytest and unittest tests (`test*.py`, so Django's `tests.py`; `*_test.py`) and `conftest.py` |
+| Decorator registration | Functions decorated with configured registrars (`app.get`, `router.post`, `pytest.fixture`, `click.command`, Flask's request, error and template hooks such as `bp.before_app_request`, Django's template library `register.filter` / `simple_tag` / `inclusion_tag` / `tag`, …) count as used |
 | Config | `[graph] entry = ["scripts/**/*.ts"]` |
 
 #### 4. Dynamic code is reported honestly, never guessed
@@ -227,7 +229,21 @@ packages/legacy/src/plugins.py:14:1  info  graph/no-unused-exports  `register` l
 - **A cache and incremental relinking are required** to keep hook latency down.
 - **Without types, method-level usage is out of scope.** The design prefers missing a finding to reporting a false one.
 - **Dynamic code yields `info`-level "uncertain" results**, never errors.
-- **The false-positive rate is unmeasured:** `W-11`. A first corpus pass (flask, httpx, zustand, excalidraw, fastapi-template, 2026-10-22) found Flask's hook decorators unregistered, now default registrars; the rate itself is not yet judged.
+- **The false-positive rate is measured** (W-11 corpus run, 2026-10-22): **14 of 145 findings are false (9.7%)** — `graph/no-unused-exports` 11 of 142 (7.7%), `graph/no-unused-css-classes` 3 of 3 — and **none is one that config cannot express**, so the veto condition does not hold.
+  - **Method.** Seven repos cloned at pinned commits; a release build of the engine; `codelaw check --rule graph/no-unused-exports,graph/no-unused-css-classes` with only `preview = true` and the `js`, `py` and `css` presets (no `[graph]` section). Every finding was classified by hand, none sampled: the name was searched across the repo, then the use read. **False** means something does use the symbol (a framework, reflection, generated markup, a published surface); an export nothing uses is **true** even in generated or copied-in code. Each false one was then re-run with the config that expresses it.
+
+    | repo @ commit | findings | true | false | the config that expresses the false ones |
+    |---|---|---|---|---|
+    | pallets/flask @ `d086db856be1` | 8 | 8 | 0 | — (dead `TypeVar`s, a never-raised exception, a leftover alias) |
+    | encode/httpx @ `b5addb64f016` | 2 (css) | 0 | 2 | `keep = ["docs/css/**"]`: MkDocs' generated pages use the classes |
+    | encode/starlette @ `1a3a401c0d33` | 1 (css) | 0 | 1 | the same |
+    | pmndrs/zustand @ `382d29c485e6` | 4 | 0 | 4 | `entry = ["src/*.ts"]`: published from a build folder, so the root `package.json` is `private` and its `exports` name unbuilt paths |
+    | excalidraw/excalidraw @ `1d4dc2c0e6e4` | 7 | 7 | 0 | — |
+    | fastapi/full-stack-fastapi-template @ `b1125d883948` | 114 | 114 | 0 | — (74 in generated `*.gen.ts` clients, 38 in a copied-in shadcn/ui kit, 2 test helpers; `keep` silences them if wanted) |
+    | django/djangoproject.com @ `c78c1306b313` | 9 | 2 | 7 | `registrars = ["stat"]` (a local registry decorator, 4); `keep = ["**/models.py"]` (Django models reached through `Metric.__subclasses__()` and a `ForeignKey("Component")` string, 2); `entry = ["docs/sphinx_ext/*.py"]` (a Sphinx `setup()`, 1) |
+
+  - **Fixed during the run.** On `main` at `68b5c2c` the same corpus gave 149 findings, 27 false (18%). Defaults: unittest's `test*.py` (Django's `tests.py`, 9) and Django's template-library decorators (4) are now entries and registrars (decision 3). Engine: module augmentation now counts as a use (zustand's `StoreMutators`); a stylesheet linked from HTML was an entry and so never checked; and the `python` copy of `graph/no-unused-exports` listed fewer kinds, so a TypeScript repo lost its `interface` and `enum` findings (10 here) when it loaded last ([SR-RULE-PACKS](0101_rule-packs.md) decision 2).
+  - **What it does not measure.** Missed findings: a published package whose `exports` point at a build folder is kept whole (excalidraw's six packages), a file nothing imports is not judged, and SCSS is not read. The CSS sample is three findings.
 
 ### Alternatives considered
 

@@ -166,6 +166,57 @@ fn unused_css_classes() {
 }
 
 #[test]
+fn a_stylesheet_linked_from_html_is_still_checked() {
+    // Corpus run (W-11): a `<link href>` made the stylesheet an entry, and
+    // entries are skipped, so a plain site's CSS was never checked.
+    let rule = compile(&serde_json::json!({"class": {"defined_in": "css"}}), None).unwrap();
+    let files = [
+        ("index.html", "<link rel=\"stylesheet\" href=\"css/site.css\"><div class=\"used\"></div>"),
+        ("css/site.css", ".used { color: red }\n.dead { color: blue }\n"),
+    ];
+    let g = graph(&files, GraphConfig::default());
+    let names: Vec<String> = run(&rule, &g, &[Language::Css]).into_iter().map(|f| f.captures[0].1.clone()).collect();
+    assert_eq!(names, vec!["dead"]);
+}
+
+#[test]
+fn framework_hooks_and_unittest_modules_are_used() {
+    // Corpus run (W-11): Flask hook decorators, Django template-library
+    // decorators and unittest's `test*.py` (`tests.py`) were reported.
+    let files = [
+        ("app/__init__.py", ""),
+        ("app/main.py", "from app import auth, tags, tests\n"),
+        ("app/auth.py", "@bp.before_app_request\ndef load_user(): pass\n\n@app.errorhandler(404)\ndef not_found(e): pass\n"),
+        ("app/tags.py", "@register.inclusion_tag('x.html')\ndef snippet(): pass\n\n@register.filter\ndef shout(s): pass\n"),
+        ("app/tests.py", "class SmokeTests: pass\n"),
+    ];
+    assert!(unused(&files).is_empty(), "{:?}", unused(&files));
+}
+
+#[test]
+fn module_augmentation_uses_the_interface() {
+    // Corpus run (W-11, zustand): middleware merges into `StoreMutators`
+    // with `declare module '../vanilla'`; that is a use, not dead code.
+    let files = [
+        ("src/main.ts", "import { create } from './vanilla';\nimport './devtools';\ncreate();\n"),
+        ("src/vanilla.ts", "export function create() {}\nexport interface StoreMutators<S, A> {}\nexport interface Unused {}\n"),
+        ("src/devtools.ts", "export {};\ndeclare module './vanilla' {\n  interface StoreMutators<S, A> { devtools: S }\n}\n"),
+    ];
+    assert_eq!(unused(&files), vec!["src/vanilla.ts#Unused"]);
+}
+
+#[test]
+fn the_two_first_party_copies_are_one_rule() {
+    // SR-RULE-PACKS decision 2 merges the js and python copies into one rule
+    // whose body is the later pack's: the bodies must not differ, or a TS
+    // repo loses `interface` / `enum` when the python pack loads last.
+    let block = |s: &str| s.split("```codelaw").nth(1).and_then(|b| b.split("```").next()).unwrap().to_owned();
+    let js = block(include_str!("../../../packs/js/rules/graph/no-unused-exports.md"));
+    let py = block(include_str!("../../../packs/python/rules/graph/no-unused-exports.md"));
+    assert_eq!(js, py);
+}
+
+#[test]
 fn why_unused_and_refs() {
     let files = [("src/a.ts", "import { x } from './b';\nx();\n"), ("src/b.ts", "export function x() {}\nexport function y() {}\n")];
     let g = graph(&files, GraphConfig::default());

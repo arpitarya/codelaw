@@ -47,7 +47,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-06** `agent` README, CHANGELOG, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT landed (filed as W-04; renumbered 2026-10-20, the number was taken by the release pipeline); blocked on the decider placing the `.github/` templates. Filed by Arpit (Cowork). [detail](open/W-06-consumer-readme.md)
 🔴 **W-23** `agent` Finish SR-FORMATTER: all five steps landed and verified on `main` 2026-10-22; DoD 1 waits on the decider for two pack rules that fail the layout check (inbox). Filed by Arpit (Claude Code). [detail](open/W-23-formatter-rest.md)
-🟢 **W-11** `agent` Project graph and `graph:` rules built and verified on `main` 2026-10-22, with the six `node/` import rules; left: judge the corpus false-positive rate (step 4). Filed by Arpit (Cowork). [detail](open/W-11-project-graph.md)
+🟢 **W-11** `agent` Graph, `graph:` rules and the six `node/` import rules on `main`; the corpus run (branch `W-11-corpus`): 14 of 145 findings false (9.7%), each expressible by config, so the veto does not hold. Every DoD met; awaits merge. Filed by Arpit (Cowork). [detail](open/W-11-project-graph.md)
 🔴 **W-21** `agent` Engine gaps: tagged templates, native-rule file context and three rules landed on `main` 2026-10-22; modern CSS needs a `tree-sitter-css` fork, the decider's call (inbox). Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
 🟢 **W-13** `agent` Build baselines, deprecations, `--as-of` and `--changed-since`/`--staged`; W-11's graph, which `graph/no-deprecated-usage` needs, landed on `main` 2026-10-22. Filed by Arpit (Cowork). [detail](open/W-13-baseline-and-time.md)
 
