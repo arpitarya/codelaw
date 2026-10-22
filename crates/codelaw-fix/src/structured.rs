@@ -141,7 +141,7 @@ pub fn data_edits(fix: &[DataStep], ctx: &DataFixContext<'_>, slot: &Slot) -> Re
     if edits.is_empty() {
         return Err("the fix has nothing to change here".into());
     }
-    edits.sort_by(|a, b| (a.start, a.end).cmp(&(b.start, b.end)));
+    edits.sort_by_key(|a| (a.start, a.end));
     edits.dedup();
     verify(ctx, slot, &edits, &changes)?;
     Ok(edits)

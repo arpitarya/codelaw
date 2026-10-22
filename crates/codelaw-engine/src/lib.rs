@@ -15,11 +15,11 @@ mod timings;
 
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
-pub use fix::{FileFix, FixOptions, FixReport};
+pub use fix::{FileFix, FileTrace, FixOptions, FixReport};
 pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
 pub use lint::FileResult;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
-pub use debug::{FileTrace, MatchReport, RuleCard};
+pub use debug::MatchReport;
 pub use timings::{PhaseTiming, RuleTiming, TimingReport};
 
 use codelaw_cache::DiskCache;
@@ -251,7 +251,7 @@ impl Project {
     /// Fix one file's text in memory; nothing is written.
     pub fn fix_source(&self, rel_path: &str, language: Language, source: &str, unsafe_fixes: bool) -> FileFix {
         let entry = FileEntry { abs: self.config.root_dir.join(rel_path), rel: rel_path.to_owned(), language };
-        fix::fix_text(self, &entry, source, &FixOptions { unsafe_fixes, dry_run: true }, false)
+        fix::fix_text(self, &entry, source, &FixOptions { unsafe_fixes, dry_run: true, trace: false }, false)
     }
 
     /// Fix files and folders and write the results (SR-ARCHITECTURE

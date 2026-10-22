@@ -106,7 +106,7 @@ The decider asked for a record of what goes into which package, under the naming
 2. **The binary** links every crate. A single `codelaw` executable serves the CLI, `codelaw lsp` and `codelaw mcp`, with no second executable.
 3. **npm `codelaw`** contains:
    - `bin/codelaw.js`: picks the right `@codelaw/cli-*` package for the platform and runs the binary;
-   - `index.js` and `index.d.ts`: `check`, `fix`, `format`, `rulesFor`, each returning the `--format json` shape;
+   - `index.js` and `index.d.ts`: `check`, `fix`, `format`, `rulesFor`, each returning the `--format json` shape of `check`, `fix`, `format` and `rules --for <path>` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 4), unchanged; options are the flags (`lang`, `rule`, `threads`, `noCache`; `unsafe` and `dryRun` on `fix`; `check` on `format`). `crates/codelaw-cli/tests/api.rs` runs this API and decision 5's against the binary and requires the same JSON from both;
    - `codelaw.schema.json`: the config schema ([SR-CONFIG](0110_config.md));
    - `optionalDependencies` on the eight binary packages, and no other dependency.
 4. **npm `@codelaw/cli-<os>-<arch>`, eight packages:**
@@ -117,7 +117,7 @@ The decider asked for a record of what goes into which package, under the naming
    Each holds only the binary, with `os`, `cpu` and `libc` fields so npm installs exactly one.
 5. **PyPI `codelaw`:**
    - eight platform wheels, built with maturin's `bin` bindings;
-   - each wheel holds the binary, a `codelaw` Python module (`check`, `fix`, `format`, `rules_for`) and `py.typed`;
+   - each wheel holds the binary, a `codelaw` Python module (`check`, `fix`, `format`, `rules_for`; the same calls and JSON as decision 3, options as keyword arguments) and `py.typed`;
    - no sdist ([L6](0008_LAW-6-python-and-node-packages.md) decision 7).
 6. **The editor extension `codelaw.codelaw`** (source: `packaging/vscode`) is published as platform-specific packages. It runs the project's own codelaw first (`node_modules/.bin`, then `.venv/bin`) and falls back to a bundled binary ([SR-EDITOR](0114_editor.md)).
 7. **One version for everything:** every crate, both registries' engine packages, the five rule packs and the extension carry the same version from one file ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).

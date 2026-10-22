@@ -16,7 +16,7 @@ from importlib import metadata
 from collections.abc import Sequence
 from typing import Any
 
-__all__ = ["binary_path", "check", "fix", "rules_for"]
+__all__ = ["binary_path", "check", "fix", "format", "rules_for"]
 
 
 def binary_path() -> str:
@@ -117,6 +117,22 @@ def fix(
         a.append("--unsafe")
     if dry_run:
         a.append("--dry-run")
+    return _run([*a, "--", *paths])
+
+
+def format(
+    paths: Sequence[str] = (),
+    *,
+    check: bool = False,
+    lang: Sequence[str] | None = None,
+    rule: Sequence[str] | None = None,
+    threads: int | None = None,
+    no_cache: bool = False,
+) -> dict[str, Any]:
+    """``codelaw format --format json`` (``check``: write nothing); returns the report."""
+    a = ["format", "--format", "json", *_common(lang, rule, threads, no_cache)]
+    if check:
+        a.append("--check")
     return _run([*a, "--", *paths])
 
 

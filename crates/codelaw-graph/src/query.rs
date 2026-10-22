@@ -166,7 +166,7 @@ impl GraphFinding {
             return m.clone();
         }
         let mut caps = self.captures.clone();
-        caps.sort_by(|a, b| b.0.len().cmp(&a.0.len()));
+        caps.sort_by_key(|a| std::cmp::Reverse(a.0.len()));
         let mut out = template.to_owned();
         for (k, v) in caps {
             out = out.replace(&format!("${k}"), &v);

@@ -234,19 +234,13 @@ fn fix(args: FixArgs) -> ExitCode {
         Ok(p) => p,
         Err(e) => return fail(e),
     };
-    // The trace runs in memory first, so it sees the files before any write.
-    let trace = if args.trace {
-        match project.trace_fix(&args.paths, &FixOptions { unsafe_fixes: args.unsafe_fixes, dry_run: true }) {
-            Ok(t) => Some(t),
-            Err(e) => return fail(e),
-        }
-    } else {
-        None
-    };
-    let report = match project.fix(&args.paths, &FixOptions { unsafe_fixes: args.unsafe_fixes, dry_run: args.dry_run }) {
+    // One run: `--trace` records the loop `fix` runs, and writes what it
+    // writes (nothing with `--dry-run`).
+    let report = match project.fix(&args.paths, &FixOptions { unsafe_fixes: args.unsafe_fixes, dry_run: args.dry_run, trace: args.trace }) {
         Ok(r) => r,
         Err(e) => return fail(e),
     };
+    let trace = args.trace.then_some(&report.traces);
     match fmt {
         Format::Text => {
             for f in &report.files {
@@ -266,7 +260,7 @@ fn fix(args: FixArgs) -> ExitCode {
         }
         Format::Json => {
             let mut v = with_timings(codelaw_report::fix_json(&report), &project);
-            if let Some(t) = &trace {
+            if let Some(t) = trace {
                 v["trace"] = codelaw_report::trace_json(t);
             }
             println!("{}", serde_json::to_string_pretty(&v).expect("json"));
@@ -275,7 +269,7 @@ fn fix(args: FixArgs) -> ExitCode {
         Format::Agent => print!("{}", codelaw_report::check_agent(&report.check)),
     }
     // Text: on stdout after the report; SARIF and agent: on stderr.
-    match (&trace, fmt) {
+    match (trace, fmt) {
         (Some(t), Format::Text) => print!("{}", codelaw_report::trace_text(t)),
         (Some(t), Format::Sarif | Format::Agent) => eprint!("{}", codelaw_report::trace_text(t)),
         _ => {}
@@ -285,7 +279,7 @@ fn fix(args: FixArgs) -> ExitCode {
 }
 
 /// `--timings` in JSON output: a `timings` field.
-fn with_timings(mut v: serde_json::Value, project: &Project) -> serde_json::Value {
+pub fn with_timings(mut v: serde_json::Value, project: &Project) -> serde_json::Value {
     if let Some(t) = project.timings() {
         v["timings"] = codelaw_report::timings_json(&t);
     }
@@ -293,7 +287,7 @@ fn with_timings(mut v: serde_json::Value, project: &Project) -> serde_json::Valu
 }
 
 /// `--timings` beside the other formats: on stderr, so stdout stays parseable.
-fn print_timings(project: &Project, fmt: Format) {
+pub fn print_timings(project: &Project, fmt: Format) {
     if let Some(t) = project.timings().filter(|_| fmt != Format::Json) {
         eprint!("{}", codelaw_report::timings_text(&t));
     }

@@ -148,7 +148,10 @@ fn rules_firing(project: &Project, entry: &FileEntry, text: &str) -> BTreeSet<St
 /// Format with the engine's own checks, then the lint check of decision 4:
 /// no rule fires on the result that did not fire before.
 pub(crate) fn verified(project: &Project, entry: &FileEntry, text: &str) -> Result<String, FormatError> {
-    let out = codelaw_format::format(entry.language, &entry.rel, text, &project.formatting.options)?;
+    let out = {
+        let _timed = project.timings.as_ref().map(|t| t.guard(crate::timings::Phase::Format));
+        codelaw_format::format(entry.language, &entry.rel, text, &project.formatting.options)?
+    };
     if out != text && project.rules.has_rules() {
         let before = rules_firing(project, entry, text);
         let new: Vec<String> = rules_firing(project, entry, &out).difference(&before).cloned().collect();

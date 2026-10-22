@@ -107,7 +107,7 @@ fn local_rule_check_and_fix() {
 fn dry_run_writes_nothing() {
     let r = Repo::new("dry");
     r.file(".codelaw/rules/acme/eqeqeq.md", &eqeq()).file("a.js", "a == b;\n");
-    let report = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false }).unwrap();
+    let report = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false, trace: false }).unwrap();
     assert_eq!(report.files[0].fixed, "a === b;\n");
     assert!(!report.files[0].written);
     assert_eq!(r.read("a.js"), "a == b;\n");
@@ -182,7 +182,7 @@ fn native_rule_from_a_first_party_pack() {
     let d = r.check();
     assert_eq!(summary(&d), ["a.js:3:3 js/no-unreachable suggest"]);
     assert!(d[0].message.starts_with("Unreachable code"));
-    let fixed = r.project().unwrap().fix(&[], &FixOptions { unsafe_fixes: true, dry_run: false }).unwrap();
+    let fixed = r.project().unwrap().fix(&[], &FixOptions { unsafe_fixes: true, dry_run: false, trace: false }).unwrap();
     assert_eq!(fixed.files.len(), 1);
     assert_eq!(r.read("a.js"), "function f() {\n  return 1;\n}\n");
 }
@@ -604,7 +604,7 @@ fn bom_offsets_are_file_offsets_and_fix_reports_like_check() {
     assert_eq!(a.edits[0].start, b.edits[0].start + 3);
     let bytes = fs::read(r.0.join("a.js")).unwrap();
     assert_eq!(&bytes[a.start_byte..a.end_byte], b"a == b");
-    let dry = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false }).unwrap();
+    let dry = r.project().unwrap().fix(&[], &FixOptions { dry_run: true, unsafe_fixes: false, trace: false }).unwrap();
     assert_eq!(dry.fixed_count(), 2);
     assert!(dry.check.diagnostics.is_empty(), "{:?}", dry.check.diagnostics);
 }
