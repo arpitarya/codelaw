@@ -71,7 +71,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - An edit re-parses incrementally and re-runs that file's rules.
    - Project rules (the graph) re-run on save, or after 300 ms idle.
    - Everything stays warm in memory, within the tree-cache bound of [SR-ARCHITECTURE](0108_architecture.md) decision 24.
-   - **Built (W-15):** incremental sync (`TextDocumentSyncKind::INCREMENTAL`). Each open document keeps its tree as a `DocumentTree`; an edit re-parses through tree-sitter's edit API; a whole-text change, or an edit that moves the byte-order mark, drops the tree; closing the document drops it. Diagnostics equal a fresh parse's. Only open documents keep trees: `[lsp] tree_cache` is not read yet, and graph re-linking waits for project rules in the editor.
+   - **Built (W-15):** incremental sync (`TextDocumentSyncKind::INCREMENTAL`). Each open document keeps its tree as a `DocumentTree`; an edit re-parses through tree-sitter's edit API; a whole-text change, or an edit that moves the byte-order mark, drops the tree; closing the document hands it to the closed files' tree cache of [SR-ARCHITECTURE](0108_architecture.md) decision 24 (its `[lsp] tree_cache` bound), and reopening the same text takes it back. Diagnostics equal a fresh parse's. Graph re-linking waits for project rules in the editor.
    - `lsp_after_edit` is an [L8](0010_LAW-8-performance-budgets.md) budget.
 3. **Same verdicts as the CLI ([L5](0007_LAW-5-no-model-in-the-engine.md)).** The server calls the same engine functions; the editor never shows a result that `codelaw check` wouldn't.
 4. **The VS Code extension `codelaw.codelaw`:**

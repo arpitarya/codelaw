@@ -5,8 +5,8 @@ use std::collections::BTreeMap;
 /// strict: an unknown key is a load error (SR-CONFIG decision 5).
 ///
 /// The sections owned by records whose features are not built yet
-/// (`[format]`, `[graph]`, `[baseline]`, `[lsp]`) are accepted as tables
-/// and not yet validated.
+/// (`[format]`, `[graph]`, `[baseline]`) are accepted as tables and not
+/// yet validated.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RawConfig {
@@ -49,7 +49,8 @@ pub struct RawConfig {
     pub agents: RawAgents,
     #[serde(default)]
     pub daemon: RawDaemon,
-    pub lsp: Option<toml::Table>,
+    #[serde(default)]
+    pub lsp: RawLsp,
 }
 
 /// A rule's severity, or its severity and options.
@@ -129,6 +130,13 @@ pub struct RawAdapters {
 #[serde(deny_unknown_fields)]
 pub struct RawDaemon {
     pub idle_timeout: Option<Duration>,
+}
+
+/// `[lsp]`: SR-ARCHITECTURE decision 24.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawLsp {
+    pub tree_cache: Option<usize>,
 }
 
 /// `[lint]`: SR-LINTER decision 3.

@@ -183,6 +183,8 @@ max_size = 512000000
 external_timeout = "500ms"
 [daemon]
 idle_timeout = 1800
+[lsp]
+tree_cache = 64
 [lint]
 tagged_templates = true
 [markdown]
@@ -205,6 +207,7 @@ line_width = 100
         ("a bad severity", json!({ "rules": { "a/b": "eror" } })),
         ("an unknown language", json!({ "languages": ["pyhton"] })),
         ("a bad size", json!({ "cache": { "max_size": "1 parsec" } })),
+        ("a negative tree cache", json!({ "lsp": { "tree_cache": -1 } })),
     ] {
         assert!(schemas.validate(&bad, idx).is_err(), "the schema accepts {what}");
         assert!(Config::from_toml(PathBuf::from("/x"), &toml::to_string(&bad).unwrap()).is_err(), "the loader accepts {what}");

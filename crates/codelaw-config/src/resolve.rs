@@ -213,7 +213,7 @@ pub struct Config {
 pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codelaw/cache"];
 
 /// Keys a nested config may not set yet; they belong to the root config.
-const ROOT_ONLY: &[&str] = &["extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]"];
+const ROOT_ONLY: &[&str] = &["extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]"];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
     let set = [
@@ -227,6 +227,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.lint != Default::default(),
         raw.markdown != Default::default(),
         raw.daemon != Default::default(),
+        raw.lsp != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -397,6 +398,12 @@ impl Config {
     /// Default 30 minutes (SR-ARCHITECTURE decision 22).
     pub fn daemon_idle_timeout(&self) -> Duration {
         self.root_raw().and_then(|r| r.daemon.idle_timeout).map(|d| d.0).unwrap_or(Duration::from_secs(30 * 60))
+    }
+
+    /// How many closed files' syntax trees a warm process keeps, most
+    /// recently touched first; default 256 (SR-ARCHITECTURE decision 24).
+    pub fn lsp_tree_cache(&self) -> usize {
+        self.root_raw().and_then(|r| r.lsp.tree_cache).unwrap_or(256)
     }
 
     pub fn lint_code_blocks(&self) -> bool {
