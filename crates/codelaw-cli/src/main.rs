@@ -116,6 +116,10 @@ struct CheckArgs {
     /// Fail when there are more warnings than this.
     #[arg(long)]
     max_warnings: Option<usize>,
+    /// Don't run the installed external linters (oxlint, Ruff, stylelint,
+    /// html-validate) this command runs otherwise.
+    #[arg(long)]
+    no_adapters: bool,
 }
 
 #[derive(Args)]
@@ -137,6 +141,10 @@ struct FixArgs {
     format: String,
     #[arg(long)]
     max_warnings: Option<usize>,
+    /// Don't run the installed external linters (oxlint, Ruff, stylelint,
+    /// html-validate) this command runs otherwise.
+    #[arg(long)]
+    no_adapters: bool,
 }
 
 #[derive(Args)]
@@ -203,10 +211,12 @@ fn check(args: CheckArgs) -> ExitCode {
         Ok(f) => f,
         Err(e) => return fail(e),
     };
-    let options = match engine_options(&args.common) {
+    let mut options = match engine_options(&args.common) {
         Ok(o) => o,
         Err(e) => return fail(e),
     };
+    // The CLI is the one surface that runs adapters (SR-ARCHITECTURE decision 19).
+    options.adapters = !args.no_adapters;
     let mut project = match load(&args.paths, options) {
         Ok(p) => p,
         Err(e) => return fail(e),
@@ -230,10 +240,12 @@ fn fix(args: FixArgs) -> ExitCode {
         Ok(f) => f,
         Err(e) => return fail(e),
     };
-    let options = match engine_options(&args.common) {
+    let mut options = match engine_options(&args.common) {
         Ok(o) => o,
         Err(e) => return fail(e),
     };
+    // The CLI is the one surface that runs adapters (SR-ARCHITECTURE decision 19).
+    options.adapters = !args.no_adapters;
     let mut project = match load(&args.paths, options) {
         Ok(p) => p,
         Err(e) => return fail(e),

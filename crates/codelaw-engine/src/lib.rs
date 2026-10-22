@@ -2,6 +2,7 @@
 //! library: the CLI and every other surface only translate between their
 //! protocol and these functions (decision 2).
 
+mod adapters;
 mod compile;
 mod debug;
 mod discover;
@@ -51,6 +52,13 @@ pub struct EngineOptions {
     pub site_packages_env: Option<String>,
     /// `VIRTUAL_ENV`.
     pub virtual_env: Option<String>,
+    /// Run the installed adapters (SR-LINTER decision 2). Only the CLI's
+    /// `check` and `fix` set it, never hook, editor or MCP mode
+    /// (SR-ARCHITECTURE decision 19); `--no-adapters` clears it.
+    pub adapters: bool,
+    /// `PATH`, where an adapter is looked for after the project's
+    /// `node_modules/.bin` and `.venv/bin`.
+    pub path_env: Option<std::ffi::OsString>,
 }
 
 impl EngineOptions {
@@ -61,6 +69,7 @@ impl EngineOptions {
             cache_dir_env: var("CODELAW_CACHE_DIR"),
             site_packages_env: var("CODELAW_SITE_PACKAGES"),
             virtual_env: var("VIRTUAL_ENV"),
+            path_env: std::env::var_os("PATH"),
             ..Default::default()
         }
     }
@@ -135,6 +144,8 @@ pub struct Project {
     pub formatting: Formatting,
     pool: rayon::ThreadPool,
     timings: Option<timings::Timings>,
+    /// The adapters found installed, looked up on first use.
+    adapters: std::sync::OnceLock<codelaw_adapters::Resolved>,
 }
 
 fn pool(threads: Option<usize>) -> rayon::ThreadPool {
@@ -191,8 +202,14 @@ impl Project {
             DiskCache::new(Some(config.cache_dir(options.cache_dir_env.as_deref())))
         };
         let formatting = Formatting::from_config(&config)?;
+        // `[adapters] enabled` names only adapters codelaw has, on every
+        // surface, whether or not this one runs them.
+        if let Err(e) = codelaw_adapters::selected(config.adapters_enabled()) {
+            return Err(EngineError::Config(codelaw_config::ConfigError::new(config.files.first().map(|f| f.path.clone()), e)));
+        }
         let pool = pool(options.threads);
-        Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool, timings })
+        let adapters = std::sync::OnceLock::new();
+        Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool, timings, adapters })
     }
 
     pub fn root(&self) -> &Path {
@@ -210,12 +227,14 @@ impl Project {
         report.warnings.extend(warnings);
         let this = &*self;
         let results: Vec<FileResult> = self.pool.install(|| files.par_iter().map(|f| this.check_file(f)).collect());
-        for r in results {
+        let mut checked: Vec<&FileEntry> = Vec::new();
+        for (r, entry) in results.into_iter().zip(&files) {
             report.diagnostics.extend(r.diagnostics);
             if let Some(s) = r.skipped {
                 skipped.push(s);
             } else {
                 report.files_checked += 1;
+                checked.push(entry);
             }
         }
         if !self.rules.has_rules() {
@@ -227,6 +246,12 @@ impl Project {
             let sources = self.graph_sources()?;
             let scopes = project::scopes(self.root(), paths);
             report.diagnostics.extend(self.run_graph_rules(&sources, config).into_iter().filter(|d| project::within(&d.file, &scopes)));
+        }
+        // The adapters (SR-ARCHITECTURE decision 4, step 5).
+        if self.adapters_on() {
+            let mut run = adapters::check(self, &checked, &report.diagnostics);
+            report.diagnostics.append(&mut run.diagnostics);
+            report.warnings.append(&mut run.warnings);
         }
         report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
         dedup_diagnostics(&mut report.diagnostics);

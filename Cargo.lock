@@ -954,7 +954,9 @@ dependencies = [
 name = "codelaw-adapters"
 version = "0.1.0"
 dependencies = [
+ "codelaw-config",
  "codelaw-core",
+ "libc",
  "semver",
  "serde",
  "serde_json",
@@ -1039,6 +1041,7 @@ dependencies = [
 name = "codelaw-engine"
 version = "0.1.0"
 dependencies = [
+ "codelaw-adapters",
  "codelaw-cache",
  "codelaw-config",
  "codelaw-core",

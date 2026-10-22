@@ -381,6 +381,18 @@ impl Config {
         self.root_raw().and_then(|r| r.fix.external_timeout).map(|d| d.0).unwrap_or(Duration::from_secs(5))
     }
 
+    /// `[adapters] enabled`; `None` is "the default adapters" (SR-LINTER
+    /// decision 2). The names are checked against the manifests by the
+    /// engine.
+    pub fn adapters_enabled(&self) -> Option<&[String]> {
+        self.root_raw().and_then(|r| r.adapters.enabled.as_deref())
+    }
+
+    /// Default 60 s per run of an adapter (SR-LINTER decision 2).
+    pub fn adapter_timeout(&self) -> Duration {
+        self.root_raw().and_then(|r| r.adapters.timeout).map(|d| d.0).unwrap_or(Duration::from_secs(60))
+    }
+
     pub fn lint_code_blocks(&self) -> bool {
         self.root_raw().and_then(|r| r.markdown.lint_code_blocks).unwrap_or(false)
     }

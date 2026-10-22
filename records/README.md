@@ -170,6 +170,7 @@ directions.
 | `crates/codelaw-rules` | SR-RULE-FORMAT | decisions 1–7: the rule-file parser and its load checks |
 | `crates/codelaw-semantic` | SR-ARCHITECTURE | decision 15a |
 | `crates/codelaw-match` | SR-LINTER | decision 2: file-scope `match:` rules |
+| `crates/codelaw-adapters` | SR-LINTER | decision 2: the adapters' manifests, runner and output mapping |
 | `crates/codelaw-native` | SR-ARCHITECTURE | decision 15b |
 | `crates/codelaw-fix` | SR-ARCHITECTURE | decisions 5 and 18: the apply loop, verifier and external fixers |
 | `crates/codelaw-format` | SR-FORMATTER | decisions 2, 4, 5 and 7: the embedded engines, their options and the verifier; `shims/option-ext` is SR-PACKAGES decision 1's L2 patch |
@@ -220,5 +221,7 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 | `crates/codelaw-match/src/target.rs` | SR-RULE-FORMAT | decision 3e: `target:` paths and `assert:` checks |
 | `crates/codelaw-match/src/schema.rs` | SR-RULE-FORMAT | decision 3e: the `schema:` check and its departures from draft-07 |
 | `crates/codelaw-fix/src/structured.rs` | SR-RULE-FORMAT | decisions 3c and 3e: a `target:` rule's fix steps and their verification |
+| `crates/codelaw-adapters` | SR-ARCHITECTURE | decision 19: the adapter contract (lookup, versions, process handling, cache key) the crate implements |
+| `crates/codelaw-engine/src/adapters.rs` | SR-LINTER | decision 2: which adapters run, the per-tool mapping and the ported-rule dedupe |
 
 <!-- DESCRIBES-TABLE-END -->

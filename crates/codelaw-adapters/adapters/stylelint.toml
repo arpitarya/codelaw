@@ -10,8 +10,17 @@ default = false
 languages = ["css"]
 version_args = ["--version"]
 args = ["--formatter", "json", "--compute-edit-info", "--allow-empty-input"]
-# The fixtures were captured from 17.16.0; `--compute-edit-info` is 16.15+.
+# The fixtures were captured from 17.16.0 (tests/fixtures/stylelint);
+# `--compute-edit-info` is 16.15+.
 tested = ">=17.16.0, <18.0.0"
 output = "stylelint"
 ported_prefix = "stylelint/"
 docs = "https://stylelint.io/user-guide/rules/{rule}"
+# The files whose content enters each cache key (SR-ARCHITECTURE decision 19),
+# looked for in every folder from the file's up to the project root.
+config_files = [
+  ".stylelintrc", ".stylelintrc.json", ".stylelintrc.yaml", ".stylelintrc.yml",
+  ".stylelintrc.js", ".stylelintrc.cjs", ".stylelintrc.mjs",
+  "stylelint.config.js", "stylelint.config.cjs", "stylelint.config.mjs", "stylelint.config.ts",
+  ".stylelintignore", "package.json",
+]

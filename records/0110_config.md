@@ -92,7 +92,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
    `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11).
 
-   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change.
+   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]` is validated by the loader since W-14, like `[fix]` and `[lint]`; `[format]`, `[graph]`, `[baseline]`, `[agents]`, `[daemon]` and `[lsp]` are still read as tables.
 4. **Precedence, last wins:**
    1. Built-in defaults.
    2. `.editorconfig` (formatter keys only).
