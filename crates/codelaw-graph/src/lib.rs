@@ -13,12 +13,12 @@ pub mod query;
 pub mod resolve;
 
 pub use config::GraphConfig;
-pub use facts::{Decl, DeclKind, FactLang, FileFacts, Span, extract};
+pub use facts::{Decl, DeclKind, FactLang, FileFacts, Span, SpecForm, Specifier, extract};
 pub use link::{Graph, GraphInput, Manifest, Module, Use, is_manifest};
 pub use query::{GraphFinding, GraphRule, Query, compile, refs, run, why_unused};
 
 /// Bumped whenever extraction changes: part of the facts cache key.
-pub const FACTS_VERSION: &str = "graph-facts-2";
+pub const FACTS_VERSION: &str = "graph-facts-3";
 
 /// Whether the graph reads facts from a language.
 pub fn reads(language: codelaw_core::Language) -> bool {

@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -73,7 +73,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
    1. Load config ([SR-CONFIG](0110_config.md)), resolve the rule packs ([SR-RULE-PACKS](0101_rule-packs.md) decision 4) and load the compiled rule set (cached).
    2. Discover files (decision 7).
    3. In parallel, per file: read once, hash, and on a cache hit reuse the results; otherwise parse once, split embedded regions, build the semantic model if an active rule needs it (decision 15a), run file rules (`native:` ones included, decision 15b) and the format check, and extract graph facts.
-   4. Link the graph and run project rules ([SR-PROJECT-GRAPH](0103_project-graph.md)).
+   4. Link the graph and run project rules ([SR-PROJECT-GRAPH](0103_project-graph.md)). The graph reads every file of the project root, including those `[files]` or `languages` leave out, so their uses count; project-rule findings are reported only in files step 3 would check.
    5. Run adapters (decision 19).
    6. Apply suppressions ([SR-LINTER](0106_linter.md) decision 6) and the baseline ([SR-BASELINE](0104_baseline-and-deprecations.md)).
    7. Merge, dedupe (same file, range, rule) and sort by path, line, column, rule.

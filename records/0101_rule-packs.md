@@ -10,7 +10,7 @@ feature: "predefined rules and rule packs"
 owns:
   - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-22T12:00:00Z
 content_sha: ""
 ---
 
@@ -82,7 +82,7 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
 
    Every other rule codelaw publishes lives in a pack.
 2. **The five first-party packs and their presets** are §1's table.
-   - Graph rules live with their language: `graph/no-unused-exports` in `js` and `python`, and `graph/no-unused-css-classes` in `css`.
+   - Graph rules live with their language: `graph/no-unused-exports` in `js` and `python`, and `graph/no-unused-css-classes` in `css`. A pack rule may also be `scope: project` under its own prefix: `node/recommended`'s six import rules (`node/no-{missing,extraneous,unpublished}-{import,require}`) run on the graph's `import:` query ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 6).
    - There's **no umbrella preset that spans packs**, because it would require packs the repo hasn't installed.
 3. **Pack layout.** A pack is the same folder in the source tree (`packs/<name>/` in the codelaw repo) and in both published forms:
 
