@@ -3,7 +3,7 @@
 # artifact this run assembled: nothing is compiled at release time
 # (SR-PACKAGES decision 11; W-04).
 #
-#   test      cargo test --workspace (the law checks: L2 licences, L3 fixtures, layers)
+#   test      cargo test --workspace (the law checks: L2 licences, L3 fixtures, L5 network fence, layers)
 #   lint      the version copies agree (W-18) · the SR guard replayed from RULE-SINCE · clippy
 #   build ×8  one maturin wheel per platform; the npm binary is taken OUT of it, so
 #             both registries ship the same bytes (L6 decision 2); each runs its
@@ -80,6 +80,9 @@ jobs:
           cache-on-failure: true
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: cargo test --workspace --locked
+        env:
+          # the L5 network fence fails here instead of skipping (SR-LAW-5)
+          CODELAW_REQUIRE_NETWORK_FENCE: '1'
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: mkdir -p .verdict && echo "${{ github.sha }}" > .verdict/sha
       - if: steps.verdict.outputs.cache-hit != 'true'
