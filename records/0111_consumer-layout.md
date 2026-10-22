@@ -7,7 +7,8 @@ description: "Defines what codelaw adds to a consumer repository: which paths th
 status: accepted
 date: 2026-10-18
 feature: "the consumer directory"
-owns: []
+owns:
+  - crates/codelaw-cli/tests/consumer_layout.rs
 laws: [L0, L3, L5, L6]
 timestamp: 2026-10-18T18:00:00Z
 content_sha: ""
@@ -23,6 +24,7 @@ content_sha: ""
 my-app/
 ├─ codelaw.toml                      you write    (or [tool.codelaw] / package.json "codelaw")
 ├─ .codelaw/
+│  ├─ rules/README.md                codelaw writes, you review (init's pointer at new-rule, decision 8)
 │  ├─ rules/<namespace>/<name>.md    you write    local rules (SR-RULE-FORMAT)
 │  ├─ rules/<namespace>/<name>.cases.md you write edge cases (SR-RULE-AUTHORING)
 │  ├─ fixers/                        you write    optional external fixers
@@ -81,6 +83,7 @@ The decider asked for a record of what the consumer directory looks like. It was
 
 - **A repo gains one folder (`.codelaw/`) and one config;** agent files only on request.
 - **Baselines and deprecations add reviewable files;** that's deliberate ([SR-BASELINE](0104_baseline-and-deprecations.md)).
+- **Checked by `crates/codelaw-cli/tests/consumer_layout.rs`:** it reads §1's tree from this file, runs `codelaw init --no-install` and then `codelaw check` in a committed fixture repo, and compares `git status --ignored` with the tree — every new path listed, nothing ignored but `.codelaw/cache/` (beside the team's own `node_modules/`), `.gitignore` changed by that one line, no generated path without `--agents`. `init --agents` writes only §1's paths, or, while it is refused (W-10), nothing.
 
 ### Alternatives considered
 
@@ -97,7 +100,7 @@ The decider asked for a record of what the consumer directory looks like. It was
 
 **Reopen this decision if:** codelaw writes a path in a consumer repo that §1's tree doesn't list, or gitignores anything but `.codelaw/cache/`.
 
-**How to check it:** `codelaw init --agents claude,copilot,codex,kiro` in an empty fixture repo, with `git status` compared against §1 (`W-20`).
+**How to check it:** `cargo test -p codelaw-cli --test consumer_layout` — `codelaw init`, with and without `--agents claude,copilot,codex,kiro`, in a fixture repo, with `git status` compared against §1.
 
 ---
 
