@@ -53,7 +53,7 @@ fn severity_name(s: Option<codelaw_core::Severity>) -> String {
 
 impl Project {
     /// A path as the engine sees it: absolute, and relative to the root.
-    fn locate(&self, file: &Path) -> (PathBuf, String) {
+    fn locate_path(&self, file: &Path) -> (PathBuf, String) {
         let abs = std::fs::canonicalize(file).unwrap_or_else(|_| self.root().join(file));
         let rel = codelaw_core::normalize_path(abs.strip_prefix(self.root()).unwrap_or(&abs));
         (abs, rel)
@@ -61,10 +61,10 @@ impl Project {
 
     /// The rules that apply to `file` with the severity they run at, or —
     /// with no file — every rule with its default severity.
-    pub fn rules_for(&self, file: Option<&Path>) -> Result<Vec<RuleCard>, EngineError> {
+    pub fn rule_cards(&self, file: Option<&Path>) -> Result<Vec<RuleCard>, EngineError> {
         let target = match file {
             Some(f) => {
-                let (abs, rel) = self.locate(f);
+                let (abs, rel) = self.locate_path(f);
                 let Some(language) = Language::from_path(&abs) else {
                     return Err(EngineError::Usage(format!("{rel}: not a file codelaw checks (no known extension)")));
                 };
@@ -104,7 +104,7 @@ impl Project {
     /// `config --print [--for <file>]`: the config's values (SR-CONFIG
     /// decision 7), then every rule's severity, each with its source.
     pub fn config_trace(&self, file: Option<&Path>, env: &TraceEnv) -> Vec<Traced> {
-        let abs = file.map(|f| self.locate(f).0);
+        let abs = file.map(|f| self.locate_path(f).0);
         let mut out = self.config.trace(abs.as_deref(), env);
         let layers = self.config.layers_for(abs.as_deref().unwrap_or(self.root()));
         for c in &self.compiled {
@@ -140,7 +140,7 @@ impl Project {
                 .unwrap_or_default();
             return Err(EngineError::Usage(format!("unknown rule `{id}`{near}")));
         };
-        let (abs, rel) = self.locate(file);
+        let (abs, rel) = self.locate_path(file);
         let language = Language::from_path(&abs).ok_or_else(|| EngineError::Usage(format!("{rel}: not a file codelaw checks")))?;
         if !matches!(c.matcher, Matcher::Match(_)) {
             return Err(EngineError::Usage(format!("`{id}` is not a `match:` rule; `match --explain` explains `match:` rules")));

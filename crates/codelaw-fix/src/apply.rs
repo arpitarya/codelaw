@@ -173,7 +173,6 @@ fn new_pass(trace: &mut Option<LoopTrace>) {
 
 /// Run fixes to a fixpoint. `collect` is called with the current text and
 /// returns the candidates on offer, in a deterministic order; candidates
-<<<<<<< HEAD
 /// whose key is in `refused` must not be offered again. Syntax errors are
 /// counted in the host grammar only; the engine counts embedded regions
 /// too, through [`fix_loop_with`].
@@ -186,16 +185,24 @@ pub fn fix_loop(language: Language, original: &str, collect: impl FnMut(&str, &B
 /// loop ends only when the text offers no fix, which is the idempotence
 /// check of SR-ARCHITECTURE decision 5: one more run changes nothing.
 pub fn fix_loop_with(
-=======
-/// whose key is in `refused` must not be offered again.
-pub fn fix_loop(language: Language, original: &str, collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>) -> LoopOutcome {
-    fix_loop_traced(language, original, collect, &mut None)
+    original: &str,
+    errors: impl Fn(&str) -> usize,
+    collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>,
+) -> LoopOutcome {
+    fix_loop_traced_with(original, errors, collect, &mut None)
 }
 
 /// [`fix_loop`], recording each step in `trace` when it is `Some`.
 pub fn fix_loop_traced(
     language: Language,
->>>>>>> origin/wip/W-16-commands-api
+    original: &str,
+    collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>,
+    trace: &mut Option<LoopTrace>,
+) -> LoopOutcome {
+    fix_loop_traced_with(original, |t| errors(language, t), collect, trace)
+}
+
+fn fix_loop_traced_with(
     original: &str,
     errors: impl Fn(&str) -> usize,
     mut collect: impl FnMut(&str, &BTreeSet<String>) -> Vec<Candidate>,

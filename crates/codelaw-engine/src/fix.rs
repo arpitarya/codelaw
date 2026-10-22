@@ -351,6 +351,7 @@ fn fix_project_rules(project: &mut Project, paths: &[PathBuf], options: &FixOpti
                 applied: counts.clone(),
                 remaining: Vec::new(),
                 written,
+                formatted: false,
             }),
         }
     }

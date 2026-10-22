@@ -186,8 +186,11 @@ impl Project {
             .part(codelaw_format::ENGINES_FINGERPRINT)
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
             .key();
-<<<<<<< HEAD
-        let mut diagnostics = match self.cache.get::<Vec<Diagnostic>>(&key) {
+        let cached = self.cache.get::<Vec<Diagnostic>>(&key);
+        if let Some(t) = &self.timings {
+            t.cache(cached.is_some());
+        }
+        let mut diagnostics = match cached {
             Some(d) => d,
             None => {
                 let mut out = lint_text(self, entry, &file.text, &RunMode::check());
@@ -200,14 +203,6 @@ impl Project {
         };
         if file.bom {
             shift_for_bom(&mut diagnostics);
-=======
-        let cached = self.cache.get::<Vec<Diagnostic>>(&key);
-        if let Some(t) = &self.timings {
-            t.cache(cached.is_some());
-        }
-        if let Some(d) = cached {
-            return FileResult { diagnostics: d, skipped: None };
->>>>>>> origin/wip/W-16-commands-api
         }
         FileResult { diagnostics, skipped: None }
     }
@@ -438,14 +433,10 @@ pub(crate) fn lint_text(project: &Project, entry: &FileEntry, text: &str, mode: 
         });
     }
 
-<<<<<<< HEAD
-    apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &ran, &mut diagnostics);
-=======
     {
         let _timed = project.timings.as_ref().map(|t| t.guard(Phase::Suppress));
-        apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &active, &mut diagnostics);
+        apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &ran, &mut diagnostics);
     }
->>>>>>> origin/wip/W-16-commands-api
     let candidates = diagnostics
         .iter()
         .filter(|d| d.fix != FixClass::Manual && !d.edits.is_empty())
@@ -541,10 +532,11 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
         return Vec::new();
     }
     let grammar = unit.grammar;
-<<<<<<< HEAD
     let n = unit.rules.len();
     let mut failed: Vec<Option<String>> = vec![None; n];
+    let timings = project.timings.as_ref();
     let semantic = if unit.rules.iter().any(|(_, r, _)| r.needs_semantic) {
+        let _timed = timings.map(|t| t.guard(Phase::Semantic));
         match catch_unwind(AssertUnwindSafe(|| codelaw_semantic::build(unit.language, &unit.root, &unit.text))) {
             Ok(model) => model,
             // A model that panics fails every rule that needs it (decision 25);
@@ -559,12 +551,6 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 None
             }
         }
-=======
-    let timings = project.timings.as_ref();
-    let semantic = if unit.rules.iter().any(|(_, r, _)| r.needs_semantic) {
-        let _timed = timings.map(|t| t.guard(Phase::Semantic));
-        catch_unwind(AssertUnwindSafe(|| codelaw_semantic::build(unit.language, &unit.root, &unit.text))).ok().flatten()
->>>>>>> origin/wip/W-16-commands-api
     } else {
         None
     };
@@ -617,17 +603,13 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 }
                 Matcher::Native(nr) => {
                     let options = if cfg.options.is_empty() { &empty } else { &cfg.options };
-                    let ctx = NativeContext { source: &unit.text, language: unit.language, semantic: semantic.as_ref(), options, data: &rule.loaded.data };
+                    let ctx = NativeContext { source: &unit.text, language: unit.language, semantic: semantic.as_ref(), options, data: &rule.loaded.data, file: &codelaw_native::DetachedFile::default() };
                     let out = &mut native[slot];
                     if let Err(p) = catch_unwind(AssertUnwindSafe(|| nr.check(node.clone(), &ctx, out))) {
                         failed[slot] = Some(panic_message(p.as_ref()));
                     }
                 }
-<<<<<<< HEAD
-                Matcher::Graph(_) | Matcher::Unsupported(_) => {}
-=======
-                Matcher::Target(_) | Matcher::Unsupported(_) => {}
->>>>>>> origin/wip/W-12-structured-rules
+                Matcher::Graph(_) | Matcher::Target(_) | Matcher::Unsupported(_) => {}
             }
             if let (Some(t), Some(s)) = (timings, started) {
                 t.rule(*index, s);
@@ -709,9 +691,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note });
                 }
             }
-<<<<<<< HEAD
-            Matcher::Graph(_) | Matcher::Unsupported(_) => {}
-=======
+            Matcher::Graph(_) => {}
             Matcher::Target(t) => {
                 let tree = data_tree.get_or_insert_with(|| {
                     catch_unwind(AssertUnwindSafe(|| codelaw_match::data::build(unit.language, unit.root.root().get_inner_node(), &unit.text))).ok().flatten()
@@ -742,7 +722,6 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 }
             }
             Matcher::Unsupported(_) => {}
->>>>>>> origin/wip/W-12-structured-rules
         }
         if let (Some(t), Some(s)) = (timings, started) {
             t.rule(*index, s);

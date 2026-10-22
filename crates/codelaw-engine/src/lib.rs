@@ -16,15 +16,11 @@ mod timings;
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
 pub use fix::{FileFix, FixOptions, FixReport};
-<<<<<<< HEAD
 pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
 pub use lint::FileResult;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
-=======
 pub use debug::{FileTrace, MatchReport, RuleCard};
-pub use lint::FileResult;
 pub use timings::{PhaseTiming, RuleTiming, TimingReport};
->>>>>>> origin/wip/W-16-commands-api
 
 use codelaw_cache::DiskCache;
 use codelaw_config::{Config, ConfigError};
@@ -196,11 +192,7 @@ impl Project {
         };
         let formatting = Formatting::from_config(&config)?;
         let pool = pool(options.threads);
-<<<<<<< HEAD
-        Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool })
-=======
-        Ok(Project { config, rules, compiled, options, cache, warnings, pool, timings })
->>>>>>> origin/wip/W-16-commands-api
+        Ok(Project { config, rules, compiled, options, cache, warnings, formatting, pool, timings })
     }
 
     pub fn root(&self) -> &Path {

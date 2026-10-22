@@ -5,7 +5,7 @@
 mod debug;
 mod sarif;
 
-pub use debug::{config_json, config_text, match_json, match_text, rules_json, rules_text, timings_json, timings_text, trace_json, trace_text};
+pub use debug::{config_json, config_text, match_json, match_text, rule_cards_json, rule_cards_text, timings_json, timings_text, trace_json, trace_text};
 pub use sarif::{SARIF_SCHEMA, check_sarif};
 
 mod hook;

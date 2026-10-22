@@ -8,13 +8,10 @@ publish.workspace = true
 [dependencies]
 codelaw-core.workspace = true
 codelaw-engine.workspace = true
-<<<<<<< HEAD
 codelaw-lang.workspace = true
-=======
 codelaw-config.workspace = true
 codelaw-fix.workspace = true
 codelaw-match.workspace = true
->>>>>>> origin/wip/W-16-commands-api
 codelaw-rules.workspace = true
 serde.workspace = true
 serde_json.workspace = true

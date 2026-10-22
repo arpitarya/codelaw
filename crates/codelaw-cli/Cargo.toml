@@ -33,9 +33,6 @@ similar = "=2.7.0"
 
 [dev-dependencies]
 toml.workspace = true
-<<<<<<< HEAD
 # The panic fixture of SR-ARCHITECTURE decision 25 (test builds only).
 codelaw-native = { workspace = true, features = ["fault-injection"] }
-=======
 boon.workspace = true
->>>>>>> origin/wip/W-16-commands-api

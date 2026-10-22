@@ -2,12 +2,9 @@
 //! `codelaw-engine` and prints the result; no logic lives here
 //! (SR-ARCHITECTURE decision 2, SR-CLI-MCP decision 6).
 
-<<<<<<< HEAD
 mod format_cmd;
 mod graph_cmd;
-=======
 mod config_cmd;
->>>>>>> origin/wip/W-16-commands-api
 mod init;
 mod match_cmd;
 mod rules_cmd;
@@ -56,7 +53,6 @@ enum Command {
     NewRule(rules_cmd::NewRuleArgs),
     /// Set codelaw up in this repo: config, rule packs, folders.
     Init(init::InitArgs),
-<<<<<<< HEAD
     /// Serve the Language Server Protocol over stdio (SR-EDITOR).
     Lsp {
         /// Talk over stdin and stdout: the default and only transport;
@@ -66,10 +62,8 @@ enum Command {
     },
     /// Query the project graph: `refs`, `why-unused`.
     Graph(graph_cmd::GraphArgs),
-=======
     /// Print the resolved configuration with each value's source, or its JSON Schema.
     Config(config_cmd::ConfigArgs),
->>>>>>> origin/wip/W-16-commands-api
     /// Manage the cache.
     Cache {
         #[command(subcommand)]
@@ -196,13 +190,8 @@ pub fn load(paths: &[PathBuf], options: EngineOptions) -> Result<Project, Engine
     Project::load(&start, options)
 }
 
-<<<<<<< HEAD
 pub fn format(s: &str) -> Result<Format, String> {
-    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json or agent)"))
-=======
-fn format(s: &str) -> Result<Format, String> {
     Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif or agent)"))
->>>>>>> origin/wip/W-16-commands-api
 }
 
 fn check(args: CheckArgs) -> ExitCode {
@@ -374,12 +363,9 @@ fn main() -> ExitCode {
         Command::Match(a) => match_cmd::run(a),
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
-<<<<<<< HEAD
         Command::Lsp { .. } => codelaw_lsp::run_stdio().map_or_else(fail, |()| ExitCode::SUCCESS),
         Command::Graph(a) => graph_cmd::graph(a),
-=======
         Command::Config(a) => config_cmd::run(a),
->>>>>>> origin/wip/W-16-commands-api
         Command::Cache { action } => cache(action),
         Command::Mcp => match codelaw_mcp::serve(std::io::stdin().lock(), std::io::stdout().lock()) {
             Ok(()) => ExitCode::SUCCESS,

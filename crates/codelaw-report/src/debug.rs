@@ -11,7 +11,7 @@ use serde_json::{Value, json};
 // ── rules ────────────────────────────────────────────────────────────────
 
 /// `rules [--for <file>]`: one line per rule.
-pub fn rules_text(cards: &[RuleCard]) -> String {
+pub fn rule_cards_text(cards: &[RuleCard]) -> String {
     let mut out = String::new();
     for c in cards {
         let preview = if c.preview { "  (preview)" } else { "" };
@@ -21,7 +21,7 @@ pub fn rules_text(cards: &[RuleCard]) -> String {
 }
 
 /// `rules [--for <file>] --format json`, and `rulesFor` / `rules_for`.
-pub fn rules_json(cards: &[RuleCard], file: Option<&str>) -> Value {
+pub fn rule_cards_json(cards: &[RuleCard], file: Option<&str>) -> Value {
     json!({
         "schema_version": SCHEMA_VERSION,
         "codelaw_version": codelaw_core::VERSION,

@@ -123,7 +123,7 @@ mod tests {
         let mut data = BTreeMap::new();
         data.insert("globals/node".to_owned(), Arc::new(serde_json::json!({ "process": false })));
         let options = BTreeMap::new();
-        let ctx = NativeContext { source: src, language: Language::Javascript, semantic: model.as_ref(), options: &options, data: &data };
+        let ctx = NativeContext { source: src, language: Language::Javascript, semantic: model.as_ref(), options: &options, data: &data, file: &crate::DetachedFile::default() };
         let mut out = Vec::new();
         NoUndef.check(root.root(), &ctx, &mut out);
         let names: Vec<&str> = out.iter().map(|f| &src[f.start..f.end]).collect();

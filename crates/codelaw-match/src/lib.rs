@@ -13,11 +13,8 @@
 //!   $REF: { undeclared: { globals: [window], tables: [globals/browser] } }
 //! ```
 
-<<<<<<< HEAD
 pub mod data;
-=======
 mod explain;
->>>>>>> origin/wip/W-16-commands-api
 mod predicate;
 pub mod schema;
 pub mod target;
@@ -131,7 +128,6 @@ fn prune_unknown_kinds(v: &mut serde_json::Value, grammar: Grammar, never: &serd
     }
 }
 
-<<<<<<< HEAD
 /// Whether a string in the `match:` block captures `$$$name`.
 fn mentions_multi(v: &serde_json::Value, name: &str) -> bool {
     match v {
@@ -147,13 +143,6 @@ fn mentions_multi(v: &serde_json::Value, name: &str) -> bool {
     }
 }
 
-/// Compile a rule's `match:` block for one grammar. `data` is the rule's
-/// pack's tables, for predicates that name one.
-pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<serde_json::Value>>) -> Result<CompiledMatch, String> {
-    let BlockKind::Match { rule: matcher, constraints, utils, predicates } = &rule.block.kind else {
-        return Err("not a `match:` rule".into());
-    };
-=======
 /// An ast-grep rule core from a `match:` object, its constraints and utils,
 /// with kinds the grammar lacks pruned.
 pub(crate) fn rule_core(
@@ -162,7 +151,6 @@ pub(crate) fn rule_core(
     utils: Option<&serde_json::Value>,
     grammar: Grammar,
 ) -> Result<RuleCore, String> {
->>>>>>> origin/wip/W-16-commands-api
     use ast_grep_core::tree_sitter::LanguageExt;
     let root_kind = grammar.ast_grep("").root().kind().to_string();
     let never = serde_json::json!({ "all": [{ "kind": root_kind }, { "not": { "kind": root_kind } }] });

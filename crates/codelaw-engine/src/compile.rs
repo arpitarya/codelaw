@@ -15,14 +15,11 @@ pub enum Matcher {
     /// One compiled `match:` per grammar the rule's languages parse with.
     Match(Vec<(Grammar, CompiledMatch)>),
     Native(&'static dyn NativeRule),
-<<<<<<< HEAD
     /// A `scope: project` rule (SR-PROJECT-GRAPH decision 6).
     Graph(codelaw_graph::GraphRule),
-=======
     /// `target:` + `assert:` on the data tree of a JSON, YAML or TOML file
     /// (SR-RULE-FORMAT decision 3e); it runs once per file, not per node.
     Target(CompiledTarget),
->>>>>>> origin/wip/W-12-structured-rules
     /// A form this version cannot run yet; the reason is warned once.
     Unsupported(&'static str),
 }
@@ -59,13 +56,10 @@ impl CompiledRule {
         match &self.matcher {
             Matcher::Match(per) => per.iter().find(|(g, _)| *g == grammar).map(|(_, m)| m.kinds()),
             Matcher::Native(n) => Some(Some(kind_ids(grammar, n.kinds()))),
-<<<<<<< HEAD
-            Matcher::Graph(_) | Matcher::Unsupported(_) => None,
-=======
+            Matcher::Graph(_) => None,
             // Dispatched to no node: the unit runs it on its data tree.
             Matcher::Target(_) => matches!(grammar, Grammar::Json | Grammar::Yaml | Grammar::Toml).then_some(Some(Vec::new())),
             Matcher::Unsupported(_) => None,
->>>>>>> origin/wip/W-12-structured-rules
         }
     }
 
@@ -154,11 +148,13 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
                     continue;
                 }
             },
-<<<<<<< HEAD
             BlockKind::Graph(g) => match codelaw_graph::compile(g, rule.block.fix.as_ref()) {
                 Ok(c) => Matcher::Graph(c),
-=======
-            BlockKind::Graph(_) => Matcher::Unsupported("`graph:` rules need the project graph (SR-PROJECT-GRAPH), which this version does not build yet"),
+                Err(e) => {
+                    fail(e);
+                    continue;
+                }
+            },
             BlockKind::Target { .. } => match codelaw_match::compile_target(rule, &loaded.data) {
                 Ok(t) => {
                     for l in &rule.languages {
@@ -168,16 +164,11 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
                     }
                     Matcher::Target(t)
                 }
->>>>>>> origin/wip/W-12-structured-rules
                 Err(e) => {
                     fail(e);
                     continue;
                 }
             },
-<<<<<<< HEAD
-            BlockKind::Target { .. } => Matcher::Unsupported("`target:` + `assert:` rules are not built yet in this version"),
-=======
->>>>>>> origin/wip/W-12-structured-rules
         };
         if let Matcher::Unsupported(why) = &matcher
             && loaded.default.is_some()
@@ -196,12 +187,9 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
             _ => None,
         };
         let fix = match &rule.block.fix {
-<<<<<<< HEAD
             // A graph rule's fix compiled with its query.
             Some(_) if matches!(matcher, Matcher::Graph(_)) => None,
-=======
             Some(_) if is_target => None,
->>>>>>> origin/wip/W-12-structured-rules
             Some(v) => match parse_fix(v) {
                 Ok(f) => Some(f),
                 Err(e) => {
@@ -216,11 +204,7 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
         let needs_semantic = match &matcher {
             Matcher::Match(per) => per.iter().any(|(_, m)| m.needs_semantic()),
             Matcher::Native(n) => n.needs_semantic(),
-<<<<<<< HEAD
-            Matcher::Graph(_) | Matcher::Unsupported(_) => false,
-=======
-            Matcher::Target(_) | Matcher::Unsupported(_) => false,
->>>>>>> origin/wip/W-12-structured-rules
+            Matcher::Graph(_) | Matcher::Target(_) | Matcher::Unsupported(_) => false,
         } || matches!(&fix, Some(FixSpec::Steps(s)) if s.iter().any(|p| matches!(p, codelaw_fix::Primitive::RenameSymbolLocal { .. })));
         out.push(CompiledRule { loaded: loaded.clone(), matcher, fix, data_fix, needs_semantic, files, exclude });
     }

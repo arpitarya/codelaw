@@ -24,11 +24,7 @@ pub struct RulesArgs {
     /// Why a rule is active, and from which source.
     #[arg(long)]
     why: Option<String>,
-<<<<<<< HEAD
-    /// text or json.
-=======
     /// text or json (the shape of the npm `rulesFor` and Python `rules_for`).
->>>>>>> origin/wip/W-16-commands-api
     #[arg(long, default_value = "text")]
     format: String,
 }
@@ -141,21 +137,12 @@ pub fn rules(args: RulesArgs) -> ExitCode {
         Some(RulesAction::Eject { id }) => return eject(&id),
         None => {}
     }
-<<<<<<< HEAD
     let json = match crate::format(&args.format) {
         Ok(Format::Json) => true,
         Ok(_) => false,
         Err(e) => return fail(e),
     };
     let mut project = match load(&args.for_path.iter().cloned().collect::<Vec<_>>(), EngineOptions::from_env()) {
-=======
-    let json = match args.format.as_str() {
-        "text" => false,
-        "json" => true,
-        other => return fail(format!("unknown --format `{other}` (text or json)")),
-    };
-    let project = match load(&args.for_path.iter().cloned().collect::<Vec<_>>(), EngineOptions::from_env()) {
->>>>>>> origin/wip/W-16-commands-api
         Ok(p) => p,
         Err(e) => return fail(e),
     };
@@ -183,21 +170,8 @@ pub fn rules(args: RulesArgs) -> ExitCode {
     ExitCode::SUCCESS
 }
 
-<<<<<<< HEAD
 fn print_json(v: &serde_json::Value) -> ExitCode {
     println!("{}", serde_json::to_string_pretty(v).expect("json"));
-=======
-    let cards = match project.rules_for(args.for_path.as_deref()) {
-        Ok(c) => c,
-        Err(e) => return fail(e),
-    };
-    if json {
-        let shown = rel.as_deref().or(args.for_path.as_deref().and_then(|p| p.to_str()));
-        println!("{}", serde_json::to_string_pretty(&codelaw_report::rules_json(&cards, shown)).expect("json"));
-    } else {
-        print!("{}", codelaw_report::rules_text(&cards));
-    }
->>>>>>> origin/wip/W-16-commands-api
     ExitCode::SUCCESS
 }
 
