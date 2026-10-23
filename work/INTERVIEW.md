@@ -90,6 +90,9 @@ upstream's noisy defaults kept in `html/require-sri`, `html/valid-id`,
 `html/button-type`; `json/package-engines` `>=22` and
 `toml/pyproject-requires-python` `>=3.11`.
 
+**W-29 / W-30** (🟡, `arpit`): the first publish, by hand from Arpit's machine
+(his ask, 2026-10-24), npm then PyPI, from one CI `dist`; the commands are in
+the item files. The npm org `codelaw` exists (checked 2026-10-24).
 **W-04 / W-03** (🔴): built, timed, merged; the first release waits on the
 registry setup and the ruling to publish. **W-18** (🔴): the environments
 and their tag rule. **W-19** (🔴): the budgets, after CI's first `perf` run.

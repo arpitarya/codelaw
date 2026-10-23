@@ -22,8 +22,8 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed | age |
 |---|---|---|
-| 🔴 **The one-time registry setup, steps 1, 4 and 5 only** — the `@codelaw` npm org, six PyPI pending publishers, the `npm`/`pypi` environments ([`RELEASING.md`](../RELEASING.md) §One time). Steps 2–3 and the ruling to publish can follow: W-07, W-08 and W-09 have landed, and `law-gate.py` lists nothing (2026-10-21) | 2026-10-20 | 4 d |
-| ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 | | |
+| 🔴 **The one-time registry setup, steps 4 and 5** (step 1, the `@codelaw` npm org, exists — checked 2026-10-24) — the six PyPI publishers (trusted on the existing projects, W-30), the `npm`/`pypi` environments ([`RELEASING.md`](../RELEASING.md) §One time). Steps 2–3 and the ruling to publish can follow: W-07, W-08 and W-09 have landed, and `law-gate.py` lists nothing (2026-10-21) | 2026-10-20 | 4 d |
+| ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 · W-30 step 4 | | |
 | 🔴 Create the `npm` and `pypi` environments and give each one tag rule `v*` and no branch rule (GitHub Settings → Environments; [`RELEASING.md`](../RELEASING.md) step 5). Checked 2026-10-22: neither exists yet; an agent's attempt through the browser was refused by the permission check, so it stays the decider's | 2026-10-20 | 4 d |
 | ↳ **blocks:** W-18 | | |
 | 🔴 Set L8's budgets: after the `perf` job's first run on `main`, apply min(design target, 1.5 × worst p95) to the CI runner's numbers and rule each `budget` in `perf/budgets.toml`; name the reference machine ([W-19](open/W-19-performance-budgets.md)) | 2026-10-22 | 2 d |
@@ -40,6 +40,10 @@ here. Read that record before changing anything below it.
 🔴 **W-03** `agent` The five rule packs: steps 2–5 done (419 rules), packaging done. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
 
 🟢 **W-21** `agent` Engine gaps: all three steps landed 2026-10-22, the CSS grammar as an in-tree fork (the decider's ruling); left: file the upstream patch, and whether DoD 3 holds while CSS rules read text. Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
+
+🟡 **W-29** `arpit` The first npm publish, by hand from Arpit's machine: 8 `@codelaw/cli-*`, 5 `@codelaw/rules-*`, then `codelaw`, from CI's `dist`; waiting on W-24 (the Windows build) and the push. Filed by Arpit (Claude Code). [detail](open/W-29-first-npm-publish.md)
+
+🟡 **W-30** `arpit` The first PyPI publish, by hand: `codelaw` (8 wheels) and 5 `codelaw-rules-*` from the same `dist` with `twine`, then trusted publishers on the six projects; waiting on W-24. Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
 
 🟢🧨 **W-24** `agent` CI cannot pass on `main` (the Windows `bench` build, the guard replay on nine as-is merges, cache keys that miss test inputs, the law gate on `--report`); fix the six. Filed by Arpit (Claude Code). [detail](open/W-24-ci-green-on-main.md)
 

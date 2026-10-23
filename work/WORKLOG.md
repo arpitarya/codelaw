@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-24 — the first publish planned: W-29 (npm) and W-30 (PyPI)  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"go to the browser and check out the organization codelaw without any hyphen. Create a work item to publish npm packages. Create another work item to publish Python packages. Give me the command for both so I can do the first publish from local."*
+- **Done:** checked in Arpit's Chrome: npm org `codelaw` exists, one member (`aarya11`, owner, 2FA), 0 packages; `codelaw` unscoped is free on npm; `pypi.org/project/codelaw` is a 404. Filed W-29 (14 npm packages, cli → rules → `codelaw` last, then `npm-trust.sh`) and W-30 (13 wheels with `twine`, then trusted publishers on the existing projects), both 🟡 on W-24; the inbox's registry row narrowed (step 1 done).
+- **Decided / left open:** the first PyPI publish is by hand too (Arpit's ask), not through a pending publisher as `RELEASING.md` planned — W-30 step 5 rewrites the doc and one SR-PACKAGES sentence. Both publish from CI's `dist`, which needs W-24 step 1 (the Windows build) and the push of `main`.
+- **Mistakes:** none.
+- **Next:** W-24 step 1, then Arpit pushes `main`, then W-29 and W-30 from the same `dist`.
+
+---
+
 ## 2026-10-22 → 24 — the review: rulings merged, five work items filed  ·  Claude Code (Fable 5.1), linked to the Mac
 
 - **Asked:** *"review or open work blockers, ratify whatever you can, review the repo, create work items to fix whatever was broken or whatever needs to be fixed or whatever needs to be structured in a better way."*

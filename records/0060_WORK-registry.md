@@ -94,7 +94,7 @@ into a scan anyone can do at task end.
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-22 | 2026-10-22 — pointer to the `/docket` skill (state-of-play table, layout) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-24 | 2026-10-24 — W-24–W-28 filed from the 2026-10-22 review; W-06 and W-23 rows gone with the rulings merge; ages recomputed |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-24 | 2026-10-24 — W-29, W-30 filed (the first publish by hand); the registry row narrowed, step 1 done |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — every row but B-006, B-007 promoted to W-07–W-22 |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-24 | 2026-10-24 — §1 and §2 rewritten to the current state (they had carried 2026-10-20 claims: 13 crates, clippy not clean, graph not built) |
