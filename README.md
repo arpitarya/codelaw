@@ -8,7 +8,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 
 ![status: preview](https://img.shields.io/badge/status-preview-orange)
 ![version 0.1.0](https://img.shields.io/badge/version-0.1.0-blue)
-![rules: 401](https://img.shields.io/badge/rules-401-informational)
+![rules: 419](https://img.shields.io/badge/rules-419-informational)
 ![languages: 9](https://img.shields.io/badge/languages-9-informational)
 ![licence: MIT](https://img.shields.io/badge/licence-MIT-green)
 ![engine: Rust](https://img.shields.io/badge/engine-Rust-b7410e)
@@ -44,7 +44,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 | 🧱 **Fixes can restructure code** | Fix primitives move and regroup code, for example gathering every `export` into one block at the end of the file. A plain node-for-node replace can't do that. |
 | 🔁 **Deterministic** | Same files and config in, same output out, with or without an AI agent. Every fix is re-parsed and checked before it's written, and a fix that would break the file is rolled back. |
 | 🤖 **Built for AI coding agents** | `--format agent` gives one line per finding with its fix, ready to feed back to an agent after every edit. |
-| 📦 **Standard rules included** | 401 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
+| 📦 **Standard rules included** | 419 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
 
 ---
 
@@ -174,25 +174,25 @@ Five first-party packs. Each one ships under the same name on both registries: `
 
 | pack | rules | presets | reimplemented from |
 |---|---|---|---|
-| [`js`](packs/js/README.md) | 132 | `js/recommended` · `ts/recommended` · `react/recommended` · `node/recommended` · `stencil/recommended` · `js/conventions` | ESLint 10 recommended (all 64), typescript-eslint 8 recommended, eslint-plugin-react, react-hooks, eslint-plugin-n, @stencil/eslint-plugin |
-| [`python`](packs/python/README.md) | 98 | `py/recommended` · `py/conventions` | Ruff 0.17's default `E4`/`E7`/`E9`/`F`, every stable flake8-bugbear rule, isort `I001`, `RUF022` |
-| [`html`](packs/html/README.md) | 71 | `html/recommended` · `html/a11y` · `html/document` · `html/conventions` | html-validate 11 recommended, a11y and document |
-| [`css`](packs/css/README.md) | 70 | `css/recommended` · `css/standard` · `css/conventions` | stylelint-config-recommended 18 (all 41), stylelint-config-standard 40 |
-| [`data`](packs/data/README.md) | 30 | `data/recommended` · `md/recommended` · `data/package-json` · `data/tsconfig` · `data/pyproject` · `data/github-actions` · `data/conventions` | markdownlint 0.42, plus JSON/YAML/TOML correctness checks |
+| [`js`](packs/js/README.md) | 140 | `js/recommended` · `ts/recommended` · `react/recommended` · `node/recommended` · `stencil/recommended` · `js/conventions` | ESLint 10 recommended (all 64), typescript-eslint 8 recommended, eslint-plugin-react, react-hooks, eslint-plugin-n, @stencil/eslint-plugin |
+| [`python`](packs/python/README.md) | 99 | `py/recommended` · `py/conventions` | Ruff 0.17's default `E4`/`E7`/`E9`/`F`, every stable flake8-bugbear rule, isort `I001`, `RUF022` |
+| [`html`](packs/html/README.md) | 72 | `html/recommended` · `html/a11y` · `html/document` · `html/conventions` | html-validate 11 recommended, a11y and document |
+| [`css`](packs/css/README.md) | 71 | `css/recommended` · `css/standard` · `css/conventions` | stylelint-config-recommended 18 (all 41), stylelint-config-standard 40 |
+| [`data`](packs/data/README.md) | 37 | `data/recommended` · `md/recommended` · `data/package-json` · `data/tsconfig` · `data/pyproject` · `data/github-actions` · `data/conventions` | markdownlint 0.42, plus JSON/YAML/TOML correctness checks |
 
 - **Reimplemented, not wrapped.** Each rule is written fresh in codelaw's format, and its `ported_from:` field names the original. You don't need ESLint, Ruff or stylelint installed.
 - **Differences are written down.** Each pack's README lists where a port behaves differently from the original, and which rules weren't ported and why.
 - **Layout rules are left out on purpose.** Indentation, spacing and quotes are the formatter's job (`codelaw format`).
-- **3,060 example checks, all green.** `codelaw test packs/<pack>` runs them.
+- **3,949 example checks, all green.** `codelaw test packs/<pack>` runs them.
 - **`*/conventions` presets are opt-in**: house-style rules such as `js/exports-at-end` and `py/no-print`.
 
-### Fix classes across all 401 rules
+### Fix classes across all 419 rules
 
 | class | rules | what happens |
 |---|---|---|
-| `auto` | 69 | `codelaw fix` applies it. It's safe and meaning-preserving. |
-| `suggest` | 61 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
-| `manual` | 271 | The finding lists numbered steps, for a person or an agent to follow. |
+| `auto` | 67 | `codelaw fix` applies it. It's safe and meaning-preserving. |
+| `suggest` | 69 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
+| `manual` | 283 | The finding lists numbered steps, for a person or an agent to follow. |
 
 ---
 
@@ -386,7 +386,7 @@ flowchart LR
 |---|---|---|
 | ✅ | Engine: nine languages, one binary, parse once, cache | built |
 | ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `new-rule`, `init`, `cache` | built |
-| ✅ | Five rule packs: 401 rules | built, `preview` |
+| ✅ | Five rule packs: 419 rules | built, `preview` |
 | ✅ | `--format agent` and `--format json` | built |
 | 🔜 | npm and PyPI packages (`npx codelaw`, `uvx codelaw`) | next |
 | ✅ | Formatter (`codelaw format`, and the last step of `fix`): Prettier-style JS/TS/JSON, Black-style Python | built |

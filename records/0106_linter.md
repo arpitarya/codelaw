@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-match
   - crates/codelaw-adapters
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-22T18:00:00Z
+timestamp: 2026-10-22T20:00:00Z
 content_sha: ""
 ---
 
@@ -76,7 +76,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | TypeScript · TSX | `tree-sitter-typescript` (both dialects; Stencil decorators parse as decorators) | yes |
    | JSON · JSONC | `tree-sitter-json` | yes |
    | Python | `tree-sitter-python` | yes |
-   | CSS | `tree-sitter-css` | yes |
+   | CSS | `tree-sitter-css`: codelaw's in-tree fork of 0.25.0, which adds range media features, `layer()` in `@import` and fractional keyframe percentages ([SR-ARCHITECTURE](0108_architecture.md) decision 3) | yes, patched in place of ast-grep's |
    | HTML | `tree-sitter-html` | yes |
    | YAML | `tree-sitter-yaml` | yes |
    | TOML | `tree-sitter-toml` | **no**: registered by codelaw as a custom language |

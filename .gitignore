@@ -12,3 +12,5 @@
 /packaging/vscode/node_modules/
 /packaging/vscode/out/
 __pycache__/
+# codelaw's own cache, wherever a check was run from
+.codelaw/cache/

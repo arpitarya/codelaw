@@ -22,16 +22,10 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed | age |
 |---|---|---|
-| 🔴 Place the five `.github/` issue and PR templates — the path is protected from remote writes ([W-06](open/W-06-consumer-readme.md)) | 2026-10-20 | 0 d |
-| ↳ **blocks:** W-06 | | |
-| 🔴 **The one-time registry setup, steps 1, 4 and 5 only** — the `@codelaw` npm org, six PyPI pending publishers, the `npm`/`pypi` environments ([`RELEASING.md`](../RELEASING.md) §One time). Steps 2–3 and the ruling to publish can follow: W-07, W-08 and W-09 have landed, and `law-gate.py` lists nothing (2026-10-21) | 2026-10-20 | 0 d |
+| 🔴 **The one-time registry setup, steps 1, 4 and 5 only** — the `@codelaw` npm org, six PyPI pending publishers, the `npm`/`pypi` environments ([`RELEASING.md`](../RELEASING.md) §One time). Steps 2–3 and the ruling to publish can follow: W-07, W-08 and W-09 have landed, and `law-gate.py` lists nothing (2026-10-21) | 2026-10-20 | 2 d |
 | ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 | | |
-| 🔴 Give the `npm` and `pypi` environments one tag rule `v*` and no branch rule (GitHub Settings → Environments; [`RELEASING.md`](../RELEASING.md) step 5) | 2026-10-20 | 0 d |
+| 🔴 Create the `npm` and `pypi` environments and give each one tag rule `v*` and no branch rule (GitHub Settings → Environments; [`RELEASING.md`](../RELEASING.md) step 5). Checked 2026-10-22: neither exists yet; an agent's attempt through the browser was refused by the permission check, so it stays the decider's | 2026-10-20 | 2 d |
 | ↳ **blocks:** W-18 | | |
-| 🔴 Two pack rules fail the layout check: `js/no-irregular-whitespace` (a layout rule: Biome turns its no-break space into a space) and `css/media-query-no-invalid` (Biome's `not (` makes an invalid query valid). Drop, rewrite or exempt each ([W-23](open/W-23-formatter-rest.md)) | 2026-10-22 | 0 d |
-| ↳ **blocks:** W-23 DoD 1 · `codelaw test packs/js` and `packs/css` pass | | |
-| 🔴 Modern CSS needs `tree-sitter-css` changed: fork it in-tree (parser regenerated with the MIT tree-sitter CLI) or patch upstream and wait; either is an L2 check and a record ([W-21](open/W-21-pack-engine-gaps.md)) | 2026-10-22 | 0 d |
-| ↳ **blocks:** W-21 step 3 | | |
 | 🔴 Set L8's budgets: after the `perf` job's first run on `main`, apply min(design target, 1.5 × worst p95) to the CI runner's numbers and rule each `budget` in `perf/budgets.toml`; name the reference machine ([W-19](open/W-19-performance-budgets.md)) | 2026-10-22 | 0 d |
 | ↳ **blocks:** W-19 DoD 3 · the perf gate binding anything | | |
 
@@ -45,9 +39,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-03** `agent` The five rule packs: steps 2–5 done (401 rules), packaging done. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
 
-🔴 **W-06** `agent` README, CHANGELOG, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT landed (filed as W-04; renumbered 2026-10-20, the number was taken by the release pipeline); blocked on the decider placing the `.github/` templates. Filed by Arpit (Cowork). [detail](open/W-06-consumer-readme.md)
-🔴 **W-23** `agent` Finish SR-FORMATTER: all five steps landed and verified on `main` 2026-10-22; DoD 1 waits on the decider for two pack rules that fail the layout check (inbox). Filed by Arpit (Claude Code). [detail](open/W-23-formatter-rest.md)
-🔴 **W-21** `agent` Engine gaps: tagged templates, native-rule file context and three rules landed on `main` 2026-10-22; modern CSS needs a `tree-sitter-css` fork, the decider's call (inbox). Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
+🟢 **W-21** `agent` Engine gaps: all three steps landed 2026-10-22, the CSS grammar as an in-tree fork (the decider's ruling); left: file the upstream patch, and whether DoD 3 holds while CSS rules read text. Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
 
 ### testing
 

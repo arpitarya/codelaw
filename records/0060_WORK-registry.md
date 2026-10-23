@@ -98,7 +98,7 @@ into a scan anyone can do at task end.
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — every row but B-006, B-007 promoted to W-07–W-22 |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-20 | 2026-10-20 — the review; the law gate; W-07–W-22 |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-20 | 2026-10-20 — the release law gate |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-22 | 2026-10-22 — W-21 step 3, the CSS grammar fork |
 | `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-22 | 2026-10-22 — row added: decision 8's check found it missing (W-20) |
 | `work/NOW.md` | every transition; `idle` when stopping | 2026-10-22 | 2026-10-22 — row added: decision 8's check found it missing (W-20) |
 | `work/LESSONS.md` | a failure teaches something durable | 2026-10-20 | 2026-10-20 — a law with no gate gets walked past by the next release |
@@ -107,11 +107,11 @@ into a scan anyone can do at task end.
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
 | `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-20 | 2026-10-22 — ratchet, deprecations registry (W-13) |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-19 | 2026-10-19 — L6 and SR-RULE-PACKS rows; rule packs in the distribution sketch and the config example |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-22 | 2026-10-22 — SR-LAW-5 and SR-CONSUMER-LAYOUT own their tests; `scripts/check-work-system.py` and its describers (W-20) |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-22 | 2026-10-22 — the `crates/codelaw-lang` row names the CSS grammar fork (W-21) |
 | `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-20 | 2026-10-20 — not releasable until W-07–W-09; step 2 runs the law gate |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-22 | 2026-10-22 — `codelaw test --corpus` (W-20); `codelaw bench` (W-19) |
-| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-20 | 2026-10-22 — Unreleased: baselines and deprecations (W-13) |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-22 | 2026-10-22 — `codelaw test --corpus` (W-20); `codelaw bench` (W-19); counts refreshed to 419 rules (decider's rulings) |
+| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-22 | 2026-10-22 — Unreleased: baselines and deprecations (W-13); modern CSS parsing, `css/media-feature-range-notation`'s fix (W-21) |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
 | `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
 | `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |

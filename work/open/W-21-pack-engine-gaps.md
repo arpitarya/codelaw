@@ -6,7 +6,7 @@ item: W-21
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-22
-updated_by: "Claude Code (Opus 5.5), subagent on branch W-21-pack-gaps"
+updated_by: "Claude Code (Opus 5.5), subagent: the CSS grammar fork (step 3)"
 ball: agent
 ---
 
@@ -18,7 +18,7 @@ ball: agent
 |---|---|---|---|
 | 1 | Lint `` css`…` `` / `` html`…` `` tagged templates as embedded regions | CSS-in-JS and lit templates checked | ✅ 2026-10-22, on branch `W-21-pack-gaps` |
 | 2 | Give native rules the file's path, raw bytes and neighbours | `md/relative-links`, `html/no-utf8-bom` and Python package checks become possible | ✅ 2026-10-22, on branch `W-21-pack-gaps` |
-| 3 | Handle modern CSS that tree-sitter-css rejects (range media queries, `layer()`, percentage keyframes) | `css/media-feature-range-notation` can be `auto` | ⏳ not started — needs a grammar fork (see Left) |
+| 3 | Handle modern CSS that tree-sitter-css rejects (range media queries, `layer()`, fractional keyframe percentages) | `css/media-feature-range-notation` can be `auto` | ✅ 2026-10-22: an in-tree fork of tree-sitter-css 0.25.0; the upstream patch is prepared, not filed |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
 
@@ -34,8 +34,8 @@ The three gaps are closed and the rules the packs list as waiting on them are po
 |---|---|---|
 | 1 · templates | Tagged templates are regions when `[lint] tagged_templates = true` (SR-LINTER decision 3). | ✅ 2026-10-22 |
 | 2 · context | Native rules receive path, bytes and a read-only view of sibling files. | ✅ 2026-10-22 |
-| 3 · CSS | The CSS pack reads modern CSS through the grammar, or a fork of it, not a side parser. | ⏳ |
-| 4 · ports | The waiting rules ship with `codelaw test` green. | 🟡 2026-10-22: `md/relative-links`, `html/no-utf8-bom`, `node/hashbang` ship green; `css/media-feature-range-notation`'s fix waits on row 3 |
+| 3 · CSS | The CSS pack reads modern CSS through the grammar, or a fork of it, not a side parser. | ✅ 2026-10-22: the fork parses the three forms without `ERROR`, and the engine verifies every CSS fix with it; the rules' own text reader (`css_syntax.rs`) stays, see Left |
+| 4 · ports | The waiting rules ship with `codelaw test` green. | ✅ 2026-10-22: `md/relative-links`, `html/no-utf8-bom`, `node/hashbang` ship green; `css/media-feature-range-notation` is `auto`, 16 checks green |
 
 ## What was built (2026-10-22)
 
@@ -44,23 +44,34 @@ The three gaps are closed and the rules the packs list as waiting on them are po
 - **Rules:** `md/relative-links` (data, `md/recommended`), `html/no-utf8-bom` (html, `html/recommended`), `node/hashbang` (js, `node/recommended`, reads the nearest `package.json`'s `bin`; `suggest`). SR-RULE-PACKS and the pack READMEs updated.
 - **Verified:** `cargo clippy --workspace --all-targets -D warnings` clean; `cargo test --workspace` 393 passed, 0 failed; `codelaw test packs/{data,html,python}` 0 failed; `packs/js` and `packs/css` each have one failure that is on `main` already (`js/no-irregular-whitespace`, `css/media-query-no-invalid`: W-23's layout refusal), not this item's. End-to-end: a `css` template's `colr` and `b {}` are reported at host positions and `fix` removes the empty block; a relative link to a missing file stops firing once the file exists, through the cache.
 
+## What was built (2026-10-22, step 3)
+
+- **The fork** (`crates/codelaw-lang/grammars/tree-sitter-css`): upstream 0.25.0 (MIT, its `LICENSE` kept), put in place by the workspace's `[patch.crates-io]`, version `0.25.0+codelaw.1`. `grammar.js` adds `range_query` (`(width >= 600px)`, `(400px <= width <= 700px)`, ratios, functions), `layer` / `layer(name)` in `@import`, and `float_value` keyframe selectors (`12.5%`; integer percentages already parsed). `src/` regenerated with tree-sitter-cli 0.25.10, which reproduces upstream's `parser.c` byte for byte from the unmodified grammar. Its README carries the credit, the change and the manual regeneration step.
+- **Tests:** `test/corpus/modern.txt` (6 corpus tests, `tree-sitter test` green); `codelaw_lang::tests::modern_css_parses` (no `ERROR`, fails if the patch stops applying) and `fingerprint_names_the_css_fork` (`GRAMMARS_FINGERPRINT` names the fork's version, so a grammar change invalidates the cache).
+- **No regressions found:** 564 stylesheets (bootstrap, bulma, normalize.css, animate.css, pico, open-props, every CSS example in `packs/`) parsed with 0.25.0 and the fork: all 555 error-free trees identical; 6 of the 9 that had errors now parse clean.
+- **Rule:** `css/media-feature-range-notation` is `auto`; a `.cases.md` covers pairs, lists, ratios and range syntax left alone. `codelaw fix` rewrites `(min-width: 600px) and (max-width: 900px)` end to end.
+- **Records:** SR-ARCHITECTURE decision 3 (the fork, the ruling, a reopen trigger in the veto), SR-PACKAGES decision 1 (the second allowed `[patch.crates-io]`), SR-LINTER decision 1, SR-LAW-2 Consequences, SR-RULE-PACKS decision 2, the register's ownership note.
+- **Upstream:** `grammar.patch` and `PR.md` are prepared against 0.25.0 (grammar, highlights, corpus; `src/` to be regenerated) and handed to the parent session; nothing is filed.
+
 ## Left
 
-- **Row 3 (modern CSS) is not started.** DoD 3 rules out a side parser, so it needs a fork of `tree-sitter-css` 0.25.0 (range media queries, `layer()` in `@import`, percentage keyframe selectors), regenerated with the tree-sitter CLI, which is not installed here. A fork is a dependency change (L2 and a record, per Hazards): **the decider** chooses fork-in-tree vs. an upstream patch before an agent starts it.
+- **File the upstream patch** (the decider, or an agent with GitHub access): the prepared [`upstream/grammar.patch`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/grammar.patch) + [`upstream/PR.md`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/PR.md) (against upstream 0.25.0; not yet run against upstream's own corpus, which the shell could not fetch). When a release carries it, drop the fork (its README says how; SR-ARCHITECTURE's veto condition is the trigger).
+- **Still `ERROR` in the fork, not filed:** `@import … supports(…)`, a name before the query in `@custom-media` / `@container` (`open-props`' media file), named-range keyframe selectors (`entry 0%`).
+- **The CSS rules still read text themselves** (`css_syntax.rs`): the fork does not cover custom properties holding blocks, so moving the rules onto the tree is not in this item.
 - Python package checks (e.g. a missing `__init__.py`) are now possible but no rule is filed for them.
-- The `IMPLEMENTATION.md` row is written when the branch lands on `main`.
 
 ## Blockers
 
-None.
+None. The fork-vs-upstream question was the decider's and is ruled: *Arpit, 2026-10-22: fork in-tree + upstream patch; drop the fork when upstream releases.*
 
 ## Record affected
 
-[SR-LINTER](../../records/0106_linter.md) decision 3 · [SR-ARCHITECTURE](../../records/0108_architecture.md) decisions 15b, 16.
+[SR-LINTER](../../records/0106_linter.md) decisions 1 and 3 · [SR-ARCHITECTURE](../../records/0108_architecture.md) decisions 3, 15b, 16 · [SR-PACKAGES](../../records/0107_packages.md) decision 1 · [SR-LAW-2](../../records/0004_LAW-2-foss-dependencies.md) · [SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 2.
 
 ## Hazards
 
-- **A grammar fork** is a dependency change: L2 and a record.
+- **A grammar fork** is a dependency change: L2 and a record (both done, 2026-10-22).
+- **A stale fork:** if `ast-grep-language` moves off `tree-sitter-css` 0.25, the patch silently stops applying; `modern_css_parses` and `fingerprint_names_the_css_fork` fail when it does.
 
 ## Reference
 

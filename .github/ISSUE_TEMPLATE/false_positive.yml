@@ -1,0 +1,54 @@
+name: False positive
+description: A rule reports code that is correct, or misses code that is wrong.
+title: "[false positive] <rule id>: "
+labels: ["false positive"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks — this is the most useful report there is. The smallest snippet that shows it is worth more than a long explanation.
+  - type: input
+    id: rule
+    attributes:
+      label: Rule id
+      description: As printed after the message, for example `js/no-unused-vars`.
+      placeholder: js/no-unused-vars
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What went wrong
+      options:
+        - It reports correct code (false positive)
+        - It misses wrong code (false negative)
+        - Its fix changes what the code does
+    validations:
+      required: true
+  - type: textarea
+    id: snippet
+    attributes:
+      label: The smallest snippet that shows it
+      description: Five lines is ideal. Say which file type it is (`.ts`, `.py`, `.css`, …).
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: What codelaw printed
+      description: The output of `codelaw check <file>`. Add `codelaw match <rule id> <file> --explain` if you can.
+      render: text
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The output of `codelaw --version`.
+    validations:
+      required: true

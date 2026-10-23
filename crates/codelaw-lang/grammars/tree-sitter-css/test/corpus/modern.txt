@@ -1,0 +1,217 @@
+================================================================================
+Range media features
+================================================================================
+
+@media (width >= 600px) {}
+@media (600px < width) {}
+@media (width = 600px) {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (media_statement
+    (range_query
+      (feature_name)
+      (integer_value
+        (unit)))
+    (block))
+  (media_statement
+    (range_query
+      (integer_value
+        (unit))
+      (feature_name))
+    (block))
+  (media_statement
+    (range_query
+      (feature_name)
+      (integer_value
+        (unit)))
+    (block)))
+
+================================================================================
+Range media features with two bounds
+================================================================================
+
+@media (400px <= width <= 700px) {}
+@media (1200px > width >= 600px) {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (media_statement
+    (range_query
+      (integer_value
+        (unit))
+      (feature_name)
+      (integer_value
+        (unit)))
+    (block))
+  (media_statement
+    (range_query
+      (integer_value
+        (unit))
+      (feature_name)
+      (integer_value
+        (unit)))
+    (block)))
+
+================================================================================
+Range media features with ratios and functions
+================================================================================
+
+@media (aspect-ratio > 16/9) {}
+@media (width < calc(100px + 1em)) {}
+@media (resolution >= 1.5dppx) {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (media_statement
+    (range_query
+      (feature_name)
+      (binary_expression
+        (integer_value)
+        (integer_value)))
+    (block))
+  (media_statement
+    (range_query
+      (feature_name)
+      (call_expression
+        (function_name)
+        (arguments
+          (binary_expression
+            (integer_value
+              (unit))
+            (integer_value
+              (unit))))))
+    (block))
+  (media_statement
+    (range_query
+      (feature_name)
+      (float_value
+        (unit)))
+    (block)))
+
+================================================================================
+Range media features combined with other queries
+================================================================================
+
+@media screen and (min-width: 600px) and (width <= 900px), not (height < 300px) {}
+@container (width > 400px) {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (media_statement
+    (binary_query
+      (binary_query
+        (keyword_query)
+        (feature_query
+          (feature_name)
+          (integer_value
+            (unit))))
+      (range_query
+        (feature_name)
+        (integer_value
+          (unit))))
+    (unary_query
+      (range_query
+        (feature_name)
+        (integer_value
+          (unit))))
+    (block))
+  (at_rule
+    (at_keyword)
+    (range_query
+      (feature_name)
+      (integer_value
+        (unit)))
+    (block)))
+
+================================================================================
+Import statements with layers
+================================================================================
+
+@import url("a.css") layer;
+@import url("b.css") layer(base);
+@import "c.css" layer(base.components) screen and (width >= 600px);
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (import_statement
+    (call_expression
+      (function_name)
+      (arguments
+        (string_value
+          (string_content))))
+    (keyword_query))
+  (import_statement
+    (call_expression
+      (function_name)
+      (arguments
+        (string_value
+          (string_content))))
+    (call_expression
+      (function_name)
+      (arguments
+        (plain_value))))
+  (import_statement
+    (string_value
+      (string_content))
+    (call_expression
+      (function_name)
+      (arguments
+        (plain_value)))
+    (binary_query
+      (keyword_query)
+      (range_query
+        (feature_name)
+        (integer_value
+          (unit))))))
+
+================================================================================
+Keyframes with fractional percentages
+================================================================================
+
+@keyframes fade {
+  from, 33.3% { opacity: 0; }
+  12.5% { opacity: 0.5; }
+  50% { opacity: 1; }
+  to { opacity: 0; }
+}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (keyframes_statement
+    (keyframes_name)
+    (keyframe_block_list
+      (keyframe_block
+        (from)
+        (float_value
+          (unit))
+        (block
+          (declaration
+            (property_name)
+            (integer_value))))
+      (keyframe_block
+        (float_value
+          (unit))
+        (block
+          (declaration
+            (property_name)
+            (float_value))))
+      (keyframe_block
+        (integer_value
+          (unit))
+        (block
+          (declaration
+            (property_name)
+            (integer_value))))
+      (keyframe_block
+        (to)
+        (block
+          (declaration
+            (property_name)
+            (integer_value)))))))

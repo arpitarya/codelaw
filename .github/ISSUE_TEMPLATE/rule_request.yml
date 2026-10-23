@@ -1,0 +1,68 @@
+name: Rule request
+description: Ask for a new rule, or a port of one from another linter.
+title: "[rule] "
+labels: ["rule request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Layout (indentation, spacing, quotes, line length) is the formatter's job, not a rule's. Ask for a `[format]` option instead.
+  - type: textarea
+    id: convention
+    attributes:
+      label: The convention the rule enforces
+      description: One or two sentences, and why it matters.
+    validations:
+      required: true
+  - type: dropdown
+    id: languages
+    attributes:
+      label: Languages
+      multiple: true
+      options:
+        - JavaScript
+        - TypeScript
+        - Python
+        - CSS
+        - HTML
+        - JSON
+        - YAML
+        - TOML
+        - Markdown
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: The original rule, if it exists elsewhere
+      description: A link to the rule in ESLint, typescript-eslint, Ruff, stylelint, html-validate or markdownlint.
+  - type: textarea
+    id: dont
+    attributes:
+      label: Code it should report (Don't)
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: do
+    attributes:
+      label: The same code, correct (Do)
+      render: text
+    validations:
+      required: true
+  - type: dropdown
+    id: fix
+    attributes:
+      label: How it can be fixed
+      description: Every codelaw rule carries a fix.
+      options:
+        - Automatically — the edit is always safe
+        - As a suggestion — the edit is mechanical but may change behaviour
+        - By hand — it needs a decision; I describe the steps below
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Fix steps, or anything else

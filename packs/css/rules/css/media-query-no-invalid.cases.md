@@ -41,3 +41,20 @@
 ```expect
 (none)
 ```
+
+### case: not without a space
+
+`not(` is a function token, not the keyword. `codelaw format` writes `not (`, which turns this
+query valid; the finding comes first because lint runs before format (SR-FORMATTER decision 4).
+
+```css
+@media not(min-width: 600px) {
+  a {
+    color: red;
+  }
+}
+```
+
+```expect
+1:8 css/media-query-no-invalid
+```

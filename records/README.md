@@ -167,7 +167,7 @@ directions.
 | `crates/codelaw-core` | SR-ARCHITECTURE | decision 13: offsets and positions; the shared types |
 | `crates/codelaw-cache` | SR-CACHE | decisions 1–6 |
 | `crates/codelaw-config` | SR-CONFIG | decisions 1–5 and 9 |
-| `crates/codelaw-lang` | SR-LINTER | decisions 1 and 3: grammars and embedded regions |
+| `crates/codelaw-lang` | SR-LINTER | decisions 1 and 3: grammars and embedded regions; `grammars/tree-sitter-css` is the CSS grammar fork SR-ARCHITECTURE decision 3 records |
 | `crates/codelaw-rules` | SR-RULE-FORMAT | decisions 1–7: the rule-file parser and its load checks |
 | `crates/codelaw-semantic` | SR-ARCHITECTURE | decision 15a |
 | `crates/codelaw-match` | SR-LINTER | decision 2: file-scope `match:` rules |

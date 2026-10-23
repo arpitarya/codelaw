@@ -1,9 +1,12 @@
 //! A small CSS reader for the `css/*` native rules. tree-sitter-css drops
-//! to ERROR nodes on much of modern CSS (`50.5%` keyframe selectors,
-//! `layer()` imports, custom properties holding blocks), so the CSS rules
-//! read the stylesheet's text themselves: statements (rules, at-rules,
+//! to ERROR nodes on parts of modern CSS (custom properties holding
+//! blocks, `@custom-media` names, `supports()` imports; codelaw's fork
+//! reads range media features, `layer()` imports and `50.5%` keyframe
+//! selectors, SR-ARCHITECTURE decision 3), so the CSS rules read the
+//! stylesheet's text themselves: statements (rules, at-rules,
 //! declarations, comments), component values, selectors and media
-//! queries, every piece with its byte range in the source.
+//! queries, every piece with its byte range in the source. The grammar
+//! still verifies every fix they make (SR-ARCHITECTURE decision 5).
 //!
 //! It never fails: anything it can't place becomes an `Other` statement,
 //! and the rules skip what they don't recognise.

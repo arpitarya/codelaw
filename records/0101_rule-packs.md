@@ -10,7 +10,7 @@ feature: "predefined rules and rule packs"
 owns:
   - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-22T18:30:00Z
+timestamp: 2026-10-22T20:00:00Z
 content_sha: ""
 ---
 
@@ -83,6 +83,7 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
    Every other rule codelaw publishes lives in a pack.
 2. **The five first-party packs and their presets** are §1's table.
    - Graph rules live with their language: `graph/no-unused-exports` in `js` and `python`, and `graph/no-unused-css-classes` in `css`. A graph rule two packs ship loads as one rule over both packs' languages with the later pack's body, so **the copies' `codelaw` blocks are identical** (a `codelaw-graph` test holds them so): when the `python` copy listed fewer kinds, a TypeScript repo lost its `interface` and `enum` findings whenever `python` loaded last (W-11 corpus run, 2026-10-22). A pack rule may also be `scope: project` under its own prefix: `node/recommended`'s six import rules (`node/no-{missing,extraneous,unpublished}-{import,require}`) run on the graph's `import:` query ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 6). A file-scope native rule that reads the files around it stays file-scope: `node/hashbang` reads the nearest `package.json`'s `bin`, `md/relative-links` checks each relative link's target, and `html/no-utf8-bom` reads the file's bytes (SR-ARCHITECTURE decision 15b; W-21, 2026-10-22).
+   - **A rule's fix class follows what the grammar can verify.** The engine refuses a fix whose output parses worse than its input (SR-ARCHITECTURE decision 5), so a rule whose fix writes syntax the grammar rejects ships `manual`. `css/media-feature-range-notation` is `auto` because codelaw's CSS grammar fork parses the range syntax it writes (SR-ARCHITECTURE decision 3; W-21, 2026-10-22).
    - There's **no umbrella preset that spans packs**, because it would require packs the repo hasn't installed.
 3. **Pack layout.** A pack is the same folder in the source tree (`packs/<name>/` in the codelaw repo) and in both published forms:
 
@@ -130,6 +131,7 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
    - Only ideas are taken from GPL-licensed tools (Pylint, yamllint), never their text or code ([L2](0004_LAW-2-foss-dependencies.md)). A rule name that describes the same check may coincide with theirs (`yaml/document-start`, yamllint's `document-start`); the pack's NOTICE names each such coincidence instead of claiming no names were shared (W-17).
    - **Not ported:** rules that need type information or the React Compiler's analysis. Each pack's README lists them under "not ported, and why".
    - **Never ported:** layout-only rules, which the formatter owns ([L7](0009_LAW-7-linter-and-formatter.md), [SR-FORMATTER](0105_formatter.md) decision 3).
+     - A source rule that is only partly layout is ported for the part the formatter leaves, and its "Differences from the source" says what was cut: `js/no-irregular-whitespace` reports templates, regular expressions, JSX text and comments, not whitespace between tokens (the decider, 2026-10-22, W-23).
    - **Data tables** in `data/` come only from sources under a permissive OSI-approved licence ([L2](0004_LAW-2-foss-dependencies.md)), each named in the pack's NOTICE with its version — for example `globals` and `known-css-properties` (MIT), html-validate's element metadata (MIT), SchemaStore (Apache-2.0).
      - CC0-1.0 is not OSI-approved, so MDN's `browser-compat-data` and `mdn-data` are not used; a table written for a pack from the specifications says so in its NOTICE.
 8. **The v0 starter catalogue is kept** (below). Each starter rule goes to the pack named by its namespace.

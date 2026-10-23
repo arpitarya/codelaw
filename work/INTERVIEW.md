@@ -24,6 +24,15 @@ entry.**
 
 ## 1 · State of play
 
+**2026-10-22, the decider's rulings (Cowork session; newest, read first).**
+Four of the six inbox rows are closed, each with its change:
+- **L2:** npm's `Artistic-2.0` passes; SR-LAW-2 decision 2 names it and `AWAITING_RULING` is empty (W-20 is 🟢).
+- **Layout check:** `js/no-irregular-whitespace` narrowed to templates, regexes, JSX text and comments (`suggest`, escapes); `css/media-query-no-invalid`'s `Don't` rewritten, `not(` a case; Biome's meaning change is B-045. W-23 closed.
+- **CSS grammar:** fork `tree-sitter-css` in-tree and send the patch upstream; the fork is in `crates/codelaw-lang/grammars/tree-sitter-css` with `upstream/` holding the patch to file. W-21 is 🟢: whether DoD 3 holds while the CSS rules still read text is the decider's to confirm.
+- **`.github/` templates** written fresh and placed; W-06 closed.
+- **Still the decider's:** the registry setup (W-04, W-03) and creating the `npm`/`pypi` environments with the `v*` tag rule (W-18) — an agent's browser attempt at the latter was refused by the permission check.
+- All five packs pass `codelaw test` (419 rules, 3,949 checks); `cargo test --workspace` 437 passed on `main` `941edac` + the branch `decider-rulings-2026-10-22`; clippy clean (rustc 1.97 — the pinned 1.99.1 could not be downloaded in the cloud session).
+
 *Updated 2026-10-20 (the merge of W-04's pipeline).* The laws L0–L8 are accepted (L8's budgets unset; L6 host
 floors Python ≥ 3.11, Node ≥ 22); every record 0101–0115 is accepted. W-01
 rewrote the records for five rule packs; **W-02 built the engine**: a Cargo
@@ -106,9 +115,9 @@ the parts that publish nothing). W-07 and W-09 landed 2026-10-21, so the
 engine L7 and L6 decision 3 require is complete; the ruling to publish is the
 decider's.
 
-**W-06** (🔴, filed as W-04): the decider places the five `.github/` templates. The
-README's counts (401 rules, 3,060 checks, fix classes) and roadmap must move
-with the packs — its registry row names the trigger.
+**W-06** closed 2026-10-22: the `.github/` templates are placed. The
+README's counts (419 rules, 3,949 checks, fix classes, refreshed 2026-10-22)
+and roadmap must move with the packs — its registry row names the trigger.
 
 **W-03** (🔴) step 6 is that same release; the packs also build locally with
 `scripts/build-packs.py`. Rules that need engine

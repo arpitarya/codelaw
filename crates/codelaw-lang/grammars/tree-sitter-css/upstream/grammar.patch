@@ -1,0 +1,337 @@
+diff --git a/grammar.js b/grammar.js
+index 4e7a49d..a11e28d 100644
+--- a/grammar.js
++++ b/grammar.js
+@@ -8,6 +8,8 @@
+ /// <reference types="tree-sitter-cli/dsl" />
+ // @ts-check
+ 
++const RANGE_OPERATORS = ['=', '<', '<=', '>', '>='];
++
+ export default grammar({
+   name: 'css',
+ 
+@@ -49,10 +51,24 @@ export default grammar({
+     import_statement: $ => seq(
+       '@import',
+       $._value,
++      optional($._import_layer),
+       sep(',', $._query),
+       ';',
+     ),
+ 
++    // `layer` or `layer(name)` after the URL of an `@import`
++    // (CSS Cascading and Inheritance Level 5). A bare `layer` keeps the
++    // `keyword_query` node it has always parsed as.
++    _import_layer: $ => choice(
++      alias('layer', $.keyword_query),
++      alias($._import_layer_function, $.call_expression),
++    ),
++
++    _import_layer_function: $ => seq(
++      alias('layer', $.function_name),
++      $.arguments,
++    ),
++
+     media_statement: $ => seq(
+       '@media',
+       sep1(',', $._query),
+@@ -88,7 +104,7 @@ export default grammar({
+     ),
+ 
+     keyframe_block: $ => seq(
+-      sep1(',', choice($.from, $.to, $.integer_value)),
++      sep1(',', choice($.from, $.to, $.integer_value, $.float_value)),
+       $.block,
+     ),
+ 
+@@ -326,6 +342,7 @@ export default grammar({
+     _query: $ => choice(
+       alias($.identifier, $.keyword_query),
+       $.feature_query,
++      $.range_query,
+       $.binary_query,
+       $.unary_query,
+       $.selector_query,
+@@ -340,6 +357,44 @@ export default grammar({
+       ')',
+     ),
+ 
++    // A range media feature (Media Queries Level 4): `(width >= 600px)`,
++    // `(600px <= width)`, `(400px < width <= 700px)`.
++    range_query: $ => seq(
++      '(',
++      choice(
++        seq(alias($.identifier, $.feature_name), choice(...RANGE_OPERATORS), $._range_value),
++        seq($._range_value, choice(...RANGE_OPERATORS), alias($.identifier, $.feature_name)),
++        seq(
++          $._range_value,
++          choice('<', '<='),
++          alias($.identifier, $.feature_name),
++          choice('<', '<='),
++          $._range_value,
++        ),
++        seq(
++          $._range_value,
++          choice('>', '>='),
++          alias($.identifier, $.feature_name),
++          choice('>', '>='),
++          $._range_value,
++        ),
++      ),
++      ')',
++    ),
++
++    _range_value: $ => choice(
++      $.integer_value,
++      $.float_value,
++      $.call_expression,
++      alias($._ratio, $.binary_expression),
++    ),
++
++    _ratio: $ => seq(
++      choice($.integer_value, $.float_value),
++      '/',
++      choice($.integer_value, $.float_value),
++    ),
++
+     parenthesized_query: $ => seq(
+       '(',
+       $._query,
+diff --git a/queries/highlights.scm b/queries/highlights.scm
+index 40c6586..11e58fe 100644
+--- a/queries/highlights.scm
++++ b/queries/highlights.scm
+@@ -16,6 +16,9 @@
+ "~=" @operator
+ "$=" @operator
+ "*=" @operator
++"<" @operator
++"<=" @operator
++">=" @operator
+ 
+ "and" @operator
+ "or" @operator
+diff --git a/test/corpus/modern.txt b/test/corpus/modern.txt
+new file mode 100644
+index 0000000..f268c8a
+--- /dev/null
++++ b/test/corpus/modern.txt
+@@ -0,0 +1,217 @@
++================================================================================
++Range media features
++================================================================================
++
++@media (width >= 600px) {}
++@media (600px < width) {}
++@media (width = 600px) {}
++
++--------------------------------------------------------------------------------
++
++(stylesheet
++  (media_statement
++    (range_query
++      (feature_name)
++      (integer_value
++        (unit)))
++    (block))
++  (media_statement
++    (range_query
++      (integer_value
++        (unit))
++      (feature_name))
++    (block))
++  (media_statement
++    (range_query
++      (feature_name)
++      (integer_value
++        (unit)))
++    (block)))
++
++================================================================================
++Range media features with two bounds
++================================================================================
++
++@media (400px <= width <= 700px) {}
++@media (1200px > width >= 600px) {}
++
++--------------------------------------------------------------------------------
++
++(stylesheet
++  (media_statement
++    (range_query
++      (integer_value
++        (unit))
++      (feature_name)
++      (integer_value
++        (unit)))
++    (block))
++  (media_statement
++    (range_query
++      (integer_value
++        (unit))
++      (feature_name)
++      (integer_value
++        (unit)))
++    (block)))
++
++================================================================================
++Range media features with ratios and functions
++================================================================================
++
++@media (aspect-ratio > 16/9) {}
++@media (width < calc(100px + 1em)) {}
++@media (resolution >= 1.5dppx) {}
++
++--------------------------------------------------------------------------------
++
++(stylesheet
++  (media_statement
++    (range_query
++      (feature_name)
++      (binary_expression
++        (integer_value)
++        (integer_value)))
++    (block))
++  (media_statement
++    (range_query
++      (feature_name)
++      (call_expression
++        (function_name)
++        (arguments
++          (binary_expression
++            (integer_value
++              (unit))
++            (integer_value
++              (unit))))))
++    (block))
++  (media_statement
++    (range_query
++      (feature_name)
++      (float_value
++        (unit)))
++    (block)))
++
++================================================================================
++Range media features combined with other queries
++================================================================================
++
++@media screen and (min-width: 600px) and (width <= 900px), not (height < 300px) {}
++@container (width > 400px) {}
++
++--------------------------------------------------------------------------------
++
++(stylesheet
++  (media_statement
++    (binary_query
++      (binary_query
++        (keyword_query)
++        (feature_query
++          (feature_name)
++          (integer_value
++            (unit))))
++      (range_query
++        (feature_name)
++        (integer_value
++          (unit))))
++    (unary_query
++      (range_query
++        (feature_name)
++        (integer_value
++          (unit))))
++    (block))
++  (at_rule
++    (at_keyword)
++    (range_query
++      (feature_name)
++      (integer_value
++        (unit)))
++    (block)))
++
++================================================================================
++Import statements with layers
++================================================================================
++
++@import url("a.css") layer;
++@import url("b.css") layer(base);
++@import "c.css" layer(base.components) screen and (width >= 600px);
++
++--------------------------------------------------------------------------------
++
++(stylesheet
++  (import_statement
++    (call_expression
++      (function_name)
++      (arguments
++        (string_value
++          (string_content))))
++    (keyword_query))
++  (import_statement
++    (call_expression
++      (function_name)
++      (arguments
++        (string_value
++          (string_content))))
++    (call_expression
++      (function_name)
++      (arguments
++        (plain_value))))
++  (import_statement
++    (string_value
++      (string_content))
++    (call_expression
++      (function_name)
++      (arguments
++        (plain_value)))
++    (binary_query
++      (keyword_query)
++      (range_query
++        (feature_name)
++        (integer_value
++          (unit))))))
++
++================================================================================
++Keyframes with fractional percentages
++================================================================================
++
++@keyframes fade {
++  from, 33.3% { opacity: 0; }
++  12.5% { opacity: 0.5; }
++  50% { opacity: 1; }
++  to { opacity: 0; }
++}
++
++--------------------------------------------------------------------------------
++
++(stylesheet
++  (keyframes_statement
++    (keyframes_name)
++    (keyframe_block_list
++      (keyframe_block
++        (from)
++        (float_value
++          (unit))
++        (block
++          (declaration
++            (property_name)
++            (integer_value))))
++      (keyframe_block
++        (float_value
++          (unit))
++        (block
++          (declaration
++            (property_name)
++            (float_value))))
++      (keyframe_block
++        (integer_value
++          (unit))
++        (block
++          (declaration
++            (property_name)
++            (integer_value))))
++      (keyframe_block
++        (to)
++        (block
++          (declaration
++            (property_name)
++            (integer_value)))))))

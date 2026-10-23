@@ -24,7 +24,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-22T18:30:00Z
+timestamp: 2026-10-22T20:00:00Z
 content_sha: ""
 ---
 
@@ -101,7 +101,7 @@ The decider asked for a record of what goes into which package, under the naming
    | surfaces | `codelaw-lsp` | the language server ([SR-EDITOR](0114_editor.md)) |
    | surfaces | `codelaw-agents` | hook mode, `sync-agents`, and the skill sources from `agents/skills/` ([SR-AGENT-SURFACES](0102_agent-surfaces.md)) |
 
-   The workspace's `Cargo.toml` may carry a `[patch.crates-io]` only to replace a transitive crate that fails [L2](0004_LAW-2-foss-dependencies.md) with a permissive stand-in kept under `crates/`. The record that takes in the dependency that pulls it names it. Today there is one: `option-ext`, for Biome ([SR-FORMATTER](0105_formatter.md) decision 2).
+   The workspace's `Cargo.toml` may carry a `[patch.crates-io]` for two reasons only: to replace a transitive crate that fails [L2](0004_LAW-2-foss-dependencies.md) with a permissive stand-in kept under `crates/`, or to put a grammar fork the decider ruled for, kept under `crates/codelaw-lang/grammars/`, in place of the pinned grammar. The record that takes in the dependency that pulls it names it. Today there are two: `option-ext`, for Biome ([SR-FORMATTER](0105_formatter.md) decision 2), and `tree-sitter-css`, codelaw's CSS grammar fork ([SR-ARCHITECTURE](0108_architecture.md) decision 3). Neither is a workspace member, so neither is one of the crates above.
 
 2. **The binary** links every crate. A single `codelaw` executable serves the CLI, `codelaw lsp`, `codelaw mcp`, `codelaw hook` and `codelaw sync-agents`, with no second executable; the agent skills are compiled into it ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 7).
 3. **npm `codelaw`** contains:

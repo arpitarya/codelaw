@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-22 — npm's Artistic-2.0 ruled permissive; four inbox rows closed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"What are the blockers? Let's go through them one by one"* — then *"add the license to law2"* and fix blockers 2, 4, 5 and 6 (the decider chose: narrow the JS rule, rewrite the CSS rule's example, fork `tree-sitter-css` in-tree plus an upstream patch).
+- **Done:** SR-LAW-2 names Artistic-2.0 and `licences.rs` allows it (W-20; committed by the Claude Code session as `a95ca2e`); `js/no-irregular-whitespace` narrowed and `css/media-query-no-invalid`'s example rewritten, B-045 filed, SR-FORMATTER and SR-RULE-PACKS updated, W-23 closed; the `tree-sitter-css` fork with range media queries, `layer()` and fractional keyframes, `css/media-feature-range-notation` `auto`, upstream patch in the fork's `upstream/` (W-21 steps 3–4); the five `.github/` templates, W-06 closed; README and CHANGELOG counts refreshed. Built and verified in a cloud clone rebased onto `main` `941edac` (rustc 1.97): clippy clean, `cargo test --workspace` 437 passed, every pack 0 failed (419 rules, 3,949 checks); delivered as the branch `decider-rulings-2026-10-22`, not merged, because another session had uncommitted edits in the main checkout.
+- **Decided / left open:** the `npm`/`pypi` environments and their `v*` tag rule stay the decider's (the agent's browser attempt was refused by the permission check; neither environment exists yet); the registry setup was not answered. W-21's DoD 3 reading is the decider's.
+- **Mistakes:** the first recommendation to drop `js/no-irregular-whitespace` missed that it also reports templates, regexes and JSX text; caught before the change and put back to the decider, who chose to narrow it.
+- **Next:** the decider creates the two environments with the `v*` tag rule, then the registry setup (W-04).
+
+---
+
 ## 2026-10-22 — the `/docket` skill: the queue walked one item at a time  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Create me a skill which looks into open work document, explains them to me one by one, and gives me a recommendation"* — named Docket; skill plus pointers; in the repo and as a personal skill; inbox first, then every item; rulings written back.
