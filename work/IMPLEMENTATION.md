@@ -11,6 +11,7 @@ against this file before an item may be closed
 
 | date | item | what landed | outcome | evidence |
 |---|---|---|---|---|
+| 2026-10-24 | W-24 (part) | `bench`'s Windows `wait` returns `(code, None)`, the type it declares; every other Unix-only call already sat behind `cfg(unix)` | landed; unproven until CI builds `win32-*` | `crates/codelaw-cli/src/bench/mod.rs`; no Windows target in the session |
 | 2026-10-22 | W-23 | DoD 1: `js/no-irregular-whitespace` narrowed to templates, regexes, JSX text and comments (`suggest`, escapes); `css/media-query-no-invalid`'s `Don't` rewritten and `not(` moved to a case; B-045 | landed; W-23 closed and archived | `codelaw test packs/js` 2039 checks and `packs/css` 475 checks, 0 failed; `literals.rs` `sparse_whitespace_multiline`; branch `decider-rulings-2026-10-22`, rustc 1.97 |
 | 2026-10-22 | W-06 | `.github/ISSUE_TEMPLATE/` (`false_positive.yml`, `bug_report.yml`, `rule_request.yml`, `config.yml`) and `.github/pull_request_template.md`; README and CHANGELOG counts refreshed | landed; W-06 closed and archived | the forms parse as YAML; the names match `CONTRIBUTING.md`'s links |
 | 2026-10-22 | W-20 | npm's `Artistic-2.0` allowed: SR-LAW-2 decision 2, `licences.rs` `ALLOWED`, `AWAITING_RULING` empty | landed | `cargo test -p codelaw-cli --test licences` 5 passed |

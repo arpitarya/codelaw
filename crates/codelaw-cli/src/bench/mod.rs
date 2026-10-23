@@ -607,7 +607,8 @@ fn wait(child: &mut Child) -> Result<(i32, Option<u64>), String> {
 #[cfg(not(unix))]
 fn wait(child: &mut Child) -> Result<(i32, Option<u64>), String> {
     let status = child.wait().map_err(|e| e.to_string())?;
-    Ok((status.code().unwrap_or(128)))
+    // No `rusage` here: the peak memory is not measured on this platform.
+    Ok((status.code().unwrap_or(128), None))
 }
 
 #[cfg(test)]

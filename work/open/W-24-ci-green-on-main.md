@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-22: the repo review — CI cannot pass on main toda
 item: W-24
 filed: 2026-10-23
 filed_by: "Arpit (Claude Code, Fable 5.1)"
-updated: 2026-10-23
-updated_by: "Arpit (Claude Code, Fable 5.1)"
+updated: 2026-10-24
+updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: agent
 ---
 
@@ -16,7 +16,7 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Fix the Windows build: `bench/mod.rs`'s `not(unix)` `wait` returns `Ok(i32)` where `Ok((i32, Option<u64>))` is declared | the two `win32-*` builds compile; `package`, `smoke` and the attestation run again | ⏳ |
+| 1 | Fix the Windows build: `bench/mod.rs`'s `not(unix)` `wait` returns `Ok(i32)` where `Ok((i32, Option<u64>))` is declared | the two `win32-*` builds compile; `package`, `smoke` and the attestation run again | 🟡 2026-10-24: fixed (`Ok((code, None))`); every other Unix-only use is behind `cfg(unix)`; proven by the first CI run after the push — no Windows target here |
 | 2 | Move `records/RULE-SINCE` forward to the commit before this item lands, with the reason written in the file: the nine failing commits are the WIP branches the decider had merged as-is (2026-10-21/22) and their two resolutions | the `lint` job's guard replay passes; nothing after the move escapes it | ⏳ |
 | 3 | Add every input a test reads to the verdict and wheel cache keys: `agents/**`, `scripts/**`, `packaging/**`, `.github/workflows/**`, `records/0111_consumer-layout.md` | a change to a skill, a script or a workflow runs the tests again instead of reusing an old verdict | ⏳ |
 | 4 | Run the law gate for real in `ci.yml` (`law-gate.py dist`, no `--report`) and drop the "until W-07–W-09 land" wording | `main` learns the day the binary loses `format`, `mcp` or `lsp`, not release day | ⏳ |

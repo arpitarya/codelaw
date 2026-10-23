@@ -45,7 +45,7 @@ here. Read that record before changing anything below it.
 
 🟡 **W-30** `arpit` The first PyPI publish, by hand: `codelaw` (8 wheels) and 5 `codelaw-rules-*` from the same `dist` with `twine`, then trusted publishers on the six projects; waiting on W-24. Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
 
-🟢🧨 **W-24** `agent` CI cannot pass on `main` (the Windows `bench` build, the guard replay on nine as-is merges, cache keys that miss test inputs, the law gate on `--report`); fix the six. Filed by Arpit (Claude Code). [detail](open/W-24-ci-green-on-main.md)
+🟢🧨 **W-24** `agent` CI cannot pass on `main`: the Windows `bench` build fixed 2026-10-24 (unproven until the push); left: the guard replay on nine as-is merges, cache keys that miss test inputs, the law gate on `--report`. Filed by Arpit (Claude Code). [detail](open/W-24-ci-green-on-main.md)
 
 🟢 **W-26** `agent` Generate the README's counts, command table and roadmap, the pack READMEs and the CHANGELOG from the binary and the packs, with a CI check; make the three `graph/*` rules reachable. Filed by Arpit (Claude Code). [detail](open/W-26-public-docs-from-the-tree.md)
 
