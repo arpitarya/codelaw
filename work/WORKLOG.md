@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-22 — the `/docket` skill: the queue walked one item at a time  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Create me a skill which looks into open work document, explains them to me one by one, and gives me a recommendation"* — named Docket; skill plus pointers; in the repo and as a personal skill; inbox first, then every item; rulings written back.
+- **Done:** `.claude/skills/docket/SKILL.md` (holds no rules — points to SR-WORK-OPEN-QUEUE and the WORK records). **`CLAUDE.md` changed** (SR-WORK-DOCS decision 7a): a state-of-play row and the layout line point to it; its registry row bumped. The personal copy is proposed to the decider for saving.
+- **Decided / left open:** drift seen while reading, not fixed: the inbox still carries npm's Artistic-2.0 row, which the worklog records as ruled 2026-10-22; the worklog sends L8's budgets to the inbox, but no inbox row carries them and W-19 is 🟢. `/docket`'s first run should take both as drift cases.
+- **Mistakes:** none.
+- **Next:** run `/docket`.
+
+---
+
 ## 2026-10-22 — the green items: W-11, W-13, W-15, W-19 landed  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement all the green items. In parallel"*.

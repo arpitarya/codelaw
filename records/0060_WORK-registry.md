@@ -92,7 +92,7 @@ into a scan anyone can do at task end.
 
 | Document | Update trigger | Last verified | Notes |
 |---|---|---|---|
-| `CLAUDE.md` | any rule or pointer changes | 2026-10-20 | 2026-10-20 — layout names `packs/`, `packaging/`, `.github/` |
+| `CLAUDE.md` | any rule or pointer changes | 2026-10-22 | 2026-10-22 — pointer to the `/docket` skill (state-of-play table, layout) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-20 | 2026-10-20 — W-07–W-22 filed from the review; the registry-setup row narrowed to steps 1, 4, 5 |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — every row but B-006, B-007 promoted to W-07–W-22 |

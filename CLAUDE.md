@@ -32,6 +32,7 @@ decision 13.
 | you want | read |
 |---|---|
 | what to work on next | [`work/OPEN-WORK.md`](work/OPEN-WORK.md) — **the single live queue** |
+| the queue explained one item at a time, with a recommendation, rulings written back | `/docket` — [`.claude/skills/docket/SKILL.md`](.claude/skills/docket/SKILL.md) |
 | what has been named and nobody is doing | [`work/BACKLOG.md`](work/BACKLOG.md) |
 | the judgment behind the current state | [`work/INTERVIEW.md`](work/INTERVIEW.md) |
 | what has actually shipped | [`work/IMPLEMENTATION.md`](work/IMPLEMENTATION.md) |
@@ -120,5 +121,5 @@ packs/       THE FIVE RULE PACKS — the same folder on npm and PyPI
 packaging/   the npm launcher and API, the PyPI module — every manifest is generated (SR-PACKAGES)
 scripts/     the commit guard, the inbox check, the version and the release scripts
 .github/     ci.yml builds and checks every package; publish.yml uploads them — RELEASING.md
-.claude/     hooks and their wiring
+.claude/     hooks and their wiring; skills/docket — the queue walk-through
 ```
