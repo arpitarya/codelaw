@@ -3,4 +3,4 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-active — 2026-10-22: the decider's rulings are on the branch `decider-rulings-2026-10-22` (W-23 and W-06 closed, W-21's CSS fork, README counts), verified, not merged. Next: merge it; the decider creates the `npm`/`pypi` environments with the `v*` tag rule, then the registry setup and L8's budgets.
+active — 2026-10-24: the rulings branch merged (`f75c848`); the review's work items filed as W-24–W-28. Next: an agent takes W-24 (CI cannot pass on `main`); then the decider pushes `main` and the `perf` job's first run gates L8's budgets.

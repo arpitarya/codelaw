@@ -94,14 +94,14 @@ into a scan anyone can do at task end.
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-22 | 2026-10-22 — pointer to the `/docket` skill (state-of-play table, layout) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-20 | 2026-10-20 — W-07–W-22 filed from the review; the registry-setup row narrowed to steps 1, 4, 5 |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-24 | 2026-10-24 — W-24–W-28 filed from the 2026-10-22 review; W-06 and W-23 rows gone with the rulings merge; ages recomputed |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — every row but B-006, B-007 promoted to W-07–W-22 |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-20 | 2026-10-20 — the review; the law gate; W-07–W-22 |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-24 | 2026-10-24 — §1 and §2 rewritten to the current state (they had carried 2026-10-20 claims: 13 crates, clippy not clean, graph not built) |
 | `work/IMPLEMENTATION.md` | something lands | 2026-10-22 | 2026-10-22 — W-21 step 3, the CSS grammar fork |
-| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-22 | 2026-10-22 — row added: decision 8's check found it missing (W-20) |
-| `work/NOW.md` | every transition; `idle` when stopping | 2026-10-22 | 2026-10-22 — row added: decision 8's check found it missing (W-20) |
-| `work/LESSONS.md` | a failure teaches something durable | 2026-10-20 | 2026-10-20 — a law with no gate gets walked past by the next release |
+| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-24 | 2026-10-24 — the review session; the merge kept both 2026-10-22 entries |
+| `work/NOW.md` | every transition; `idle` when stopping | 2026-10-24 | 2026-10-24 — set after the merge and the filing |
+| `work/LESSONS.md` | a failure teaches something durable | 2026-10-24 | 2026-10-24 — the cfg-split lesson and the two-sessions-one-checkout lesson |
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |

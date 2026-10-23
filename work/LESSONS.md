@@ -11,6 +11,27 @@ named here only as the failure that produced it. A lesson whose remedy is
 
 ---
 
+## 2026-10-24 — a `cfg`-split function is two functions; the other half is never compiled where you are
+
+`bench/mod.rs` grew a `#[cfg(unix)]` `wait` that reads `rusage` and a
+`#[cfg(not(unix))]` twin that returns the wrong type. Clippy, 435 tests and the
+reviewer all passed it, because on a Mac the second function does not exist.
+It landed on `main` and would have turned both Windows builds red on the first
+push — no `dist`, no attestation, no release. **When a file gains a `cfg`
+split, `cargo check --target x86_64-pc-windows-msvc` (or the other side of the
+split) before merging is part of verification, not CI's job** — W-24 fixes
+this one. The same shape hides anywhere one platform is the only one anyone
+builds on: the review that found it read the code, not the test results.
+
+## 2026-10-24 — two sessions, one checkout: a ruling can sit on a branch for days
+
+The decider's 2026-10-22 rulings were built, verified and delivered as a
+branch, unmerged, because another session had left uncommitted edits in the
+main checkout; the next session found the queue still showing six inbox rows
+and nearly re-did the templates. **Every session's first look is `git status`
+and `git branch --no-merged main`, not just the queue** — an unmerged branch
+named after a date or a ruling is work the queue does not know about.
+
 ## 2026-10-20 — a law with no gate gets walked past by the next release
 
 L7 says the linter and formatter never ship apart, and L6 decision 3 says every

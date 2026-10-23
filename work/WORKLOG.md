@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-22 → 24 — the review: rulings merged, five work items filed  ·  Claude Code (Fable 5.1), linked to the Mac
+
+- **Asked:** *"review or open work blockers, ratify whatever you can, review the repo, create work items to fix whatever was broken or whatever needs to be fixed or whatever needs to be structured in a better way."*
+- **Done:** the six inbox rows put to the decider (rulings below). `main` `941edac` built in a cloud clone from a bundle (rustc 1.97): clippy clean, 435 tests, the two known pack failures. An independent review agent read the tree and wrote 30 findings; nine verified by hand (the Windows `wait`, the guard replay's nine failing commits, the rule counts). Found the Cowork session's unmerged branch `decider-rulings-2026-10-22` carrying the same rulings plus the CSS fork and templates; on the decider's OK: the docket session's edits committed (`77ce957`), the branch merged (`f75c848`; a stray `.codelaw/cache/` under `.github/ISSUE_TEMPLATE` dropped, `.codelaw/cache/` ignored everywhere), this session's duplicate templates discarded. Filed **W-24** (CI cannot pass on `main`, 🧨), **W-25** (records and work files vs. the tree), **W-26** (public docs generated from the tree), **W-27** (engine and packaging hygiene), **W-28** (the layout check by codelaw's own tokens). INTERVIEW §1–2 rewritten; two lessons; registry rows; the inbox ages recomputed; `W-03`'s row count 419.
+- **Decided / left open:** the decider, 2026-10-22: templates — agent writes them (superseded by the branch's, already ruled); layout rules — *"biome is not the right thing to reference. build how we design it. make the decision and create the work item"* → W-28 (this session's decision: same token stream = layout; the formatter comparison advisory); CSS grammar — fork in-tree, upstream in parallel; push `main` — *after the review's fixes land*; registry setup and the `v*` tag rule — *later, keep the row*. `work/BLOCKED.json` stands. Git housekeeping named in chat, not the queue (rule 47): `main` is 58 commits ahead of `origin/main`; 14 merged agent worktrees (8.2 GB) and 11 GB of `target/` sit under the repo.
+- **Mistakes:** this session wrote five templates before finding the branch that already had them, ruled — the second lesson of 2026-10-24. A write test left `.github/.write-test` in the tree for a minute (moved out, nothing committed). The review agent hit the session's rate limit after writing its report; its last area (shell scripts) was not re-run.
+- **Next:** an agent takes W-24; the decider pushes `main` once it lands.
+
+---
+
 ## 2026-10-22 — npm's Artistic-2.0 ruled permissive; four inbox rows closed  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"What are the blockers? Let's go through them one by one"* — then *"add the license to law2"* and fix blockers 2, 4, 5 and 6 (the decider chose: narrow the JS rule, rewrite the CSS rule's example, fork `tree-sitter-css` in-tree plus an upstream patch).

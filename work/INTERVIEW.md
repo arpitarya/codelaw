@@ -24,111 +24,75 @@ entry.**
 
 ## 1 · State of play
 
-**2026-10-22, the decider's rulings (Cowork session; newest, read first).**
-Four of the six inbox rows are closed, each with its change:
-- **L2:** npm's `Artistic-2.0` passes; SR-LAW-2 decision 2 names it and `AWAITING_RULING` is empty (W-20 is 🟢).
-- **Layout check:** `js/no-irregular-whitespace` narrowed to templates, regexes, JSX text and comments (`suggest`, escapes); `css/media-query-no-invalid`'s `Don't` rewritten, `not(` a case; Biome's meaning change is B-045. W-23 closed.
-- **CSS grammar:** fork `tree-sitter-css` in-tree and send the patch upstream; the fork is in `crates/codelaw-lang/grammars/tree-sitter-css` with `upstream/` holding the patch to file. W-21 is 🟢: whether DoD 3 holds while the CSS rules still read text is the decider's to confirm.
-- **`.github/` templates** written fresh and placed; W-06 closed.
-- **Still the decider's:** the registry setup (W-04, W-03) and creating the `npm`/`pypi` environments with the `v*` tag rule (W-18) — an agent's browser attempt at the latter was refused by the permission check.
-- All five packs pass `codelaw test` (419 rules, 3,949 checks); `cargo test --workspace` 437 passed on `main` `941edac` + the branch `decider-rulings-2026-10-22`; clippy clean (rustc 1.97 — the pinned 1.99.1 could not be downloaded in the cloud session).
+*Updated 2026-10-24 (the review session; the rulings branch merged).*
+**Where things stand:** the laws L0–L8 are accepted (L8's budgets still
+`unset`); every record 0101–0115 is accepted. **The engine is complete**
+(L7, L6 decision 3; `law-gate.py` lists nothing): 20 crates under `crates/`,
+the `codelaw` binary with `check`, `fix`, `format`, `test`, `rules`,
+`explain`, `tree`, `new-rule`, `init`, `cache`, `graph`, `config`, `match`,
+`hook`, `sync-agents`, `baseline`, `deprecate`, `daemon`, `bench`, `mcp`,
+`lsp`. Five packs, 419 rules, 3,949 example checks, every pack green; every
+rule `preview`. W-01–W-02, W-06–W-17, W-22–W-23 are closed and archived.
+Verified on `main` `f75c848` in a cloud clone (rustc 1.97 — the pinned 1.99.1
+cannot be downloaded there): clippy clean, `cargo test --workspace` green,
+every pack 0 failed. **Nothing is published**; `main` has not been pushed
+since the 2026-10-21 merges, so CI has never run on it.
 
-*Updated 2026-10-20 (the merge of W-04's pipeline).* The laws L0–L8 are accepted (L8's budgets unset; L6 host
-floors Python ≥ 3.11, Node ≥ 22); every record 0101–0115 is accepted. W-01
-rewrote the records for five rule packs; **W-02 built the engine**: a Cargo
-workspace of 13 crates under `crates/` and the `codelaw` binary (`check`,
-`fix`, `test`, `rules`, `explain`, `tree`, `new-rule`, `init`, `cache`), with
-the semantic model, `native:` rules and pack resolution. Every crate is owned in
-the register's Ownership table. W-03 steps 2–5 are done: five packs under `packs/` — js 132 rules, python 98,
-html 71, css 70, data 30 — every rule `preview`, each pack's tests green and
-checked against its upstream linter on third-party code. **W-04 built the
-release pipeline**, merged into `main` 2026-10-20 (green on all eight
-platforms, nothing published): `ci.yml` builds and checks all 27
-packages on every push, `publish.yml` uploads exactly that set by OIDC. The
-licence is MIT (Arpit, 2026-10-20; it superseded `MIT OR Apache-2.0`). **W-06**
-added the public docs — `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`,
-`SECURITY.md`, `CODE_OF_CONDUCT.md`. **The engine is complete since
-2026-10-21:** the formatter (W-07), MCP (W-08) and LSP (W-09) have landed, and
-`law-gate.py` lists nothing. Not built: graph, baseline, adapters, agent
-surfaces, the rest of SR-FORMATTER (W-23) — open items W-10–W-23.
-`cargo test --workspace` is green (204 tests; every pack's `codelaw test`
-green). **Clippy is not clean:** CI's clippy step can't fail (no `pipefail`)
-and hid three warnings — W-17, W-18. **A release is refused by
-`scripts/law-gate.py`** until `format`, `mcp` and `lsp` exist (L7, L6
-decision 3); the 2026-10-20 review's findings are W-17, W-18 and W-22. **Ground it before you edit it** — `git log`, the queue,
-`cargo test`.
+**What the 2026-10-22 review found (filed 2026-10-24 as W-24–W-28):** CI
+cannot pass on `main` as it stands — `bench/mod.rs`'s `not(unix)` `wait`
+does not compile (both Windows builds red, so no `dist`, no attestation, no
+release), the SR-guard replay fails nine as-is WIP merges, the verdict cache
+keys miss inputs the tests read, the law gate still runs `--report` (W-24).
+The records and work files drifted from the tree — `codelaw-graph` and
+`perf/` have no owner, the register's `built` column is stale for seven
+records, dead `B-nnn` ids are cited, item files name landed blockers (W-25).
+The README's roadmap, command table and the CHANGELOG lag the binary (W-26).
+`rust-version = "1.85"` is false (let-chains need 1.88), one process-kill
+is duplicated, Windows has no `daemon` and nothing says so (W-27). The
+layout-rule check is defined by what Biome does, not by codelaw (W-28 — the
+decider: *"biome is not the right thing to reference; build how we design
+it"*).
+
+**The decider's rulings of 2026-10-22** (merged 2026-10-24 as `f75c848`):
+npm's Artistic-2.0 passes L2; `js/no-irregular-whitespace` narrowed and
+`css/media-query-no-invalid`'s example rewritten (W-23 closed; B-045 holds the
+formatter's meaning change); `tree-sitter-css` forked in-tree with the
+upstream patch in `crates/codelaw-lang/grammars/tree-sitter-css/upstream/`
+(W-21 steps 3–4); the `.github/` templates placed (W-06 closed). **Still the
+decider's (inbox):** the one-time registry setup (W-03, W-04), the
+`npm`/`pypi` environments with the `v*` tag rule (W-18) — both answered
+"later, keep the row" on 2026-10-22 — and L8's budgets after the `perf`
+job's first run on `main` (W-19). **The push of `main`** is the decider's,
+after W-24 lands (ruled 2026-10-22: "push after the review's fixes land").
+
+**Ground it before you edit it** — `git log`, the queue, `cargo test`.
+Concurrent sessions are the norm here: the 2026-10-22 rulings sat on a branch
+for two days because another session's edits were uncommitted in the main
+checkout.
 
 ## 2 · In flight, and the immediate next step
 
-**W-05** (🟢, `research`, Cowork): guidance **while** an agent writes — a construct-filtered `brief` before writing and a `hook --pre` check before bytes land; Fux only as an optional free-text layer. Next is step 1, the per-agent pre-write matrix. Design is a proposal until step 5 is ruled on.
+**Next for an agent:** W-24 (🟢🧨) first — `main` cannot be pushed green
+without it, and the push gates L8's budgets. Then W-25 (the records), W-26
+(the public docs), W-27, W-28; W-20's pinned corpus and W-21's upstream patch
+remain from before. W-05 is Cowork research only (rule 37a).
 
-**2026-10-20, cloud session (stopped by the decider to continue locally):**
-W-08, W-17 and W-22 landed and are archived; W-09 landed except formatting
-(waits on W-07); W-18 landed except the tag-only environment rule (decider,
-inbox) and the staging-index install. Unfinished, unbuilt work sits on pushed
-branches `wip/W-07-formatter`, `wip/W-08-mcp-W-10-agent-surfaces` (W-10, on
-top of W-08), `wip/W-11-graph`, `wip/W-12-structured-rules`,
-`wip/W-14-adapters`, `wip/W-16-commands-api`, `wip/W-20-conformance`,
-`wip/W-21-pack-gaps` — each is one WIP commit (most with `--no-verify`) on a
-base before the final merges: rebase or merge `main` in, build, finish,
-and rewrite the WIP commit so the SR guard passes before it lands. W-15 and
-W-19 were not started.
+**Open questions for the decider, carried from earlier sessions:** W-21 —
+whether DoD 3 holds while the CSS rules still read text; W-11's two default
+gaps (self-aliased private packages; CSS only for linked stylesheets); W-13's
+`on_touch` default for non-deprecation baselines and `codelaw/stale-baseline`
+as `manual`; W-15's per-project tree-cache bound; a `rustfmt.toml` and a
+one-time format of the tree; whether the html pack's `entities.json` (WHATWG,
+CC BY 4.0 via html-validate's MIT copy) passes L2; renaming
+`yaml/document-start`; `codelaw check <file>` with no config taking the
+file's folder as the project root; every pack rule shipping `preview`;
+upstream's noisy defaults kept in `html/require-sri`, `html/valid-id`,
+`html/button-type`; `json/package-engines` `>=22` and
+`toml/pyproject-requires-python` `>=3.11`.
 
-**2026-10-21, local session:** W-07 landed from `wip/W-07-formatter`, and
-W-09 with it (LSP document formatting). `codelaw format`, the format step of
-`fix`, and `format/unformatted` in `check`, the editor and MCP's snippets all
-use six embedded engines behind one verifier. Parity against Prettier and
-Black is recorded in SR-FORMATTER: JS/TS/JSON are 100 % identical, HTML only
-62 %. What W-07's DoD left of SR-FORMATTER is W-23. **One reconciliation:**
-`end_of_line` unset keeps each file's line ending (SR-ARCHITECTURE decision
-9); the WIP had rewritten CRLF to LF, which matches Prettier but breaks that
-record.
-
-**2026-10-22, the decider:** *"Merge everything to main"* — the seven
-`wip/*` commits (W-10, W-11, W-12, W-14, W-16, W-20, W-21) were merged into
-`main` as they were, unfinished, with the conflicts resolved and the
-merge-caused compile errors fixed. **`main` does not build whole:**
-`crates/codelaw-agents` (W-10) declares modules `hook` and `sync` that were
-never written. Everything else builds; `cargo test --workspace --exclude
-codelaw-agents` is 319 passed, 3 failed — `debug.rs`'s
-`fix_trace_shows_each_pass_and_writes_only_without_dry_run` and
-`rules_for_json_is_the_api_shape` (W-16), and `licences.rs`'s
-`every_build_tool_is_declared_and_free_and_permissive` (W-20). W-14's
-`crates/codelaw-adapters` has only a stub `lib.rs`. Each item is still
-open and is now finished on `main`, not from a branch. W-20 also asks the
-decider whether npm's Artistic-2.0 passes L2.
-
-**Next for an agent:** make `main` build again — W-10's `hook` and `sync`
-modules — then W-10, W-11 and the rest in the order of 2026-10-21.
-
-**Open questions for the decider (from 2026-10-20 agents):** a
-`rustfmt.toml` and a one-time format of the tree (the code isn't
-rustfmt-formatted, so `cargo fmt --all` rewrites ~94 files); whether the html
-pack's `entities.json` (WHATWG table, CC BY 4.0, taken via html-validate's MIT
-copy) passes L2; renaming `yaml/document-start` (shares yamllint's name;
-NOTICE now says so); `codelaw check <file>` with no config takes the file's
-own folder as the project root.
-
-**W-04** (🔴): the pipeline is built, timed and merged; the first release waits on the
-decider's one-time registry setup (`RELEASING.md` §One time, steps 1, 4, 5 —
-the parts that publish nothing). W-07 and W-09 landed 2026-10-21, so the
-engine L7 and L6 decision 3 require is complete; the ruling to publish is the
-decider's.
-
-**W-06** closed 2026-10-22: the `.github/` templates are placed. The
-README's counts (419 rules, 3,949 checks, fix classes, refreshed 2026-10-22)
-and roadmap must move with the packs — its registry row names the trigger.
-
-**W-03** (🔴) step 6 is that same release; the packs also build locally with
-`scripts/build-packs.py`. Rules that need engine
-features not built wait in each pack README's "not ported" table: `target:`
-rules (W-12), the graph (W-11), a native rule's file path and bytes (W-21),
-a CSS grammar that parses modern CSS (W-21). For the decider to confirm or
-correct: every pack rule ships `preview`; upstream's noisy defaults kept in
-`html/require-sri`, `html/valid-id`, `html/button-type`; `json/package-engines`
-`>=22` and `toml/pyproject-requires-python` `>=3.11`.
-The decider (`git config user.name`) still installs `scripts/sr-guard.sh` as
-the `commit-msg` hook.
+**W-04 / W-03** (🔴): built, timed, merged; the first release waits on the
+registry setup and the ruling to publish. **W-18** (🔴): the environments
+and their tag rule. **W-19** (🔴): the budgets, after CI's first `perf` run.
 
 ## 3 · Standing constraints
 

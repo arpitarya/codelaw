@@ -22,11 +22,11 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed | age |
 |---|---|---|
-| 🔴 **The one-time registry setup, steps 1, 4 and 5 only** — the `@codelaw` npm org, six PyPI pending publishers, the `npm`/`pypi` environments ([`RELEASING.md`](../RELEASING.md) §One time). Steps 2–3 and the ruling to publish can follow: W-07, W-08 and W-09 have landed, and `law-gate.py` lists nothing (2026-10-21) | 2026-10-20 | 2 d |
+| 🔴 **The one-time registry setup, steps 1, 4 and 5 only** — the `@codelaw` npm org, six PyPI pending publishers, the `npm`/`pypi` environments ([`RELEASING.md`](../RELEASING.md) §One time). Steps 2–3 and the ruling to publish can follow: W-07, W-08 and W-09 have landed, and `law-gate.py` lists nothing (2026-10-21) | 2026-10-20 | 4 d |
 | ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 | | |
-| 🔴 Create the `npm` and `pypi` environments and give each one tag rule `v*` and no branch rule (GitHub Settings → Environments; [`RELEASING.md`](../RELEASING.md) step 5). Checked 2026-10-22: neither exists yet; an agent's attempt through the browser was refused by the permission check, so it stays the decider's | 2026-10-20 | 2 d |
+| 🔴 Create the `npm` and `pypi` environments and give each one tag rule `v*` and no branch rule (GitHub Settings → Environments; [`RELEASING.md`](../RELEASING.md) step 5). Checked 2026-10-22: neither exists yet; an agent's attempt through the browser was refused by the permission check, so it stays the decider's | 2026-10-20 | 4 d |
 | ↳ **blocks:** W-18 | | |
-| 🔴 Set L8's budgets: after the `perf` job's first run on `main`, apply min(design target, 1.5 × worst p95) to the CI runner's numbers and rule each `budget` in `perf/budgets.toml`; name the reference machine ([W-19](open/W-19-performance-budgets.md)) | 2026-10-22 | 0 d |
+| 🔴 Set L8's budgets: after the `perf` job's first run on `main`, apply min(design target, 1.5 × worst p95) to the CI runner's numbers and rule each `budget` in `perf/budgets.toml`; name the reference machine ([W-19](open/W-19-performance-budgets.md)) | 2026-10-22 | 2 d |
 | ↳ **blocks:** W-19 DoD 3 · the perf gate binding anything | | |
 
 ---
@@ -37,9 +37,17 @@ here. Read that record before changing anything below it.
 
 🔴 **W-04** `agent` The release pipeline, steps 1–4 done 2026-10-20. Step 5, the first release: blocked on the registry setup above; the engine is complete since 2026-10-21 (L7, L6 decision 3). Filed by Arpit (Claude Code). [detail](open/W-04-release-pipeline.md)
 
-🔴 **W-03** `agent` The five rule packs: steps 2–5 done (401 rules), packaging done. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
+🔴 **W-03** `agent` The five rule packs: steps 2–5 done (419 rules), packaging done. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
 
 🟢 **W-21** `agent` Engine gaps: all three steps landed 2026-10-22, the CSS grammar as an in-tree fork (the decider's ruling); left: file the upstream patch, and whether DoD 3 holds while CSS rules read text. Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
+
+🟢🧨 **W-24** `agent` CI cannot pass on `main` (the Windows `bench` build, the guard replay on nine as-is merges, cache keys that miss test inputs, the law gate on `--report`); fix the six. Filed by Arpit (Claude Code). [detail](open/W-24-ci-green-on-main.md)
+
+🟢 **W-26** `agent` Generate the README's counts, command table and roadmap, the pack READMEs and the CHANGELOG from the binary and the packs, with a CI check; make the three `graph/*` rules reachable. Filed by Arpit (Claude Code). [detail](open/W-26-public-docs-from-the-tree.md)
+
+🟢 **W-27** `agent` Engine and packaging hygiene: a true `rust-version`, one process-group kill, Windows one-shot behaviour stated and smoke-tested, `version.py` over the extension manifest, one pack builder. Filed by Arpit (Claude Code). [detail](open/W-27-engine-and-packaging-hygiene.md)
+
+🟢 **W-28** `agent` The layout-rule check decided by codelaw's own tokens (same token stream = layout), the formatter comparison kept as an advisory cross-check; SR-FORMATTER decision 3 rewritten. Filed by Arpit (Claude Code). [detail](open/W-28-layout-check-by-tokens.md)
 
 ### testing
 
@@ -49,6 +57,7 @@ here. Read that record before changing anything below it.
 
 ### record update
 
+🟢 **W-25** `agent` Records and work files back in line with the tree: owners for `codelaw-graph` and `perf/`, the register's `built` column, dead `B-nnn` ids, stale blockers and `ball:` values in item files, the copied inbox `age`. Filed by Arpit (Claude Code). [detail](open/W-25-governance-drift.md)
 
 ### research
 
