@@ -7,7 +7,9 @@ description: "codelaw is a high-performance tool: every operation has a time bud
 status: accepted
 date: 2026-10-18
 feature: "speed as a law"
-owns: []
+owns:
+  - fixtures/perf
+  - perf/budgets.toml
 laws: [L0, L3, L5, L8]
 timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
@@ -140,7 +142,7 @@ The decider wants performance to be a key property and accepts that today's numb
 
 **Reopen this decision if:** a change merged while an operation's p95 exceeded its set budget, or a budget value in `perf/budgets.toml` increased.
 
-**How to check it:** `git log -p perf/budgets.toml` shows no budget value rising, and the perf gate's history shows no merge over budget (once `W-19` exists).
+**How to check it:** `git log -p perf/budgets.toml` shows no budget value rising, and the perf gate's history (`ci.yml`, job `perf`) shows no merge over budget.
 
 ---
 

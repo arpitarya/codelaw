@@ -108,7 +108,7 @@ A diagnostic without a fix is a chore for a person and an invitation to guess fo
 
 - **Rule authors carry the cost:** every rule needs a fix class, and every `manual` rule needs written steps.
 - **The verifier runs on every fix**, so fixing is slower than matching. That cost is accepted.
-- **Nothing checks this law yet:** `B-010` in `work/BACKLOG.md`.
+- **Checked on every CI run** by `crates/codelaw-cli/tests/laws.rs`: `l4_every_diagnostic_carries_its_fix` (decision 4's fields over the L3 fixture matrix) and `l4_the_loader_refuses_a_rule_without_a_fix` (decisions 1–3, at load and by `codelaw rules lint`).
 
 ### Alternatives considered
 

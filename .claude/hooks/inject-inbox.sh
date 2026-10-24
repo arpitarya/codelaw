@@ -10,9 +10,30 @@ if [ -s work/BLOCKED.json ] && ! jq -e '.decision == "PROCEED"' work/BLOCKED.jso
   echo "A blocker is open. Say so in your first sentence before anything else."
 fi
 
+# Noon of a YYYY-MM-DD as epoch seconds, by BSD or GNU date; empty if neither parses it.
+epoch() { date -j -f "%Y-%m-%d %H:%M" "$1 12:00" +%s 2>/dev/null || date -d "$1 12:00" +%s 2>/dev/null; }
+
+# The inbox stores no age (SR-WORK-OPEN-QUEUE rule 40): add the column here,
+# today minus each row's `filed`, on every prompt.
+with_age() {
+  local today line filed f
+  today=$(epoch "$(date +%Y-%m-%d)")
+  while IFS= read -r line; do
+    filed=$(printf '%s' "$line" | grep -oE '\| [0-9]{4}-[0-9]{2}-[0-9]{2} \|' | head -1 | tr -d '| ')
+    case "$line" in
+      "| what"*) echo "$line age |" ;;
+      "|---"*) echo "$line---|" ;;
+      "|"*) f=""; [ -n "$filed" ] && f=$(epoch "$filed")
+            if [ -n "$f" ] && [ -n "$today" ]; then echo "$line $(( (today - f + 43200) / 86400 )) d |"
+            else echo "$line |"; fi ;;
+      *) echo "$line" ;;
+    esac
+  done
+}
+
 if [ -f work/OPEN-WORK.md ]; then
   DECIDER=$(git config user.name 2>/dev/null); DECIDER=${DECIDER:-the decider}
-  INBOX=$(sed -n '/## Blocked on the decider/,/^---$/p' work/OPEN-WORK.md | sed '1d;$d')
+  INBOX=$(sed -n '/## Blocked on the decider/,/^---$/p' work/OPEN-WORK.md | sed '1d;$d' | with_age)
   case "$INBOX" in
     *"*Empty since"*|"") ;;
     *) echo "<inbox>"; echo "$INBOX"; echo "</inbox>"

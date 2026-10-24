@@ -91,7 +91,8 @@ under things nobody intends to do yet.
 22. One class per row: what would have to happen first.
 23. Promotion = opening a `W-nn` (file, row, ball) **and deleting the backlog
     row in the same change**.
-24. Deleted, never ticked; nothing to archive, a row has no file.
+24. Deleted, never ticked; a row has no file, so only its id is mapped, in
+    `archive/README.md` ([SR-WORK-ARCHIVE](0057_WORK-archive.md) decision 3).
 25. Check what the row was the only home of before deleting it.
 26. A row whose source is rewritten so the item no longer exists is deleted in
     that change.

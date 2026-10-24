@@ -79,7 +79,8 @@ that works around one makes the decision it was waiting for.
    would have said.
 6. **Do not work around a blocker.** Say it, set `surfaced: true`, stop.
 7. Three hooks enforce it: `UserPromptSubmit` injects the blocker and the
-   inbox into every prompt (`inject-inbox.sh`); `Stop` refuses to end a turn
+   inbox into every prompt, each inbox row with its age computed from its
+   `filed` date (`inject-inbox.sh`); `Stop` refuses to end a turn
    while a blocker is unsurfaced, three times, then relents
    (`stop-if-blocked.sh`); `PreToolUse` on writes is a **per-asset** lock
    (`session-lock.sh`, TTL 900 s).
