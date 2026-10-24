@@ -10,6 +10,8 @@ feature: "rule authoring, debugging and testing"
 owns:
   - crates/codelaw-test
   - crates/codelaw-cli/tests/promotion.rs
+  - scripts/corpus.py
+  - scripts/corpus.json
 laws: [L0, L3, L4, L5]
 timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
