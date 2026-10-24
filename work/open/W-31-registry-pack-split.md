@@ -31,7 +31,7 @@ ball: arpit
 | 2 | `FIRST_PARTY_PACKS` (pack.rs) names each pack's npm and PyPI name; resolution, the missing-pack error and `codelaw init` follow it | the engine finds a pack only where it is published | ✅ 2026-10-24 |
 | 3 | `package.py` reads that table; `assemble`, `check`, `names`, `build-packs.py`, the bench workload and the docs follow | 17 npm tarballs + 14 wheels, one list | ✅ 2026-10-24 |
 | 4 | L6, SR-RULE-PACKS, SR-PACKAGES and the records that describe the touched files amended | the records say what the tree does | ✅ 2026-10-24 |
-| 5 | Arpit unpublishes `@codelaw/rules-python` from npm **before 2026-10-27 03:18 IST** (the 72-hour window) | npm carries no Python pack | ⏳ Arpit |
+| 5 | Arpit unpublishes `@codelaw/rules-python` from npm **before 2026-10-27 03:18 IST** (the 72-hour window) | npm carries no Python pack | ✅ 2026-10-24 13:43 IST: deleted on npmjs.com after Arpit's 2FA; the registry answers 404 |
 | 6 | Arpit commits and pushes; CI goes green on `main` (W-24) | a `dist` in the new layout | ⏳ Arpit |
 | 7 | 0.2.0: `version.py --set 0.2.0`, CI green, then the first hand publish of `@codelaw/rules-ts`, `-react`, `-node`, `-stencil` from that `dist`, `npm-trust.sh`, and the PyPI pending publishers incl. `codelaw-rules-react` (W-30) | the first release in this layout, on both registries | ⏳ Arpit |
 
@@ -50,7 +50,7 @@ Each registry carries only the packs its users install: npm the eight JS-ecosyst
 | 1 · tree | `packs/` holds nine folders; `cargo test -p codelaw-rules` loads each as its first-party pack and pins the 8 / 6 split | ✅ 2026-10-24 |
 | 2 · packages | `package.py names` lists 17 npm and 7 PyPI names; `build-packs.py --release --verify` builds 14 pack artefacts, equal output from the packs on both, each layout loading all its own | ✅ 2026-10-24 (`build-packs.py`; `package.py check` runs in CI on the next push) |
 | 3 · init | `codelaw init` installs only packs the chosen registry publishes, writes only their presets, and notes the rest (`commands.rs`, `consumer_layout.rs`) | ✅ 2026-10-24 |
-| 4 · npm | `npm view @codelaw/rules-python` is a 404 | ⏳ step 5 |
+| 4 · npm | `npm view @codelaw/rules-python` is a 404 | ✅ 2026-10-24 |
 | 5 · released | 0.2.0 on npm (17 names) and PyPI (7 projects), trusted publishing bound for every name | ⏳ step 7 |
 
 ## Blockers

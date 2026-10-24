@@ -47,7 +47,7 @@ here. Read that record before changing anything below it.
 
 🟡 **W-30** `arpit` The first PyPI publish: `codelaw` (8 wheels) and the six `codelaw-rules-*` of W-31's layout, at 0.2.0 rather than 0.1.0; waiting on W-31 (0.2.0). Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
 
-🟢🧨 **W-31** `arpit` Eight packs on npm, six on PyPI, `rules-js` split in five: landed 2026-10-24. Left: unpublish `@codelaw/rules-python` before 2026-10-27 (npm's 72 h window), push, 0.2.0. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
+🟢 **W-31** `arpit` Eight packs on npm, six on PyPI, `rules-js` split in five: landed 2026-10-24, and `@codelaw/rules-python` is off npm. Left: commit and push, then 0.2.0. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
 
 🔴 **W-32** `agent` A Redux Toolkit pack and a React Query pack, npm only: waiting on the decider's naming and Redux-source ruling (inbox). Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
 
