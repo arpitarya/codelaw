@@ -7,6 +7,7 @@ same bytes appear on every machine without 10,000 files in git.
 
 ```sh
 codelaw bench --workload /tmp/workload --generate-only   # seed 20261018, 10,000 files
+codelaw bench --repo <dir> ...                           # also time `check` on a pinned real repo (scripts/corpus.py fetch --repo <name>)
 ```
 
 - **The generator** is `crates/codelaw-cli/src/bench/workload.rs`; its digest is

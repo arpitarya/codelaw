@@ -222,6 +222,48 @@ pub fn write(dir: &Path, packs: &Path, seed: u64, files: usize) -> Result<String
     Ok(digest)
 }
 
+/// What a `--repo` copy leaves behind: its history, and what an install of
+/// its own would put where the packs go.
+const REPO_SKIP: &[&str] = &[".git", "node_modules", ".venv", "codelaw.toml"];
+
+/// Copy the real repository `src` into `dir` (replacing a copy made before)
+/// with the workload's `codelaw.toml` and packs, so it is checked with the
+/// same rules as the workload. Returns how many of its files were copied.
+pub fn write_repo(src: &Path, dir: &Path, packs: &Path) -> Result<usize, String> {
+    let io = |e: std::io::Error| format!("cannot copy the repo {} into {}: {e}", codelaw_core::normalize_path(src), codelaw_core::normalize_path(dir));
+    if !src.is_dir() {
+        return Err(format!("--repo {}: no such folder (scripts/corpus.py fetch checks the pinned repos out)", codelaw_core::normalize_path(src)));
+    }
+    if dir.exists() {
+        std::fs::remove_dir_all(dir).map_err(io)?;
+    }
+    let files = copy_repo(src, dir).map_err(io)?;
+    std::fs::write(dir.join("codelaw.toml"), CONFIG).map_err(io)?;
+    for pack in codelaw_rules::FIRST_PARTY_PACKS {
+        copy_dir(&packs.join(pack.short), &dir.join(install_path(pack))).map_err(io)?;
+    }
+    Ok(files)
+}
+
+fn copy_repo(from: &Path, to: &Path) -> std::io::Result<usize> {
+    std::fs::create_dir_all(to)?;
+    let mut n = 0;
+    for e in std::fs::read_dir(from)? {
+        let e = e?;
+        if REPO_SKIP.iter().any(|s| e.file_name() == *s) {
+            continue;
+        }
+        let kind = e.file_type()?;
+        if kind.is_dir() {
+            n += copy_repo(&e.path(), &to.join(e.file_name()))?;
+        } else if kind.is_file() {
+            std::fs::copy(e.path(), to.join(e.file_name()))?;
+            n += 1;
+        }
+    }
+    Ok(n)
+}
+
 fn copy_dir(from: &Path, to: &Path) -> std::io::Result<()> {
     std::fs::create_dir_all(to)?;
     for e in std::fs::read_dir(from)? {
@@ -454,6 +496,26 @@ fn cap(w: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_repo_is_copied_without_its_history_and_with_the_workload_packs() {
+        let packs = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packs");
+        let tmp = std::env::temp_dir().join(format!("codelaw-bench-repo-{}", std::process::id()));
+        let src = tmp.join("src");
+        for f in ["a.py", "web/b.ts", ".git/HEAD", "node_modules/x/index.js", "codelaw.toml"] {
+            std::fs::create_dir_all(src.join(f).parent().unwrap()).unwrap();
+            std::fs::write(src.join(f), "x\n").unwrap();
+        }
+        let dir = tmp.join("copy");
+        assert_eq!(write_repo(&src, &dir, &packs).unwrap(), 2);
+        assert!(dir.join("web/b.ts").is_file() && !dir.join(".git").exists());
+        assert_eq!(std::fs::read_to_string(dir.join("codelaw.toml")).unwrap(), CONFIG);
+        for pack in codelaw_rules::FIRST_PARTY_PACKS {
+            assert!(dir.join(install_path(pack)).join("codelaw-pack.toml").is_file(), "{} installed", pack.short);
+        }
+        assert!(write_repo(&tmp.join("nope"), &dir, &packs).unwrap_err().contains("corpus.py fetch"));
+        std::fs::remove_dir_all(&tmp).unwrap();
+    }
 
     #[test]
     fn the_same_seed_gives_the_same_bytes() {

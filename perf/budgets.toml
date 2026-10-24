@@ -23,7 +23,7 @@
 
 [reference]
 machine = "GitHub-hosted ubuntu-24.04 runner (the decider, 2026-10-24)"
-repos = ["djangoproject.com", "full-stack-fastapi-template", "html5-boilerplate"] # pinned in scripts/corpus.json; not benched yet (W-19)
+repos = ["djangoproject.com", "full-stack-fastapi-template", "html5-boilerplate"] # pinned in scripts/corpus.json; benched as `check_cold_repo` / `check_warm_repo` context rows (W-19, 2026-10-25)
 workload = "codelaw bench --seed 20261018 --files 10000 (digest bf9c5bea0d8b31ee)"
 
 [operation.startup]

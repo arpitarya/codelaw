@@ -49,6 +49,8 @@ pub const OPERATIONS: &[Op] = &[
 pub const CONTEXT: &[Op] = &[
     Op { name: "check_warm_10k_no_daemon", unit: "ms", budgeted: false, what: "`check` in its own process, primed cache" },
     Op { name: "fix_one_file_cold", unit: "ms", budgeted: false, what: "`codelaw hook <file>`, empty cache" },
+    Op { name: "check_cold_repo", unit: "ms", budgeted: false, what: "`check` on each `--repo`, empty cache" },
+    Op { name: "check_warm_repo", unit: "ms", budgeted: false, what: "`check` on each `--repo` in its own process, primed cache" },
 ];
 
 #[derive(Args)]
@@ -86,12 +88,19 @@ pub struct BenchArgs {
     /// Generate the workload, print where, and stop.
     #[arg(long)]
     generate_only: bool,
+    /// Also time `check` on this real repository (repeatable): L8 decision
+    /// 2's three pinned repos, checked out by `scripts/corpus.py fetch`. It
+    /// is copied beside the workload with the workload's config and packs.
+    #[arg(long = "repo", value_name = "DIR")]
+    repos: Vec<PathBuf>,
 }
 
 /// One operation's samples, after the discarded first run.
 struct Measured {
     op: &'static Op,
     samples: Vec<f64>,
+    /// The `--repo` it was measured on; the workload when `None`.
+    repo: Option<String>,
 }
 
 impl Measured {
@@ -192,7 +201,7 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
         if wanted("peak_memory_10k")
             && let Some(samples) = peaks
         {
-            results.push(Measured { op: op("peak_memory_10k"), samples });
+            results.push(Measured { op: op("peak_memory_10k"), samples, repo: None });
         }
     }
     let warm = caches.join("warm");
@@ -255,6 +264,34 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
     if wanted("mcp_rules_for_path") {
         results.push(b.mcp(op("mcp_rules_for_path"), &target, &warm)?);
     }
+    let mut repos = Vec::new();
+    if wanted("check_cold_repo") || wanted("check_warm_repo") {
+        let base = dir.with_file_name(format!("{}.repos", dir.file_name().and_then(|n| n.to_str()).unwrap_or("workload")));
+        for src in &args.repos {
+            let name = src.file_name().and_then(|n| n.to_str()).ok_or_else(|| format!("--repo {}: not a folder name", codelaw_core::normalize_path(src)))?.to_owned();
+            let at = base.join(&name);
+            let files = workload::write_repo(src, &at, &packs)?;
+            let rb = Bench { exe: b.exe.clone(), dir: std::fs::canonicalize(&at).map_err(|e| e.to_string())?, caches: caches.clone(), runs: args.runs };
+            if wanted("check_cold_repo") {
+                let mut m = rb.repeat(op("check_cold_repo"), |i| {
+                    let cache = caches.join(format!("repo-cold-{i}"));
+                    let r = rb.cli(&["check", "--no-adapters"], Some(&cache));
+                    let _ = std::fs::remove_dir_all(&cache);
+                    r.map(|r| r.ms)
+                })?;
+                m.repo = Some(name.clone());
+                results.push(m);
+            }
+            if wanted("check_warm_repo") {
+                let cache = caches.join(format!("repo-warm-{name}"));
+                rb.cli(&["check", "--no-adapters"], Some(&cache))?;
+                let mut m = rb.repeat(op("check_warm_repo"), |_| rb.cli(&["check", "--no-adapters"], Some(&cache)).map(|r| r.ms))?;
+                m.repo = Some(name.clone());
+                results.push(m);
+            }
+            repos.push(json!({ "name": name, "files": files, "path": codelaw_core::normalize_path(&at) }));
+        }
+    }
     let _ = std::fs::remove_dir_all(&caches);
 
     // The report, in the order of OPERATIONS then CONTEXT.
@@ -270,6 +307,7 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
             over |= v == Some(budgets::Verdict::Over);
             json!({
                 "name": m.op.name,
+                "repo": m.repo,
                 "unit": m.op.unit,
                 "budgeted": m.op.budgeted,
                 "what": m.op.what,
@@ -298,6 +336,7 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
         "os": format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH),
         "warm_runs_served_by_daemon": served_warm,
         "reference_machine": budgets.as_ref().map(|b| b.machine.clone()),
+        "repos": repos,
         "operations": rows,
     });
     let pretty = serde_json::to_string_pretty(&report).expect("json");
@@ -328,7 +367,12 @@ fn text(r: &Value) -> String {
         r["os"].as_str().unwrap_or(""),
         r["threads"],
     );
-    s.push_str(&format!("{:<26} {:>10} {:>10} {:>21}  {}\n", "operation", "median", "p95", "min – max", "budget"));
+    let label = |o: &Value| match o["repo"].as_str() {
+        Some(repo) => format!("{} {repo}", o["name"].as_str().unwrap_or("")),
+        None => o["name"].as_str().unwrap_or("").to_owned(),
+    };
+    let w = r["operations"].as_array().into_iter().flatten().map(|o| label(o).len()).max().unwrap_or(0).max(26);
+    s.push_str(&format!("{:<w$} {:>10} {:>10} {:>21}  {}\n", "operation", "median", "p95", "min – max", "budget"));
     let num = |v: &Value| v.as_f64().map(|x| format!("{x:.1}")).unwrap_or_else(|| "-".into());
     for o in r["operations"].as_array().into_iter().flatten() {
         let unit = o["unit"].as_str().unwrap_or("");
@@ -345,8 +389,8 @@ fn text(r: &Value) -> String {
             }
         };
         s.push_str(&format!(
-            "{:<26} {:>7} {:<3}{:>6} {:<3} {:>8} – {:<8} {}\n",
-            o["name"].as_str().unwrap_or(""),
+            "{:<w$} {:>7} {:<3}{:>6} {:<3} {:>8} – {:<8} {}\n",
+            label(o),
             num(&o["median"]),
             unit,
             num(&o["p95"]),
@@ -390,7 +434,7 @@ impl Bench {
             samples.push(f(i).map_err(|e| format!("{}: {e}", op.name))?);
         }
         samples.remove(0);
-        Ok(Measured { op, samples })
+        Ok(Measured { op, samples, repo: None })
     }
 
     fn command(&self, cache: Option<&Path>) -> Command {
@@ -619,10 +663,10 @@ mod tests {
 
     #[test]
     fn median_and_p95_are_nearest_rank() {
-        let m = Measured { op: &OPERATIONS[0], samples: vec![5.0, 1.0, 9.0, 3.0, 7.0, 2.0, 8.0, 4.0, 6.0] };
+        let m = Measured { op: &OPERATIONS[0], samples: vec![5.0, 1.0, 9.0, 3.0, 7.0, 2.0, 8.0, 4.0, 6.0], repo: None };
         assert_eq!(m.median(), 5.0);
         assert_eq!(m.p95(), 9.0);
-        let even = Measured { op: &OPERATIONS[0], samples: vec![1.0, 2.0, 3.0, 4.0] };
+        let even = Measured { op: &OPERATIONS[0], samples: vec![1.0, 2.0, 3.0, 4.0], repo: None };
         assert_eq!(even.median(), 2.5);
         assert_eq!(even.p95(), 4.0);
     }

@@ -212,11 +212,16 @@ jobs:
             echo "load: $(cut -d' ' -f1-3 /proc/loadavg)"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: the three pinned real repos (L8 decision 2; scripts/corpus.json)
+        if: steps.changed.outputs.run == 'true'
+        run: python3 scripts/corpus.py fetch --dir "$RUNNER_TEMP/corpus" --repo djangoproject.com --repo full-stack-fastapi-template --repo html5-boilerplate
       - name: codelaw bench --budgets perf/budgets.toml
         if: steps.changed.outputs.run == 'true'
         run: |
           code=0
-          target/release/codelaw bench --workload "$RUNNER_TEMP/bench" --packs packs --budgets perf/budgets.toml --output "$RUNNER_TEMP/bench.json" 2>&1 | tee "$RUNNER_TEMP/bench.txt" || code=$?
+          repos=()
+          for r in djangoproject.com full-stack-fastapi-template html5-boilerplate; do repos+=(--repo "$RUNNER_TEMP/corpus/repos/$r"); done
+          target/release/codelaw bench --workload "$RUNNER_TEMP/bench" --packs packs --budgets perf/budgets.toml "${repos[@]}" --output "$RUNNER_TEMP/bench.json" 2>&1 | tee "$RUNNER_TEMP/bench.txt" || code=$?
           {
             echo '### perf: L8 operations (each p95 against perf/budgets.toml; an unset budget is reported only)'
             echo '```'

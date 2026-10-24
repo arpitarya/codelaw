@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-20: L8's budgets, which are all unset because nothi
 item: W-19
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-24
-updated_by: "Claude (Opus 5.5), docket 2026-10-24"
+updated: 2026-10-25
+updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: agent
 ---
 
@@ -40,7 +40,7 @@ ball: agent
 
 ## Blockers
 
-The budgets are the decider's to set (L8 decision 4), from the CI runner's numbers. **Arpit, 2026-10-24 (docket):** *"Both as recommended"* — the reference machine is GitHub's hosted `ubuntu-24.04` runner; the three pinned real repos are `djangoproject.com`, `full-stack-fastapi-template` and `html5-boilerplate`, at the commits in `scripts/corpus.json`. Left for an agent: pin the `perf` job to `ubuntu-24.04` and add the three repos to `codelaw bench`.
+The budgets are the decider's to set (L8 decision 4), from the CI runner's numbers. **Arpit, 2026-10-24 (docket):** *"Both as recommended"* — the reference machine is GitHub's hosted `ubuntu-24.04` runner; the three pinned real repos are `djangoproject.com`, `full-stack-fastapi-template` and `html5-boilerplate`, at the commits in `scripts/corpus.json`. Left for an agent: pin the `perf` job to `ubuntu-24.04` and add the three repos to `codelaw bench`. **Both done:** the pin in `483b2a1` (2026-10-24); `codelaw bench --repo <dir>` (repeatable, `check_cold_repo` / `check_warm_repo` context rows on a copy with the workload's config and packs) and the `perf` job fetching the three with `scripts/corpus.py fetch --repo` on 2026-10-25 — SR-CLI-MCP decision 10 and SR-LAW-8 §as built say so. Checked locally on the three pinned commits (debug binary, loaded Mac: numbers not comparable). What is left is CI's `perf` run on `main` and then the decider's ruling (the inbox).
 
 ## Record affected
 

@@ -3,7 +3,8 @@
 (SR-RULE-AUTHORING decision 4; W-20).
 
     corpus.py --self-test                    the manifest is well-formed (no network)
-    corpus.py fetch [--dir D] [--pack P]     check out each pinned repo, verify its licence
+    corpus.py fetch [--dir D] [--pack P] [--repo NAME ...]
+                                             check out each pinned repo, verify its licence
     corpus.py run --binary B [--dir D] [--pack P] [--update]
                                              per pack: codelaw test packs/P --corpus D/packs/P
                                              --snapshot packs/P/corpus.toml [--update-snapshot]
@@ -162,6 +163,7 @@ def main():
     ap.add_argument("action", nargs="?", choices=["fetch", "run"])
     ap.add_argument("--dir", type=Path, default=ROOT / "target" / "corpus")
     ap.add_argument("--pack", choices=PACKS)
+    ap.add_argument("--repo", action="append", default=[], help="fetch only this repo (repeatable): `perf`'s three (L8 decision 2)")
     ap.add_argument("--binary", type=Path)
     ap.add_argument("--update", action="store_true", help="rewrite packs/<pack>/corpus.toml")
     a = ap.parse_args()
@@ -174,7 +176,10 @@ def main():
         fail("scripts/corpus.json:\n  " + "\n  ".join(bad))
     base = a.dir.resolve()
     if a.action == "fetch":
-        fetch(selected(repos, a.pack), base)
+        unknown = set(a.repo) - {r["name"] for r in repos}
+        if unknown:
+            fail(f"--repo {', '.join(sorted(unknown))}: not in scripts/corpus.json")
+        fetch([r for r in selected(repos, a.pack) if not a.repo or r["name"] in a.repo], base)
         return 0
     if a.action == "run":
         if not a.binary or not a.binary.is_file():
