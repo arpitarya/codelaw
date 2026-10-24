@@ -9,10 +9,12 @@
 
 mod grammar;
 mod regions;
+mod tokens;
 
 pub use ast_grep_core::Language as AgLanguage;
 pub use grammar::Grammar;
 pub use regions::{Hole, Region, RegionOptions, regions};
+pub use tokens::{Token, same_tokens, token_stream};
 
 use ast_grep_core::tree_sitter::{LanguageExt, StrDoc};
 use ast_grep_core::{AstGrep, Node};

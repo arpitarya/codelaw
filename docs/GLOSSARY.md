@@ -20,7 +20,7 @@ description: "Recurring terms, defined once."
 | project graph | the whole-repo map of modules, exports, imports and references that cross-file rules query; SR-PROJECT-GRAPH |
 | baseline | the committed per-file, per-rule counts of violations allowed to remain, with a deadline and a touch policy; SR-BASELINE |
 | as-of date | the date deadline rules evaluate against — the `HEAD` commit date unless `--as-of` says otherwise; SR-BASELINE |
-| layout rule | a lint rule whose fix only changes formatting; refused — layout belongs to the formatter (SR-FORMATTER) |
+| layout rule | a lint rule whose `Don't` and `Do` have the same token stream through codelaw's own parser, so its fix only changes layout; refused — layout belongs to the formatter (SR-FORMATTER decision 3) |
 | embedded region | code of one language inside a file of another — HTML `<script>`/`<style>`, Markdown fences — linted and formatted as its own language (SR-LINTER) |
 | budget | an L8 time limit for one operation, set from measurement, never exceeded or loosened |
 | reference workload | the seeded 10,000-file repo plus pinned real repos that L8 budgets are measured on |

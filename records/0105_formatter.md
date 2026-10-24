@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-format
   - scripts/format-parity.py
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-22T18:00:00Z
+timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
 ---
 
@@ -76,12 +76,19 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
    Every engine must pass [L2](0004_LAW-2-foss-dependencies.md); `crates/codelaw-cli/tests/licences.rs` checks every crate in `Cargo.lock`, the git-pinned Biome ones included. One transitive crate failed L2: Biome reaches `option-ext` (MPL-2.0) through `directories`. The workspace's `[patch.crates-io]` replaces it with `crates/codelaw-format/shims/option-ext`, an MIT re-implementation of the one trait method `dirs-sys` uses; the licence check sees the shim, not the original. The engine versions are `codelaw_format::ENGINES_FINGERPRINT`, part of every cache key a format result enters (decision 7).
 
-3. **Layout belongs to the formatter, and the rule loader enforces it.** A lint rule whose fix only changes layout is refused. `codelaw test` checks this deterministically: if `format(Don't) == format(Do)`, the rule is a layout rule and fails. This is the formatter-versus-linter fight that ESLint's stylistic rules caused, ruled out by construction.
-   - **How:** for every language's examples, each `Don't` is formatted with the default options and compared with each `Do` and `Fixed`, formatted the same way, file by file for a multi-file snippet. Equal texts fail the `Don't` at the examples level with a message naming this decision ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 4). A snippet the formatter cannot format is not compared.
-   - **Measured on the five packs, 2026-10-22:** two rules failed it; the decider ruled both the same day (`W-23`).
-     - `js/no-irregular-whitespace` was half a layout rule: Biome turns a no-break space between tokens into a space. It is narrowed to where the formatter leaves the character — templates, regular expressions, JSX text and comments — with a `suggest` fix that escapes it.
-     - `css/media-query-no-invalid` is not a layout rule: Biome rewrites `@media not(` to `@media not (`, which turns an invalid query into a valid one, so there the formatter changes meaning. Its `Don't` is now a mixed `and`/`or` query the formatter leaves alone, and `not(` is a case in its `.cases.md`; the meaning change is B-045.
-     - All five packs pass.
+3. **Layout belongs to the formatter, and the rule loader enforces it.** A lint rule whose fix only changes layout is refused. Layout is what codelaw's own parser does not see: `codelaw test` checks this deterministically, and the same on every machine and under every formatter version — if a `Don't` has the same token stream as a `Do` (or `Fixed`), the two differ only in layout, the rule is a layout rule, and it fails. This is the formatter-versus-linter fight that ESLint's stylistic rules caused, ruled out by construction. (Decided `W-28`, on the decider's ruling of 2026-10-22: *"biome is not the right thing to reference. build how we design it."*)
+   - **How:** for every language's examples, each `Don't` is compared with each `Do` and `Fixed` by `codelaw_lang::token_stream`, file by file for a multi-file snippet (the file's path is part of the comparison). The stream is every visible node of the tree in pre-order, each with its depth and kind, and each leaf with its exact text; whitespace no token holds is not in it. Equal streams fail the `Don't` at the examples level with a message naming this decision ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 4). The walk runs per example at `codelaw test` time, never in `check` ([L8](0010_LAW-8-performance-budgets.md)).
+   - **What counts as a token, for all nine grammars:**
+     - a **comment** is a token with its text, although tree-sitter parses it as an extra: a fix that edits or deletes a comment is not layout;
+     - **text no node holds** (Markdown's inline grammar leaves plain words outside any node) is split on whitespace into `text` tokens, so a changed word is a changed token;
+     - **depth** carries the structure that hidden tokens hold — Python's and YAML's indentation — so re-indenting a statement into another block is not layout;
+     - **embedded regions** (`<script>`, `<style>`, `style=""`, Markdown code blocks and inline content) are compared region by region in their own language;
+     - **a leaf's text is compared exactly**, so whitespace inside a string, a template, a regular expression, JSX text, an HTML text node or a Markdown inline run is token text, not layout;
+     - **quotes, semicolons and trailing commas are tokens.** The formatter still owns them (§1), but a rule that only changes them is not refused: the advisory check below reports it.
+   - **The formatter is evidence, not the judge.** After the token check passes, each `Don't` is also formatted with the default options and compared with each `Do` and `Fixed` formatted the same way. Equal formatted texts with different tokens mean the formatter changes tokens there — a quote style, or a meaning change such as B-045's — and `codelaw test` prints a warning naming the engine and B-045. It is never a failure. A snippet the formatter cannot format is not compared.
+   - **Measured on the five packs, 2026-10-24 (`W-28`, on the pre-`W-31` pack layout — the same 419 rules):** every rule passes the token check and no rule draws the advisory warning.
+     - `js/no-irregular-whitespace`: a no-break space between tokens is not in the token stream, so that part is layout and stays the formatter's; inside a template, a regular expression, JSX text or a comment it is token text, so the rule as narrowed on 2026-10-22 (`W-23`) stands, with its `suggest` fix that escapes the character.
+     - `css/media-query-no-invalid`: CSS Syntax reads `not(` as a function token and `not (` as an identifier and a parenthesis, but codelaw's CSS grammar parses both to the same tree, so by codelaw's tokens the two differ only in layout. The rule's `Don't` is the mixed `and`/`or` query, which has different tokens from its `Do`; `not(` stays a case in its `.cases.md`, where the layout check does not run. Biome rewriting `not(` to `not (` is B-045.
 
 4. **Order of operations:**
    1. Parse.
@@ -154,7 +161,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
 
 ### What is built
 
-Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`, with every pack passing it; decision 5's `.editorconfig` layer and `--import-config`; decision 6's markers in every engine; decision 8's LSP range formatting. The agent hook is `W-10`'s; nothing else in this record is missing.
+Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclude`; decision 8's LSP document formatting and MCP tool. Built 2026-10-22 (`W-23`): decision 3's refusal in `codelaw test`, with every pack passing it — decided by the formatter's output until 2026-10-24, when `W-28` made the token stream the judge and the formatter an advisory cross-check; decision 5's `.editorconfig` layer and `--import-config`; decision 6's markers in every engine; decision 8's LSP range formatting. The agent hook is `W-10`'s; nothing else in this record is missing.
 
 ### Consequences
 
