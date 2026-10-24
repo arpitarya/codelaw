@@ -44,6 +44,52 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 | [`W-23-formatter-rest.md`](open/W-23-formatter-rest.md) | 2026-10-22 | `crates/codelaw-format`, `crates/codelaw-test`'s layout refusal, `crates/codelaw-lsp` range formatting; [SR-FORMATTER](../records/0105_formatter.md) §What is built and decision 3; B-045 |
 | [`W-22-record-drift.md`](open/W-22-record-drift.md) | 2026-10-20 | [SR-RULE-PACKS](../records/0101_rule-packs.md), [SR-PACKAGES](../records/0107_packages.md) decision 9, [SR-ARCHITECTURE](../records/0108_architecture.md) decision 1 |
 
+## `backlog/`
+
+A backlog row has no file, so nothing of it is archived but its id: each
+deleted `B-nnn` that a document still names gets a row here
+([SR-WORK-ARCHIVE](../records/0057_WORK-archive.md) decision 3). B-006, B-007,
+B-043, B-044 and B-045 are live in [`work/BACKLOG.md`](../work/BACKLOG.md).
+
+| id | deleted | what absorbed it |
+|---|---|---|
+| B-001–B-005 | 2026-10-20 | W-20: `scripts/check-work-system.py` — the queue's row rules, `owns:` ↔ the Ownership table, the registry, lost `W-nn` ids, one archive |
+| B-008 | 2026-10-20 | W-02 (Cargo) and W-20 (npm, PyPI tools): `crates/codelaw-cli/tests/licences.rs` |
+| B-009 | 2026-10-20 | W-02: `crates/codelaw-cli/tests/laws.rs` `l3_*`; the runtime fence and install matrix are W-18's (`scripts/smoke.sh`) |
+| B-010 | 2026-10-19 | W-02: `crates/codelaw-cli/tests/laws.rs` `l4_*` |
+| B-011 | 2026-10-20 | W-02 (determinism, CLI/library parity: `laws.rs` `l5_*`) and W-20 (`tests/network_fence.rs`) |
+| B-012 | 2026-10-20 | W-04 (`scripts/version.py --check`) and W-18 (the install matrix, `scripts/smoke.sh`) |
+| B-013 | 2026-10-20 | W-11: the corpus run in SR-PROJECT-GRAPH's Consequences |
+| B-014 | 2026-10-20 | W-13: the veto check in SR-BASELINE, `crates/codelaw-baseline/src/tests.rs` |
+| B-015 | 2026-10-20 | W-07: `scripts/format-parity.py`, the parity table in SR-FORMATTER |
+| B-016 | 2026-10-20 | W-19 (`codelaw bench`) and the region tests named in SR-LINTER's veto |
+| B-017 | 2026-10-20 | W-07: `crates/codelaw-cli/tests/laws.rs` `l7_*` |
+| B-018 | 2026-10-20 | W-19: `codelaw bench`, `perf/budgets.toml`, `ci.yml`'s `perf` job |
+| B-019 | 2026-10-20 | W-19: the proposed budgets; setting them is the decider's (the OPEN-WORK inbox) |
+| B-020 | 2026-10-20 | W-02 (`crates/codelaw-cli/tests/layers.rs`) and W-04 (the names check in `scripts/package.py check`) |
+| B-021 | 2026-10-19 | W-02: `crates/codelaw-engine/tests/engine.rs` `cold_warm_and_partial_cache_agree` |
+| B-022 | 2026-10-20 | W-16: the schema-vs-records test |
+| B-023 | 2026-10-20 | W-20: `crates/codelaw-cli/tests/consumer_layout.rs` |
+| B-024 | 2026-10-20 | W-20: `codelaw rules lint`, `crates/codelaw-cli/tests/promotion.rs`; the corpus job is still W-20's |
+| B-025 | 2026-10-20 | W-08: `crates/codelaw-cli/tests/mcp_parity.rs`; the LSP side is W-09's |
+| B-026 | 2026-10-20 | W-17 (the panic fixture) and W-15 (stale-socket cleanup) |
+| B-027 | 2026-10-20 | W-19: the cold targets measured by `codelaw bench` |
+| B-028 | 2026-10-20 | W-07 and W-23: `crates/codelaw-format` |
+| B-029 | 2026-10-20 | W-11: `crates/codelaw-graph` |
+| B-030 | 2026-10-20 | W-12: `target:` and `assert:` rules, the structured fix primitives |
+| B-031 | 2026-10-20 | W-13: `crates/codelaw-baseline` |
+| B-032 | 2026-10-20 | W-14: `crates/codelaw-adapters` |
+| B-033 | 2026-10-20 | W-08: `crates/codelaw-mcp` |
+| B-034 | 2026-10-20 | W-09: `crates/codelaw-lsp`, `packaging/vscode` |
+| B-035 | 2026-10-20 | W-10: `crates/codelaw-agents`, `agents/` |
+| B-036 | 2026-10-20 | W-15: the warm processes |
+| B-037 | 2026-10-20 | W-16 (the commands and flags), W-13 (`--changed-since`, `--staged`), W-19 (`bench`) |
+| B-038 | 2026-10-20 | W-04: the packaging and the release pipeline |
+| B-039 | 2026-10-20 | W-21: tagged templates as regions |
+| B-040 | 2026-10-20 | W-21: native rules' file context |
+| B-041 | 2026-10-20 | W-21: the in-tree tree-sitter-css fork |
+| B-042 | 2026-10-20 | W-16: `rulesFor`/`rules_for`, `format` and `codelaw.schema.json` in both APIs |
+
 ## `records/`
 
 | file | retired | ruling | successor |

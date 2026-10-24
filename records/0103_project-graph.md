@@ -7,9 +7,10 @@ description: "codelaw builds a cached, incremental graph of every module, export
 status: accepted
 date: 2026-10-18
 feature: "cross-file analysis"
-owns: []
+owns:
+  - crates/codelaw-graph
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-22T15:30:00Z
+timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
 ---
 

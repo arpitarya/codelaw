@@ -100,7 +100,7 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 
 - **Every capability is tested nine times.** The fixture matrix is the price of decision 6.
 - **Vue, Svelte, Angular, SCSS/Less and type-aware checks stay outside the core** until this law is amended; adapters cover them.
-- **Nothing checks this law yet:** `W-18` in `work/BACKLOG.md`.
+- **Checked on every CI run** by `crates/codelaw-cli/tests/laws.rs`: `l3_each_language_alone_and_together` (the fixture matrix and decision 5's isolation diff) and `l3_a_language_switched_off_costs_nothing`. The runtime fence runs in `scripts/smoke.sh` (W-18).
 
 ### Alternatives considered
 

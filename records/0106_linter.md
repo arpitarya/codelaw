@@ -172,7 +172,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
 
 **Reopen this decision if:** a language in [L3](0005_LAW-3-languages.md) has no tree-sitter grammar that ast-grep can load, or an injection kind can't map diagnostics back to exact host locations.
 
-**How to check it:** `codelaw test --injections` passes on every host and region pair in decision 3, once the engine exists (`W-19`).
+**How to check it:** `cargo test -p codelaw-lang regions && cargo test -p codelaw-engine --test engine regions` passes — the region extractor's mapping back to host offsets for decision 3's hosts, then lint and fix inside HTML and Markdown regions.
 
 ---
 

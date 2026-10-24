@@ -78,7 +78,7 @@ The decider made performance a law (L8) and asked for a caching record. Caches w
 ### Consequences
 
 - **Disk use grows with the repo**, bounded by `max_size`.
-- **A key that misses an input gives stale results;** decision 7's test is the guard (`B-021`).
+- **A key that misses an input gives stale results;** decision 7's test is the guard (`crates/codelaw-engine/tests/engine.rs`, `cold_warm_and_partial_cache_agree`).
 
 ### Alternatives considered
 
@@ -96,7 +96,7 @@ The decider made performance a law (L8) and asked for a caching record. Caches w
 
 **Reopen this decision if:** a warm or partially deleted cache ever produces output different from a cold run.
 
-**How to check it:** the cold/warm/partial fixture test (`B-021`) passes.
+**How to check it:** `cargo test -p codelaw-engine --test engine cold_warm_and_partial_cache_agree` passes.
 
 ---
 

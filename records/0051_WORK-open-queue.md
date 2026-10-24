@@ -164,9 +164,11 @@ the top.
 
 **F · The Blocked-on-the-decider inbox**
 
-39. The header carries the inbox; each item's file carries its `filed` date.
+39. The header carries the inbox; each item's file carries its `filed` date,
+    and each inbox row its `filed` column.
 40. `age` is arithmetic — today minus `filed`, recomputed on every read, never
-    copied.
+    copied. **The inbox table stores no `age` column**; whoever shows the inbox
+    computes it (`.claude/hooks/inject-inbox.sh`, `/docket`).
 41. Any inbox row older than 5 days is named, with its age, in the session's
     first output.
 42. Every inbox row is followed by a `↳ **blocks:**` sub-row naming every item
@@ -234,6 +236,9 @@ the top.
 63. An *Open items* row ends `Filed by <person> (<surface>).` — the file's
     `filed_by` without the model — just before its detail link. Inbox rows do
     not carry it.
+64. An item file's `ball:` names whose move it is: `arpit` when its row is 🔴,
+    otherwise the row's lane (`agent`, `arpit` or `cowork`). It changes in the
+    same edit as the row's ball or lane.
 
 **The legend** — the one rule text the queue carries, exactly these two lines
 under its header:
@@ -248,21 +253,22 @@ under its header:
 - **Enforced today:** rule 45a, by `.claude/hooks/guard-open-work-inbox.sh`
   (PostToolUse), which runs `scripts/check-open-work-inbox.py`. Rules 33 and 41
   are supported by `.claude/hooks/inject-inbox.sh`, which puts the inbox in
-  front of every prompt; the age arithmetic is still the session's.
+  front of every prompt with each row's age computed (rule 40).
 - **Checked in CI** (`ci.yml`, job `lint`) by `scripts/check-work-system.py`:
   - the row rules — one or two lines (13), the row's shape (14), at most 280
     characters as rendered, a link counted by its text (15), no body (16),
     the row's id matches its detail link (17), a link that resolves (45);
   - the inbox — every row 🔴 (44) and followed by its `↳ **blocks:**`
-    sub-row (42);
+    sub-row (42), and no stored `age` column (40);
+  - each row's item file — its `ball:` matches the row (64);
   - a `W-nn` named in `CLAUDE.md`, `work/`, `records/` or `docs/` that
     resolves to neither `work/open/` nor `archive/open/` (the veto).
 
   The same script checks SR-WORK-OWNERSHIP decision 2, SR-WORK-REGISTRY
   decisions 5–8 and SR-WORK-ARCHIVE decision 1. Rules 18 and 19 — what is
   short, what belongs in the file — stay judgment.
-- Everything else — balls, ordering, closing, authorship, the meeting view — is
-  judgment.
+- Everything else — balls, ordering, closing, authorship, the meeting view, and
+  whether a blocker an item file names has landed — is judgment.
 
 ### Alternatives considered
 

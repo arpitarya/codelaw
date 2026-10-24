@@ -58,7 +58,9 @@ session cite it as current. One frozen tree with a map solves both.
 2. Anything archived is **moved** there into a directory mirroring where it
    came from (`archive/open/`, `archive/records/`, `archive/compare/`, …).
 3. Every archived document gets a row in `archive/README.md` naming its live
-   successor, or saying it has none.
+   successor, or saying it has none. **So does every deleted backlog id** that
+   a document still names: a row in the map's `backlog/` section naming the
+   item or test that absorbed it.
 4. An archived document may be **named** in prose, with a link.
 5. It may **never back a live claim** — nothing guarantees it was not
    overwritten after retirement.
@@ -74,8 +76,11 @@ session cite it as current. One frozen tree with a map solves both.
 
 - Decision 1 is checked in CI (job `lint`) by `scripts/check-work-system.py`:
   a directory named `archive` anywhere but the root fails it (`.git/`,
-  `target/`, `node_modules/` and worktrees aside). Nothing mechanical enforces
-  the rest of this record.
+  `target/`, `node_modules/` and worktrees aside). The same script fails a
+  `B-nnn` named in `CLAUDE.md`, `README.md`, `RELEASING.md`, `work/`,
+  `records/` or `docs/` that is neither a row of `work/BACKLOG.md` nor named in
+  `archive/README.md` (decision 3, for backlog ids). Nothing mechanical
+  enforces the rest of this record.
 - A citation to an archived document is judgment until a link test exists.
 
 ### Alternatives considered

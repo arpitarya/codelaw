@@ -62,7 +62,11 @@ check that slips on the first busy day.
 
 1. Two relations: `owns` (exactly one record per component) and `describes`
    (any number). `describes` never substitutes for `owns`.
-2. Both are declared in the register, in two marked tables.
+2. Both are declared in the register, in two marked tables. **The Ownership
+   table is complete:** every top-level entry of `crates/`, `scripts/`,
+   `.claude/hooks/`, `fixtures/` and `packs/` has a row of its own or sits
+   under one (`packs` covers `packs/js`), and the workspace `Cargo.toml` has
+   one. Each record's `owns:` lists exactly the components the table gives it.
 3. **The guard demands the owner and every describer** be staged in the same
    commit as a change to the component — or the commit message carries
    `no SR affected` on its own line.
@@ -77,6 +81,9 @@ check that slips on the first busy day.
    each judged against the register as it stood in that commit
    (`SR_GUARD_COMMIT=<sha> scripts/sr-guard.sh`).
 8. The guard proves a record was **touched**, never that it is coherent.
+9. The register's `built` column is never `no` for a record whose `owns:` is
+   non-empty and every one of whose components exists: code that exists
+   implements the record at least `partly`.
 
 ### Consequences
 
@@ -85,7 +92,9 @@ check that slips on the first busy day.
 - `owns:` ↔ Ownership-table agreement (decision 2) is checked in CI (job
   `lint`) by `scripts/check-work-system.py`, in both directions: each
   record's `owns:` entry has its table row naming that record, each table row
-  names a record whose `owns:` lists it, and each component exists.
+  names a record whose `owns:` lists it, and each component exists. The same
+  script fails a top-level entry of the five folders that no row covers
+  (decision 2) and a `built: no` that decision 9 forbids.
 - A `--no-verify` commit fails CI on its first push (decision 7); a merge
   commit is not replayed, since its changes are its parents'.
 - Coherence is not checked (decision 8; backlog row B-006).
