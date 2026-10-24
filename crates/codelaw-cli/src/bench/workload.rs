@@ -18,7 +18,7 @@ pub const SEED: u64 = 20_261_018;
 /// The file count of the `*_10k` operations.
 pub const FILES: usize = 10_000;
 /// The digest of `generate(SEED, FILES)`: the bytes L8's budgets bind.
-pub const REFERENCE_DIGEST: &str = "8a5682d3ee6bf132";
+pub const REFERENCE_DIGEST: &str = "bf9c5bea0d8b31ee";
 /// Files per folder.
 const PER_DIR: usize = 25;
 
@@ -166,22 +166,30 @@ pub fn digest(files: &[File]) -> String {
 /// the preview rules on (SR-RULE-PACKS decision 9) — every pack rule is
 /// preview today, and a budget set on a run that lints nothing would break
 /// the day the rules turn stable.
-pub const CONFIG: &str = "preview = true\nextends = [\n  \"codelaw:js/recommended\",\n  \"codelaw:ts/recommended\",\n  \"codelaw:react/recommended\",\n  \"codelaw:py/recommended\",\n  \"codelaw:data/recommended\",\n  \"codelaw:md/recommended\",\n  \"codelaw:css/recommended\",\n  \"codelaw:html/recommended\",\n]\n";
+pub const CONFIG: &str = "preview = true\nextends = [\n  \"codelaw:js/recommended\",\n  \"codelaw:js/typescript\",\n  \"codelaw:ts/recommended\",\n  \"codelaw:react/recommended\",\n  \"codelaw:py/recommended\",\n  \"codelaw:data/recommended\",\n  \"codelaw:md/recommended\",\n  \"codelaw:css/recommended\",\n  \"codelaw:html/recommended\",\n]\n";
 
-/// The five first-party packs, as npm installs them.
-pub const PACKS: &[(&str, &str)] =
-    &[("js", "@codelaw/rules-js"), ("python", "@codelaw/rules-python"), ("data", "@codelaw/rules-data"), ("css", "@codelaw/rules-css"), ("html", "@codelaw/rules-html")];
+/// Where the workload installs a first-party pack: npm's `node_modules`
+/// when the pack is on npm, else the workload's `.venv` (L6 decision 11).
+fn install_path(pack: &codelaw_rules::FirstPartyPack) -> std::path::PathBuf {
+    match (pack.npm, pack.module()) {
+        (Some(npm), _) => Path::new("node_modules").join(npm),
+        (None, Some(module)) => Path::new(".venv/lib/python3.12/site-packages").join(module),
+        (None, None) => unreachable!("every first-party pack is on a registry"),
+    }
+}
 
 /// The marker naming what a workload folder holds.
 const MARKER: &str = ".codelaw-bench";
 
 /// Write the workload into `dir` with the packs from `packs`: the files,
-/// `codelaw.toml` and `node_modules/@codelaw/rules-*`. A folder whose
+/// `codelaw.toml`, `node_modules/@codelaw/rules-*` and the PyPI-only pack in `.venv`. A folder whose
 /// marker names this digest is reused as it is. Returns the digest.
 pub fn write(dir: &Path, packs: &Path, seed: u64, files: usize) -> Result<String, String> {
     let set = generate(seed, files);
     let digest = digest(&set);
-    let marker = format!("seed {seed}\nfiles {files}\ndigest {digest}\n");
+    // `packs 9`: the nine-pack layout of 2026-10-24; a folder written with
+    // the five-pack layout is rewritten, not reused.
+    let marker = format!("seed {seed}\nfiles {files}\ndigest {digest}\npacks {}\n", codelaw_rules::FIRST_PARTY_PACKS.len());
     if std::fs::read_to_string(dir.join(MARKER)).is_ok_and(|m| m == marker) {
         return Ok(digest);
     }
@@ -203,12 +211,12 @@ pub fn write(dir: &Path, packs: &Path, seed: u64, files: usize) -> Result<String
         std::fs::write(&path, &f.text).map_err(io)?;
     }
     std::fs::write(dir.join("codelaw.toml"), CONFIG).map_err(io)?;
-    for (folder, package) in PACKS {
-        let from = packs.join(folder);
+    for pack in codelaw_rules::FIRST_PARTY_PACKS {
+        let from = packs.join(pack.short);
         if !from.join("codelaw-pack.toml").is_file() {
             return Err(format!("no rule pack in {}; name the packs folder with --packs", codelaw_core::normalize_path(&from)));
         }
-        copy_dir(&from, &dir.join("node_modules").join(package)).map_err(io)?;
+        copy_dir(&from, &dir.join(install_path(pack))).map_err(io)?;
     }
     std::fs::write(dir.join(MARKER), marker).map_err(io)?;
     Ok(digest)

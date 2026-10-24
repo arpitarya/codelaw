@@ -92,30 +92,30 @@ into a scan anyone can do at task end.
 
 | Document | Update trigger | Last verified | Notes |
 |---|---|---|---|
-| `CLAUDE.md` | any rule or pointer changes | 2026-10-22 | 2026-10-22 — pointer to the `/docket` skill (state-of-play table, layout) |
+| `CLAUDE.md` | any rule or pointer changes | 2026-10-24 | 2026-10-24 — the L6 line and the `packs/` layout line: nine packs, eight on npm and six on PyPI (W-31, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-24 | 2026-10-24 — W-29, W-30 filed (the first publish by hand); the registry row narrowed, step 1 done |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-24 | 2026-10-24 — W-31 and W-32 filed, W-32's ruling in the inbox; W-29 re-balled (0.1.0 on npm); W-30 moved to 0.2.0 |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — every row but B-006, B-007 promoted to W-07–W-22 |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-24 | 2026-10-24 — §1 and §2 rewritten to the current state (they had carried 2026-10-20 claims: 13 crates, clippy not clean, graph not built) |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-22 | 2026-10-22 — W-21 step 3, the CSS grammar fork |
-| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-24 | 2026-10-24 — the review session; the merge kept both 2026-10-22 entries |
-| `work/NOW.md` | every transition; `idle` when stopping | 2026-10-24 | 2026-10-24 — set after the merge and the filing |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-24 | 2026-10-24 — §1: nine packs, 0.1.0 on npm, W-31 uncommitted |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-24 | 2026-10-24 — W-29 (0.1.0 on npm) and W-31 (the registry pack split) |
+| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-24 | 2026-10-24 — the first npm publish and W-31 |
+| `work/NOW.md` | every transition; `idle` when stopping | 2026-10-24 | 2026-10-24 — after W-31: unpublish `@codelaw/rules-python`, push, 0.2.0 |
 | `work/LESSONS.md` | a failure teaches something durable | 2026-10-24 | 2026-10-24 — the cfg-split lesson and the two-sessions-one-checkout lesson |
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
-| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-20 | 2026-10-22 — ratchet, deprecations registry (W-13) |
-| `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-19 | 2026-10-19 — L6 and SR-RULE-PACKS rows; rule packs in the distribution sketch and the config example |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-22 | 2026-10-22 — the `crates/codelaw-lang` row names the CSS grammar fork (W-21) |
-| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-20 | 2026-10-20 — not releasable until W-07–W-09; step 2 runs the law gate |
+| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-24 | 2026-10-24 — pack, first-party pack and `dist` for the nine packs (W-31) |
+| `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-24 | 2026-10-24 — the L6 and SR-RULE-PACKS rows: nine packs (W-31) |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-24 | 2026-10-24 — the L6 and SR-PACKAGES rows and the `packs` row: nine packs (W-31) |
+| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-24 | 2026-10-24 — the names per registry; npm's one-time steps done (W-29) and owed again for the four new pack names (W-31) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-22 | 2026-10-22 — `codelaw test --corpus` (W-20); `codelaw bench` (W-19); counts refreshed to 419 rules (decider's rulings) |
-| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-22 | 2026-10-22 — Unreleased: baselines and deprecations (W-13); modern CSS parsing, `css/media-feature-range-notation`'s fix (W-21) |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-24 | 2026-10-24 — the rule-pack table per registry, the config example (W-31) |
+| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-24 | 2026-10-24 — Unreleased: the nine packs and the preset changes (W-31) |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
 | `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
 | `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
-| `LICENSE` | the licence or the copyright holder changes (SR-PACKAGES decision 10); the five `packs/*/LICENSE` copies change with it | 2026-10-20 | 2026-10-20 — created: MIT |
+| `LICENSE` | the licence or the copyright holder changes (SR-PACKAGES decision 10); every `packs/*/LICENSE` copy changes with it | 2026-10-20 | 2026-10-20 — created: MIT |
 
 ---
 

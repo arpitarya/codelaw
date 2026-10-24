@@ -99,7 +99,7 @@ fn no_pack_rule_is_stable_without_a_corpus_count() {
             }
         }
     }
-    assert_eq!(packs_seen, 5, "the five first-party packs");
+    assert_eq!(packs_seen, codelaw_rules::FIRST_PARTY_PACKS.len(), "every first-party pack");
     eprintln!("{stable} stable pack rules, each with a corpus count");
     assert!(
         unearned.is_empty(),

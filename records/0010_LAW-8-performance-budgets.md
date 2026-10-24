@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "speed as a law"
 owns: []
 laws: [L0, L3, L5, L8]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-24T08:00:00Z
 content_sha: ""
 ---
 
@@ -90,7 +90,7 @@ The decider wants performance to be a key property and accepts that today's numb
 - `proposed = <number>`: a proposal awaiting the decider. It is printed beside the p95 and never compared.
 - So the file of proposals the gate runs on today reports and passes; the ruling that writes a number into `budget` turns the gate on for that operation, with no change to CI.
 
-**The reference workload, as built (W-19).** Decision 2's generated repo is written by `codelaw bench` from seed `20261018` (10,000 files, digest `8a5682d3ee6bf132`, pinned by a test in `crates/codelaw-cli/src/bench/workload.rs`) and is not committed; [`fixtures/perf/README.md`](../fixtures/perf/README.md) describes it. Its config extends every pack's `recommended` presets with `preview = true`, since every pack rule is preview today. The three pinned real repos and the reference machine are not done yet: both are the decider's to name.
+**The reference workload, as built (W-19).** Decision 2's generated repo is written by `codelaw bench` from seed `20261018` (10,000 files, digest `bf9c5bea0d8b31ee`, pinned by a test in `crates/codelaw-cli/src/bench/workload.rs`; it was `8a5682d3ee6bf132` until 2026-10-24, when the pack split (W-31) added `codelaw:js/typescript` to its config — the same rules run, but a number measured before that day was measured on the old digest) and is not committed; [`fixtures/perf/README.md`](../fixtures/perf/README.md) describes it. Its config extends every pack's `recommended` presets with `preview = true`, since every pack rule is preview today. The three pinned real repos and the reference machine are not done yet: both are the decider's to name.
 
 #### Measurements
 

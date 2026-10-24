@@ -7,7 +7,7 @@
 use crate::fail;
 use clap::Args;
 use codelaw_core::Language;
-use codelaw_rules::FIRST_PARTY_PACKS;
+use codelaw_rules::first_party;
 use std::collections::BTreeSet;
 use std::path::Path;
 use std::process::{Command, ExitCode};
@@ -31,15 +31,31 @@ enum Registry {
     Pypi,
 }
 
-/// The pack each language needs (decision 6).
-fn pack_for(language: Language) -> &'static str {
-    match language {
-        Language::Javascript | Language::Jsx | Language::Typescript | Language::Tsx => "js",
-        Language::Html => "html",
-        Language::Css => "css",
-        Language::Python => "python",
-        Language::Json | Language::Yaml | Language::Toml | Language::Markdown => "data",
+/// The packs a repo needs (decision 6): one per language, `ts` for
+/// TypeScript, and `react` or `stencil` when `package.json` depends on it.
+fn packs_for(languages: &BTreeSet<Language>, package_json: Option<&str>) -> BTreeSet<&'static str> {
+    let mut out = BTreeSet::new();
+    for l in languages {
+        out.insert(match l {
+            Language::Javascript | Language::Jsx | Language::Typescript | Language::Tsx => "js",
+            Language::Html => "html",
+            Language::Css => "css",
+            Language::Python => "python",
+            Language::Json | Language::Yaml | Language::Toml | Language::Markdown => "data",
+        });
+        if l.is_typescript() {
+            out.insert("ts");
+        }
     }
+    if out.contains("js") {
+        if package_json.is_some_and(|j| depends_on(j, "react")) {
+            out.insert("react");
+        }
+        if package_json.is_some_and(|j| depends_on(j, "@stencil/core")) {
+            out.insert("stencil");
+        }
+    }
+    out
 }
 
 fn detect_languages(root: &Path) -> BTreeSet<Language> {
@@ -65,23 +81,20 @@ fn depends_on(package_json: &str, name: &str) -> bool {
     ["dependencies", "devDependencies", "peerDependencies"].iter().any(|k| v.get(k).and_then(|d| d.get(name)).is_some())
 }
 
-/// Each pack's `recommended` presets for what the repo holds.
-fn presets(packs: &BTreeSet<&str>, languages: &BTreeSet<Language>, package_json: Option<&str>) -> Vec<String> {
+/// Each installed pack's `recommended` presets for what the repo holds.
+fn presets(packs: &BTreeSet<&str>, languages: &BTreeSet<Language>) -> Vec<String> {
     let mut out = Vec::new();
     for p in packs {
         match *p {
             "js" => {
                 out.push("codelaw:js/recommended".into());
                 if languages.iter().any(|l| l.is_typescript()) {
-                    out.push("codelaw:ts/recommended".into());
-                }
-                if package_json.is_some_and(|j| depends_on(j, "react")) {
-                    out.push("codelaw:react/recommended".into());
-                }
-                if package_json.is_some_and(|j| depends_on(j, "@stencil/core")) {
-                    out.push("codelaw:stencil/recommended".into());
+                    out.push("codelaw:js/typescript".into());
                 }
             }
+            "ts" => out.push("codelaw:ts/recommended".into()),
+            "react" => out.push("codelaw:react/recommended".into()),
+            "stencil" => out.push("codelaw:stencil/recommended".into()),
             "html" => out.push("codelaw:html/recommended".into()),
             "css" => out.push("codelaw:css/recommended".into()),
             "python" => out.push("codelaw:py/recommended".into()),
@@ -95,6 +108,29 @@ fn presets(packs: &BTreeSet<&str>, languages: &BTreeSet<Language>, package_json:
         }
     }
     out
+}
+
+impl Registry {
+    fn key(self) -> &'static str {
+        match self {
+            Registry::Npm => "npm",
+            Registry::Pypi => "pypi",
+        }
+    }
+
+    fn label(self) -> &'static str {
+        match self {
+            Registry::Npm => "npm",
+            Registry::Pypi => "PyPI",
+        }
+    }
+
+    fn other(self) -> Registry {
+        match self {
+            Registry::Npm => Registry::Pypi,
+            Registry::Pypi => Registry::Npm,
+        }
+    }
 }
 
 /// The install command for one registry, with the repo's own manager.
@@ -134,16 +170,17 @@ pub fn init(args: InitArgs) -> ExitCode {
     }
 
     let languages = detect_languages(&root);
-    let packs: BTreeSet<&str> = languages.iter().map(|l| pack_for(*l)).collect();
     let package_json = std::fs::read_to_string(root.join("package.json")).ok();
+    let wanted = packs_for(&languages, package_json.as_deref());
     let has_npm = package_json.is_some();
     let has_pypi = root.join("pyproject.toml").is_file();
-    let extends = presets(&packs, &languages, package_json.as_deref());
 
     // Which registry each pack comes from: `--registry`, else the one the
     // repo uses; a repo with both takes the Python pack from PyPI and the
-    // rest from npm.
-    let registry_for = |pack: &str| -> Registry {
+    // rest from npm. A pack the chosen registry does not publish (L6
+    // decision 11) comes from the other one when the repo uses it too, or
+    // uses neither; otherwise it is left out and init says how to add it.
+    let preferred = |pack: &str| -> Registry {
         if let Some(r) = forced {
             return r;
         }
@@ -154,7 +191,7 @@ pub fn init(args: InitArgs) -> ExitCode {
             (false, true) => Registry::Pypi,
             (true, false) => Registry::Npm,
             (false, false) => {
-                if languages.iter().all(|l| *l == Language::Python || pack_for(*l) == "data") && languages.contains(&Language::Python) {
+                if languages.iter().all(|l| *l == Language::Python || matches!(l, Language::Json | Language::Yaml | Language::Toml | Language::Markdown)) && languages.contains(&Language::Python) {
                     Registry::Pypi
                 } else {
                     Registry::Npm
@@ -162,12 +199,40 @@ pub fn init(args: InitArgs) -> ExitCode {
             }
         }
     };
+    let in_use = |r: Registry| match r {
+        Registry::Npm => has_npm,
+        Registry::Pypi => has_pypi,
+    };
     let mut by_registry: std::collections::BTreeMap<Registry, Vec<&str>> = Default::default();
-    for p in &packs {
-        let (_, npm, pypi, _) = FIRST_PARTY_PACKS.iter().find(|x| x.0 == *p).expect("a first-party pack");
-        let r = registry_for(p);
-        by_registry.entry(r).or_default().push(if r == Registry::Npm { npm } else { pypi });
+    let mut packs: BTreeSet<&str> = BTreeSet::new();
+    let mut skipped: Vec<String> = Vec::new();
+    for p in &wanted {
+        let pack = first_party(p);
+        let first = preferred(p);
+        let chosen = if pack.on(first.key()).is_some() {
+            Some(first)
+        } else if forced.is_none() && (in_use(first.other()) || (!has_npm && !has_pypi)) && pack.on(first.other().key()).is_some() {
+            Some(first.other())
+        } else {
+            None
+        };
+        match chosen {
+            Some(r) => {
+                by_registry.entry(r).or_default().push(pack.on(r.key()).expect("published there"));
+                packs.insert(p);
+            }
+            None => {
+                let (r, name) = if let Some(n) = pack.npm { (Registry::Npm, n) } else { (Registry::Pypi, pack.pypi.expect("on a registry")) };
+                skipped.push(format!(
+                    "{name} is published on {} only, so it was not installed from {}; to lint with it, install it from {} and add its presets to `extends`",
+                    r.label(),
+                    first.label(),
+                    r.label()
+                ));
+            }
+        }
     }
+    let extends = presets(&packs, &languages);
 
     // codelaw.toml: `extends` and nothing else (SR-CONFIG decision 8).
     let mut config = String::from("# codelaw configuration — see `codelaw config --print` and SR-CONFIG.\n");
@@ -201,6 +266,9 @@ pub fn init(args: InitArgs) -> ExitCode {
     let langs: Vec<&str> = languages.iter().map(|l| l.name()).collect();
     println!("languages: {}", if langs.is_empty() { "none found".into() } else { langs.join(", ") });
     println!("wrote codelaw.toml, .codelaw/rules/README.md and the .gitignore line");
+    for s in &skipped {
+        println!("note: {s}");
+    }
 
     let commands: Vec<Vec<String>> = by_registry.iter().map(|(r, pkgs)| install_command(&root, *r, pkgs)).collect();
     if args.no_install && !commands.is_empty() {
@@ -240,11 +308,27 @@ mod tests {
     #[test]
     fn presets_follow_the_repo() {
         let langs: BTreeSet<Language> = [Language::Tsx, Language::Markdown, Language::Python].into();
-        let packs: BTreeSet<&str> = langs.iter().map(|l| pack_for(*l)).collect();
         let pj = r#"{"dependencies":{"react":"^19"}}"#;
+        let packs = packs_for(&langs, Some(pj));
+        assert_eq!(packs.iter().copied().collect::<Vec<_>>(), ["data", "js", "python", "react", "ts"]);
         assert_eq!(
-            presets(&packs, &langs, Some(pj)),
-            ["codelaw:data/recommended", "codelaw:md/recommended", "codelaw:js/recommended", "codelaw:ts/recommended", "codelaw:react/recommended", "codelaw:py/recommended"]
+            presets(&packs, &langs),
+            [
+                "codelaw:data/recommended",
+                "codelaw:md/recommended",
+                "codelaw:js/recommended",
+                "codelaw:js/typescript",
+                "codelaw:py/recommended",
+                "codelaw:react/recommended",
+                "codelaw:ts/recommended"
+            ]
         );
+    }
+
+    #[test]
+    fn react_and_stencil_need_javascript() {
+        let langs: BTreeSet<Language> = [Language::Python].into();
+        let pj = r#"{"dependencies":{"react":"^19","@stencil/core":"^4"}}"#;
+        assert_eq!(packs_for(&langs, Some(pj)).into_iter().collect::<Vec<_>>(), ["python"]);
     }
 }

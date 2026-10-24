@@ -1,8 +1,8 @@
-# @codelaw/rules-python · codelaw-rules-python
+# codelaw-rules-python
 
-codelaw's rules for Python — one of the five first-party rule packs
-([SR-RULE-PACKS](../../records/0101_rule-packs.md)). The same files ship on
-PyPI as `codelaw-rules-python` and on npm as `@codelaw/rules-python`.
+codelaw's rules for Python — one of the first-party rule packs
+([SR-RULE-PACKS](../../records/0101_rule-packs.md)). It ships on
+PyPI only, as `codelaw-rules-python`; npm has no copy (L6 decision 11).
 
 ```toml
 # codelaw.toml

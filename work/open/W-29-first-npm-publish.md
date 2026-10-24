@@ -17,10 +17,12 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | The `@codelaw` npm org exists, Arpit (`aarya11`) its owner, 2FA on | the scope the 13 sub-packages publish under | ✅ 2026-10-24, checked in the browser: org `codelaw`, 1 member, 0 packages; `codelaw` (unscoped) is not taken |
-| 2 | W-24 step 1 lands (the Windows build compiles) and `main` is pushed | CI builds all 8 binaries and uploads the `dist` artifact | 🟡 waits on W-24 |
-| 3 | Download `dist` from that green run; `package.py check` and `law-gate.py` pass on it | exactly what CI built and checked, nothing rebuilt locally | ⏳ |
-| 4 | Publish in order — 8 `@codelaw/cli-*`, then 5 `@codelaw/rules-*`, then `codelaw` last; dry run first | no moment where `codelaw` exists and its platform binary does not | ⏳ Arpit runs it |
-| 5 | Bind trusted publishing: `scripts/npm-trust.sh` (every package trusts `arpitarya/codelaw` · `publish.yml` · environment `npm`) | every later release comes from CI, no token | ⏳ Arpit runs it |
+| 2 | W-24 step 1 lands (the Windows build compiles) and `main` is pushed | CI builds all 8 binaries and uploads the `dist` artifact | ✅ 2026-10-24: run 40026216188 on `5e489f4` built all 8 and uploaded `dist`, but the run **failed** elsewhere (W-24), so it was not green |
+| 3 | Download `dist` from that green run; `package.py check` and `law-gate.py` pass on it | exactly what CI built and checked, nothing rebuilt locally | ✅ 2026-10-24, from run 40026216188: both passed, and all 14 dry runs were clean |
+| 4 | Publish in order — 8 `@codelaw/cli-*`, then 5 `@codelaw/rules-*`, then `codelaw` last; dry run first | no moment where `codelaw` exists and its platform binary does not | ✅ 2026-10-24 03:18 IST: all 14 live at 0.1.0 (`latest`), checked on the registry |
+| 5 | Bind trusted publishing: `scripts/npm-trust.sh` (every package trusts `arpitarya/codelaw` · `publish.yml` · environment `npm`) | every later release comes from CI, no token | ✅ 2026-10-24: "Trust configuration created successfully" for all 14 (permissions: publish, stage publish) |
+
+> **2026-10-24, the same day:** W-31 splits the packs by registry. `@codelaw/rules-python@0.1.0` is to be unpublished from npm, and `@codelaw/rules-ts`, `-react`, `-node`, `-stencil` get their first hand publish at 0.2.0 ([W-31](W-31-registry-pack-split.md) step 7).
 
 **Arpit, 2026-10-24:** *"Create a work item to publish npm packages … Give me the command … so I can do the first publish from local. I have already configured token for my whole system."*
 
@@ -60,9 +62,9 @@ All 14 npm packages exist at the release version, published from CI's checked `d
 
 | DoD | what | state |
 |---|---|---|
-| 1 · live | `npm view <name> version` prints the version for all 14 names in `package.py names` | ⏳ |
+| 1 · live | `npm view <name> version` prints the version for all 14 names in `package.py names` | ✅ 2026-10-24 (the 0.1.0 names) |
 | 2 · works | in an empty folder: `npm i codelaw && npx codelaw --version` on the Mac; the `smoke` job's install from the registry passes on the 8 platforms | ⏳ |
-| 3 · trusted | `npm trust list <name>` shows `arpitarya/codelaw` · `publish.yml` · `npm` for each package | ⏳ |
+| 3 · trusted | `npm trust list <name>` shows `arpitarya/codelaw` · `publish.yml` · `npm` for each package | ✅ 2026-10-24 (`npm-trust.sh`'s output) |
 | 4 · recorded | `work/IMPLEMENTATION.md` row; `RELEASING.md` §One time step 2 marked done with the date | ⏳ |
 
 ## Blockers

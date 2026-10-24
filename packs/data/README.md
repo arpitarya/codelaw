@@ -1,6 +1,6 @@
 # @codelaw/rules-data · codelaw-rules-data
 
-codelaw's rules for JSON, YAML, TOML and Markdown — one of the five
+codelaw's rules for JSON, YAML, TOML and Markdown — one of the
 first-party rule packs ([SR-RULE-PACKS](../../records/0101_rule-packs.md)). The
 same files ship on npm as `@codelaw/rules-data` and on PyPI as
 `codelaw-rules-data`.

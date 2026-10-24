@@ -1,0 +1,6 @@
+name = "@codelaw/rules-ts"
+version = "0.1.0"
+min_codelaw = "0.1.0"
+languages = ["typescript", "tsx"]
+presets = ["ts/recommended", "ts/conventions"]
+description = "codelaw's TypeScript rules, from typescript-eslint; npm only (SR-RULE-PACKS)"

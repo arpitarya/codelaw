@@ -1,7 +1,7 @@
 ---
 type: Handoff
 name: W-30
-description: "Arpit, 2026-10-24: the first publish of the 6 PyPI projects (13 wheels), by hand from his machine, from CI's dist artifact."
+description: "Arpit, 2026-10-24: the first publish of the 7 PyPI projects (14 wheels) at 0.2.0, in W-31's layout, by hand from his machine, from CI's dist artifact."
 item: W-30
 filed: 2026-10-24
 filed_by: "Arpit (Claude Code, Opus 5.5)"
@@ -10,14 +10,16 @@ updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: arpit
 ---
 
-# W-30 — Publish the 6 PyPI projects for the first time, from Arpit's machine
+# W-30 — Publish the 7 PyPI projects for the first time, at 0.2.0, from Arpit's machine
 
 ## At a glance
 
+> **Re-scoped 2026-10-24 by W-31:** PyPI carries `codelaw` and six packs — `js`, `react`, `html`, `css`, `python`, `data` — and skips 0.1.0: its first release is 0.2.0, the first in the nine-pack layout, from that release's `dist`. Every `13`, `six` and `0.1.0` below reads as `14`, `seven` and `0.2.0`.
+
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | The names are free: `codelaw` and `codelaw-rules-{js,python,css,html,data}` | nobody else owns them | 🟡 `pypi.org/project/codelaw` is a 404 (2026-10-24, browser); a 404 is not a guarantee — the first upload is the proof |
-| 2 | The same `dist` as W-29 (W-24 step 1 landed, `main` pushed, CI green) | the wheels hold the same binary as npm's (L6 decision 2) | 🟡 waits on W-24 |
+| 1 | The names are free: `codelaw` and `codelaw-rules-{js,react,html,css,python,data}` | nobody else owns them | 🟡 all seven are a 404 on PyPI's JSON API (2026-10-24); a 404 is not a guarantee — the first upload is the proof |
+| 2 | The 0.2.0 `dist` (W-31 step 7: bumped, pushed, CI green) | the wheels hold the same binary as npm's 0.2.0 (L6 decision 2) | 🟡 waits on W-31 |
 | 3 | `twine check`, then upload all 13 wheels with Arpit's account token | the six projects exist, owned by Arpit | ⏳ Arpit runs it |
 | 4 | Add a trusted publisher to each of the six (now existing) projects: `arpitarya` / `codelaw` / `publish.yml` / environment `pypi` | every later release comes from CI, no token | ⏳ Arpit, on pypi.org |
 | 5 | `RELEASING.md` §One time step 4: "pending publishers" becomes "trusted publishers on the existing projects", and the first PyPI publish is by hand like npm's | the release doc matches what was done | ⏳ agent |
@@ -41,7 +43,7 @@ python3 -m twine upload dist/pypi/*.whl
 #   UV_PUBLISH_TOKEN=pypi-… uv publish dist/pypi/*.whl
 
 # check: every project is live at 0.1.0
-for p in codelaw codelaw-rules-js codelaw-rules-python codelaw-rules-css codelaw-rules-html codelaw-rules-data; do
+for p in codelaw codelaw-rules-js codelaw-rules-react codelaw-rules-html codelaw-rules-css codelaw-rules-python codelaw-rules-data; do
   curl -s "https://pypi.org/pypi/$p/json" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['info']['name'],d['info']['version'],len(d['urls']),'files')"
 done
 ```
@@ -61,7 +63,7 @@ The six PyPI projects exist at the release version with all 13 wheels, uploaded 
 
 ## Blockers
 
-W-24 step 1 and the push of `main`, as W-29.
+W-31 step 7: the 0.2.0 bump and a green CI run on it (W-24).
 
 ## Record affected
 

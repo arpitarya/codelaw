@@ -12,7 +12,7 @@ fn temp(name: &str) -> PathBuf {
 }
 
 fn codelaw(cwd: &Path, args: &[&str]) -> (i32, String, String) {
-    let out = Command::new(env!("CARGO_BIN_EXE_codelaw")).args(args).current_dir(cwd).env_remove("VIRTUAL_ENV").output().unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codelaw")).args(args).current_dir(cwd).env_remove("VIRTUAL_ENV").env_remove("CODELAW_SITE_PACKAGES").output().unwrap();
     (out.status.code().unwrap_or(-1), String::from_utf8(out.stdout).unwrap(), String::from_utf8(out.stderr).unwrap())
 }
 
@@ -79,8 +79,11 @@ fn init_writes_config_rules_folder_and_gitignore() {
     let (code, out, err) = codelaw(&d, &["init", "--no-install"]);
     assert_eq!(code, 0, "{out}{err}");
     let config = fs::read_to_string(d.join("codelaw.toml")).unwrap();
-    assert!(config.contains(r#"extends = ["codelaw:data/recommended", "codelaw:js/recommended", "codelaw:ts/recommended", "codelaw:react/recommended", "codelaw:py/recommended"]"#), "{config}");
-    assert!(out.contains("pnpm add -D @codelaw/rules-data @codelaw/rules-js"), "{out}");
+    assert!(
+        config.contains(r#"extends = ["codelaw:data/recommended", "codelaw:js/recommended", "codelaw:js/typescript", "codelaw:py/recommended", "codelaw:react/recommended", "codelaw:ts/recommended"]"#),
+        "{config}"
+    );
+    assert!(out.contains("pnpm add -D @codelaw/rules-data @codelaw/rules-js @codelaw/rules-react @codelaw/rules-ts"), "{out}");
     assert!(out.contains("uv add --dev codelaw-rules-python"), "{out}");
     assert_eq!(fs::read_to_string(d.join(".gitignore")).unwrap(), "dist/\n.codelaw/cache/\n");
     assert!(d.join(".codelaw/rules/README.md").is_file());
@@ -88,10 +91,23 @@ fn init_writes_config_rules_folder_and_gitignore() {
     let (code, _, err) = codelaw(&d, &["init", "--no-install"]);
     assert_eq!(code, 2);
     assert!(err.contains("already configures codelaw"), "{err}");
-    // --registry pypi puts every pack on PyPI.
+    // --registry pypi puts every pack PyPI publishes on PyPI, and leaves out
+    // the npm-only TypeScript pack, saying so (L6 decision 11).
     fs::remove_file(d.join("codelaw.toml")).unwrap();
     let (_, out, _) = codelaw(&d, &["init", "--no-install", "--registry", "pypi"]);
-    assert!(out.contains("uv add --dev codelaw-rules-data codelaw-rules-js codelaw-rules-python"), "{out}");
+    assert!(out.contains("uv add --dev codelaw-rules-data codelaw-rules-js codelaw-rules-python codelaw-rules-react"), "{out}");
+    assert!(out.contains("note: @codelaw/rules-ts is published on npm only"), "{out}");
+    let config = fs::read_to_string(d.join("codelaw.toml")).unwrap();
+    assert!(!config.contains("codelaw:ts/"), "{config}");
+    // An npm-only repo with Python in it leaves the PyPI-only pack out.
+    fs::remove_file(d.join("codelaw.toml")).unwrap();
+    fs::remove_file(d.join("pyproject.toml")).unwrap();
+    fs::remove_file(d.join("uv.lock")).unwrap();
+    let (code, out, err) = codelaw(&d, &["init", "--no-install"]);
+    assert_eq!(code, 0, "{out}{err}");
+    assert!(out.contains("note: codelaw-rules-python is published on PyPI only"), "{out}");
+    assert!(!out.contains("codelaw-rules-python codelaw") && !out.contains("uv add"), "{out}");
+    assert!(!fs::read_to_string(d.join("codelaw.toml")).unwrap().contains("codelaw:py/"));
     let _ = fs::remove_dir_all(&d);
 }
 
@@ -137,7 +153,7 @@ fn copy_dir(from: &Path, to: &Path) {
 fn strict_keyword_fixes_are_suggestions() {
     let d = temp("strict");
     let packs = Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().join("packs/python");
-    copy_dir(&packs, &d.join("node_modules/@codelaw/rules-python"));
+    copy_dir(&packs, &d.join(".venv/lib/python3.12/site-packages/codelaw_rules_python")); // PyPI only (L6 decision 11)
     fs::write(d.join("codelaw.toml"), "extends = [\"codelaw:py/recommended\"]\npreview = true\n").unwrap();
     let src = "def f(g, a, b):\n    return list(zip(a, b)), list(map(g, a, b))\n";
     fs::write(d.join("a.py"), src).unwrap();
@@ -242,6 +258,7 @@ fn init_agents_writes_the_layout_and_sync_keeps_it() {
     // The packs `npm install` would add (`--no-install` here).
     let packs = Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().join("packs");
     copy_dir(&packs.join("js"), &d.join("node_modules/@codelaw/rules-js"));
+    copy_dir(&packs.join("ts"), &d.join("node_modules/@codelaw/rules-ts"));
     copy_dir(&packs.join("data"), &d.join("node_modules/@codelaw/rules-data"));
     let before = tree(&d);
     let (code, out, err) = codelaw(&d, &["init", "--no-install", "--agents", "kiro,claude,cowork,copilot,codex"]);

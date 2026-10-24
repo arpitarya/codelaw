@@ -2,8 +2,12 @@
 
 **One release, both registries, one version** ([L6](records/0008_LAW-6-python-and-node-packages.md)
 decision 9). What ships is [SR-PACKAGES](records/0107_packages.md) §1: npm
-`codelaw` + eight `@codelaw/cli-*` + five `@codelaw/rules-*`, PyPI `codelaw`
-(eight wheels) + five `codelaw-rules-*`.
+`codelaw` + eight `@codelaw/cli-*` + eight `@codelaw/rules-*` (`js`, `ts`,
+`react`, `node`, `stencil`, `html`, `css`, `data`), PyPI `codelaw` (eight
+wheels) + six `codelaw-rules-*` (`js`, `react`, `html`, `css`, `python`,
+`data`). Which pack goes where is `FIRST_PARTY_PACKS` in
+`crates/codelaw-rules/src/pack.rs`; `python3 scripts/package.py names` prints
+every name.
 
 **Publishing is only `.github/workflows/publish.yml`**, run by a published
 GitHub Release. It compiles nothing: it uploads the `dist` artifact that
@@ -20,7 +24,7 @@ anywhere — both registries use trusted publishing (OIDC).
 
 | workflow | when | what | time |
 |---|---|---|---|
-| `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 20 packages (27 files: 14 npm tarballs, 13 wheels) assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](work/open/W-04-release-pipeline.md) §Measured |
+| `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 24 packages (31 files: 17 npm tarballs, 14 wheels) assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](work/open/W-04-release-pipeline.md) §Measured |
 | `publish.yml` | a GitHub Release | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | see W-04 §Measured |
 
 Every check `ci.yml` runs on the packages is `scripts/package.py check`:
@@ -50,6 +54,13 @@ In this order. npm binds a trusted publisher only to a package that already
 exists, so the first npm publish cannot come from CI. PyPI can: a *pending*
 publisher creates the project on its first upload.
 
+**Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](work/open/W-29-first-npm-publish.md)).
+Steps 2–3 come back for **every pack name new to npm**: at 0.2.0,
+`@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](work/open/W-31-registry-pack-split.md)) —
+publish just those tarballs by hand from the 0.2.0 `dist`, then run
+`npm-trust.sh` again (it skips nothing, and re-binding an existing package is
+harmless); `publish.yml` then skips the versions already on npm.
+
 1. **npm:** create the `@codelaw` organisation (account with 2FA).
 2. **npm, first publish by hand** — from the `dist` artifact of a green
    `ci.yml` run on `main` (`gh run download <run-id> -n dist`). **First run
@@ -61,7 +72,7 @@ publisher creates the project on its first upload.
    every package trusts `arpitarya/codelaw` · `publish.yml` · environment `npm`,
    with *Allow npm publish* ticked.
 4. **PyPI pending publishers** — <https://pypi.org/manage/account/publishing/>,
-   one per project: `codelaw` and `codelaw-rules-{js,html,css,python,data}`;
+   one per project: `codelaw` and `codelaw-rules-{js,react,html,css,python,data}`;
    owner `arpitarya`, repository `codelaw`, workflow `publish.yml`, environment
    `pypi`.
 5. **GitHub environments** `npm` and `pypi` (*Settings → Environments*) —
@@ -79,7 +90,7 @@ After this, no release needs a token, a code or your machine.
 ## Every release
 
 1. **Bump:** `python3 scripts/version.py --set 0.2.0` — Cargo.toml, Cargo.lock
-   and the five pack manifests; every npm and PyPI manifest is generated from
+   and the nine pack manifests; every npm and PyPI manifest is generated from
    it. Commit and push to `main`.
 2. **Wait for `ci.yml` to go green on that commit, on `main`.** `publish.yml`
    refuses anything else.

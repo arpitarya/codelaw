@@ -21,7 +21,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 ---
 
 > [!IMPORTANT]
-> **codelaw is a preview (0.1.0) and is not on npm or PyPI yet.** The linter, the fixer, the formatter, the MCP server, the language server and all five rule packs work today if you build from source. The published packages and the editor extension's Marketplace listing come next. [Roadmap](#roadmap) lists what is built and what is not.
+> **codelaw is a preview (0.1.0) and is not on npm or PyPI yet.** The linter, the fixer, the formatter, the MCP server, the language server and all nine rule packs work today if you build from source. The published packages and the editor extension's Marketplace listing come next. [Roadmap](#roadmap) lists what is built and what is not.
 
 ## In plain words
 
@@ -170,15 +170,19 @@ The npm and PyPI packages will be the same engine and give byte-identical output
 
 ## Rule packs
 
-Five first-party packs. Each one ships under the same name on both registries: `@codelaw/rules-<pack>` on npm and `codelaw-rules-<pack>` on PyPI.
+Nine first-party packs: eight on npm as `@codelaw/rules-<pack>`, six on PyPI as `codelaw-rules-<pack>`. A pack on both registries holds the same files on both.
 
-| pack | rules | presets | reimplemented from |
-|---|---|---|---|
-| [`js`](packs/js/README.md) | 140 | `js/recommended` · `ts/recommended` · `react/recommended` · `node/recommended` · `stencil/recommended` · `js/conventions` | ESLint 10 recommended (all 64), typescript-eslint 8 recommended, eslint-plugin-react, react-hooks, eslint-plugin-n, @stencil/eslint-plugin |
-| [`python`](packs/python/README.md) | 99 | `py/recommended` · `py/conventions` | Ruff 0.17's default `E4`/`E7`/`E9`/`F`, every stable flake8-bugbear rule, isort `I001`, `RUF022` |
-| [`html`](packs/html/README.md) | 72 | `html/recommended` · `html/a11y` · `html/document` · `html/conventions` | html-validate 11 recommended, a11y and document |
-| [`css`](packs/css/README.md) | 71 | `css/recommended` · `css/standard` · `css/conventions` | stylelint-config-recommended 18 (all 41), stylelint-config-standard 40 |
-| [`data`](packs/data/README.md) | 37 | `data/recommended` · `md/recommended` · `data/package-json` · `data/tsconfig` · `data/pyproject` · `data/github-actions` · `data/conventions` | markdownlint 0.42, plus JSON/YAML/TOML correctness checks |
+| pack | npm | PyPI | rules | presets | reimplemented from |
+|---|---|---|---|---|---|
+| [`js`](packs/js/README.md) | ✅ | ✅ | 72 | `js/recommended` · `js/typescript` · `js/conventions` | ESLint 10 recommended (all 64), and the four core rules typescript-eslint switches on for TypeScript |
+| [`ts`](packs/ts/README.md) | ✅ | — | 21 | `ts/recommended` · `ts/conventions` | typescript-eslint 8 recommended (all 20) |
+| [`react`](packs/react/README.md) | ✅ | ✅ | 21 | `react/recommended` · `react/conventions` | eslint-plugin-react, react-hooks |
+| [`node`](packs/node/README.md) | ✅ | — | 10 | `node/recommended` | eslint-plugin-n |
+| [`stencil`](packs/stencil/README.md) | ✅ | — | 16 | `stencil/recommended` · `stencil/conventions` | @stencil/eslint-plugin |
+| [`python`](packs/python/README.md) | — | ✅ | 99 | `py/recommended` · `py/conventions` | Ruff 0.17's default `E4`/`E7`/`E9`/`F`, every stable flake8-bugbear rule, isort `I001`, `RUF022` |
+| [`html`](packs/html/README.md) | ✅ | ✅ | 72 | `html/recommended` · `html/a11y` · `html/document` · `html/conventions` | html-validate 11 recommended, a11y and document |
+| [`css`](packs/css/README.md) | ✅ | ✅ | 71 | `css/recommended` · `css/standard` · `css/conventions` | stylelint-config-recommended 18 (all 41), stylelint-config-standard 40 |
+| [`data`](packs/data/README.md) | ✅ | ✅ | 37 | `data/recommended` · `md/recommended` · `data/package-json` · `data/tsconfig` · `data/pyproject` · `data/github-actions` · `data/conventions` | markdownlint 0.42, plus JSON/YAML/TOML correctness checks |
 
 - **Reimplemented, not wrapped.** Each rule is written fresh in codelaw's format, and its `ported_from:` field names the original. You don't need ESLint, Ruff or stylelint installed.
 - **Differences are written down.** Each pack's README lists where a port behaves differently from the original, and which rules weren't ported and why.
@@ -266,8 +270,9 @@ $ codelaw test acme/no-console-log
 ```toml
 extends = [
   "codelaw:js/recommended",
-  "codelaw:ts/recommended",
-  "codelaw:py/recommended",
+  "codelaw:js/typescript",      # the core rules typescript-eslint switches on
+  "codelaw:ts/recommended",     # @codelaw/rules-ts, on npm
+  "codelaw:py/recommended",     # codelaw-rules-python, on PyPI
   "codelaw:js/conventions",     # opt-in house style
 ]
 preview = true                  # every rule is preview in 0.1.0
@@ -386,7 +391,7 @@ flowchart LR
 |---|---|---|
 | ✅ | Engine: nine languages, one binary, parse once, cache | built |
 | ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `new-rule`, `init`, `cache` | built |
-| ✅ | Five rule packs: 419 rules | built, `preview` |
+| ✅ | Nine rule packs: 419 rules | built, `preview` |
 | ✅ | `--format agent` and `--format json` | built |
 | 🔜 | npm and PyPI packages (`npx codelaw`, `uvx codelaw`) | next |
 | ✅ | Formatter (`codelaw format`, and the last step of `fix`): Prettier-style JS/TS/JSON, Black-style Python | built |
@@ -428,7 +433,7 @@ Bug reports, false positives and rule requests are welcome. See [CONTRIBUTING.md
 
 ## Licence
 
-**MIT** — see [LICENSE](LICENSE). It covers the engine, the repo and every package, the five rule packs included (each carries its own copy). Every dependency is free, open source and permissively licensed, and nothing paid or copyleft is used ([L2](records/0004_LAW-2-foss-dependencies.md)).
+**MIT** — see [LICENSE](LICENSE). It covers the engine, the repo and every package, the rule packs included (each carries its own copy). Every dependency is free, open source and permissively licensed, and nothing paid or copyleft is used ([L2](records/0004_LAW-2-foss-dependencies.md)).
 
 ## Acknowledgements
 

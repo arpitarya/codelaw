@@ -1,0 +1,6 @@
+@codelaw/rules-ts
+
+The rules are reimplementations written for codelaw. Their `ported_from:`
+fields name the typescript-eslint rules (https://typescript-eslint.io, MIT
+License) whose documented behaviour they reproduce; no typescript-eslint code
+or documentation text is included.

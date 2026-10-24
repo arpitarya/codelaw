@@ -1,0 +1,6 @@
+name = "@codelaw/rules-node"
+version = "0.1.0"
+min_codelaw = "0.1.0"
+languages = ["javascript", "jsx", "typescript", "tsx"]
+presets = ["node/recommended"]
+description = "codelaw's Node.js rules, from eslint-plugin-n; npm only (SR-RULE-PACKS)"

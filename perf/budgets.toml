@@ -23,7 +23,7 @@
 
 [reference]
 machine = "unset"
-workload = "codelaw bench --seed 20261018 --files 10000 (digest 8a5682d3ee6bf132)"
+workload = "codelaw bench --seed 20261018 --files 10000 (digest bf9c5bea0d8b31ee)"
 
 [operation.startup]
 unit = "ms"

@@ -10,7 +10,7 @@ feature: "the consumer directory"
 owns:
   - crates/codelaw-cli/tests/consumer_layout.rs
 laws: [L0, L3, L5, L6]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-24T08:00:00Z
 content_sha: ""
 ---
 
@@ -78,13 +78,13 @@ The decider asked for a record of what the consumer directory looks like. It was
 5. **No agents, no agent files.** With no `[agents] targets` ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 6), none of the generated agent paths exist ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 4).
 6. **Local rules live under `rules_dir`** (default `.codelaw/rules/`). The subfolders are namespaces for ids (`.codelaw/rules/acme/no-moment.md` → `acme/no-moment`); a rule's `languages:` field, not its folder, decides where it applies ([SR-RULE-FORMAT](0112_rule-format.md)).
 7. **Monorepos:** one `.codelaw/` at the root. A package may add its own `codelaw.toml` and `.codelaw/rules/`, which inherit from the root ([SR-CONFIG](0110_config.md) decision 2).
-8. **`codelaw init`** adds the rule packs for the detected languages as dev dependencies ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and creates `codelaw.toml`, `.codelaw/rules/` (empty, with a README pointing at `codelaw new-rule`) and the `.gitignore` line. With `--agents`, it also writes the agent files.
+8. **`codelaw init`** adds the rule packs for the detected languages as dev dependencies ([SR-RULE-PACKS](0101_rule-packs.md) decision 6) — a pack the repo's registry does not publish is left out with a `note:`, and adds no path — and creates `codelaw.toml`, `.codelaw/rules/` (empty, with a README pointing at `codelaw new-rule`) and the `.gitignore` line. With `--agents`, it also writes the agent files.
 
 ### Consequences
 
 - **A repo gains one folder (`.codelaw/`) and one config;** agent files only on request.
 - **Baselines and deprecations add reviewable files;** that's deliberate ([SR-BASELINE](0104_baseline-and-deprecations.md)).
-- **Checked by `crates/codelaw-cli/tests/consumer_layout.rs`:** it reads §1's tree from this file, runs `codelaw init --no-install` and then `codelaw check` in a committed fixture repo, and compares `git status --ignored` with the tree — every new path listed, nothing ignored but `.codelaw/cache/` (beside the team's own `node_modules/`), `.gitignore` changed by that one line, no generated path without `--agents`. `init --agents` writes only §1's paths, or, while it is refused (W-10), nothing.
+- **Checked by `crates/codelaw-cli/tests/consumer_layout.rs`:** it reads §1's tree from this file, runs `codelaw init --no-install` and then `codelaw check` in a committed fixture repo (an npm repo with a Python file: its packs are `js`, `ts` and `data`, and `init` notes that `codelaw-rules-python` is on PyPI only), and compares `git status --ignored` with the tree — every new path listed, nothing ignored but `.codelaw/cache/` (beside the team's own `node_modules/`), `.gitignore` changed by that one line, no generated path without `--agents`. `init --agents` writes only §1's paths, or, while it is refused (W-10), nothing.
 
 ### Alternatives considered
 

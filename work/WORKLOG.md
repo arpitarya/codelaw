@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-24 — the first npm publish, and each registry gets only its users' packs (W-31)  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Review how npm packages are published in Fux and Sheetpane. Give me the command to publish it in the same way for the first run"*; then *"The ones that are going to be used in npm and the ones that are going to be used in PyPI should only be published"*, *"in js have js, node, stencil as separate packs; in pypi have js, react as separate packs and remove ts, node and stencil from pypi"*, html kept on npm, *"implement everything"*; and *"i want a redux tool kit and react query pack as well in npm"*.
+- **Done:** Arpit published 0.1.0 to npm by hand (all 14 names, `latest`) from `ci.yml` run 40026216188's `dist` — a failed run whose `dist` passed `package.py check`, `law-gate.py` and 14 dry runs — and bound trusted publishing on all 14 (W-29). W-31 landed uncommitted: `packs/js` split into `js`, `ts`, `react`, `node`, `stencil`; `FIRST_PARTY_PACKS` (pack.rs) gives each pack its npm and PyPI name; resolution, the missing-pack error, `codelaw init`, `bench`, `package.py` (reads the table), `build-packs.py`, the docs; L6, SR-RULE-PACKS, SR-PACKAGES and the records owning the touched files amended; **`CLAUDE.md`'s L6 line and `packs/` layout line changed** (SR-WORK-DOCS decision 7: the decider's ruling). Filed W-31 and W-32 (Redux Toolkit and React Query, npm only).
+- **Decided / left open:** a preset names only its own pack's rules, so `ts/recommended`'s four core rules became `codelaw:js/typescript` and `js/conventions` split per pack; the reference workload's digest moved to `bf9c5bea0d8b31ee` (same rules; no budget is set). Open: unpublish `@codelaw/rules-python` before 2026-10-27, push, 0.2.0 as the first two-registry release; W-32's names and Redux source (inbox). `work/BLOCKED.json` still says `ASK` on the 0.1.0 go — the decider gave it by publishing; resetting the file to `PROCEED` is left to him.
+- **Mistakes:** the first verification command I gave (`xargs -n1 npm view --json name version`) looked up an npm package called `name`, printing `0.0.2` fourteen times; corrected in the session. A pasted block ran a placeholder `<RUN_ID>` and every later step after the first failure — nothing was published.
+- **Next:** Arpit runs `npm unpublish @codelaw/rules-python --force`, commits and pushes W-31; then W-24 to green, then 0.2.0.
+
 ## 2026-10-24 — the first publish planned: W-29 (npm) and W-30 (PyPI)  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"go to the browser and check out the organization codelaw without any hyphen. Create a work item to publish npm packages. Create another work item to publish Python packages. Give me the command for both so I can do the first publish from local."*

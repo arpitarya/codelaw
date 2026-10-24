@@ -1,0 +1,6 @@
+name = "@codelaw/rules-react"
+version = "0.1.0"
+min_codelaw = "0.1.0"
+languages = ["javascript", "jsx", "typescript", "tsx"]
+presets = ["react/recommended", "react/conventions"]
+description = "codelaw's React rules, from eslint-plugin-react and eslint-plugin-react-hooks (SR-RULE-PACKS)"

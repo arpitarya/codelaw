@@ -156,8 +156,10 @@ fn init_writes_only_the_paths_the_consumer_layout_lists() {
     let d = consumer("init");
     let (code, out) = codelaw(&d, &["init", "--no-install"]);
     assert_eq!(code, 0, "{out}");
-    // What `npm install -D @codelaw/rules-…` would put in place.
-    for pack in ["data", "js", "python"] {
+    // What `npm install -D @codelaw/rules-…` would put in place: the
+    // Python pack is PyPI-only, so this npm repo's init leaves it out.
+    assert!(out.contains("note: codelaw-rules-python is published on PyPI only"), "{out}");
+    for pack in ["data", "js", "ts"] {
         copy_dir(&repo_root().join("packs").join(pack), &d.join("node_modules/@codelaw").join(format!("rules-{pack}")));
     }
     let (code, out) = codelaw(&d, &["check"]);

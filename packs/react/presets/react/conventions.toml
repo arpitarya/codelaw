@@ -1,0 +1,5 @@
+description = "House conventions from codelaw's starter catalogue; opt in"
+
+[rules]
+"react/hook-prefix" = "error"
+"react/props-type-name" = "error"

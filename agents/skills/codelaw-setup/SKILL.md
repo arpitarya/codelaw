@@ -37,11 +37,14 @@ Both packages are the same engine with identical output.
 set to the matching presets, creates `.codelaw/rules/` with a README, adds
 `.codelaw/cache/` to `.gitignore`, and installs the rule packs
 (`@codelaw/rules-*` on npm, `codelaw-rules-*` on PyPI) with the repo's
-package manager.
+package manager. Not every pack is on both registries: `python` is on PyPI
+only, and `ts`, `node` and `stencil` are on npm only. When init prints a
+`note:` that it left a pack out, tell the user which registry has it.
 
 Flags:
 
-- `--registry npm` or `--registry pypi` — take every pack from one registry;
+- `--registry npm` or `--registry pypi` — take every pack from one registry
+  (a pack that registry does not publish is left out, with a `note:`);
 - `--no-install` — print the install commands instead of running them (then
   run them yourself, or show them to the user);
 - `--agents claude,cowork,copilot,codex,kiro` — only the agents the user

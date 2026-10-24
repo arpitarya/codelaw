@@ -12,7 +12,7 @@ mod rule;
 mod ruleset;
 
 pub use engine_rules::{ENGINE_RULES, EngineRule, engine_rule};
-pub use pack::{ExtendsSpec, FIRST_PARTY_PACKS, PackManifest, PackSearch, Preset, RulePack, load_pack, load_pack_from, load_rules_dir, namespace_pack};
+pub use pack::{ExtendsSpec, FIRST_PARTY_PACKS, FirstPartyPack, PackManifest, PackSearch, Preset, RulePack, first_party, first_party_npm, first_party_pypi, load_pack, load_pack_from, load_rules_dir, namespace_pack};
 pub use rule::{
     Block, BlockKind, Case, Example, ExampleKind, KNOWN_SKILLS, LanguageExamples, OptionSpec, RESERVED_NAMESPACES,
     RuleFile, Scope, Snippet, Stability, parse_cases, parse_rule,

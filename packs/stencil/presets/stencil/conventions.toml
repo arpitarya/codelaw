@@ -1,0 +1,4 @@
+description = "House conventions from codelaw's starter catalogue; opt in"
+
+[rules]
+"stencil/tag-prefix" = "error"

@@ -3,7 +3,7 @@
 
 use crate::LoadError;
 use crate::engine_rules::engine_rule;
-use crate::pack::{ExtendsSpec, FIRST_PARTY_PACKS, PackSearch, RulePack, load_pack_from, load_rules_dir};
+use crate::pack::{ExtendsSpec, PackSearch, RulePack, first_party_npm, first_party_pypi, load_pack_from, load_rules_dir};
 use crate::rule::{RESERVED_NAMESPACES, RuleFile, Stability};
 use codelaw_cache::{Key, KeyBuilder};
 use codelaw_config::{Config, Layer, RuleConfig, RuleSetting};
@@ -132,8 +132,8 @@ impl RuleSet {
             };
             let first_party_origin = match &spec {
                 ExtendsSpec::FirstParty { .. } => true,
-                ExtendsSpec::Npm(name) => FIRST_PARTY_PACKS.iter().any(|p| p.1 == name),
-                ExtendsSpec::Pypi(name) => FIRST_PARTY_PACKS.iter().any(|p| p.2 == name.to_ascii_lowercase().replace(['_', '.'], "-")),
+                ExtendsSpec::Npm(name) => first_party_npm(name).is_some(),
+                ExtendsSpec::Pypi(name) => first_party_pypi(name).is_some(),
                 ExtendsSpec::Path(_) => false,
             };
             let pack = match loaded_packs.iter().find(|(d, _)| *d == dir) {

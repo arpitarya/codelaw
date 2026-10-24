@@ -6,7 +6,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Added
 
-- **Licence: MIT**, for the repo and every package. `LICENSE` at the root and in each of the five rule packs.
+- **Licence: MIT**, for the repo and every package. `LICENSE` at the root and in each rule pack.
 - `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` and the GitHub issue and pull-request templates.
 - **The formatter:** `codelaw format [--check] [--diff]` for all nine languages, with six engines compiled in: Biome, Ruff's formatter, pretty_yaml, taplo, dprint-plugin-markdown and markup_fmt. `fix` now ends with a format. `check` reports unformatted files as `format/unformatted` (`auto`). A format that would not parse, would change again on a second run, or would change a JSON/YAML/TOML value is refused and reported as `format/failed`. Line endings are kept unless `[format] end_of_line` is set.
 - **`codelaw mcp`**, the MCP server for agents, and **`codelaw lsp`**, the language server: diagnostics, quick fixes, fix all, hovers and document formatting.
@@ -14,6 +14,9 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Changed
 
+- **Nine rule packs, each on the registry its users install from** (W-31). `rules-js` is split into `rules-js`, `rules-ts`, `rules-react`, `rules-node` and `rules-stencil`. npm carries eight packs (`js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `data`); PyPI carries six (`js`, `react`, `html`, `css`, `python`, `data`). `@codelaw/rules-python` is no longer on npm, and `ts`, `node` and `stencil` are not on PyPI. The rules themselves are unchanged (419).
+  - **Before you upgrade:** `codelaw:ts/recommended` no longer turns on `js/no-var`, `js/prefer-const`, `js/prefer-rest-params` and `js/prefer-spread`; add `codelaw:js/typescript` for them (`codelaw init` writes it for a TypeScript repo). `codelaw:js/conventions` holds only the `js/*` conventions; the others are `ts/conventions`, `react/conventions` and `stencil/conventions`.
+  - **`codelaw init`** installs `rules-ts` for TypeScript and `rules-react` or `rules-stencil` when `package.json` depends on them, and leaves out, with a `note:`, a pack the repo's registry does not publish.
 - **CSS parsing** reads range media features (`@media (400px <= width <= 700px)`), `layer()` in `@import` and fractional keyframe selectors (`12.5%`) without syntax errors, through codelaw's fork of tree-sitter-css 0.25.0. Fixes that write them are no longer refused.
 - `css/media-feature-range-notation` now has an `auto` fix: `(min-width: 600px)` becomes `(width >= 600px)`.
 - `codelaw fix` now formats every file it checks. Set `[format] enabled = false` to keep the old behaviour, or `[format] check = false` to keep formatting out of `check`.

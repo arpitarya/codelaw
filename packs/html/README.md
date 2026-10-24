@@ -1,6 +1,6 @@
 # @codelaw/rules-html · codelaw-rules-html
 
-codelaw's rules for HTML — one of the five first-party rule packs
+codelaw's rules for HTML — one of the first-party rule packs
 ([SR-RULE-PACKS](../../records/0101_rule-packs.md)). The same files ship on npm
 as `@codelaw/rules-html` and on PyPI as `codelaw-rules-html`.
 

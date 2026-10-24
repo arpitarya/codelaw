@@ -395,7 +395,9 @@ impl Bench {
 
     fn command(&self, cache: Option<&Path>) -> Command {
         let mut c = Command::new(&self.exe);
-        c.current_dir(&self.dir).env("NO_COLOR", "1");
+        // The workload's own `.venv` holds the PyPI-only pack; an inherited
+        // environment would hide it (SR-RULE-PACKS decision 4).
+        c.current_dir(&self.dir).env("NO_COLOR", "1").env_remove("VIRTUAL_ENV").env_remove("CODELAW_SITE_PACKAGES");
         if let Some(cache) = cache {
             c.env("CODELAW_CACHE_DIR", cache);
         }

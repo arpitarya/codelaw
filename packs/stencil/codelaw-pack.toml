@@ -1,0 +1,6 @@
+name = "@codelaw/rules-stencil"
+version = "0.1.0"
+min_codelaw = "0.1.0"
+languages = ["typescript", "tsx"]
+presets = ["stencil/recommended", "stencil/conventions"]
+description = "codelaw's Stencil rules, from @stencil/eslint-plugin; npm only (SR-RULE-PACKS)"

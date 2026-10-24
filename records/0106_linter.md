@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-match
   - crates/codelaw-adapters
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-22T20:00:00Z
+timestamp: 2026-10-24T08:00:00Z
 content_sha: ""
 ---
 
@@ -147,7 +147,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    - warm-cache `check` on 10,000 files: under 2 s;
    - hook mode on one file: under 100 ms.
 
-9. **Rules per language** live in the five rule packs of [SR-RULE-PACKS](0101_rule-packs.md), `rules-css` and `rules-html` included. The engine carries none.
+9. **Rules per language** live in the nine rule packs of [SR-RULE-PACKS](0101_rule-packs.md), `rules-css` and `rules-html` included. The engine carries none.
 
 ### Consequences
 

@@ -8,7 +8,7 @@ build jobs in `.github/workflows/ci.yml`.
     package.py prepare-wheel                 copy LICENSE and README into packaging/python for maturin
     package.py extract WHEEL OUTDIR          take the binary out of a maturin wheel (the npm copy)
     package.py assemble --bins B --wheels W --out dist
-                                             build the 14 npm tarballs and the 5 pack wheels; copy the 8 engine wheels
+                                             build the 17 npm tarballs and the 6 pack wheels; copy the 8 engine wheels
     package.py check dist                    the release checks, against what was assembled
     package.py names                         every name codelaw publishes (SR-PACKAGES §1)
 
@@ -39,7 +39,32 @@ LICENCE = "MIT"
 LICENCE_FILES = ("LICENSE",)
 SCHEMA = ROOT / "crates" / "codelaw-config" / "codelaw.schema.json"  # shipped in npm codelaw (SR-PACKAGES decision 3)
 REPO = "https://github.com/arpitarya/codelaw"
-PACKS = ("js", "html", "css", "python", "data")
+PACK_TABLE = ROOT / "crates" / "codelaw-rules" / "src" / "pack.rs"
+
+
+def read_packs() -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Which first-party pack is published on which registry: read from
+    FIRST_PARTY_PACKS in pack.rs, the one list (L6 decision 11; the
+    decider's ruling of 2026-10-24), so the engine and the release never
+    disagree. Returns (on npm, on PyPI), in the table's order."""
+    text = PACK_TABLE.read_text(encoding="utf-8")
+    body = text[text.index("pub const FIRST_PARTY_PACKS"):]
+    body = body[:body.index("];")]
+    npm: list[str] = []
+    pypi: list[str] = []
+    for kind, short in re.findall(r'\b(both|npm_only|pypi_only)\("([a-z]+)"', body):
+        if kind in ("both", "npm_only"):
+            npm.append(short)
+        if kind in ("both", "pypi_only"):
+            pypi.append(short)
+    folders = sorted(p.parent.name for p in (ROOT / "packs").glob("*/codelaw-pack.toml"))
+    if not npm or sorted(set(npm) | set(pypi)) != folders:
+        sys.exit(f"✗ FIRST_PARTY_PACKS in {PACK_TABLE.relative_to(ROOT)} names {sorted(set(npm) | set(pypi))}, packs/ holds {folders}")
+    return tuple(npm), tuple(pypi)
+
+
+NPM_PACKS, PYPI_PACKS = read_packs()
+PACKS = tuple(dict.fromkeys(NPM_PACKS + PYPI_PACKS))
 
 # key -> (npm os, npm cpu, npm libc or None, Rust target, wheel platform-tag pattern)
 TARGETS = {
@@ -236,15 +261,18 @@ def assemble(bins: pathlib.Path, wheels: pathlib.Path, out: pathlib.Path) -> Non
     write_json(d / "package.json", m)
     to_pack.append(d)
 
-    # the five rule packs, on both registries, the same files (decision 9)
+    # the rule packs, each on the registries pack.rs names, the same files
+    # on both where it is on both (decision 9, L6 decision 11)
     for name in PACKS:
         src = ROOT / "packs" / name
         pd = stage / f"rules-{name}"
         shutil.copytree(src, pd)
         copy_licences(pd)
-        wheel_for_pack(name, v, pd, pypi_out)  # before package.json joins the folder
-        write_json(pd / "package.json", pack_manifest(name, v))
-        to_pack.append(pd)
+        if name in PYPI_PACKS:
+            wheel_for_pack(name, v, pd, pypi_out)  # before package.json joins the folder
+        if name in NPM_PACKS:
+            write_json(pd / "package.json", pack_manifest(name, v))
+            to_pack.append(pd)
     with concurrent.futures.ThreadPoolExecutor(8) as pool:
         list(pool.map(lambda d: npm_pack(d, npm_out), to_pack))
 
@@ -293,7 +321,7 @@ def check(out: pathlib.Path) -> None:
             bad.append(f"{t.name}: only codelaw may have optionalDependencies")
         if "scripts" in man:
             bad.append(f"{t.name}: has lifecycle scripts")
-    want_npm = {"codelaw"} | {f"@codelaw/cli-{k}" for k in TARGETS} | {f"@codelaw/rules-{n}" for n in PACKS}
+    want_npm = {"codelaw"} | {f"@codelaw/cli-{k}" for k in TARGETS} | {f"@codelaw/rules-{n}" for n in NPM_PACKS}
     if set(npm) != want_npm:
         bad.append(f"npm names: missing {sorted(want_npm - set(npm))}, not allowed {sorted(set(npm) - want_npm)}")
     if "codelaw" in npm and npm["codelaw"].get("codelaw.schema.json") != SCHEMA.read_bytes():
@@ -303,7 +331,7 @@ def check(out: pathlib.Path) -> None:
         if opt != {f"@codelaw/cli-{k}": v for k in TARGETS}:
             bad.append(f"codelaw optionalDependencies are not exactly the eight binaries at {v}: {opt}")
 
-    # PyPI: codelaw ×8 platform wheels and codelaw-rules-* ×5 pure wheels, nothing else, no sdist
+    # PyPI: codelaw ×8 platform wheels and a pure codelaw-rules-* wheel per PyPI pack, nothing else, no sdist
     seen_tags: dict[str, str] = {}
     pypi_packs: dict[str, dict[str, bytes]] = {}
     for w in sorted((out / "pypi").iterdir()):
@@ -347,20 +375,27 @@ def check(out: pathlib.Path) -> None:
                 pypi_packs[short] = {n[len(prefix):]: z.read(n) for n in names if n.startswith(prefix) and not n.endswith("/")}
     if sorted(seen_tags) != sorted(TARGETS):
         bad.append(f"PyPI codelaw wheels: missing {sorted(set(TARGETS) - set(seen_tags))}")
-    if sorted(pypi_packs) != sorted(PACKS):
-        bad.append(f"PyPI packs: missing {sorted(set(PACKS) - set(pypi_packs))}")
+    if sorted(pypi_packs) != sorted(PYPI_PACKS):
+        bad.append(f"PyPI packs: missing {sorted(set(PYPI_PACKS) - set(pypi_packs))}, not allowed {sorted(set(pypi_packs) - set(PYPI_PACKS))}")
 
-    # pack parity: the npm tarball and the wheel hold the same files, byte for byte (L6, SR-RULE-PACKS decision 3)
+    # pack parity: every published copy is packs/<name>/ (+ LICENSE), so a
+    # pack on both registries holds the same files on both, byte for byte
+    # (L6 decision 11, SR-RULE-PACKS decision 3)
     for name in PACKS:
-        a = {k: x for k, x in npm.get(f"@codelaw/rules-{name}", {}).items() if k != "package.json"}
-        b = pypi_packs.get(name, {})
-        if a != b:
-            diff = sorted(set(a) ^ set(b)) or sorted(k for k in a if a[k] != b.get(k))
-            bad.append(f"rules-{name}: npm and PyPI differ ({len(diff)} files, e.g. {diff[:3]})")
         src = ROOT / "packs" / name
         tree = {p.relative_to(src).as_posix() for p in src.rglob("*") if p.is_file()}
-        if set(a) - set(LICENCE_FILES) != tree - set(LICENCE_FILES):
-            bad.append(f"rules-{name}: the npm tarball is not packs/{name}/ (+ LICENSE)")
+        copies = {}
+        if name in NPM_PACKS:
+            copies["npm"] = {k: x for k, x in npm.get(f"@codelaw/rules-{name}", {}).items() if k != "package.json"}
+        if name in PYPI_PACKS:
+            copies["PyPI"] = pypi_packs.get(name, {})
+        for reg, files in copies.items():
+            if set(files) - set(LICENCE_FILES) != tree - set(LICENCE_FILES):
+                bad.append(f"rules-{name}: the {reg} copy is not packs/{name}/ (+ LICENSE)")
+        if len(copies) == 2 and copies["npm"] != copies["PyPI"]:
+            a, b = copies["npm"], copies["PyPI"]
+            diff = sorted(set(a) ^ set(b)) or sorted(k for k in a if a[k] != b.get(k))
+            bad.append(f"rules-{name}: npm and PyPI differ ({len(diff)} files, e.g. {diff[:3]})")
 
     # SHA256SUMS: exactly the files that will be uploaded, each with its digest (W-18)
     sums = out / "SHA256SUMS"
@@ -385,7 +420,7 @@ def check(out: pathlib.Path) -> None:
     if bad:
         fail(f"{len(bad)} release check(s) failed:\n  " + "\n  ".join(bad))
     print(f"✔ {len(npm)} npm packages and {len(seen_tags) + len(pypi_packs)} wheels at {v}: only the SR-PACKAGES names, one version, "
-          "zero dependencies, licensed, one binary per platform, packs equal on both registries, SHA256SUMS true")
+          "zero dependencies, licensed, one binary per platform, each pack its folder on every registry it is on, SHA256SUMS true")
 
 
 def main() -> None:
@@ -412,9 +447,9 @@ def main() -> None:
     elif args.cmd == "check":
         check(args.out)
     else:
-        for n in ["codelaw", *[f"@codelaw/cli-{k}" for k in TARGETS], *[f"@codelaw/rules-{x}" for x in PACKS]]:
+        for n in ["codelaw", *[f"@codelaw/cli-{k}" for k in TARGETS], *[f"@codelaw/rules-{x}" for x in NPM_PACKS]]:
             print(f"npm {n}")
-        for n in ["codelaw", *[f"codelaw-rules-{x}" for x in PACKS]]:
+        for n in ["codelaw", *[f"codelaw-rules-{x}" for x in PYPI_PACKS]]:
             print(f"pypi {n}")
 
 

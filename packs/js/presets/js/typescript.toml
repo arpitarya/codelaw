@@ -1,0 +1,7 @@
+description = "The four core rules typescript-eslint's eslint-recommended switches on for TypeScript (8.71.2); use with codelaw:ts/recommended"
+
+[rules]
+"js/no-var" = "error"
+"js/prefer-const" = "error"
+"js/prefer-rest-params" = "error"
+"js/prefer-spread" = "error"

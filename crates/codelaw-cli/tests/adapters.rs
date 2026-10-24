@@ -108,7 +108,7 @@ fn fix_applies_the_adapters_safe_edits_and_dry_run_does_not() {
 fn a_ported_rule_and_its_adapter_report_once() {
     let d = project("ported", "extends = [\"codelaw:py/recommended\"]\npreview = true\n[rules]\n\"py/unused-import\" = \"error\"\n");
     let packs = Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().join("packs/python");
-    copy_dir(&packs, &d.join("node_modules/@codelaw/rules-python"));
+    copy_dir(&packs, &d.join(".venv/lib/python3.12/site-packages/codelaw_rules_python")); // PyPI only (L6 decision 11)
     let (_, out, err) = codelaw(&d, &["check", "--format", "json", "--no-cache"]);
     let found = rules(&diagnostics(&out)).into_iter().map(str::to_owned).collect::<Vec<_>>();
     assert!(found.contains(&"py/unused-import".to_owned()), "{found:?}{err}");

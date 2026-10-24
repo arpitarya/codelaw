@@ -31,12 +31,18 @@ entry.**
 the `codelaw` binary with `check`, `fix`, `format`, `test`, `rules`,
 `explain`, `tree`, `new-rule`, `init`, `cache`, `graph`, `config`, `match`,
 `hook`, `sync-agents`, `baseline`, `deprecate`, `daemon`, `bench`, `mcp`,
-`lsp`. Five packs, 419 rules, 3,949 example checks, every pack green; every
-rule `preview`. W-01–W-02, W-06–W-17, W-22–W-23 are closed and archived.
+`lsp`. **Nine packs since W-31 (2026-10-24)** — `js`, `ts`, `react`,
+`node`, `stencil`, `html`, `css`, `python`, `data`; eight on npm, six on PyPI,
+the split in `FIRST_PARTY_PACKS` (pack.rs) — 419 rules, 3,949 example checks,
+every pack green; every rule `preview`. W-01–W-02, W-06–W-17, W-22–W-23 are closed and archived.
 Verified on `main` `f75c848` in a cloud clone (rustc 1.97 — the pinned 1.99.1
 cannot be downloaded there): clippy clean, `cargo test --workspace` green,
-every pack 0 failed. **Nothing is published**; `main` has not been pushed
-since the 2026-10-21 merges, so CI has never run on it.
+every pack 0 failed. **0.1.0 is on npm** (2026-10-24, W-29: the five-pack
+layout, 14 names, trusted publishing bound), published by hand from a
+failed CI run's `dist`; **PyPI has nothing** and starts at 0.2.0 (W-30).
+**W-31 is uncommitted in Arpit's tree** until he pushes; its open hand steps
+are unpublishing `@codelaw/rules-python` before 2026-10-27, then 0.2.0, which
+first-publishes `rules-ts`, `-react`, `-node`, `-stencil` by hand.
 
 **What the 2026-10-22 review found (filed 2026-10-24 as W-24–W-28):** CI
 cannot pass on `main` as it stands — `bench/mod.rs`'s `not(unix)` `wait`

@@ -22,10 +22,12 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed | age |
 |---|---|---|
-| 🔴 **The one-time registry setup, steps 4 and 5** (step 1, the `@codelaw` npm org, exists — checked 2026-10-24) — the six PyPI publishers (trusted on the existing projects, W-30), the `npm`/`pypi` environments ([`RELEASING.md`](../RELEASING.md) §One time). Steps 2–3 and the ruling to publish can follow: W-07, W-08 and W-09 have landed, and `law-gate.py` lists nothing (2026-10-21) | 2026-10-20 | 4 d |
-| ↳ **blocks:** W-04 step 5 (the first release) · W-03 step 6 · W-30 step 4 | | |
+| 🔴 **The one-time registry setup, steps 4 and 5** — the seven PyPI pending publishers (`codelaw` and six packs, `codelaw-rules-react` among them since W-31), the `npm`/`pypi` environments ([`RELEASING.md`](../RELEASING.md) §One time). Steps 1–3 are done for npm (2026-10-24, W-29), and the decider gave the go by publishing 0.1.0 there | 2026-10-20 | 4 d |
+| ↳ **blocks:** W-04 step 5 (the first release on both registries) · W-03 step 6 · W-30 step 4 | | |
 | 🔴 Create the `npm` and `pypi` environments and give each one tag rule `v*` and no branch rule (GitHub Settings → Environments; [`RELEASING.md`](../RELEASING.md) step 5). Checked 2026-10-22: neither exists yet; an agent's attempt through the browser was refused by the permission check, so it stays the decider's | 2026-10-20 | 4 d |
 | ↳ **blocks:** W-18 | | |
+| 🔴 **W-32: name the Redux Toolkit and React Query packs and pick the Redux source** — proposed `@codelaw/rules-redux` and `@codelaw/rules-query`, rules from the official Redux Style Guide (no official RTK ESLint plugin exists) ([W-32](open/W-32-redux-and-query-packs.md) §The decider decides) | 2026-10-24 | 0 d |
+| ↳ **blocks:** W-32 | | |
 | 🔴 Set L8's budgets: after the `perf` job's first run on `main`, apply min(design target, 1.5 × worst p95) to the CI runner's numbers and rule each `budget` in `perf/budgets.toml`; name the reference machine ([W-19](open/W-19-performance-budgets.md)) | 2026-10-22 | 2 d |
 | ↳ **blocks:** W-19 DoD 3 · the perf gate binding anything | | |
 
@@ -37,13 +39,17 @@ here. Read that record before changing anything below it.
 
 🔴 **W-04** `agent` The release pipeline, steps 1–4 done 2026-10-20. Step 5, the first release: blocked on the registry setup above; the engine is complete since 2026-10-21 (L7, L6 decision 3). Filed by Arpit (Claude Code). [detail](open/W-04-release-pipeline.md)
 
-🔴 **W-03** `agent` The five rule packs: steps 2–5 done (419 rules), packaging done. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
+🔴 **W-03** `agent` The rule packs: steps 2–5 done (419 rules), packaging done; nine packs since W-31. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
 
 🟢 **W-21** `agent` Engine gaps: all three steps landed 2026-10-22, the CSS grammar as an in-tree fork (the decider's ruling); left: file the upstream patch, and whether DoD 3 holds while CSS rules read text. Filed by Arpit (Cowork). [detail](open/W-21-pack-engine-gaps.md)
 
-🟡 **W-29** `arpit` The first npm publish, by hand from Arpit's machine: 8 `@codelaw/cli-*`, 5 `@codelaw/rules-*`, then `codelaw`, from CI's `dist`; waiting on W-24 (the Windows build) and the push. Filed by Arpit (Claude Code). [detail](open/W-29-first-npm-publish.md)
+🟢 **W-29** `arpit` The first npm publish: 14 names live at 0.1.0, trusted publishing bound (2026-10-24), from the `dist` of a failed CI run; left: the install check and the records (DoD 2, 4). Filed by Arpit (Claude Code). [detail](open/W-29-first-npm-publish.md)
 
-🟡 **W-30** `arpit` The first PyPI publish, by hand: `codelaw` (8 wheels) and 5 `codelaw-rules-*` from the same `dist` with `twine`, then trusted publishers on the six projects; waiting on W-24. Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
+🟡 **W-30** `arpit` The first PyPI publish: `codelaw` (8 wheels) and the six `codelaw-rules-*` of W-31's layout, at 0.2.0 rather than 0.1.0; waiting on W-31 (0.2.0). Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
+
+🟢🧨 **W-31** `arpit` Eight packs on npm, six on PyPI, `rules-js` split in five: landed 2026-10-24. Left: unpublish `@codelaw/rules-python` before 2026-10-27 (npm's 72 h window), push, 0.2.0. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
+
+🔴 **W-32** `agent` A Redux Toolkit pack and a React Query pack, npm only: waiting on the decider's naming and Redux-source ruling (inbox). Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
 
 🟢🧨 **W-24** `agent` CI cannot pass on `main`: the Windows `bench` build fixed 2026-10-24 (unproven until the push); left: the guard replay on nine as-is merges, cache keys that miss test inputs, the law gate on `--report`. Filed by Arpit (Claude Code). [detail](open/W-24-ci-green-on-main.md)
 

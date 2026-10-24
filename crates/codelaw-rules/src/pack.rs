@@ -12,19 +12,71 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-/// The five first-party packs: short name, npm name, PyPI name, module.
-pub const FIRST_PARTY_PACKS: &[(&str, &str, &str, &str)] = &[
-    ("js", "@codelaw/rules-js", "codelaw-rules-js", "codelaw_rules_js"),
-    ("html", "@codelaw/rules-html", "codelaw-rules-html", "codelaw_rules_html"),
-    ("css", "@codelaw/rules-css", "codelaw-rules-css", "codelaw_rules_css"),
-    ("python", "@codelaw/rules-python", "codelaw-rules-python", "codelaw_rules_python"),
-    ("data", "@codelaw/rules-data", "codelaw-rules-data", "codelaw_rules_data"),
+/// One first-party pack and where it is published (L6 decision 11,
+/// SR-RULE-PACKS decision 2). A pack is published on a registry only when
+/// that registry's name is `Some`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct FirstPartyPack {
+    /// The folder under `packs/` and the name `extends` resolves to.
+    pub short: &'static str,
+    /// `name` in its `codelaw-pack.toml`: the npm name when it is on npm,
+    /// else the PyPI name.
+    pub manifest: &'static str,
+    pub npm: Option<&'static str>,
+    pub pypi: Option<&'static str>,
+}
+
+impl FirstPartyPack {
+    /// The Python module a PyPI copy installs as.
+    pub fn module(&self) -> Option<String> {
+        self.pypi.map(|d| d.replace('-', "_"))
+    }
+
+    /// The name on one registry: `npm` or `pypi`.
+    pub fn on(&self, registry: &str) -> Option<&'static str> {
+        match registry {
+            "npm" => self.npm,
+            "pypi" => self.pypi,
+            _ => None,
+        }
+    }
+}
+
+const fn both(short: &'static str, npm: &'static str, pypi: &'static str) -> FirstPartyPack {
+    FirstPartyPack { short, manifest: npm, npm: Some(npm), pypi: Some(pypi) }
+}
+
+const fn npm_only(short: &'static str, npm: &'static str) -> FirstPartyPack {
+    FirstPartyPack { short, manifest: npm, npm: Some(npm), pypi: None }
+}
+
+const fn pypi_only(short: &'static str, pypi: &'static str) -> FirstPartyPack {
+    FirstPartyPack { short, manifest: pypi, npm: None, pypi: Some(pypi) }
+}
+
+/// The nine first-party packs: eight on npm, six on PyPI (the decider's
+/// ruling of 2026-10-24). `scripts/package.py` reads this table, so it is
+/// the one list of what is published where.
+pub const FIRST_PARTY_PACKS: &[FirstPartyPack] = &[
+    both("js", "@codelaw/rules-js", "codelaw-rules-js"),
+    npm_only("ts", "@codelaw/rules-ts"),
+    both("react", "@codelaw/rules-react", "codelaw-rules-react"),
+    npm_only("node", "@codelaw/rules-node"),
+    npm_only("stencil", "@codelaw/rules-stencil"),
+    both("html", "@codelaw/rules-html", "codelaw-rules-html"),
+    both("css", "@codelaw/rules-css", "codelaw-rules-css"),
+    pypi_only("python", "codelaw-rules-python"),
+    both("data", "@codelaw/rules-data", "codelaw-rules-data"),
 ];
 
 /// The fixed namespace-to-pack map (decision 4).
 pub fn namespace_pack(namespace: &str) -> Option<&'static str> {
     Some(match namespace {
-        "js" | "ts" | "react" | "node" | "stencil" => "js",
+        "js" => "js",
+        "ts" => "ts",
+        "react" => "react",
+        "node" => "node",
+        "stencil" => "stencil",
         "html" => "html",
         "css" => "css",
         "py" => "python",
@@ -33,8 +85,21 @@ pub fn namespace_pack(namespace: &str) -> Option<&'static str> {
     })
 }
 
-fn first_party(short: &str) -> &'static (&'static str, &'static str, &'static str, &'static str) {
-    FIRST_PARTY_PACKS.iter().find(|p| p.0 == short).expect("a first-party pack")
+/// The first-party pack with this short name.
+pub fn first_party(short: &str) -> &'static FirstPartyPack {
+    FIRST_PARTY_PACKS.iter().find(|p| p.short == short).expect("a first-party pack")
+}
+
+/// The first-party pack published under this npm name.
+pub fn first_party_npm(name: &str) -> Option<&'static FirstPartyPack> {
+    FIRST_PARTY_PACKS.iter().find(|p| p.npm == Some(name))
+}
+
+/// The first-party pack published under this PyPI name, in any spelling
+/// PEP 503 treats as the same.
+pub fn first_party_pypi(name: &str) -> Option<&'static FirstPartyPack> {
+    let norm = name.to_ascii_lowercase().replace(['_', '.'], "-");
+    FIRST_PARTY_PACKS.iter().find(|p| p.pypi == Some(norm.as_str()))
 }
 
 /// One `extends` entry.
@@ -186,16 +251,25 @@ impl PackSearch {
         self.site_packages.iter().map(|sp| sp.join(&module)).find(|p| p.join("codelaw-pack.toml").is_file())
     }
 
-    /// The npm copy first, then the Python one (decision 4).
+    /// The npm copy first, then the Python one (decision 4), each only on
+    /// a registry the pack is published on.
     pub fn find_first_party(&self, short: &str) -> Option<PathBuf> {
-        let (_, npm, pypi, _) = first_party(short);
-        self.find_npm(npm).or_else(|| self.find_pypi(pypi))
+        let p = first_party(short);
+        p.npm.and_then(|n| self.find_npm(n)).or_else(|| p.pypi.and_then(|d| self.find_pypi(d)))
     }
 
-    /// The error for a missing first-party pack, naming both installs.
+    /// The error for a missing first-party pack, naming every install it
+    /// has, and saying so when it is on one registry only.
     pub fn missing_first_party(spec: &str, short: &str) -> String {
-        let (_, npm, pypi, _) = first_party(short);
-        format!("`{spec}` needs the rule pack {npm} (npm) or {pypi} (PyPI); install it with `npm i -D {npm}` or `pip install {pypi}`")
+        let p = first_party(short);
+        match (p.npm, p.pypi) {
+            (Some(npm), Some(pypi)) => {
+                format!("`{spec}` needs the rule pack {npm} (npm) or {pypi} (PyPI); install it with `npm i -D {npm}` or `pip install {pypi}`")
+            }
+            (Some(npm), None) => format!("`{spec}` needs the rule pack {npm}, which is published on npm only; install it with `npm i -D {npm}`"),
+            (None, Some(pypi)) => format!("`{spec}` needs the rule pack {pypi}, which is published on PyPI only; install it with `pip install {pypi}`"),
+            (None, None) => unreachable!("every first-party pack is on a registry"),
+        }
     }
 }
 
@@ -337,7 +411,7 @@ pub fn load_pack_from(dir: &Path, first_party_origin: bool) -> Result<RulePack, 
             errors.push(LoadError::new(Some(manifest_path.clone()), format!("unknown language `{l}` in `languages`")));
         }
     }
-    let first_party = FIRST_PARTY_PACKS.iter().find(|p| p.1 == manifest.name).map(|p| p.0).filter(|_| first_party_origin);
+    let first_party = FIRST_PARTY_PACKS.iter().find(|p| p.manifest == manifest.name).map(|p| p.short).filter(|_| first_party_origin);
 
     let rules = read_rules(&dir.join("rules"), &mut errors);
     for rule in &rules {
@@ -405,8 +479,10 @@ mod tests {
     fn extends_specs() {
         assert_eq!(
             ExtendsSpec::parse("codelaw:react/recommended"),
-            Ok(ExtendsSpec::FirstParty { pack: "js", preset: "react/recommended".into() })
+            Ok(ExtendsSpec::FirstParty { pack: "react", preset: "react/recommended".into() })
         );
+        assert_eq!(ExtendsSpec::parse("codelaw:ts/recommended"), Ok(ExtendsSpec::FirstParty { pack: "ts", preset: "ts/recommended".into() }));
+        assert_eq!(ExtendsSpec::parse("codelaw:py/recommended"), Ok(ExtendsSpec::FirstParty { pack: "python", preset: "py/recommended".into() }));
         assert_eq!(ExtendsSpec::parse("codelaw:md/recommended"), Ok(ExtendsSpec::FirstParty { pack: "data", preset: "md/recommended".into() }));
         assert!(ExtendsSpec::parse("codelaw:jss/recommended").unwrap_err().contains("did you mean `js`"));
         assert_eq!(ExtendsSpec::parse("npm:@acme/x"), Ok(ExtendsSpec::Npm("@acme/x".into())));
@@ -417,5 +493,51 @@ mod tests {
     fn missing_pack_names_both_installs() {
         let m = PackSearch::missing_first_party("codelaw:js/recommended", "js");
         assert!(m.contains("npm i -D @codelaw/rules-js") && m.contains("pip install codelaw-rules-js"), "{m}");
+    }
+
+    #[test]
+    fn a_one_registry_pack_names_only_that_registry() {
+        let m = PackSearch::missing_first_party("codelaw:ts/recommended", "ts");
+        assert!(m.contains("npm only") && m.contains("npm i -D @codelaw/rules-ts") && !m.contains("pip"), "{m}");
+        let m = PackSearch::missing_first_party("codelaw:py/recommended", "python");
+        assert!(m.contains("PyPI only") && m.contains("pip install codelaw-rules-python") && !m.contains("npm"), "{m}");
+    }
+
+    #[test]
+    fn eight_packs_on_npm_and_six_on_pypi() {
+        // The decider's ruling of 2026-10-24 (L6 decision 11).
+        let npm: Vec<&str> = FIRST_PARTY_PACKS.iter().filter(|p| p.npm.is_some()).map(|p| p.short).collect();
+        let pypi: Vec<&str> = FIRST_PARTY_PACKS.iter().filter(|p| p.pypi.is_some()).map(|p| p.short).collect();
+        assert_eq!(npm, ["js", "ts", "react", "node", "stencil", "html", "css", "data"]);
+        assert_eq!(pypi, ["js", "react", "html", "css", "python", "data"]);
+        for p in FIRST_PARTY_PACKS {
+            assert_eq!(Some(p.manifest), p.npm.or(p.pypi), "{}", p.short);
+            if let Some(n) = p.npm {
+                assert_eq!(n, format!("@codelaw/rules-{}", p.short));
+            }
+            if let Some(d) = p.pypi {
+                assert_eq!(d, format!("codelaw-rules-{}", p.short));
+            }
+        }
+        // Every namespace a first-party pack owns maps to a pack in the table.
+        for ns in ["js", "ts", "react", "node", "stencil", "html", "css", "py", "data", "md", "json", "yaml", "toml"] {
+            let short = namespace_pack(ns).unwrap();
+            assert!(FIRST_PARTY_PACKS.iter().any(|p| p.short == short), "{ns}");
+        }
+    }
+
+    #[test]
+    fn every_pack_folder_loads_as_its_first_party_pack() {
+        let packs = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packs");
+        let mut folders: Vec<String> = fs::read_dir(&packs).unwrap().flatten().filter(|e| e.path().is_dir()).map(|e| e.file_name().to_string_lossy().into_owned()).collect();
+        folders.sort();
+        let mut table: Vec<&str> = FIRST_PARTY_PACKS.iter().map(|p| p.short).collect();
+        table.sort();
+        assert_eq!(folders, table, "packs/ and FIRST_PARTY_PACKS name the same packs");
+        for p in FIRST_PARTY_PACKS {
+            let pack = load_pack(&packs.join(p.short)).unwrap_or_else(|e| panic!("{}: {e:?}", p.short));
+            assert_eq!(pack.manifest.name, p.manifest);
+            assert!(pack.first_party, "{}", p.short);
+        }
     }
 }

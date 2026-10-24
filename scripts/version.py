@@ -3,7 +3,7 @@
 
 The version lives in ONE file: `Cargo.toml` [workspace.package] `version`.
 Every npm and PyPI manifest is generated from it by `scripts/package.py`; the
-only other copies are the five `packs/*/codelaw-pack.toml` files, which this
+only other copies are the `packs/*/codelaw-pack.toml` files, which this
 script writes and checks.
 
     python3 scripts/version.py                     print the version

@@ -1,0 +1,10 @@
+@codelaw/rules-node
+
+data/node/deprecated-api.json was written for this pack: the Node.js APIs that
+the Node.js documentation deprecates (https://nodejs.org/api/deprecations.html),
+each with its documented replacement, in codelaw's own words. No text or code
+is copied from Node.js.
+
+The rules are reimplementations written for codelaw. Their `ported_from:`
+fields name the eslint-plugin-n rules (MIT License) whose documented behaviour
+they reproduce; no eslint-plugin-n code or documentation text is included.

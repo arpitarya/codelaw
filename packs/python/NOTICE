@@ -1,4 +1,4 @@
-@codelaw/rules-python / codelaw-rules-python
+codelaw-rules-python
 
 data/python/stdlib.json lists the top-level module names of the Python
 standard library: the union of `sys.stdlib_module_names` from CPython 3.10,

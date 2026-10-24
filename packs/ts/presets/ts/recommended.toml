@@ -1,4 +1,4 @@
-description = "typescript-eslint's recommended preset (8.71.2, not type-checked), reimplemented, with the core rules it switches on for TypeScript"
+description = "typescript-eslint's recommended preset (8.71.2, not type-checked), reimplemented; the core rules it switches on for TypeScript are codelaw:js/typescript"
 
 [rules]
 "ts/ban-ts-comment" = "error"
@@ -21,7 +21,3 @@ description = "typescript-eslint's recommended preset (8.71.2, not type-checked)
 "ts/prefer-as-const" = "error"
 "ts/prefer-namespace-keyword" = "error"
 "ts/triple-slash-reference" = "error"
-"js/no-var" = "error"
-"js/prefer-const" = "error"
-"js/prefer-rest-params" = "error"
-"js/prefer-spread" = "error"

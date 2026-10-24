@@ -3,13 +3,13 @@ type: Standing Record
 kind: law
 name: SR-LAW-6
 title: "SR-LAW-6 (0008) — L6 — one release, two packages: PyPI and npm"
-description: "codelaw ships as a Python package and a Node package, released together under one version, each a complete engine, with its rules as five packs on both registries; both produce byte-identical results."
+description: "codelaw ships as a Python package and a Node package, released together under one version, each a complete engine, with its rules as nine packs — eight on npm, six on PyPI, each registry carrying the packs its users install; both engines produce byte-identical results."
 status: accepted
 date: 2026-10-18
 feature: "how codelaw is packaged and released"
 owns: []
 laws: [L0, L2, L3, L6]
-timestamp: 2026-10-22T12:00:00Z
+timestamp: 2026-10-24T08:00:00Z
 content_sha: ""
 ---
 
@@ -20,9 +20,9 @@ content_sha: ""
 
 **The law (L6).**
 
-> **codelaw is published as a Python package on PyPI and a Node package on npm, both named `codelaw`, in the same release, under the same version number.** Each `codelaw` package is **complete on its own as an engine**: it needs no runtime of the other language, has no optional extras, and contains every language, the formatter, the MCP server and the LSP. **Its rules ship as five rule packs, each published on both registries in the same release under the same version: `@codelaw/rules-<name>` on npm and `codelaw-rules-<name>` on PyPI.** For the same inputs, the two registries' packages produce **byte-identical output**. **A release that reaches one registry and not the other is a failed release.** **On npm, the only unscoped package is `codelaw`; every other npm package is `@codelaw/<name>`. On PyPI, the engine is `codelaw` and the only other codelaw distributions are the five `codelaw-rules-<name>` packs; platform builds are wheels, never separate packages.**
+> **codelaw is published as a Python package on PyPI and a Node package on npm, both named `codelaw`, in the same release, under the same version number.** Each `codelaw` package is **complete on its own as an engine**: it needs no runtime of the other language, has no optional extras, and contains every language, the formatter, the MCP server and the LSP. **Its rules ship as nine rule packs, published in the same release under the same version: eight on npm as `@codelaw/rules-<name>` (`js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `data`) and six on PyPI as `codelaw-rules-<name>` (`js`, `react`, `html`, `css`, `python`, `data`); each registry carries only the packs its users install.** For the same inputs and the same packs, the two registries' packages produce **byte-identical output**. **A release that reaches one registry and not the other is a failed release.** **On npm, the only unscoped package is `codelaw`; every other npm package is `@codelaw/<name>`. On PyPI, the engine is `codelaw` and the only other codelaw distributions are the six `codelaw-rules-<name>` packs; platform builds are wheels, never separate packages.**
 
-**Ruled by Arpit, 2026-10-18;** amended by his ruling of 2026-10-19: rules ship as five separately published packs, mirrored on both registries, apart from the engine ([SR-RULE-PACKS](0101_rule-packs.md)).
+**Ruled by Arpit, 2026-10-18;** amended by his ruling of 2026-10-19: rules ship as five separately published packs, mirrored on both registries, apart from the engine ([SR-RULE-PACKS](0101_rule-packs.md)); amended again by his ruling of 2026-10-24 (W-31): *"The ones that are going to be used in npm and the ones that are going to be used in PyPI should only be published"* — `rules-js` splits into `js`, `ts`, `react`, `node` and `stencil`, npm carries eight packs and PyPI six.
 
 **Why it exists.** [L3](0005_LAW-3-languages.md) promises Python-only, JS-only and mixed repos. That promise is only real if each kind of team can install codelaw with the package manager it already uses, and gets the same tool.
 
@@ -33,9 +33,9 @@ flowchart LR
     B["one source tree"] --> X["native binary per platform"]
     X --> N["npm: codelaw"]
     X --> Y["PyPI: codelaw"]
-    B --> R["five rule packs"]
-    R --> N2["npm: @codelaw/rules-*"]
-    R --> Y2["PyPI: codelaw-rules-*"]
+    B --> R["nine rule packs"]
+    R --> N2["npm: @codelaw/rules-* (8)"]
+    R --> Y2["PyPI: codelaw-rules-* (6)"]
     N --> O["byte-identical output"]
     Y --> O
     N2 --> O
@@ -48,8 +48,8 @@ flowchart LR
 ```text
    source --> binary per platform --+--> npm  codelaw ----------+
           |                         +--> PyPI codelaw ----------+
-          +-> five rule packs ------+--> npm  @codelaw/rules-* -+--> identical output
-                                    +--> PyPI codelaw-rules-* --+
+          +-> nine rule packs ------+--> npm  @codelaw/rules-* (8) -+--> identical output
+                                    +--> PyPI codelaw-rules-* (6) --+    (same packs)
 ```
 
 </details>
@@ -89,7 +89,7 @@ flowchart LR
    npm ships them as per-platform `optionalDependencies` (the Biome and oxlint pattern). PyPI ships them as platform wheels (the Ruff pattern).
 7. **An unsupported platform fails clearly.** It stops with an error that names the supported platforms. It never silently builds from source; no sdist that needs a Rust toolchain is published.
 8. **Host floors:** Python ≥ 3.11 and Node ≥ 22. **Ruled by Arpit, 2026-10-19:** the oldest lines still supported upstream when codelaw first ships (Python 3.10 reaches end of life in October 2026; Node 18 and 20 already have). Each package declares its floor (`requires-python`, `engines.node`).
-9. **Released together.** One release job publishes the engine and the five rule packs (decision 11) to both registries. If any publish fails:
+9. **Released together.** One release job publishes the engine to both registries and each rule pack to the registries decision 11 names. If any publish fails:
    - the job fails;
    - everything already published in that release is yanked (PyPI) or deprecated (npm);
    - the version is not announced.
@@ -98,25 +98,33 @@ flowchart LR
 
 10. **Package names.**
     - **npm:** exactly one unscoped package, `codelaw`. Everything else lives under the `@codelaw` scope, for example the per-platform binaries `@codelaw/cli-<os>-<arch>` and the rule packs `@codelaw/rules-<name>` ([SR-PACKAGES](0107_packages.md)).
-    - **PyPI:** one engine distribution, `codelaw`, whose platform builds are wheels of it, plus the five rule packs `codelaw-rules-<name>` (decision 11). PyPI has no scopes, so no other codelaw distribution is published.
-    - The `@codelaw` npm organisation, the `codelaw` names on both registries and the five `codelaw-rules-<name>` names on PyPI are reserved before the first release.
-11. **Rule packs:** `js`, `html`, `css`, `python` and `data` ([SR-RULE-PACKS](0101_rule-packs.md)). **Ruled by Arpit, 2026-10-19.**
-    - Each is pure data (rule files, presets, data tables): one tarball on npm and one `py3-none-any` wheel on PyPI, holding the same files.
+    - **PyPI:** one engine distribution, `codelaw`, whose platform builds are wheels of it, plus the six rule packs `codelaw-rules-<name>` (decision 11). PyPI has no scopes, so no other codelaw distribution is published.
+    - The `@codelaw` npm organisation, the `codelaw` names on both registries and the six `codelaw-rules-<name>` names on PyPI are reserved before the first release.
+11. **Rule packs** ([SR-RULE-PACKS](0101_rule-packs.md)). **Ruled by Arpit, 2026-10-19** (five packs on both registries); **amended 2026-10-24**:
+
+    | registry | packs |
+    |---|---|
+    | npm, `@codelaw/rules-<name>` | `js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `data` |
+    | PyPI, `codelaw-rules-<name>` | `js`, `react`, `html`, `css`, `python`, `data` |
+
+    - Each is pure data (rule files, presets, data tables): one tarball on npm, one `py3-none-any` wheel on PyPI, or both. **A pack on both registries holds the same files on both.**
     - Each declares `min_codelaw` and shares the engine's version (decision 9).
     - A Python-only repo installs `codelaw` and `codelaw-rules-python` (plus `codelaw-rules-data` for its TOML, YAML and Markdown) from PyPI and never touches npm. A Node-only repo does the same from npm ([L3](0005_LAW-3-languages.md) decision 2).
+    - **What each registry leaves out is the decider's accepted cost:** an npm-only install has no Python rules, and a PyPI-only install has no `ts/*`, `node/*` or `stencil/*` rules. The engine on either registry is still complete (decision 3): it formats and parses every language, and its TypeScript gets the `js` rules that declare it.
 
 #### How L6 is enforced
 
 - **Completeness gate:** `scripts/law-gate.py` refuses a release whose binary has no `format`, `mcp` or `lsp` (decision 3), in `publish.yml` and before the one-time hand publish ([SR-PACKAGES](0107_packages.md) decision 11).
 - **Version check:** CI fails if `pyproject.toml`, `package.json` and the binary's `--version` disagree.
 - **Install matrix:** on every release candidate, a clean container per platform installs from each registry (a staging index first) and runs the [L3](0005_LAW-3-languages.md) combined fixture. The npm and PyPI outputs must be byte-equal.
-- **Pack parity:** each pack's npm tarball and PyPI wheel hold the same files, byte for byte, and the install matrix installs the packs for each fixture's languages.
+- **Pack parity:** every published copy of a pack holds `packs/<name>/`, byte for byte, so a pack on both registries is the same on both; the names on each registry are decision 11's table, read from `FIRST_PARTY_PACKS` in `crates/codelaw-rules/src/pack.rs`; and the install matrix installs the packs for each fixture's languages.
 - **Runtime fence:** the PyPI package is installed and run with no Node on the PATH, and the npm package with no Python.
 - **Dependency check:** both published manifests are checked for zero runtime dependencies (apart from the npm per-platform binary packages).
 
 ### Consequences
 
-- **Every release builds a binary for each platform and publishes the engine and the five packs to both registries.** One failed publish fails the release.
+- **Every release builds a binary for each platform and publishes the engine to both registries, eight packs to npm and six to PyPI.** One failed publish fails the release.
+- **The first npm publish (0.1.0, 2026-10-24, W-29) predates the split:** it carried the five packs, so `@codelaw/rules-python` is unpublished from npm by hand and 0.2.0 is the first release in the nine-pack layout ([W-31](../work/open/W-31-registry-pack-split.md)).
 - **`codelaw` installed alone lints nothing:** rules come from packs, and `codelaw init` installs them ([SR-RULE-PACKS](0101_rule-packs.md) decision 6).
 - **The wrappers stay thin:** zero runtime dependencies, which also keeps them trivially within [L2](0004_LAW-2-foss-dependencies.md).
 - **Checked since 2026-10-20 by every `ci.yml` run:** the version check (`scripts/version.py --check`, with the binary on every platform), the dependency check and pack parity (`scripts/package.py check`), and the runtime fence and npm-vs-PyPI byte-equality (`scripts/smoke.sh`). **The install matrix and the runtime fence run on all eight platforms** (`ci.yml`'s `smoke` job, added by W-18 on 2026-10-20 and first proven by its first CI run; the musl two in a clean Alpine container). **Since 2026-10-22 (W-18) they install from a staging index**: `smoke.sh` publishes the built files to a throwaway npm registry and PyPI simple index on localhost and installs `codelaw` from it by name ([SR-PACKAGES](0107_packages.md) decision 11). Proven on darwin-arm64 by hand; the eight platforms are proven by the first CI run that carries it.
@@ -126,6 +134,7 @@ flowchart LR
 - **npm only, with a Python shim that needs Node:** rejected. It breaks Python-only repos.
 - **A pure-Python and a pure-JS implementation:** rejected. Two engines drift apart.
 - **Every built-in rule inside the `codelaw` package** (this law's 2026-10-18 text): superseded by the decider's ruling of 2026-10-19. Rules ship as packs.
+- **Every pack on both registries** (this law's 2026-10-19 text): superseded by the decider's ruling of 2026-10-24. Each registry carries the packs its users install.
 - **An sdist that builds from source:** rejected. It means a silent Rust compile on unsupported platforms.
 
 ### Reference (required)
@@ -136,9 +145,9 @@ flowchart LR
 
 ### Veto condition
 
-**Reopen this decision if:** the npm and PyPI packages (engine or pack) carry different versions, either engine package depends on the other, or a pack's npm and PyPI contents differ.
+**Reopen this decision if:** the npm and PyPI packages (engine or pack) carry different versions, either engine package depends on the other, a pack on both registries holds different files on each, or a registry carries a pack decision 11 does not name.
 
-**How to check it:** `python3 scripts/package.py check dist` — one version, no engine depending on the other, each pack byte-equal on both registries.
+**How to check it:** `python3 scripts/package.py check dist` — one version, no engine depending on the other, each published pack its `packs/` folder byte for byte, and each registry's names exactly decision 11's.
 
 ---
 
@@ -147,5 +156,7 @@ flowchart LR
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
 **Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PACKAGES](0107_packages.md) · [SR-LAW-3](0005_LAW-3-languages.md)
+
+**Work items** — [W-31](../work/open/W-31-registry-pack-split.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

@@ -1,0 +1,10 @@
+@codelaw/rules-react / codelaw-rules-react
+
+data/react/dom-property-aliases.json was written for this pack: HTML attribute
+names and the React DOM prop names that replace them (`class` -> `className`),
+as React documents them. No React code is included.
+
+The rules are reimplementations written for codelaw. Their `ported_from:`
+fields name the eslint-plugin-react and eslint-plugin-react-hooks rules (MIT
+License) whose documented behaviour they reproduce; no code or documentation
+text from either is included.

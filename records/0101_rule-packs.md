@@ -2,24 +2,24 @@
 type: Standing Record
 kind: component
 name: SR-RULE-PACKS
-title: "SR-RULE-PACKS (0101) — five first-party rule packs published apart from the engine; team packs and local rules on the same footing"
-description: "codelaw's own rules ship as five separately published packs — js, html, css, python, data — on both npm (@codelaw/rules-*) and PyPI (codelaw-rules-*), released with the engine at one version; the engine carries no rules of its own beyond meta diagnostics; teams publish packs the same way, and project rules live in .codelaw/rules."
+title: "SR-RULE-PACKS (0101) — nine first-party rule packs published apart from the engine, eight on npm and six on PyPI; team packs and local rules on the same footing"
+description: "codelaw's own rules ship as nine separately published packs — js, ts, react, node, stencil, html, css, python, data — eight on npm (@codelaw/rules-*) and six on PyPI (codelaw-rules-*), released with the engine at one version; the engine carries no rules of its own beyond meta diagnostics; teams publish packs the same way, and project rules live in .codelaw/rules."
 status: accepted
 date: 2026-10-18
 feature: "predefined rules and rule packs"
 owns:
   - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-22T20:00:00Z
+timestamp: 2026-10-24T08:00:00Z
 content_sha: ""
 ---
 
 
-# SR-RULE-PACKS — five first-party rule packs published apart from the engine; team packs and local rules on the same footing
+# SR-RULE-PACKS — nine first-party rule packs published apart from the engine, eight on npm and six on PyPI; team packs and local rules on the same footing
 
 ## §1 — For humans
 
-**The decision in one line.** The engine package, `codelaw`, carries **no rules**. codelaw's own rules ship as **five rule packs**. Each pack is published on **npm as `@codelaw/rules-<name>`** and on **PyPI as `codelaw-rules-<name>`**, in the same release and at the same version as the engine. `codelaw init` installs the packs for the languages it finds. Teams publish their own packs the same way, and project rules stay in `.codelaw/rules/`.
+**The decision in one line.** The engine package, `codelaw`, carries **no rules**. codelaw's own rules ship as **nine rule packs**. A pack is published on **npm as `@codelaw/rules-<name>`**, on **PyPI as `codelaw-rules-<name>`**, or on both, as §1's table says, in the same release and at the same version as the engine. `codelaw init` installs the packs for the languages it finds. Teams publish their own packs the same way, and project rules stay in `.codelaw/rules/`.
 
 **Ruled by Arpit, 2026-10-19:**
 - the packs are separately published, not just separate in the source tree;
@@ -29,18 +29,30 @@ content_sha: ""
 
 This record was rewritten to that ruling and then accepted ("go with the recommendations").
 
-| Package (npm · PyPI) | Languages | Presets |
-|---|---|---|
-| `codelaw` · `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics, the formatter's `format/unformatted` and `format/failed`, and `graph/no-deprecated-usage` | — |
-| `@codelaw/rules-js` · `codelaw-rules-js` | JS, JSX, TS, TSX, incl. Node, React, Stencil | `js/recommended`, `ts/recommended`, `react/recommended`, `node/recommended`, `stencil/recommended`, `js/conventions` · *later:* `js/strict` |
-| `@codelaw/rules-html` · `codelaw-rules-html` | HTML, incl. HTML embedded in Markdown and templates | `html/recommended`, `html/a11y`, `html/document`, `html/conventions` |
-| `@codelaw/rules-css` · `codelaw-rules-css` | CSS | `css/recommended`, `css/standard`, `css/conventions` |
-| `@codelaw/rules-python` · `codelaw-rules-python` | Python | `py/recommended`, `py/conventions` · *later:* `py/strict` |
-| `@codelaw/rules-data` · `codelaw-rules-data` | JSON, YAML, TOML, Markdown | `data/recommended`, `md/recommended`, `data/package-json`, `data/tsconfig`, `data/pyproject`, `data/github-actions`, `data/conventions` |
+**Ruled by Arpit, 2026-10-24** (W-31), superseding "every pack is mirrored on both registries": *"The ones that are going to be used in npm and the ones that are going to be used in PyPI should only be published."*
+- `rules-js` splits into `js`, `ts`, `react`, `node` and `stencil`;
+- **npm** carries `js`, `ts`, `react`, `node`, `stencil`, `html`, `css` and `data` (eight);
+- **PyPI** carries `js`, `react`, `html`, `css`, `python` and `data` (six);
+- `rules-python` leaves npm, and `ts`, `node` and `stencil` are not on PyPI.
+
+| Pack | npm | PyPI | Languages | Presets |
+|---|---|---|---|---|
+| engine | `codelaw` | `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics, the formatter's `format/unformatted` and `format/failed`, and `graph/no-deprecated-usage` | — |
+| `js` | `@codelaw/rules-js` | `codelaw-rules-js` | JS, JSX; its core rules also run on TS and TSX | `js/recommended`, `js/typescript`, `js/conventions` · *later:* `js/strict` |
+| `ts` | `@codelaw/rules-ts` | — | TS, TSX | `ts/recommended`, `ts/conventions` |
+| `react` | `@codelaw/rules-react` | `codelaw-rules-react` | JSX, TSX, and React in JS and TS | `react/recommended`, `react/conventions` |
+| `node` | `@codelaw/rules-node` | — | JS, JSX, TS, TSX run on Node.js | `node/recommended` |
+| `stencil` | `@codelaw/rules-stencil` | — | TS, TSX Stencil components | `stencil/recommended`, `stencil/conventions` |
+| `html` | `@codelaw/rules-html` | `codelaw-rules-html` | HTML, incl. HTML embedded in Markdown and templates | `html/recommended`, `html/a11y`, `html/document`, `html/conventions` |
+| `css` | `@codelaw/rules-css` | `codelaw-rules-css` | CSS | `css/recommended`, `css/standard`, `css/conventions` |
+| `python` | — | `codelaw-rules-python` | Python | `py/recommended`, `py/conventions` · *later:* `py/strict` |
+| `data` | `@codelaw/rules-data` | `codelaw-rules-data` | JSON, YAML, TOML, Markdown | `data/recommended`, `md/recommended`, `data/package-json`, `data/tsconfig`, `data/pyproject`, `data/github-actions`, `data/conventions` |
+
+`FIRST_PARTY_PACKS` in `crates/codelaw-rules/src/pack.rs` is this table in code, and `scripts/package.py` reads it, so the engine and the release name the same packs on the same registries.
 
 *Later* marks a preset the ruling names that no pack ships yet: `js/strict` and `py/strict` are planned in [W-03](../work/open/W-03-rule-packs.md) and are not in `packs/` (checked 2026-10-20). Every other preset in the table is in its pack's `codelaw-pack.toml` and `presets/`.
 
-**What you install depends on your repo.** A Python-only repo installs `codelaw` and `codelaw-rules-python`, plus `codelaw-rules-data` if it wants `pyproject.toml`, YAML and Markdown checked, all from PyPI, and never touches npm. A React repo installs `codelaw`, `@codelaw/rules-js` and, likely, `@codelaw/rules-data` from npm.
+**What you install depends on your repo.** A Python-only repo installs `codelaw` and `codelaw-rules-python`, plus `codelaw-rules-data` if it wants `pyproject.toml`, YAML and Markdown checked, all from PyPI, and never touches npm. A React and TypeScript repo installs `codelaw`, `@codelaw/rules-js`, `@codelaw/rules-ts`, `@codelaw/rules-react` and, likely, `@codelaw/rules-data` from npm. **What each registry leaves out:** a repo that installs only from npm gets no Python rules, and one that installs only from PyPI gets no `ts/*`, `node/*` or `stencil/*` rules (its TypeScript still gets the `js` rules that declare it, and `js/typescript`).
 
 ```mermaid
 flowchart LR
@@ -55,8 +67,9 @@ flowchart LR
 
 ```text
    engine codelaw (no rules) ------------------+
-   first-party packs (rules-js, -html, -css,   |
-                      -python, -data) ---------+--> merged rule set   (local wins, then packs in extends order)
+   first-party packs (rules-js, -ts, -react,   |
+     -node, -stencil, -html, -css, -python,    |
+     -data) -----------------------------------+--> merged rule set   (local wins, then packs in extends order)
    team / third-party packs (npm, PyPI, path) -+
    local .codelaw/rules/ ----------------------+
 ```
@@ -81,11 +94,11 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
    - `graph/no-deprecated-usage`, which reads the consumer's deprecations registry and belongs to no language, and runs only when the project declares deprecations; and `codelaw/stale-baseline`, a baseline entry its file has outgrown ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 2 and 6).
 
    Every other rule codelaw publishes lives in a pack.
-2. **The five first-party packs and their presets** are §1's table.
+2. **The nine first-party packs, their registries and their presets** are §1's table.
    - Graph rules live with their language: `graph/no-unused-exports` in `js` and `python`, and `graph/no-unused-css-classes` in `css`. A graph rule two packs ship loads as one rule over both packs' languages with the later pack's body, so **the copies' `codelaw` blocks are identical** (a `codelaw-graph` test holds them so): when the `python` copy listed fewer kinds, a TypeScript repo lost its `interface` and `enum` findings whenever `python` loaded last (W-11 corpus run, 2026-10-22). A pack rule may also be `scope: project` under its own prefix: `node/recommended`'s six import rules (`node/no-{missing,extraneous,unpublished}-{import,require}`) run on the graph's `import:` query ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 6). A file-scope native rule that reads the files around it stays file-scope: `node/hashbang` reads the nearest `package.json`'s `bin`, `md/relative-links` checks each relative link's target, and `html/no-utf8-bom` reads the file's bytes (SR-ARCHITECTURE decision 15b; W-21, 2026-10-22).
    - **A rule's fix class follows what the grammar can verify.** The engine refuses a fix whose output parses worse than its input (SR-ARCHITECTURE decision 5), so a rule whose fix writes syntax the grammar rejects ships `manual`. `css/media-feature-range-notation` is `auto` because codelaw's CSS grammar fork parses the range syntax it writes (SR-ARCHITECTURE decision 3; W-21, 2026-10-22).
    - There's **no umbrella preset that spans packs**, because it would require packs the repo hasn't installed.
-3. **Pack layout.** A pack is the same folder in the source tree (`packs/<name>/` in the codelaw repo) and in both published forms:
+3. **Pack layout.** A pack is the same folder in the source tree (`packs/<name>/` in the codelaw repo) and in each published form it has:
 
    ```text
    packs/js/
@@ -99,30 +112,31 @@ The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the co
 
    - **On npm,** the package *is* this folder.
    - **On PyPI,** it is one pure `py3-none-any` wheel whose `codelaw_rules_<name>` package holds this folder as package data.
-   - **Both forms hold the same files, byte for byte.** A pack has no code to execute and no dependencies.
-   - **A preset** is `presets/<namespace>/<name>.toml`: an optional `description` and a `[rules]` table, a severity or `{ severity, options }` per rule. Every rule it names is in the pack.
+   - **Every published form holds the folder's files, byte for byte**, so a pack on both registries is the same on both. A pack has no code to execute and no dependencies.
+   - **A preset** is `presets/<namespace>/<name>.toml`: an optional `description` and a `[rules]` table, a severity or `{ severity, options }` per rule. Every rule it names is in the pack, so a preset never needs a second pack: the four core rules typescript-eslint switches on for TypeScript are `js/typescript` in `js`, not part of `ts/recommended` (2026-10-24), and each pack's starter conventions are its own `<namespace>/conventions`.
    - **A data table** is `data/**/*.json`, named by its path under `data/` without `.json` (`data/globals/browser.json` is `globals/browser`).
 4. **Resolution.** First-party presets are named `codelaw:<namespace>/<preset>` in `extends`, for example `codelaw:js/recommended`.
-   - **A pack is first-party** when its manifest `name` is one of the five npm names in §1.
+   - **A pack is first-party** when its manifest `name` is one of §1's: the npm name when the pack is on npm, else its PyPI name (`codelaw-rules-python`).
    - **Namespace to pack** is a fixed map in the engine:
-     - `js`, `ts`, `react`, `node`, `stencil` → `rules-js`;
+     - `js` → `rules-js`; `ts` → `rules-ts`; `react` → `rules-react`; `node` → `rules-node`; `stencil` → `rules-stencil`;
      - `html` → `rules-html`;
      - `css` → `rules-css`;
      - `py` → `rules-python`;
      - `data`, `md`, `json`, `yaml`, `toml` → `rules-data`.
-   - **The pack is found in this order:**
+   - **The pack is found in this order,** each place only for a registry the pack is published on:
      1. `node_modules/@codelaw/rules-<name>`, walking up from the config file's directory.
      2. The Python environment: the site-packages paths the Python launcher passes in (`CODELAW_SITE_PACKAGES`); otherwise `$VIRTUAL_ENV`; otherwise `.venv/` at the project root.
 
      The first one found wins. Both copies of one version are identical (decision 3).
-   - **A missing pack stops the run:** exit 2, with an error naming both install commands, for example `npm i -D @codelaw/rules-js` and `pip install codelaw-rules-js`.
-5. **One version, released together.** The engine and the five packs carry one version and are published by one release job ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
+   - **A missing pack stops the run:** exit 2, with an error naming every install command the pack has, for example `npm i -D @codelaw/rules-js` and `pip install codelaw-rules-js`; a pack on one registry is named as that registry's only (`@codelaw/rules-ts, which is published on npm only`).
+5. **One version, released together.** The engine and the nine packs carry one version and are published by one release job ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
    - Each pack's manifest declares `min_codelaw`. An engine older than that refuses the pack, with an error naming the upgrade.
    - `codelaw rules --why <id>` and the JSON output name the pack and version each rule came from.
 6. **`codelaw init` installs what it detects.**
-   - **Languages to packs:** JS/JSX/TS/TSX → `js`; HTML → `html`; CSS → `css`; Python → `python`; JSON/YAML/TOML/Markdown → `data`.
+   - **Languages to packs:** JS/JSX → `js`; TS/TSX → `js` and `ts`; HTML → `html`; CSS → `css`; Python → `python`; JSON/YAML/TOML/Markdown → `data`. With JS or TS, `react` when `package.json` depends on `react` and `stencil` when it depends on `@stencil/core`. `node` is never added by `init`.
    - **How it installs:** it adds those packs as dev dependencies with the package manager the repo already uses: npm, pnpm, yarn or bun for a `package.json` repo; uv, pip or poetry for a `pyproject.toml` repo. A repo with both uses both — `rules-python` from PyPI, the other packs from npm — unless `--registry npm|pypi` picks one.
-   - **What it writes:** `extends` with each pack's `recommended` presets ([SR-CONFIG](0110_config.md) decision 8).
+   - **A pack the chosen registry does not publish** (§1) comes from the other registry when the repo uses that one too, or uses neither; otherwise — and always under `--registry` — it is left out, its presets are not written, and `init` prints a `note:` naming the registry it is on. An npm repo with a few Python files gets no `codelaw:py/recommended` until `codelaw-rules-python` is installed from PyPI.
+   - **What it writes:** `extends` with each installed pack's `recommended` presets, and `js/typescript` when the repo has TypeScript ([SR-CONFIG](0110_config.md) decision 8).
    - **`--no-install`** prints the install commands instead of running them.
    - **`--agents`** writes the agent files after the packs are installed, so the per-language instructions list the packs' rules; under `--no-install` they wait for `codelaw sync-agents` ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 7).
    - **With no pack and no local rule,** `codelaw check` reports one `codelaw/no-rules` info diagnostic naming `codelaw init`. The formatter works regardless ([L7](0009_LAW-7-linter-and-formatter.md)).
@@ -206,7 +220,8 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 ### Consequences
 
 - **`codelaw` installed alone lints nothing.** It formats every language and reports `codelaw/no-rules`. `codelaw init` is the documented path, and `codelaw-setup` follows it ([SR-AGENT-SURFACES](0102_agent-surfaces.md)).
-- **Each release publishes twenty packages:** the engine and the five packs on each of two registries (twelve), plus the eight `@codelaw/cli-*` binary packages on npm. That is 27 files, because PyPI's `codelaw` is eight platform wheels. One failed publish fails the release ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
+- **Each release publishes twenty-four packages:** on npm, `codelaw`, the eight `@codelaw/cli-*` binary packages and eight packs (seventeen); on PyPI, `codelaw` and six packs (seven). That is 31 files — 17 npm tarballs and 14 wheels — because PyPI's `codelaw` is eight platform wheels. One failed publish fails the release ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
+- **`@codelaw/rules-python@0.1.0` and `@codelaw/rules-js@0.1.0` predate the split** (the first npm publish, 2026-10-24, W-29): `rules-python` is unpublished from npm by hand, and 0.2.0 is the first release in this layout ([W-31](../work/open/W-31-registry-pack-split.md)).
 - **A repo carries only its ecosystems' rules and data tables.** A Python-only repo stays on PyPI ([L3](0005_LAW-3-languages.md) decision 2).
 - **Rules still update with engine releases** (one version). Engine and rules can't drift, which was the reason for embedding them in the first version: `min_codelaw` and the native-id check keep that guarantee.
 - **The engine work this needs:** the semantic model, `native:` rules and pack loading, in [W-02](../archive/open/W-02-engine-p0.md) ([SR-ARCHITECTURE](0108_architecture.md) decisions 15a–15c).
@@ -216,7 +231,8 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 
 - **Built-in rules embedded in the binary** (this record's 2026-10-18 version): superseded by the decider's ruling of 2026-10-19. Its argument, that rules and engine can't drift apart, is kept by one version and `min_codelaw`.
 - **One `codelaw-rules` package for every language:** rejected. A Python-only repo would install JS, HTML and CSS rules and their data tables.
-- **A package per language (eleven):** rejected. JS, JSX, TS and TSX share most rules, and the JSON, YAML, TOML and Markdown rules are small and share schema data. Five is the ruled split.
+- **A package per language (eleven):** rejected. JS, JSX, TS and TSX share most rules, and the JSON, YAML, TOML and Markdown rules are small and share schema data. The JS family splits by framework instead (2026-10-24).
+- **Every pack mirrored on both registries** (the 2026-10-19 ruling, five packs): superseded by the decider's ruling of 2026-10-24. Each registry carries only the packs its users install.
 - **Packs on npm only, with a Python shim:** rejected. It breaks [L3](0005_LAW-3-languages.md) and [L6](0008_LAW-6-python-and-node-packages.md).
 - **Rules written as Rust code:** still rejected as the face of a rule, because people and agents can't read them. `native:` keeps the Markdown file as the rule while the engine runs the check.
 
@@ -231,10 +247,11 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 
 **Reopen this decision if:**
 - a first-party pack needs code executed at load;
-- a pack's npm and PyPI contents differ;
-- a Python-only or Node-only repo needs the other registry to get its rules.
+- a pack on both registries holds different files on npm and on PyPI;
+- a Python-only or Node-only repo needs the other registry to get its rules;
+- `packs/`, `FIRST_PARTY_PACKS` and the published names disagree.
 
-**How to check it:** `once built: the release job compares each pack's npm tarball with its wheel's package data, file by file; and codelaw rules --list --source <pack> matches packs/<name>/rules/ in the source tree`
+**How to check it:** `python3 scripts/package.py check dist` compares every published copy of each pack with `packs/<name>/`, file by file, and the names with `FIRST_PARTY_PACKS`; `cargo test -p codelaw-rules` loads every `packs/` folder as its first-party pack.
 
 ---
 
@@ -244,4 +261,4 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 
 **Records** — [SR-LAW-2](0004_LAW-2-foss-dependencies.md) · [SR-LAW-3](0005_LAW-3-languages.md) · [SR-LAW-4](0006_LAW-4-every-rule-has-a-fix.md) · [SR-LAW-5](0007_LAW-5-no-model-in-the-engine.md) · [SR-LAW-6](0008_LAW-6-python-and-node-packages.md) · [SR-LAW-7](0009_LAW-7-linter-and-formatter.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-ARCHITECTURE](0108_architecture.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md)
 
-**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [W-02](../archive/open/W-02-engine-p0.md) · [W-03](../work/open/W-03-rule-packs.md)
+**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [W-02](../archive/open/W-02-engine-p0.md) · [W-03](../work/open/W-03-rule-packs.md) · [W-31](../work/open/W-31-registry-pack-split.md)

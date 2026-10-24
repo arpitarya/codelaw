@@ -16,8 +16,9 @@ as `codelaw` on npm and on PyPI; neither needs the other.
 `codelaw` installed alone lints nothing until a rule pack is installed — it
 says so (`codelaw/no-rules`).
 
-**Rule packs:** `js` · `html` · `css` · `python` · `data` — on npm as
-`@codelaw/rules-<name>`, on PyPI as `codelaw-rules-<name>`.
+**Rule packs** — on npm as `@codelaw/rules-<name>`: `js` · `ts` · `react` ·
+`node` · `stencil` · `html` · `css` · `data`; on PyPI as `codelaw-rules-<name>`:
+`js` · `react` · `html` · `css` · `python` · `data`.
 
 ## Use
 
