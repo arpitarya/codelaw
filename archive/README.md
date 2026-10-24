@@ -47,6 +47,9 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 | [`W-28-layout-check-by-tokens.md`](open/W-28-layout-check-by-tokens.md) | 2026-10-24 | `codelaw_lang::token_stream` and `codelaw-test`'s layout check; [SR-FORMATTER](../records/0105_formatter.md) decision 3, [SR-RULE-AUTHORING](../records/0113_rule-authoring.md) decision 4 |
 | [`W-26-public-docs-from-the-tree.md`](open/W-26-public-docs-from-the-tree.md) | 2026-10-24 | `scripts/docs-sync.py` and the README/CHANGELOG regions it keeps; [SR-WORK-REGISTRY](../records/0060_WORK-registry.md) Consequences |
 | [`W-25-governance-drift.md`](open/W-25-governance-drift.md) | 2026-10-24 | the work system's checks: `scripts/check-work-system.py` (rules 40, 64; SR-WORK-OWNERSHIP decisions 2, 9); [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md), [SR-WORK-OWNERSHIP](../records/0058_WORK-ownership.md) |
+| [`W-27-engine-and-packaging-hygiene.md`](open/W-27-engine-and-packaging-hygiene.md) | 2026-10-25 | MSRV 1.97 and the `msrv` job, `codelaw_core::process::kill_group`, Windows one-shot asserted by `smoke.sh`, `version.py`, one pack builder; [SR-ARCHITECTURE](../records/0108_architecture.md) decision 21, [SR-PACKAGES](../records/0107_packages.md) |
+| [`W-18-release-hardening.md`](open/W-18-release-hardening.md) | 2026-10-25 | `ci.yml`/`publish.yml` hardening, `SHA256SUMS` and attestation, the eight-platform `smoke` job from a staging index, tag-only environments; [SR-PACKAGES](../records/0107_packages.md), `RELEASING.md` |
+| [`W-20-conformance-tests.md`](open/W-20-conformance-tests.md) | 2026-10-25 | the L5 fence, the L2 licence check, the consumer-layout test, `codelaw test --corpus` with the pinned corpus and its `corpus` job, `check-work-system.py`; [SR-RULE-AUTHORING](../records/0113_rule-authoring.md) decision 4 |
 
 ## `backlog/`
 

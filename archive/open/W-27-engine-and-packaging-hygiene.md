@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-22: the repo review — small defects in the crates
 item: W-27
 filed: 2026-10-23
 filed_by: "Arpit (Claude Code, Fable 5.1)"
-updated: 2026-10-24
+updated: 2026-10-25
 updated_by: "Arpit (Claude Code, Opus 5.5)"
-ball: agent
+ball: closed
 ---
 
 # W-27 — Engine and packaging hygiene: a true MSRV, one process killer, Windows stated, manifests covered
@@ -35,9 +35,9 @@ The workspace's stated floors and manifests are true, duplicated code has one ho
 
 | DoD | what | state |
 |---|---|---|
-| 1 · msrv | `cargo +<rust-version> check --workspace` passes in CI | ⏳ passes locally on 1.97 (`--all-targets --locked`); CI's `msrv` job not yet run |
+| 1 · msrv | `cargo +<rust-version> check --workspace` passes in CI | ✅ CI run 40124005285 on `main` (`483b2a1`, 2026-10-24), all jobs green: the `msrv` job passed |
 | 2 · kill | `grep -rn "libc::kill" crates/` has one hit, in `codelaw-core` | ✅ |
-| 3 · windows | SR-ARCHITECTURE names the Windows behaviour; the `smoke` job's `win32-*` legs assert it | ⏳ record ✅; the assertion is in `smoke.sh`, unproven until the `win32-*` legs run |
+| 3 · windows | SR-ARCHITECTURE names the Windows behaviour; the `smoke` job's `win32-*` legs assert it | ✅ record; CI run 40124005285 on `main` (`483b2a1`, 2026-10-24), all jobs green: `smoke win32-x64` and `win32-arm64` print "one-shot: `codelaw daemon` refuses (exit 2) and `--prefer-warm` runs in-process, byte-identical" |
 | 4 · version | `scripts/version.py --check` fails when `packaging/vscode/package.json`'s version drifts, or the record says it may | ✅ (failed on 0.0.0, passes after `--set 0.1.0`) |
 | 5 · packs | `cmp dist/npm/codelaw-rules-js.tgz <build-packs.py's tarball>` is a CI step, or one builder remains | ✅ one builder; all 14 artefacts `cmp`-equal between `assemble` and `build-packs.py` locally |
 | 6 · ignore | `git check-ignore out/x foo.vsix` names both | ✅ |
@@ -67,3 +67,5 @@ None.
   - **One pack builder:** the npm pack tarballs are now written by `package.py pack_tarball`, not `npm pack`; `npm publish --dry-run` accepts one. With stand-in binaries, `assemble` then `check` pass every check but the (absent) engine wheels, and each of the 14 pack artefacts is byte-identical to `build-packs.py --release`'s.
   - **Left:** DoD 1 and 3 are proven only by the first CI run that carries them (`msrv` job; `smoke` on `win32-x64` and `win32-arm64`).
 
+
+**Closed 2026-10-25:** every DoD met; DoD 1 and 3 proven by CI run 40124005285 on `main` (`483b2a1`, 2026-10-24), all jobs green.

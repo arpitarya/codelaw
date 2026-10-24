@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-22: the repo review — CI cannot pass on main toda
 item: W-24
 filed: 2026-10-23
 filed_by: "Arpit (Claude Code, Fable 5.1)"
-updated: 2026-10-24
+updated: 2026-10-25
 updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: agent
 ---
@@ -25,7 +25,7 @@ ball: agent
 
 **Arpit, 2026-10-22:** *"review the repo, create work items to fix whatever was broken"*
 
-| 7 | Found 2026-10-24 in run 40039203859: `smoke darwin-*` fail with "the staging index did not start" — `HTTPServer.server_bind` calls `socket.getfqdn("127.0.0.1")`, a reverse-DNS lookup that stalls on the macOS runners | the two macOS smokes pass | 🟡 2026-10-24: `staging-index.py` binds without the lookup; the diagnosis fits (empty log, process alive past 10 s, Linux and Windows fine) but is proven only by the next CI run |
+| 7 | Found 2026-10-24 in run 40039203859: `smoke darwin-*` fail with "the staging index did not start" — `HTTPServer.server_bind` calls `socket.getfqdn("127.0.0.1")`, a reverse-DNS lookup that stalls on the macOS runners | the two macOS smokes pass | ✅ CI run 40124005285: `smoke darwin-arm64` and `darwin-x64` installed from the staging index and passed — the reverse-DNS diagnosis held |
 
 **Model:** Sonnet: six concrete edits, each with a mechanical pass condition; step 2 needs care with the reason text.
 
@@ -43,7 +43,7 @@ A push of `main` as it stands is green on all eight platforms, and a green verdi
 | 4 · gate | `ci.yml`'s law-gate step fails on a binary missing `format`, `mcp` or `lsp` | ✅ (law-gate.py exits 1 without `--report`) |
 | 5 · perf | a push touching only `*.md` does not run `perf` | 🟡 the step, run locally on `4b19bd1..32ff82a` (work/ only), says skip; on `32ff82a..5e489f4` (crates), run; proven by the first docs-only push |
 | 6 · hook | `LC_ALL=C python3 scripts/check-open-work-inbox.py` passes | ✅ (and its failure path, under `LC_ALL=C`) |
-| 7 · green | a push of `main` with this change is green on all eight platforms | ⏳ needs a push — the decider's |
+| 7 · green | a push of `main` with this change is green on all eight platforms | ✅ CI run 40124005285 on `483b2a1` (2026-10-24): every job green — all eight builds, packages and smokes, `lint` (guard replay), `test`, `msrv`, `corpus`, `perf` |
 
 ## Blockers
 

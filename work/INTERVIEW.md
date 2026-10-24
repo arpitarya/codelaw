@@ -91,9 +91,17 @@ at a time on this machine** (LESSONS 2026-10-24).
 
 **Docket 2026-10-24:** W-21 closed (fork kept, the PR is B-046, DoD 3 restated
 engine-only, a CSS-tree port is B-047); W-32 named (`rules-redux-toolkit`,
-`rules-react-query`, Redux Style Guide); W-28's token rule confirmed; W-20's
+`rules-tanstack-query` — renamed from `react-query` 2026-10-25 — Redux Style Guide); W-28's token rule confirmed; W-20's
 build-and-test leg dropped; W-19's machine (`ubuntu-24.04`) and three repos
 named; step 5 of the registry setup done. Left in the inbox: PyPI step 4, L8's budgets.
+
+**2026-10-25:** `main` pushed and **CI green on every job for the first time** (run
+40124005285) — W-18, W-20, W-27 closed; W-24 waits only on a docs-only push skipping
+`perf`. The L9 / SR-WORK-NOW / SR-WORK-CLEANUP hooks exist and are wired (written
+from the records; `target/` cleaned on the decider's ruling). `bench --repo` times the
+three pinned repos (W-19). On `ubuntu-24.04` three p95s sit above their Mac
+proposals (`check_cold_10k` 8701 ms, `format_warm_10k` 1353 ms, `mcp_rules_for_path`
+40.8 ms), so the proposals must be re-applied from CI's runs before the decider rules.
 
 **Open questions for the decider, carried from earlier sessions:** W-11's two default
 gaps (self-aliased private packages; CSS only for linked stylesheets); W-13's

@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — W-32: the query pack is `tanstack-query`  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"rename react-query > tanstack query"*
+- **Done:** W-32's item file, its queue row, INTERVIEW §2 and the registry rows now name `@codelaw/rules-tanstack-query`, namespace `tanstack-query`, `packs/tanstack-query/`. Code not touched.
+- **Decided / left open:** Arpit's ruling, verbatim in the item file. Session `c8d31825` has W-32 in flight with uncommitted `crates/codelaw-native/src/react_query.rs` using `react-query/*` ids; it was not reachable to message, so its sub-agent renames them (file `tanstack_query.rs`, ids `tanstack-query/*`).
+- **Mistakes:** none.
+- **Next:** the W-32 session picks up the new name before it commits.
+
 ## 2026-10-24 — Docket: seven rulings, step 5 of the registry setup, W-21/W-25/W-26/W-28 closed, every corpus snapshot  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** *"Let's go ahead and raise a PR for TreeSitter.css."* → *"keep using the patch copy and put the PR in backlog. Then look into all the blockers one by one, explain them to me, and recommend"* → *"implement all the open items and close them out."*

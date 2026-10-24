@@ -95,11 +95,11 @@ into a scan anyone can do at task end.
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-24 | 2026-10-24 — the L6 line and the `packs/` layout line: nine packs, eight on npm and six on PyPI (W-31, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-24 | 2026-10-24 — docket rulings; W-21, W-25, W-26, W-28 closed; W-20's snapshots |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-18, W-20, W-27 closed (CI green on `main`); W-19 red on the budgets; W-32's query pack renamed `tanstack-query`; 2026-10-24 docket rulings, W-21/W-25/W-26/W-28 closed |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-24 | 2026-10-24 — B-046 (the tree-sitter-css upstream PR), B-047 (the CSS-tree port) |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-24 | 2026-10-24 — §2: the docket's rulings |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-24 | 2026-10-24 — W-21, W-25, W-26, W-28 closed; W-20's snapshots |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §2: `tanstack-query`; the 2026-10-24 docket's rulings |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-25 | 2026-10-25 — the L9/NOW/CLEANUP hooks; CI green on `main`, W-18/W-20/W-27 closed; `bench --repo` (W-19) |
 | `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-24 | 2026-10-24 — the first npm publish and W-31 |
 | `work/NOW.md` | kept by hooks: a row per live session; empty when nothing runs | 2026-10-24 | 2026-10-24 — after W-31: unpublish `@codelaw/rules-python`, push, 0.2.0 |
 | `work/LESSONS.md` | a failure teaches something durable | 2026-10-24 | 2026-10-24 — the cfg-split lesson and the two-sessions-one-checkout lesson |

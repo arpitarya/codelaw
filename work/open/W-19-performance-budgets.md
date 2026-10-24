@@ -7,7 +7,7 @@ filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
 updated_by: "Arpit (Claude Code, Opus 5.5)"
-ball: agent
+ball: arpit
 ---
 
 # W-19 — Build `codelaw bench`, measure, and propose the L8 budgets

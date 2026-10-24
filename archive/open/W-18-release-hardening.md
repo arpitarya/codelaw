@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-20: the pipeline defects an independent review foun
 item: W-18
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-24
-updated_by: "Claude (Opus 5.5), docket: step 3 done in the decider's browser"
-ball: agent
+updated: 2026-10-25
+updated_by: "Arpit (Claude Code, Opus 5.5)"
+ball: closed
 ---
 
 # W-18 — Harden CI and the release pipeline
@@ -45,7 +45,7 @@ Every finding below is fixed, and the L6 install matrix and runtime fence run on
 | 9 | Any non-pre-release becomes npm `latest`, so a backport (0.1.5 after 0.2.0) demotes the newer line. | `.github/workflows/publish.yml:128` | minor | ✅ 2026-10-20: a version older than npm's `latest` gets `release-<major>.<minor>` |
 | 10 | `actions/checkout` keeps `persist-credentials` (low impact: read-only token). | `.github/workflows/*.yml` | minor | ✅ 2026-10-20: `persist-credentials: false` on all six checkouts |
 | 11 | The unquoted regex `^(Number\.)?NaN$` is YAML 1.2 only; quote it for other tools. | `packs/js/rules/js/use-isnan.md:23` | minor | ✅ 2026-10-20: quoted |
-| 12 | L6's install matrix and L3's runtime fence run on linux-x64 only, from built files not a staging index (was B-009, B-012). | `scripts/smoke.sh · scripts/staging-index.py · ci.yml` | gap | ✅ the matrix: a `smoke` job on all eight platforms (musl in Alpine containers, darwin-x64 on `macos-15-intel`), `smoke.sh DIST [KEY]`. ✅ 2026-10-22, the staging index: `scripts/staging-index.py` (standard library only) serves an npm registry and a PyPI simple index on 127.0.0.1; `smoke.sh` publishes all of `dist` to it (`npm publish`, `uv publish`) and installs by name from it — `npm i`, `npx`, `pip install`, `uvx` — with caches and config of its own, and fails unless the index served every download. No remote registry, TestPyPI included. Proven by hand on darwin-arm64 (a `dist` whose other seven binaries were stand-ins; a missing wheel fails it); the eight platforms are proven by the first CI run that carries it. Build tool `uv` 0.11.3 (`MIT OR Apache-2.0`) declared in `licences.rs` |
+| 12 | L6's install matrix and L3's runtime fence run on linux-x64 only, from built files not a staging index (was B-009, B-012). | `scripts/smoke.sh · scripts/staging-index.py · ci.yml` | gap | ✅ the matrix: a `smoke` job on all eight platforms (musl in Alpine containers, darwin-x64 on `macos-15-intel`), `smoke.sh DIST [KEY]`. ✅ 2026-10-22, the staging index: `scripts/staging-index.py` (standard library only) serves an npm registry and a PyPI simple index on 127.0.0.1; `smoke.sh` publishes all of `dist` to it (`npm publish`, `uv publish`) and installs by name from it — `npm i`, `npx`, `pip install`, `uvx` — with caches and config of its own, and fails unless the index served every download. No remote registry, TestPyPI included. Proven by hand on darwin-arm64 (a `dist` whose other seven binaries were stand-ins; a missing wheel fails it); the eight platforms are proven by the first CI run that carries it. Build tool `uv` 0.11.3 (`MIT OR Apache-2.0`) declared in `licences.rs` ✅ proven by CI run 40124005285 on `main` (`483b2a1`, 2026-10-24), all jobs green: all eight `smoke` legs print "installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte" |
 
 ## Blockers
 
@@ -62,3 +62,5 @@ None. The environment rules are set (row 4, 2026-10-24). **Arpit, 2026-10-24:** 
 ## Reference
 
 - [`work/OPEN-WORK.md`](../OPEN-WORK.md): this item's row.
+
+**Closed 2026-10-25:** all twelve findings fixed; the last, the staging-index install on every platform, proven by CI run 40124005285 on `main` (`483b2a1`, 2026-10-24), all jobs green.
