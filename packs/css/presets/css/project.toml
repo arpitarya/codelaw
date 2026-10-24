@@ -1,0 +1,4 @@
+description = "The rule that reads the whole repo: classes no markup or script uses (purgecss); opt in"
+
+[rules]
+"graph/no-unused-css-classes" = "warn"

@@ -12,12 +12,16 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 ## Presets
 
+<!-- docs-sync:presets -->
+
 | preset | rules | ported from |
 |---|---|---|
 | `html/recommended` | 64 | html-validate 11.16.4 `html-validate:recommended`, without its layout rules and without the cosmetic rules its `prettier` and `browser` presets switch off (see below) |
 | `html/a11y` | 26 | html-validate 11.16.4 `html-validate:a11y`: every rule it turns on |
 | `html/document` | 5 | html-validate 11.16.4 `html-validate:document`: checks that only make sense for a complete page |
 | `html/conventions` | 3 | opt-in: the starter rule `html/target-blank-rel`, and HTMLHint's `inline-style-disabled` and `inline-script-disabled` |
+
+<!-- /docs-sync:presets -->
 
 `html/a11y` is a subset of `html/recommended`, as upstream; turn it on alone
 for an accessibility-only check. `html/document` adds to `html/recommended`.

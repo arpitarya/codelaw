@@ -12,10 +12,14 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 ## Presets
 
+<!-- docs-sync:presets -->
+
 | preset | rules | ported from |
 |---|---|---|
 | `react/recommended` | 19 | eslint-plugin-react 7.37.5 `recommended` + `jsx-runtime` (17 of its 20 active rules), and eslint-plugin-react-hooks 7.1.1's `rules-of-hooks` and `exhaustive-deps` |
 | `react/conventions` | 2 | codelaw's starter catalogue: `react/hook-prefix`, `react/props-type-name` — opt in |
+
+<!-- /docs-sync:presets -->
 
 Every rule is **reimplemented**, not vendored: the matchers, messages and docs
 are written fresh, and each rule's `ported_from:` names the source rule.

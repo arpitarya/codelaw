@@ -13,6 +13,8 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 ## Presets
 
+<!-- docs-sync:presets -->
+
 | preset | rules | what it holds |
 |---|---|---|
 | `data/recommended` | 6 | correctness for JSON, YAML and TOML: keys defined twice in each, YAML aliases without an anchor, and the YAML scalars that YAML 1.1 and 1.2 read differently |
@@ -22,6 +24,8 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `data/pyproject` | 3 | `toml/deps-sorted`, `toml/pyproject-requires-python`, `toml/pyproject-schema` — `files: **/pyproject.toml` |
 | `data/github-actions` | 3 | `yaml/gha-pin-sha`, `yaml/gha-workflow-schema`, `yaml/gha-action-schema` — workflows and composite actions |
 | `data/conventions` | 2 | opt-in house style: `yaml/document-start`, `md/no-inline-html` |
+
+<!-- /docs-sync:presets -->
 
 37 rules: 8 `auto`, 5 `suggest`, 24 `manual`. Every rule is
 **reimplemented**, not vendored: the checks, messages and docs are written

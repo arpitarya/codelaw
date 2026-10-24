@@ -12,10 +12,14 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 ## Presets
 
+<!-- docs-sync:presets -->
+
 | preset | rules | ported from |
 |---|---|---|
 | `ts/recommended` | 20 | typescript-eslint `recommended` 8.71.2 (not type-checked) — all 20 rules; the four core rules its `eslint-recommended` switches on are `codelaw:js/typescript` in `@codelaw/rules-js` |
 | `ts/conventions` | 1 | codelaw's starter catalogue: `ts/type-only-imports` — opt in |
+
+<!-- /docs-sync:presets -->
 
 Every rule is **reimplemented**, not vendored: the matchers, messages and docs
 are written fresh, and each rule's `ported_from:` names the source rule.

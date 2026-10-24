@@ -1,0 +1,4 @@
+description = "The rule that reads the whole repo: exports nothing imports (knip's exports and types); opt in"
+
+[rules]
+"graph/no-unused-exports" = "error"
