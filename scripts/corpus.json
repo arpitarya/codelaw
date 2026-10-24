@@ -39,7 +39,7 @@
       "commit": "382d29c485e67018c06e75ec7235130d0968522c",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "data"]
+      "packs": ["js", "data", "ts", "react", "node"]
     },
     {
       "name": "jotai",
@@ -47,7 +47,7 @@
       "commit": "e5971ba44866d070564a0a30187f6976fee0e350",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js"]
+      "packs": ["js", "ts", "react", "node"]
     },
     {
       "name": "full-stack-fastapi-template",
@@ -55,7 +55,7 @@
       "commit": "b1125d8839482cb7bbae603ddc6d0081bf87532e",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "python", "data"]
+      "packs": ["js", "python", "data", "ts", "react", "node"]
     },
     {
       "name": "html5-boilerplate",
@@ -80,6 +80,14 @@
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE",
       "packs": ["python", "html", "css"]
+    },
+    {
+      "name": "ionic-framework",
+      "url": "https://github.com/ionic-team/ionic-framework",
+      "commit": "25a114f4077cae0aa2d633e32d26638096eeb9f1",
+      "licence": "MIT",
+      "licence_file": "LICENSE",
+      "packs": ["stencil", "ts"]
     }
   ]
 }

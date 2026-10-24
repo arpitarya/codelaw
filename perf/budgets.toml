@@ -22,7 +22,8 @@
 # anything (SR-LAW-8 §Measurements).
 
 [reference]
-machine = "unset"
+machine = "GitHub-hosted ubuntu-24.04 runner (the decider, 2026-10-24)"
+repos = ["djangoproject.com", "full-stack-fastapi-template", "html5-boilerplate"] # pinned in scripts/corpus.json; not benched yet (W-19)
 workload = "codelaw bench --seed 20261018 --files 10000 (digest bf9c5bea0d8b31ee)"
 
 [operation.startup]

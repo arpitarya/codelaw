@@ -1,0 +1,20 @@
+# `codelaw test --corpus` finding counts (SR-RULE-AUTHORING decision 4).
+# Rewrite with --update-snapshot, and review the change.
+
+[findings]
+"stencil/ban-default-true" = 39
+"stencil/ban-exported-const-enums" = 0
+"stencil/ban-prefix" = 0
+"stencil/decorators-context" = 0
+"stencil/host-data-deprecated" = 0
+"stencil/methods-must-be-public" = 0
+"stencil/no-unused-watch" = 6
+"stencil/own-methods-must-be-private" = 202
+"stencil/own-props-must-be-private" = 224
+"stencil/prefer-vdom-listener" = 12
+"stencil/prop-readonly" = 589
+"stencil/props-must-be-public" = 0
+"stencil/required-jsdoc" = 3
+"stencil/reserved-member-names" = 9
+"stencil/strict-mutable" = 8
+"stencil/tag-prefix" = 0

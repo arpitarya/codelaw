@@ -88,6 +88,8 @@ that works around one makes the decision it was waiting for.
    never relents is a hang. Taking the third exit while still blocked breaks
    rule 6.
 9. The lock is per asset, not per session; two sessions are expected.
+9a. **Cleaning a lock is [SR-WORK-CLEANUP](0062_WORK-cleanup.md)'s** (decisions 8–10). The
+    lock itself stays here: `session-lock.sh` keys it by the hook input's `session_id`.
 10. When the decider rules, the file is set back to `PROCEED` with the ruling as
     `reason` and the resulting item re-balled in the same change.
 

@@ -1,0 +1,25 @@
+# `codelaw test --corpus` finding counts (SR-RULE-AUTHORING decision 4).
+# Rewrite with --update-snapshot, and review the change.
+
+[findings]
+"react/display-name" = 0
+"react/exhaustive-deps" = 0
+"react/hook-prefix" = 0
+"react/jsx-key" = 1
+"react/jsx-no-comment-textnodes" = 0
+"react/jsx-no-duplicate-props" = 0
+"react/jsx-no-target-blank" = 0
+"react/jsx-no-undef" = 0
+"react/no-children-prop" = 1
+"react/no-danger-with-children" = 0
+"react/no-deprecated" = 0
+"react/no-direct-mutation-state" = 0
+"react/no-find-dom-node" = 0
+"react/no-is-mounted" = 0
+"react/no-render-return-value" = 0
+"react/no-string-refs" = 0
+"react/no-unescaped-entities" = 9
+"react/no-unknown-property" = 0
+"react/props-type-name" = 8
+"react/require-render-return" = 0
+"react/rules-of-hooks" = 65

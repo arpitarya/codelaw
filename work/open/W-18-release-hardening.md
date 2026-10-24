@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-20: the pipeline defects an independent review foun
 item: W-18
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-22
-updated_by: "Arpit (Claude Code, Opus 5.5)"
-ball: decider
+updated: 2026-10-24
+updated_by: "Claude (Opus 5.5), docket: step 3 done in the decider's browser"
+ball: agent
 ---
 
 # W-18 — Harden CI and the release pipeline
@@ -18,7 +18,7 @@ ball: decider
 |---|---|---|---|
 | 1 | Make the clippy step fail CI (`pipefail`), then fix the warnings it was hiding | a green CI means clippy passed | ✅ pipefail · the warnings are W-17's last row |
 | 2 | Pin every action by commit SHA and pin npm's version in the OIDC jobs | no moved tag can publish | ✅ |
-| 3 | Require tag-only deployment rules on the `npm`/`pypi` environments | only a release can publish | ⏳ the decider, in GitHub settings (`RELEASING.md` step 5) |
+| 3 | Require tag-only deployment rules on the `npm`/`pypi` environments | only a release can publish | ✅ 2026-10-24: `npm` and `pypi`, one tag rule `v*` each, no branch rule |
 | 4 | Verify `SHA256SUMS` before upload; attest the CI build | publish exactly what CI built | ✅ unproven until the first release |
 | 5 | Fix the remaining findings below | the pipeline matches L6 decision 9 and SR-PACKAGES decision 11 | ✅ row 12's staging index 2026-10-22: proven on darwin-arm64, the other seven by the first CI run |
 
@@ -37,7 +37,7 @@ Every finding below is fixed, and the L6 install matrix and runtime fence run on
 | 1 | The clippy step pipes into `tee` under `bash -e` with no `pipefail`, so clippy failures never fail CI; a green verdict is cached and the publish gate trusts it. Fix the warnings it hides first (W-17's last row). | `.github/workflows/ci.yml:118` | 🧨 high | ✅ 2026-10-20: `defaults.run.shell: bash` in both workflows (`-eo pipefail` on every step). CI's lint job fails until W-17 row 21's clippy fixes land |
 | 2 | None of the 28 `uses:` is pinned by SHA, including `Swatinem/rust-cache@v2` and the branch ref `pypa/gh-action-pypi-publish@release/v1` in an `id-token: write` job. | `.github/workflows/*.yml` | high | ✅ 2026-10-20: all 28 by full SHA with a `# vX.Y.Z` comment, resolved with `git ls-remote` (same majors as before; `release/v1` → v1.14.3, the same commit) |
 | 3 | `npm i -g npm@latest` runs unpinned in both OIDC jobs. | `.github/workflows/publish.yml:78,119` | high | ✅ 2026-10-20: `NPM_VERSION: '11.21.0'`, exact, in both jobs |
-| 4 | Environment protection is optional; trusted publishers check workflow and environment, not the ref — require tag-only (`v*`) deployment rules on `npm` and `pypi`. | `RELEASING.md:45` | major (plausible) | ⏳ the decider: *Settings → Environments*, one tag rule `v*`, no branch rule, on both — `RELEASING.md` step 5 now says it is required |
+| 4 | Environment protection is optional; trusted publishers check workflow and environment, not the ref — require tag-only (`v*`) deployment rules on `npm` and `pypi`. | `RELEASING.md:45` | major (plausible) | ✅ 2026-10-24: both environments exist with one tag rule `v*` and no branch rule (`RELEASING.md` step 5) |
 | 5 | `SHA256SUMS` is generated but never verified before upload; no build attestation in `ci.yml` (`--provenance` attests `publish.yml`). | `scripts/package.py:249` | minor | ✅ 2026-10-20: `package.py check` verifies `SHA256SUMS` (exact file set and digests); `ci.yml` attests the set on `main` (`attest-build-provenance`); `publish.yml`'s gate runs `gh attestation verify` on every file (signer `ci.yml`, ref `main`, the release sha), and each upload job re-checks its download against the gate's `SHA256SUMS`. Unproven until the first release |
 | 6 | `npm deprecate … && echo` hides a failed deprecate under `set -e`: a partial withdrawal reports success. | `scripts/withdraw.sh:25` | minor | ✅ 2026-10-20: a failed `npm deprecate` is reported and makes the script exit 1 |
 | 7 | The SR-guard replay prints "0 commits" and passes when `git rev-list` fails (bad `RULE-SINCE`). | `.github/workflows/ci.yml:94` | minor | ✅ 2026-10-20: `RULE-SINCE` must name a commit, and a failing `git rev-list` fails the step |
@@ -49,7 +49,7 @@ Every finding below is fixed, and the L6 install matrix and runtime fence run on
 
 ## Blockers
 
-None for the code. The environment rules are set by the decider in GitHub settings (row 4); with the staging index done (row 12), that is the only step left, so the ball is the decider's.
+None. The environment rules are set (row 4, 2026-10-24). **Arpit, 2026-10-24:** *"Drive my Chrome"* — the agent created both environments in his browser; checked on the Environments page: `npm` and `pypi`, 1 protection rule each. Left: the first CI run on `main` proves row 12 on the eight platforms.
 
 ## Record affected
 

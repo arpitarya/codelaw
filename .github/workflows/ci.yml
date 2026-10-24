@@ -129,6 +129,8 @@ jobs:
           python3 scripts/check-work-system.py --self-test
           python3 scripts/check-open-work-inbox.py
           python3 scripts/check-work-system.py
+      - name: the public docs agree with the tree (scripts/docs-sync.py; SR-WORK-REGISTRY, W-26)
+        run: python3 scripts/docs-sync.py --check
       - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
         run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - id: verdict
@@ -173,7 +175,7 @@ jobs:
     # the packs it loads, perf/, this file — skips it (W-24); the nightly run
     # and a manual dispatch always run it.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # L8 reference machine (the decider, 2026-10-24); never ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0

@@ -6,8 +6,8 @@ item: W-21
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-24
-updated_by: "Claude Code (Opus 5.5), subagent: W-21 upstream patch checked, DoD 3 settled"
-ball: decider
+updated_by: "Claude (Opus 5.5), docket 2026-10-24"
+ball: closed
 ---
 
 # W-21 — Close the engine gaps that hold rules out of the packs
@@ -18,9 +18,11 @@ ball: decider
 |---|---|---|---|
 | 1 | Lint `` css`…` `` / `` html`…` `` tagged templates as embedded regions | CSS-in-JS and lit templates checked | ✅ 2026-10-22, on branch `W-21-pack-gaps` |
 | 2 | Give native rules the file's path, raw bytes and neighbours | `md/relative-links`, `html/no-utf8-bom` and Python package checks become possible | ✅ 2026-10-22, on branch `W-21-pack-gaps` |
-| 3 | Handle modern CSS that tree-sitter-css rejects (range media queries, `layer()`, fractional keyframe percentages) | `css/media-feature-range-notation` can be `auto` | ✅ 2026-10-22: an in-tree fork of tree-sitter-css 0.25.0; the upstream patch is prepared and checked against upstream's corpus (2026-10-24), not filed |
+| 3 | Handle modern CSS that tree-sitter-css rejects (range media queries, `layer()`, fractional keyframe percentages) | `css/media-feature-range-notation` can be `auto` | ✅ 2026-10-22: an in-tree fork of tree-sitter-css 0.25.0; the upstream patch is prepared and checked against upstream's corpus (2026-10-24); the fork stays, the PR is backlog [B-046](../../work/BACKLOG.md) (ruled 2026-10-24) |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
+
+**Arpit, 2026-10-24:** *"Then let's keep using the patch copy and put the PR in backlog."*
 
 **Model:** Opus: a region extractor and a grammar fix both risk off-by-one locations, the main injection risk SR-LINTER names.
 
@@ -34,7 +36,7 @@ The three gaps are closed and the rules the packs list as waiting on them are po
 |---|---|---|
 | 1 · templates | Tagged templates are regions when `[lint] tagged_templates = true` (SR-LINTER decision 3). | ✅ 2026-10-22 |
 | 2 · context | Native rules receive path, bytes and a read-only view of sibling files. | ✅ 2026-10-22 |
-| 3 · CSS | The CSS pack reads modern CSS through the grammar, or a fork of it, not a side parser. | ⚠️ holds for the engine, not the rules (2026-10-24): the fork parses the three forms without `ERROR` and the engine verifies every CSS fix with it, but all 70 `css/*` rules are native and read the text through `css_syntax.rs`, a side parser. A port is not feasible yet, see *DoD 3, settled*. Restating DoD 3 or filing the port is the decider's call |
+| 3 · CSS | **Restated by the decider, 2026-10-24:** modern CSS parses through the fork, and the engine parses every CSS file and region and verifies every CSS fix with it; the CSS rules keep their text reader (`css_syntax.rs`). | ✅ 2026-10-24 (restated). Moving the rules onto a real tree is [B-047](../../work/BACKLOG.md) |
 | 4 · ports | The waiting rules ship with `codelaw test` green. | ✅ 2026-10-22: `md/relative-links`, `html/no-utf8-bom`, `node/hashbang` ship green; `css/media-feature-range-notation` is `auto`, 16 checks green |
 
 ## What was built (2026-10-22)
@@ -66,15 +68,14 @@ The three gaps are closed and the rules the packs list as waiting on them are po
 
 ## Left
 
-- **File the upstream patch: the decider.** Opening a PR on tree-sitter/tree-sitter-css is outward-facing, so no agent does it. Ready: [`upstream/grammar.patch`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/grammar.patch) (apply on the `v0.25.0` tag with `patch -p1`, then `tree-sitter generate`) and [`upstream/PR.md`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/PR.md) (title on its first line, body ready to paste). **Checked 2026-10-24** on upstream's `v0.25.0` tarball with tree-sitter-cli 0.25.10. Unpatched, `generate` reproduces the released `parser.c` byte for byte and `tree-sitter test` passes 40/40. Patched, it applies cleanly, the corpus passes 46/46, the highlight test passes (37 assertions), `eslint grammar.js` is clean, and the regenerated `src/parser.c`, `grammar.json` and `node-types.json` match the fork byte for byte. When a release carries it, drop the fork (its README says how; SR-ARCHITECTURE's veto condition is the trigger).
-- **Rule on DoD 3:** (a) or (b) above.
+- **The upstream patch: backlog [B-046](../../work/BACKLOG.md)** (Arpit, 2026-10-24: keep the fork, put the PR in the backlog). Opening a PR on tree-sitter/tree-sitter-css is outward-facing, so no agent does it. Also ready: `upstream/0001-tree-sitter-css-modern.patch`, one commit with `src/` regenerated (byte-identical to the fork, re-checked 2026-10-24; `PR.md` says so). Ready: [`upstream/grammar.patch`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/grammar.patch) (apply on the `v0.25.0` tag with `patch -p1`, then `tree-sitter generate`) and [`upstream/PR.md`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/PR.md) (title on its first line, body ready to paste). **Checked 2026-10-24** on upstream's `v0.25.0` tarball with tree-sitter-cli 0.25.10. Unpatched, `generate` reproduces the released `parser.c` byte for byte and `tree-sitter test` passes 40/40. Patched, it applies cleanly, the corpus passes 46/46, the highlight test passes (37 assertions), `eslint grammar.js` is clean, and the regenerated `src/parser.c`, `grammar.json` and `node-types.json` match the fork byte for byte. When a release carries it, drop the fork (its README says how; SR-ARCHITECTURE's veto condition is the trigger).
 - **Still `ERROR` in the fork, not filed:** `@import … supports(…)`, a name before the query in `@custom-media` / `@container` (`open-props`' media file), named-range keyframe selectors (`entry 0%`).
 - **The CSS rules still read text themselves** (`css_syntax.rs`): see *DoD 3, settled*.
 - Python package checks (e.g. a missing `__init__.py`) are now possible but no rule is filed for them.
 
 ## Blockers
 
-No agent work is left. Two things are the decider's: submitting the prepared upstream PR, and ruling (a) or (b) on DoD 3. The fork-vs-upstream question is already ruled: *Arpit, 2026-10-22: fork in-tree + upstream patch; drop the fork when upstream releases.*
+None. Closed 2026-10-24: **Arpit, 2026-10-24 (docket):** *"(a) engine-only, close W-21"*. The upstream PR is backlog B-046; the CSS-tree port is B-047. The fork-vs-upstream question is already ruled: *Arpit, 2026-10-22: fork in-tree + upstream patch; drop the fork when upstream releases.*
 
 ## Record affected
 

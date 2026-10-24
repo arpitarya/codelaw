@@ -48,7 +48,7 @@ record to become wrong?*
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002` SR-LAW-0, `0003` SR-LAW-1, `0004` SR-LAW-2, `0005` SR-LAW-3, `0006` SR-LAW-4, `0007` SR-LAW-5, `0008` SR-LAW-6, `0009` SR-LAW-7, `0010` SR-LAW-8 | the next free number after the highest law |
+| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002` SR-LAW-0, `0003` SR-LAW-1, `0004` SR-LAW-2, `0005` SR-LAW-3, `0006` SR-LAW-4, `0007` SR-LAW-5, `0008` SR-LAW-6, `0009` SR-LAW-7, `0010` SR-LAW-8, `0011` SR-LAW-9 | the next free number after the highest law |
 | `0051`–`0100` | the **WORK** records only — how work is done | the next free number after the highest |
 | `0101`– | every other record | the next free number after the highest |
 
@@ -113,6 +113,7 @@ Start from `TEMPLATE.md`.
 | [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as nine packs, eight on npm (`@codelaw/rules-*`) and six on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` | accepted | partly |
 | [0009](0009_LAW-7-linter-and-formatter.md) | **SR-LAW-7** | **L7** — always both a linter and a formatter, for every L3 language | accepted | yes |
 | [0010](0010_LAW-8-performance-budgets.md) | **SR-LAW-8** | **L8** — performance budgets — set from measurement, never exceeded, never loosened | accepted | partly |
+| [0011](0011_LAW-9-machine-budget.md) | **SR-LAW-9** | **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it approved first | accepted | yes |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — the queue discipline in eight groups | accepted | yes |
 | [0052](0052_WORK-backlog.md) | **SR-WORK-BACKLOG** | How `BACKLOG.md` works — the named-but-unclaimed in five classes | accepted | yes |
 | [0053](0053_WORK-lifecycle.md) | **SR-WORK-LIFECYCLE** | How a feature travels — compare, proposal, handoff in the item file, the model line, one record | accepted | yes |
@@ -123,6 +124,8 @@ Start from `TEMPLATE.md`.
 | [0058](0058_WORK-ownership.md) | **SR-WORK-OWNERSHIP** | `owns` and `describes`, and the commit guard | accepted | yes |
 | [0059](0059_WORK-governance.md) | **SR-WORK-GOVERNANCE** | The governance map — which file governs what; no counts | accepted | yes |
 | [0060](0060_WORK-registry.md) | **SR-WORK-REGISTRY** | The doc registry — rules in §2, the table in §3 | accepted | yes |
+| [0061](0061_WORK-now.md) | **SR-WORK-NOW** | `work/NOW.md` holds only what is live — a row per session; what a session leaves becomes a work item | accepted | yes |
+| [0062](0062_WORK-cleanup.md) | **SR-WORK-CLEANUP** | Worktrees, lock files and session leftovers — cleaned automatically when nothing is lost; red, blocked on the decider, when something would be | accepted | yes |
 | [0101](0101_rule-packs.md) | **SR-RULE-PACKS** | Five first-party rule packs on npm and PyPI apart from the engine; team packs; project rules in `.codelaw/rules` | accepted | partly |
 | [0102](0102_agent-surfaces.md) | **SR-AGENT-SURFACES** | Skills, steering, instructions, agent files and hooks, generated from one source | accepted | partly |
 | [0103](0103_project-graph.md) | **SR-PROJECT-GRAPH** | A whole-repo symbol graph for cross-file rules — unused exports first | accepted | partly |
@@ -161,7 +164,11 @@ yet is owned by an open `W-nn`.
 | `.claude/hooks/inject-inbox.sh` | SR-WORK-BLOCKERS | decision 7 |
 | `.claude/hooks/stop-if-blocked.sh` | SR-WORK-BLOCKERS | decision 7 |
 | `.claude/hooks/session-lock.sh` | SR-WORK-BLOCKERS | decision 7 |
+| `.claude/hooks/release-locks.sh` | SR-WORK-CLEANUP | decisions 8–9 |
+| `.claude/hooks/worktree-cleanup.py` | SR-WORK-CLEANUP | decisions 1–6 |
 | `.claude/hooks/require-progress.sh` | SR-WORK-SESSION | decision 5 |
+| `.claude/hooks/now-ledger.py` | SR-WORK-NOW | decisions 2–5 |
+| `.claude/hooks/disk-budget.py` | SR-LAW-9 | decision 4 |
 | `Cargo.toml` | SR-PACKAGES | decision 1: the workspace and its one version |
 | `crates/codelaw-core` | SR-ARCHITECTURE | decision 13: offsets and positions; the shared types; `process`: the one process-group kill (decisions 18 and 19) |
 | `crates/codelaw-cache` | SR-CACHE | decisions 1–6 |
@@ -189,6 +196,7 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-cli/tests/network_fence.rs` | SR-LAW-5 | how L5 is enforced: the network fence (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/consumer_layout.rs` | SR-CONSUMER-LAYOUT | the veto's `init` check against §1's tree (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/promotion.rs` | SR-RULE-AUTHORING | decisions 4 and 6: level 4 and the `stable` gate (a different decision from the CLI's) |
+| `scripts/docs-sync.py` | SR-WORK-REGISTRY | its Consequences: `README.md`'s and `CHANGELOG.md`'s triggers, checked in CI (W-26) |
 | `scripts/corpus.py` | SR-RULE-AUTHORING | decision 4: fetches the pinned corpus and runs level 4 per pack (W-20) |
 | `scripts/corpus.json` | SR-RULE-AUTHORING | decision 4: the pinned corpus — repositories, commits, licences, packs |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |

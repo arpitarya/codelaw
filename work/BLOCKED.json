@@ -1,8 +1,8 @@
 {
- "decision": "ASK",
- "reason": "W-03/W-04: the packages are built and checked in CI and the licence is MIT, but the first release needs the decider's one-time registry setup and go-ahead",
- "questions": ["Will you do the one-time registry setup (RELEASING.md §One time) and give the go to publish 0.1.0?"],
- "safe_alternative": "W-05 research runs in Cowork; nothing is published",
+ "decision": "PROCEED",
+ "reason": "W-03/W-04: the go to publish was given — Arpit published 0.1.0 on npm, 2026-10-24 (W-29); the remaining registry steps 4 and 5 are the inbox's first row",
+ "questions": [],
+ "safe_alternative": "",
  "surfaced": true,
- "filed": "2026-10-20"
+ "filed": "2026-10-24"
 }

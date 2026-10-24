@@ -2,12 +2,15 @@
 """The work system's mechanical checks — each one a rule its record states
 and nothing else enforced (W-20). This script states no rule of its own:
 
-  queue      SR-WORK-OPEN-QUEUE rules 13-17 and 42, 44, 45 — the shape of
-             every row of work/OPEN-WORK.md and of its inbox
+  queue      SR-WORK-OPEN-QUEUE rules 13-17, 40, 42, 44, 45 and 64 — the
+             shape of every row of work/OPEN-WORK.md and of its inbox (no
+             stored `age`), and each row's item file's `ball:`
   lost       SR-WORK-OPEN-QUEUE veto — every `W-nn` named in a live document
              resolves to work/open/ or archive/open/
-  ownership  SR-WORK-OWNERSHIP decision 2 — each record's `owns:` and the
-             register's Ownership table agree, in both directions
+  ownership  SR-WORK-OWNERSHIP decisions 2 and 9 — each record's `owns:`
+             and the register's Ownership table agree, in both directions;
+             the table covers every top-level entry of the five folders and
+             the workspace Cargo.toml; no `built: no` for code that exists
   registry   SR-WORK-REGISTRY decisions 5-8 — no row into archive/, every
              row's target exists, one row per document, every maintained
              document has its row
@@ -29,6 +32,8 @@ ROW_RE = re.compile(
     r" Filed by [^()]+ \([^()]+\)\. \[detail\]\((?P<link>open/(?P<link_id>W-\d+)-[A-Za-z0-9-]+\.md)\)$"
 )
 LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
+LANE_RE = re.compile(r"\*\* `(arpit|agent|cowork)` ")
+COVERED = ("crates", "scripts", ".claude/hooks", "fixtures", "packs")
 W_RE = re.compile(r"\bW-\d+\b")
 SKIP_DIRS = {".git", "target", "node_modules", "worktrees"}
 
@@ -69,6 +74,9 @@ def check_queue(root):
     if inbox is None:
         out.append("work/OPEN-WORK.md has no `## Blocked on the decider` section (SR-WORK-OPEN-QUEUE rule 39)")
         inbox = []
+    header = [l for l in inbox if l.startswith("|")][:1]
+    if header and "age" in [c.strip().lower() for c in header[0].strip().strip("|").split("|")]:
+        out.append("inbox: a stored `age` column; age is computed from `filed`, never stored (SR-WORK-OPEN-QUEUE rule 40)")
     table = [l for l in inbox if l.startswith("|")][2:]  # past the header and separator
     for i, l in enumerate(table):
         cells = [c.strip() for c in l.strip().strip("|").split("|")]
@@ -113,6 +121,11 @@ def check_queue(root):
             out.append(f"{name}: {len(shown)} characters as rendered; at most 280 (SR-WORK-OPEN-QUEUE rule 15)")
         if m and m.group("id") != m.group("link_id"):
             out.append(f"{name}: links {m.group('link')}, another item's file (SR-WORK-OPEN-QUEUE rule 17)")
+        if m and (base / m.group("link")).is_file():
+            want = "arpit" if m.group("ball") == "🔴" else LANE_RE.search(text).group(1)
+            got = frontmatter((base / m.group("link")).read_text(encoding="utf-8")).get("ball")
+            if got != want:
+                out.append(f"{name}: its file says `ball: {got or '(none)'}`; the row makes it `{want}` (SR-WORK-OPEN-QUEUE rule 64)")
         links_exist(text, base, name, out)
     return out
 
@@ -200,6 +213,21 @@ def check_ownership(root):
             out.append(f"Ownership table: `{c}` is owned by {owner}, which is no record's name (SR-WORK-OWNERSHIP decision 2)")
         elif c not in owns[owner][1]:
             out.append(f"Ownership table: `{c}` is {owner}'s, and {owns[owner][0]}'s `owns:` does not list it (SR-WORK-OWNERSHIP decision 2)")
+    entries = ["Cargo.toml"] if (root / "Cargo.toml").is_file() else []
+    for d in COVERED:
+        if (root / d).is_dir():
+            entries += sorted(f"{d}/{x.name}" for x in (root / d).iterdir() if not x.name.startswith(".") and x.name != "__pycache__")
+    for e in entries:
+        parts = e.split("/")
+        if not any("/".join(parts[:k]) in table for k in range(1, len(parts) + 1)):
+            out.append(f"Ownership table: `{e}` has no row and sits under none (SR-WORK-OWNERSHIP decision 2)")
+    for l in register.read_text(encoding="utf-8").splitlines():
+        cells = [c.strip() for c in l.strip().strip("|").split("|")]
+        if l.startswith("| [") and len(cells) == 5 and cells[4] == "no":
+            name = cells[1].strip("*")
+            comps = owns.get(name, ("", []))[1]
+            if comps and all((root / c).exists() for c in comps):
+                out.append(f"register: {name} says `built: no`, and every component it owns exists (SR-WORK-OWNERSHIP decision 9)")
     return out
 
 
@@ -277,12 +305,12 @@ def self_test():
         r = Path(t)
         files = {
             "CLAUDE.md": "See W-01 and W-02 and W-99.\n",
-            "work/open/W-01-a.md": "# W-01\n",
+            "work/open/W-01-a.md": "---\nball: arpit\n---\n# W-01\n",
             "archive/open/W-02-b.md": "# W-02\n",
             "work/README.md": "map\n",
             "work/NEW.md": "unregistered\n",
             "docs/old/archive/x.md": "a second archive\n",
-            "records/README.md": "<!-- OWNERSHIP-TABLE-START -->\n| component | owner | note |\n|---|---|---|\n"
+            "records/README.md": "| [0001](0001_a.md) | **SR-A** | a | accepted | no |\n<!-- OWNERSHIP-TABLE-START -->\n| component | owner | note |\n|---|---|---|\n"
             "| `scripts/a.sh` | SR-A | ok |\n| `scripts/b.sh` | SR-A | not in owns |\n| `scripts/gone.sh` | SR-NONE | x |\n"
             "<!-- OWNERSHIP-TABLE-END -->\n",
             "records/0001_a.md": "---\nname: SR-A\nowns:\n  - scripts/a.sh\n  - scripts/c.sh\n---\n",
@@ -290,7 +318,7 @@ def self_test():
             "| `work/README.md` | t | v | n |\n| `work/README.md` | t | v | n |\n| `archive/open/W-02-b.md` | t | v | n |\n"
             "| `work/MISSING.md` | t | v | n |\n| `CLAUDE.md` | t | v | n |\n| `records/README.md` | t | v | n |\n"
             "| `work/OPEN-WORK.md` | t | v | n |\n\n## References\n",
-            "scripts/a.sh": "", "scripts/b.sh": "",
+            "scripts/a.sh": "", "scripts/b.sh": "", "scripts/c.sh": "", "packs/x/rule.yml": "",
             "work/OPEN-WORK.md": "# OPEN-WORK\n\n---\n\n## Blocked on the decider\n\n| what | filed | age |\n|---|---|---|\n"
             "| Decide a thing ([W-01](open/W-01-a.md)) | 2026-10-20 | 0 d |\n"
             "| 🔴 Decide another ([x](open/nope.md)) | 2026-10-20 | 0 d |\n| ↳ **blocks:** W-01 | | |\n\n---\n\n## Open items\n\n### build\n\n"
@@ -309,6 +337,7 @@ def self_test():
             "lost: W-99", "owns `scripts/c.sh`", "`scripts/b.sh` is SR-A's", "SR-NONE, which is no record",
             "`scripts/gone.sh` does not exist", "points into archive/", "`work/MISSING.md` does not exist",
             "`work/README.md` has two rows", "`work/NEW.md` is a maintained document", "a second archive: docs/old/archive/",
+            "rule 40", "rule 64", "`packs/x` has no row", "decision 9",
         ]
         missed = [e for e in expect if e not in got]
         if missed or "W-01 (named" in got or "W-02 (named" in got:

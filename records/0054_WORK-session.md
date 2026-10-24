@@ -20,7 +20,8 @@ content_sha: ""
 
 **A session leaves the repo better than it found it.** Before it ends it
 appends one `work/WORKLOG.md` entry; while it works it keeps
-`work/INTERVIEW.md` true and `work/NOW.md` at one line, so a session that dies
+`work/INTERVIEW.md` true and `work/NOW.md` holding only what is live — empty
+when nothing runs — so a session that dies
 mid-task leaves a note, not a mystery.
 
 **It speaks in markers, not summaries** — `→ W-nn: …` on start,
@@ -32,17 +33,17 @@ the second occurrence.
 
 ```mermaid
 flowchart LR
-    A["read INTERVIEW + queue"] --> N["NOW.md: one line"]
+    A["read INTERVIEW + queue"] --> N["NOW.md: my row"]
     N --> W["work · INTERVIEW kept true"]
     W --> L["WORKLOG entry"]
-    L --> I["NOW.md: idle"]
+    L --> I["NOW.md: row gone; leftovers → W-item"]
 ```
 
 <details>
 <summary><b>ASCII twin</b> — the same diagram, for terminals and diffs</summary>
 
 ```text
-   read INTERVIEW + queue --> NOW.md (one line) --> work, INTERVIEW kept true
+   read INTERVIEW + queue --> NOW.md (in flight) --> work, INTERVIEW kept true
                                                           |
                                      NOW.md: idle <-- WORKLOG entry
 ```
@@ -71,8 +72,8 @@ not after.
    standing constraints · lessons learned.
 4. **`work/IMPLEMENTATION.md` is the evidence store** the queue reconciles
    against. A row is earned by landing, never by being planned.
-5. **`work/NOW.md` carries one line, overwritten.** A session that dies
-   mid-task leaves a note, not a mystery. `idle` when nothing is in flight.
+5. **`work/NOW.md` is [SR-WORK-NOW](0061_WORK-now.md)'s** — only what is being worked on
+   right now, empty when nothing is; a session keeps its own row true.
 6. **Announce every transition in one line — a marker, never a summary.**
    `→ W-12: building the parser` on start; `✓ W-12 · → W-13: …` on finish.
    A finish with no next is a stop, and a stop is its own sentence.
@@ -93,6 +94,7 @@ not after.
 
 ### Consequences
 
+- Decision 5 points at [SR-WORK-NOW](0061_WORK-now.md), which owns `.claude/hooks/now-ledger.py`.
 - Decision 5 is nudged by `.claude/hooks/require-progress.sh`: a Stop hook that
   blocks once when the tree changed and `work/NOW.md` did not, then relents.
 - Every other decision — the worklog entry, INTERVIEW kept current, answer

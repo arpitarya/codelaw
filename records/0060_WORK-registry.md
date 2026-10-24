@@ -7,7 +7,8 @@ description: "Every maintained document has a row in §3 of this record naming i
 status: accepted
 date: 2026-10-18
 feature: the doc registry
-owns: []
+owns:
+  - scripts/docs-sync.py
 laws: [L0]
 timestamp: 2026-10-18T12:52:51Z
 content_sha: ""
@@ -94,13 +95,13 @@ into a scan anyone can do at task end.
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-24 | 2026-10-24 — the L6 line and the `packs/` layout line: nine packs, eight on npm and six on PyPI (W-31, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-24 | 2026-10-24 — W-31 and W-32 filed, W-32's ruling in the inbox; W-29 re-balled (0.1.0 on npm); W-30 moved to 0.2.0 |
-| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-20 | 2026-10-20 — every row but B-006, B-007 promoted to W-07–W-22 |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-24 | 2026-10-24 — docket rulings; W-21, W-25, W-26, W-28 closed; W-20's snapshots |
+| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-24 | 2026-10-24 — B-046 (the tree-sitter-css upstream PR), B-047 (the CSS-tree port) |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-24 | 2026-10-24 — §1: nine packs, 0.1.0 on npm, W-31 uncommitted |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-24 | 2026-10-24 — W-29 (0.1.0 on npm) and W-31 (the registry pack split) |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-24 | 2026-10-24 — §2: the docket's rulings |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-24 | 2026-10-24 — W-21, W-25, W-26, W-28 closed; W-20's snapshots |
 | `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-24 | 2026-10-24 — the first npm publish and W-31 |
-| `work/NOW.md` | every transition; `idle` when stopping | 2026-10-24 | 2026-10-24 — after W-31: unpublish `@codelaw/rules-python`, push, 0.2.0 |
+| `work/NOW.md` | kept by hooks: a row per live session; empty when nothing runs | 2026-10-24 | 2026-10-24 — after W-31: unpublish `@codelaw/rules-python`, push, 0.2.0 |
 | `work/LESSONS.md` | a failure teaches something durable | 2026-10-24 | 2026-10-24 — the cfg-split lesson and the two-sessions-one-checkout lesson |
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
@@ -108,7 +109,7 @@ into a scan anyone can do at task end.
 | `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-24 | 2026-10-24 — pack, first-party pack and `dist` for the nine packs (W-31) |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-24 | 2026-10-24 — the L6 and SR-RULE-PACKS rows: nine packs (W-31) |
 | `records/README.md` | a record's state, ownership or number changes | 2026-10-24 | 2026-10-24 — the L6 and SR-PACKAGES rows and the `packs` row: nine packs (W-31) |
-| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-24 | 2026-10-24 — the names per registry; npm's one-time steps done (W-29) and owed again for the four new pack names (W-31) |
+| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-24 | 2026-10-24 — step 5 done: the `npm`/`pypi` environments, tag rule `v*` (W-18) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
 | `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-24 | 2026-10-24 — the rule-pack table per registry, the config example (W-31) |
 | `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-24 | 2026-10-24 — Unreleased: the nine packs and the preset changes (W-31) |

@@ -1,0 +1,25 @@
+# `codelaw test --corpus` finding counts (SR-RULE-AUTHORING decision 4).
+# Rewrite with --update-snapshot, and review the change.
+
+[findings]
+"ts/ban-ts-comment" = 96
+"ts/no-array-constructor" = 0
+"ts/no-duplicate-enum-values" = 0
+"ts/no-empty-object-type" = 276
+"ts/no-explicit-any" = 1653
+"ts/no-extra-non-null-assertion" = 0
+"ts/no-misused-new" = 0
+"ts/no-namespace" = 1
+"ts/no-non-null-asserted-optional-chain" = 0
+"ts/no-require-imports" = 3
+"ts/no-this-alias" = 1
+"ts/no-unnecessary-type-constraint" = 0
+"ts/no-unsafe-declaration-merging" = 173
+"ts/no-unsafe-function-type" = 8
+"ts/no-unused-expressions" = 39
+"ts/no-unused-vars" = 318
+"ts/no-wrapper-object-types" = 0
+"ts/prefer-as-const" = 0
+"ts/prefer-namespace-keyword" = 0
+"ts/triple-slash-reference" = 0
+"ts/type-only-imports" = 797

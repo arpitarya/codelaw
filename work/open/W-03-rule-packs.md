@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-19: research the ESLint, typescript-eslint, TSLint,
 item: W-03
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-20
-updated_by: "Arpit (Claude Code, Opus 5.5) — step 6 packaging"
-ball: agent
+updated: 2026-10-24
+updated_by: "Claude (Opus 5.5), W-25/W-26 close-out 2026-10-24"
+ball: arpit
 ---
 
 # W-03 — Build the five rule packs from the best-known presets
@@ -137,9 +137,9 @@ Prettier has no lint rules. Its option defaults become SR-FORMATTER's `[format]`
 
 None for steps 2–5: W-02 landed the engine, the semantic model, `native:` rules and pack loading on 2026-10-19.
 
-- **Step 6 also waits on W-07, W-08 and W-09** (2026-10-20): the packs ship with the engine (L6 decision 9), and the engine may not ship without its formatter, MCP server and LSP (L7, L6 decision 3).
+- ~~Step 6 also waits on W-07, W-08 and W-09~~ — landed 2026-10-21 (L7, L6 decision 3 hold; struck by W-25, 2026-10-24).
 - **Step 6 (publish)** — the packs are built two ways: `scripts/build-packs.py` (local, 2026-10-20) and the release pipeline's `scripts/package.py` (W-04, 2026-10-20). The licence is ruled MIT (SR-PACKAGES decision 10). What remains is the decider's: the one-time registry setup (`RELEASING.md` §One time) and the ruling to publish — the OPEN-WORK inbox.
-- **Engine features some ports need, not built yet:** `target:` + `assert:` rules and the `sort-keys`/`ensure-key` primitives (W-12) for `rules-data`'s schema and sorting rules; the project graph (W-11) for `graph/no-unused-exports`. Rules that need them wait in the pack README's "not ported yet" list; they are not approximated.
+- ~~Engine features some ports need~~ — W-12 (`target:`/`assert:`, `sort-keys`/`ensure-key`) and W-11 (the project graph) landed 2026-10-22 (struck by W-25, 2026-10-24).
 
 ## Record affected
 

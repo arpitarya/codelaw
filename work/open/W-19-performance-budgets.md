@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-20: L8's budgets, which are all unset because nothi
 item: W-19
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-22
-updated_by: "Claude Code (Opus 5.5), subagent on branch W-19-bench"
+updated: 2026-10-24
+updated_by: "Claude (Opus 5.5), docket 2026-10-24"
 ball: agent
 ---
 
@@ -40,7 +40,7 @@ ball: agent
 
 ## Blockers
 
-The budgets are the decider's to set (L8 decision 4), from the CI runner's numbers. The three pinned real repos and the reference machine of L8 decision 2 are the decider's to name.
+The budgets are the decider's to set (L8 decision 4), from the CI runner's numbers. **Arpit, 2026-10-24 (docket):** *"Both as recommended"* — the reference machine is GitHub's hosted `ubuntu-24.04` runner; the three pinned real repos are `djangoproject.com`, `full-stack-fastapi-template` and `html5-boilerplate`, at the commits in `scripts/corpus.json`. Left for an agent: pin the `perf` job to `ubuntu-24.04` and add the three repos to `codelaw bench`.
 
 ## Record affected
 

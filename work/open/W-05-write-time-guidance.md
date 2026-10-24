@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-20: codelaw guides an agent while it writes code, n
 item: W-05
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-20
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated: 2026-10-24
+updated_by: "Claude (Opus 5.5), W-25/W-26 close-out 2026-10-24"
+ball: cowork
 ---
 
 # W-05 — Guide the agent while it writes, not only after

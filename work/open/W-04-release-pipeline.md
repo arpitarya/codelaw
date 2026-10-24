@@ -5,21 +5,12 @@ description: "Arpit, 2026-10-20: a CI/CD pipeline that publishes codelaw's packa
 item: W-04
 filed: 2026-10-20
 filed_by: "Arpit (Claude Code, Opus 5.5)"
-updated: 2026-10-20
-updated_by: "Arpit (Claude Code, Opus 5.5)"
-ball: agent
+updated: 2026-10-24
+updated_by: "Claude (Opus 5.5), W-25/W-26 close-out 2026-10-24"
+ball: arpit
 ---
 
 # W-04 — The release pipeline: build once in CI, publish what CI built
-
-**Arpit, 2026-10-20:** *"checkout fux and sheetpane for how the cicd pipeline
-are built how pypi and npm packages are published — build a cicd pipeline for
-codelaw to publish packages it should take around 2 mins even faster."*
-
-**His rulings the same day:** the licence is **MIT** (first recorded here as `MIT OR Apache-2.0`; ruled MIT only at the merge, SR-PACKAGES decision 10); CI builds
-the binaries and **publish reuses them**; the pipeline is timed on a scratch
-branch of the real repo, publishing nothing; and, after the first timings,
-**pin the Rust toolchain** (1.99.1).
 
 ## At a glance
 
@@ -30,6 +21,17 @@ branch of the real repo, publishing nothing; and, after the first timings,
 | 3 | `publish.yml`: gate on CI, upload that run's `dist` to npm and PyPI by OIDC | a release with no token and no rebuild | ✅ written; ⏳ first live run |
 | 4 | Time it on real runners and cut it to ~2 min | the target Arpit set | ✅ 63 s for a non-code push, 2 m 45 s for a code push (§Measured) |
 | 5 | The first release | codelaw on both registries | 🔴 the one-time registry setup, then the ruling to publish |
+
+**Arpit, 2026-10-20:** *"checkout fux and sheetpane for how the cicd pipeline
+are built how pypi and npm packages are published — build a cicd pipeline for
+codelaw to publish packages it should take around 2 mins even faster."*
+
+**His rulings the same day:** the licence is **MIT** (first recorded here as `MIT OR Apache-2.0`; ruled MIT only at the merge, SR-PACKAGES decision 10); CI builds
+the binaries and **publish reuses them**; the pipeline is timed on a scratch
+branch of the real repo, publishing nothing; and, after the first timings,
+**pin the Rust toolchain** (1.99.1).
+
+**Model:** Opus for the pipeline (steps 1–4): two registries, OIDC and a build-once artifact are judgment calls; NONE for step 5, the decider's registry setup.
 
 ## What was taken from fux and sheetpane
 
@@ -65,7 +67,8 @@ Wall time is first job start to last job end.
 
 ## Blockers
 
-- **Step 5 waits on W-07, W-08 and W-09** (2026-10-20): L7 and L6 decision 3 forbid releasing an engine without the formatter, MCP server and LSP. `scripts/law-gate.py` now refuses such a release in `publish.yml`; `ci.yml` reports it on every push.
+- ~~Step 5 waits on W-07, W-08 and W-09~~ — landed 2026-10-21; `scripts/law-gate.py` still refuses a release without them (struck by W-25, 2026-10-24).
+- **2026-10-24:** npm steps 1–3 done (W-29) and step 5, the `npm`/`pypi` environments with tag rule `v*`, done; left: step 4, the PyPI pending publishers (inbox).
 - **Step 5 is the decider's:** the `@codelaw` npm org, the first hand publish of the 14 npm packages, `scripts/npm-trust.sh`, six PyPI pending publishers and the `npm` / `pypi` GitHub environments ([`RELEASING.md`](../../RELEASING.md) §One time) — then his ruling to publish, which is W-03 step 6.
 
 ## Not done here (backlog)

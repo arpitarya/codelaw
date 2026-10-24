@@ -6,7 +6,7 @@ item: W-32
 filed: 2026-10-24
 filed_by: "Arpit (Claude Code, Opus 5.5)"
 updated: 2026-10-24
-updated_by: "Arpit (Claude Code, Opus 5.5)"
+updated_by: "Claude (Opus 5.5), docket 2026-10-24"
 ball: agent
 ---
 
@@ -16,7 +16,7 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | The decider picks the names and the Redux Toolkit source (below) | the two packs can be scoped | 🔴 decider decides |
+| 1 | The decider picks the names and the Redux Toolkit source (below) | the two packs can be scoped | ✅ 2026-10-24: `@codelaw/rules-redux-toolkit` (namespace `redux-toolkit`), `@codelaw/rules-react-query` (namespace `react-query`); source (a) |
 | 2 | Port TanStack's `@tanstack/eslint-plugin-query` `recommended` into `packs/query/` | React Query rules | ⏳ |
 | 3 | Write the Redux rules from the chosen source into `packs/redux/` | Redux Toolkit rules | ⏳ |
 | 4 | Add both to `FIRST_PARTY_PACKS` as `npm_only`, their namespaces to the reserved list and `namespace_pack`, `init` detection by `package.json` dependency | `init` installs them in a repo that uses them | ⏳ |
@@ -40,6 +40,8 @@ ball: agent
 
    Recommended: **(a)**, since it is the official guidance and is about Redux Toolkit itself.
 
+**Arpit, 2026-10-24 (docket):** *"redux-toolkit + react-query, (a)"* — packs `@codelaw/rules-redux-toolkit` (namespace `redux-toolkit`) and `@codelaw/rules-react-query` (namespace `react-query`, in `packs/react-query/`); the Redux rules written fresh from the Redux Style Guide (a). Steps 2–4 use these names in place of `packs/query/` and `packs/redux/`.
+
 ## Definition of done
 
 | DoD | what | state |
@@ -51,7 +53,7 @@ ball: agent
 
 ## Blockers
 
-Step 1: the decider's ruling (inbox). W-31 lands first; this adds two rows to its table.
+None: step 1 ruled 2026-10-24. Step 4 also amends [SR-LAW-6](../../records/0008_LAW-6-python-and-node-packages.md)'s pack counts (nine packs → eleven, eight on npm → ten) under this ruling.
 
 ## Record affected
 

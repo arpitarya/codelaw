@@ -43,6 +43,10 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 | [`W-16-commands-and-api.md`](open/W-16-commands-and-api.md) | 2026-10-22 | `crates/codelaw-cli`, `codelaw.schema.json` and the npm/Python API; [SR-CLI-MCP](../records/0115_cli-and-mcp.md), [SR-CONFIG](../records/0110_config.md) and [SR-PACKAGES](../records/0107_packages.md) |
 | [`W-23-formatter-rest.md`](open/W-23-formatter-rest.md) | 2026-10-22 | `crates/codelaw-format`, `crates/codelaw-test`'s layout refusal, `crates/codelaw-lsp` range formatting; [SR-FORMATTER](../records/0105_formatter.md) §What is built and decision 3; B-045 |
 | [`W-22-record-drift.md`](open/W-22-record-drift.md) | 2026-10-20 | [SR-RULE-PACKS](../records/0101_rule-packs.md), [SR-PACKAGES](../records/0107_packages.md) decision 9, [SR-ARCHITECTURE](../records/0108_architecture.md) decision 1 |
+| [`W-21-pack-engine-gaps.md`](open/W-21-pack-engine-gaps.md) | 2026-10-24 | the engine in `crates/codelaw-lang` (regions, the tree-sitter-css fork) and `crates/codelaw-engine` (file context); [SR-ARCHITECTURE](../records/0108_architecture.md) decisions 3 and 15b; the upstream PR is [B-046](../work/BACKLOG.md), the CSS-tree port [B-047](../work/BACKLOG.md) |
+| [`W-28-layout-check-by-tokens.md`](open/W-28-layout-check-by-tokens.md) | 2026-10-24 | `codelaw_lang::token_stream` and `codelaw-test`'s layout check; [SR-FORMATTER](../records/0105_formatter.md) decision 3, [SR-RULE-AUTHORING](../records/0113_rule-authoring.md) decision 4 |
+| [`W-26-public-docs-from-the-tree.md`](open/W-26-public-docs-from-the-tree.md) | 2026-10-24 | `scripts/docs-sync.py` and the README/CHANGELOG regions it keeps; [SR-WORK-REGISTRY](../records/0060_WORK-registry.md) Consequences |
+| [`W-25-governance-drift.md`](open/W-25-governance-drift.md) | 2026-10-24 | the work system's checks: `scripts/check-work-system.py` (rules 40, 64; SR-WORK-OWNERSHIP decisions 2, 9); [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md), [SR-WORK-OWNERSHIP](../records/0058_WORK-ownership.md) |
 
 ## `backlog/`
 

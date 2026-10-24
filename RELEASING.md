@@ -54,7 +54,7 @@ In this order. npm binds a trusted publisher only to a package that already
 exists, so the first npm publish cannot come from CI. PyPI can: a *pending*
 publisher creates the project on its first upload.
 
-**Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](work/open/W-29-first-npm-publish.md)).
+**Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](work/open/W-29-first-npm-publish.md)). **Step 5 done 2026-10-24** (both environments, tag rule `v*`, [W-18](work/open/W-18-release-hardening.md)). Left: step 4.
 Steps 2–3 come back for **every pack name new to npm**: at 0.2.0,
 `@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](work/open/W-31-registry-pack-split.md)) —
 publish just those tarballs by hand from the 0.2.0 `dist`, then run

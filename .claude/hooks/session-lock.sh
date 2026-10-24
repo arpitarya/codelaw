@@ -10,6 +10,12 @@ mkdir -p "$LOCKS_DIR"
 NOW=$(date +%s)
 TTL=900
 
+# Sweep every lock past its TTL (SR-WORK-CLEANUP decision 8).
+for d in "$LOCKS_DIR"/*/; do
+  [ -f "$d/owner" ] || continue
+  [ $((NOW - $(cut -d' ' -f2 "$d/owner"))) -ge $TTL ] && rm -rf "$d"
+done
+
 INPUT=$(cat)
 # The owner is the hook input's session_id: $PPID differs per tool call, so a
 # session would otherwise lock itself out of the file it just wrote.

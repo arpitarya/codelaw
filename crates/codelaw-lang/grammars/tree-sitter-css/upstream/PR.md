@@ -27,11 +27,9 @@ Three CSS forms that browsers have shipped for a while currently parse with
 - `test/corpus/modern.txt`: six corpus tests covering the three constructs.
   Happy to fold them into the existing corpus files (`statements.txt`?) if
   you prefer.
-- `src/` is **not** in the patch: please regenerate with
-  `tree-sitter generate` (I used tree-sitter-cli 0.25.10, the version 0.25.0
-  was generated with; it reproduces the released `src/parser.c` byte for byte
-  from the unmodified grammar). Happy to push the regenerated `src/` if that
-  is the preferred workflow here.
+- `src/` is regenerated with tree-sitter-cli 0.25.10 (the version 0.25.0 was
+  generated with; from the unmodified grammar it reproduces the released
+  `src/parser.c` byte for byte).
 
 ## Compatibility
 

@@ -1,0 +1,41 @@
+# `codelaw test --corpus` finding counts (SR-RULE-AUTHORING decision 4).
+# Rewrite with --update-snapshot, and review the change.
+
+[findings]
+"json/no-duplicate-keys" = 0
+"json/package-deps-sorted" = 1
+"json/package-engines" = 7
+"json/package-json-schema" = 0
+"json/package-scripts-sorted" = 9
+"json/tsconfig-schema" = 0
+"json/tsconfig-strict" = 1
+"md/commands-show-output" = 39
+"md/descriptive-link-text" = 10
+"md/fence-language" = 12
+"md/first-line-heading" = 26
+"md/heading-increment" = 4
+"md/link-fragments" = 16
+"md/link-image-reference-definitions" = 1
+"md/no-alt-text" = 0
+"md/no-bare-urls" = 33
+"md/no-duplicate-heading" = 0
+"md/no-emphasis-as-heading" = 52
+"md/no-empty-links" = 0
+"md/no-inline-html" = 83
+"md/no-reversed-links" = 0
+"md/reference-links-images" = 0
+"md/relative-links" = 159
+"md/single-h1" = 10
+"md/table-column-count" = 0
+"toml/deps-sorted" = 3
+"toml/no-duplicate-keys" = 0
+"toml/pyproject-requires-python" = 3
+"toml/pyproject-schema" = 0
+"yaml/document-start" = 62
+"yaml/gha-action-schema" = 0
+"yaml/gha-pin-sha" = 8
+"yaml/gha-workflow-schema" = 0
+"yaml/no-ambiguous-booleans" = 0
+"yaml/no-ambiguous-numbers" = 0
+"yaml/no-duplicate-keys" = 0
+"yaml/no-undeclared-alias" = 0

@@ -86,14 +86,16 @@ checkout.
 
 **Next:** the decider pushes `main` — CI's first run proves W-24 (green),
 W-27 (the `msrv` job, the win32 smoke) and gates L8's budgets. **Next for an
-agent:** W-20's `packs/*/corpus.toml` snapshots (the `corpus` job fails until
-they exist — do this before or with the push), then what is left of W-25
-(`check-work-system.py`, item-file `ball:`) and W-26 (the `ci.yml` step, the
-register row). W-05 is Cowork research only (rule 37a). **Run one cargo build
+agent:** W-32's two packs (steps 2–4), W-19's `perf` pin and the three repos in `bench`; W-20's snapshots, W-25 and W-26 are done (2026-10-24). W-05 is Cowork research only (rule 37a). **Run one cargo build
 at a time on this machine** (LESSONS 2026-10-24).
 
-**Open questions for the decider, carried from earlier sessions:** W-21 —
-whether DoD 3 holds while the CSS rules still read text; W-11's two default
+**Docket 2026-10-24:** W-21 closed (fork kept, the PR is B-046, DoD 3 restated
+engine-only, a CSS-tree port is B-047); W-32 named (`rules-redux-toolkit`,
+`rules-react-query`, Redux Style Guide); W-28's token rule confirmed; W-20's
+build-and-test leg dropped; W-19's machine (`ubuntu-24.04`) and three repos
+named; step 5 of the registry setup done. Left in the inbox: PyPI step 4, L8's budgets.
+
+**Open questions for the decider, carried from earlier sessions:** W-11's two default
 gaps (self-aliased private packages; CSS only for linked stylesheets); W-13's
 `on_touch` default for non-deprecation baselines and `codelaw/stale-baseline`
 as `manual`; W-15's per-project tree-cache bound; a `rustfmt.toml` and a
@@ -109,8 +111,8 @@ upstream's noisy defaults kept in `html/require-sri`, `html/valid-id`,
 (his ask, 2026-10-24), npm then PyPI, from one CI `dist`; the commands are in
 the item files. The npm org `codelaw` exists (checked 2026-10-24).
 **W-04 / W-03** (🔴): built, timed, merged; the first release waits on the
-registry setup and the ruling to publish. **W-18** (🔴): the environments
-and their tag rule. **W-19** (🔴): the budgets, after CI's first `perf` run.
+registry setup (the go was given with npm 0.1.0; `BLOCKED.json` is `PROCEED`). **W-18** (🟢): the environments
+and their tag rule set 2026-10-24; CI's first run proves the rest. **W-19** (🟢): pin `perf` to `ubuntu-24.04` and bench the three repos; the budgets after CI's first `perf` run.
 
 ## 3 · Standing constraints
 

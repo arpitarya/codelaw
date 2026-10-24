@@ -24,6 +24,50 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-24 — Docket: seven rulings, step 5 of the registry setup, W-21/W-25/W-26/W-28 closed, every corpus snapshot  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"Let's go ahead and raise a PR for TreeSitter.css."* → *"keep using the patch copy and put the PR in backlog. Then look into all the blockers one by one, explain them to me, and recommend"* → *"implement all the open items and close them out."*
+- **Done:** the tree-sitter-css PR re-verified on upstream `master` (= v0.25.0: 46/46, 37 highlight checks, `src/` byte-identical to the fork) and packaged as `upstream/0001-tree-sitter-css-modern.patch`; `PR.md` now says `src/` is included. Docket: `BLOCKED.json` → `PROCEED`; the two registry rows merged; step 5 done in Arpit's Chrome (both environments, tag rule `v*`, checked); W-32 named; W-21 DoD 3 restated and W-21 closed (B-046, B-047); W-28 confirmed; W-20's build-and-test leg dropped; W-19's machine and three repos named (`perf` pinned to `ubuntu-24.04`). Built in the cloud (rustc 1.97): W-28 DoD 4 on nine packs (419 rules, 0 failed, 0 warnings) → closed; W-20 corpus extended to nine packs and 11 repos (`ionic-framework` for `stencil`), every `corpus.toml` written and re-run clean; W-25's checker (rules 40, 64; SR-WORK-OWNERSHIP 2, 9), item-file `ball:` fixes → closed; W-26's `docs-sync.py --check` in CI and its owner row → closed. Nothing committed.
+- **Decided / left open:** Arpit's rulings are in each item file. Open: PyPI step 4 (needs his login), L8's budgets (after CI's first `perf` run).
+- **Mistakes:** a source tarball was written into the repo and could not be deleted (no delete permission): it, and four helper scripts, sit in `_to_delete/` for Arpit to remove. Pushing the upstream PR was refused to this session; the patch waits as B-046.
+- **Found:** `check-work-system.py` fails on four `.claude/hooks/*` rows another session staged before their files exist — that session's, not touched here. `target/` is 15 GB, past L9.
+- **Next:** Arpit reviews `git status` and commits (concurrent session in flight), then pushes `main` — CI's first run proves W-18, W-20, W-24, W-27.
+
+## 2026-10-24 — SR-WORK-CLEANUP: a worktree is removed at session end only if nothing is lost; otherwise red, blocked on the decider  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"whenever a work tree's cleanup happens, always make sure everything is merged into main branch and no data is lost. If any data is supposed to be lost, mark it as red, block it on me, and I'll make a call. Otherwise, automatically do the cleanup when the session ends. Create a work SR for work trees, lock files, cleanup."* — Arpit, for fux, sheetpane and codelaw.
+- **Done:** [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md), new — worktrees (the four checks, never `--force` / `-D`, red → a `🔴 arpit` item plus an inbox row), other leftovers, lock files (moved here from SR-WORK-BLOCKERS decision 9a, now a pointer), surfaces. It owns `release-locks.sh` and the new `worktree-cleanup.py`. SR-WORK-NOW decision 4 now cleans or queues instead of only queueing. Register, ownership, governance and `CLAUDE.md` rows. The `.claude/` half is `install-agent-hooks.py` v4.
+- **Decided / left open:** cleanup never merges (decision 4); an unmerged branch is red, even though removing only the worktree would keep its commits — "everything merged into main" is the bar Arpit set.
+- **Mistakes:** none.
+- **Next:** Arpit runs `python3 install-agent-hooks.py` (v4), then commits.
+
+## 2026-10-24 — L9: work/MACHINE.md's budget section is law, every GB past 5 GB approved; SR-WORK-NOW  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"So 5 GB is the limit. If it goes beyond it, ask me for my approval on every GB that it increases, and create a law that machine.md should always, machine.md budget section should always be followed."* … *"create a work SR just for now.md, and whatever we talked about, put it in there … have a separate SR work document for now.md."* — Arpit, for fux, sheetpane and codelaw.
+- **Done:** [SR-LAW-9](../records/0011_LAW-9-machine-budget.md) — **L9**, new: MACHINE.md's budget section binds every session and agent; past 5 GB every GB is approved first. It owns `.claude/hooks/disk-budget.py`, which now reads the number from MACHINE.md and raises a permission prompt per GB instead of refusing. [SR-WORK-NOW](../records/0061_WORK-now.md), new: everything decided today about NOW.md, moved out of SR-WORK-SESSION (decision 5 is a pointer; 5a, 5b and 15 are gone, never committed). SR-LAWS, the register, ownership rows and `CLAUDE.md` name both (SR-WORK-DOCS decision 7a). The `.claude/` half is `install-agent-hooks.py` v3.
+- **Found:** at filing, codelaw is 15 GB — past the budget; `target/` alone is 15 GB, rebuildable with `cargo clean` (the installer offers it).
+- **Decided / left open:** none.
+- **Mistakes:** none.
+- **Next:** Arpit runs `python3 install-agent-hooks.py` (v3), then commits.
+
+## 2026-10-24 — NOW.md holds only what is live; a 5 GB disk budget per project, all agents combined  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"now.md should track everything that is being worked in the chat right now … once it ends, now.md should have nothing … if there is any cleanup … create work items, but make sure now.md is empty … no agent in one project should consume more than 5 GB. Even sub agents … combined"* — Arpit, for fux, sheetpane and codelaw.
+- **Done:** [SR-WORK-SESSION](../records/0054_WORK-session.md) decisions 5–5b rewritten — this supersedes the morning's resource ledger, which was never installed — and decision 15, the disk budget; `work/NOW.md` emptied to its two live tables; MACHINE.md's budget section; ownership, registry and governance rows; `CLAUDE.md` names the budget (SR-WORK-DOCS decision 7a). The `.claude/` half — `now-ledger.py`, `disk-budget.py`, the settings wiring, the shared debug-free cargo target — is in `install-agent-hooks.py` v2.
+- **Found:** at filing, codelaw is 15 GB — over; `target/` alone is 15 GB, rebuildable with `cargo clean` (the installer offers it).
+- **Decided / left open:** the budget is a decision of SR-WORK-SESSION, not a numbered law; Arpit can promote it. The stale in-flight line was dropped — a status note, not live work; its next steps are in OPEN-WORK.
+- **Mistakes:** none.
+- **Next:** Arpit runs `python3 install-agent-hooks.py` (v2), then commits.
+
+## 2026-10-24 — locks are cleaned; NOW.md lists what is in flight and every uncleaned worktree or VM  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"whenever .lock file is created, it needs to be cleaned out … now.md file should have everything that is being implemented right now. And once it is implemented, it should be cleaned … tracks in now.md what virtual machines got created, what work trees got created … if they aren't cleaned, then create a work item to clean them"* — Arpit, for fux, sheetpane and codelaw.
+- **Done:** [SR-WORK-SESSION](../records/0054_WORK-session.md) decisions 5–5b and [SR-WORK-BLOCKERS](../records/0056_WORK-blockers.md) decision 9a; `work/NOW.md` moved to the in-flight list + resource ledger; ownership, registry, governance rows; `CLAUDE.md`’s session-continuity line changed (SR-WORK-DOCS decision 7a). The `.claude/` half — `session-lock.sh` (session_id owner, TTL sweep), `release-locks.sh`, `now-resources.py`, the `settings.json` wiring — is in `install-agent-hooks.py`: the bridge refuses writes under `.claude/`.
+- **Found:** `stop-if-blocked.sh`, `require-progress.sh` and `guard-open-work-inbox.sh` emit `decision:"block"` inside `hookSpecificOutput`; Claude Code reads it only at the top level for `Stop` and `PostToolUse`, so none of the three has ever blocked. Fixed in the installer.
+- **Decided / left open:** the 5 GB-per-project budget is proposed, not yet a law — waiting on Arpit.
+- **Mistakes:** a write probe was left as `.claude/hooks/.probe-delete-me` (the bridge cannot unlink); the installer removes it.
+- **Next:** Arpit runs `python3 install-agent-hooks.py`, then commits.
+
 ## 2026-10-24 — the green queue in parallel: W-20, W-21, W-24–W-28 merged; the disk filled  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"give me the command to publish all npm packages … for trusted publisher"*; *"commit everything and then give me a command to publish the new packages for the first time"*; *"implement everything that is in green in parallel"*; *"merge everything to main. And delete everything that is not needed."*

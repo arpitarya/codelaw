@@ -42,12 +42,14 @@ decision 13.
 | why a command fails on *this* machine | [`work/MACHINE.md`](work/MACHINE.md) |
 | the stages a feature moves through | [SR-WORK-LIFECYCLE](records/0053_WORK-lifecycle.md) |
 | what a session owes before it ends, and how long an answer may be | [SR-WORK-SESSION](records/0054_WORK-session.md) |
+| what `work/NOW.md` holds — only what is live | [SR-WORK-NOW](records/0061_WORK-now.md) |
+| what happens to worktrees and lock files when a session ends | [SR-WORK-CLEANUP](records/0062_WORK-cleanup.md) |
 | what a task owes the documentation | [SR-WORK-DOCS](records/0055_WORK-docs.md) |
 | what to do when you cannot proceed without the decider | [SR-WORK-BLOCKERS](records/0056_WORK-blockers.md) |
 | whether a claim may be grounded in an archived doc | [SR-WORK-ARCHIVE](records/0057_WORK-archive.md) |
 | which record owns a module | [`records/README.md`](records/README.md) §Ownership |
 | which file governs what | [SR-WORK-GOVERNANCE](records/0059_WORK-governance.md) |
-| the whole set of rules about how work is done | the **WORK** records `0051`–`0060` |
+| the whole set of rules about how work is done | the **WORK** records `0051`–`0062` |
 
 Any work item that starts, finishes, blocks or is descoped updates
 `OPEN-WORK.md` **in the same change as the work**. The record is the spec;
@@ -66,6 +68,7 @@ Each law is stated in exactly one record and is **not restated here**:
 - **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as nine packs, eight on npm (`@codelaw/rules-*`) and six on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` — [SR-LAW-6](records/0008_LAW-6-python-and-node-packages.md)
 - **L7** — always both a linter and a formatter, for every L3 language — [SR-LAW-7](records/0009_LAW-7-linter-and-formatter.md)
 - **L8** — performance budgets — set from measurement, never exceeded, never loosened — [SR-LAW-8](records/0010_LAW-8-performance-budgets.md)
+- **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it needs the decider's approval — [SR-LAW-9](records/0011_LAW-9-machine-budget.md)
 
 [SR-LAWS](records/0001_LAWS.md) assigns the handles and routes each to its
 record; that is all it does. Add a law by adding a record in the law range and
@@ -85,7 +88,7 @@ holds what the project *is*. Read `work/README.md` once; it is the map.
 ## Session continuity (required)
 
 The worklog entry (a chat-only session counts), the interview kept current
-*during* the session, the one-line `work/NOW.md`, the transition markers and
+*during* the session, `work/NOW.md` ([SR-WORK-NOW](records/0061_WORK-now.md)), the transition markers and
 how long an answer may be — [SR-WORK-SESSION](records/0054_WORK-session.md).
 
 ## Blockers stop the session (required)
