@@ -16,9 +16,16 @@ as `codelaw` on npm and on PyPI; neither needs the other.
 `codelaw` installed alone lints nothing until a rule pack is installed — it
 says so (`codelaw/no-rules`).
 
-**Rule packs** — on npm as `@codelaw/rules-<name>`: `js` · `ts` · `react` ·
-`node` · `stencil` · `html` · `css` · `data`; on PyPI as `codelaw-rules-<name>`:
-`js` · `react` · `html` · `css` · `python` · `data`.
+**Rule packs** — each registry carries the packs its users install:
+
+<!-- docs-sync:registries -->
+
+| registry | named | packs |
+|---|---|---|
+| npm | `@codelaw/rules-<name>` | `js` · `ts` · `react` · `node` · `stencil` · `html` · `css` · `data` |
+| PyPI | `codelaw-rules-<name>` | `js` · `react` · `html` · `css` · `python` · `data` |
+
+<!-- /docs-sync:registries -->
 
 ## Use
 
@@ -31,14 +38,24 @@ codelaw check --format json
 **Programmatic API** — runs the bundled binary and returns its JSON report:
 
 ```js
-import { check, fix } from "codelaw";
+import { check, fix, format, rulesFor } from "codelaw";
 const report = check(["src"]);
+const rules = rulesFor("src/app.ts");
 ```
 
 ```python
 import codelaw
 report = codelaw.check(["src"])
+rules = codelaw.rules_for("app/main.py")
 ```
+
+| npm | Python | what it returns |
+|---|---|---|
+| `check(paths, options)` | `check(paths, …)` | `codelaw check --format json` |
+| `fix(paths, options)` | `fix(paths, …)` | `codelaw fix --format json`; `unsafe`, `dryRun` / `dry_run` |
+| `format(paths, options)` | `format(paths, …)` | `codelaw format --format json`; `check` writes nothing |
+| `rulesFor(path)` | `rules_for(path)` | the rules that apply to one file, as `codelaw rules --for` lists them |
+| `binaryPath()`, `platformKey()` | `binary_path()` | the bundled binary, and the platform key it was chosen by |
 
 ## Platforms
 

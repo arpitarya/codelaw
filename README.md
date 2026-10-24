@@ -21,7 +21,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 ---
 
 > [!IMPORTANT]
-> **codelaw is a preview (0.1.0) and is not on npm or PyPI yet.** The linter, the fixer, the formatter, the MCP server, the language server and all nine rule packs work today if you build from source. The published packages and the editor extension's Marketplace listing come next. [Roadmap](#roadmap) lists what is built and what is not.
+> **codelaw is a preview.** 0.1.0 is on npm, with the rules in the five packs of that release; the nine-pack layout below, and PyPI, come with 0.2.0. The linter, the fixer, the formatter, the MCP server, the language server and all nine rule packs work today if you build from source. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
 
 ## In plain words
 
@@ -140,11 +140,16 @@ cargo install --path codelaw/crates/codelaw-cli
 cd your-project
 codelaw init --no-install
 
-# 3. Until the packs are published, link them from the clone
-mkdir -p node_modules/@codelaw
-for p in js python html css data; do
+# 3. Until the packs are published, link them from the clone:
+#    the npm packs into node_modules/, the PyPI-only ones where a Python install would put them
+mkdir -p node_modules/@codelaw .codelaw-packs
+for p in js ts react node stencil html css data; do
   ln -s "$OLDPWD/codelaw/packs/$p" "node_modules/@codelaw/rules-$p"
 done
+for p in python; do
+  ln -s "$OLDPWD/codelaw/packs/$p" ".codelaw-packs/codelaw_rules_$p"
+done
+export CODELAW_SITE_PACKAGES="$PWD/.codelaw-packs"
 
 # 4. Opt in to the preview rules, then run
 echo 'preview = true' >> codelaw.toml
@@ -153,7 +158,7 @@ codelaw check
 
 - **`init` detects your languages** and writes the matching `recommended` presets into `codelaw.toml`.
 - **Every rule is `preview` in 0.1.0**, so `preview = true` is needed until rules are promoted to stable.
-- **Step 3 is temporary.** Linking the packs into `node_modules/` works in any repo, Python-only included: codelaw only reads the folder, and Node is never run. Add `node_modules/` to `.gitignore` if it isn't there already.
+- **Step 3 is temporary.** codelaw only reads the linked folders, so it works in any repo, Python-only included, and neither Node nor Python is run. `CODELAW_SITE_PACKAGES` is where codelaw looks for the PyPI packs, as an activated `.venv` would tell it. Add `node_modules/` and `.codelaw-packs/` to `.gitignore`.
 
 ### After the first release
 
@@ -172,31 +177,41 @@ The npm and PyPI packages will be the same engine and give byte-identical output
 
 Nine first-party packs: eight on npm as `@codelaw/rules-<pack>`, six on PyPI as `codelaw-rules-<pack>`. A pack on both registries holds the same files on both.
 
+<!-- docs-sync:packs -->
+
 | pack | npm | PyPI | rules | presets | reimplemented from |
 |---|---|---|---|---|---|
-| [`js`](packs/js/README.md) | ✅ | ✅ | 72 | `js/recommended` · `js/typescript` · `js/conventions` | ESLint 10 recommended (all 64), and the four core rules typescript-eslint switches on for TypeScript |
+| [`js`](packs/js/README.md) | ✅ | ✅ | 72 | `js/recommended` · `js/typescript` · `js/conventions` · `js/project` | ESLint 10 recommended (all 64), and the four core rules typescript-eslint switches on for TypeScript |
 | [`ts`](packs/ts/README.md) | ✅ | — | 21 | `ts/recommended` · `ts/conventions` | typescript-eslint 8 recommended (all 20) |
 | [`react`](packs/react/README.md) | ✅ | ✅ | 21 | `react/recommended` · `react/conventions` | eslint-plugin-react, react-hooks |
 | [`node`](packs/node/README.md) | ✅ | — | 10 | `node/recommended` | eslint-plugin-n |
 | [`stencil`](packs/stencil/README.md) | ✅ | — | 16 | `stencil/recommended` · `stencil/conventions` | @stencil/eslint-plugin |
-| [`python`](packs/python/README.md) | — | ✅ | 99 | `py/recommended` · `py/conventions` | Ruff 0.17's default `E4`/`E7`/`E9`/`F`, every stable flake8-bugbear rule, isort `I001`, `RUF022` |
+| [`python`](packs/python/README.md) | — | ✅ | 99 | `py/recommended` · `py/conventions` · `py/project` | Ruff 0.17's default `E4`/`E7`/`E9`/`F`, every stable flake8-bugbear rule, isort `I001`, `RUF022` |
 | [`html`](packs/html/README.md) | ✅ | ✅ | 72 | `html/recommended` · `html/a11y` · `html/document` · `html/conventions` | html-validate 11 recommended, a11y and document |
-| [`css`](packs/css/README.md) | ✅ | ✅ | 71 | `css/recommended` · `css/standard` · `css/conventions` | stylelint-config-recommended 18 (all 41), stylelint-config-standard 40 |
+| [`css`](packs/css/README.md) | ✅ | ✅ | 71 | `css/recommended` · `css/standard` · `css/conventions` · `css/project` | stylelint-config-recommended 18 (all 41), stylelint-config-standard 40 |
 | [`data`](packs/data/README.md) | ✅ | ✅ | 37 | `data/recommended` · `md/recommended` · `data/package-json` · `data/tsconfig` · `data/pyproject` · `data/github-actions` · `data/conventions` | markdownlint 0.42, plus JSON/YAML/TOML correctness checks |
+
+<!-- /docs-sync:packs -->
 
 - **Reimplemented, not wrapped.** Each rule is written fresh in codelaw's format, and its `ported_from:` field names the original. You don't need ESLint, Ruff or stylelint installed.
 - **Differences are written down.** Each pack's README lists where a port behaves differently from the original, and which rules weren't ported and why.
 - **Layout rules are left out on purpose.** Indentation, spacing and quotes are the formatter's job (`codelaw format`).
 - **3,949 example checks, all green.** `codelaw test packs/<pack>` runs them.
 - **`*/conventions` presets are opt-in**: house-style rules such as `js/exports-at-end` and `py/no-print`.
+- **`*/project` presets are opt-in too**: the rules that read the whole repo, `graph/no-unused-exports` (`js/project`, `py/project`) and `graph/no-unused-css-classes` (`css/project`). `codelaw graph why-unused <symbol>` says why a finding held.
+- **The counts on this page are checked.** `python3 scripts/docs-sync.py --check` fails CI when a pack's rules, presets or fix classes and this page disagree.
 
 ### Fix classes across all 419 rules
+
+<!-- docs-sync:fix-classes -->
 
 | class | rules | what happens |
 |---|---|---|
 | `auto` | 67 | `codelaw fix` applies it. It's safe and meaning-preserving. |
 | `suggest` | 69 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
 | `manual` | 283 | The finding lists numbered steps, for a person or an agent to follow. |
+
+<!-- /docs-sync:fix-classes -->
 
 ---
 
@@ -344,26 +359,38 @@ flowchart LR
 
 - **The same command works in any agent with post-edit hooks** (Codex, Copilot, Kiro), and in pre-commit and CI.
 - **`codelaw mcp`** lets an agent ask `rules_for_path` *before* writing, and `format_snippet` for the exact bytes `fix` would write.
-- **Coming next:** `codelaw init --agents` to install the hooks; and generated `AGENTS.md`, `CLAUDE.md`, Copilot and Kiro instruction files ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
+- **`codelaw hook`** is that recipe built in: it reads the agent's hook payload on stdin, fixes, and returns what is left. `codelaw init --agents claude,codex,copilot,kiro,cowork` installs the hooks and writes each agent's instruction files from the rules; `codelaw sync-agents` rewrites them when the rules change, and `--check` reports drift ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
 
 ---
 
 ## Commands
 
+<!-- docs-sync:commands -->
+
 | command | what it does |
 |---|---|
-| `codelaw check [paths]` | Report every finding with its fix. `--format text\|json\|agent`, `--max-warnings N`, `--lang`, `--rule` |
-| `codelaw fix [paths]` | Apply `auto` fixes, format, then report what's left. `--unsafe` adds `suggest` fixes; `--dry-run` writes nothing |
+| `codelaw check [paths]` | Report every finding with its fix. `--format text\|json\|sarif\|agent`, `--max-warnings N`, `--lang`, `--rule`, `--timings`; `--no-adapters` skips the installed oxlint, Ruff, stylelint and html-validate |
+| `codelaw fix [paths]` | Apply `auto` fixes, format, then report what's left. `--unsafe` adds `suggest` fixes; `--dry-run` writes nothing; `--trace` shows each pass |
 | `codelaw format [paths]` | Format every file: Prettier-style JS/TS/JSON/CSS/HTML/YAML/Markdown, Black-style Python, taplo-style TOML. `--check` and `--diff` change nothing |
 | `codelaw mcp` · `codelaw lsp` | The MCP server for agents and the language server for editors, from the same binary |
-| `codelaw init` | Detect languages and write `codelaw.toml`, `.codelaw/rules/` and the `.gitignore` line. `--no-install` prints the pack install commands instead of running them |
+| `codelaw init` | Detect languages and write `codelaw.toml`, `.codelaw/rules/` and the `.gitignore` line. `--no-install` prints the pack install commands instead of running them; `--registry npm\|pypi`; `--agents` writes the agent hooks and files |
+| `codelaw config` | `--print` every resolved value and where it came from; `--schema` prints the config's JSON Schema; `--for <file>` resolves for one file |
 | `codelaw rules` | List active rules. `--for <file>` shows the ones that apply to that file. `rules lint` checks rule files |
 | `codelaw explain <id>` | What a rule requires, why, and how to fix it |
 | `codelaw test [rule\|folder] [--corpus <dir>]` | Run rules against their own examples; `--corpus` also runs them over real code |
 | `codelaw new-rule <ns/name>` | Write a rule file from the template |
 | `codelaw tree <file>` | Show the syntax tree the engine sees |
+| `codelaw match <id> <file>` | Which clause of a rule matched or failed, and what it captured. `--explain` shows every candidate node |
+| `codelaw graph refs\|why-unused <symbol>` | Query the project graph: every use of a symbol, or why `graph/no-unused-exports` held |
+| `codelaw baseline add\|prune\|check` | Grandfather a rule's existing findings with a deadline, lower the counts, or fail when the baseline got looser ([SR-BASELINE](records/0104_baseline-and-deprecations.md)) |
+| `codelaw deprecate <symbol>` | Deprecate a symbol: write the registry entry and baseline every current use, for `graph/no-deprecated-usage` |
+| `codelaw hook [paths]` | Check and fix the files an agent just edited; what is left goes back to it |
+| `codelaw sync-agents` | Write every agent's instruction files from the rules and skills; `--check` reports drift |
+| `codelaw daemon start\|stop\|status` | An opt-in warm process that `--prefer-warm` runs use; the output is the same |
 | `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
 | `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set ([L8](records/0010_LAW-8-performance-budgets.md)) |
+
+<!-- /docs-sync:commands -->
 
 **Exit codes:** `0` clean · `1` findings remain · `2` config or rule error.
 
@@ -387,18 +414,26 @@ flowchart LR
 
 ## Roadmap
 
-| | feature | state |
-|---|---|---|
-| ✅ | Engine: nine languages, one binary, parse once, cache | built |
-| ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `new-rule`, `init`, `cache` | built |
-| ✅ | Nine rule packs: 419 rules | built, `preview` |
-| ✅ | `--format agent` and `--format json` | built |
-| 🔜 | npm and PyPI packages (`npx codelaw`, `uvx codelaw`) | next |
-| ✅ | Formatter (`codelaw format`, and the last step of `fix`): Prettier-style JS/TS/JSON, Black-style Python | built |
-| ✅ | MCP server (`codelaw mcp`) | built |
-| ✅ | Language server (`codelaw lsp`): diagnostics, quick fixes, formatting | built; the VS Code extension is built, not published |
-| 🔜 | Agent hooks, `init --agents`, `sync-agents` | designed |
-| 🔜 | Project-wide rules (unused exports), baselines, SARIF output | designed |
+<!-- docs-sync:roadmap -->
+
+| | feature | record | state |
+|---|---|---|---|
+| ✅ | Engine: nine languages, one binary, parse once, cache | [SR-ARCHITECTURE](records/0108_architecture.md) | built |
+| ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `match`, `config`, `new-rule`, `init`, `cache` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
+| ✅ | Nine rule packs: 419 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
+| ✅ | `--format agent`, `--format json` and `--format sarif`; `--timings` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
+| ✅ | npm package (`npx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.1.0 published, five packs |
+| 🔜 | PyPI package (`uvx codelaw`) and the nine-pack 0.2.0 on both registries | [SR-PACKAGES](records/0107_packages.md) | next |
+| ✅ | Formatter (`codelaw format`, and the last step of `fix`): Prettier-style JS/TS/JSON, Black-style Python | [SR-FORMATTER](records/0105_formatter.md) | built |
+| ✅ | MCP server (`codelaw mcp`) | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
+| ✅ | Language server (`codelaw lsp`): diagnostics, quick fixes, formatting | [SR-EDITOR](records/0114_editor.md) | built; the VS Code extension is built, not published |
+| ✅ | Agent hooks (`codelaw hook`), `init --agents`, `sync-agents` | [SR-AGENT-SURFACES](records/0102_agent-surfaces.md) | built |
+| ✅ | Project-wide rules (`graph/no-unused-exports`, `graph/no-unused-css-classes`, the `node/no-*-import` rules) | [SR-PROJECT-GRAPH](records/0103_project-graph.md) | built, `preview` |
+| ✅ | Baselines and deprecations (`baseline`, `deprecate`) | [SR-BASELINE](records/0104_baseline-and-deprecations.md) | built |
+| ✅ | External linters as adapters (oxlint, Ruff, stylelint, html-validate) and the warm `daemon` | [SR-ARCHITECTURE](records/0108_architecture.md) | built |
+| 🔜 | Promotion to `stable`: the pinned corpus and its CI job | [SR-RULE-AUTHORING](records/0113_rule-authoring.md) | designed |
+
+<!-- /docs-sync:roadmap -->
 
 The design for each item is a record in [`records/`](records/README.md); the open work is [`work/OPEN-WORK.md`](work/OPEN-WORK.md).
 

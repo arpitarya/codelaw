@@ -13,11 +13,16 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 ## Presets
 
+<!-- docs-sync:presets -->
+
 | preset | rules | ported from |
 |---|---|---|
 | `css/recommended` | 41 | stylelint-config-recommended 18.0.0 (stylelint 17.16.0) — all 41 rules |
 | `css/standard` | 28 | the rules stylelint-config-standard 40.0.0 adds to the recommended set, less the 13 layout rules (see below). It holds only the additions: extend it together with `css/recommended` |
 | `css/conventions` | 1 | house conventions, opt-in: `css/no-important` |
+| `css/project` | 1 | `graph/no-unused-css-classes`, the rule that reads the whole repo, from purgecss — opt in |
+
+<!-- /docs-sync:presets -->
 
 Three starter rules match stylelint rules and sit in `css/recommended` under
 their starter ids: `css/no-empty-block` (`block-no-empty`),

@@ -1,0 +1,4 @@
+description = "The rule that reads the whole repo: module-level names nothing imports (vulture); opt in"
+
+[rules]
+"graph/no-unused-exports" = "error"

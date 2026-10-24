@@ -12,9 +12,13 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 ## Presets
 
+<!-- docs-sync:presets -->
+
 | preset | rules | ported from |
 |---|---|---|
 | `node/recommended` | 10 | eslint-plugin-n 18.5.0 `recommended-module` — 10 of its 14 rules: the 3 that need no `package.json`, `node/hashbang`, which reads the nearest `package.json`'s `bin`, and the 6 import rules, which run on the project graph |
+
+<!-- /docs-sync:presets -->
 
 Every rule is **reimplemented**, not vendored: the matchers, messages and docs
 are written fresh, and each rule's `ported_from:` names the source rule.

@@ -12,10 +12,14 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 ## Presets
 
+<!-- docs-sync:presets -->
+
 | preset | rules | ported from |
 |---|---|---|
 | `stencil/recommended` | 15 | @stencil/eslint-plugin 1.4.0 `recommended` — 15 of its 21 rules |
 | `stencil/conventions` | 1 | codelaw's starter catalogue: `stencil/tag-prefix` — opt in |
+
+<!-- /docs-sync:presets -->
 
 Every rule is **reimplemented**, not vendored: the matchers, messages and docs
 are written fresh, and each rule's `ported_from:` names the source rule.
