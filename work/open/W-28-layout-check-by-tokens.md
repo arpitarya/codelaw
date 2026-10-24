@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-22: the layout-rule check must be codelaw's own def
 item: W-28
 filed: 2026-10-23
 filed_by: "Arpit (Claude Code, Fable 5.1)"
-updated: 2026-10-23
-updated_by: "Arpit (Claude Code, Fable 5.1)"
+updated: 2026-10-24
+updated_by: "Arpit (Claude Code, Opus 5.5)"
 ball: agent
 ---
 
@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Define a layout rule in codelaw's terms: a rule whose `Don't` and every `Do`/`Fixed` have the **same token stream** through codelaw's own parser — every leaf token's kind and text equal, whitespace and other extras ignored, file by file | the test no longer depends on which engine formats, or on its version | ⏳ |
-| 2 | `codelaw test` runs that comparison instead of `format(Don't) == format(Do)`; the message still names SR-FORMATTER decision 3 | one deterministic answer per rule, the same on every machine (L5 spirit, L8 cheap) | ⏳ |
-| 3 | Keep the formatter comparison as a **second, advisory** check that prints a warning when the two disagree — that is exactly the case where the formatter changes meaning | a formatter that changes meaning is caught instead of trusted | ⏳ |
-| 4 | Re-run the five packs; record the result in SR-FORMATTER decision 3 and B-045's note | the two rules of 2026-10-22 are judged by the new definition | ⏳ |
+| 1 | Define a layout rule in codelaw's terms: a rule whose `Don't` and every `Do`/`Fixed` have the **same token stream** through codelaw's own parser — every leaf token's kind and text equal, whitespace and other extras ignored, file by file | the test no longer depends on which engine formats, or on its version | ✅ `codelaw_lang::token_stream` |
+| 2 | `codelaw test` runs that comparison instead of `format(Don't) == format(Do)`; the message still names SR-FORMATTER decision 3 | one deterministic answer per rule, the same on every machine (L5 spirit, L8 cheap) | ✅ |
+| 3 | Keep the formatter comparison as a **second, advisory** check that prints a warning when the two disagree — that is exactly the case where the formatter changes meaning | a formatter that changes meaning is caught instead of trusted | ✅ |
+| 4 | Re-run the five packs; record the result in SR-FORMATTER decision 3 and B-045's note | the two rules of 2026-10-22 are judged by the new definition | ✅ (pre-W-31 layout; re-run on the split packs at merge) |
 
 **Arpit, 2026-10-22:** *"biome is not the right thing to reference. build how we design it. make the decision and create the work item"*
 
@@ -39,10 +39,15 @@ A rule is accepted or refused as a layout rule by codelaw's own parse of its exa
 
 | DoD | what | state |
 |---|---|---|
-| 1 · definition | SR-FORMATTER decision 3's "How" states the token comparison; SR-RULE-AUTHORING decision 4 names the message | ⏳ |
-| 2 · test | `a_layout_rule_is_refused` and a new `a_token_change_is_not_a_layout_rule` pass; a rule whose `Don't`/`Do` differ only in whitespace fails with the decision-3 message; one differing only inside a string literal passes | ⏳ |
+| 1 · definition | SR-FORMATTER decision 3's "How" states the token comparison; SR-RULE-AUTHORING decision 4 names the message | ✅ |
+| 2 · test | `a_layout_rule_is_refused` and a new `a_token_change_is_not_a_layout_rule` pass; a rule whose `Don't`/`Do` differ only in whitespace fails with the decision-3 message; one differing only inside a string literal passes | ✅ |
 | 3 · advisory | a rule whose tokens differ but whose formatted texts are equal prints a warning naming the formatter and B-045, and does not fail | ⏳ |
-| 4 · packs | `codelaw test packs/<pack>` passes for all five; the record's "Measured" note is rewritten against the new definition | ⏳ |
+| 4 · packs | `codelaw test packs/<pack>` passes for all five; the record's "Measured" note is rewritten against the new definition | ✅ on the five pre-W-31 packs (419 rules, 0 failed, 0 warnings, via `codelaw_test::test_rules` — the CLI could not be built: disk full); ⏳ re-run `codelaw test packs/<pack>` on the W-31 packs |
+
+## Progress
+
+- **2026-10-24 (Opus 5.5, worktree `worktree-agent-afc9f1fca5c536088`):** built. `codelaw_lang::token_stream` (new `tokens.rs`): pre-order visible nodes with depth and kind, leaves with exact text; comments are tokens; words no node holds become `text` tokens (Markdown inline); depth carries Python/YAML indentation; embedded regions compared in their own language. `codelaw-test`'s `layout_only` now fails on equal token streams and warns (new `RuleReport::warnings`, rendered, never a failure) when tokens differ but the formatted texts agree. SR-FORMATTER decision 3, SR-RULE-AUTHORING decision 4, SR-LINTER decision 1 (pointer), the glossary and B-045 updated.
+- **Findings:** (1) codelaw's CSS grammar parses `@media not(a)` and `not (a)` to the same tree, so the item's expectation that the two have different tokens is wrong for codelaw's parser; `not(` lives in the rule's `.cases.md`, outside the layout check, so nothing fails — pinned by `the_css_grammar_does_not_see_not_paren`. (2) Quotes, semicolons and trailing commas are tokens: a rule that only changes them now passes the refusal and draws the advisory warning instead — the decider may want that to fail. (3) Rule tests that reuse one rule id with different matchers interfere when run in parallel (the engine appears to keep compiled matchers by id for the process; not investigated); the tests now take distinct ids.
 
 ## Blockers
 

@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-test
   - crates/codelaw-cli/tests/promotion.rs
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-22T18:00:00Z
+timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
 ---
 
@@ -83,7 +83,7 @@ The decider asked that rules can be written manually or by an AI agent with a sk
 
    | Level | Source | Checks |
    |---|---|---|
-   | examples | the rule's `## Examples` | Don't fires · Do passes · fix(Don't) = Do (or Fixed) · fixpoint, for each language · format(Don't) ≠ format(Do) and format(Fixed): a Don't that the formatter (default options) lays out identically to a Do or Fixed makes the rule a layout rule, refused ([SR-FORMATTER](0105_formatter.md) decision 3) |
+   | examples | the rule's `## Examples` | Don't fires · Do passes · fix(Don't) = Do (or Fixed) · fixpoint, for each language · tokens(Don't) ≠ tokens(Do) and tokens(Fixed): a Don't with the same token stream as a Do or Fixed makes the rule a layout rule, refused with the message *"a layout rule: it has the same tokens as the Do (line N), so the two differ only in layout, and layout belongs to the formatter (SR-FORMATTER decision 3)"*; a Don't the formatter (default options) lays out identically to a Do or Fixed whose tokens differ draws a warning naming the engine and B-045, never a failure ([SR-FORMATTER](0105_formatter.md) decision 3) |
    | cases | `<name>.cases.md` | exact diagnostics (`line:col rule`) and exact fixed output, per case |
    | invariants | frontmatter `invariant:` plus the built-ins | still parses · only the fix's range changed · deterministic · isolated across languages · rule-specific (e.g. `exports-unchanged`) |
    | corpus | `codelaw test --corpus` (codelaw's CI) | real pinned repos: invariants hold, finding counts are snapshotted, and the repo still builds and passes its own tests after fixes |

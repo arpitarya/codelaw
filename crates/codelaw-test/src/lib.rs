@@ -56,6 +56,9 @@ pub struct RuleReport {
     pub path: PathBuf,
     pub checks: usize,
     pub failures: Vec<Failure>,
+    /// Advisory findings: printed, never a failure (SR-FORMATTER decision 3's
+    /// formatter cross-check).
+    pub warnings: Vec<Failure>,
 }
 
 impl RuleReport {
@@ -279,25 +282,59 @@ impl<'a> Tester<'a> {
             .collect()
     }
 
-    /// SR-FORMATTER decision 3: a `Don't` that formats to the same text as
-    /// a `Do` (or `Fixed`) differs from it only in layout, so the rule is a
-    /// layout rule, and layout belongs to the formatter.
+    /// A snippet's token streams through codelaw's own parser, file by file
+    /// with each file's path, embedded regions region by region.
+    fn tokens(language: Language, snippet: &Snippet) -> Vec<(String, Vec<codelaw_lang::Token>)> {
+        split_files(language, &snippet.code).into_iter().map(|f| (f.path, codelaw_lang::token_stream(f.language, &f.text))).collect()
+    }
+
+    /// SR-FORMATTER decision 3: a `Don't` with the same token stream as a
+    /// `Do` (or `Fixed`) differs from it only in layout, so the rule is a
+    /// layout rule, and layout belongs to the formatter. The formatter is a
+    /// second, advisory opinion: when it lays out a `Don't` and a target
+    /// with different tokens identically, it changes tokens there, which may
+    /// change meaning (B-045) — a warning, never a failure.
     fn layout_only(&mut self, ex: &LanguageExamples) {
         let l = ex.language;
-        let targets: Vec<(&str, &Snippet, Option<Vec<String>>)> =
-            ex.dos.iter().map(|s| ("Do", s)).chain(ex.fixed.iter().map(|s| ("Fixed", s))).map(|(k, s)| (k, s, Self::formatted(l, s))).collect();
+        let targets: Vec<(&str, &Snippet)> = ex.dos.iter().map(|s| ("Do", s)).chain(ex.fixed.iter().map(|s| ("Fixed", s))).collect();
+        let target_tokens: Vec<_> = targets.iter().map(|(_, s)| Self::tokens(l, s)).collect();
+        let mut target_formatted: Vec<Option<Option<Vec<String>>>> = vec![None; targets.len()];
         for dont in &ex.donts {
             self.report.checks += 1;
-            let Some(d) = Self::formatted(l, dont) else { continue };
-            if let Some((kind, s, _)) = targets.iter().find(|(_, s, t)| t.as_ref() == Some(&d) && s.code != dont.code) {
+            let at = format!("{} Don't (line {})", l.display(), dont.line);
+            let d = Self::tokens(l, dont);
+            let differs = |s: &Snippet| s.code != dont.code;
+            if let Some(i) = (0..targets.len()).find(|&i| differs(targets[i].1) && target_tokens[i] == d) {
+                let (kind, s) = targets[i];
                 self.fail(
                     Level::Examples,
-                    format!("{} Don't (line {})", l.display(), dont.line),
+                    at,
                     format!(
-                        "a layout rule: formatted, it is identical to the {kind} (line {}), so the two differ only in layout, and layout belongs to the formatter (SR-FORMATTER decision 3)",
+                        "a layout rule: it has the same tokens as the {kind} (line {}), so the two differ only in layout, and layout belongs to the formatter (SR-FORMATTER decision 3)",
                         s.line
                     ),
                 );
+                continue;
+            }
+            let Some(df) = Self::formatted(l, dont) else { continue };
+            for i in 0..targets.len() {
+                let (kind, s) = targets[i];
+                if !differs(s) {
+                    continue;
+                }
+                let tf = target_formatted[i].get_or_insert_with(|| Self::formatted(l, s));
+                if tf.as_ref() == Some(&df) {
+                    self.report.warnings.push(Failure {
+                        level: Level::Examples,
+                        at: at.clone(),
+                        message: format!(
+                            "the formatter ({}) lays this out identically to the {kind} (line {}) although their tokens differ: formatting changes tokens here, so check it does not change meaning (B-045); not a layout rule (SR-FORMATTER decision 3)",
+                            codelaw_format::engine(l),
+                            s.line
+                        ),
+                    });
+                    break;
+                }
             }
         }
     }
@@ -387,6 +424,7 @@ pub fn test_rule(loaded: &LoadedRule, case: Option<&str>) -> RuleReport {
         path: loaded.rule.path.clone(),
         checks: 0,
         failures: Vec::new(),
+        warnings: Vec::new(),
     };
     let mut t = Tester { loaded, plain: project_for(loaded, false), with_globs: None, report };
     for inv in &loaded.rule.invariants {
@@ -425,6 +463,7 @@ pub fn corpus_rule(loaded: &LoadedRule, files: &[(String, Language, String)]) ->
         path: loaded.rule.path.clone(),
         checks: 0,
         failures: Vec::new(),
+        warnings: Vec::new(),
     };
     let mut t = Tester { loaded, plain: project_for(loaded, true), with_globs: None, report };
     let id = loaded.rule.id.clone();
@@ -545,16 +584,24 @@ pub fn render(reports: &[RuleReport], color: bool) -> String {
     for r in reports {
         if r.passed() {
             out.push_str(&format!("{} {}  {}\n", paint("32", "✔"), r.id, paint("2", &format!("{} checks · {}", r.checks, r.source))));
+            for w in &r.warnings {
+                out.push_str(&format!("    {} {} · {}: {}\n", paint("33", "warning"), w.level.name(), w.at, w.message));
+            }
         } else {
             out.push_str(&format!("{} {}  {}\n", paint("31", "✖"), r.id, paint("2", &format!("{} · {}", codelaw_core::normalize_path(&r.path), r.source))));
             for f in &r.failures {
                 out.push_str(&format!("    {} · {}: {}\n", f.level.name(), f.at, f.message));
             }
+            for w in &r.warnings {
+                out.push_str(&format!("    {} {} · {}: {}\n", paint("33", "warning"), w.level.name(), w.at, w.message));
+            }
         }
     }
     let failed = reports.iter().filter(|r| !r.passed()).count();
     let checks: usize = reports.iter().map(|r| r.checks).sum();
-    out.push_str(&format!("\n{} rules · {checks} checks · {failed} failed\n", reports.len()));
+    let warned: usize = reports.iter().map(|r| r.warnings.len()).sum();
+    let warned = if warned == 0 { String::new() } else { format!(" · {warned} warnings") };
+    out.push_str(&format!("\n{} rules · {checks} checks · {failed} failed{warned}\n", reports.len()));
     out
 }
 

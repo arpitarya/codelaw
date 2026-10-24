@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-match
   - crates/codelaw-adapters
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-22T20:00:00Z
+timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
 ---
 
@@ -83,6 +83,8 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | Markdown | `tree-sitter-markdown` (block + inline) | yes |
 
    `codelaw-lang`'s `reparse` applies one edit to a parsed text through tree-sitter's edit API, for the warm processes' incremental re-parse ([SR-ARCHITECTURE](0108_architecture.md) decision 23).
+
+   `codelaw-lang`'s `token_stream` is a text's tokens through these grammars — what [SR-FORMATTER](0105_formatter.md) decision 3 compares to decide that a rule only changes layout. What it counts as a token in each grammar (comments, words no node holds, the depth that carries indentation, embedded regions) is that decision's, not this one's.
 
 2. **Three rule scopes**, all in the same Markdown rule format ([SR-RULE-PACKS](0101_rule-packs.md)) and all bound by [L4](0006_LAW-4-every-rule-has-a-fix.md):
    - **`scope: file`** (the default): an ast-grep pattern or YAML rule with relational clauses (`inside`, `has`, `precedes`, `follows`) and the semantic-model predicates ([SR-RULE-FORMAT](0112_rule-format.md) decision 3a), or a `native:` rule ([SR-ARCHITECTURE](0108_architecture.md) decision 15b) for checks a pattern can't express, or for JSON, YAML and TOML a `target:` + `assert:` rule on the file's data tree ([SR-RULE-FORMAT](0112_rule-format.md) decision 3e); fixes come from the edit primitives;
