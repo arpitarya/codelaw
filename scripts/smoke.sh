@@ -137,4 +137,17 @@ n="$(node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "
 cmp -s "$work/npm.json" "$work/pypi.json" || { echo "✗ npm and PyPI disagree:" >&2; diff "$work/npm.json" "$work/pypi.json" >&2 || true; exit 1; }
 node -e 'const [a, b, c] = process.argv.slice(1).map(f => JSON.parse(require("fs").readFileSync(f, "utf8"))); const s = JSON.stringify(a.summary); if (s !== JSON.stringify(b) || s !== JSON.stringify(c)) { console.error("✗ an API disagrees with the CLI", s, JSON.stringify(b), JSON.stringify(c)); process.exit(1) }' \
   "$(native "$work/npm.json")" "$(native "$work/api-npm.json")" "$(native "$work/api-pypi.json")"
-echo "✔ $key, installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree; codelaw --version is codelaw $version through uvx and through npx; the index served $served_npm tarballs and $served_pypi wheels"
+# ── Windows is one-shot (SR-ARCHITECTURE decision 21): no warm socket, so
+# `codelaw daemon` refuses with its stated message and exit 2, and
+# `--prefer-warm` runs in-process with byte-identical output ──
+oneshot=""
+if [ "$win" = 1 ]; then
+  st=0; (cd "$work/pypi" && "$vbin/codelaw" daemon status >"$work/daemon.out" 2>"$work/daemon.err") || st=$?
+  want="error: \`codelaw daemon\` needs Unix domain sockets; on this system every command runs in its own process"
+  [ "$st" = 2 ] && [ "$(tr -d '\r' <"$work/daemon.err")" = "$want" ] ||
+    { echo "✗ win32 \`codelaw daemon status\` exited $st with '$(cat "$work/daemon.err")'; expected exit 2 and '$want'" >&2; exit 1; }
+  (cd "$work/pypi" && fenced "$(bare_path pypi)" VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" check --prefer-warm --format json --no-cache >"$work/warm.json") || [ $? = 1 ]
+  cmp -s "$work/warm.json" "$work/pypi.json" || { echo "✗ win32: \`check --prefer-warm\` differs from \`check\`" >&2; exit 1; }
+  oneshot="; one-shot: \`codelaw daemon\` refuses (exit 2) and \`--prefer-warm\` runs in-process, byte-identical"
+fi
+echo "✔ $key, installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree; codelaw --version is codelaw $version through uvx and through npx; the index served $served_npm tarballs and $served_pypi wheels$oneshot"

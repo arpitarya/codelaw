@@ -17,4 +17,4 @@ platform package. The project's own codelaw wins, so the editor agrees with CI.
 npm ci && npm test     # compiles and tests the binary lookup
 ```
 
-`version` is `0.0.0` here; the release stamps the one version (L6 decision 9).
+`version` is the one version (L6 decision 9): `scripts/version.py --set` writes it here and in `package-lock.json`, and `--check` fails when either drifts.

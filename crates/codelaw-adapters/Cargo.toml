@@ -12,10 +12,6 @@ serde.workspace = true
 serde_json.workspace = true
 toml.workspace = true
 
-[target.'cfg(unix)'.dependencies]
-# Stops an adapter's whole process group at its timeout (SR-ARCHITECTURE
-# decision 19). MIT / Apache-2.0.
-libc.workspace = true
 
 [dev-dependencies]
 # The schema's `[adapters] enabled` names exactly the manifests.

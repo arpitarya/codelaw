@@ -129,7 +129,7 @@ def greet(names=None):
 
 ### Today: build from source
 
-You need a Rust toolchain (1.85 or newer).
+You need a Rust toolchain (1.97 or newer).
 
 ```bash
 # 1. Build and install the codelaw binary

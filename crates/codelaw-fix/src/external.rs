@@ -3,12 +3,13 @@
 //! timeout per file, the repo root as the working directory.
 
 use codelaw_core::TextEdit;
+use codelaw_core::process::kill_group;
 use codelaw_match::Match;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::io::{Read, Write};
 use std::path::Path;
-use std::process::{Child, Command, Stdio};
+use std::process::{Command, Stdio};
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
@@ -102,20 +103,6 @@ fn drain(mut pipe: impl Read + Send + 'static) -> mpsc::Receiver<Vec<u8>> {
     rx
 }
 
-/// Stop the fixer and everything it started. On Unix the fixer leads its
-/// own process group, so the group is killed, not just `sh`.
-fn kill_all(child: &mut Child) {
-    #[cfg(unix)]
-    if let Ok(pid) = libc::pid_t::try_from(child.id()) {
-        // SAFETY: `kill` takes plain integers and has no memory effects; a
-        // group that is already gone is ESRCH, which is ignored.
-        unsafe {
-            libc::kill(-pid, libc::SIGKILL);
-        }
-    }
-    let _ = child.kill();
-}
-
 /// The last line of what the fixer wrote to stderr, for the error message.
 fn stderr_tail(rx: &mpsc::Receiver<Vec<u8>>) -> String {
     let bytes = rx.recv_timeout(CLOSE_GRACE).unwrap_or_default();
@@ -161,13 +148,13 @@ pub fn run_external(call: &ExternalCall<'_>) -> Result<Vec<TextEdit>, String> {
         match child.try_wait() {
             Ok(Some(status)) => break status,
             Ok(None) if started.elapsed() >= call.timeout => {
-                kill_all(&mut child);
+                kill_group(&mut child);
                 let _ = child.wait();
                 return Err(format!("`{}` timed out after {:?}", call.command, call.timeout));
             }
             Ok(None) => std::thread::sleep(Duration::from_millis(2)),
             Err(e) => {
-                kill_all(&mut child);
+                kill_group(&mut child);
                 let _ = child.wait();
                 return Err(format!("`{}` failed: {e}", call.command));
             }
@@ -175,7 +162,7 @@ pub fn run_external(call: &ExternalCall<'_>) -> Result<Vec<TextEdit>, String> {
     };
     // The fixer is done; whatever it left running goes with it, so its
     // pipes close and nothing waits on them.
-    kill_all(&mut child);
+    kill_group(&mut child);
     let out = match stdout.recv_timeout(CLOSE_GRACE) {
         Ok(bytes) => String::from_utf8_lossy(&bytes).into_owned(),
         Err(_) => return Err(format!("`{}` exited but a process it started kept its output open", call.command)),

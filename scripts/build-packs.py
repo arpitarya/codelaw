@@ -11,10 +11,12 @@ pack's files, byte for byte; only the registry's own metadata
 (`package.json`, `*.dist-info/`) is added. The version comes from the one file, the workspace `Cargo.toml`
 (SR-LAW-6 decision 9).
 
-The package.json and the wheel are `scripts/package.py`'s own (`pack_manifest`,
-`wheel_for_pack`, `pep440`), so a local build and the release build cannot
-drift: `0.2.0-beta.1` is the wheel `0.2.0b1` here too. Only the npm tarball is
-written here rather than by `npm pack`, so no npm is needed.
+Every artefact is `scripts/package.py`'s own — `stage_pack` copies the folder
+and the licence, `pack_tarball` writes the npm tarball, `wheel_for_pack` the
+wheel — so this is the release build's pack step run locally, not a second
+builder (W-27): the tarball and the wheel built here are byte-for-byte the ones
+`package.py assemble` puts in `dist/`, and `0.2.0-beta.1` is the wheel `0.2.0b1`
+here too. No npm is needed.
 
     python3 scripts/build-packs.py                    # build into dist/packs/
     python3 scripts/build-packs.py --verify CODELAW   # and install both ways, compare
@@ -24,15 +26,12 @@ Stdlib only, Python 3.9 syntax (work/MACHINE.md). Nothing is published.
 """
 
 import argparse
-import gzip
-import io
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
-import tarfile
 import tempfile
 import zipfile
 from pathlib import Path
@@ -42,9 +41,6 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import package  # noqa: E402  the release build's own code (SR-PACKAGES decision 9)
 
 PACKS = list(package.PACKS)
-# npm's own fixed mtime for tarball entries (1985-10-26T08:15:00Z).
-NPM_MTIME = 499162500
-ZIP_DATE = (1980, 1, 1, 0, 0, 0)
 
 
 def fail(msg):
@@ -111,30 +107,8 @@ def read_pack(name, version, release):
     }
 
 
-def package_json(pack, version):
-    return (json.dumps(package.pack_manifest(pack["name"], version), indent=2) + "\n").encode("utf-8")
-
-
-def build_npm(pack, version, out_dir):
-    buf = io.BytesIO()
-    entries = list(pack["files"]) + [("package.json", package_json(pack, version))]
-    with tarfile.open(fileobj=buf, mode="w", format=tarfile.PAX_FORMAT) as tar:
-        for rel, data in sorted(entries):
-            info = tarfile.TarInfo("package/" + rel)
-            info.size = len(data)
-            info.mtime = NPM_MTIME
-            info.mode = 0o644
-            tar.addfile(info, io.BytesIO(data))
-    # npm names a scoped package's tarball without the `@` and with `-` for `/`.
-    path = out_dir / "codelaw-rules-{}-{}.tgz".format(pack["name"], version)
-    with open(path, "wb") as raw, gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as gz:
-        gz.write(buf.getvalue())
-    return path
-
-
 def npm_contents(path):
-    with tarfile.open(path, "r:gz") as tar:
-        return {m.name[len("package/"):]: tar.extractfile(m).read() for m in tar.getmembers() if m.isfile()}
+    return package.tar_files(path)
 
 
 def wheel_contents(path, module):
@@ -221,15 +195,18 @@ def main():
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     built = []
-    for name in PACKS:
-        pack = read_pack(name, version, args.release)
-        npm_path = build_npm(pack, version, out_dir) if pack["npm"] else None
-        wheel_path = package.wheel_for_pack(name, version, ROOT / "packs" / name, out_dir) if pack["pypi"] else None
-        check_parity(pack, npm_path, wheel_path)
-        built.append((pack, npm_path, wheel_path))
-        note = "" if pack["licensed"] else "  (no LICENSE: not publishable)"
-        made = ", ".join(p.name for p in (npm_path, wheel_path) if p)
-        print("{}@{}: {} files -> {}{}".format(pack["label"], version, len(pack["files"]), made, note))
+    with tempfile.TemporaryDirectory() as stage:
+        for name in PACKS:
+            pack = read_pack(name, version, args.release)
+            staged = package.stage_pack(name, Path(stage))
+            pack["files"] = pack_files(staged)  # the folder as every registry ships it (+ LICENSE)
+            npm_path = package.pack_tarball(name, version, staged, out_dir) if pack["npm"] else None
+            wheel_path = package.wheel_for_pack(name, version, staged, out_dir) if pack["pypi"] else None
+            check_parity(pack, npm_path, wheel_path)
+            built.append((pack, npm_path, wheel_path))
+            note = "" if pack["licensed"] else "  (no LICENSE: not publishable)"
+            made = ", ".join(p.name for p in (npm_path, wheel_path) if p)
+            print("{}@{}: {} files -> {}{}".format(pack["label"], version, len(pack["files"]), made, note))
     if args.verify:
         verify(str(Path(args.verify).resolve()), built, version)
 

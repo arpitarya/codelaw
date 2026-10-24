@@ -7,3 +7,9 @@ publish.workspace = true
 
 [dependencies]
 serde.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+# `process::kill_group` stops a child's whole process group: the adapter
+# runner's and the external fixer's (SR-ARCHITECTURE decisions 18 and 19).
+# MIT / Apache-2.0.
+libc.workspace = true

@@ -375,3 +375,26 @@ jobs:
           docker run --rm -v "$PWD:/w" -w /w "alpine:${{ matrix.alpine }}" sh -euc '
             apk add --no-cache -q bash git nodejs npm python3
             bash scripts/smoke.sh dist ${{ matrix.key }}'
+
+  msrv:
+    # The workspace's `rust-version` is true (W-27, SR-PACKAGES decision 13):
+    # the whole workspace type-checks on exactly that compiler. It is the floor
+    # the dependencies set (ruff_* 0.0.18 declare 1.97); the release itself is
+    # built with rust-toolchain.toml's pinned compiler, so this is informational
+    # for `cargo install` users and never a release input.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
+      - id: msrv
+        run: echo "v=$(sed -n 's/^rust-version = "\(.*\)"/\1/p' Cargo.toml)" >> "$GITHUB_OUTPUT"
+      - run: rustup toolchain install ${{ steps.msrv.outputs.v }} --profile minimal --no-self-update
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          key: msrv-${{ steps.msrv.outputs.v }}
+          cache-on-failure: true
+      - name: cargo +${{ steps.msrv.outputs.v }} check --workspace
+        run: cargo +${{ steps.msrv.outputs.v }} check --workspace --all-targets --locked
