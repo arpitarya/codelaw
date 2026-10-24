@@ -59,5 +59,16 @@ When upstream releases a `tree-sitter-css` that parses the three forms and
 `ast-grep-language` can take it: delete this folder and its
 `[patch.crates-io]` line, return `GRAMMARS_FINGERPRINT` to the released
 version, and run `cargo test -p codelaw-lang` (`modern_css_parses` must still
-pass). The upstream patch is filed from this folder's `grammar.js` diff and
-`test/corpus/modern.txt`.
+pass).
+
+## The upstream patch
+
+[`upstream/grammar.patch`](upstream/grammar.patch) is this folder's change
+against upstream's `v0.25.0` (`grammar.js`, `queries/highlights.scm`,
+`test/corpus/modern.txt`; no `src/`), and [`upstream/PR.md`](upstream/PR.md)
+is the pull-request text, ready to paste. Checked 2026-10-24 on a checkout of
+the tag with tree-sitter-cli 0.25.10: the patch applies cleanly, upstream's
+corpus passes 46/46 (40 existing, 6 new), `eslint grammar.js` is clean, and
+the regenerated `src/parser.c`, `grammar.json` and `node-types.json` are
+byte-identical to this folder's. It is not filed: opening the PR on
+upstream's repository is the decider's to do.
