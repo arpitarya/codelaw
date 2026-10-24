@@ -2,4 +2,15 @@
 # owned component without touching its owning record". Written at setup;
 # moved forward only after a bulk review, and each move is noted here with
 # its reason — the cost is that commits before it are no longer re-auditable.
-c6b9f03cf008778afec3f0598c47ee03d1266957
+#
+# Moves:
+# - 2026-10-24, W-24, after the 2026-10-22 repo review: c6b9f03 -> 5e489f4.
+#   Ten commits since c6b9f03 failed the replay, so CI's `lint` job could not
+#   pass: d41c87f (W-03 step 6 / W-04 docs, 2026-10-20); the six WIP branches
+#   the decider had merged as-is on 2026-10-21/22 — 5d1229a (W-12), 6749f3f
+#   (W-16), 42e9a8a (W-21), bbdc39d (W-08/W-10), 4e788e1 (W-11), 820efea
+#   (W-20); their two resolutions 7498d1d and 895324a; and 434fd75 (the
+#   decider's rulings of 2026-10-22, crates/codelaw-native/src/literals.rs
+#   without SR-ARCHITECTURE). The review filed what each left open as
+#   W-24–W-28. 5e489f4 is the commit before W-24's CI change landed.
+5e489f4f83af2123260ff6280f3e8742c88b623d

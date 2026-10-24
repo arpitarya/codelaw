@@ -16,14 +16,16 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Fix the Windows build: `bench/mod.rs`'s `not(unix)` `wait` returns `Ok(i32)` where `Ok((i32, Option<u64>))` is declared | the two `win32-*` builds compile; `package`, `smoke` and the attestation run again | 🟡 2026-10-24: fixed (`Ok((code, None))`); every other Unix-only use is behind `cfg(unix)`; proven by the first CI run after the push — no Windows target here |
-| 2 | Move `records/RULE-SINCE` forward to the commit before this item lands, with the reason written in the file: the nine failing commits are the WIP branches the decider had merged as-is (2026-10-21/22) and their two resolutions | the `lint` job's guard replay passes; nothing after the move escapes it | ⏳ |
-| 3 | Add every input a test reads to the verdict and wheel cache keys: `agents/**`, `scripts/**`, `packaging/**`, `.github/workflows/**`, `records/0111_consumer-layout.md` | a change to a skill, a script or a workflow runs the tests again instead of reusing an old verdict | ⏳ |
-| 4 | Run the law gate for real in `ci.yml` (`law-gate.py dist`, no `--report`) and drop the "until W-07–W-09 land" wording | `main` learns the day the binary loses `format`, `mcp` or `lsp`, not release day | ⏳ |
-| 5 | Run the `perf` job only when `crates/**`, `Cargo.lock` or `perf/**` changed | a docs push stops building a full LTO release | ⏳ |
-| 6 | `check-open-work-inbox.py`: `read_text(encoding="utf-8")` like every other script | the hook does not die on a non-UTF-8 locale (`work/MACHINE.md`) | ⏳ |
+| 1 | Fix the Windows build: `bench/mod.rs`'s `not(unix)` `wait` returns `Ok(i32)` where `Ok((i32, Option<u64>))` is declared | the two `win32-*` builds compile; `package`, `smoke` and the attestation run again | ✅ 2026-10-24: fixed in `5e489f4` (`Ok((code, None))`); both `win32-*` builds green in CI runs 40026216188 and 40039203859; a unit test pins `wait`'s `(code, peak)` shape on every platform |
+| 2 | Move `records/RULE-SINCE` forward to the commit before this item lands, with the reason written in the file: the nine failing commits are the WIP branches the decider had merged as-is (2026-10-21/22) and their two resolutions | the `lint` job's guard replay passes; nothing after the move escapes it | ✅ 2026-10-24: `c6b9f03` → `5e489f4`; ten commits failed, not nine (`d41c87f` and `434fd75` too) — all ten named in the file |
+| 3 | Add every input a test reads to the verdict and wheel cache keys: `agents/**`, `scripts/**`, `packaging/**`, `.github/workflows/**`, `records/0111_consumer-layout.md` | a change to a skill, a script or a workflow runs the tests again instead of reusing an old verdict | ✅ 2026-10-24: `test` adds `agents/**`, `perf/**`, `records/[0-9]*.md` (schema.rs reads every record), `scripts/**`, `packaging/**`, `.github/workflows/**`; `clippy` adds the `include_str!` inputs `agents/**`, `perf/**`, `packs/**`; `wheel` adds `agents/**` (compiled in) and `scripts/package.py` |
+| 4 | Run the law gate for real in `ci.yml` (`law-gate.py dist`, no `--report`) and drop the "until W-07–W-09 land" wording | `main` learns the day the binary loses `format`, `mcp` or `lsp`, not release day | ✅ 2026-10-24: no `--report`; CI run 40039203859 already reported the engine complete, so it passes today |
+| 5 | Run the `perf` job only when `crates/**`, `Cargo.lock` or `perf/**` changed | a docs push stops building a full LTO release | ✅ 2026-10-24: a `changed` step diffs the push's `before` (a PR's base) against HEAD over `crates`, `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `perf`, `packs` (bench loads them) and `ci.yml`; unknown base, nightly and dispatch run it |
+| 6 | `check-open-work-inbox.py`: `read_text(encoding="utf-8")` like every other script | the hook does not die on a non-UTF-8 locale (`work/MACHINE.md`) | ✅ 2026-10-24: and its error line is written as UTF-8 bytes, which also died under `LC_ALL=C` |
 
 **Arpit, 2026-10-22:** *"review the repo, create work items to fix whatever was broken"*
+
+| 7 | Found 2026-10-24 in run 40039203859: `smoke darwin-*` fail with "the staging index did not start" — `HTTPServer.server_bind` calls `socket.getfqdn("127.0.0.1")`, a reverse-DNS lookup that stalls on the macOS runners | the two macOS smokes pass | 🟡 2026-10-24: `staging-index.py` binds without the lookup; the diagnosis fits (empty log, process alive past 10 s, Linux and Windows fine) but is proven only by the next CI run |
 
 **Model:** Sonnet: six concrete edits, each with a mechanical pass condition; step 2 needs care with the reason text.
 
@@ -35,12 +37,13 @@ A push of `main` as it stands is green on all eight platforms, and a green verdi
 
 | DoD | what | state |
 |---|---|---|
-| 1 · windows | `cargo check --target x86_64-pc-windows-msvc -p codelaw-cli` passes; the fix has a unit test of `wait`'s return shape or a `cfg(not(unix))` compile test | ⏳ |
-| 2 · replay | `for c in $(git rev-list --no-merges $(grep -v '^#' records/RULE-SINCE)..HEAD); do SR_GUARD_COMMIT=$c scripts/sr-guard.sh; done` exits 0 on `main`; `RULE-SINCE` names the reason and the date of the move | ⏳ |
-| 3 · keys | the `test`, `clippy` and `wheel` cache keys hash every path a test under `crates/*/tests` reads (`grep -rn "include_str!\|read_to_string\|\.\./\.\./" crates/*/tests crates/*/src | grep -v target` is the list) | ⏳ |
-| 4 · gate | `ci.yml`'s law-gate step fails on a binary missing `format`, `mcp` or `lsp` | ⏳ |
-| 5 · perf | a push touching only `*.md` does not run `perf` | ⏳ |
-| 6 · hook | `LC_ALL=C python3 scripts/check-open-work-inbox.py` passes | ⏳ |
+| 1 · windows | `cargo check --target x86_64-pc-windows-msvc -p codelaw-cli` passes; the fix has a unit test of `wait`'s return shape or a `cfg(not(unix))` compile test | ✅ CI's `build win32-x64`/`win32-arm64` compile it (stronger than a check); `bench::tests::wait_returns_the_exit_code_and_peak_memory_only_where_measured` |
+| 2 · replay | `for c in $(git rev-list --no-merges $(grep -v '^#' records/RULE-SINCE)..HEAD); do SR_GUARD_COMMIT=$c scripts/sr-guard.sh; done` exits 0 on `main`; `RULE-SINCE` names the reason and the date of the move | ✅ locally: 0 commits after `5e489f4` fail; CI replays the merged branches |
+| 3 · keys | the `test`, `clippy` and `wheel` cache keys hash every path a test under `crates/*/tests` reads (`grep -rn "include_str!\|read_to_string\|\.\./\.\./" crates/*/tests crates/*/src | grep -v target` is the list) | ✅ |
+| 4 · gate | `ci.yml`'s law-gate step fails on a binary missing `format`, `mcp` or `lsp` | ✅ (law-gate.py exits 1 without `--report`) |
+| 5 · perf | a push touching only `*.md` does not run `perf` | 🟡 the step, run locally on `4b19bd1..32ff82a` (work/ only), says skip; on `32ff82a..5e489f4` (crates), run; proven by the first docs-only push |
+| 6 · hook | `LC_ALL=C python3 scripts/check-open-work-inbox.py` passes | ✅ (and its failure path, under `LC_ALL=C`) |
+| 7 · green | a push of `main` with this change is green on all eight platforms | ⏳ needs a push — the decider's |
 
 ## Blockers
 
@@ -48,7 +51,7 @@ None.
 
 ## Record affected
 
-[SR-WORK-OWNERSHIP](../../records/0058_WORK-ownership.md) decision 7 (the baseline move, step 2) · [SR-PACKAGES](../../records/0107_packages.md) decision 11 (the gate, step 4) · [SR-LAW-8](../../records/0010_LAW-8-performance-budgets.md) decision 7 (when the `perf` job runs, step 5) · [SR-CLI-MCP](../../records/0115_cli-and-mcp.md) decision 10 (`bench` on Windows, step 1).
+[SR-WORK-OWNERSHIP](../../records/0058_WORK-ownership.md) decision 7 (the baseline move, step 2) · [SR-PACKAGES](../../records/0107_packages.md) decision 11 (the gate, step 4) · [SR-LAW-8](../../records/0010_LAW-8-performance-budgets.md) decision 7 (when the `perf` job runs, step 5) · [SR-CLI-MCP](../../records/0115_cli-and-mcp.md) decision 10 (`bench` on Windows, step 1) · [SR-PACKAGES](../../records/0107_packages.md) decision 11's staging index (step 7).
 
 ## Hazards
 

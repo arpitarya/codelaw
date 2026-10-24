@@ -628,6 +628,16 @@ mod tests {
     }
 
     #[test]
+    fn wait_returns_the_exit_code_and_peak_memory_only_where_measured() {
+        // W-24: the not(unix) arm once returned a bare code; both arms return
+        // (code, peak). The test binary lists its tests and exits 0.
+        let mut child = Command::new(std::env::current_exe().unwrap()).arg("--list").stdout(Stdio::null()).spawn().unwrap();
+        let (code, peak): (i32, Option<u64>) = wait(&mut child).unwrap();
+        assert_eq!(code, 0);
+        assert_eq!(peak.is_some_and(|b| b > 0), cfg!(unix), "{peak:?}");
+    }
+
+    #[test]
     fn every_l8_operation_is_measured() {
         // L8 decision 1's table, in its order.
         let names: Vec<&str> = OPERATIONS.iter().map(|o| o.name).collect();

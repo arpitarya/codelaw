@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "speed as a law"
 owns: []
 laws: [L0, L3, L5, L8]
-timestamp: 2026-10-24T08:00:00Z
+timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
 ---
 
@@ -81,7 +81,7 @@ The decider wants performance to be a key property and accepts that today's numb
 
 #### How L8 is enforced
 
-- The CI perf gate (`W-19`) over `perf/budgets.toml`: `ci.yml`'s `perf` job runs `codelaw bench --budgets perf/budgets.toml` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 10) on every push and fails when it exits `1`.
+- The CI perf gate (`W-19`) over `perf/budgets.toml`: `ci.yml`'s `perf` job runs `codelaw bench --budgets perf/budgets.toml` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 10) on every change to what it times — the engine (`crates/`, `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`), the packs it loads, `perf/` and `ci.yml` itself — and fails when it exits `1` (decision 7). A push touching none of them skips it; the nightly run and a manual dispatch always run it (W-24, 2026-10-24).
 - Determinism ([L5](0007_LAW-5-no-model-in-the-engine.md)) keeps the measured work identical across runs, so only timing varies.
 
 **How the gate tells a set budget from a proposal (W-19, 2026-10-22).** Each operation is an `[operation.<name>]` table with a `unit` (`ms` or `MiB`) and a `budget`.
