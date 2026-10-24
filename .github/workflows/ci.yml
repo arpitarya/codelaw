@@ -9,6 +9,8 @@
 #   perf      L8's gate (W-19): `codelaw bench` on the reference workload against
 #             perf/budgets.toml — fails only on a budget the decider SET; an
 #             unset one (a proposal) is reported in the job summary
+#   corpus    level 4 (W-20): every pack's rules over the pinned corpus (scripts/corpus.json),
+#             invariants on every file, finding counts against packs/<pack>/corpus.toml
 #   build ×8  one maturin wheel per platform; the npm binary is taken OUT of it, so
 #             both registries ship the same bytes (L6 decision 2); each runs its
 #             binary's --version and every pack's tests on its own platform
@@ -209,6 +211,61 @@ jobs:
           name: perf-bench
           path: ${{ runner.temp }}/bench.json
           if-no-files-found: ignore
+
+  corpus:
+    # Level 4 of `codelaw test` over the pinned corpus (SR-RULE-AUTHORING
+    # decision 4; W-20). scripts/corpus.json pins each repository to a full
+    # commit; `fetch` checks each one out and refuses one whose licence file is
+    # not the permissive licence it declares (SR-LAW-2). `run` holds every
+    # pack's rules to the invariants on every file and each rule's finding
+    # count to packs/<pack>/corpus.toml. A count that moved fails: rerun
+    # `scripts/corpus.py run --update` and commit the reviewed diff.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
+      - name: the corpus manifest (pinned commits, permissive licences, every pack covered)
+        run: python3 scripts/corpus.py --self-test
+      - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
+        run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
+      - id: verdict
+        if: env.REUSE == 'true'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .verdict
+          key: corpus-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'packs/**', 'scripts/corpus.*') }}
+          lookup-only: true
+      - if: steps.verdict.outputs.cache-hit == 'true'
+        run: echo "::notice title=corpus::skipped — the corpus run already passed on these exact sources with rustc ${{ steps.rustc.outputs.v }}"
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --no-self-update
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          cache-on-failure: true
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        run: cargo build --release --locked -p codelaw-cli
+      - name: check out the pinned corpus
+        if: steps.verdict.outputs.cache-hit != 'true'
+        run: python3 scripts/corpus.py fetch --dir "$RUNNER_TEMP/corpus"
+      - name: codelaw test packs/<pack> --corpus … --snapshot packs/<pack>/corpus.toml
+        if: steps.verdict.outputs.cache-hit != 'true'
+        run: |
+          code=0
+          python3 scripts/corpus.py run --binary target/release/codelaw --dir "$RUNNER_TEMP/corpus" 2>&1 | tee "$RUNNER_TEMP/corpus.txt" || code=$?
+          { echo '### corpus: level 4 per pack'; echo '```'; cat "$RUNNER_TEMP/corpus.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          [ "$code" = 0 ] || echo "::error title=corpus::a pack's corpus run failed — an invariant broke on a real file, or a finding count moved (rerun scripts/corpus.py run --update and review the diff)"
+          exit "$code"
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        run: mkdir -p .verdict && echo "${{ github.sha }}" > .verdict/sha
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .verdict
+          key: corpus-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'packs/**', 'scripts/corpus.*') }}
 
   build:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
