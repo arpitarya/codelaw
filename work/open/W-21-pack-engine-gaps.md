@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-20: engine features some ported rules need."
 item: W-21
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-22
-updated_by: "Claude Code (Opus 5.5), subagent: the CSS grammar fork (step 3)"
-ball: agent
+updated: 2026-10-24
+updated_by: "Claude Code (Opus 5.5), subagent: W-21 upstream patch checked, DoD 3 settled"
+ball: decider
 ---
 
 # W-21 — Close the engine gaps that hold rules out of the packs
@@ -18,7 +18,7 @@ ball: agent
 |---|---|---|---|
 | 1 | Lint `` css`…` `` / `` html`…` `` tagged templates as embedded regions | CSS-in-JS and lit templates checked | ✅ 2026-10-22, on branch `W-21-pack-gaps` |
 | 2 | Give native rules the file's path, raw bytes and neighbours | `md/relative-links`, `html/no-utf8-bom` and Python package checks become possible | ✅ 2026-10-22, on branch `W-21-pack-gaps` |
-| 3 | Handle modern CSS that tree-sitter-css rejects (range media queries, `layer()`, fractional keyframe percentages) | `css/media-feature-range-notation` can be `auto` | ✅ 2026-10-22: an in-tree fork of tree-sitter-css 0.25.0; the upstream patch is prepared, not filed |
+| 3 | Handle modern CSS that tree-sitter-css rejects (range media queries, `layer()`, fractional keyframe percentages) | `css/media-feature-range-notation` can be `auto` | ✅ 2026-10-22: an in-tree fork of tree-sitter-css 0.25.0; the upstream patch is prepared and checked against upstream's corpus (2026-10-24), not filed |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
 
@@ -34,7 +34,7 @@ The three gaps are closed and the rules the packs list as waiting on them are po
 |---|---|---|
 | 1 · templates | Tagged templates are regions when `[lint] tagged_templates = true` (SR-LINTER decision 3). | ✅ 2026-10-22 |
 | 2 · context | Native rules receive path, bytes and a read-only view of sibling files. | ✅ 2026-10-22 |
-| 3 · CSS | The CSS pack reads modern CSS through the grammar, or a fork of it, not a side parser. | ✅ 2026-10-22: the fork parses the three forms without `ERROR`, and the engine verifies every CSS fix with it; the rules' own text reader (`css_syntax.rs`) stays, see Left |
+| 3 · CSS | The CSS pack reads modern CSS through the grammar, or a fork of it, not a side parser. | ⚠️ holds for the engine, not the rules (2026-10-24): the fork parses the three forms without `ERROR` and the engine verifies every CSS fix with it, but all 70 `css/*` rules are native and read the text through `css_syntax.rs`, a side parser. A port is not feasible yet, see *DoD 3, settled*. Restating DoD 3 or filing the port is the decider's call |
 | 4 · ports | The waiting rules ship with `codelaw test` green. | ✅ 2026-10-22: `md/relative-links`, `html/no-utf8-bom`, `node/hashbang` ship green; `css/media-feature-range-notation` is `auto`, 16 checks green |
 
 ## What was built (2026-10-22)
@@ -53,20 +53,32 @@ The three gaps are closed and the rules the packs list as waiting on them are po
 - **Records:** SR-ARCHITECTURE decision 3 (the fork, the ruling, a reopen trigger in the veto), SR-PACKAGES decision 1 (the second allowed `[patch.crates-io]`), SR-LINTER decision 1, SR-LAW-2 Consequences, SR-RULE-PACKS decision 2, the register's ownership note.
 - **Upstream:** `grammar.patch` and `PR.md` are prepared against 0.25.0 (grammar, highlights, corpus; `src/` to be regenerated) and handed to the parent session; nothing is filed.
 
+## DoD 3, settled (2026-10-24)
+
+**As written, DoD 3 does not hold, and an agent cannot make it hold inside this item.**
+
+- **What the rules read.** All 70 rules in `packs/css/rules/css/` are `native:`, and every one is registered by one macro in `crates/codelaw-native/src/css_syntax.rs` that declares the single node kind `stylesheet` and re-reads the stylesheet's text with that file's 1,028-line reader. No CSS rule looks at a tree node below the root. The rule bodies are about 2,800 lines in `css_{atrules,declarations,media,misc,selectors,values}.rs`.
+- **Why they cannot move onto the tree yet.** Probed with the fork's grammar (`tree-sitter parse`, 2026-10-24). These still give `ERROR`: a nesting selector after a compound (`a { .b & {} }`), `@page :first`, `@container name (…)`, `@custom-media --x (…)`, `@import … supports(…)`, `@font-feature-values`, `!ie`-style annotations, named-range keyframe selectors (`entry 0%`), an unclosed block. Worse than an `ERROR`: a custom property holding a block, `:root { --x: { color: red; } }`, parses as a *nested rule* `--x` whose `color: red` looks like a real declaration, so tree-based `declaration-block-no-duplicate-properties`, `no-unknown-property` and the value rules would report findings that are not there. The text reader handles every one of these today, and the pack's cases depend on it.
+- **Some rules report what the grammar rejects.** `css/media-query-no-invalid` and `css/at-rule-prelude-no-invalid` say *what* is wrong in a prelude the grammar turns into a bare `ERROR`. On the tree they could only say "syntax error".
+- **A partial port does not meet the DoD either.** The pack would then read CSS two ways, and the side parser would stay.
+- **What does hold:** the fork reads the three forms, the engine parses every CSS file and region with it, and the fix verifier (SR-ARCHITECTURE decision 5) refuses any CSS fix that adds an `ERROR`. SR-ARCHITECTURE decision 15b now records this under *The CSS rules read text, not the tree*.
+- **The decider's choice:** (a) restate DoD 3 as what holds (*modern CSS parses through the fork and every CSS fix is verified by it; the rules keep their text reader*) and close W-21 once the patch is filed; or (b) keep DoD 3 and file a new item: *extend the fork for the forms above, then port the 70 rules onto the tree*. That means a grammar change per form plus a rewrite of every CSS rule.
+
 ## Left
 
-- **File the upstream patch** (the decider, or an agent with GitHub access): the prepared [`upstream/grammar.patch`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/grammar.patch) + [`upstream/PR.md`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/PR.md) (against upstream 0.25.0; not yet run against upstream's own corpus, which the shell could not fetch). When a release carries it, drop the fork (its README says how; SR-ARCHITECTURE's veto condition is the trigger).
+- **File the upstream patch: the decider.** Opening a PR on tree-sitter/tree-sitter-css is outward-facing, so no agent does it. Ready: [`upstream/grammar.patch`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/grammar.patch) (apply on the `v0.25.0` tag with `patch -p1`, then `tree-sitter generate`) and [`upstream/PR.md`](../../crates/codelaw-lang/grammars/tree-sitter-css/upstream/PR.md) (title on its first line, body ready to paste). **Checked 2026-10-24** on upstream's `v0.25.0` tarball with tree-sitter-cli 0.25.10. Unpatched, `generate` reproduces the released `parser.c` byte for byte and `tree-sitter test` passes 40/40. Patched, it applies cleanly, the corpus passes 46/46, the highlight test passes (37 assertions), `eslint grammar.js` is clean, and the regenerated `src/parser.c`, `grammar.json` and `node-types.json` match the fork byte for byte. When a release carries it, drop the fork (its README says how; SR-ARCHITECTURE's veto condition is the trigger).
+- **Rule on DoD 3:** (a) or (b) above.
 - **Still `ERROR` in the fork, not filed:** `@import … supports(…)`, a name before the query in `@custom-media` / `@container` (`open-props`' media file), named-range keyframe selectors (`entry 0%`).
-- **The CSS rules still read text themselves** (`css_syntax.rs`): the fork does not cover custom properties holding blocks, so moving the rules onto the tree is not in this item.
+- **The CSS rules still read text themselves** (`css_syntax.rs`): see *DoD 3, settled*.
 - Python package checks (e.g. a missing `__init__.py`) are now possible but no rule is filed for them.
 
 ## Blockers
 
-None. The fork-vs-upstream question was the decider's and is ruled: *Arpit, 2026-10-22: fork in-tree + upstream patch; drop the fork when upstream releases.*
+No agent work is left. Two things are the decider's: submitting the prepared upstream PR, and ruling (a) or (b) on DoD 3. The fork-vs-upstream question is already ruled: *Arpit, 2026-10-22: fork in-tree + upstream patch; drop the fork when upstream releases.*
 
 ## Record affected
 
-[SR-LINTER](../../records/0106_linter.md) decisions 1 and 3 · [SR-ARCHITECTURE](../../records/0108_architecture.md) decisions 3, 15b, 16 · [SR-PACKAGES](../../records/0107_packages.md) decision 1 · [SR-LAW-2](../../records/0004_LAW-2-foss-dependencies.md) · [SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 2.
+[SR-LINTER](../../records/0106_linter.md) decisions 1 and 3 · [SR-ARCHITECTURE](../../records/0108_architecture.md) decisions 3, 15b (the CSS rules' text reader, 2026-10-24), 16 · [SR-PACKAGES](../../records/0107_packages.md) decision 1 · [SR-LAW-2](../../records/0004_LAW-2-foss-dependencies.md) · [SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 2.
 
 ## Hazards
 

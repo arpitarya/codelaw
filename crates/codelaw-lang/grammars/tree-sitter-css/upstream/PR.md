@@ -54,8 +54,14 @@ tree-sitter generate
 tree-sitter test
 ```
 
-I could not run the existing upstream corpus where I prepared this (no access
-to the repository from that environment), so please let CI confirm it.
+Run on a checkout of the `v0.25.0` tag with tree-sitter-cli 0.25.10:
+
+- before the patch, `tree-sitter generate` reproduces the released
+  `src/parser.c` byte for byte and `tree-sitter test` passes 40/40;
+- with the patch, `tree-sitter test` passes 46/46 (the 40 existing corpus
+  tests unchanged, plus the 6 new ones) and the highlight test still passes
+  (37 assertions);
+- `npm run lint` (`eslint grammar.js`) is clean.
 
 ## Context
 

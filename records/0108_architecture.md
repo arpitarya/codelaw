@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-22T20:00:00Z
+timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
 ---
 
@@ -69,7 +69,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
    - **One grammar is a fork.** CSS is codelaw's in-tree fork of `tree-sitter-css` 0.25.0 (MIT), in `crates/codelaw-lang/grammars/tree-sitter-css`. The workspace's `[patch.crates-io]` puts it in place of the crates.io crate `ast-grep-language` pulls in ([SR-PACKAGES](0107_packages.md) decision 1).
    - **What it adds:** range media features (`(400px <= width <= 700px)`), `layer` / `layer(name)` in `@import`, and fractional keyframe percentages (`12.5%`), which 0.25.0 parses as `ERROR`. On 564 real stylesheets, every tree 0.25.0 parsed without an error came out unchanged (W-21, 2026-10-22).
    - **How it stays honest:** only `grammar.js` (and its highlight query) is edited by hand; `src/` is regenerated with tree-sitter-cli 0.25.10 by a manual step its README documents, never by the build. Its version is `0.25.0+codelaw.N`, bumped with every grammar change, and `codelaw_lang::GRAMMARS_FINGERPRINT` names it, so a grammar change invalidates the cache; a unit test checks the two agree and that the fork parses the three forms.
-   - **It is temporary.** The same change is prepared as an upstream patch, and the fork is dropped when an upstream release carries it. *(Arpit, 2026-10-22: fork in-tree + upstream patch; drop the fork when upstream releases. W-21.)*
+   - **It is temporary.** The same change is prepared as an upstream patch, and the fork is dropped when an upstream release carries it. *(Arpit, 2026-10-22: fork in-tree + upstream patch; drop the fork when upstream releases. W-21.)* The patch and the pull-request text are in the fork's `upstream/`; on upstream's `v0.25.0` tag the patch applies and upstream's corpus passes with it (W-21, 2026-10-24). Filing it on upstream's repository is the decider's.
 
 #### B. The pipelines
 
@@ -127,6 +127,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
   - **What it reads:** the file, its semantic model, the rule's options and the pack's data tables (decision 15c).
   - **What it sees of the file beyond its text:** its project-relative path, its bytes as they are on disk (a byte-order mark included, which the text never holds), and a read-only view of the project's files — whether a path exists or is a folder, a file's text, a folder's listing. Paths are `/`-separated and relative to the project root; a path with a `..`, `.` or empty segment answers "no", so nothing outside the root is read. An embedded region sees its host file. `check_files` and `codelaw test` answer from the in-memory set, never the disk.
   - **Cached results stay honest:** every question a rule asks about another file is stored with a hash of its answer in the file's cached result, and the result is reused only while every answer still holds ([SR-CACHE](0109_cache.md) §1), so a link checked against a missing file is checked again once the file exists. *(W-21, 2026-10-22.)*
+  - **The CSS rules read text, not the tree.** Every `css/*` native rule declares `stylesheet` and reads the stylesheet's text with `codelaw-native`'s own reader (`css_syntax.rs`), because the CSS grammar, the fork included, still mis-reads forms those rules must see: a custom property holding a block (`--x: { color: red }` parses as a nested rule whose `color` looks like a real declaration), a nesting selector after a compound (`.b &`), `@page :first`, `@container name (…)`, `@custom-media`, `@import … supports(…)`, `@font-feature-values`, `!ie`-style annotations and named-range keyframe selectors (`entry 0%`); and several rules exist to report CSS the grammar rejects (`css/media-query-no-invalid`, `css/at-rule-prelude-no-invalid`). The grammar still verifies every fix those rules make (decision 5). Moving them onto the tree waits on the grammar reading those forms. *(W-21, 2026-10-24.)*
   - **Only first-party packs** and ejected copies of their rules may use `native:` ([SR-RULE-PACKS](0101_rule-packs.md) decision 10).
 
 15c. **Rule packs and data tables.** Rules come from the packs resolved by [SR-RULE-PACKS](0101_rule-packs.md) decision 4, plus local rules. The engine embeds only its own (`codelaw/*` diagnostics and `graph/no-deprecated-usage`).
