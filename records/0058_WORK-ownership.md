@@ -10,7 +10,7 @@ feature: ownership and the commit guard
 owns:
   - scripts/sr-guard.sh
 laws: [L0]
-timestamp: 2026-10-20T06:30:00Z
+timestamp: 2026-10-24T12:00:00Z
 content_sha: ""
 ---
 
@@ -101,7 +101,7 @@ check that slips on the first busy day.
 
 - [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) — decisions 3 and 6.
 - [`records/README.md`](README.md) §Ownership and §Describes — the two tables.
-- [`records/RULE-SINCE`](RULE-SINCE) — the audit baseline.
+- [`records/RULE-SINCE`](RULE-SINCE) — the audit baseline; each move is noted in the file with its reason (moved 2026-10-24 by W-24, after the 2026-10-22 review, past the ten commits it lists).
 
 ### Veto condition
 

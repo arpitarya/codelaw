@@ -37,7 +37,7 @@ def paragraphs(lines):
 
 
 def check(open_work: Path):
-    lines = open_work.read_text().splitlines()
+    lines = open_work.read_text(encoding="utf-8").splitlines()
     try:
         start = next(i for i, l in enumerate(lines) if l.strip() == HEADING)
     except StopIteration:
@@ -78,7 +78,8 @@ def main():
     error = check(open_work)
     if error is None:
         return 0
-    print(f"work/OPEN-WORK.md — {error} (see records/0051_WORK-open-queue.md rule 45a)")
+    message = f"work/OPEN-WORK.md — {error} (see records/0051_WORK-open-queue.md rule 45a)\n"
+    sys.stdout.buffer.write(message.encode("utf-8"))  # whatever the locale (work/MACHINE.md)
     return 1
 
 

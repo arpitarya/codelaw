@@ -23,13 +23,15 @@
 # pinned by commit SHA; the comment names its release.
 #
 # 🔴 Speed — a verdict already earned is not earned again. Each Rust job keys
-# its result by the inputs that can change it (the sources it reads and the
-# pinned rustc of rust-toolchain.toml that compiles them):
+# its result by the inputs that can change it (the sources it compiles, every
+# file a test reads — records, scripts, packaging, workflows included — and the
+# pinned rustc of rust-toolchain.toml that compiles them; W-24):
 #   - build: the WHEEL is cached under that key. A push that changes no input —
 #     records, docs, packs, work/ — restores the wheel instead of compiling it.
 #     The binary's --version and every pack's tests still run on it, every time.
 #   - test / clippy: a green result saves a marker under that key; the same key
 #     on a later push skips the run.
+#   - perf: no verdict is kept — it runs only when what it times changed (W-24).
 # ⚠ Only push and pull_request READ a saved verdict. The nightly run and a
 # manual dispatch always run everything fresh — the backstop for a runner image
 # changing what a key cannot see.
@@ -73,7 +75,7 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
-          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**') }}
+          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**', 'agents/**', 'perf/**', 'records/[0-9]*.md', 'scripts/**', 'packaging/**', '.github/workflows/**') }}
           lookup-only: true
       - if: steps.verdict.outputs.cache-hit == 'true'
         run: echo "::notice title=test::skipped — cargo test already passed on these exact sources with rustc ${{ steps.rustc.outputs.v }}"
@@ -94,7 +96,7 @@ jobs:
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
-          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**') }}
+          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**', 'agents/**', 'perf/**', 'records/[0-9]*.md', 'scripts/**', 'packaging/**', '.github/workflows/**') }}
 
   lint:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
@@ -132,7 +134,7 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
-          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**') }}
+          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'agents/**', 'perf/**', 'packs/**') }}
           lookup-only: true
       - if: steps.verdict.outputs.cache-hit == 'true'
         run: echo "::notice title=clippy::skipped — clippy already passed on these exact sources with rustc ${{ steps.rustc.outputs.v }}"
@@ -155,7 +157,7 @@ jobs:
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
-          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**') }}
+          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'agents/**', 'perf/**', 'packs/**') }}
 
   perf:
     # L8's perf gate (SR-LAW-8 decision 7; W-19). `codelaw bench` times every
@@ -165,6 +167,9 @@ jobs:
     # "unset"` entry — every one until the decider rules; a `proposed` value is
     # never compared — is reported in the job summary and fails nothing
     # (decision 6). No verdict is reused: the timing is what is checked.
+    # A push or PR that changed nothing it times — the engine, its toolchain,
+    # the packs it loads, perf/, this file — skips it (W-24); the nightly run
+    # and a manual dispatch always run it.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -172,14 +177,28 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false # nothing here pushes (W-18)
+      - id: changed # an unknown base (a new branch, a force push, a failed fetch) runs it
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          run=true
+          if [ "$REUSE" = true ] && [ -n "$BASE" ] && [ -n "${BASE//0/}" ] && git fetch -q --depth=1 origin "$BASE" 2>/dev/null; then
+            git diff --quiet "$BASE" HEAD -- crates Cargo.toml Cargo.lock rust-toolchain.toml perf packs .github/workflows/ci.yml && run=false
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          [ "$run" = true ] || echo "::notice title=perf::skipped — nothing it times changed since ${BASE::8}"
       - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
         run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
-      - run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --no-self-update
-      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      - if: steps.changed.outputs.run == 'true'
+        run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --no-self-update
+      - if: steps.changed.outputs.run == 'true'
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           cache-on-failure: true
-      - run: cargo build --release --locked -p codelaw-cli
+      - if: steps.changed.outputs.run == 'true'
+        run: cargo build --release --locked -p codelaw-cli
       - name: the machine measured (a budget names its reference machine, L8 decision 2)
+        if: steps.changed.outputs.run == 'true'
         run: |
           {
             echo '### perf: the runner'
@@ -190,6 +209,7 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
       - name: codelaw bench --budgets perf/budgets.toml
+        if: steps.changed.outputs.run == 'true'
         run: |
           code=0
           target/release/codelaw bench --workload "$RUNNER_TEMP/bench" --packs packs --budgets perf/budgets.toml --output "$RUNNER_TEMP/bench.json" 2>&1 | tee "$RUNNER_TEMP/bench.txt" || code=$?
@@ -203,7 +223,7 @@ jobs:
             echo "::error title=L8 perf gate::a p95 is over a budget the decider set in perf/budgets.toml; optimise it — a budget is never loosened (L8 decision 5)"
           fi
           exit "$code"
-      - if: always()
+      - if: always() && steps.changed.outputs.run == 'true'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: perf-bench
@@ -242,7 +262,7 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: out/wheel
-          key: wheel-${{ matrix.key }}-${{ steps.rustc.outputs.v }}-${{ env.MATURIN_VERSION }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.toml', 'Cargo.lock', 'crates/**', 'packaging/python/**', 'packaging/README.md', 'LICENSE', '.github/workflows/ci.yml') }}
+          key: wheel-${{ matrix.key }}-${{ steps.rustc.outputs.v }}-${{ env.MATURIN_VERSION }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.toml', 'Cargo.lock', 'crates/**', 'agents/**', 'packaging/python/**', 'packaging/README.md', 'LICENSE', 'scripts/package.py', '.github/workflows/ci.yml') }}
       - if: steps.wheel.outputs.cache-hit == 'true'
         run: echo "::notice title=build ${{ matrix.key }}::reused the wheel built from these exact sources with rustc ${{ steps.rustc.outputs.v }}"
       - if: steps.wheel.outputs.cache-hit != 'true'
@@ -307,8 +327,8 @@ jobs:
         run: python3 scripts/package.py assemble --bins out/bin --wheels out/wheel --out dist
       - name: the release checks — names (B-020), one version, zero deps, licence, one binary, pack parity, SHA256SUMS
         run: python3 scripts/package.py check dist
-      - name: the engine is complete enough to release (L6 decision 3, L7) — reported, not failed, until W-07–W-09 land
-        run: python3 scripts/law-gate.py dist --report
+      - name: the engine is complete enough to release — format, mcp and lsp present (L6 decision 3, L7)
+        run: python3 scripts/law-gate.py dist
       - name: attest every file publish.yml may upload (SR-PACKAGES decision 11) — main pushes only
         # publish.yml's gate verifies each file against this attestation, so it
         # uploads exactly what this run built, from this commit, on main.

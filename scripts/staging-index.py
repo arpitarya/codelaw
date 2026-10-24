@@ -32,6 +32,7 @@ import html
 import json
 import pathlib
 import re
+import socketserver
 import sys
 import threading
 import urllib.parse
@@ -187,6 +188,16 @@ class Handler(BaseHTTPRequestHandler):
     do_HEAD = do_GET
 
 
+class Server(ThreadingHTTPServer):
+    def server_bind(self) -> None:
+        # HTTPServer.server_bind resolves socket.getfqdn("127.0.0.1"), a reverse
+        # DNS lookup that stalls past smoke.sh's 10 s wait on the macOS runners
+        # (W-24); nothing here reads server_name, so the address stands in for it.
+        socketserver.TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name, self.server_port = host, port
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("dir", type=pathlib.Path)
@@ -194,7 +205,7 @@ def main() -> None:
     a = ap.parse_args()
     a.dir.mkdir(parents=True, exist_ok=True)
     Handler.root = a.dir.resolve()
-    srv = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    srv = Server(("127.0.0.1", 0), Handler)
     url = "http://127.0.0.1:%d" % srv.server_address[1]
     if a.port_file:
         tmp = a.port_file.with_suffix(".tmp")
