@@ -4,10 +4,11 @@
 //! and is stopped at the timeout with everything it started.
 
 use crate::manifest::Manifest;
+use codelaw_core::process::kill_group;
 use semver::Version;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::process::{Child, Command, Stdio};
+use std::process::{Command, Stdio};
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
@@ -68,20 +69,6 @@ fn drain(mut pipe: impl Read + Send + 'static) -> mpsc::Receiver<Vec<u8>> {
     rx
 }
 
-/// Stop the program and everything it started: on Unix it leads its own
-/// process group, and the group is killed.
-fn kill_all(child: &mut Child) {
-    #[cfg(unix)]
-    if let Ok(pid) = libc::pid_t::try_from(child.id()) {
-        // SAFETY: `kill` takes plain integers and has no memory effects; a
-        // group that is already gone is ESRCH, which is ignored.
-        unsafe {
-            libc::kill(-pid, libc::SIGKILL);
-        }
-    }
-    let _ = child.kill();
-}
-
 /// Run `program args…` in `cwd`. A non-zero exit is not an error here: the
 /// linters exit 1 when they find something; the caller reads the output.
 pub fn run(program: &Path, args: &[String], cwd: &Path, timeout: Duration) -> Result<Ran, String> {
@@ -114,19 +101,19 @@ pub fn run(program: &Path, args: &[String], cwd: &Path, timeout: Duration) -> Re
         match child.try_wait() {
             Ok(Some(status)) => break status,
             Ok(None) if started.elapsed() >= timeout => {
-                kill_all(&mut child);
+                kill_group(&mut child);
                 let _ = child.wait();
                 return Err(format!("`{shown}` timed out after {timeout:?}"));
             }
             Ok(None) => std::thread::sleep(Duration::from_millis(5)),
             Err(e) => {
-                kill_all(&mut child);
+                kill_group(&mut child);
                 let _ = child.wait();
                 return Err(format!("`{shown}` failed: {e}"));
             }
         }
     };
-    kill_all(&mut child);
+    kill_group(&mut child);
     let text = |rx: mpsc::Receiver<Vec<u8>>| rx.recv_timeout(CLOSE_GRACE).ok().map(|b| String::from_utf8_lossy(&b).into_owned());
     let Some(stdout) = text(stdout) else {
         return Err(format!("`{shown}` exited but a process it started kept its output open"));

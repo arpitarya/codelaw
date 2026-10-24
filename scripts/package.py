@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import base64
 import concurrent.futures
+import gzip
 import hashlib
 import io
 import json
@@ -78,6 +79,8 @@ TARGETS = {
     "win32-arm64": ("win32", "arm64", None, "aarch64-pc-windows-msvc", r"win_arm64"),
 }
 ZIP_DATE = (1980, 1, 1, 0, 0, 0)
+# npm's own fixed mtime for tarball entries (1985-10-26T08:15:00Z).
+NPM_MTIME = 499162500
 
 
 def fail(msg: str) -> None:
@@ -125,7 +128,7 @@ def base_manifest(name: str, v: str, description: str) -> dict:
 
 
 def pack_manifest(name: str, v: str) -> dict:
-    """A rule pack's package.json (decision 9); scripts/build-packs.py writes the same one."""
+    """A rule pack's package.json (decision 9)."""
     m = base_manifest(f"@codelaw/rules-{name}", v, pack_meta(name)["description"])
     m["keywords"] = ["codelaw", "codelaw-pack", "lint-rules"]
     return m
@@ -164,6 +167,37 @@ def extract(wheel: pathlib.Path, outdir: pathlib.Path) -> None:
 def npm_pack(pkg_dir: pathlib.Path, dest: pathlib.Path) -> None:
     npm = shutil.which("npm") or fail("npm is not on PATH")
     subprocess.run([npm, "pack", "--pack-destination", str(dest), "--silent"], cwd=pkg_dir, check=True, stdout=subprocess.DEVNULL)
+
+
+def stage_pack(name: str, stage: pathlib.Path) -> pathlib.Path:
+    """`packs/<name>/` copied to `stage/rules-<name>/` with the licence files: what
+    every registry's copy of the pack holds (decision 9). The one pack builder —
+    `assemble` and `scripts/build-packs.py` both stage through here (W-27)."""
+    d = stage / f"rules-{name}"
+    shutil.copytree(ROOT / "packs" / name, d, ignore=shutil.ignore_patterns(".*"))
+    copy_licences(d)
+    return d
+
+
+def pack_tarball(name: str, v: str, src: pathlib.Path, dest: pathlib.Path) -> pathlib.Path:
+    """`@codelaw/rules-<name>` as an npm tarball: `package/` is the staged folder plus
+    its package.json. Written here, not by `npm pack`, so it is byte-for-byte the
+    same wherever it is built: fixed mtimes and modes, sorted entries, gzip mtime 0."""
+    entries = [(f.relative_to(src).as_posix(), f.read_bytes()) for f in src.rglob("*") if f.is_file()]
+    entries.append(("package.json", (json.dumps(pack_manifest(name, v), indent=2) + "\n").encode("utf-8")))
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w", format=tarfile.PAX_FORMAT) as tar:
+        for rel, data in sorted(entries):
+            info = tarfile.TarInfo("package/" + rel)
+            info.size = len(data)
+            info.mtime = NPM_MTIME
+            info.mode = 0o644
+            tar.addfile(info, io.BytesIO(data))
+    # npm names a scoped package's tarball without the `@` and with `-` for `/`.
+    out = dest / f"codelaw-rules-{name}-{v}.tgz"
+    with open(out, "wb") as raw, gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as gz:
+        gz.write(buf.getvalue())
+    return out
 
 
 def wheel_for_pack(name: str, v: str, src: pathlib.Path, dest: pathlib.Path) -> pathlib.Path:
@@ -264,15 +298,11 @@ def assemble(bins: pathlib.Path, wheels: pathlib.Path, out: pathlib.Path) -> Non
     # the rule packs, each on the registries pack.rs names, the same files
     # on both where it is on both (decision 9, L6 decision 11)
     for name in PACKS:
-        src = ROOT / "packs" / name
-        pd = stage / f"rules-{name}"
-        shutil.copytree(src, pd)
-        copy_licences(pd)
+        pd = stage_pack(name, stage)
         if name in PYPI_PACKS:
-            wheel_for_pack(name, v, pd, pypi_out)  # before package.json joins the folder
+            wheel_for_pack(name, v, pd, pypi_out)
         if name in NPM_PACKS:
-            write_json(pd / "package.json", pack_manifest(name, v))
-            to_pack.append(pd)
+            pack_tarball(name, v, pd, npm_out)
     with concurrent.futures.ThreadPoolExecutor(8) as pool:
         list(pool.map(lambda d: npm_pack(d, npm_out), to_pack))
 

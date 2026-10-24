@@ -164,7 +164,7 @@ directions.
 | `.claude/hooks/session-lock.sh` | SR-WORK-BLOCKERS | decision 7 |
 | `.claude/hooks/require-progress.sh` | SR-WORK-SESSION | decision 5 |
 | `Cargo.toml` | SR-PACKAGES | decision 1: the workspace and its one version |
-| `crates/codelaw-core` | SR-ARCHITECTURE | decision 13: offsets and positions; the shared types |
+| `crates/codelaw-core` | SR-ARCHITECTURE | decision 13: offsets and positions; the shared types; `process`: the one process-group kill (decisions 18 and 19) |
 | `crates/codelaw-cache` | SR-CACHE | decisions 1–6 |
 | `crates/codelaw-config` | SR-CONFIG | decisions 1–5 and 9 |
 | `crates/codelaw-lang` | SR-LINTER | decisions 1 and 3: grammars and embedded regions; `grammars/tree-sitter-css` is the CSS grammar fork SR-ARCHITECTURE decision 3 records |
