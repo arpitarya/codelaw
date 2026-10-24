@@ -8,12 +8,16 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 - **`js/project`, `py/project` and `css/project`**, opt-in presets for the rules that read the whole repo: `graph/no-unused-exports` and `graph/no-unused-css-classes` were in no preset, so nothing turned them on but a `[rules]` line (W-26).
 - **The README's and the pack READMEs' counts, tables and roadmap are checked against the tree** by `scripts/docs-sync.py` in CI (W-26).
+- **A pinned corpus of ten permissively licensed repositories** (`scripts/corpus.json`) that every pack's rules run over in CI, holding each rule to its invariants on real files (W-20).
 
 ### Changed
 
 - **Nine rule packs, each on the registry its users install from** (W-31). `rules-js` is split into `rules-js`, `rules-ts`, `rules-react`, `rules-node` and `rules-stencil`. npm carries eight packs (`js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `data`); PyPI carries six (`js`, `react`, `html`, `css`, `python`, `data`). `@codelaw/rules-python` is no longer on npm, and `ts`, `node` and `stencil` are not on PyPI. The rules themselves are unchanged (419).
   - **Before you upgrade:** `codelaw:ts/recommended` no longer turns on `js/no-var`, `js/prefer-const`, `js/prefer-rest-params` and `js/prefer-spread`; add `codelaw:js/typescript` for them (`codelaw init` writes it for a TypeScript repo). `codelaw:js/conventions` holds only the `js/*` conventions; the others are `ts/conventions`, `react/conventions` and `stencil/conventions`.
   - **`codelaw init`** installs `rules-ts` for TypeScript and `rules-react` or `rules-stencil` when `package.json` depends on them, and leaves out, with a `note:`, a pack the repo's registry does not publish.
+- **The minimum Rust version is 1.97**, not 1.85: the pinned `ruff_*` crates need it. It matters only when you build codelaw from source (W-27).
+- **A rule's example counts as layout-only when codelaw's own tokens are the same before and after**, not when an external formatter says so; that formatter comparison is now only a warning (W-28).
+- **The records name an owner for every module and say which are built**, and the inbox's age is computed, not stored (W-25). This is project bookkeeping and changes nothing you run.
 
 ## 0.1.0 — 2026-10-24, preview, on npm only
 

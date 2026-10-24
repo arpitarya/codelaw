@@ -11,6 +11,17 @@ named here only as the failure that produced it. A lesson whose remedy is
 
 ---
 
+## 2026-10-24 — seven parallel cargo builds fill this disk; one at a time
+
+Seven agents, each in its own worktree with its own `target/`, built the
+workspace at once. Each `target/` is 0.3–4 GB; with the main one they came to
+about 27 GB and the disk hit 0 bytes free. Every agent stopped mid-commit, and
+no shell command could run — not even `df` — until the decider freed space by
+hand. Nothing was lost (the edits sat uncommitted in the worktrees), but six
+of seven items needed a second pass to test and commit. **Parallel agents on
+this machine may edit in parallel; only one may build.** Delete a finished
+worktree's `target/` before starting the next build.
+
 ## 2026-10-24 — a `cfg`-split function is two functions; the other half is never compiled where you are
 
 `bench/mod.rs` grew a `#[cfg(unix)]` `wait` that reads `rusage` and a

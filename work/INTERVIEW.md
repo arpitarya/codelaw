@@ -24,7 +24,7 @@ entry.**
 
 ## 1 · State of play
 
-*Updated 2026-10-24 (the review session; the rulings branch merged).*
+*Updated 2026-10-24 (the parallel session: W-20, W-21, W-24–W-28 merged to `main` `82df231`, unpushed).*
 **Where things stand:** the laws L0–L8 are accepted (L8's budgets still
 `unset`); every record 0101–0115 is accepted. **The engine is complete**
 (L7, L6 decision 3; `law-gate.py` lists nothing): 20 crates under `crates/`,
@@ -40,9 +40,15 @@ cannot be downloaded there): clippy clean, `cargo test --workspace` green,
 every pack 0 failed. **0.1.0 is on npm** (2026-10-24, W-29: the five-pack
 layout, 14 names, trusted publishing bound), published by hand from a
 failed CI run's `dist`; **PyPI has nothing** and starts at 0.2.0 (W-30).
-**W-31 is uncommitted in Arpit's tree** until he pushes; its open hand steps
-are unpublishing `@codelaw/rules-python` before 2026-10-27, then 0.2.0, which
-first-publishes `rules-ts`, `-react`, `-node`, `-stencil` by hand.
+**W-31 is committed** (`da9b207`) and `@codelaw/rules-python` is off npm;
+0.2.0 first-publishes `rules-ts`, `-react`, `-node`, `-stencil` by hand.
+**The review's fixes are merged, not pushed** (2026-10-24): W-24's seven CI
+fixes, W-27's hygiene (MSRV is **1.97**, the pinned `ruff_*` crates' floor),
+W-28's token-stream layout check, W-25's register and inbox-age rules, W-26's
+`docs-sync.py` and `*/project` presets, W-20's pinned corpus, W-21's patch
+checked against upstream. On `main` `82df231`, rustc from `rust-toolchain.toml`:
+clippy `-D warnings` clean, `cargo test --workspace` 449 passed, `codelaw test`
+on all nine packs 0 failed, 0 advisory warnings.
 
 **What the 2026-10-22 review found (filed 2026-10-24 as W-24–W-28):** CI
 cannot pass on `main` as it stands — `bench/mod.rs`'s `not(unix)` `wait`
@@ -78,10 +84,13 @@ checkout.
 
 ## 2 · In flight, and the immediate next step
 
-**Next for an agent:** W-24 (🟢🧨) first — `main` cannot be pushed green
-without it, and the push gates L8's budgets. Then W-25 (the records), W-26
-(the public docs), W-27, W-28; W-20's pinned corpus and W-21's upstream patch
-remain from before. W-05 is Cowork research only (rule 37a).
+**Next:** the decider pushes `main` — CI's first run proves W-24 (green),
+W-27 (the `msrv` job, the win32 smoke) and gates L8's budgets. **Next for an
+agent:** W-20's `packs/*/corpus.toml` snapshots (the `corpus` job fails until
+they exist — do this before or with the push), then what is left of W-25
+(`check-work-system.py`, item-file `ball:`) and W-26 (the `ci.yml` step, the
+register row). W-05 is Cowork research only (rule 37a). **Run one cargo build
+at a time on this machine** (LESSONS 2026-10-24).
 
 **Open questions for the decider, carried from earlier sessions:** W-21 —
 whether DoD 3 holds while the CSS rules still read text; W-11's two default
