@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-24: the first publish of the 7 PyPI projects (14 wh
 item: W-30
 filed: 2026-10-24
 filed_by: "Arpit (Claude Code, Opus 5.5)"
-updated: 2026-10-24
-updated_by: "Arpit (Claude Code, Opus 5.5)"
+updated: 2026-10-25
+updated_by: "Claude (Opus 5.5), cloud docket 2026-10-25"
 ball: arpit
 ---
 
@@ -20,11 +20,13 @@ ball: arpit
 |---|---|---|---|
 | 1 | The names are free: `codelaw` and `codelaw-rules-{js,react,html,css,python,data}` | nobody else owns them | 🟡 all seven are a 404 on PyPI's JSON API (2026-10-24); a 404 is not a guarantee — the first upload is the proof |
 | 2 | The 0.2.0 `dist` (W-31 step 7: bumped, pushed, CI green) | the wheels hold the same binary as npm's 0.2.0 (L6 decision 2) | 🟡 waits on W-31 |
-| 3 | `twine check`, then upload all 13 wheels with Arpit's account token | the six projects exist, owned by Arpit | ⏳ Arpit runs it |
+| 3 | `twine check`, then upload the six `codelaw_rules_*` wheels with Arpit's account token (not `codelaw`'s: CI creates it through its pending publisher) | the six projects exist, owned by Arpit | ⏳ Arpit runs it |
 | 4 | Add a trusted publisher to each of the six (now existing) projects: `arpitarya` / `codelaw` / `publish.yml` / environment `pypi` | every later release comes from CI, no token | ⏳ Arpit, on pypi.org |
-| 5 | `RELEASING.md` §One time step 4: "pending publishers" becomes "trusted publishers on the existing projects", and the first PyPI publish is by hand like npm's | the release doc matches what was done | ⏳ agent |
+| 5 | `RELEASING.md` §One time step 4: "pending publishers" becomes "trusted publishers on the existing projects", and the first PyPI publish is by hand like npm's | the release doc matches what was done | ✅ 2026-10-25 |
 
 **Arpit, 2026-10-24:** *"Create another work item to publish Python packages. Give me the command … so I can do the first publish from local. I have already configured token for my whole system."*
+
+**Arpit, 2026-10-25 (docket):** *"A: hand-upload once, then bind"* — PyPI refused a second pending publisher for the same `arpitarya/codelaw` · `publish.yml` · `pypi` (*"A pending trusted publisher matching this configuration has already been registered for a different project name"*), so the six `codelaw-rules-*` get their first 0.2.0 by hand and a trusted publisher after; `codelaw` keeps its pending publisher (registered 2026-10-25) and is created by CI.
 
 **Model:** NONE for steps 1–4 (Arpit); Sonnet for step 5 (one doc and one record sentence).
 
@@ -36,8 +38,8 @@ ls dist/pypi/                                   # 8 codelaw-*.whl + 5 codelaw_ru
 
 # 3 · check, then upload with the token in ~/.pypirc ([pypi] username = __token__)
 python3 -m pip install --user twine             # if not installed (Apache-2.0)
-python3 -m twine check dist/pypi/*.whl
-python3 -m twine upload dist/pypi/*.whl
+python3 -m twine check dist/pypi/codelaw_rules_*.whl
+python3 -m twine upload dist/pypi/codelaw_rules_*.whl   # codelaw itself: CI, via its pending publisher
 
 #   or with uv (reads the token from the environment, not ~/.pypirc):
 #   UV_PUBLISH_TOKEN=pypi-… uv publish dist/pypi/*.whl

@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-24: publish on each registry only the packs its use
 item: W-31
 filed: 2026-10-24
 filed_by: "Arpit (Claude Code, Opus 5.5)"
-updated: 2026-10-24
-updated_by: "Arpit (Claude Code, Opus 5.5)"
+updated: 2026-10-25
+updated_by: "Claude (Opus 5.5), cloud docket 2026-10-25"
 ball: arpit
 ---
 
@@ -38,6 +38,27 @@ ball: arpit
 **Arpit, 2026-10-24:** *"All the packages aren't needed to be published in npm or PyPI repo. The ones that are going to be used in npm and the ones that are going to be used in PyPI should only be published."* Then: *"in js have js, node, stencil as separate packs; in pypi have js, react as separate packs and remove ts, node and stencil from pypi"*, html kept on npm, and *"implement everything"*.
 
 **Model:** Opus for steps 1–4 (landed); NONE for 5–7 — Arpit's hand at npm and PyPI.
+
+## 0.2.0, step by step (prepared 2026-10-25)
+
+**Arpit, 2026-10-25 (docket):** *"Yes, both"* — an agent prepares 0.2.0 (the bump and the command list); W-29's 8-platform registry install is checked on 0.2.0, not 0.1.0.
+
+Checked on the registries 2026-10-25: `@codelaw/rules-ts`, `-react`, `-node` and `-stencil` already exist on npm at 0.1.0, and `@codelaw/rules-python` is gone; `@codelaw/rules-tanstack-query` and `@codelaw/rules-redux-toolkit` (W-32) do not exist yet; nothing is on PyPI. `python3 scripts/version.py --set 0.2.0` is applied in the tree (Cargo.toml, Cargo.lock, 11 pack manifests, the editor extension) and `--check` passes; **not committed**.
+
+```bash
+# 1 · the release commit — only the version files, plus CHANGELOG's Unreleased renamed "## 0.2.0 — <date>"
+git add Cargo.toml Cargo.lock packs/*/codelaw-pack.toml packaging/vscode/package.json packaging/vscode/package-lock.json CHANGELOG.md
+git commit -m "release: 0.2.0" && git push
+# 2 · wait for ci.yml green on that commit, then take its dist
+gh run list -R arpitarya/codelaw -w ci.yml -b main -L 3
+rm -rf dist && gh run download <RUN_ID> -R arpitarya/codelaw -n dist -D dist
+python3 scripts/package.py check dist && python3 scripts/law-gate.py dist
+# 3 · first hand publish of the two names npm has never seen (npm binds trust only to an existing package)
+cd dist/npm && for t in codelaw-rules-tanstack-query-0.2.0.tgz codelaw-rules-redux-toolkit-0.2.0.tgz; do npm publish "$t" --access public; done && cd ../..
+bash scripts/npm-trust.sh
+# 4 · PyPI first (RELEASING.md step 4, W-30): twine upload dist/pypi/codelaw_rules_*.whl, then a trusted publisher on each; then the release publishes the rest
+gh release create v0.2.0 --title "v0.2.0 — packs per registry" --notes "<what changed>"
+```
 
 ## Goal
 

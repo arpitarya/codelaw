@@ -68,7 +68,7 @@ Wall time is first job start to last job end.
 ## Blockers
 
 - ~~Step 5 waits on W-07, W-08 and W-09~~ — landed 2026-10-21; `scripts/law-gate.py` still refuses a release without them (struck by W-25, 2026-10-24).
-- **2026-10-24:** npm steps 1–3 done (W-29) and step 5, the `npm`/`pypi` environments with tag rule `v*`, done; left: step 4, the PyPI pending publishers (inbox).
+- **2026-10-24:** npm steps 1–3 done (W-29) and step 5, the `npm`/`pypi` environments with tag rule `v*`, done; left: step 4 — `codelaw`'s pending publisher registered 2026-10-25; the six packs by hand, then trusted publishers (ruled 2026-10-25, W-30).
 - **Step 5 is the decider's:** the `@codelaw` npm org, the first hand publish of the 14 npm packages, `scripts/npm-trust.sh`, six PyPI pending publishers and the `npm` / `pypi` GitHub environments ([`RELEASING.md`](../../RELEASING.md) §One time) — then his ruling to publish, which is W-03 step 6.
 
 ## Not done here (backlog)

@@ -71,10 +71,16 @@ harmless); `publish.yml` then skips the versions already on npm.
 3. **npm trusted publishers:** `scripts/npm-trust.sh` (npm 12, your login) —
    every package trusts `arpitarya/codelaw` · `publish.yml` · environment `npm`,
    with *Allow npm publish* ticked.
-4. **PyPI pending publishers** — <https://pypi.org/manage/account/publishing/>,
-   one per project: `codelaw` and `codelaw-rules-{js,react,html,css,python,data}`;
-   owner `arpitarya`, repository `codelaw`, workflow `publish.yml`, environment
-   `pypi`.
+4. **PyPI** — owner `arpitarya`, repository `codelaw`, workflow `publish.yml`,
+   environment `pypi` for every project. PyPI allows **one** pending publisher per
+   repository · workflow · environment, so:
+   - `codelaw`: a pending publisher at <https://pypi.org/manage/account/publishing/>
+     (done 2026-10-25); the first release's `publish.yml` creates the project.
+   - `codelaw-rules-{js,react,html,css,python,data}`: the first version by hand,
+     `twine upload dist/pypi/codelaw_rules_*.whl` from the release's `dist`
+     with your account token, then a trusted publisher on each project's
+     *Settings → Publishing*; `publish.yml` skips versions already uploaded.
+     ([W-30](work/open/W-30-first-pypi-publish.md); the decider, 2026-10-25.)
 5. **GitHub environments** `npm` and `pypi` (*Settings → Environments*) —
    **required, both:**
    - *Deployment branches and tags* → **Selected branches and tags** → add one

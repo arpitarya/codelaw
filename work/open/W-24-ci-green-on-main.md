@@ -7,7 +7,7 @@ filed: 2026-10-23
 filed_by: "Arpit (Claude Code, Fable 5.1)"
 updated: 2026-10-25
 updated_by: "Claude Code (Opus 5.5): DoD 5 proven; main red on docs-sync, fixed in the tree"
-ball: arpit
+ball: agent
 ---
 
 # W-24 — Make CI pass on `main`, and make a green verdict mean something

@@ -5,6 +5,11 @@
 # sets one (L8 decision 4). Until then the gate reports each p95 and fails
 # nothing (decision 6).
 #
+# THE METHOD IS RULED (the decider, 2026-10-25, W-19): budget = min(design
+# target, 1.5 x the worst p95 of perf's three ubuntu-24.04 runs on main),
+# rounded up; where the target is below 1.5 x that p95, leave it unset and
+# put it back in the inbox. Each set entry names this ruling in set_by.
+#
 # How the gate tells a set budget from a proposal:
 #   budget = "unset"        not set: reported, never gated
 #   budget = <number>       SET: a p95 over it fails CI; must also carry

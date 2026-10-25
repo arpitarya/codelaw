@@ -103,6 +103,8 @@ three pinned repos (W-19). On `ubuntu-24.04` three p95s sit above their Mac
 proposals (`check_cold_10k` 8701 ms, `format_warm_10k` 1353 ms, `mcp_rules_for_path`
 40.8 ms), so the proposals must be re-applied from CI's runs before the decider rules.
 
+**Docket 2026-10-25:** `main` pushed; L8's budgets ruled by method (min(target, 1.5 × worst CI p95), a capped one back to the decider; W-19 applies it with `gh` on the Mac); PyPI step 4 — Arpit logs in, Claude adds the seven; 0.2.0 bumped in the tree (uncommitted), command list in W-31; W-29's 8-platform check moved to 0.2.0; W-33 filed (two Stencil rules).
+
 **Open questions for the decider, carried from earlier sessions:** W-11's two default
 gaps (self-aliased private packages; CSS only for linked stylesheets); W-13's
 `on_touch` default for non-deprecation baselines and `codelaw/stale-baseline`

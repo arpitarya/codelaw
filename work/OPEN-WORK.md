@@ -22,10 +22,8 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
-| 🔴 **The one-time registry setup, step 4** — the seven PyPI pending publishers ([`RELEASING.md`](../RELEASING.md) §One time); needs his PyPI login. Steps 1–3 done for npm (W-29) and step 5, the `npm`/`pypi` environments with tag rule `v*`, done 2026-10-24 | 2026-10-20 |
+| 🔴 **PyPI, ruled 2026-10-25: upload the six `codelaw-rules-*` 0.2.0 wheels by hand, then add a trusted publisher to each** — `codelaw` comes from CI through its pending publisher (registered 2026-10-25); commands in [W-30](open/W-30-first-pypi-publish.md) | 2026-10-20 |
 | ↳ **blocks:** W-04 step 5 (the first release on both registries) · W-03 step 6 · W-30 step 4 | |
-| 🔴 Set L8's budgets: `perf` has run on `ubuntu-24.04` (CI runs 40124005285, 40124756694, 40124878075); rule each `budget` in `perf/budgets.toml` from the re-applied proposals ([W-19](open/W-19-performance-budgets.md)) | 2026-10-22 |
-| ↳ **blocks:** W-19 DoD 3 · the perf gate binding anything | |
 
 ---
 
@@ -37,19 +35,21 @@ here. Read that record before changing anything below it.
 
 🔴 **W-03** `agent` The rule packs: steps 2–5 done (419 rules), packaging done; nine packs since W-31. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
 
-🟢 **W-29** `arpit` The first npm publish: 14 names live at 0.1.0, trusted publishing bound (2026-10-24), from the `dist` of a failed CI run; the Mac install check passed 2026-10-25; left: the 8-platform registry install and the records (DoD 2, 4). Filed by Arpit (Claude Code). [detail](open/W-29-first-npm-publish.md)
+🟡 **W-29** `arpit` The first npm publish: 14 names live at 0.1.0, trusted publishing bound, the Mac install check passed 2026-10-25, records done; left: the 8-platform registry install, moved to 0.2.0 (ruled 2026-10-25). Filed by Arpit (Claude Code). [detail](open/W-29-first-npm-publish.md)
 
 🟡 **W-30** `arpit` The first PyPI publish: `codelaw` (8 wheels) and the six `codelaw-rules-*` of W-31's layout, at 0.2.0 rather than 0.1.0; waiting on W-31 (0.2.0). Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
 
-🟢 **W-31** `arpit` Eight packs on npm, six on PyPI, `rules-js` split in five: landed 2026-10-24, and `@codelaw/rules-python` is off npm. Left: commit and push, then 0.2.0. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
+🟢 **W-31** `arpit` Eight packs on npm, six on PyPI: landed and pushed; 0.2.0 bumped in the tree 2026-10-25 (uncommitted) with the command list in the item; left: Arpit commits, pushes and publishes. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
 
 🟡 **W-32** `arpit` A Redux Toolkit pack and a TanStack Query pack, npm only: steps 2–4 done in the tree 2026-10-25 (7 + 12 rules, all green, wired); left: Arpit pushes the W-32 commit, then their first publish at 0.2.0 with W-31 step 7. Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
 
-🟢🧨 **W-24** `arpit` CI green on `main`: DoD 5 proven (run 40125039176 skipped `perf` on a docs-only push), but `main` is red since that run — `lint`'s docs-sync (CHANGELOG missed W-18, W-19); fixed 2026-10-25 in the W-32 commit; left: Arpit pushes it. Filed by Arpit (Claude Code). [detail](open/W-24-ci-green-on-main.md)
+🟢 **W-33** `agent` The two Stencil rules missing from `stencil/recommended`: port `ban-side-effects` and `enforce-slot-jsdoc` from @stencil/eslint-plugin 1.4.0 (or record why not), and fix the pack README's count (23 rules on, not 21). Filed by Arpit (Claude). [detail](open/W-33-stencil-preset-gaps.md)
+
+🟢🧨 **W-24** `agent` CI green on `main`: DoD 5 proven (run 40125039176); `main` red since on `lint`'s docs-sync, fixed in `76f1ad6`, pushed 2026-10-25; left: CI run 40185344678 on it goes green. Filed by Arpit (Claude Code). [detail](open/W-24-ci-green-on-main.md)
 
 ### testing
 
-🔴 **W-19** `agent` `bench` times the three pinned repos and `perf` runs on `ubuntu-24.04` (2026-10-25); CI's numbers are in, three p95s past their Mac proposals; blocked on the L8 budgets ruling above. Filed by Arpit (Cowork). [detail](open/W-19-performance-budgets.md)
+🟢 **W-19** `agent` `bench` times the three pinned repos on `ubuntu-24.04`; the method for the budgets ruled 2026-10-25; left: apply it to the three CI runs (`gh` on the Mac) and set every budget, a capped one back to the inbox. Filed by Arpit (Cowork). [detail](open/W-19-performance-budgets.md)
 
 ### record update
 

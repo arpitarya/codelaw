@@ -73,7 +73,7 @@ The decider wants performance to be a key property and accepts that today's numb
    - Three pinned real repos.
    - A reference machine named in `budgets.toml`.
 3. **The measurement.** `codelaw bench` runs each operation 10 times, discards the first run, and reports the median and p95. The gate compares **p95** against the budget.
-4. **Setting a budget** is the decider's ruling. The entry records the value, the measured p95 it came from, and the date. Anyone may propose a tighter value; only a ruling sets one.
+4. **Setting a budget** is the decider's ruling. The entry records the value, the measured p95 it came from, and the date. Anyone may propose a tighter value; only a ruling sets one. The decider may rule a method in advance; each entry then names that ruling. **Ruled 2026-10-25 (W-19):** min(design target, 1.5 × the worst p95 of the `perf` job's three `ubuntu-24.04` runs on `main`), rounded up; an operation whose design target is below 1.5 × that p95 is not set and goes back to the decider.
 5. **Never broken, never loosened.**
    - No flag, label or override lets a change over budget merge.
    - A budget is never raised.

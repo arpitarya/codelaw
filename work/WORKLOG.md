@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — Docket: L8 by method, PyPI step 4 rethought, 0.2.0 prepared, W-33 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"What are the blockers? Let's go through them one by one … provide a recommendation."*
+- **Done:** Arpit pushed `76f1ad6` (CI run 40185344678 in progress; W-24 waits on it). L8 ruled by method (min(design target, 1.5 × worst CI p95), a capped one back to the decider) in SR-LAW-8 decision 4, `perf/budgets.toml`, W-19 (🟢: an agent with `gh` on the Mac applies it). PyPI step 4 in Arpit's Chrome: `codelaw`'s pending publisher registered; `codelaw-rules-js` refused (one pending publisher per repo · workflow · environment) → ruled: the six packs by hand, then trusted publishers; `RELEASING.md` step 4, W-30, W-31, W-04 rewritten. `version.py --set 0.2.0` applied in the tree (uncommitted) and the release command list put in W-31; on npm, `rules-ts`, `-react`, `-node`, `-stencil` already exist at 0.1.0, so only the two W-32 packs need a hand publish. W-29 DoD 4 found done; its 8-platform check moved to 0.2.0. W-33 filed (the two Stencil rules from the 2026-10-25 coverage comparison).
+- **Decided / left open:** the rulings are verbatim in W-19, W-29, W-30, W-31, W-33.
+- **Mistakes:** none.
+- **Next:** CI green on `76f1ad6`; then Arpit commits the 0.2.0 bump and runs W-31's list.
+
 ## 2026-10-25 — W-32's two packs finished and verified; `main`'s red lint found and fixed  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement all OpenWork tasks in parallel."*
