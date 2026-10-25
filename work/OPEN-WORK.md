@@ -41,6 +41,10 @@ here. Read that record before changing anything below it.
 
 🟢 **W-41** `agent` `react/no-context`: old context use warns through a baseline, any new `createContext`/`useContext` errors. Filed by Arpit (Cowork). [detail](open/W-41-react-no-context.md)
 
+🟢 **W-42** `agent` More TanStack Query hook rules from TanStack's v5 docs — removed v4 options, object syntax, array keys, returning `invalidateQueries`, no mutating `setQueryData`. Filed by Arpit (Claude Code). [detail](open/W-42-tanstack-query-hooks-rules.md)
+
+🟢 **W-43** `agent` More React hooks rules from eslint-plugin-react-hooks 7 and @eslint-react — set-state in render/effect, refs and purity in render, nested components, `useMemo` returns. Filed by Arpit (Claude Code). [detail](open/W-43-react-hooks-rules.md)
+
 🟡 **W-34** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; waiting on Fux item 298, then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
 🟡 **W-35** `agent` README leads with "your rules, before, while and after the AI writes"; waiting on W-05 to drop While's "in design" and restore Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
