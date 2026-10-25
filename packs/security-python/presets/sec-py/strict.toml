@@ -1,0 +1,4 @@
+description = "sec-py/recommended and the heuristic security rules, at warn"
+extends = ["codelaw:sec-py/recommended"]
+
+[rules]

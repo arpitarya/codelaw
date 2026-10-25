@@ -6,7 +6,7 @@
 use crate::{SCHEMA_VERSION, diagnostic_json};
 use codelaw_core::{FixClass, Language, LineIndex};
 use codelaw_engine::{FileFix, RuleRow, RuleWhy, severity_name};
-use codelaw_rules::{EngineRule, LoadedRule};
+use codelaw_rules::{EngineRule, LoadedRule, OWASP_TOP_10_2025, Security};
 use serde_json::{Map, Value, json};
 
 fn envelope(body: Value) -> Value {
@@ -19,23 +19,86 @@ fn envelope(body: Value) -> Value {
     Value::Object(out)
 }
 
-/// `rules [--for <file>] --format json`: one card per rule.
+/// A security rule's `security` object in JSON.
+pub fn security_json(s: &Security) -> Value {
+    json!({ "cwe": s.cwe, "owasp": s.owasp, "severity": s.severity.name(), "security_severity": s.severity.score() })
+}
+
+/// `rules [--for <file>] --format json`: one card per rule; a security
+/// rule's card adds `security` (SR-RULE-FORMAT decision 2a).
 pub fn rules_json(rows: &[RuleRow], for_file: Option<&str>) -> Value {
     let rules: Vec<Value> = rows
         .iter()
-        .map(|r| json!({ "id": r.id, "severity": r.severity, "fix": r.fix.name(), "title": r.title, "source": r.source, "preview": r.preview }))
+        .map(|r| {
+            let mut card = json!({ "id": r.id, "severity": r.severity, "fix": r.fix.name(), "title": r.title, "source": r.source, "preview": r.preview });
+            if let Some(s) = &r.security {
+                card["security"] = security_json(s);
+            }
+            card
+        })
         .collect();
     envelope(json!({ "for": for_file, "rules": rules }))
 }
 
-/// `rules [--for <file>]` as text: one line per rule.
+/// `rules [--for <file>]` as text: one line per rule; a security rule's
+/// line names its CWE ids.
 pub fn rules_text(rows: &[RuleRow]) -> String {
     let mut out = String::new();
     for r in rows {
         let preview = if r.preview { "  (preview)" } else { "" };
-        out.push_str(&format!("{:<40} {:<6} {:<8} {}{preview}\n", r.id, r.severity, r.fix.name(), r.source));
+        let cwe = r.security.as_ref().map(|s| s.cwe_label()).filter(|l| !l.is_empty()).map(|l| format!("  {l}")).unwrap_or_default();
+        out.push_str(&format!("{:<40} {:<6} {:<8} {}{preview}{cwe}\n", r.id, r.severity, r.fix.name(), r.source));
     }
     out
+}
+
+/// `rules --security-coverage`: each OWASP Top 10:2025 category and the
+/// security rules mapped to it, then the security rules mapped to none.
+/// An OWASP category's id and name, and the rules mapped to it.
+type Category<'a> = (&'static str, &'static str, Vec<&'a RuleRow>);
+
+fn coverage(rows: &[RuleRow]) -> (Vec<Category<'_>>, Vec<&RuleRow>) {
+    let security: Vec<&RuleRow> = rows.iter().filter(|r| r.security.is_some()).collect();
+    let categories = OWASP_TOP_10_2025
+        .iter()
+        .map(|(id, name)| {
+            let hits = security.iter().copied().filter(|r| r.security.as_ref().is_some_and(|s| s.owasp.iter().any(|o| o == id))).collect();
+            (*id, *name, hits)
+        })
+        .collect();
+    let unmapped =
+        security.iter().copied().filter(|r| r.security.as_ref().is_some_and(|s| !s.owasp.iter().any(|o| OWASP_TOP_10_2025.iter().any(|(id, _)| id == o)))).collect();
+    (categories, unmapped)
+}
+
+pub fn security_coverage_text(rows: &[RuleRow]) -> String {
+    let (categories, unmapped) = coverage(rows);
+    let mut out = String::from("OWASP Top 10:2025 × the rules this project loads\n\n");
+    for (id, name, hits) in &categories {
+        let list = if hits.is_empty() {
+            "—".to_owned()
+        } else {
+            hits.iter().map(|r| format!("{} {}", r.id, r.security.as_ref().map(|s| s.cwe_label()).unwrap_or_default()).trim_end().to_owned()).collect::<Vec<_>>().join(", ")
+        };
+        out.push_str(&format!("{id}  {name:<40} {:>3}  {list}\n", hits.len()));
+    }
+    let covered = categories.iter().filter(|(_, _, h)| !h.is_empty()).count();
+    let total = rows.iter().filter(|r| r.security.is_some()).count();
+    out.push_str(&format!("\n{covered} of 10 categories covered by {total} security rule(s)"));
+    if !unmapped.is_empty() {
+        out.push_str(&format!("; {} mapped to no 2025 category: {}", unmapped.len(), unmapped.iter().map(|r| r.id.as_str()).collect::<Vec<_>>().join(", ")));
+    }
+    out.push('\n');
+    out
+}
+
+pub fn security_coverage_json(rows: &[RuleRow]) -> Value {
+    let (categories, unmapped) = coverage(rows);
+    let card = |r: &&RuleRow| json!({ "id": r.id, "severity": r.severity, "source": r.source, "security": r.security.as_ref().map(security_json) });
+    envelope(json!({
+        "owasp": categories.iter().map(|(id, name, hits)| json!({ "id": id, "name": name, "rules": hits.iter().map(card).collect::<Vec<_>>() })).collect::<Vec<_>>(),
+        "unmapped": unmapped.iter().map(card).collect::<Vec<_>>(),
+    }))
 }
 
 /// `rules --why <id> [--for <file>] --format json`.

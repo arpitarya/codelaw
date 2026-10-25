@@ -2,10 +2,11 @@
 
 **One release, both registries, one version** ([L6](records/0008_LAW-6-python-and-node-packages.md)
 decision 9). What ships is [SR-PACKAGES](records/0107_packages.md) §1: npm
-`codelaw` + eight `@codelaw/cli-*` + eight `@codelaw/rules-*` (`js`, `ts`,
-`react`, `node`, `stencil`, `html`, `css`, `data`), PyPI `codelaw` (eight
-wheels) + six `codelaw-rules-*` (`js`, `react`, `html`, `css`, `python`,
-`data`). Which pack goes where is `FIRST_PARTY_PACKS` in
+`codelaw` + eight `@codelaw/cli-*` + thirteen `@codelaw/rules-*` (`js`, `ts`,
+`react`, `node`, `stencil`, `html`, `css`, `data`, `tanstack-query`,
+`redux-toolkit`, `security-js`, `security-ts`, `security-html`), PyPI `codelaw`
+(eight wheels) + nine `codelaw-rules-*` (`js`, `react`, `html`, `css`,
+`python`, `data`, `security-js`, `security-html`, `security-python`). Which pack goes where is `FIRST_PARTY_PACKS` in
 `crates/codelaw-rules/src/pack.rs`; `python3 scripts/package.py names` prints
 every name.
 
@@ -56,7 +57,9 @@ publisher creates the project on its first upload.
 
 **Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](archive/open/W-29-first-npm-publish.md)). **Step 5 done 2026-10-24** (both environments, tag rule `v*`, [W-18](work/open/W-18-release-hardening.md)). Left: step 4.
 Steps 2–3 come back for **every pack name new to npm**: at 0.2.0,
-`@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](archive/open/W-31-registry-pack-split.md)) —
+`@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](archive/open/W-31-registry-pack-split.md)), and
+at the first release with the security packs `@codelaw/rules-security-js`, `-security-ts` and
+`-security-html` ([W-53](work/open/W-53-security-packs-groundwork.md)) —
 publish just those tarballs by hand from the 0.2.0 `dist`, then run
 `npm-trust.sh` again (it skips nothing, and re-binding an existing package is
 harmless); `publish.yml` then skips the versions already on npm.
@@ -76,7 +79,9 @@ harmless); `publish.yml` then skips the versions already on npm.
    repository · workflow · environment, so:
    - `codelaw`: a pending publisher at <https://pypi.org/manage/account/publishing/>
      (done 2026-10-25); the first release's `publish.yml` creates the project.
-   - `codelaw-rules-{js,react,html,css,python,data}`: the first version by hand,
+   - `codelaw-rules-{js,react,html,css,python,data}`, and with W-53
+     `codelaw-rules-{security-js,security-html,security-python}` (wheels
+     `codelaw_rules_security_*.whl`): the first version by hand,
      `twine upload dist/pypi/codelaw_rules_*.whl` from the release's `dist`
      with your account token, then a trusted publisher on each project's
      *Settings → Publishing*; `publish.yml` skips versions already uploaded.

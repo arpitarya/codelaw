@@ -24,11 +24,11 @@ codelaw init --no-install
 # 3. Until the packs are published, link them from the clone:
 #    the npm packs into node_modules/, the PyPI-only ones where a Python install would put them
 mkdir -p node_modules/@codelaw .codelaw-packs
-for p in js ts react node stencil html css data tanstack-query redux-toolkit; do
+for p in js ts react node stencil html css data tanstack-query redux-toolkit security-js security-ts security-html; do
   ln -s "$OLDPWD/codelaw/packs/$p" "node_modules/@codelaw/rules-$p"
 done
-for p in python; do
-  ln -s "$OLDPWD/codelaw/packs/$p" ".codelaw-packs/codelaw_rules_$p"
+for p in python security-python; do
+  ln -s "$OLDPWD/codelaw/packs/$p" ".codelaw-packs/codelaw_rules_${p//-/_}"
 done
 export CODELAW_SITE_PACKAGES="$PWD/.codelaw-packs"
 
@@ -303,7 +303,7 @@ flowchart LR
 | `codelaw mcp` · `codelaw lsp` | The MCP server for agents and the language server for editors, from the same binary |
 | `codelaw init` | Detect languages and write `codelaw.toml`, `.codelaw/rules/` and the `.gitignore` line. `--no-install` prints the pack install commands instead of running them; `--registry npm\|pypi`; `--agents` writes the agent hooks and files; `--git-hooks [pre-commit,post-commit]` installs the git hooks |
 | `codelaw config` | `--print` every resolved value and where it came from; `--schema` prints the config's JSON Schema; `--for <file>` resolves for one file |
-| `codelaw rules` | List active rules. `--for <file>` shows the ones that apply to that file. `rules lint` checks rule files |
+| `codelaw rules` | List active rules. `--for <file>` shows the ones that apply to that file. `--tag cwe:79` / `--tag owasp:A05` / `--tag security` keep the rules with that security mapping; `--security-coverage` prints the OWASP Top 10:2025 × rule matrix. `rules lint` checks rule files |
 | `codelaw explain <id>` | What a rule requires, why, and how to fix it |
 | `codelaw test [rule\|folder] [--corpus <dir>]` | Run rules against their own examples; `--corpus` also runs them over real code |
 | `codelaw new-rule <ns/name>` | Write a rule file from the template |

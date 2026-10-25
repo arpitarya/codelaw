@@ -12,10 +12,10 @@ mod rule;
 mod ruleset;
 
 pub use engine_rules::{ENGINE_RULES, EngineRule, engine_rule};
-pub use pack::{ExtendsSpec, FIRST_PARTY_PACKS, FirstPartyPack, PackManifest, PackSearch, Preset, RulePack, first_party, first_party_npm, first_party_pypi, load_pack, load_pack_from, load_rules_dir, namespace_pack};
+pub use pack::{ExtendsSpec, FIRST_PARTY_NAMESPACES, FIRST_PARTY_PACKS, FirstPartyPack, PackManifest, PackSearch, Preset, RulePack, first_party, first_party_npm, first_party_pypi, load_pack, load_pack_from, load_rules_dir, namespace_pack};
 pub use rule::{
     Block, BlockKind, Case, Example, ExampleKind, KNOWN_SKILLS, LanguageExamples, OptionSpec, RESERVED_NAMESPACES,
-    RuleFile, Scope, Snippet, Stability, parse_cases, parse_rule,
+    OWASP_TOP_10_2025, RuleFile, SECURITY_NAMESPACES, Scope, Security, SecuritySeverity, Snippet, Stability, parse_cases, parse_rule,
 };
 pub use ruleset::{LoadOptions, LoadedRule, RuleSet, RuleSource};
 

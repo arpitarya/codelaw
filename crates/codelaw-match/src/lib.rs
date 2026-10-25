@@ -17,10 +17,11 @@ pub mod data;
 mod explain;
 mod predicate;
 pub mod schema;
+pub mod source;
 pub mod target;
 
 pub use explain::{ClauseResult, Explainer, NodeExplanation};
-pub use predicate::{Predicate, parse_predicates};
+pub use predicate::{Predicate, Subject, parse_predicates};
 pub use target::{CompiledTarget, Pred, Slot, TargetFinding, compile_target};
 
 use ast_grep_config::{DeserializeEnv, RuleCore, SerializableRuleCore};
@@ -228,11 +229,14 @@ impl CompiledMatch {
             }
         }
         let range = m.range();
-        let this = captured(&m);
+        let source: &str = {
+            use ast_grep_core::Doc;
+            m.get_doc().get_source()
+        };
         for (var, predicate) in &self.predicates {
-            let target = if var == MATCH_KEY { Some(&this) } else { single.get(var.trim_start_matches('$')) };
+            let target = if var == MATCH_KEY { Some(m.get_inner_node()) } else { env.get_match(var.trim_start_matches('$')).map(|n| n.get_inner_node()) };
             let holds = match (target, semantic) {
-                (Some(t), Some(model)) => predicate.holds(model, t.start),
+                (Some(t), Some(model)) => predicate.holds(model, &Subject { start: t.start_byte(), node: Some(t), source }),
                 _ => false,
             };
             if !holds {

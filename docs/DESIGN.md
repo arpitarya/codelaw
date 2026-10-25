@@ -31,12 +31,12 @@ The hard requirements are stated as **laws** in [`records/`](../records/README.m
 | [L3](../records/0005_LAW-3-languages.md) | JS, TS, Python, JSON, YAML, TOML, Markdown, CSS and HTML, each alone or in any combination |
 | [L4](../records/0006_LAW-4-every-rule-has-a-fix.md) | Every rule has a fix: `auto` wherever safe, otherwise `suggest` (diff) or `manual` (written steps, carried by a skill) |
 | [L5](../records/0007_LAW-5-no-model-in-the-engine.md) | No model in the engine; works the same with or without an agent |
-| [L6](../records/0008_LAW-6-python-and-node-packages.md) | One release: `codelaw` on PyPI and npm, each a complete engine, identical output; rules as eleven packs, ten on npm and six on PyPI; npm sub-packages only as `@codelaw/*` |
+| [L6](../records/0008_LAW-6-python-and-node-packages.md) | One release: `codelaw` on PyPI and npm, each a complete engine, identical output; rules as fifteen packs, thirteen on npm and nine on PyPI; npm sub-packages only as `@codelaw/*` |
 | [L7](../records/0009_LAW-7-linter-and-formatter.md) | Always both a linter and a formatter, for every L3 language |
 | [L8](../records/0010_LAW-8-performance-budgets.md) | Performance budgets: set from measurement, never exceeded, never loosened |
 
 Feature decisions:
-- [SR-RULE-PACKS](../records/0101_rule-packs.md): eleven first-party rule packs (ten `@codelaw/rules-*` on npm, six `codelaw-rules-*` on PyPI), team packs and local rules.
+- [SR-RULE-PACKS](../records/0101_rule-packs.md): fifteen first-party rule packs (thirteen `@codelaw/rules-*` on npm, nine `codelaw-rules-*` on PyPI), team packs and local rules.
 - [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md): skills, steering, instructions, hooks.
 - [SR-PROJECT-GRAPH](../records/0103_project-graph.md): cross-file rules over a whole-repo symbol graph.
 - [SR-BASELINE](../records/0104_baseline-and-deprecations.md): grandfathering with deadlines, touch policy and deprecations.

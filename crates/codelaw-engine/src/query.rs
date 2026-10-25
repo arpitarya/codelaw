@@ -7,7 +7,7 @@
 use crate::{EngineError, Project};
 use codelaw_config::RuleConfig;
 use codelaw_core::{Diagnostic, FixClass, Language};
-use codelaw_rules::LoadedRule;
+use codelaw_rules::{LoadedRule, Security};
 use std::path::{Path, PathBuf};
 
 /// A severity as config spells it; `off` when a rule does not run.
@@ -26,6 +26,19 @@ pub struct RuleRow {
     pub fix: FixClass,
     pub source: String,
     pub preview: bool,
+    /// The rule's frontmatter `tags:`.
+    pub tags: Vec<String>,
+    /// CWE, OWASP and severity, for a security rule (SR-RULE-FORMAT
+    /// decision 2a).
+    pub security: Option<Security>,
+}
+
+impl RuleRow {
+    /// `rules --tag`: `security`, `cwe:<n>`, `owasp:<category>`, or one of
+    /// the rule's `tags:`.
+    pub fn has_tag(&self, tag: &str) -> bool {
+        self.tags.iter().any(|t| t == tag) || self.security.as_ref().is_some_and(|s| s.matches_tag(tag))
+    }
 }
 
 /// Why a rule is or isn't active (`rules --why`, MCP `trace_rule`).
@@ -61,7 +74,16 @@ pub struct WhyForFile {
 }
 
 fn row(r: &LoadedRule, severity: String) -> RuleRow {
-    RuleRow { id: r.rule.id.clone(), title: r.rule.title.clone(), severity, fix: r.rule.fix, source: r.source.label(), preview: r.preview_blocked }
+    RuleRow {
+        id: r.rule.id.clone(),
+        title: r.rule.title.clone(),
+        severity,
+        fix: r.rule.fix,
+        source: r.source.label(),
+        preview: r.preview_blocked,
+        tags: r.rule.tags.clone(),
+        security: r.rule.security.clone(),
+    }
 }
 
 impl Project {

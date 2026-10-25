@@ -1,0 +1,6 @@
+name = "@codelaw/rules-security-js"
+version = "0.2.0"
+min_codelaw = "0.2.0"
+languages = ["javascript", "jsx", "typescript", "tsx"]
+presets = ["sec-js/recommended", "sec-js/strict"]
+description = "codelaw's security rules for JavaScript and JSX, and the TypeScript that runs them: CWE and OWASP Top 10:2025 mapped (SR-RULE-PACKS)"

@@ -106,14 +106,14 @@ into a scan anyone can do at task end.
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
-| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-25 | 2026-10-25 — first-party pack: eleven packs (W-32) |
-| `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-25 | 2026-10-25 — the L6 and SR-RULE-PACKS rows: eleven packs (W-32) |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-25 | 2026-10-25 — the L6 and SR-PACKAGES rows and the `packs` row: eleven packs (W-32) |
-| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-25 | 2026-10-25 — npm first by a run by hand on the tag, PyPI with the Release (L6 decision 9; W-37, W-38) |
+| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-25 | 2026-10-25 — first-party pack: fifteen packs; preset (extends), security metadata, request source (W-53) |
+| `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-25 | 2026-10-25 — the L6 and SR-RULE-PACKS rows: fifteen packs (W-53) |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-25 | 2026-10-25 — the L6 and SR-PACKAGES rows and the `packs` row: fifteen packs (W-53) |
+| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-25 | 2026-10-25 — the thirteen npm and nine PyPI pack names; the six new security-pack names published by hand once (W-53) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — version 0.2.0: badge, preview note, roadmap (W-37) |
-| `USAGE.md` | a command, flag, install step, config key or agent wiring changes | 2026-10-25 | 2026-10-25 — created from the README's how-to sections (W-35) |
-| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-25 | 2026-10-25 — Unreleased: the README rewrite, `USAGE.md`, the npm-only publish run (W-37) |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — the four security packs' rows, fifteen packs (W-53) |
+| `USAGE.md` | a command, flag, install step, config key or agent wiring changes | 2026-10-25 | 2026-10-25 — the from-source link loops: the security packs, `codelaw_rules_${p//-/_}` (W-53) |
+| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-25 | 2026-10-25 — Unreleased: the security packs' groundwork (W-53) |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
 | `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
 | `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |

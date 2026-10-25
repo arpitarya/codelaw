@@ -350,10 +350,10 @@ fn check(args: CheckArgs, ctx: &Ctx) -> Output {
     };
     let mut out = Output::default();
     match fmt {
-        Format::Text => out.stdout.push_str(&codelaw_report::check_text(&report, ctx.color)),
+        Format::Text => out.stdout.push_str(&codelaw_report::check_text_with(&report, ctx.color, &codelaw_report::security_labels(&project))),
         Format::Json => out.stdout = json_line(&with_timings(codelaw_report::check_json(&report), &project)),
         Format::Sarif => out.stdout = json_line(&codelaw_report::check_sarif(&report, &project)),
-        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent(&report)),
+        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent_with(&report, &codelaw_report::security_labels(&project))),
         ci => out.stdout = ci_output(ci, &report),
     }
     timings(&project, fmt, &mut out);
@@ -425,7 +425,7 @@ fn fix(args: FixArgs, ctx: &Ctx) -> Option<Output> {
             for b in &report.pruned {
                 out.stdout.push_str(&format!("pruned {b}\n"));
             }
-            out.stdout.push_str(&codelaw_report::fix_text(&report, ctx.color));
+            out.stdout.push_str(&codelaw_report::fix_text_with(&report, ctx.color, &codelaw_report::security_labels(&project)));
         }
         Format::Json => {
             let mut v = with_timings(codelaw_report::fix_json(&report), &project);
@@ -435,7 +435,7 @@ fn fix(args: FixArgs, ctx: &Ctx) -> Option<Output> {
             out.stdout = json_line(&v);
         }
         Format::Sarif => out.stdout = json_line(&codelaw_report::check_sarif(&report.check, &project)),
-        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent(&report.check)),
+        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent_with(&report.check, &codelaw_report::security_labels(&project))),
         ci => out.stdout = ci_output(ci, &report.check),
     }
     // Text: on stdout after the report; SARIF and agent: on stderr.
@@ -469,7 +469,11 @@ fn test(args: TestArgs) -> ExitCode {
         Ok(r) => r,
         Err(e) => return fail(e),
     };
-    if rules.is_empty() {
+    // A pack folder with no rules yet (a scaffold, like the security packs
+    // before their catalogues land) passes with nothing to check; a project
+    // or rule id with none is a usage error.
+    let empty_pack = args.target.as_deref().is_some_and(|t| std::path::Path::new(t).join("codelaw-pack.toml").is_file());
+    if rules.is_empty() && !empty_pack {
         return fail("no rules to test");
     }
     let mut reports = codelaw_test::test_rules(rules.iter(), args.case.as_deref());

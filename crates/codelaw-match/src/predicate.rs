@@ -1,7 +1,8 @@
 //! The semantic-model predicates of a `where:` block: `unused`,
-//! `undeclared`, `shadowed`, `reassigned` and `imported-from`, combined
-//! with `not`, `all` and `any`.
+//! `undeclared`, `shadowed`, `reassigned`, `imported-from`, `from_source`
+//! and the rest, combined with `not`, `all` and `any`.
 
+use crate::source::{SourcePath, from_source, parse_source};
 use codelaw_semantic::SemanticModel;
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
@@ -36,14 +37,18 @@ pub enum Predicate {
     /// A reference to one of the language's own globals that the file does
     /// not declare.
     Builtin,
+    /// The node is a request source, is built from one, or is a local name
+    /// bound to one in the same function (`source.rs`; not taint
+    /// analysis).
+    FromSource { sources: Vec<SourcePath> },
     Not(Box<Predicate>),
     All(Vec<Predicate>),
     Any(Vec<Predicate>),
 }
 
 const NAMES: &[&str] = &[
-    "unused", "undeclared", "shadowed", "reassigned", "imported-from", "write", "declaration", "redeclared", "binding", "builtin", "not", "all",
-    "any",
+    "unused", "undeclared", "shadowed", "reassigned", "imported-from", "write", "declaration", "redeclared", "binding", "builtin", "from_source",
+    "not", "all", "any",
 ];
 
 const KINDS: &[&str] = &[
@@ -107,6 +112,7 @@ fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Predicate, St
             "builtin" => Ok(Predicate::Builtin),
             "imported-from" => Err("`imported-from` names a module: `{ imported-from: react }`".into()),
             "binding" => Err("`binding` names declaration kinds: `{ binding: [const, let] }`".into()),
+            "from_source" => Err("`from_source` names its sources: `{ from_source: { sources: [req.query], tables: [sources/express] } }`".into()),
             other => Err(unknown(other)),
         },
         Value::Array(items) => Ok(Predicate::All(items.iter().map(|i| parse(i, data)).collect::<Result<_, _>>()?)),
@@ -151,6 +157,33 @@ fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Predicate, St
                     }
                     Ok(Predicate::Undeclared { globals })
                 }
+                "from_source" => {
+                    let mut names = Vec::new();
+                    match arg {
+                        Value::Object(o) => {
+                            for (k, v) in o {
+                                match k.as_str() {
+                                    "sources" => names.extend(strings(v, "sources")?),
+                                    "tables" => {
+                                        for t in strings(v, "tables")? {
+                                            names.extend(table_names(&t, data)?);
+                                        }
+                                    }
+                                    other => return Err(format!("`from_source` takes `sources` and `tables`, not `{other}`")),
+                                }
+                            }
+                        }
+                        other => names.extend(strings(other, "from_source")?),
+                    }
+                    if names.is_empty() {
+                        return Err("`from_source` names at least one source".into());
+                    }
+                    let sources = names
+                        .iter()
+                        .map(|n| parse_source(n).ok_or_else(|| format!("`from_source`: `{n}` is not a dotted access path like `req.query`")))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    Ok(Predicate::FromSource { sources })
+                }
                 "binding" => {
                     let kinds = strings(arg, "binding")?;
                     for k in &kinds {
@@ -184,9 +217,19 @@ pub fn parse_predicates(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Resul
     Ok(out)
 }
 
+/// What a predicate is asked about: the captured node, and the source of
+/// the tree it belongs to.
+#[derive(Clone, Copy)]
+pub struct Subject<'a> {
+    pub start: usize,
+    pub node: Option<tree_sitter::Node<'a>>,
+    pub source: &'a str,
+}
+
 impl Predicate {
-    /// Whether the predicate holds for the identifier starting at `start`.
-    pub fn holds(&self, model: &SemanticModel, start: usize) -> bool {
+    /// Whether the predicate holds for the captured node.
+    pub fn holds(&self, model: &SemanticModel, subject: &Subject<'_>) -> bool {
+        let start = subject.start;
         match self {
             Predicate::Unused => model.declared_at(start).is_some_and(|s| model.is_unused(s)),
             Predicate::Undeclared { globals } => {
@@ -202,9 +245,10 @@ impl Predicate {
             Predicate::Redeclared => model.is_redeclaration_at(start),
             Predicate::Binding { kinds } => model.symbol_at(start).is_some_and(|s| kinds.iter().any(|k| k == model.symbol(s).kind.name())),
             Predicate::Builtin => model.reference_at(start).is_some_and(|r| model.is_builtin_reference(r)),
-            Predicate::Not(p) => !p.holds(model, start),
-            Predicate::All(ps) => ps.iter().all(|p| p.holds(model, start)),
-            Predicate::Any(ps) => ps.iter().any(|p| p.holds(model, start)),
+            Predicate::FromSource { sources } => subject.node.is_some_and(|n| from_source(n, subject.source, model, sources)),
+            Predicate::Not(p) => !p.holds(model, subject),
+            Predicate::All(ps) => ps.iter().all(|p| p.holds(model, subject)),
+            Predicate::Any(ps) => ps.iter().any(|p| p.holds(model, subject)),
         }
     }
 }

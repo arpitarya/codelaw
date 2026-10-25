@@ -1,0 +1,8 @@
+description = "the html pack's security rules: subresource integrity, reverse tabnabbing, inline scripts, password autocomplete, meta refresh; codelaw:sec-html/recommended extends it"
+
+[rules]
+"html/autocomplete-password" = "error"
+"html/meta-refresh" = "error"
+"html/no-inline-script" = "error"
+"html/require-sri" = "error"
+"html/target-blank-rel" = "error"
