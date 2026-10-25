@@ -6,7 +6,7 @@ fix: manual
 fix_reason: "the slot's description, or whether it should exist, needs the author"
 stability: preview
 ported_from: [stencil/enforce-slot-jsdoc]
-since: 0.3.0
+since: 0.2.0
 ---
 
 A `@Component` class's JSDoc has a `@slot` tag for each `<slot>` it renders — `@slot name - what it

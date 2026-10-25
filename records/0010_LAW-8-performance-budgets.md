@@ -128,7 +128,7 @@ The decider wants performance to be a key property and accepts that today's numb
 | `check_warm_10k` | 217.9 / 173.5 / 220.6 ms | 220.6 | 330.9 | < 2 s | **331 ms** |
 | `check_cold_10k` | 8,700.8 / 7,526.4 / 8,745.0 ms | 8,745.0 | 13,117.5 | < 20 s | **13,118 ms** |
 | `format_warm_10k` | 1,353.3 / 1,167.4 / 1,585.9 ms | 1,585.9 | 2,378.85 | — | **2,379 ms** |
-| `fix_one_file` | 73.9 / 58.6 / 76.3 ms | 76.3 | 114.45 | < 100 ms warm | **unset** — the guard: the target is below 1.5 × the worst p95, so it is the decider's |
+| `fix_one_file` | 73.9 / 58.6 / 76.3 ms | 76.3 | 114.45 | < 100 ms warm | **unset** — the guard: the target is below 1.5 × the worst p95; the decider, 2026-10-25: leave it unset (not 100 ms at 1.31 × headroom) |
 | `lsp_after_edit` | 2.8 / 2.5 / 2.8 ms | 2.8 | 4.2 | < 50 ms | **5 ms** |
 | `mcp_rules_for_path` | 40.8 / 30.0 / 43.0 ms | 43.0 | 64.5 | — | **65 ms** |
 | `peak_memory_10k` | 47.6 / 48.0 / 46.6 MiB | 48.0 | 72.0 | < 1 GiB | **72 MiB** |
@@ -140,7 +140,7 @@ The decider wants performance to be a key property and accepts that today's numb
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
-- **The gate binds seven of the eight operations** since 2026-10-25 (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` is still `unset` and only reported, until the decider rules on it (`W-19`).
+- **The gate binds seven of the eight operations** since 2026-10-25 (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`).
 
 ### Alternatives considered
 

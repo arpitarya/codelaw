@@ -3,8 +3,9 @@
 #
 # SEVEN OF EIGHT ARE SET (2026-10-25, W-19), by the method the decider ruled
 # (L8 decision 4). A set `budget` fails CI when a p95 goes over it; it is
-# never raised (decision 5). `fix_one_file` is still "unset": the method's
-# guard held it back for the decider (the inbox in work/OPEN-WORK.md).
+# never raised (decision 5). `fix_one_file` stays "unset", reported and not
+# gated: the method's guard held it back and the decider ruled (2026-10-25)
+# to leave it unset rather than set it at its 100 ms target.
 #
 # THE METHOD IS RULED (the decider, 2026-10-25, W-19): budget = min(design
 # target, 1.5 x the worst p95 of perf's three ubuntu-24.04 runs on main),
@@ -28,7 +29,7 @@
 #
 # The 2026-10-22 proposals came from a LOADED developer Mac (SR-LAW-8
 # §Measurements) and are superseded by the CI numbers above; the one still
-# carried is fix_one_file's, which the guard sent back.
+# carried is fix_one_file's `proposed`, kept for reference only.
 
 [reference]
 machine = "GitHub-hosted ubuntu-24.04 runner (the decider, 2026-10-24)"
@@ -65,7 +66,7 @@ measured_p95 = 1585.9
 
 [operation.fix_one_file]
 unit = "ms"
-budget = "unset" # HELD BACK by the guard: p95 73.9 / 58.6 / 76.3; worst 76.3 x 1.5 = 114.45 > target 100 ms warm — the decider's (inbox)
+budget = "unset" # HELD BACK by the guard: p95 73.9 / 58.6 / 76.3; worst 76.3 x 1.5 = 114.45 > target 100 ms warm — the decider, 2026-10-25: leave it unset
 proposed = 100 # the design target (SR-ARCHITECTURE decision 29, SR-LINTER decision 8); headroom 1.31 x the worst p95
 
 [operation.lsp_after_edit]

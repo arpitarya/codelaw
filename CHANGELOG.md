@@ -4,14 +4,11 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
-### Added
-
-- **`stencil/recommended` gains `stencil/ban-side-effects` and `stencil/enforce-slot-jsdoc`**, the two rules of @stencil/eslint-plugin 1.4.0's `recommended` that need no type information and were not yet ported: a call at a module's top level, and a component whose `@slot` JSDoc tags and rendered `<slot>`s disagree. The preset now holds 17 rules, and the pack README counts against the 23 upstream turns on (W-33).
-
 ## 0.2.0 — 2026-10-25
 
 ### Added
 
+- **`stencil/recommended` gains `stencil/ban-side-effects` and `stencil/enforce-slot-jsdoc`**, the two rules of @stencil/eslint-plugin 1.4.0's `recommended` that need no type information and were not yet ported: a call at a module's top level, and a component whose `@slot` JSDoc tags and rendered `<slot>`s disagree. The preset now holds 17 rules, and the pack README counts against the 23 upstream turns on (W-33).
 - **On PyPI for the first time:** the six `codelaw-rules-*` packs (`js`, `react`, `html`, `css`, `python`, `data`) at 0.2.0, `pip install codelaw-rules-python` and the rest; `codelaw` itself follows with the release (W-30).
 - **Two npm-only library packs** (W-32): `@codelaw/rules-tanstack-query` (`tanstack-query/recommended`, 7 rules: @tanstack/eslint-plugin-query's `recommended`, reimplemented) and `@codelaw/rules-redux-toolkit` (`redux-toolkit/recommended`, 12 rules codelaw wrote from the Redux Style Guide's Priority A and B rules). `codelaw init` adds them when `package.json` depends on `@tanstack/react-query` or `react-query`, and on `@reduxjs/toolkit` or `redux`. npm now carries ten packs.
 - **`codelaw bench --repo <dir>`** times `check`, cold and warm, on a copy of a real repository with the reference workload's config and packs; CI's `perf` job runs it on L8's three pinned repos (W-19).

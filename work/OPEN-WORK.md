@@ -24,8 +24,6 @@ here. Read that record before changing anything below it.
 |---|---|
 | 🔴 **PyPI, ruled 2026-10-25: upload the six `codelaw-rules-*` 0.2.0 wheels by hand, then add a trusted publisher to each** — `codelaw` comes from CI through its pending publisher (registered 2026-10-25); commands in [W-30](open/W-30-first-pypi-publish.md) | 2026-10-20 |
 | ↳ **blocks:** W-04 step 5 (the first release on both registries) · W-03 step 6 · W-30 step 4 | |
-| 🔴 **`fix_one_file`'s L8 budget** — the ruled method's guard held it back: worst CI p95 76.3 ms × 1.5 = 114.45 ms is past its 100 ms design target; set 100 ms (1.31 × headroom), or leave it unset. The other seven are set ([W-19](open/W-19-performance-budgets.md) §Budgets) | 2026-10-25 |
-| ↳ **blocks:** W-19 (its last budget) | |
 
 ---
 
@@ -50,8 +48,6 @@ here. Read that record before changing anything below it.
 🟢 **W-35** `agent` Lead the README with "your rules, before, while and after the AI writes"; the while beat labelled in design until W-05's check ships. Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
 
 ### testing
-
-🔴 **W-19** `agent` Seven of L8's eight budgets set 2026-10-25 from CI's three `ubuntu-24.04` runs by the ruled method; `fix_one_file` held back by the guard — blocked on its ruling above. Filed by Arpit (Cowork). [detail](open/W-19-performance-budgets.md)
 
 ### record update
 

@@ -6,8 +6,8 @@ item: W-19
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), 2026-10-25"
-ball: arpit
+updated_by: "Claude Code (Opus 5.5), 2026-10-25: closed on the decider's fix_one_file ruling"
+ball: done
 ---
 
 # W-19 — Build `codelaw bench`, measure, and propose the L8 budgets
@@ -18,7 +18,7 @@ ball: arpit
 |---|---|---|---|
 | 1 | Build `codelaw bench` and the reference workload | a repeatable measurement | ✅ 2026-10-22 |
 | 2 | Measure the SR-LINTER and SR-ARCHITECTURE targets (warm/cold 10k files, one-file hook, fix, LSP edit, startup, peak memory) | numbers to set budgets from | ✅ 2026-10-25 on `ubuntu-24.04`, CI's three `perf` runs |
-| 3 | Propose `perf/budgets.toml` values | the decider sets the budgets | 🔴 seven of eight set 2026-10-25 by the ruled method; `fix_one_file` held back by its guard — the decider's |
+| 3 | Propose `perf/budgets.toml` values | the decider sets the budgets | ✅ 2026-10-25: seven of eight set by the ruled method; `fix_one_file` held back by its guard, and the decider, 2026-10-25: leave it unset |
 | 4 | Add the CI perf gate | a budget is never exceeded | ✅ 2026-10-22 |
 
 **Arpit, 2026-10-20:** *"Review the code. What are the blockers and what is pending?"* — then *"create work items for what all things are pending."*
@@ -35,7 +35,7 @@ ball: arpit
 |---|---|---|
 | 1 · bench | `codelaw bench` runs the reference workload and prints each budgeted operation. | ✅ 2026-10-22 — [SR-CLI-MCP](../../records/0115_cli-and-mcp.md) decision 10; `crates/codelaw-cli/src/bench/`, `tests/bench.rs` |
 | 2 · measure | Every target in SR-ARCHITECTURE decision 29 and SR-LINTER decision 8 is measured on named hardware. | ✅ 2026-10-25 on the reference machine, GitHub's `ubuntu-24.04` runner: the `perf` job's three runs on `main` ([SR-LAW-8](../../records/0010_LAW-8-performance-budgets.md) §Measurements; the loaded-Mac numbers of 2026-10-22 are superseded) |
-| 3 · propose | A budget proposal goes to the decider (inbox row). | 🔴 2026-10-25: the method applied (§Budgets below) — seven `budget`s written with `set_by`, `set_on`, `measured_p95`; `fix_one_file` is `unset`, the guard sent it to the inbox |
+| 3 · propose | A budget proposal goes to the decider (inbox row). | ✅ 2026-10-25: the method applied (§Budgets below) — seven `budget`s written with `set_by`, `set_on`, `measured_p95`; `fix_one_file` is `unset`, the guard sent it to the inbox; **Arpit, 2026-10-25:** *"Leave it unset"* |
 | 4 · gate | CI compares each run against `perf/budgets.toml` ([L8](../../records/0010_LAW-8-performance-budgets.md) decision 7). | ✅ 2026-10-22 — `ci.yml` `perf`; fails only on a set budget (`budget = <number>`), reports `unset` ones |
 
 ## Blockers
@@ -52,7 +52,7 @@ Applied 2026-10-25 by Claude Code (Opus 5.5) on the Mac. Source: `gh run view <r
 | `check_warm_10k` | 217.9 / 173.5 / 220.6 ms | 220.6 | 330.9 | 2000 | **331** |
 | `check_cold_10k` | 8700.8 / 7526.4 / 8745.0 ms | 8745.0 | 13117.5 | 20000 | **13118** |
 | `format_warm_10k` | 1353.3 / 1167.4 / 1585.9 ms | 1585.9 | 2378.85 | — | **2379** |
-| `fix_one_file` | 73.9 / 58.6 / 76.3 ms | 76.3 | 114.45 | 100 | **held back** (100 < 114.45) → inbox |
+| `fix_one_file` | 73.9 / 58.6 / 76.3 ms | 76.3 | 114.45 | 100 | **held back** (100 < 114.45) → inbox → **unset**, ruled 2026-10-25 |
 | `lsp_after_edit` | 2.8 / 2.5 / 2.8 ms | 2.8 | 4.2 | 50 | **5** |
 | `mcp_rules_for_path` | 40.8 / 30.0 / 43.0 ms | 43.0 | 64.5 | — | **65** |
 | `peak_memory_10k` | 47.6 / 48.0 / 46.6 MiB | 48.0 | 72.0 | 1024 | **72** |

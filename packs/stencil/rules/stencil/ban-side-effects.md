@@ -8,7 +8,7 @@ stability: preview
 options:
   allow: { type: "string[]", default: ["describe", "test", "bind", "createStore"], description: "functions that may be called at the top level; setting it replaces the default list" }
 ported_from: [stencil/ban-side-effects]
-since: 0.3.0
+since: 0.2.0
 ---
 
 A module makes no calls at its top level: every call sits inside a function, a method or a class, or
