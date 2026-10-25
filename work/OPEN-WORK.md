@@ -33,10 +33,6 @@ here. Read that record before changing anything below it.
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
-🟢 **W-39** `agent` CI/local profiles, per-glob `remap`, `js/no-console`, merged 2026-10-25 (`51644b2`; workspace 497 tests green); left: CI's `perf` on the push for L8 (DoD 6). Filed by Arpit (Cowork). [detail](open/W-39-ci-and-local-profiles.md)
-
-🟢 **W-40** `agent` Exceptions with an expiry, merged 2026-10-25 (`42bdd82`; workspace 480 tests green); left: CI's `perf` on the push for L8 (DoD 6), the never-remapped check once W-39 lands. Filed by Arpit (Cowork). [detail](open/W-40-dated-exceptions.md)
-
 🟢 **W-44** `agent` `codelaw check --watch`: re-check changed files and their dependents on every save; config reloads; NDJSON for tools. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
 🟢 **W-45** `agent` CI report formats: `--format github|gitlab|junit|checkstyle`, stable fingerprints. Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
@@ -51,7 +47,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-53** `agent` Security packs' groundwork: L6 to fifteen packs (`security-js`, `-ts`, `-html`, `-python`), CWE/OWASP metadata, SARIF `security-severity`, a same-function request-source predicate. Filed by Arpit (Cowork). [detail](open/W-53-security-packs-groundwork.md)
 
-🟡 **W-46** waits on **W-40** `agent` `codelaw exceptions --expiring 30d --group-by added_by`: every exception, days left, owner; MCP twin. Filed by Arpit (Cowork). [detail](open/W-46-exceptions-report.md)
+🟢 **W-46** `agent` `codelaw exceptions --expiring 30d --group-by added_by`: every exception, days left, owner; MCP twin. Filed by Arpit (Cowork). [detail](open/W-46-exceptions-report.md)
 
 🟡 **W-49** waits on **W-44** `agent` Dev-server plugins for Vite, Webpack, Rspack, Next.js: overlay and terminal on `local`, builds fail on `ci`. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
 

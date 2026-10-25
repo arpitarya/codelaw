@@ -6,8 +6,8 @@ item: W-39
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), W-39 build"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), 2026-10-25: closed — merged, CI perf within budget"
+ball: done
 ---
 
 # W-39 — warn on a laptop, fail in CI; globs that never error or never warn
@@ -81,7 +81,7 @@ remap = { warn = "error" }
 | 3 · | each `remap` example above behaves as commented; `codelaw/stale-baseline` is not remapped | ✅ `profiles.rs` `remap_never_errors_never_warns_or_only_errors`: `scripts/` warns, `gen/` silent, `payments/` errors, an expired entry in `scripts/` warns, `codelaw/stale-baseline` stays `error` |
 | 4 · | `config --print --for <f>` names the profile and its source | ✅ `profile = "ci"  # CI=1 (codelaw.toml:4)`; `remap.<sev>` lines name their override |
 | 5 · | `cargo test -p codelaw-config --test schema` green with the new keys; `codelaw test packs/js` green with `no-console` cases | ✅ schema 4/4; `codelaw test packs/js` 73 rules · 1255 checks · 0 failed; corpus 73 rules · 2154 checks · 0 failed |
-| 6 · | L8 budgets unchanged (`codelaw bench`) | ⏳ not measured here: the budgets are CI's `ubuntu-24.04` release numbers, and this machine is a loaded Mac building debug under L9's disk ceiling. CI's `perf` job on the branch is the check. By construction a config with no `remap` skips the stage (`has_remap`), and the profile adds one key part only when `[profiles]` exists; the reference workload has neither |
+| 6 · | L8 budgets unchanged (`codelaw bench`) | ✅ 2026-10-25: CI's `perf` on `ubuntu-24.04` — run 40210463091 (`eda3607`, W-40 merged) and run 40214600609 (`bb589ee`, W-39–W-43 merged): every budgeted operation within budget (`check_warm_10k` p95 217.0 ms of 331, `check_cold_10k` 9750.2 of 13118, `startup` 1.6 of 3.0, `peak_memory_10k` 48.9 MiB of 72) |
 
 ## Blockers
 
