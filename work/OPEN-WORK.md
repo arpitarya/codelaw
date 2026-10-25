@@ -39,13 +39,11 @@ here. Read that record before changing anything below it.
 
 🟡 **W-30** `arpit` The first PyPI publish: `codelaw` (8 wheels) and the six `codelaw-rules-*` of W-31's layout, at 0.2.0 rather than 0.1.0; waiting on W-31 (0.2.0). Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
 
-🟢 **W-31** `arpit` Eight packs on npm, six on PyPI: landed and pushed; 0.2.0 bumped in the tree 2026-10-25 (uncommitted) with the command list in the item; left: Arpit commits, pushes and publishes. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
+🟢 **W-31** `arpit` Eight packs on npm, six on PyPI: landed and pushed; 0.2.0 committed 2026-10-25 (`f40b2e6`, unpushed); two PyPI packs live, four uploading; left: Arpit pushes, publishes npm's two new names, cuts the release. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
 
-🟡 **W-32** `arpit` A Redux Toolkit pack and a TanStack Query pack, npm only: steps 2–4 done in the tree 2026-10-25 (7 + 12 rules, all green, wired); left: Arpit pushes the W-32 commit, then their first publish at 0.2.0 with W-31 step 7. Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
+🟡 **W-32** `arpit` A Redux Toolkit pack and a TanStack Query pack, npm only: steps 2–4 done in the tree 2026-10-25 (7 + 12 rules, all green, wired); pushed, CI run 40185344678 green; left: their first publish at 0.2.0 with W-31 step 7. Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
 
 🟢 **W-33** `agent` The two Stencil rules missing from `stencil/recommended`: port `ban-side-effects` and `enforce-slot-jsdoc` from @stencil/eslint-plugin 1.4.0 (or record why not), and fix the pack README's count (23 rules on, not 21). Filed by Arpit (Claude). [detail](open/W-33-stencil-preset-gaps.md)
-
-🟢🧨 **W-24** `agent` CI green on `main`: DoD 5 proven (run 40125039176); `main` red since on `lint`'s docs-sync, fixed in `76f1ad6`, pushed 2026-10-25; left: CI run 40185344678 on it goes green. Filed by Arpit (Claude Code). [detail](open/W-24-ci-green-on-main.md)
 
 ### testing
 
