@@ -61,6 +61,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 | [`W-33-stencil-preset-gaps.md`](open/W-33-stencil-preset-gaps.md) | 2026-10-25 | `stencil/ban-side-effects` and `stencil/enforce-slot-jsdoc` in `crates/codelaw-native/src/stencil.rs` and `stencil/recommended`; the pack README's count; [SR-RULE-PACKS](../records/0101_rule-packs.md) decision 7, [SR-ARCHITECTURE](../records/0108_architecture.md) 15b |
 | [`W-24-ci-green-on-main.md`](open/W-24-ci-green-on-main.md) | 2026-10-25 | the Windows `bench` build, `RULE-SINCE` at `5e489f4`, verdict-cache keys over every test input, the law gate for real, `perf` only on engine changes, the UTF-8 inbox check, the macOS staging-index stall; [SR-WORK-OWNERSHIP](../records/0058_WORK-ownership.md) decision 7, [SR-PACKAGES](../records/0107_packages.md) decision 11, [SR-LAW-8](../records/0010_LAW-8-performance-budgets.md) decision 7 |
 | [`W-20-conformance-tests.md`](open/W-20-conformance-tests.md) | 2026-10-25 | the L5 fence, the L2 licence check, the consumer-layout test, `codelaw test --corpus` with the pinned corpus and its `corpus` job, `check-work-system.py`; [SR-RULE-AUTHORING](../records/0113_rule-authoring.md) decision 4 |
+| [`W-48-codelaw-migrate.md`](open/W-48-codelaw-migrate.md) | 2026-10-25 | not built — moved to the backlog by the decider as [B-050](../work/BACKLOG.md); the spec is [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) §P2 `codelaw-migrate` |
 
 ## `backlog/`
 

@@ -24,6 +24,30 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — security packs: a second research pass, 82 more rules  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"research, more security rules, and add it to the list for the programming languages, respectively."*
+- **Done:** read CodeQL's JS and Python query lists, Ruff's `S` rules and the OWASP cheat sheets; added 34 rules to W-54 (66 in all), 9 to W-55 (16), 8 to W-56 (19 + five existing `html/*`), 31 to W-57 (61), each with CWE, OWASP 2025, fix class and its starting preset; queue rows updated. Nothing committed.
+- **Decided / left open:** heuristic rules start in each pack's `strict` preset (`warn`), not `recommended`.
+- **Mistakes:** none. `check-work-system.py` reports W-41 and W-43 as `ball: done` in their files but still queued — another session's close in progress, not touched.
+- **Next:** W-53 in Claude Code.
+
+## 2026-10-25 — W-48 `migrate` moved to the backlog as B-050  ·  Claude Code, VS Code (Opus 5.5)
+
+- **Asked:** *"the migrate work item, put it in backlog."*
+- **Done:** W-48's row out of `OPEN-WORK.md`; its detail file moved to `archive/open/` with a map row; B-050 (`unbuilt`, sourced in SR-AGENT-SURFACES §P2 `codelaw-migrate`) in `BACKLOG.md`; the interview's filing line notes it. Nothing committed.
+- **Decided / left open:** filed as `unbuilt`, not `unruled` — the P2 skill is already ratified in SR-AGENT-SURFACES; only its timing was deferred.
+- **Mistakes:** none.
+- **Next:** W-38 (PyPI 0.2.0 by hand) is still the decider's.
+
+## 2026-10-25 — type-aware parked (B-049); security packs filed as W-53–W-57  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"For now, put type aware rules and details in backlog … create a pack for security issues … Veracode, Black Duck, X-Ray, OWASP … one for JavaScript, one for TypeScript, one for HTML, one for Python. Research and create work items for individual languages … if … anything that we are missing from security point, print it in the chat."*
+- **Done:** wrote [the type-aware proposal](proposals/type-aware-rules.md) and B-049 (`unruled`). Researched OWASP Top 10:2025, CWE Top 25 2025, JFrog's SAST rule list, Bandit and eslint-plugin-security; filed W-53 (groundwork: L6 to fifteen packs, CWE/OWASP metadata, SARIF security-severity, a `from_source:` predicate) and W-54 JS (32 rules), W-55 TS (7), W-56 HTML (11 + five existing `html/*`), W-57 Python (30), each waiting on W-53. Printed the security gaps in chat (taint, SCA/CVEs and licences, secrets in data files, CI and supply-chain config, scanner import, stricter security exceptions). Nothing committed.
+- **Decided / left open:** four packs, as asked (one combined `security` pack was the alternative); the gaps in chat are not filed.
+- **Mistakes:** none.
+- **Next:** the decider picks which security gaps to file; W-53 in Claude Code.
+
 ## 2026-10-25 — W-51 (scheduled auto-fix PR) and W-52 (dependency latest versions) filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** *"schedule fix PR, create a work item for it … For type-aware rules, TypeScript Go. If TypeScript dependency is already present in a repo, do we still need the Go binary … Elaborate on this highlighting the latest version of each dependency. Let's go with it."*

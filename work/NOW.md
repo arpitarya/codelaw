@@ -15,12 +15,9 @@ Rule: [SR-WORK-NOW](../records/0061_WORK-now.md).
 | c96062ca-828a-4388-a925-eba8ab17fa75 | Claude Code | 2026-10-25 15:50 | W-32 steps 2–4 verified, W-24 lint fix, W-29 Mac install check — committed, awaiting Arpit's push |
 | 3e47b744-de3b-4cb1-a688-bb0caba84309 | Claude Code | 2026-10-25 15:58 | W-04 step 5 — answered how the first PyPI publish runs (chat only, no change) |
 | f38f16ad-b340-4498-9df6-967458d3d0b2 | Claude Code | 2026-10-25 16:28 | 0.2.0 committed; W-30 step 3 — the six codelaw-rules-* wheels built and uploaded to PyPI |
+| 0077d53b-7d89-44a1-9f98-549270237222 | Claude Code | 2026-10-25 21:50 | W-48 moved to the backlog as B-050 — uncommitted, waiting for the concurrent merge to land |
 
 ## Resources this session created
 
 | kind | where | host | session | created |
 |---|---|---|---|---|
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/agent-a029cdb49ad374fd3` | Arpits-MacBook | f38f16ad-b340-4498-9df6-967458d3d0b2 | 2026-10-25 |
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/agent-a33ac489a4e8971a2` | Arpits-MacBook | f38f16ad-b340-4498-9df6-967458d3d0b2 | 2026-10-25 |
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/agent-ae1779df87a914216` | Arpits-MacBook | f38f16ad-b340-4498-9df6-967458d3d0b2 | 2026-10-25 |
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/agent-af8d5f44cd58e33d7` | Arpits-MacBook | f38f16ad-b340-4498-9df6-967458d3d0b2 | 2026-10-25 |
