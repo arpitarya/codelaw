@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — W-19, W-35 (step 2) landed; 0.2.0 pushed and its dist verified; PyPI held by 429  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement all the green items and then implement the yellow items as and when they get unblocked … close them out … in parallel."*
+- **Done:** rulings asked and applied — `fix_one_file` left unset (W-19 closed), `v0.2.0` from the latest `main` (W-33's rules `since: 0.2.0`), README's Before says what ships (W-35 step 2, agent in a worktree). The cloud session's W-05/W-34/W-35 filing committed as its own commit. Pushed `main` to `f33b772`; CI run 40189751330 all green with the budgets gating; its `dist` passes `package.py check`, `law-gate`, `SHA256SUMS`; the hand-built pack wheels are byte-identical to CI's. PyPI: `codelaw-rules-css`, `-data` live; `html`, `js`, `python`, `react` refused (429) for over an hour — a 30-minute retry runs on.
+- **Decided / left open:** Arpit's hand: `npm login` + the two new npm names + `npm-trust.sh`; six PyPI trusted publishers (pypi.org UI); `gh release create v0.2.0`. W-34 waits on Fux item 298; W-05 and W-36 are research.
+- **Mistakes:** a `git add -A` swept a concurrent session's uncommitted USAGE.md, W-36 and docs-sync changes into my commit; caught before push, reset, and recommitted with only my hunks (CLAUDE.md's "re-derive `git status` right before staging" — I had, one command earlier, and the other session wrote in between).
+- **Next:** the four PyPI uploads land; Arpit's steps above; then the release, W-29's 8-platform install check, and W-04/W-03/W-30/W-31/W-32 close.
+
 ## 2026-10-25 — W-05 researched; W-34 and W-35 filed, Fux item 298 filed in Fux  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** *"research W05 … if Fux can be utilized, enhanced, for code law … propose just within chat"*, then by voice the shape, then *"file all the work items discussed here."*
