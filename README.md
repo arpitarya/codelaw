@@ -20,6 +20,20 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 
 ---
 
+## Before, while and after the AI writes
+
+**codelaw: your rules, before, while and after the AI writes.**
+
+| | what the agent gets | where it stands |
+|---|---|---|
+| **Before** | it asks what applies to this file and gets the handful of rules that matter, not a wall of 132 | ✅ today: the MCP tool `rules_for_path` (or `codelaw rules --for <path>`) gives the rules for that path, and `codelaw init --agents` installs the skills. Cutting that list to the handful for the task (`brief_for_task`) is in design, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
+| **While** | every edit is checked before it reaches disk; a bad line is refused with the reason and the fix | 🧪 **in design**: `codelaw hook --pre`, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
+| **After** | anything that slips through is fixed on save, in the hook and in CI | ✅ today: `codelaw hook`, `codelaw check`, `codelaw fix`, and fix-on-save in the editor extension |
+
+*no AI inside codelaw — the same verdict on every machine, with or without an agent* ([SR-LAW-5](records/0007_LAW-5-no-model-in-the-engine.md)).
+
+---
+
 > [!IMPORTANT]
 > **codelaw is a preview.** 0.1.0 is on npm, with the rules in the five packs of that release; the pack layout below, and PyPI, come with 0.2.0. The linter, the fixer, the formatter, the MCP server, the language server and all eleven rule packs work today if you build from source. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
 
