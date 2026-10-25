@@ -1,14 +1,22 @@
 # L8's performance budgets (SR-LAW-8). The gate is `codelaw bench --budgets
 # perf/budgets.toml`, run by ci.yml's `perf` job.
 #
-# NOTHING HERE IS SET. Every `budget` is "unset"; only a ruling of the decider
-# sets one (L8 decision 4). Until then the gate reports each p95 and fails
-# nothing (decision 6).
+# SEVEN OF EIGHT ARE SET (2026-10-25, W-19), by the method the decider ruled
+# (L8 decision 4). A set `budget` fails CI when a p95 goes over it; it is
+# never raised (decision 5). `fix_one_file` is still "unset": the method's
+# guard held it back for the decider (the inbox in work/OPEN-WORK.md).
 #
 # THE METHOD IS RULED (the decider, 2026-10-25, W-19): budget = min(design
 # target, 1.5 x the worst p95 of perf's three ubuntu-24.04 runs on main),
 # rounded up; where the target is below 1.5 x that p95, leave it unset and
 # put it back in the inbox. Each set entry names this ruling in set_by.
+# "Rounded up" is applied to the next whole unit (ms or MiB), the tightest
+# reading.
+#
+# The three runs (ci.yml `perf`, Image ubuntu-24.04 20261012.334):
+#   A = run 40124005285 (483b2a1) · B = run 40124756694 (ae90982, push)
+#   C = run 40124878075 (ae90982, workflow_dispatch)
+# Each entry's comment gives the three p95s as A / B / C, the worst, and 1.5 x.
 #
 # How the gate tells a set budget from a proposal:
 #   budget = "unset"        not set: reported, never gated
@@ -18,13 +26,9 @@
 #                           compared against
 # A set budget is never raised (decision 5): `git log -p perf/budgets.toml`.
 #
-# The proposals below (2026-10-22, W-19) come from a LOADED developer Mac —
-# Apple M4, 10 cores, 16 GiB, with three other agents compiling (load average
-# 10-18) — not from CI's runner. The rule that made them:
-#     proposed = min(SR-ARCHITECTURE decision 29's target, 1.5 x the worst p95
-#                of three 10-run sessions), rounded up
-# It is to be re-applied to the `perf` job's numbers before the decider sets
-# anything (SR-LAW-8 §Measurements).
+# The 2026-10-22 proposals came from a LOADED developer Mac (SR-LAW-8
+# §Measurements) and are superseded by the CI numbers above; the one still
+# carried is fix_one_file's, which the guard sent back.
 
 [reference]
 machine = "GitHub-hosted ubuntu-24.04 runner (the decider, 2026-10-24)"
@@ -33,40 +37,54 @@ workload = "codelaw bench --seed 20261018 --files 10000 (digest bf9c5bea0d8b31ee
 
 [operation.startup]
 unit = "ms"
-budget = "unset"
-proposed = 4 # PROPOSAL: worst p95 2.6 ms on the loaded Mac; target 20 ms
+budget = 3 # p95 1.6 / 1.3 / 1.4; worst 1.6 x 1.5 = 2.4; target 20
+set_by = "Arpit, method ruled 2026-10-25 (SR-LAW-8 decision 4, W-19)"
+set_on = 2026-10-25
+measured_p95 = 1.6
 
 [operation.check_warm_10k]
 unit = "ms"
-budget = "unset"
-proposed = 550 # PROPOSAL: worst p95 366.2 ms; target 2000 ms
+budget = 331 # p95 217.9 / 173.5 / 220.6; worst 220.6 x 1.5 = 330.9; target 2000
+set_by = "Arpit, method ruled 2026-10-25 (SR-LAW-8 decision 4, W-19)"
+set_on = 2026-10-25
+measured_p95 = 220.6
 
 [operation.check_cold_10k]
 unit = "ms"
-budget = "unset"
-proposed = 6600 # PROPOSAL: worst p95 4367.9 ms; target 20000 ms
+budget = 13118 # p95 8700.8 / 7526.4 / 8745.0; worst 8745.0 x 1.5 = 13117.5; target 20000
+set_by = "Arpit, method ruled 2026-10-25 (SR-LAW-8 decision 4, W-19)"
+set_on = 2026-10-25
+measured_p95 = 8745.0
 
 [operation.format_warm_10k]
 unit = "ms"
-budget = "unset"
-proposed = 900 # PROPOSAL: worst p95 587.1 ms; no design target
+budget = 2379 # p95 1353.3 / 1167.4 / 1585.9; worst 1585.9 x 1.5 = 2378.85; no design target
+set_by = "Arpit, method ruled 2026-10-25 (SR-LAW-8 decision 4, W-19)"
+set_on = 2026-10-25
+measured_p95 = 1585.9
 
 [operation.fix_one_file]
 unit = "ms"
-budget = "unset"
-proposed = 100 # PROPOSAL: worst p95 66.1 ms; target 100 ms warm (1.5 x = 99.2)
+budget = "unset" # HELD BACK by the guard: p95 73.9 / 58.6 / 76.3; worst 76.3 x 1.5 = 114.45 > target 100 ms warm — the decider's (inbox)
+proposed = 100 # the design target (SR-ARCHITECTURE decision 29, SR-LINTER decision 8); headroom 1.31 x the worst p95
 
 [operation.lsp_after_edit]
 unit = "ms"
-budget = "unset"
-proposed = 3 # PROPOSAL: worst p95 1.5 ms; target 50 ms
+budget = 5 # p95 2.8 / 2.5 / 2.8; worst 2.8 x 1.5 = 4.2; target 50
+set_by = "Arpit, method ruled 2026-10-25 (SR-LAW-8 decision 4, W-19)"
+set_on = 2026-10-25
+measured_p95 = 2.8
 
 [operation.mcp_rules_for_path]
 unit = "ms"
-budget = "unset"
-proposed = 40 # PROPOSAL: worst p95 25.6 ms; no design target
+budget = 65 # p95 40.8 / 30.0 / 43.0; worst 43.0 x 1.5 = 64.5; no design target
+set_by = "Arpit, method ruled 2026-10-25 (SR-LAW-8 decision 4, W-19)"
+set_on = 2026-10-25
+measured_p95 = 43.0
 
 [operation.peak_memory_10k]
 unit = "MiB"
-budget = "unset"
-proposed = 125 # PROPOSAL: worst p95 82.3 MiB; target 1024 MiB
+budget = 72 # p95 47.6 / 48.0 / 46.6; worst 48.0 x 1.5 = 72.0; target 1024
+set_by = "Arpit, method ruled 2026-10-25 (SR-LAW-8 decision 4, W-19)"
+set_on = 2026-10-25
+measured_p95 = 48.0

@@ -11,7 +11,7 @@ owns:
   - fixtures/perf
   - perf/budgets.toml
 laws: [L0, L3, L5, L8]
-timestamp: 2026-10-24T12:00:00Z
+timestamp: 2026-10-25T12:00:00Z
 content_sha: ""
 ---
 
@@ -120,11 +120,27 @@ The decider wants performance to be a key property and accepts that today's numb
   - `codelaw hook` gains nothing from a primed cache: `fix_one_file` is 53.7 ms warm and 49.7 ms cold. Its time is project and rule-set loading, not checking.
   - Every operation is well inside its design target on this machine.
 
+**The reference machine's numbers and the budgets set from them, 2026-10-25 (W-19).** Decision 4's ruled method applied to the `perf` job's three runs on `main` on `ubuntu-24.04` (image 20261012.334): A = run 40124005285 (`483b2a1`), B = 40124756694 and C = 40124878075 (both `ae90982`). "Rounded up" is taken to the next whole ms or MiB.
+
+| operation | p95 A / B / C | worst | 1.5 × worst | design target | budget |
+|---|---|---|---|---|---|
+| `startup` | 1.6 / 1.3 / 1.4 ms | 1.6 | 2.4 | < 20 ms | **3 ms** |
+| `check_warm_10k` | 217.9 / 173.5 / 220.6 ms | 220.6 | 330.9 | < 2 s | **331 ms** |
+| `check_cold_10k` | 8,700.8 / 7,526.4 / 8,745.0 ms | 8,745.0 | 13,117.5 | < 20 s | **13,118 ms** |
+| `format_warm_10k` | 1,353.3 / 1,167.4 / 1,585.9 ms | 1,585.9 | 2,378.85 | — | **2,379 ms** |
+| `fix_one_file` | 73.9 / 58.6 / 76.3 ms | 76.3 | 114.45 | < 100 ms warm | **unset** — the guard: the target is below 1.5 × the worst p95, so it is the decider's |
+| `lsp_after_edit` | 2.8 / 2.5 / 2.8 ms | 2.8 | 4.2 | < 50 ms | **5 ms** |
+| `mcp_rules_for_path` | 40.8 / 30.0 / 43.0 ms | 43.0 | 64.5 | — | **65 ms** |
+| `peak_memory_10k` | 47.6 / 48.0 / 46.6 MiB | 48.0 | 72.0 | < 1 GiB | **72 MiB** |
+
+- On the runner `check_cold_10k` (8.7 s), `format_warm_10k` (1.6 s) and `mcp_rules_for_path` (43 ms) are past the loaded Mac's proposals; every one but `fix_one_file` still leaves 1.5 × headroom under its design target.
+- `fix_one_file` is 76.3 ms against a 100 ms target: 1.31 × headroom, not 1.5 ×. Its context twin `fix_one_file_cold` is 76.7 ms against < 300 ms.
+
 ### Consequences
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
-- **The gate runs but binds nothing yet:** every budget is `unset`, so the `perf` job only reports. The budgets wait on the CI runner's numbers and the decider's ruling (`W-19`).
+- **The gate binds seven of the eight operations** since 2026-10-25 (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` is still `unset` and only reported, until the decider rules on it (`W-19`).
 
 ### Alternatives considered
 
