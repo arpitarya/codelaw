@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — npm 0.2.0 from CI (W-37); W-39–W-43 merged, W-41/W-42/W-43 closed  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"go ahead and run it"*; then *"Whatever is in green implement it … till the closure. And I want more React query hooks and React hooks. Rules."*
+- **Done:** tagged `v0.2.0` on `08b7158` and ran `publish.yml` by hand (run 40207195373, 5 min 21 s): 19 npm names at 0.2.0, 17 with provenance; W-37 closed, its eight-platform registry check moved to W-38. The 0.2.0 release notes are CHANGELOG's section (fux/sheetpane shape). Filed W-42 (TanStack Query) and W-43 (React hooks); four agents in worktrees ran W-39, W-40, W-41+W-43, W-42; merged all onto `main`; a clean rebuild: 497 workspace tests, clippy clean, 11 packs / 458 rules 0 failed. W-41, W-42, W-43 closed; W-39, W-40 wait on CI's `perf` (DoD 6).
+- **Decided / left open:** for the decider — W-42's three v4-loud rules on repos not yet on v5; W-40's changed wording (`expires`) and info-not-warn in the warning window.
+- **Mistakes:** twice staged a shared file whole (`OPEN-WORK.md`) and swept another session's rows into a commit — once caught before push, once after (`eda3607`, taken back in `3909552`). Shared files are now staged by hunk only. Parallel agents sharing one `CARGO_TARGET_DIR` overwrote each other's binaries: every result was re-proved on `main` from a clean build.
+- **Next:** push; CI's `perf` closes W-39 and W-40; W-38 is the decider's.
+
 ## 2026-10-25 — security packs: a second research pass, 82 more rules  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** *"research, more security rules, and add it to the list for the programming languages, respectively."*

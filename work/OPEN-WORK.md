@@ -33,13 +33,9 @@ here. Read that record before changing anything below it.
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
-🟢 **W-39** `agent` Warn on a laptop, fail in CI: auto `ci`/`local` profiles (agents run `ci`), a per-glob severity `remap`, and `js/no-console`. Filed by Arpit (Cowork). [detail](open/W-39-ci-and-local-profiles.md)
+🟢 **W-39** `agent` CI/local profiles, per-glob `remap`, `js/no-console`, merged 2026-10-25 (`51644b2`; workspace 497 tests green); left: CI's `perf` on the push for L8 (DoD 6). Filed by Arpit (Cowork). [detail](open/W-39-ci-and-local-profiles.md)
 
 🟢 **W-40** `agent` Exceptions with an expiry, merged 2026-10-25 (`42bdd82`; workspace 480 tests green); left: CI's `perf` on the push for L8 (DoD 6), the never-remapped check once W-39 lands. Filed by Arpit (Cowork). [detail](open/W-40-dated-exceptions.md)
-
-🟢 **W-41** `agent` `react/no-context`: old context use warns through a baseline, any new `createContext`/`useContext` errors. Filed by Arpit (Cowork). [detail](open/W-41-react-no-context.md)
-
-🟢 **W-43** `agent` More React hooks rules from eslint-plugin-react-hooks 7 and @eslint-react — set-state in render/effect, refs and purity in render, nested components, `useMemo` returns. Filed by Arpit (Claude Code). [detail](open/W-43-react-hooks-rules.md)
 
 🟢 **W-44** `agent` `codelaw check --watch`: re-check changed files and their dependents on every save; config reloads; NDJSON for tools. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 

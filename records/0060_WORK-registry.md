@@ -95,7 +95,7 @@ into a scan anyone can do at task end.
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-25 | 2026-10-25 — the L6 line and the `packs/` layout line: eleven packs, ten on npm and six on PyPI (W-32, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-37 closed (npm 0.2.0 from CI); W-42, W-43 filed |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-41, W-42, W-43 closed; W-39, W-40 merged, waiting on CI's perf |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-25 | 2026-10-25 — B-048, the later presets from W-03 |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §2: release state (W-37, W-38); README/USAGE; the Fux layer |
