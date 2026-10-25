@@ -6,7 +6,7 @@ item: W-42
 filed: 2026-10-25
 filed_by: "Arpit (Claude Code, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Claude Code, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5), 2026-10-25: closed — merged to main as b4a6ac4"
 ball: done
 ---
 
