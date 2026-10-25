@@ -1,6 +1,8 @@
 //! `--format sarif`: SARIF 2.1.0 for code scanning (SR-CLI-MCP decision 4).
 //! It carries the L4 fix fields: `auto` and `suggest` edits as SARIF
-//! `fixes`, and the class, steps and note in each result's `properties`.
+//! `fixes`, and the class, steps and note in each result's `properties`. A
+//! security rule's descriptor carries GitHub code scanning's `tags`
+//! (`security`, `external/cwe/cwe-<n>`) and `security-severity`.
 
 use codelaw_core::{Diagnostic, FixClass, Severity};
 use codelaw_engine::{CheckReport, Project};
@@ -74,14 +76,23 @@ pub fn check_sarif(report: &CheckReport, project: &Project) -> Value {
             continue;
         }
         let meta = if let Some(r) = project.rules.get(&d.rule) {
-            json!({
+            let mut meta = json!({
                 "id": r.rule.id,
                 "name": r.rule.id,
                 "shortDescription": { "text": r.rule.title },
                 "fullDescription": { "text": r.rule.summary },
                 "help": { "text": format!("{}\n\nWhy: {}\n\n`codelaw explain {}`", r.rule.summary, r.rule.why, r.rule.id) },
                 "properties": { "fixClass": r.rule.fix.name(), "source": r.source.label(), "languages": r.rule.languages.iter().map(|l| l.name()).collect::<Vec<_>>() },
-            })
+            });
+            if let Some(s) = &r.rule.security {
+                let mut tags = s.sarif_tags();
+                tags.extend(r.rule.tags.iter().filter(|t| !tags.contains(t)).cloned().collect::<Vec<_>>());
+                meta["properties"]["tags"] = json!(tags);
+                meta["properties"]["security-severity"] = json!(s.severity.score());
+                meta["properties"]["cwe"] = json!(s.cwe);
+                meta["properties"]["owasp"] = json!(s.owasp);
+            }
+            meta
         } else if let Some(e) = codelaw_rules::engine_rule(&d.rule) {
             json!({
                 "id": e.id,

@@ -81,6 +81,14 @@ export interface RuleCard {
   /** `local`, or the pack the rule comes from. */
   source: string;
   preview: boolean;
+  /** A security rule's CWE ids, OWASP Top 10 categories and severity (SR-RULE-FORMAT decision 2a). */
+  security?: {
+    cwe: number[];
+    owasp: string[];
+    severity: "high" | "medium" | "low";
+    /** SARIF's `security-severity` score for `severity`. */
+    security_severity: string;
+  };
 }
 
 export interface RulesReport {

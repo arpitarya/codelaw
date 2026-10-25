@@ -129,3 +129,55 @@ fn data_tables_feed_undeclared() {
     assert!(compile(&r, Grammar::JavaScript, &data).is_ok());
     assert!(compile(&r, Grammar::JavaScript, &BTreeMap::new()).err().unwrap().contains("no data table"));
 }
+
+const REDIRECT_JS: &str = "match:\n  pattern: res.redirect($URL)\nwhere:\n  $URL: { from_source: { sources: [req.query, req.params, req.body] } }\nmessage: \"redirect to $URL\"";
+
+#[test]
+fn from_source_matches_a_source_and_what_is_built_from_it() {
+    let src = "app.get('/', (req, res) => {\n  res.redirect(req.query.next);\n  res.redirect('/home?x=' + req.query.x);\n  res.redirect(`/u/${req.params.id}`);\n  res.redirect(req.query.get('next'));\n  res.redirect('/home');\n  res.redirect(safe(req.query.next));\n});\n";
+    assert_eq!(
+        matches(Language::Javascript, REDIRECT_JS, src),
+        ["redirect to req.query.next", "redirect to '/home?x=' + req.query.x", "redirect to `/u/${req.params.id}`", "redirect to req.query.get('next')"]
+    );
+}
+
+#[test]
+fn from_source_follows_a_binding_in_the_same_function() {
+    // One assignment away, a destructuring, a renamed default, two hops, a
+    // later write.
+    let src = "app.get('/', (req, res) => {\n  const url = req.query.next;\n  res.redirect(url);\n  const { back } = req.query;\n  res.redirect(back);\n  const { next: to = '/' } = req.body;\n  res.redirect(to);\n  const q = req.query;\n  const n = q.n;\n  res.redirect(n);\n  let later = '/';\n  if (x) later = req.query.later;\n  res.redirect(later);\n  const fixed = '/home';\n  res.redirect(fixed);\n});\n";
+    assert_eq!(
+        matches(Language::Typescript, REDIRECT_JS, src),
+        ["redirect to url", "redirect to back", "redirect to to", "redirect to n", "redirect to later"]
+    );
+}
+
+#[test]
+fn from_source_does_not_cross_functions() {
+    // A closure's outer variable, a parameter, a helper's return value.
+    let src = "app.get('/', (req, res) => {\n  const url = req.query.next;\n  setTimeout(() => res.redirect(url), 0);\n});\nfunction go(res, url) { res.redirect(url); }\nfunction target(req) { return req.query.next; }\napp.get('/b', (req, res) => { const t = target(req); res.redirect(t); });\n";
+    assert!(matches(Language::Javascript, REDIRECT_JS, src).is_empty());
+}
+
+#[test]
+fn from_source_in_python() {
+    let block = "match:\n  pattern: redirect($URL)\nwhere:\n  $URL: { from_source: [request.args, request.form] }\nmessage: \"redirect to $URL\"";
+    let src = "def view():\n    nxt = request.args.get('next')\n    redirect(nxt)\n    redirect(f\"/x?{request.form['n']}\")\n    redirect('/x?%s' % request.args['y'])\n    redirect('/x?{}'.format(request.args['z']))\n    redirect('/home')\n\ndef get_next():\n    return request.args.get('next')\n\ndef other():\n    redirect(get_next())\n    held = request.args['h']\n    def inner():\n        redirect(held)\n";
+    assert_eq!(
+        matches(Language::Python, block, src),
+        ["redirect to nxt", "redirect to f\"/x?{request.form['n']}\"", "redirect to '/x?%s' % request.args['y']", "redirect to '/x?{}'.format(request.args['z'])"]
+    );
+}
+
+#[test]
+fn from_source_reads_its_tables_and_refuses_bad_sources() {
+    let mut data = BTreeMap::new();
+    data.insert("sources/express".to_owned(), Arc::new(serde_json::json!({ "req.query": "query string", "req.params": "route params" })));
+    let r = rule(Language::Javascript, "match:\n  pattern: res.redirect($URL)\nwhere:\n  $URL: { from_source: { tables: [sources/express] } }\nmessage: x");
+    assert!(compile(&r, Grammar::JavaScript, &data).is_ok());
+    assert!(compile(&r, Grammar::JavaScript, &BTreeMap::new()).err().unwrap().contains("no data table"));
+    let r = rule(Language::Javascript, "match:\n  pattern: res.redirect($URL)\nwhere:\n  $URL: { from_source: { sources: [\"req..query\"] } }\nmessage: x");
+    assert!(compile(&r, Grammar::JavaScript, &data).err().unwrap().contains("dotted access path"));
+    let r = rule(Language::Javascript, "match:\n  pattern: res.redirect($URL)\nwhere:\n  $URL: from_source\nmessage: x");
+    assert!(compile(&r, Grammar::JavaScript, &data).err().unwrap().contains("names its sources"));
+}

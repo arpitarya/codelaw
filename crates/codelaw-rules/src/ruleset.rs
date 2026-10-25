@@ -8,7 +8,7 @@ use crate::rule::{RESERVED_NAMESPACES, RuleFile, Stability};
 use codelaw_cache::{Key, KeyBuilder};
 use codelaw_config::{Config, Layer, RuleConfig, RuleSetting};
 use codelaw_core::Severity;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -106,7 +106,16 @@ impl RuleSet {
         let mut loaded_packs: Vec<(PathBuf, Arc<RulePack>)> = Vec::new();
         let mut key = KeyBuilder::new("ruleset");
 
-        for spec_text in config.extends() {
+        // Each entry, with the presets that extended it (outermost first):
+        // a preset's own `extends` are resolved before its `[rules]`, so
+        // the preset's settings win (SR-RULE-PACKS decision 3).
+        let mut queue: VecDeque<(String, Vec<String>, bool)> = config.extends().iter().map(|s| (s.to_string(), Vec::new(), false)).collect();
+        while let Some((spec_owned, via, expanded)) = queue.pop_front() {
+            let spec_text = &spec_owned;
+            let label = match via.last() {
+                Some(v) => format!("{spec_text} (extended by {v})"),
+                None => spec_text.clone(),
+            };
             let spec = match ExtendsSpec::parse(spec_text) {
                 Ok(s) => s,
                 Err(e) => {
@@ -122,7 +131,7 @@ impl RuleSet {
             };
             let Some(dir) = dir else {
                 let msg = match &spec {
-                    ExtendsSpec::FirstParty { pack, .. } => PackSearch::missing_first_party(spec_text, pack),
+                    ExtendsSpec::FirstParty { pack, .. } => PackSearch::missing_first_party(&label, pack),
                     ExtendsSpec::Npm(n) => format!("`{spec_text}`: no `node_modules/{n}` with a codelaw-pack.toml above {}", codelaw_core::normalize_path(&options.search.config_dir)),
                     ExtendsSpec::Pypi(n) => format!("`{spec_text}`: `{n}` is not installed in the Python environment"),
                     ExtendsSpec::Path(p) => format!("`{spec_text}`: no codelaw-pack.toml in `{p}`"),
@@ -210,6 +219,26 @@ impl RuleSet {
                     },
                 );
             }
+            if let ExtendsSpec::FirstParty { preset, .. } = &spec
+                && !expanded
+                && let Some(p) = pack.presets.get(preset)
+                && !p.extends.is_empty()
+            {
+                let mut chain = via.clone();
+                chain.push(spec_text.clone());
+                queue.push_front((spec_text.clone(), via.clone(), true));
+                for parent in p.extends.iter().rev() {
+                    if chain.contains(parent) {
+                        errors.push(LoadError::new(
+                            Some(pack.dir.clone()),
+                            format!("presets extend each other in a cycle: {} → {parent}", chain.join(" → ")),
+                        ));
+                        continue;
+                    }
+                    queue.push_front((parent.clone(), chain.clone(), false));
+                }
+                continue;
+            }
             let enabled: Vec<(String, Option<RuleSetting>)> = match &spec {
                 ExtendsSpec::FirstParty { preset, .. } => match pack.presets.get(preset) {
                     Some(p) => p.rules.iter().map(|(k, v)| (k.clone(), Some(v.clone()))).collect(),
@@ -217,7 +246,8 @@ impl RuleSet {
                         let near = codelaw_config::did_you_mean(preset, pack.presets.keys().map(String::as_str))
                             .map(|n| format!("; did you mean `codelaw:{n}`?"))
                             .unwrap_or_default();
-                        errors.push(LoadError::new(config_file.clone(), format!("{} has no preset `{preset}`{near}", pack.label())));
+                        let by = via.last().map(|v| format!(" (extended by {v})")).unwrap_or_default();
+                        errors.push(LoadError::new(config_file.clone(), format!("{} has no preset `{preset}`{near}{by}", pack.label())));
                         continue;
                     }
                 },
@@ -232,7 +262,7 @@ impl RuleSet {
                     check_options(&entry.rule, s, &pack.dir, &mut errors);
                 }
                 entry.default = to_config(&entry.rule, setting.as_ref());
-                entry.enabled_by = Some(spec_text.clone());
+                entry.enabled_by = Some(label.clone());
             }
         }
 

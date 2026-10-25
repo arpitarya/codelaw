@@ -12,8 +12,120 @@ use std::path::{Path, PathBuf};
 /// (SR-RULE-FORMAT decision 1).
 pub const RESERVED_NAMESPACES: &[&str] = &[
     "js", "ts", "react", "node", "stencil", "py", "json", "yaml", "toml", "md", "data", "css", "html", "graph", "format",
-    "codelaw", "tanstack-query", "redux-toolkit",
+    "codelaw", "tanstack-query", "redux-toolkit", "sec-js", "sec-ts", "sec-html", "sec-py",
 ];
+
+/// The namespaces of the four security packs: a rule in one must carry
+/// `security:` (SR-RULE-FORMAT decision 2a).
+pub const SECURITY_NAMESPACES: &[&str] = &["sec-js", "sec-ts", "sec-html", "sec-py"];
+
+/// The OWASP Top 10:2025 categories, for `rules --security-coverage`
+/// (SR-CLI-MCP decision 1).
+pub const OWASP_TOP_10_2025: &[(&str, &str)] = &[
+    ("A01:2025", "Broken Access Control"),
+    ("A02:2025", "Security Misconfiguration"),
+    ("A03:2025", "Software Supply Chain Failures"),
+    ("A04:2025", "Cryptographic Failures"),
+    ("A05:2025", "Injection"),
+    ("A06:2025", "Insecure Design"),
+    ("A07:2025", "Authentication Failures"),
+    ("A08:2025", "Software or Data Integrity Failures"),
+    ("A09:2025", "Security Logging and Alerting Failures"),
+    ("A10:2025", "Mishandling of Exceptional Conditions"),
+];
+
+/// How bad a security finding is (SR-RULE-FORMAT decision 2a). SARIF's
+/// `security-severity` is its score.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SecuritySeverity {
+    Low,
+    Medium,
+    High,
+}
+
+impl SecuritySeverity {
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "high" => Some(SecuritySeverity::High),
+            "medium" => Some(SecuritySeverity::Medium),
+            "low" => Some(SecuritySeverity::Low),
+            _ => None,
+        }
+    }
+
+    pub fn name(self) -> &'static str {
+        match self {
+            SecuritySeverity::High => "high",
+            SecuritySeverity::Medium => "medium",
+            SecuritySeverity::Low => "low",
+        }
+    }
+
+    /// The score GitHub code scanning ranks by (`security-severity`): it
+    /// reads 7.0–8.9 as high, 4.0–6.9 as medium and 0.1–3.9 as low.
+    pub fn score(self) -> &'static str {
+        match self {
+            SecuritySeverity::High => "8.0",
+            SecuritySeverity::Medium => "5.0",
+            SecuritySeverity::Low => "2.0",
+        }
+    }
+}
+
+/// A rule's `security:` metadata: the CWE ids and OWASP Top 10 categories it
+/// maps to, and how severe a finding is (SR-RULE-FORMAT decision 2a).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Security {
+    pub cwe: Vec<u32>,
+    /// `A01:2025` … `A10:2025`.
+    pub owasp: Vec<String>,
+    pub severity: SecuritySeverity,
+}
+
+impl Security {
+    /// `(CWE-78)` or `(CWE-614, CWE-1004)`; empty without a CWE.
+    pub fn cwe_label(&self) -> String {
+        if self.cwe.is_empty() {
+            return String::new();
+        }
+        format!("({})", self.cwe.iter().map(|c| format!("CWE-{c}")).collect::<Vec<_>>().join(", "))
+    }
+
+    /// The tags SARIF carries: `security`, `external/cwe/cwe-<n>` and
+    /// `external/owasp/<category>`.
+    pub fn sarif_tags(&self) -> Vec<String> {
+        let mut out = vec!["security".to_owned()];
+        out.extend(self.cwe.iter().map(|c| format!("external/cwe/cwe-{c}")));
+        out.extend(self.owasp.iter().map(|o| format!("external/owasp/{o}")));
+        out
+    }
+
+    /// `rules --tag`: `security`, `cwe:<n>`, or `owasp:<category>` (`A05`
+    /// matches `A05:2025`).
+    pub fn matches_tag(&self, tag: &str) -> bool {
+        let tag = tag.trim();
+        if tag.eq_ignore_ascii_case("security") {
+            return true;
+        }
+        if let Some(n) = tag.strip_prefix("cwe:").or_else(|| tag.strip_prefix("CWE-")) {
+            return n.trim_start_matches("CWE-").parse::<u32>().is_ok_and(|n| self.cwe.contains(&n));
+        }
+        if let Some(c) = tag.strip_prefix("owasp:") {
+            return self.owasp.iter().any(|o| o.eq_ignore_ascii_case(c) || o.split(':').next().is_some_and(|x| x.eq_ignore_ascii_case(c)));
+        }
+        false
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SecurityFm {
+    #[serde(default)]
+    cwe: Vec<u32>,
+    #[serde(default)]
+    owasp: Vec<String>,
+    severity: Option<String>,
+}
 
 /// The skills a `fix_skill:` may name: those codelaw ships
 /// (SR-AGENT-SURFACES; L4 decision 10).
@@ -105,6 +217,7 @@ struct Frontmatter {
     ported_from: Vec<String>,
     #[serde(default)]
     tags: Vec<String>,
+    security: Option<SecurityFm>,
     since: Option<String>,
 }
 
@@ -200,6 +313,8 @@ pub struct RuleFile {
     pub options: BTreeMap<String, OptionSpec>,
     pub ported_from: Vec<String>,
     pub tags: Vec<String>,
+    /// CWE, OWASP and severity (SR-RULE-FORMAT decision 2a).
+    pub security: Option<Security>,
     pub since: Option<String>,
     pub summary: String,
     pub why: String,
@@ -362,7 +477,7 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
             let msg = if msg.contains("unknown field") {
                 let valid = [
                     "id", "title", "languages", "scope", "files", "exclude", "severity", "fix", "fix_reason", "fix_skill",
-                    "stability", "host", "invariant", "options", "ported_from", "tags", "since",
+                    "stability", "host", "invariant", "options", "ported_from", "tags", "security", "since",
                 ];
                 let unknown = msg.split('`').nth(1).unwrap_or_default();
                 let near = codelaw_config::did_you_mean(unknown, valid).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
@@ -485,6 +600,42 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
         if p.split('/').count() < 2 {
             err(&mut errors, 2, format!("`ported_from: {p}` must be `<tool>/<rule>`"));
         }
+    }
+    let security = fm.security.as_ref().and_then(|sec| {
+        let mut ok = true;
+        let severity = match sec.severity.as_deref() {
+            None => {
+                err(&mut errors, 2, "`security:` needs `severity: high`, `medium` or `low`".into());
+                ok = false;
+                None
+            }
+            Some(v) => SecuritySeverity::parse(v).or_else(|| {
+                err(&mut errors, 2, format!("`security:` `severity: {v}` must be `high`, `medium` or `low`"));
+                ok = false;
+                None
+            }),
+        };
+        if sec.cwe.contains(&0) {
+            err(&mut errors, 2, "`security:` `cwe:` lists CWE ids, which start at 1".into());
+            ok = false;
+        }
+        for o in &sec.owasp {
+            if !owasp_category(o) {
+                err(&mut errors, 2, format!("`security:` `owasp: {o}` must be an OWASP Top 10 category with its edition, `A01:2025` … `A10:2025`"));
+                ok = false;
+            }
+        }
+        if sec.cwe.is_empty() && sec.owasp.is_empty() {
+            err(&mut errors, 2, "`security:` names at least one `cwe` or `owasp` entry".into());
+            ok = false;
+        }
+        ok.then(|| Security { cwe: sec.cwe.clone(), owasp: sec.owasp.clone(), severity: severity.expect("checked") })
+    });
+    if let Some((ns, _)) = id.split_once('/')
+        && SECURITY_NAMESPACES.contains(&ns)
+        && fm.security.is_none()
+    {
+        err(&mut errors, 2, format!("a `{ns}/` rule carries `security: {{ cwe, owasp, severity }}` (SR-RULE-FORMAT decision 2a)"));
     }
     let invariants = match fm.invariant {
         None => Vec::new(),
@@ -663,6 +814,7 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
         options: fm.options,
         ported_from: fm.ported_from,
         tags: fm.tags,
+        security,
         since: fm.since,
         summary: summary.unwrap_or_default(),
         why: why.unwrap_or_default(),
@@ -672,6 +824,13 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
         cases: Vec::new(),
         hash: hash_bytes(text.as_bytes()),
     })
+}
+
+/// `A01:2025` … `A10:2025`: an OWASP Top 10 category and its edition's year.
+fn owasp_category(s: &str) -> bool {
+    let Some((cat, year)) = s.split_once(':') else { return false };
+    let n = cat.strip_prefix('A').filter(|n| n.len() == 2).and_then(|n| n.parse::<u32>().ok());
+    n.is_some_and(|n| (1..=10).contains(&n)) && year.len() == 4 && year.chars().all(|c| c.is_ascii_digit())
 }
 
 /// Parse a `<name>.cases.md` sidecar.
@@ -848,6 +1007,32 @@ let a: number = 1;
             .replace("## Examples", "## How to fix\n\n1. Change `var` to `let`.\n2. Check closures.\n\n## Examples");
         let r = parse_rule(Path::new("acme/no-var.md"), &text, Some("acme/no-var")).unwrap();
         assert_eq!(r.steps, vec!["Change var to let.", "Check closures."]);
+    }
+
+    #[test]
+    fn security_metadata() {
+        let text = GOOD.replace("stability: stable", "stability: stable\nsecurity: { cwe: [79, 1004], owasp: [\"A05:2025\"], severity: high }");
+        let r = parse_rule(Path::new("acme/no-var.md"), &text, Some("acme/no-var")).unwrap();
+        let s = r.security.unwrap();
+        assert_eq!(s.cwe, [79, 1004]);
+        assert_eq!(s.severity, SecuritySeverity::High);
+        assert_eq!(s.cwe_label(), "(CWE-79, CWE-1004)");
+        assert_eq!(s.sarif_tags(), ["security", "external/cwe/cwe-79", "external/cwe/cwe-1004", "external/owasp/A05:2025"]);
+        for (tag, hit) in [("cwe:79", true), ("cwe:78", false), ("owasp:A05", true), ("owasp:a05:2025", true), ("owasp:A01", false), ("security", true), ("CWE-1004", true)] {
+            assert_eq!(s.matches_tag(tag), hit, "{tag}");
+        }
+        let e = errors(&GOOD.replace("stability: stable", "stability: stable\nsecurity: { cwe: [79], severity: severe }"));
+        assert!(e.iter().any(|m| m.contains("must be `high`, `medium` or `low`")), "{e:?}");
+        let e = errors(&GOOD.replace("stability: stable", "stability: stable\nsecurity: { owasp: [A5], severity: low }"));
+        assert!(e.iter().any(|m| m.contains("OWASP Top 10 category")), "{e:?}");
+        let e = errors(&GOOD.replace("stability: stable", "stability: stable\nsecurity: { severity: low }"));
+        assert!(e.iter().any(|m| m.contains("at least one")), "{e:?}");
+        let e = errors(&GOOD.replace("stability: stable", "stability: stable\nsecurity: { cwe: [79], severity: low, cvss: 9 }"));
+        assert!(!e.is_empty(), "an unknown `security:` key is refused");
+        // A rule in a security pack's namespace must carry it.
+        let sec = GOOD.replace("id: acme/no-var", "id: sec-js/no-var");
+        let e: Vec<String> = parse_rule(Path::new("sec-js/no-var.md"), &sec, Some("sec-js/no-var")).unwrap_err().into_iter().map(|e| e.message).collect();
+        assert!(e.iter().any(|m| m.contains("carries `security:")), "{e:?}");
     }
 
     #[test]

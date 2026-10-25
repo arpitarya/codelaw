@@ -1,0 +1,6 @@
+name = "@codelaw/rules-security-html"
+version = "0.2.0"
+min_codelaw = "0.2.0"
+languages = ["html"]
+presets = ["sec-html/recommended", "sec-html/strict"]
+description = "codelaw's security rules for HTML; its presets also turn on the html pack's security rules (SR-RULE-PACKS)"

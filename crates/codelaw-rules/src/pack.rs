@@ -54,10 +54,11 @@ const fn pypi_only(short: &'static str, pypi: &'static str) -> FirstPartyPack {
     FirstPartyPack { short, manifest: pypi, npm: None, pypi: Some(pypi) }
 }
 
-/// The eleven first-party packs: ten on npm, six on PyPI (the decider's
-/// rulings of 2026-10-24: W-31's split, and W-32's two npm-only library
-/// packs). `scripts/package.py` reads this table, so it is
-/// the one list of what is published where.
+/// The fifteen first-party packs: thirteen on npm, nine on PyPI (the
+/// decider's rulings of 2026-10-24: W-31's split, and W-32's two npm-only
+/// library packs; and of 2026-10-25, W-53's four security packs).
+/// `scripts/package.py` reads this table, so it is the one list of what is
+/// published where.
 pub const FIRST_PARTY_PACKS: &[FirstPartyPack] = &[
     both("js", "@codelaw/rules-js", "codelaw-rules-js"),
     npm_only("ts", "@codelaw/rules-ts"),
@@ -70,6 +71,16 @@ pub const FIRST_PARTY_PACKS: &[FirstPartyPack] = &[
     both("data", "@codelaw/rules-data", "codelaw-rules-data"),
     npm_only("tanstack-query", "@codelaw/rules-tanstack-query"),
     npm_only("redux-toolkit", "@codelaw/rules-redux-toolkit"),
+    both("security-js", "@codelaw/rules-security-js", "codelaw-rules-security-js"),
+    npm_only("security-ts", "@codelaw/rules-security-ts"),
+    both("security-html", "@codelaw/rules-security-html", "codelaw-rules-security-html"),
+    pypi_only("security-python", "codelaw-rules-security-python"),
+];
+
+/// Every namespace a first-party pack owns, in [`namespace_pack`]'s order.
+pub const FIRST_PARTY_NAMESPACES: &[&str] = &[
+    "js", "ts", "react", "node", "stencil", "html", "css", "py", "data", "md", "json", "yaml", "toml", "tanstack-query", "redux-toolkit",
+    "sec-js", "sec-ts", "sec-html", "sec-py",
 ];
 
 /// The fixed namespace-to-pack map (decision 4).
@@ -86,6 +97,10 @@ pub fn namespace_pack(namespace: &str) -> Option<&'static str> {
         "data" | "md" | "json" | "yaml" | "toml" => "data",
         "tanstack-query" => "tanstack-query",
         "redux-toolkit" => "redux-toolkit",
+        "sec-js" => "security-js",
+        "sec-ts" => "security-ts",
+        "sec-html" => "security-html",
+        "sec-py" => "security-python",
         _ => return None,
     })
 }
@@ -127,8 +142,7 @@ impl ExtendsSpec {
                 return Err(format!("`{spec}`: a first-party preset is `codelaw:<namespace>/<preset>`, e.g. `codelaw:js/recommended`"));
             };
             let Some(pack) = namespace_pack(ns) else {
-                let known = ["js", "ts", "react", "node", "stencil", "html", "css", "py", "data", "md", "json", "yaml", "toml", "tanstack-query", "redux-toolkit"];
-                let near = codelaw_config::did_you_mean(ns, known).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
+                let near = codelaw_config::did_you_mean(ns, FIRST_PARTY_NAMESPACES.iter().copied()).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
                 return Err(format!("`{spec}`: no first-party pack has the namespace `{ns}`{near}"));
             };
             let _ = name;
@@ -165,6 +179,10 @@ pub struct PackManifest {
 #[serde(deny_unknown_fields)]
 struct PresetFile {
     description: Option<String>,
+    /// First-party presets this one switches on first, as `codelaw:` specs
+    /// (SR-RULE-PACKS decision 3).
+    #[serde(default)]
+    extends: Vec<String>,
     #[serde(default)]
     rules: BTreeMap<String, RuleSetting>,
 }
@@ -173,6 +191,9 @@ struct PresetFile {
 pub struct Preset {
     pub name: String,
     pub description: Option<String>,
+    /// `codelaw:<namespace>/<preset>` entries, resolved as `extends`
+    /// entries before this preset's own `[rules]`.
+    pub extends: Vec<String>,
     pub rules: BTreeMap<String, RuleSetting>,
 }
 
@@ -458,7 +479,20 @@ pub fn load_pack_from(dir: &Path, first_party_origin: bool) -> Result<RulePack, 
                             errors.push(LoadError::new(Some(path.clone()), format!("preset `{name}` names `{id}`, which is not in this pack")));
                         }
                     }
-                    presets.insert(name.clone(), Preset { name: name.clone(), description: p.description, rules: p.rules });
+                    for spec in &p.extends {
+                        match ExtendsSpec::parse(spec) {
+                            Ok(ExtendsSpec::FirstParty { preset, .. }) if preset == *name => {
+                                errors.push(LoadError::new(Some(path.clone()), format!("preset `{name}` extends itself")));
+                            }
+                            Ok(ExtendsSpec::FirstParty { .. }) => {}
+                            Ok(_) => errors.push(LoadError::new(
+                                Some(path.clone()),
+                                format!("preset `{name}` extends `{spec}`: a preset extends only first-party presets, `codelaw:<namespace>/<preset>`"),
+                            )),
+                            Err(e) => errors.push(LoadError::new(Some(path.clone()), format!("preset `{name}`: {e}"))),
+                        }
+                    }
+                    presets.insert(name.clone(), Preset { name: name.clone(), description: p.description, extends: p.extends, rules: p.rules });
                 }
                 Err(e) => errors.push(LoadError::new(Some(path.clone()), format!("invalid preset: {}", e.message()))),
             },
@@ -490,6 +524,11 @@ mod tests {
         assert_eq!(ExtendsSpec::parse("codelaw:py/recommended"), Ok(ExtendsSpec::FirstParty { pack: "python", preset: "py/recommended".into() }));
         assert_eq!(ExtendsSpec::parse("codelaw:md/recommended"), Ok(ExtendsSpec::FirstParty { pack: "data", preset: "md/recommended".into() }));
         assert!(ExtendsSpec::parse("codelaw:jss/recommended").unwrap_err().contains("did you mean `js`"));
+        assert_eq!(
+            ExtendsSpec::parse("codelaw:sec-py/recommended"),
+            Ok(ExtendsSpec::FirstParty { pack: "security-python", preset: "sec-py/recommended".into() })
+        );
+        assert!(ExtendsSpec::parse("codelaw:sec-jss/recommended").unwrap_err().contains("did you mean `sec-js`"));
         assert_eq!(ExtendsSpec::parse("npm:@acme/x"), Ok(ExtendsSpec::Npm("@acme/x".into())));
         assert!(ExtendsSpec::parse("github:acme/x").is_err());
     }
@@ -509,12 +548,17 @@ mod tests {
     }
 
     #[test]
-    fn ten_packs_on_npm_and_six_on_pypi() {
-        // The decider's rulings of 2026-10-24 (L6 decision 11; W-31, W-32).
+    fn thirteen_packs_on_npm_and_nine_on_pypi() {
+        // The decider's rulings of 2026-10-24 and 2026-10-25 (L6 decision 11;
+        // W-31, W-32, W-53).
         let npm: Vec<&str> = FIRST_PARTY_PACKS.iter().filter(|p| p.npm.is_some()).map(|p| p.short).collect();
         let pypi: Vec<&str> = FIRST_PARTY_PACKS.iter().filter(|p| p.pypi.is_some()).map(|p| p.short).collect();
-        assert_eq!(npm, ["js", "ts", "react", "node", "stencil", "html", "css", "data", "tanstack-query", "redux-toolkit"]);
-        assert_eq!(pypi, ["js", "react", "html", "css", "python", "data"]);
+        assert_eq!(FIRST_PARTY_PACKS.len(), 15);
+        assert_eq!(
+            npm,
+            ["js", "ts", "react", "node", "stencil", "html", "css", "data", "tanstack-query", "redux-toolkit", "security-js", "security-ts", "security-html"]
+        );
+        assert_eq!(pypi, ["js", "react", "html", "css", "python", "data", "security-js", "security-html", "security-python"]);
         for p in FIRST_PARTY_PACKS {
             assert_eq!(Some(p.manifest), p.npm.or(p.pypi), "{}", p.short);
             if let Some(n) = p.npm {
@@ -525,9 +569,14 @@ mod tests {
             }
         }
         // Every namespace a first-party pack owns maps to a pack in the table.
-        for ns in ["js", "ts", "react", "node", "stencil", "html", "css", "py", "data", "md", "json", "yaml", "toml", "tanstack-query", "redux-toolkit"] {
+        for ns in FIRST_PARTY_NAMESPACES {
             let short = namespace_pack(ns).unwrap();
             assert!(FIRST_PARTY_PACKS.iter().any(|p| p.short == short), "{ns}");
+            assert!(RESERVED_NAMESPACES.contains(ns), "{ns} is reserved");
+        }
+        // Every pack owns at least one namespace.
+        for p in FIRST_PARTY_PACKS {
+            assert!(FIRST_PARTY_NAMESPACES.iter().any(|ns| namespace_pack(ns) == Some(p.short)), "{}", p.short);
         }
     }
 
@@ -539,10 +588,42 @@ mod tests {
         let mut table: Vec<&str> = FIRST_PARTY_PACKS.iter().map(|p| p.short).collect();
         table.sort();
         assert_eq!(folders, table, "packs/ and FIRST_PARTY_PACKS name the same packs");
+        let mut loaded = BTreeMap::new();
         for p in FIRST_PARTY_PACKS {
             let pack = load_pack(&packs.join(p.short)).unwrap_or_else(|e| panic!("{}: {e:?}", p.short));
             assert_eq!(pack.manifest.name, p.manifest);
             assert!(pack.first_party, "{}", p.short);
+            loaded.insert(p.short, pack);
         }
+        // A preset extends only presets that exist, in packs published on
+        // every registry its own pack is (decision 3): `sec-ts` on npm needs
+        // `sec-js` on npm, `sec-html` on both needs `html` on both.
+        for p in FIRST_PARTY_PACKS {
+            for preset in loaded[p.short].presets.values() {
+                for spec in &preset.extends {
+                    let Ok(ExtendsSpec::FirstParty { pack: other, preset: name }) = ExtendsSpec::parse(spec) else {
+                        panic!("{}: `{spec}` is not a first-party preset", preset.name)
+                    };
+                    let o = first_party(other);
+                    assert!(p.npm.is_none() || o.npm.is_some(), "{} extends {spec}, which is not on npm", preset.name);
+                    assert!(p.pypi.is_none() || o.pypi.is_some(), "{} extends {spec}, which is not on PyPI", preset.name);
+                    assert!(loaded[other].presets.contains_key(&name), "{} extends {spec}, which {other} does not have", preset.name);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn a_preset_extends_only_first_party_presets() {
+        let dir = std::env::temp_dir().join(format!("codelaw-preset-extends-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(dir.join("presets/acme")).unwrap();
+        fs::write(dir.join("codelaw-pack.toml"), "name = \"acme\"\nversion = \"1.0.0\"\nmin_codelaw = \"0.1.0\"\nlanguages = [\"javascript\"]\npresets = [\"acme/a\", \"acme/b\"]\n").unwrap();
+        fs::write(dir.join("presets/acme/a.toml"), "extends = [\"npm:@acme/other\"]\n").unwrap();
+        fs::write(dir.join("presets/acme/b.toml"), "extends = [\"codelaw:acme/b\"]\n").unwrap();
+        let e: Vec<String> = load_pack(&dir).unwrap_err().into_iter().map(|e| e.message).collect();
+        assert!(e.iter().any(|m| m.contains("extends only first-party presets")), "{e:?}");
+        assert!(e.iter().any(|m| m.contains("no first-party pack has the namespace `acme`")), "{e:?}");
+        let _ = fs::remove_dir_all(&dir);
     }
 }

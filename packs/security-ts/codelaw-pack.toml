@@ -1,0 +1,6 @@
+name = "@codelaw/rules-security-ts"
+version = "0.2.0"
+min_codelaw = "0.2.0"
+languages = ["typescript", "tsx"]
+presets = ["sec-ts/recommended", "sec-ts/strict"]
+description = "codelaw's TypeScript-only security rules; its presets extend security-js's; npm only (SR-RULE-PACKS)"

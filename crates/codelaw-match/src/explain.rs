@@ -157,10 +157,15 @@ impl Explainer {
             let this = captured(&node);
             let m = self.full.core.match_node(node.clone()).expect("matched");
             let env = m.get_env();
+            let source: &str = {
+                use ast_grep_core::Doc;
+                m.get_doc().get_source()
+            };
             for ((var, p), label) in self.full.predicates.iter().zip(&self.predicate_labels) {
-                let start = if var == MATCH_KEY { Some(this.start) } else { env.get_match(var.trim_start_matches('$')).map(|n| n.range().start) };
-                let holds = match (start, semantic) {
-                    (Some(s), Some(model)) => Some(p.holds(model, s)),
+                let target = if var == MATCH_KEY { Some(m.get_inner_node()) } else { env.get_match(var.trim_start_matches('$')).map(|n| n.get_inner_node()) };
+                let start = target.map(|t| t.start_byte()).or((var == MATCH_KEY).then_some(this.start));
+                let holds = match (target, semantic) {
+                    (Some(t), Some(model)) => Some(p.holds(model, &crate::Subject { start: t.start_byte(), node: Some(t), source })),
                     _ => None,
                 };
                 let error = match (start, semantic) {

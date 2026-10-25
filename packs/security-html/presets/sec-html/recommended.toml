@@ -1,0 +1,4 @@
+description = "html/security and the high-confidence HTML security rules, at error"
+extends = ["codelaw:html/security"]
+
+[rules]

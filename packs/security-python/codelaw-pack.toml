@@ -1,0 +1,6 @@
+name = "codelaw-rules-security-python"
+version = "0.2.0"
+min_codelaw = "0.2.0"
+languages = ["python"]
+presets = ["sec-py/recommended", "sec-py/strict"]
+description = "codelaw's security rules for Python: CWE and OWASP Top 10:2025 mapped; PyPI only (SR-RULE-PACKS)"

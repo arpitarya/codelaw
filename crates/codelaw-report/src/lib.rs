@@ -14,12 +14,12 @@ mod query;
 pub use hook::{HOOK_FINDINGS, hook_blocks, hook_text};
 
 pub use query::{
-    explain_engine_json, explain_engine_text, explain_json, explain_text, fix_skill, rules_json, rules_text, snippet_fix_json, tree_json, tree_text, why_json,
-    why_text,
+    explain_engine_json, explain_engine_text, explain_json, explain_text, fix_skill, rules_json, rules_text, security_coverage_json, security_coverage_text,
+    security_json, snippet_fix_json, tree_json, tree_text, why_json, why_text,
 };
 
 use codelaw_core::{Diagnostic, FixClass, Severity};
-use codelaw_engine::{CheckReport, FixReport, FormatReport};
+use codelaw_engine::{CheckReport, FixReport, FormatReport, Project};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
@@ -223,16 +223,47 @@ fn summary_line(report: &CheckReport, paint: &Paint, fixed: Option<usize>) -> St
     format!("{head} {}", parts.join(" · "))
 }
 
+/// What text and agent output print after a rule id: a security rule's CWE
+/// ids, `(CWE-78)` (SR-CLI-MCP decision 4).
+pub type Labels = BTreeMap<String, String>;
+
+/// The labels of every rule of the project that has them.
+pub fn security_labels(project: &Project) -> Labels {
+    project
+        .rules
+        .rules
+        .iter()
+        .filter_map(|r| r.rule.security.as_ref().map(|s| (r.rule.id.clone(), s.cwe_label())))
+        .filter(|(_, l)| !l.is_empty())
+        .collect()
+}
+
+fn labelled(rule: &str, labels: &Labels) -> String {
+    match labels.get(rule) {
+        Some(l) => format!("{rule} {l}"),
+        None => rule.to_owned(),
+    }
+}
+
 /// Grouped by file, coloured on a TTY.
 pub fn check_text(report: &CheckReport, color: bool) -> String {
-    text(report, color, None)
+    text(report, color, None, &Labels::new())
+}
+
+/// [`check_text`], each security rule's id followed by its CWE ids.
+pub fn check_text_with(report: &CheckReport, color: bool, labels: &Labels) -> String {
+    text(report, color, None, labels)
 }
 
 pub fn fix_text(report: &FixReport, color: bool) -> String {
-    text(&report.check, color, Some(report.fixed_count()))
+    text(&report.check, color, Some(report.fixed_count()), &Labels::new())
 }
 
-fn text(report: &CheckReport, color: bool, fixed: Option<usize>) -> String {
+pub fn fix_text_with(report: &FixReport, color: bool, labels: &Labels) -> String {
+    text(&report.check, color, Some(report.fixed_count()), labels)
+}
+
+fn text(report: &CheckReport, color: bool, fixed: Option<usize>, labels: &Labels) -> String {
     let paint = Paint(color);
     let mut out = String::new();
     if let Some(a) = &report.as_of {
@@ -259,7 +290,7 @@ fn text(report: &CheckReport, color: bool, fixed: Option<usize>) -> String {
                 paint.dim(&format!("{}:{}", d.start.line, d.start.column)),
                 paint.severity(d.severity),
                 d.message,
-                paint.dim(&format!("{} [{fix}]{note}", d.rule))
+                paint.dim(&format!("{} [{fix}]{note}", labelled(&d.rule, labels)))
             ));
             if d.fix == FixClass::Manual {
                 for (i, s) in d.steps.iter().enumerate() {
@@ -281,6 +312,11 @@ fn text(report: &CheckReport, color: bool, fixed: Option<usize>) -> String {
 
 /// Compact lines for hooks: one per diagnostic, with what to do next.
 pub fn check_agent(report: &CheckReport) -> String {
+    check_agent_with(report, &Labels::new())
+}
+
+/// [`check_agent`], each security rule's id followed by its CWE ids.
+pub fn check_agent_with(report: &CheckReport, labels: &Labels) -> String {
     let mut out = String::new();
     if let Some(a) = &report.as_of {
         out.push_str(&format!("{}\n", a.line()));
@@ -291,7 +327,7 @@ pub fn check_agent(report: &CheckReport) -> String {
             FixClass::Suggest if !d.edits.is_empty() => "fix: suggest (diff in --format json)".to_owned(),
             _ => format!("fix: manual — {}", d.steps.join(" ")),
         };
-        out.push_str(&format!("{}:{}:{} {} {} — {next}\n", d.file, d.start.line, d.start.column, d.rule, d.message));
+        out.push_str(&format!("{}:{}:{} {} {} — {next}\n", d.file, d.start.line, d.start.column, labelled(&d.rule, labels), d.message));
     }
     for s in &report.skipped {
         out.push_str(&format!("{} skipped: {}\n", s.file, s.reason));
