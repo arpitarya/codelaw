@@ -34,6 +34,7 @@ description: "Recurring terms, defined once."
 | native rule | a rule whose matcher is implemented in the engine in Rust; its Markdown file still carries docs, fix class and examples (SR-ARCHITECTURE decision 15b) |
 | change set | the files counted as touched: from `--changed-since`, `--staged` or the agent hook, never inferred; SR-BASELINE |
 | ratchet | a baseline may only shrink: `fix` and `baseline prune` lower counts, only `baseline add` raises one, and `baseline check --since` fails CI on any loosening; SR-BASELINE decision 5 |
+| burn-down | how the findings a baseline allows shrank per rule over commits, read from the committed baseline files with no lint: `baseline history`; SR-BASELINE decision 10 |
 | deprecations registry | `.codelaw/deprecations.toml`: deprecated symbols, their replacements and deadlines, read by `graph/no-deprecated-usage`; SR-BASELINE decision 6 |
 | exception | a finding allowed to stay: a baseline entry, a deprecations-registry entry or an inline `codelaw-ignore`; each may carry `expires`, `warn_days`, a reason and `added_by`, and `[exceptions] require_expiry` makes the date mandatory; SR-BASELINE decision 9 |
 | expires | the first day an exception no longer holds: from `warn_days` before it a warning, on it an error and the findings come back; `until`, the last allowed day, is read as the day before it; SR-BASELINE decision 9 |

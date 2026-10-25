@@ -82,6 +82,36 @@ pub(crate) fn files_at(dir: &Path, rev: &str, folder: &str) -> Result<Vec<(Strin
     Ok(out)
 }
 
+/// Whether the clone is shallow: its history stops at the clone's depth.
+pub(crate) fn is_shallow(dir: &Path) -> bool {
+    git(dir, &["rev-parse", "--is-shallow-repository"]).map(|b| text(b) == "true").unwrap_or(false)
+}
+
+/// `rev` as a full commit id, or why it is none.
+pub(crate) fn resolve(dir: &Path, rev: &str) -> Result<String, String> {
+    git(dir, &["rev-parse", "--verify", "--quiet", &format!("{rev}^{{commit}}")]).map(text).map_err(|_| format!("`{rev}` is not a date, a duration like 90d, or a commit"))
+}
+
+/// The commits that changed `folder` (relative to `dir`), oldest first, as
+/// `(id, committer date YYYY-MM-DD)`; `range` limits them (`ref..HEAD`),
+/// `HEAD` when none.
+pub(crate) fn commits_touching(dir: &Path, range: Option<&str>, folder: &str) -> Result<Vec<(String, String)>, String> {
+    let out = text(git(dir, &["log", "--reverse", "--topo-order", "--format=%H %cI", range.unwrap_or("HEAD"), "--", folder])?);
+    Ok(out
+        .lines()
+        .filter_map(|l| {
+            let (id, iso) = l.split_once(' ')?;
+            Some((id.to_owned(), iso.get(..10)?.to_owned()))
+        })
+        .collect())
+}
+
+/// A commit's date, `YYYY-MM-DD`, in the committer's own time zone.
+pub(crate) fn commit_date(dir: &Path, rev: &str) -> Result<String, String> {
+    let iso = text(git(dir, &["log", "-1", "--format=%cI", rev])?);
+    iso.get(..10).map(str::to_owned).ok_or_else(|| format!("`{rev}` has no commit date"))
+}
+
 /// `git config user.email`: who a commit made here would name.
 pub(crate) fn user_email(dir: &Path) -> Result<String, String> {
     let e = text(git(dir, &["config", "user.email"]).map_err(|e| if e.contains("config") || e.is_empty() { "no `user.email` is set".to_owned() } else { e })?);

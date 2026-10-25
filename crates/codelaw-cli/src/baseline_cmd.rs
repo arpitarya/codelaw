@@ -18,6 +18,24 @@ pub enum BaselineAction {
     Prune(PruneArgs),
     /// Fail if the baseline got looser since the merge base with a ref.
     Check(CheckArgs),
+    /// The burn-down per rule over the commits that touched the baseline, read from the repository (no lint).
+    History(HistoryArgs),
+}
+
+#[derive(Args)]
+pub struct HistoryArgs {
+    /// Where the window starts: a date (YYYY-MM-DD), a duration back from the `HEAD` commit date (`90d`, `12w`) or a ref. The whole history when not given.
+    #[arg(long)]
+    since: Option<String>,
+    /// One rule only.
+    #[arg(long)]
+    rule: Option<String>,
+    /// One point per commit, or the last commit of each day or week.
+    #[arg(long, default_value = "commit")]
+    by: String,
+    /// text, json, csv or markdown.
+    #[arg(long, default_value = "text")]
+    format: String,
 }
 
 #[derive(Args)]
@@ -123,6 +141,7 @@ pub fn baseline(action: BaselineAction) -> ExitCode {
         BaselineAction::Add(a) => add(a),
         BaselineAction::Prune(a) => prune(a),
         BaselineAction::Check(a) => check(a),
+        BaselineAction::History(a) => history(a),
     }
 }
 
@@ -241,4 +260,43 @@ pub fn deprecate(a: DeprecateArgs) -> ExitCode {
         }
         Err(e) => fail(e),
     }
+}
+
+fn history(a: HistoryArgs) -> ExitCode {
+    let by = match codelaw_baseline::history::By::parse(&a.by) {
+        Ok(b) => b,
+        Err(e) => return fail(e),
+    };
+    if !["text", "json", "csv", "markdown"].contains(&a.format.as_str()) {
+        return fail(format!("unknown --format `{}` (text, json, csv or markdown)", a.format));
+    }
+    let p = match project(&[]) {
+        Ok(p) => p,
+        Err(e) => return fail(e),
+    };
+    let (h, warnings) = match p.baseline_history(a.since.as_deref(), by, a.rule.as_deref()) {
+        Ok(r) => r,
+        Err(e) => return fail(e),
+    };
+    for w in warnings {
+        eprintln!("warning: {w}");
+    }
+    let out = match a.format.as_str() {
+        "json" => {
+            let row = |r: &codelaw_baseline::history::Row| serde_json::json!({ "rule": r.rule, "start": r.start(), "now": r.now(), "change": r.change(), "counts": r.values });
+            let v = serde_json::json!({
+                "schema_version": 1,
+                "by": h.by.name(),
+                "points": h.points.iter().map(|(c, d)| serde_json::json!({ "commit": c, "date": d.to_string() })).collect::<Vec<_>>(),
+                "rules": h.rows.iter().map(row).collect::<Vec<_>>(),
+                "total": row(&h.total),
+            });
+            serde_json::to_string_pretty(&v).unwrap_or_default() + "\n"
+        }
+        "csv" => h.csv(),
+        "markdown" => h.markdown(),
+        _ => h.text(),
+    };
+    print!("{out}");
+    ExitCode::SUCCESS
 }
