@@ -16,7 +16,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 | preset | rules | ported from |
 |---|---|---|
-| `stencil/recommended` | 15 | @stencil/eslint-plugin 1.4.0 `recommended` — 15 of its 21 rules |
+| `stencil/recommended` | 17 | @stencil/eslint-plugin 1.4.0 `recommended` — 16 of the 23 rules it turns on, and `stencil/prop-readonly` (upstream `props-must-be-readonly`) |
 | `stencil/conventions` | 1 | codelaw's starter catalogue: `stencil/tag-prefix` — opt in |
 
 <!-- /docs-sync:presets -->

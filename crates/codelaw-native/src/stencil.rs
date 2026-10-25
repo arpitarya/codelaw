@@ -1,9 +1,10 @@
 //! Native rules behind `stencil/recommended`. Each one needs the same
 //! context a pattern can't carry: whether a class is a `@Component`, and
 //! which Stencil decorators each member has — a field's decorators are its
-//! children, a method's are the siblings before it.
+//! children, a method's are the siblings before it. `ban-side-effects` is
+//! the exception: it looks at every call, component or not.
 
-use crate::util::{children, named_children, text};
+use crate::util::{children, descendants, has_token, is_function, named_children, string_value, text};
 use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
@@ -401,9 +402,169 @@ impl NativeRule for BanExportedConstEnums {
     }
 }
 
+/// The functions `stencil/ban-side-effects` lets run at the top level by
+/// default: test-suite builders and store factories.
+const SIDE_EFFECT_DEFAULTS: &[&str] = &["describe", "test", "bind", "createStore"];
+
+/// A node whose contents run later, or only as part of a declaration: a
+/// call inside one is not a side effect of loading the module.
+fn defers(n: Node<'_>) -> bool {
+    is_function(n.kind()) || n.kind() == "arrow_function" || (n.kind() == "export_statement" && !has_token(n, "default"))
+}
+
+pub struct BanSideEffects;
+
+impl NativeRule for BanSideEffects {
+    fn id(&self) -> &'static str {
+        "stencil/ban-side-effects"
+    }
+    fn languages(&self) -> &'static [Language] {
+        TS
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["call_expression"]
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let call = node.get_inner_node();
+        // Test files may run code at load time.
+        if regex::Regex::new(r"\b(spec|e2e|test)\.").is_ok_and(|r| r.is_match(ctx.file.path())) {
+            return;
+        }
+        let Some(callee) = call.child_by_field_name("function") else { return };
+        // A tagged template and a dynamic `import()` are call expressions in
+        // the tree, not calls in the source rule's.
+        if callee.kind() == "import" || call.child_by_field_name("arguments").is_some_and(|a| a.kind() == "template_string") {
+            return;
+        }
+        if callee.kind() == "identifier" {
+            let name = text(callee, ctx.source);
+            let skipped = match ctx.options.get("allow").and_then(|v| v.as_array()) {
+                Some(list) => list.iter().any(|x| x.as_str() == Some(name)),
+                None => SIDE_EFFECT_DEFAULTS.contains(&name),
+            };
+            if skipped {
+                return;
+            }
+        }
+        let mut p = call.parent();
+        while let Some(x) = p {
+            if defers(x) {
+                return;
+            }
+            p = x.parent();
+        }
+        out.push(finding(call, "This call runs when the module loads; move it into a function or a lifecycle method", Vec::new()));
+    }
+}
+
+/// The slot names a component's JSDoc documents with `@slot`; `<default>`
+/// for the unnamed slot. `@slot name - text` names `name`; `@slot - text`
+/// and a bare `@slot` document the default slot.
+fn documented_slots(jsdoc: &str) -> BTreeSet<String> {
+    let Ok(tag) = regex::Regex::new(r"@(\w+)[ \t]*(.*)") else { return BTreeSet::new() };
+    tag.captures_iter(jsdoc)
+        .filter(|c| &c[1] == "slot")
+        .map(|c| {
+            let comment = c[2].trim();
+            if comment.is_empty() || comment == "-" || comment.starts_with("- ") {
+                "<default>".to_owned()
+            } else {
+                comment.find(" - ").map_or(comment, |i| comment[..i].trim()).to_owned()
+            }
+        })
+        .collect()
+}
+
+/// The first `/** … */` comment directly before a class (before its
+/// decorators and `export`), without its `/*` and `*/`.
+fn class_jsdoc<'s>(class: Node<'_>, src: &'s str) -> Option<&'s str> {
+    let start = class.parent().filter(|p| p.kind() == "export_statement").unwrap_or(class);
+    let mut comments = Vec::new();
+    let mut prev = start.prev_sibling();
+    while let Some(c) = prev.filter(|c| c.kind() == "comment") {
+        comments.push(c);
+        prev = c.prev_sibling();
+    }
+    comments.into_iter().rev().map(|c| text(c, src)).find(|t| t.len() >= 5 && t.starts_with("/**") && t.ends_with("*/")).map(|t| &t[2..t.len() - 2])
+}
+
+/// The slot names a component renders: each `<slot>`'s literal `name`, or
+/// `<default>` for one with none. A computed name is left out.
+fn rendered_slots(body: Node<'_>, src: &str) -> BTreeSet<String> {
+    let mut all = Vec::new();
+    descendants(body, &|_| false, &mut all);
+    let mut out = BTreeSet::new();
+    for el in all.into_iter().filter(|n| matches!(n.kind(), "jsx_opening_element" | "jsx_self_closing_element")) {
+        if el.child_by_field_name("name").is_none_or(|n| text(n, src) != "slot") {
+            continue;
+        }
+        let name_attr = named_children(el).into_iter().filter(|a| a.kind() == "jsx_attribute").find(|a| a.named_child(0).is_some_and(|n| text(n, src) == "name"));
+        match name_attr.map(|a| a.named_child(1)) {
+            None => {
+                out.insert("<default>".to_owned());
+            }
+            Some(Some(v)) if v.kind() == "string" => {
+                out.insert(string_value(v, src));
+            }
+            _ => {}
+        }
+    }
+    out
+}
+
+pub struct EnforceSlotJsdoc;
+
+impl NativeRule for EnforceSlotJsdoc {
+    fn id(&self) -> &'static str {
+        "stencil/enforce-slot-jsdoc"
+    }
+    fn languages(&self) -> &'static [Language] {
+        &[Language::Tsx]
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["class_body"]
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let body = node.get_inner_node();
+        let src = ctx.source;
+        let Some(class) = body.parent().filter(|c| matches!(c.kind(), "class_declaration" | "abstract_class_declaration")) else { return };
+        if is_component(body, src).is_none() {
+            return;
+        }
+        let at = class.child_by_field_name("name").unwrap_or(class);
+        let documented = class_jsdoc(class, src).map(documented_slots).unwrap_or_default();
+        let rendered = rendered_slots(body, src);
+        let label = |s: &str| if s == "<default>" { "The default slot".to_owned() } else { format!("The slot '{s}'") };
+        for s in rendered.difference(&documented) {
+            out.push(finding(at, format!("{} is rendered but has no `@slot` tag in the component's JSDoc", label(s)), Vec::new()));
+        }
+        for s in documented.difference(&rendered) {
+            out.push(finding(at, format!("{} has a `@slot` tag but the component never renders it", label(s)), Vec::new()));
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ban_side_effects() {
+        let src = "import { setMode } from './x';\nsetMode('md');\nconsole.log(1);\ndescribe('x', () => {});\nconst a = compute();\nexport const b = compute();\nexport default compute();\nconst t = tag`x`;\nconst m = import('./m');\nfunction f() { g(); }\nconst h = () => g();\nclass C { x = g(); m() { g(); } }\n";
+        let got: Vec<&str> = crate::run(&BanSideEffects, Language::Typescript, src).into_iter().map(|f| &src[f.start..f.end]).collect();
+        assert_eq!(got, ["setMode('md')", "console.log(1)", "compute()", "compute()"]);
+    }
+
+    #[test]
+    fn enforce_slot_jsdoc() {
+        let src = "/**\n * @slot - The body.\n * @slot start - Before the body.\n * @slot gone - Never rendered.\n */\n@Component({ tag: 'my-item' })\nexport class Item {\n  render() {\n    return <Host><slot name=\"start\" /><slot /><slot name=\"end\"></slot><slot name={this.n} /></Host>;\n  }\n}\nclass Plain { render() { return <slot name=\"x\" />; } }\n";
+        let got: Vec<String> = crate::run(&EnforceSlotJsdoc, Language::Tsx, src).into_iter().map(|f| f.message).collect();
+        assert_eq!(got.len(), 2, "{got:?}");
+        assert!(got[0].starts_with("The slot 'end' is rendered"), "{got:?}");
+        assert!(got[1].starts_with("The slot 'gone' has a `@slot` tag"), "{got:?}");
+        let documented = documented_slots("* @slot\n * @slot -\n * @slot a - x - y\n * @slot b text ");
+        assert_eq!(documented.into_iter().collect::<Vec<_>>(), ["<default>", "a", "b text"]);
+    }
 
     const SRC: &str = "@Component({ tag: 'stencil-card' })\nexport class Card {\n  /** The heading. */\n  @Prop() heading: string;\n  @Prop() private open = true;\n  @Prop({ mutable: true }) count = 0;\n  @Prop() readonly title: string;\n  @State() expanded = false;\n  @Watch('heading') onHeading() {}\n  @Watch('missing') onMissing() {}\n  @Listen('click') onClick() {}\n  /** Opens it. */\n  @Method() private async show() {}\n  helper() {}\n  private done() {}\n  render() { return null; }\n  hostData() {}\n  cache = new Map();\n}\nclass Plain { @Prop() x: string; }\nexport const enum Size { S, M }\n";
 

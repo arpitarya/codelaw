@@ -2,6 +2,12 @@
 
 Every user-visible change, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/). Each line names the work item it came from (`W-nn`); `python3 scripts/docs-sync.py --check` fails when an item `work/IMPLEMENTATION.md` dates after the last release is not named under *Unreleased*.
 
+## Unreleased
+
+### Added
+
+- **`stencil/recommended` gains `stencil/ban-side-effects` and `stencil/enforce-slot-jsdoc`**, the two rules of @stencil/eslint-plugin 1.4.0's `recommended` that need no type information and were not yet ported: a call at a module's top level, and a component whose `@slot` JSDoc tags and rendered `<slot>`s disagree. The preset now holds 17 rules, and the pack README counts against the 23 upstream turns on (W-33).
+
 ## 0.2.0 — 2026-10-25
 
 ### Added

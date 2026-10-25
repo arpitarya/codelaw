@@ -45,7 +45,7 @@ here. Read that record before changing anything below it.
 
 🟡 **W-32** `arpit` A Redux Toolkit pack and a TanStack Query pack, npm only: steps 2–4 done in the tree 2026-10-25 (7 + 12 rules, all green, wired); pushed, CI run 40185344678 green; left: their first publish at 0.2.0 with W-31 step 7. Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
 
-🟢 **W-33** `agent` The two Stencil rules missing from `stencil/recommended`: port `ban-side-effects` and `enforce-slot-jsdoc` from @stencil/eslint-plugin 1.4.0 (or record why not), and fix the pack README's count (23 rules on, not 21). Filed by Arpit (Claude). [detail](open/W-33-stencil-preset-gaps.md)
+🟢 **W-33** `agent` Stencil's `ban-side-effects` and `enforce-slot-jsdoc` ported 2026-10-25: `stencil/recommended` holds 17 rules, 16 of upstream's 23; corpus clean; on branch `worktree-agent-a46bf2b8666b9da0f`. Left: merge, then close. Filed by Arpit (Claude). [detail](open/W-33-stencil-preset-gaps.md)
 
 ### testing
 
