@@ -46,7 +46,7 @@ fn key_part(n: Node<'_>, src: &str) -> String {
 }
 
 /// A key (bare, quoted or dotted) as its parts.
-fn key_path(n: Node<'_>, src: &str) -> Vec<String> {
+pub(crate) fn key_path(n: Node<'_>, src: &str) -> Vec<String> {
     match n.kind() {
         "dotted_key" => named_children(n).into_iter().flat_map(|c| key_path(c, src)).collect(),
         "bare_key" | "quoted_key" => vec![key_part(n, src)],
@@ -55,12 +55,12 @@ fn key_path(n: Node<'_>, src: &str) -> Vec<String> {
 }
 
 /// The key node of a table header or a pair: its first named child.
-fn key_node(n: Node<'_>) -> Option<Node<'_>> {
+pub(crate) fn key_node(n: Node<'_>) -> Option<Node<'_>> {
     named_children(n).into_iter().find(|c| matches!(c.kind(), "bare_key" | "quoted_key" | "dotted_key"))
 }
 
 /// The value node of a pair: the named child after its key.
-fn pair_value(pair: Node<'_>) -> Option<Node<'_>> {
+pub(crate) fn pair_value(pair: Node<'_>) -> Option<Node<'_>> {
     named_children(pair).into_iter().filter(|c| c.kind() != "comment").nth(1)
 }
 
@@ -258,7 +258,7 @@ fn table_pairs<'t>(t: Node<'t>, src: &str) -> Vec<(Vec<String>, Node<'t>, Option
 }
 
 /// A TOML basic or literal string's value, without escapes decoded.
-fn string_text(n: Node<'_>, src: &str) -> Option<String> {
+pub(crate) fn string_text(n: Node<'_>, src: &str) -> Option<String> {
     if n.kind() != "string" {
         return None;
     }

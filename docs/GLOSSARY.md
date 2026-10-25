@@ -38,6 +38,7 @@ description: "Recurring terms, defined once."
 | exception | a finding allowed to stay: a baseline entry, a deprecations-registry entry or an inline `codelaw-ignore`; each may carry `expires`, `warn_days`, a reason and `added_by`, and `[exceptions] require_expiry` makes the date mandatory; SR-BASELINE decision 9 |
 | expires | the first day an exception no longer holds: from `warn_days` before it a warning, on it an error and the findings come back; `until`, the last allowed day, is read as the day before it; SR-BASELINE decision 9 |
 | predicate | a semantic-model condition on a capture, written under `where:` in a `match:` rule — `unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`; SR-RULE-FORMAT decision 3a |
+| deps snapshot | `.codelaw/deps-snapshot.json`: the committed npm and PyPI facts — versions, publish days, deprecated and yanked ones — that `codelaw deps refresh` writes and `data/outdated-dependency` reads offline; SR-RULE-PACKS decision 15 |
 | data table | a JSON file in a pack's `data/` (CSS properties, HTML elements, globals), read once and shared by the rules that name it; SR-RULE-PACKS decision 3 |
 | fixpoint | a file the fixes no longer change: the apply loop runs until it reaches one, at most ten passes; SR-ARCHITECTURE decision 5 |
 | group fix | a fix computed once over every match in a file (`collect-into-block`); each diagnostic carries the whole edit set; SR-RULE-FORMAT decision 3c |

@@ -7,6 +7,7 @@ mod bench;
 mod format_cmd;
 mod graph_cmd;
 mod config_cmd;
+mod deps_cmd;
 mod init;
 mod match_cmd;
 mod rules_cmd;
@@ -85,6 +86,9 @@ enum Command {
     },
     /// Deprecate a symbol: write the registry entry and baseline every current use (SR-BASELINE decision 6).
     Deprecate(baseline_cmd::DeprecateArgs),
+    /// Read npm and the Python index and write the dependency snapshot the
+    /// offline rules read: the one command that uses the network (L5 decision 3).
+    Deps(deps_cmd::DepsArgs),
     /// Time every L8 operation on the reference workload and compare each
     /// with `perf/budgets.toml` (SR-LAW-8).
     Bench(bench::BenchArgs),
@@ -553,6 +557,7 @@ fn main() -> ExitCode {
         Command::Deprecate(a) => baseline_cmd::deprecate(a),
         Command::Daemon { action } => warm::daemon(action),
         Command::Bench(a) => bench::bench(a),
+        Command::Deps(a) => deps_cmd::deps(a),
         Command::Hook(a) => codelaw_agents::hook(a),
         Command::SyncAgents(a) => codelaw_agents::sync_agents(a),
     }

@@ -21,6 +21,7 @@ mod data_json;
 mod data_md;
 mod data_toml;
 mod data_yaml;
+pub mod deps;
 mod duplicates;
 mod expressions;
 #[cfg(feature = "fault-injection")]
@@ -53,7 +54,7 @@ mod useless_assignment;
 mod useless_escape;
 mod util;
 
-use codelaw_core::{Language, TextEdit};
+use codelaw_core::{Language, Severity, TextEdit};
 use codelaw_lang::SyntaxNode;
 use codelaw_semantic::SemanticModel;
 use std::collections::BTreeMap;
@@ -96,6 +97,12 @@ pub trait FileContext: Sync {
     fn read(&self, path: &str) -> Option<String>;
     /// The names in the folder at `path` (`""` is the root), sorted.
     fn list(&self, path: &str) -> Option<Vec<String>>;
+    /// The as-of date, `YYYY-MM-DD`, when there is one (L5 decision 2):
+    /// the only date a rule may judge by. The engine records the question,
+    /// so a cached result is reused only on the same date.
+    fn as_of(&self) -> Option<String> {
+        None
+    }
 }
 
 /// A file with no neighbours: what a rule sees when only its text is known.
@@ -172,6 +179,17 @@ pub trait NativeRule: Send + Sync {
         false
     }
     fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>);
+    /// A config section whose keys the rule reads as its options (the
+    /// rule's own options win): `[deps]` for the dependency rules
+    /// (SR-RULE-PACKS decision 15).
+    fn config_section(&self) -> Option<&'static str> {
+        None
+    }
+    /// The severity of one finding, for a rule that grades its findings;
+    /// `None` keeps the rule's.
+    fn severity_of(&self, _finding: &NativeFinding, _options: &BTreeMap<String, serde_json::Value>) -> Option<Severity> {
+        None
+    }
 }
 
 const JS_ONLY: &[Language] = &[Language::Javascript, Language::Jsx];
@@ -520,6 +538,8 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &stencil::StrictMutable,
     &stencil::TagPrefix,
     &data_toml::DepsSorted,
+    &deps::OutdatedDependency,
+    &deps::StaleDepsSnapshot,
     &data_toml::NoDuplicateKeys,
     &data_toml::PyprojectRequiresPython,
     &typescript::NoDuplicateEnumValues,

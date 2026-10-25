@@ -10,7 +10,7 @@ feature: "predefined rules and rule packs"
 owns:
   - packs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-25T09:00:00Z
+timestamp: 2026-10-25T18:00:00Z
 content_sha: ""
 ---
 
@@ -39,6 +39,8 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 - two npm-only library packs: `tanstack-query` (@tanstack/eslint-plugin-query's `recommended`, reimplemented) and `redux-toolkit` (codelaw's own rules, written from the Redux Style Guide's Priority A and B rules: there is no official Redux Toolkit ESLint plugin);
 - **npm** carries ten packs; PyPI is unchanged.
 
+**Ruled by Arpit, 2026-10-25** (W-52): *"I want latest versions of any dependencies that are present in Node or Python to be highlighted as well."* On the design, the same day: *"Let's go with it. I like the suggestion."* — a separate, explicit network command writes a committed snapshot, and two `data/*` rules read it offline (decision 15; [L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
+
 | Pack | npm | PyPI | Languages | Presets |
 |---|---|---|---|---|
 | engine | `codelaw` | `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics, the formatter's `format/unformatted` and `format/failed`, and `graph/no-deprecated-usage` | — |
@@ -50,7 +52,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 | `html` | `@codelaw/rules-html` | `codelaw-rules-html` | HTML, incl. HTML embedded in Markdown and templates | `html/recommended`, `html/a11y`, `html/document`, `html/conventions` |
 | `css` | `@codelaw/rules-css` | `codelaw-rules-css` | CSS | `css/recommended`, `css/standard`, `css/conventions`, `css/project` |
 | `python` | — | `codelaw-rules-python` | Python | `py/recommended`, `py/conventions`, `py/project` · *later:* `py/strict` |
-| `data` | `@codelaw/rules-data` | `codelaw-rules-data` | JSON, YAML, TOML, Markdown | `data/recommended`, `md/recommended`, `data/package-json`, `data/tsconfig`, `data/pyproject`, `data/github-actions`, `data/conventions` |
+| `data` | `@codelaw/rules-data` | `codelaw-rules-data` | JSON, YAML, TOML, Markdown; the dependencies of `package.json` and `pyproject.toml` (decision 15) | `data/recommended`, `md/recommended`, `data/package-json`, `data/tsconfig`, `data/pyproject`, `data/github-actions`, `data/conventions` |
 | `tanstack-query` | `@codelaw/rules-tanstack-query` | — | JS, JSX, TS, TSX using TanStack Query | `tanstack-query/recommended` |
 | `redux-toolkit` | `@codelaw/rules-redux-toolkit` | — | JS, JSX, TS, TSX using Redux | `redux-toolkit/recommended` |
 
@@ -182,6 +184,14 @@ The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the
     2. packs, in `extends` order (later wins), first-party and third-party alike.
 
     A pack can't loosen a rule the consumer set locally.
+15. **Dependencies and their latest versions** (W-52, the decider's ruling of 2026-10-25). Two native rules in `data`, both in `data/package-json` and `data/pyproject`, compare a manifest's dependencies with **`.codelaw/deps-snapshot.json`**, a committed file of registry facts. They read only that file and the lockfiles, never a registry ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
+    - **The snapshot** is written only by `codelaw deps refresh` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 1), the one command that uses the network. It holds `fetched` (the day, `--as-of` or today in UTC), `registries` (each ecosystem's or npm scope's URL, without credentials) and `packages`: per `npm:<name>` or `pypi:<normalised name>`, `latest` (the highest stable version that is not deprecated or yanked), `versions` (each version from the lowest one in use up, with its publish day; prereleases only under `[deps] prerelease`), and `deprecated` (npm) or `yanked` (PyPI) with the registry's message. Every map is sorted and the file is two-space JSON, so a refresh with no registry change writes the same bytes. A failed request writes nothing; a package the registry does not have is left out with a warning.
+    - **What `deps refresh` reads:** every `package.json` and `pyproject.toml` the project's discovery finds (each workspace of a monorepo; one snapshot at the root). npm comes from `registry` and `@scope:registry` in the user's and the project's `.npmrc` (the project's wins, `NPM_CONFIG_REGISTRY` over both), with `//host/path/:_authToken` values whose `${VAR}` is read from the environment; Python from `PIP_INDEX_URL`, `UV_DEFAULT_INDEX` or `UV_INDEX_URL`, else the root `[[tool.uv.index]]` marked `default = true`, else `https://pypi.org/simple/`, through PEP 691's JSON simple API with PEP 700's `versions` and `upload-time`. Requests go through `curl` on the PATH, as the as-of date goes through `git`: the binary carries no HTTP or TLS stack ([L2](0004_LAW-2-foss-dependencies.md)), and a token goes to curl on its standard input, never on its command line or into the snapshot.
+    - **`data/outdated-dependency`** (`suggest`) reads `dependencies`, `devDependencies`, `peerDependencies` and `optionalDependencies`, and `[project] dependencies`, `[project.optional-dependencies]` and `[dependency-groups]`. The version in use is the nearest lockfile's — `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `uv.lock` or `poetry.lock`, beside the manifest or above it — else the one the range starts from. Versions compare by semver for npm and by PEP 440 for Python (`crates/codelaw-native/src/deps/`, no new dependency). The latest is the highest stable version in the snapshot that is not deprecated or yanked and is at least `[deps] min_release_age` old on `fetched`. Each finding ends with its grade, and **the grade sets its severity**, not the rule's (`[deps] severity`; the rule's own severity only turns it on or off): `major` `warn`, `minor` `info`, `patch` `info`, `deprecated` and `yanked` (the version in use) `error`, `lockfile` (the range allows the latest, the lockfile is behind) `info`; `off` drops a grade.
+    - **Its fix** moves the range's version to the latest and keeps the operator: `^`, `~`, `>=`, `=` or none for npm, at the written precision except for a full exact version; `==` (the full version), `>=` and `~=` (the written precision, at least two parts for `~=`) for Python. A range with `||`, a hyphen, a space, `x`, a tag, or another clause the latest falls outside is reported without an edit.
+    - **`data/stale-deps-snapshot`** (`info`, `manual`) reports, once per project, on the root `package.json` or else the root `pyproject.toml`: a snapshot that cannot be read, or one fetched more than `[deps] max_snapshot_age` days before the as-of date. It never reads the clock.
+    - **`[deps]`** is the root config's ([SR-CONFIG](0110_config.md) decision 2): `[deps] severity` (a table of the six grades above, each `error`, `warn`, `info` or `off`), `[deps] min_release_age` (days, default 0), `[deps] prerelease` (default `false`), `[deps] ignore` (`npm:<name>` / `pypi:<name>`, or `{ package, expires, added_by, reason }`, which holds until its `expires` on the as-of date, as a dated exception: [SR-BASELINE](0104_baseline-and-deprecations.md) decision 9) and `[deps] max_snapshot_age` (days, default 14). The rules receive it as their options: a native rule may name one config section to read so ([SR-ARCHITECTURE](0108_architecture.md) decision 15b).
+    - **Not read:** `requirements*.txt` — a text file is not one of [L3](0005_LAW-3-languages.md)'s nine languages, so no rule can report on its lines; and the agent hint W-52 names (`rules_for_path` naming a source file's major-version gaps), which is not built.
 
 ### Starter catalogue (v0)
 
@@ -260,7 +270,7 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 - a Python-only or Node-only repo needs the other registry to get its rules;
 - `packs/`, `FIRST_PARTY_PACKS` and the published names disagree.
 
-**How to check it:** `python3 scripts/package.py check dist` compares every published copy of each pack with `packs/<name>/`, file by file, and the names with `FIRST_PARTY_PACKS`; `cargo test -p codelaw-rules` loads every `packs/` folder as its first-party pack.
+**How to check it:** `python3 scripts/package.py check dist` compares every published copy of each pack with `packs/<name>/`, file by file, and the names with `FIRST_PARTY_PACKS`; `cargo test -p codelaw-rules` loads every `packs/` folder as its first-party pack. Decision 15: `cargo test -p codelaw-native --lib deps`, `cargo test -p codelaw-cli --test deps` and `--test network_fence`.
 
 ---
 
