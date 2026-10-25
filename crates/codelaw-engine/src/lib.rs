@@ -17,6 +17,7 @@ mod query;
 mod project;
 mod suppress;
 mod timings;
+mod watch;
 
 pub use baseline::{AsOf, BaselineAdd, Ratchet};
 pub use compile::{CompiledRule, Matcher};
@@ -28,12 +29,12 @@ pub use lint::FileResult;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
 pub use debug::MatchReport;
 pub use timings::{PhaseTiming, RuleTiming, TimingReport};
+pub use watch::{COALESCE, Changes, Rerun, Snapshot, Watch};
 
 use codelaw_cache::DiskCache;
 use codelaw_config::{Config, ConfigError};
 use codelaw_core::{Diagnostic, Language, Skipped};
 use codelaw_rules::{LoadError, LoadOptions, PackSearch, RuleSet};
-use rayon::prelude::*;
 use std::collections::BTreeSet;
 use std::fmt;
 use std::path::{Path, PathBuf};
@@ -291,12 +292,8 @@ impl Project {
 
     /// Check files and folders (the project root when `paths` is empty).
     pub fn check(&mut self, paths: &[PathBuf]) -> Result<CheckReport, EngineError> {
-        let (mut report, deprecated, ran) = self.check_raw(paths)?;
-        self.apply_baselines(&mut report, deprecated, &ran);
-        self.finish(&mut report);
-        report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
-        dedup_diagnostics(&mut report.diagnostics);
-        Ok(report)
+        let raw = self.check_raw(paths)?;
+        Ok(self.conclude(raw))
     }
 
     /// The last stage of a report (SR-CONFIG decisions 10–11): `remap`,
@@ -333,55 +330,13 @@ impl Project {
     /// `check` before the baseline: every finding, the uses of deprecated
     /// symbols apart, and what the run saw completely.
     pub(crate) fn check_raw(&mut self, paths: &[PathBuf]) -> Result<(CheckReport, Vec<codelaw_baseline::Occurrence>, baseline::Ran), EngineError> {
-        let discovering = self.timings.is_some().then(std::time::Instant::now);
-        let (files, mut skipped, warnings) = discover::discover(self, paths)?;
-        if let (Some(t), Some(start)) = (&self.timings, discovering) {
-            t.add(timings::Phase::Discover, start);
-        }
-        let mut report = CheckReport { warnings: self.warnings.clone(), ..Default::default() };
-        report.warnings.extend(warnings);
-        let this = &*self;
-        let results: Vec<FileResult> = self.pool.install(|| files.par_iter().map(|f| this.check_file(f)).collect());
-        let mut checked: Vec<&FileEntry> = Vec::new();
-        for (r, entry) in results.into_iter().zip(&files) {
-            report.diagnostics.extend(r.diagnostics);
-            if let Some(s) = r.skipped {
-                skipped.push(s);
-            } else {
-                report.files_checked += 1;
-                checked.push(entry);
-            }
-        }
-        if !self.rules.has_rules() {
-            report.diagnostics.push(lint::no_rules(self));
-        }
-        let scopes = project::scopes(self.root(), paths);
-        // Project rules see the whole root, and report inside `paths`.
-        let graph_rules = !self.graph_rules().is_empty();
-        let deprecations = self.deprecations_on();
-        let mut deprecated = Vec::new();
-        if graph_rules || deprecations {
-            let config = self.graph_config()?;
-            let sources = self.graph_sources()?;
-            let graph = self.build_graph(&sources, config);
-            report.diagnostics.extend(self.run_graph_rules_on(&graph, &sources).into_iter().filter(|d| project::within(&d.file, &scopes)));
-            if deprecations {
-                deprecated = self.deprecated_occurrences(&graph, &sources).into_iter().filter(|o| project::within(&o.diag.file, &scopes)).collect();
-            }
-        }
-        // The adapters (SR-ARCHITECTURE decision 4, step 5).
-        if self.adapters_on() {
-            let mut run = adapters::check(self, &checked, &report.diagnostics);
-            report.diagnostics.append(&mut run.diagnostics);
-            report.warnings.append(&mut run.warnings);
-        }
-        let ran = baseline::Ran { files: checked.iter().map(|e| e.rel.clone()).collect(), scopes, project: true };
-        report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
-        dedup_diagnostics(&mut report.diagnostics);
-        skipped.sort();
-        report.skipped = skipped;
+        // What each file and the graph give, then the report put together
+        // from them: a watch keeps the parts and redoes only what changed
+        // (W-44), so both go through the same `assemble`.
+        let parts = self.parts(paths)?;
+        let out = self.assemble(&parts, paths);
         self.cache.prune(self.config.cache_max_size());
-        Ok((report, deprecated, ran))
+        Ok(out)
     }
 
     /// Check one file's text as if it were at `rel_path` (MCP

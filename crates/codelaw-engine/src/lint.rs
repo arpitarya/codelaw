@@ -177,7 +177,7 @@ impl Project {
         Some(format!("marked generated (`{marker}`); set `[files] lint_generated = true` to check it"))
     }
 
-    /// An editor's text of a file, through the same skips `check_file`
+    /// An editor's text of a file, through the same skips `check_file_asked`
     /// makes on the file on disk (SR-EDITOR decision 3).
     /// The as-of date as `YYYY-MM-DD`, for a native rule that asks
     /// (SR-ARCHITECTURE decision 15b).
@@ -203,10 +203,12 @@ impl Project {
         FileResult { diagnostics, skipped: None }
     }
 
-    pub(crate) fn check_file(&self, entry: &FileEntry) -> FileResult {
+    /// One file of a run, with the questions its rules asked about other
+    /// files: a watch re-checks a file whose answers no longer hold (W-44).
+    pub(crate) fn check_file_asked(&self, entry: &FileEntry) -> (FileResult, Vec<Asked>) {
         let file = match self.read_entry(entry) {
             Ok(f) => f,
-            Err(skipped) => return skipped,
+            Err(skipped) => return (skipped, Vec::new()),
         };
         let key = KeyBuilder::new("file+asked")
             .part(&entry.rel)
@@ -229,21 +231,21 @@ impl Project {
         if let Some(t) = &self.timings {
             t.cache(cached.is_some());
         }
-        let mut diagnostics = match cached {
-            Some(c) => c.diagnostics,
+        let (mut diagnostics, asked) = match cached {
+            Some(c) => (c.diagnostics, c.asked),
             None => {
                 let mut out = lint_text(self, entry, &file.text, &RunMode::check().with_bom(file.bom));
                 out.diagnostics.extend(crate::format::check_diagnostic(self, entry, &file.text));
                 if !out.diagnostics.iter().any(|d| d.rule == "codelaw/internal-error") {
-                    self.cache.put(&key, &CachedFile { diagnostics: out.diagnostics.clone(), asked: out.asked });
+                    self.cache.put(&key, &CachedFile { diagnostics: out.diagnostics.clone(), asked: out.asked.clone() });
                 }
-                out.diagnostics
+                (out.diagnostics, out.asked)
             }
         };
         if file.bom {
             shift_for_bom(&mut diagnostics);
         }
-        FileResult { diagnostics, skipped: None }
+        (FileResult { diagnostics, skipped: None }, asked)
     }
 }
 
