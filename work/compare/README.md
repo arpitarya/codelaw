@@ -19,3 +19,4 @@ built, its trigger is ported into the owning record and the doc moves to
 
 | doc | fork | verdict | reopen-trigger |
 |-----|------|---------|----------------|
+| [ci-profiles-and-dated-exceptions](ci-profiles-and-dated-exceptions.compare.md) | CI vs local severity, per-glob remap, dated exceptions, React context | decided 2026-10-25 (Arpit) — builds as W-39, W-40, W-41 | `CI` unset in a pipeline ships a `console.log`; `git blame` breaks L8 |

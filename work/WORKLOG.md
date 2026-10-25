@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — CI vs local severity, dated exceptions, React context: designed and filed as W-39–W-41  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"I want Code Law to work in a way that it can be used in CI/CD pipeline. As well as dev environment … for certain files it should never throw an error … every exception should have a date … an optional field … email ID … validated on commit or in CI/CD … React context … new implementation … should throw an error."*
+- **Done:** mapped the ask against SR-CONFIG, SR-LINTER and SR-BASELINE (the baseline already gives `until`, `warn_from`, `reason`, and old-warns/new-errors). Wrote [the compare doc](compare/ci-profiles-and-dated-exceptions.compare.md) and filed **W-39** (profiles, `remap`, `js/no-console`), **W-40** (`expires`, `warn_days`, `require_expiry`, `added_by`), **W-41** (`react/no-context` + the baseline recipe). No record edited: SR-CONFIG §1 is parsed by the schema test, so record, schema and loader land together in each build. Nothing committed.
+- **Decided / left open:** Arpit ruled auto-detected profiles with agents on `ci`; a configurable per-glob remap (silent, warning or error); `added_by` checked against the git author; `createContext` and `useContext` both. The agent chose `expires` = first failing day, with `until` as a one-release alias.
+- **Mistakes:** none.
+- **Next:** W-39 in Claude Code.
+
 ## 2026-10-25 — npm 0.2.0 from CI made possible; PyPI merged into one blocked item; queue brought up to date  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** *"All codelaw npm packages are published. The PyPI packages will take 2 to 3 days … create just one work item, merge everything into it, and keep it blocked … Everything else related to npm, let's go ahead and build it out, even have the pipelines start working … Whatever Claude Code needs to do, create separate work items for it. Review open work file and get it up to date."*

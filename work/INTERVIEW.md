@@ -24,6 +24,8 @@ entry.**
 
 ## 1 · State of play
 
+**2026-10-25 (Cowork): new feature work filed, not built.** CI-vs-local severity (profiles, agents on `ci`), a per-glob severity `remap`, dated exceptions (`expires`, `warn_days`, `require_expiry`, git-checked `added_by`) and `react/no-context` — W-39, W-40, W-41, rulings in [the compare doc](compare/ci-profiles-and-dated-exceptions.compare.md). Each build writes its record, schema and loader in one change: SR-CONFIG §1 is parsed by `crates/codelaw-config/tests/schema.rs`.
+
 *Updated 2026-10-24 (the parallel session: W-20, W-21, W-24–W-28 merged to `main` `82df231`, unpushed).*
 **Where things stand:** the laws L0–L8 are accepted (L8's budgets still
 `unset`); every record 0101–0115 is accepted. **The engine is complete**

@@ -35,6 +35,12 @@ here. Read that record before changing anything below it.
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
+🟢 **W-39** `agent` Warn on a laptop, fail in CI: auto `ci`/`local` profiles (agents run `ci`), a per-glob severity `remap`, and `js/no-console`. Filed by Arpit (Cowork). [detail](open/W-39-ci-and-local-profiles.md)
+
+🟢 **W-40** `agent` Exceptions with an expiry: opt-in `require_expiry`, a warning `warn_days` before, an error on the day, an optional `reason` and a git-checked `added_by`. Filed by Arpit (Cowork). [detail](open/W-40-dated-exceptions.md)
+
+🟢 **W-41** `agent` `react/no-context`: old context use warns through a baseline, any new `createContext`/`useContext` errors. Filed by Arpit (Cowork). [detail](open/W-41-react-no-context.md)
+
 🟡 **W-34** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; waiting on Fux item 298, then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
 🟡 **W-35** `agent` README leads with "your rules, before, while and after the AI writes"; waiting on W-05 to drop While's "in design" and restore Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
