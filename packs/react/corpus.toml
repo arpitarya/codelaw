@@ -3,7 +3,9 @@
 
 [findings]
 "react/display-name" = 0
+"react/error-boundaries" = 0
 "react/exhaustive-deps" = 0
+"react/globals" = 0
 "react/hook-prefix" = 0
 "react/jsx-key" = 1
 "react/jsx-no-comment-textnodes" = 0
@@ -17,10 +19,18 @@
 "react/no-direct-mutation-state" = 0
 "react/no-find-dom-node" = 0
 "react/no-is-mounted" = 0
+"react/no-nested-components" = 2
+"react/no-ref-in-render" = 4
 "react/no-render-return-value" = 0
+"react/no-set-state-in-effect" = 5
+"react/no-set-state-in-render" = 0
 "react/no-string-refs" = 0
 "react/no-unescaped-entities" = 9
 "react/no-unknown-property" = 0
+"react/no-unnecessary-use-prefix" = 1
+"react/prefer-lazy-state-init" = 0
 "react/props-type-name" = 8
+"react/purity" = 2
 "react/require-render-return" = 0
 "react/rules-of-hooks" = 65
+"react/use-memo" = 0

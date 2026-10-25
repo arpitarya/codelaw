@@ -43,6 +43,7 @@ mod python_pycodestyle;
 mod python_pyflakes;
 mod python_util;
 mod react;
+mod react_hooks;
 mod tanstack_query;
 mod redux_toolkit;
 mod regexp;
@@ -475,6 +476,16 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &python_bugbear::ZipWithoutExplicitStrict,
     &react::ExhaustiveDeps,
     &react::NoContext,
+    &react_hooks::ErrorBoundaries,
+    &react_hooks::Globals,
+    &react_hooks::NoNestedComponents,
+    &react_hooks::NoRefInRender,
+    &react_hooks::NoSetStateInEffect,
+    &react_hooks::NoSetStateInRender,
+    &react_hooks::NoUnnecessaryUsePrefix,
+    &react_hooks::PreferLazyStateInit,
+    &react_hooks::Purity,
+    &react_hooks::UseMemo,
     &react::JsxNoDuplicateProps,
     &react::NoUnknownProperty,
     &conventions::PropsTypeName,
