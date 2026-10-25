@@ -6,7 +6,7 @@ item: W-41
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), sub-agent"
+updated_by: "Claude Code (Opus 5.5), 2026-10-25: closed — merged and verified on main"
 ball: done
 ---
 

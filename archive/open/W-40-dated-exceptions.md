@@ -6,8 +6,8 @@ item: W-40
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), W-40 implementation"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), 2026-10-25: closed — merged, CI perf within budget"
+ball: done
 ---
 
 # W-40 — exceptions with an expiry date, a comment and an author
@@ -91,9 +91,9 @@ console.log(state);
 | 3 · | `added_by` of someone else in a staged change → exit 1; matching → exit 0; under `--changed-since` the blame author is used | ✅ 2026-10-25 — `added_by_is_checked_against_git_and_expires_only_moves_earlier` |
 | 4 · | `until = D-1` and `expires = D` give byte-identical output | ✅ 2026-10-25 — `until_is_read_as_expires_the_day_after` (baseline and inline, four as-of dates) |
 | 5 · | `baseline check --since` fails when `expires` moves later | ✅ 2026-10-25 — `added_by_is_checked_against_git_and_expires_only_moves_earlier` |
-| 6 · | SR-BASELINE's UTC+14 / UTC−12 test still byte-identical; L8 budgets unchanged | ⏳ the UTC test passes unchanged (`the_same_repo_on_two_dates_gives_the_same_output`); L8 not measured here — `codelaw bench --budgets perf/budgets.toml` is ci.yml's `perf` job on ubuntu, and a debug build on a loaded dev Mac is no evidence (LESSONS). The per-file cost is one `contains` on files holding `codelaw-ignore`; `git` runs only for a dated comment or under `--staged`/`--changed-since` with an `added_by` |
+| 6 · | SR-BASELINE's UTC+14 / UTC−12 test still byte-identical; L8 budgets unchanged | ✅ 2026-10-25: CI's `perf` on `ubuntu-24.04` — run 40210463091 (`eda3607`, W-40 merged) and run 40214600609 (`bb589ee`, W-39–W-43 merged): every budgeted operation within budget (`check_warm_10k` p95 217.0 ms of 331, `check_cold_10k` 9750.2 of 13118, `startup` 1.6 of 3.0, `peak_memory_10k` 48.9 MiB of 72) |
 
-**Open after the implementation (2026-10-25):** DoD 6's L8 half waits for ci.yml's `perf` run on the merge; the "never remapped" line (`codelaw/*` diagnostics are never remapped by W-39's `remap`) is checked once W-39 lands, as Blockers says.
+**Closed 2026-10-25 (Claude Code):** both checked — L8 by CI's `perf` (above); never remapped: `Engine::remap` keeps every `codelaw/*` finding unchanged (`crates/codelaw-engine/src/lib.rs`, the `starts_with("codelaw/")` branch), proved for `codelaw/stale-baseline` by W-39's `profiles.rs`. *Was open:* DoD 6's L8 half waits for ci.yml's `perf` run on the merge; the "never remapped" line (`codelaw/*` diagnostics are never remapped by W-39's `remap`) is checked once W-39 lands, as Blockers says.
 
 ## Blockers
 

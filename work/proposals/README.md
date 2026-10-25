@@ -24,3 +24,4 @@ timestamp: <ISO 8601>
 
 | doc | idea | graduation trigger | status |
 |-----|------|--------------------|--------|
+| [type-aware-rules](type-aware-rules.md) | type-aware TS rules and TS errors through a typescript-go helper | the decider reopens it, or TypeScript 7.1 ships its API | proposed |
