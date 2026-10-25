@@ -27,6 +27,12 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-03-rule-packs.md`](open/W-03-rule-packs.md) | 2026-10-25 | the packs in `packs/` and [SR-RULE-PACKS](../records/0101_rule-packs.md); publishing is [W-37](../work/open/W-37-npm-0-2-0-through-the-pipeline.md) and [W-38](../work/open/W-38-pypi-0-2-0-by-hand.md); the *later* presets are B-048 in [`work/BACKLOG.md`](../work/BACKLOG.md) |
+| [`W-04-release-pipeline.md`](open/W-04-release-pipeline.md) | 2026-10-25 | `.github/workflows/`, [`RELEASING.md`](../RELEASING.md) and [SR-PACKAGES](../records/0107_packages.md) decision 11; the first release is W-37 (npm) and W-38 (PyPI) |
+| [`W-29-first-npm-publish.md`](open/W-29-first-npm-publish.md) | 2026-10-25 | [`RELEASING.md`](../RELEASING.md) §One time; npm 0.2.0 and the 8-platform install check are [W-37](../work/open/W-37-npm-0-2-0-through-the-pipeline.md) |
+| [`W-30-first-pypi-publish.md`](open/W-30-first-pypi-publish.md) | 2026-10-25 | [W-38](../work/open/W-38-pypi-0-2-0-by-hand.md), which absorbed all of it |
+| [`W-31-registry-pack-split.md`](open/W-31-registry-pack-split.md) | 2026-10-25 | [SR-LAW-6](../records/0008_LAW-6-python-and-node-packages.md) decision 11 and [SR-RULE-PACKS](../records/0101_rule-packs.md); the 0.2.0 release is [W-37](../work/open/W-37-npm-0-2-0-through-the-pipeline.md) and [W-38](../work/open/W-38-pypi-0-2-0-by-hand.md) |
+| [`W-32-redux-and-query-packs.md`](open/W-32-redux-and-query-packs.md) | 2026-10-25 | `packs/tanstack-query/`, `packs/redux-toolkit/` and [SR-RULE-PACKS](../records/0101_rule-packs.md) decision 4; both on npm at 0.2.0 |
 | [`W-01-rule-pack-records.md`](open/W-01-rule-pack-records.md) | 2026-10-19 | [SR-RULE-PACKS](../records/0101_rule-packs.md) and [SR-LAW-6](../records/0008_LAW-6-python-and-node-packages.md), the records it rewrote |
 | [`W-02-engine-p0.md`](open/W-02-engine-p0.md) | 2026-10-19 | the engine in `crates/`, owned per the register's Ownership table; [SR-ARCHITECTURE](../records/0108_architecture.md) is its design of record; [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) has what landed |
 | [`W-06-consumer-readme.md`](open/W-06-consumer-readme.md) | 2026-10-22 | `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` and `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`; [SR-WORK-REGISTRY](../records/0060_WORK-registry.md) §3 |

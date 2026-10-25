@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "how codelaw is packaged and released"
 owns: []
 laws: [L0, L2, L3, L6]
-timestamp: 2026-10-25T09:00:00Z
+timestamp: 2026-10-25T12:30:00Z
 content_sha: ""
 ---
 
@@ -94,6 +94,8 @@ flowchart LR
    - everything already published in that release is yanked (PyPI) or deprecated (npm);
    - the version is not announced.
 
+   - **npm may go first.** **Ruled by Arpit, 2026-10-25:** *"All codelaw npm packages are published. The PyPI packages will take 2 to 3 days because there is a limit of 4 packages per day to be published by hand … Everything else related to npm, let's go ahead and build it out, even have the pipelines start working and start publishing those packages."* A release may reach npm first, by a run of `publish.yml` by hand on the release's `v*` tag, which publishes npm only; the GitHub Release on **the same tag** later runs both registries and skips every version already published. One tag, one commit, one `dist`, so both registries still carry the same binary (decision 2) — "together" means the same release, not the same hour. A run that fails part-way is withdrawn as above, for what that run published.
+
    The version number lives in one file, and every manifest (the engine's and each pack's, on both registries) is generated from it.
 
 10. **Package names.**
@@ -124,7 +126,7 @@ flowchart LR
 ### Consequences
 
 - **Every release builds a binary for each platform and publishes the engine to both registries, ten packs to npm and six to PyPI.** One failed publish fails the release.
-- **The first npm publish (0.1.0, 2026-10-24, W-29) predates the split:** it carried the five packs, so `@codelaw/rules-python` is unpublished from npm by hand and 0.2.0 is the first release in the per-registry layout ([W-31](../work/open/W-31-registry-pack-split.md)).
+- **The first npm publish (0.1.0, 2026-10-24, W-29) predates the split:** it carried the five packs, so `@codelaw/rules-python` is unpublished from npm by hand and 0.2.0 is the first release in the per-registry layout ([W-31](../archive/open/W-31-registry-pack-split.md)).
 - **`codelaw` installed alone lints nothing:** rules come from packs, and `codelaw init` installs them ([SR-RULE-PACKS](0101_rule-packs.md) decision 6).
 - **The wrappers stay thin:** zero runtime dependencies, which also keeps them trivially within [L2](0004_LAW-2-foss-dependencies.md).
 - **Checked since 2026-10-20 by every `ci.yml` run:** the version check (`scripts/version.py --check`, with the binary on every platform), the dependency check and pack parity (`scripts/package.py check`), and the runtime fence and npm-vs-PyPI byte-equality (`scripts/smoke.sh`). **The install matrix and the runtime fence run on all eight platforms** (`ci.yml`'s `smoke` job, added by W-18 on 2026-10-20 and first proven by its first CI run; the musl two in a clean Alpine container). **Since 2026-10-22 (W-18) they install from a staging index**: `smoke.sh` publishes the built files to a throwaway npm registry and PyPI simple index on localhost and installs `codelaw` from it by name ([SR-PACKAGES](0107_packages.md) decision 11). Proven on darwin-arm64 by hand; the eight platforms are proven by the first CI run that carries it.
@@ -157,6 +159,6 @@ flowchart LR
 
 **Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PACKAGES](0107_packages.md) · [SR-LAW-3](0005_LAW-3-languages.md)
 
-**Work items** — [W-31](../work/open/W-31-registry-pack-split.md) · [W-32](../work/open/W-32-redux-and-query-packs.md)
+**Work items** — [W-31](../archive/open/W-31-registry-pack-split.md) · [W-32](../archive/open/W-32-redux-and-query-packs.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

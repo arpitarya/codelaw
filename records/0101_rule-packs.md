@@ -56,7 +56,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 
 `FIRST_PARTY_PACKS` in `crates/codelaw-rules/src/pack.rs` is this table in code, and `scripts/package.py` reads it, so the engine and the release name the same packs on the same registries.
 
-*Later* marks a preset the ruling names that no pack ships yet: `js/strict` and `py/strict` are planned in [W-03](../work/open/W-03-rule-packs.md) and are not in `packs/` (checked 2026-10-20). Every other preset in the table is in its pack's `codelaw-pack.toml` and `presets/`. Each `<namespace>/project` preset is opt-in and turns on only that pack's `graph/*` rule, the one that reads the whole repository (W-26, 2026-10-24); `init` does not write it.
+*Later* marks a preset the ruling names that no pack ships yet: `js/strict` and `py/strict` are planned as B-048 in [`work/BACKLOG.md`](../work/BACKLOG.md) and are not in `packs/` (checked 2026-10-20). Every other preset in the table is in its pack's `codelaw-pack.toml` and `presets/`. Each `<namespace>/project` preset is opt-in and turns on only that pack's `graph/*` rule, the one that reads the whole repository (W-26, 2026-10-24); `init` does not write it.
 
 **What you install depends on your repo.** A Python-only repo installs `codelaw` and `codelaw-rules-python`, plus `codelaw-rules-data` if it wants `pyproject.toml`, YAML and Markdown checked, all from PyPI, and never touches npm. A React and TypeScript repo installs `codelaw`, `@codelaw/rules-js`, `@codelaw/rules-ts`, `@codelaw/rules-react` and, likely, `@codelaw/rules-data` from npm. **What each registry leaves out:** a repo that installs only from npm gets no Python rules, and one that installs only from PyPI gets no `ts/*`, `node/*`, `stencil/*`, `tanstack-query/*` or `redux-toolkit/*` rules (its TypeScript still gets the `js` rules that declare it, and `js/typescript`).
 
@@ -90,7 +90,7 @@ flowchart LR
 
 The first version of this record (2026-10-18) embedded codelaw's predefined rules in the binary, because the decider had left the choice open. On 2026-10-19 he asked for the presets of ESLint, typescript-eslint, TSLint, Ruff, Prettier, stylelint and the HTML linters to be researched. He also asked for the rules to ship as separate packages, one per ecosystem, with the engine on its own. He then ruled on the shape (§1).
 
-The research ([W-03](../work/open/W-03-rule-packs.md)) found that porting the correctness core of those presets yields several hundred rules. Some of those rules need per-ecosystem data tables (CSS properties, HTML elements, JSON Schemas). Embedding all of that in the binary would make every user carry every ecosystem's rules and data.
+The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the correctness core of those presets yields several hundred rules. Some of those rules need per-ecosystem data tables (CSS properties, HTML elements, JSON Schemas). Embedding all of that in the binary would make every user carry every ecosystem's rules and data.
 
 ### Decision
 
@@ -229,11 +229,11 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 
 - **`codelaw` installed alone lints nothing.** It formats every language and reports `codelaw/no-rules`. `codelaw init` is the documented path, and `codelaw-setup` follows it ([SR-AGENT-SURFACES](0102_agent-surfaces.md)).
 - **Each release publishes twenty-six packages:** on npm, `codelaw`, the eight `@codelaw/cli-*` binary packages and ten packs (nineteen); on PyPI, `codelaw` and six packs (seven). That is 33 files — 19 npm tarballs and 14 wheels — because PyPI's `codelaw` is eight platform wheels. One failed publish fails the release ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
-- **`@codelaw/rules-python@0.1.0` and `@codelaw/rules-js@0.1.0` predate the split** (the first npm publish, 2026-10-24, W-29): `rules-python` is unpublished from npm by hand, and 0.2.0 is the first release in this layout ([W-31](../work/open/W-31-registry-pack-split.md)).
+- **`@codelaw/rules-python@0.1.0` and `@codelaw/rules-js@0.1.0` predate the split** (the first npm publish, 2026-10-24, W-29): `rules-python` is unpublished from npm by hand, and 0.2.0 is the first release in this layout ([W-31](../archive/open/W-31-registry-pack-split.md)).
 - **A repo carries only its ecosystems' rules and data tables.** A Python-only repo stays on PyPI ([L3](0005_LAW-3-languages.md) decision 2).
 - **Rules still update with engine releases** (one version). Engine and rules can't drift, which was the reason for embedding them in the first version: `min_codelaw` and the native-id check keep that guarantee.
 - **The engine work this needs:** the semantic model, `native:` rules and pack loading, in [W-02](../archive/open/W-02-engine-p0.md) ([SR-ARCHITECTURE](0108_architecture.md) decisions 15a–15c).
-- **The packs' content** is [W-03](../work/open/W-03-rule-packs.md).
+- **The packs' content** is [W-03](../archive/open/W-03-rule-packs.md).
 
 ### Alternatives considered
 
@@ -246,7 +246,7 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 
 ### Reference (required)
 
-- [W-03](../work/open/W-03-rule-packs.md): the preset research behind §1's table.
+- [W-03](../archive/open/W-03-rule-packs.md): the preset research behind §1's table.
 - [ESLint recommended](https://cdn.jsdelivr.net/npm/@eslint/js/src/configs/eslint-recommended.js) · [typescript-eslint configs](https://typescript-eslint.io/users/configs/) · [Ruff rules](https://docs.astral.sh/ruff/rules/) · [stylelint-config-recommended](https://cdn.jsdelivr.net/npm/stylelint-config-recommended/index.js) · [html-validate presets](https://html-validate.org/rules/presets.html) · [markdownlint](https://github.com/DavidAnson/markdownlint).
 - [SR-LAW-6](0008_LAW-6-python-and-node-packages.md): the pack package names and the joint release.
 - [`docs/DESIGN.md`](../docs/DESIGN.md) §3.2: the rule-file format.
@@ -269,4 +269,4 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 
 **Records** — [SR-LAW-2](0004_LAW-2-foss-dependencies.md) · [SR-LAW-3](0005_LAW-3-languages.md) · [SR-LAW-4](0006_LAW-4-every-rule-has-a-fix.md) · [SR-LAW-5](0007_LAW-5-no-model-in-the-engine.md) · [SR-LAW-6](0008_LAW-6-python-and-node-packages.md) · [SR-LAW-7](0009_LAW-7-linter-and-formatter.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-ARCHITECTURE](0108_architecture.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md)
 
-**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [W-02](../archive/open/W-02-engine-p0.md) · [W-03](../work/open/W-03-rule-packs.md) · [W-31](../work/open/W-31-registry-pack-split.md) · [W-32](../work/open/W-32-redux-and-query-packs.md)
+**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [W-02](../archive/open/W-02-engine-p0.md) · [W-03](../archive/open/W-03-rule-packs.md) · [W-31](../archive/open/W-31-registry-pack-split.md) · [W-32](../archive/open/W-32-redux-and-query-packs.md)

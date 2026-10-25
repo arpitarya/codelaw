@@ -9,12 +9,12 @@ the docs to:
              pack, its `fix:` class, whether its block is `native:`; every
              preset's `[rules]`; the registries from FIRST_PARTY_PACKS
              (through `scripts/package.py`). They fill README.md's pack and
-             fix-class tables, the counts in its prose, `packaging/README.md`'s
+             fix-class tables, the counts in its prose, USAGE.md's install loops, `packaging/README.md`'s
              registry table and each pack README's preset table.
   commands   the subcommands of `codelaw --help` — from the binary with
              `--codelaw BIN`, otherwise from the `Command` enum in
              `crates/codelaw-cli/src/main.rs` (clap's names). Every one has a
-             row in README.md's command table, and no row names one that is
+             row in USAGE.md's command table, and no row names one that is
              gone. `--write` adds a missing row from the help line.
   checks     with `--codelaw BIN` only: `codelaw test packs/<pack>` for every
              pack, summed into README.md's "N example checks".
@@ -53,6 +53,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")  # work/MACHINE.md: the Windows console
 
 README = ROOT / "README.md"
+USAGE = ROOT / "USAGE.md"
 CHANGELOG = ROOT / "CHANGELOG.md"
 PKG_README = ROOT / "packaging" / "README.md"
 IMPLEMENTATION = ROOT / "work" / "IMPLEMENTATION.md"
@@ -257,9 +258,6 @@ def sync_readme(packs, subcommands, checks):
     doc.anchor(r"all (\w+) rule packs work today", [word(len(packs))])
     doc.anchor(r"(\w+) first-party packs: (\w+) on npm as `@codelaw/rules-<pack>`, (\w+) on PyPI",
                [word(len(packs), True), word(len(npm)), word(len(pypi))])
-    doc.anchor(r'for p in ([a-z -]+); do\n  ln -s "\$OLDPWD/codelaw/packs/\$p" "node_modules/', [" ".join(npm)])
-    doc.anchor(r'for p in ([a-z -]+); do\n  ln -s "\$OLDPWD/codelaw/packs/\$p" "\.codelaw-packs/',
-               [" ".join(p for p in pypi if p not in npm)])
     doc.anchor(r"### Fix classes across all (\d+) rules", [total])
     doc.anchor(r"\| (\w+) rule packs: (\d+) rules \|", [word(len(packs), True), total])
     if checks is not None:
@@ -277,19 +275,6 @@ def sync_readme(packs, subcommands, checks):
     sync_table(doc, "fix-classes", list(FIX_CLASSES), {c: {1: str(counts[c])} for c in FIX_CLASSES},
                lambda c: ["`{}`".format(c), str(counts[c]), "—"])
 
-    # commands: every subcommand has a row; no row names one that is gone
-    rows, span = doc.table("commands")
-    if rows is not None:
-        documented = set()
-        for r in rows[2:]:
-            documented.update(re.findall(r"`codelaw ([a-z][a-z0-9-]*)", r[0]))
-        names = [n for n, _ in subcommands]
-        for gone in sorted(documented - set(names)):
-            doc.problem("the command table names `codelaw {}`, which `codelaw --help` does not list".format(gone))
-        missing = [(n, h) for n, h in subcommands if n not in documented]
-        if missing:
-            doc.put_table(span, rows + [["`codelaw {}`".format(n), h] for n, h in missing])
-
     # roadmap: no row "designed" for a record built
     built = register_built()
     rows, _ = doc.table("roadmap")
@@ -305,6 +290,30 @@ def sync_readme(packs, subcommands, checks):
                 doc.problem("roadmap row {!r} names {}, which the register does not list".format(r[1], n))
             elif built[n] == "yes" and ("🔜" in r[0] or "designed" in r[3].lower()):
                 doc.problem("roadmap row {!r} says it is not built, but the register marks {} `built: yes`".format(r[1], n))
+    return doc
+
+
+def sync_usage(subcommands):
+    """USAGE.md: the from-source install loops and the command table (moved from README.md)."""
+    doc = Doc(USAGE)
+    npm, pypi = package.NPM_PACKS, package.PYPI_PACKS
+    doc.anchor(r'for p in ([a-z -]+); do\n  ln -s "\$OLDPWD/codelaw/packs/\$p" "node_modules/', [" ".join(npm)])
+    doc.anchor(r'for p in ([a-z -]+); do\n  ln -s "\$OLDPWD/codelaw/packs/\$p" "\.codelaw-packs/',
+               [" ".join(p for p in pypi if p not in npm)])
+
+    # commands: every subcommand has a row; no row names one that is gone
+    rows, span = doc.table("commands")
+    if rows is not None:
+        documented = set()
+        for r in rows[2:]:
+            documented.update(re.findall(r"`codelaw ([a-z][a-z0-9-]*)", r[0]))
+        names = [n for n, _ in subcommands]
+        for gone in sorted(documented - set(names)):
+            doc.problem("the command table names `codelaw {}`, which `codelaw --help` does not list".format(gone))
+        missing = [(n, h) for n, h in subcommands if n not in documented]
+        if missing:
+            doc.put_table(span, rows + [["`codelaw {}`".format(n), h] for n, h in missing])
+
     return doc
 
 
@@ -384,7 +393,7 @@ def main():
     else:
         subcommands, checks = subcommands_from_source(), None
 
-    docs = [sync_readme(packs, subcommands, checks), sync_packaging_readme(), check_changelog()]
+    docs = [sync_readme(packs, subcommands, checks), sync_usage(subcommands), sync_packaging_readme(), check_changelog()]
     docs += sync_pack_readmes(packs)
     failed = False
     for doc in docs:

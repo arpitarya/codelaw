@@ -1,6 +1,6 @@
 {
  "decision": "PROCEED",
- "reason": "W-03/W-04: the go to publish was given — Arpit published 0.1.0 on npm, 2026-10-24 (W-29); the remaining registry steps 4 and 5 are the inbox's first row",
+ "reason": "the go to publish was given — npm 0.1.0 by hand 2026-10-24; npm 0.2.0 from CI is W-37 (agent, now), PyPI 0.2.0 by hand is W-38, the inbox's one row",
  "questions": [],
  "safe_alternative": "",
  "surfaced": true,

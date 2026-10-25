@@ -84,6 +84,8 @@ checkout.
 
 ## 2 · In flight, and the immediate next step
 
+**Release state, 2026-10-25 (Cowork):** all 19 npm names exist and trust `publish.yml`, but the engine and eight packs are still 0.1.0 there. **W-37 (Claude Code, now):** commit the npm-only `publish.yml` run (L6 decision 9 amended on Arpit's ruling), Arpit pushes, tag `v0.2.0`, run it, check the 19 names. **W-38 (🔴 Arpit, 2–3 days):** the four remaining PyPI packs by hand (four new projects a day), six trusted publishers, then `gh release create v0.2.0` on the same tag brings `codelaw` to PyPI. W-03, W-04, W-29–W-32 are closed and archived into those two; the *later* presets are B-048.
+
 **Next:** the decider pushes `main` — CI's first run proves W-24 (green),
 W-27 (the `msrv` job, the win32 smoke) and gates L8's budgets. **Next for an
 agent:** W-32's two packs (steps 2–4), W-19's `perf` pin and the three repos in `bench`; W-20's snapshots, W-25 and W-26 are done (2026-10-24). W-05 is Cowork research only (rule 37a). **Run one cargo build
@@ -106,6 +108,8 @@ proposals (`check_cold_10k` 8701 ms, `format_warm_10k` 1353 ms, `mcp_rules_for_p
 **Docket 2026-10-25:** `main` pushed; L8's budgets ruled by method (min(target, 1.5 × worst CI p95), a capped one back to the decider; W-19 applies it with `gh` on the Mac); PyPI step 4 — Arpit logs in, Claude adds the seven; 0.2.0 bumped in the tree (uncommitted), command list in W-31; W-29's 8-platform check moved to 0.2.0; W-33 filed (two Stencil rules).
 
 **2026-10-25 (Cowork, W-05):** the Fux layer is ruled — each pack's Fux index is its own optional package, built in codelaw's CI, on npm and PyPI (W-34, waiting on Fux item 298's spike and design; then L6's amendment). W-35 puts "before, while and after the AI writes" on the README, the while beat labelled until W-05's `hook --pre` ships. W-05's next step is its step 1 payload capture (Codex, Copilot CLI, Kiro).
+
+**2026-10-25 (Cowork, README):** the README is the pitch (story, four moments, the ESLint/Prettier/Biome comparison) and `USAGE.md` the how-to; `docs-sync.py` checks both. W-36 (research) checks the claims against the incumbents and finds the adoption gaps.
 
 **Open questions for the decider, carried from earlier sessions:** W-11's two default
 gaps (self-aliased private packages; CSS only for linked stylesheets); W-13's

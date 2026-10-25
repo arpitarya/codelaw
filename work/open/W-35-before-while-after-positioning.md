@@ -6,7 +6,7 @@ item: W-35
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), 2026-10-25: step 2 landed"
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
@@ -18,6 +18,7 @@ ball: agent
 |---|---|---|---|
 | 1 | Agree the line and the three beats | the story | ✅ 2026-10-25, below |
 | 2 | Put it at the top of the README: before and after as they are today, while marked "in design" with a link | the pitch on the front page, true on the day it lands | ✅ 2026-10-25: README's top section. **Arpit, 2026-10-25:** *"Say what ships"* — Before reads "gets the rules for it" until `brief_for_task` (W-05) narrows them; the "handful, not a wall" line returns with it |
+| 2a | Rewrite the README around a story people recognise, the four moments (before, while, after, without AI) and an ESLint / Prettier / Biome comparison; move the how-to into `USAGE.md` | a front page that sells, and a usage guide | ✅ 2026-10-25 (Cowork). **Arpit, 2026-10-25:** *"edit README file so that it tells all these things, and a story which people can relate to … create a separate file just for usage purposes"* |
 | 3 | When the while-writing check ships, drop the "in design" label; when `brief_for_task` ships, restore Before's "the handful of rules that matter" | the full story | ⏳ waits on W-05 |
 
 **Arpit, 2026-10-25 (voice):** *"I want it as a marketing thing where codelaw can

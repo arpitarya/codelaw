@@ -2,7 +2,9 @@
 
 <div align="center">
 
-**One linter for your whole repo. Rules are Markdown files that your team, your CI and your AI agents can all read.**
+**The linter and formatter for code written by people — and by AI.**
+
+**Your rules, before, while and after the AI writes. The same rules with no AI at all.**
 
 JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML · Markdown · CSS · HTML
 
@@ -14,51 +16,85 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 ![engine: Rust](https://img.shields.io/badge/engine-Rust-b7410e)
 ![no AI in the engine](https://img.shields.io/badge/AI%20in%20the%20engine-none-success)
 
-[Quickstart](#quickstart) · [Rule packs](#rule-packs) · [Write a rule](#write-your-own-rule-in-one-markdown-file) · [AI agents](#use-it-with-ai-coding-agents) · [Roadmap](#roadmap) · [FAQ](#faq)
+[The story](#the-story) · [Four moments](#one-set-of-rules-four-moments) · [vs ESLint, Prettier, Biome](#if-you-know-eslint-and-prettier--or-biome--you-know-codelaw) · [See it](#see-it) · [Rule packs](#rule-packs) · [Get started](#get-started) · [**Usage guide**](USAGE.md) · [Roadmap](#roadmap) · [FAQ](#faq)
 
 </div>
 
 ---
 
-## Before, while and after the AI writes
+## The story
 
-**codelaw: your rules, before, while and after the AI writes.**
+**It's Tuesday morning. An AI agent opened a pull request overnight.** It compiles, the tests pass, and it breaks four of your team's rules.
 
-| | what the agent gets | where it stands |
+- **It used `var` and `== None`.** Your linters flagged both in CI, twenty minutes later, and the agent went round again.
+- **It put an `export` in the middle of a file.** That is your team's convention. No linter knows it, so you write the same review comment for the fortieth time.
+- **It left a bare `except:` in the Python service.** That half of the repo has its own linter, its own config and its own CI step.
+- **Your `CLAUDE.md` said all of this.** The agent read it. Reading is not following.
+
+Your rules live in five tools, five config files and one wiki page — and only some of those places can say no.
+
+**codelaw puts every rule in one Markdown file that people, CI and AI agents all read, and one engine that enforces it.** The agent gets the rules before it writes, is checked while it writes, and is fixed after. Your editor, your pre-commit hook and your CI run the very same check — with no AI anywhere in it.
+
+---
+
+## One set of rules, four moments
+
+| moment | what happens | where it stands |
 |---|---|---|
-| **Before** | it asks what applies to this file and gets the rules for it | ✅ today: the MCP tool `rules_for_path` (or `codelaw rules --for <path>`), and the skills `codelaw init --agents` installs. Narrowing that list to the few rules a task needs (`brief_for_task`) is in design, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
-| **While** | every edit is checked before it reaches disk; a bad line is refused with the reason and the fix | 🧪 **in design**: `codelaw hook --pre`, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
-| **After** | anything that slips through is fixed on save, in the hook and in CI | ✅ today: `codelaw hook`, `codelaw check`, `codelaw fix`, and fix-on-save in the editor extension |
+| **Before** the AI writes | it asks what applies to this file and gets the rules for it | ✅ today: the MCP tool `rules_for_path` (or `codelaw rules --for <path>`), and the skills `codelaw init --agents` installs. Narrowing that list to the few rules a task needs (`brief_for_task`) is in design, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
+| **While** the AI writes | every edit is checked before it reaches disk; a bad line is refused with the reason and the fix | 🧪 **in design**: `codelaw hook --pre`, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
+| **After** the AI writes | anything that slips through is fixed on save, in the hook and in CI | ✅ today: `codelaw hook`, `codelaw check`, `codelaw fix`, and fix-on-save in the editor extension |
+| **Without AI** | a person, an editor, a pre-commit hook or a CI job runs `check`, `fix` and `format` — the way you run ESLint and Prettier, or Biome | ✅ today: the CLI, `codelaw lsp`, `--format sarif` for code scanning |
 
 *no AI inside codelaw — the same verdict on every machine, with or without an agent* ([SR-LAW-5](records/0007_LAW-5-no-model-in-the-engine.md)).
+
+```mermaid
+flowchart LR
+    R["your rules<br/>one Markdown file each"] --> E["codelaw engine<br/>one binary · no AI"]
+    E --> A["AI agents<br/>MCP · hooks"]
+    E --> D["editors<br/>codelaw lsp"]
+    E --> P["people · pre-commit<br/>codelaw check / fix / format"]
+    E --> C["CI<br/>exit code · SARIF"]
+```
+
+<details>
+<summary><b>ASCII version</b></summary>
+
+```text
+   your rules (one .md each) --> codelaw engine (one binary, no AI) --+--> AI agents   (MCP, hooks)
+                                                                       +--> editors     (codelaw lsp)
+                                                                       +--> people, pre-commit (check / fix / format)
+                                                                       +--> CI          (exit code, SARIF)
+```
+
+</details>
+
+Every door gets the same answer, because they all call the same engine.
 
 ---
 
 > [!IMPORTANT]
 > **codelaw is a preview.** 0.1.0 is on npm, with the rules in the five packs of that release; the pack layout below, and PyPI, come with 0.2.0. The linter, the fixer, the formatter, the MCP server, the language server and all eleven rule packs work today if you build from source. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
 
-## In plain words
-
-- Every project has rules: "don't use `var`", "no bare `except:`", "exports go at the bottom".
-- Today those rules live in five tools with five config files, and only humans read the docs.
-- **codelaw puts every rule in one small Markdown file.** The file says what the rule wants, shows good and bad code, and tells the tool how to fix it.
-- One command checks your whole repo, fixes what it safely can, and tells you exactly what to do about the rest.
-- A person, a CI job and an AI coding assistant get **the same answer**, because no AI runs inside codelaw.
-
 ---
 
-## Why codelaw
+## If you know ESLint and Prettier — or Biome — you know codelaw
 
-| | |
-|---|---|
-| 🧰 **One tool, nine languages** | JS, TS, Python, JSON, YAML, TOML, Markdown, CSS and HTML, from one binary in one run. A Python-only repo doesn't need Node, and a JS-only repo doesn't need Python. |
-| 📝 **A rule is a Markdown file** | Front matter for metadata, one fenced block for the matcher and fix, and `Do` / `Don't` examples. People read it, agents read it, and the engine runs it. |
-| 🧪 **The docs are the tests** | `codelaw test` runs every rule against its own examples, so a rule's docs can't drift from what it does. |
-| 🔧 **Every finding comes with a fix** | `auto` fixes apply themselves, `suggest` fixes come as a reviewable diff, and `manual` findings list the exact steps. No rule just says "this is wrong". |
-| 🧱 **Fixes can restructure code** | Fix primitives move and regroup code, for example gathering every `export` into one block at the end of the file. A plain node-for-node replace can't do that. |
-| 🔁 **Deterministic** | Same files and config in, same output out, with or without an AI agent. Every fix is re-parsed and checked before it's written, and a fix that would break the file is rolled back. |
-| 🤖 **Built for AI coding agents** | `--format agent` gives one line per finding with its fix, ready to feed back to an agent after every edit. |
-| 📦 **Standard rules included** | 440 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
+**The moves are the ones you already make:** a config file at the root, `check` to report, `fix` to repair, `format` to lay out, fix-on-save in the editor, a non-zero exit in CI. Like Biome, it is one Rust binary that is both the linter and the formatter.
+
+**What changes is where the rules live and who can use them:**
+
+| | the usual stack | codelaw |
+|---|---|---|
+| **Tools** | ESLint, Prettier, Ruff, stylelint, markdownlint, … | one binary |
+| **Config** | one file per tool | one `codelaw.toml` (or `[tool.codelaw]` in `pyproject.toml`, `"codelaw"` in `package.json`) |
+| **Languages in one run** | one family per tool | nine: JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, HTML |
+| **Your team's own rule** | code against a plugin API, where the tool has one | one Markdown file in `.codelaw/rules/`: pattern, message, fix, examples |
+| **What a finding gives you** | a message, sometimes a fix | always a way out: an automatic fix, a diff to review, or numbered steps |
+| **A rule's documentation** | kept apart from the code that runs it | the rule file itself, tested against its own examples |
+| **AI agents** | read your instructions file | ask codelaw for the rules, and are checked after every edit |
+
+You keep the rules you know: **440 rules are reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint**, and none of those tools needs to be installed.
 
 ---
 
@@ -139,51 +175,20 @@ def greet(names=None):
 
 ---
 
-## Quickstart
+## Why teams pick codelaw
 
-### Today: build from source
+| | |
+|---|---|
+| 🧰 **One tool, nine languages** | JS, TS, Python, JSON, YAML, TOML, Markdown, CSS and HTML, from one binary in one run. A Python-only repo doesn't need Node, and a JS-only repo doesn't need Python. |
+| 📝 **A rule is a Markdown file** | Front matter for metadata, one fenced block for the matcher and fix, and `Do` / `Don't` examples. People read it, agents read it, and the engine runs it. |
+| 🧪 **The docs are the tests** | `codelaw test` runs every rule against its own examples, so a rule's docs can't drift from what it does. |
+| 🔧 **Every finding comes with a fix** | `auto` fixes apply themselves, `suggest` fixes come as a reviewable diff, and `manual` findings list the exact steps. No rule just says "this is wrong". |
+| 🧱 **Fixes can restructure code** | Fix primitives move and regroup code, for example gathering every `export` into one block at the end of the file. A plain node-for-node replace can't do that. |
+| 🔁 **Deterministic** | Same files and config in, same output out, with or without an AI agent. Every fix is re-parsed and checked before it's written, and a fix that would break the file is rolled back. |
+| 🤖 **Built for AI coding agents** | `--format agent` gives one line per finding with its fix, ready to feed back to an agent after every edit. |
+| 📦 **Standard rules included** | 440 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
 
-You need a Rust toolchain (1.97 or newer).
-
-```bash
-# 1. Build and install the codelaw binary
-git clone https://github.com/arpitarya/codelaw.git
-cargo install --path codelaw/crates/codelaw-cli
-
-# 2. In your project: write codelaw.toml, .codelaw/rules/ and the .gitignore line
-cd your-project
-codelaw init --no-install
-
-# 3. Until the packs are published, link them from the clone:
-#    the npm packs into node_modules/, the PyPI-only ones where a Python install would put them
-mkdir -p node_modules/@codelaw .codelaw-packs
-for p in js ts react node stencil html css data tanstack-query redux-toolkit; do
-  ln -s "$OLDPWD/codelaw/packs/$p" "node_modules/@codelaw/rules-$p"
-done
-for p in python; do
-  ln -s "$OLDPWD/codelaw/packs/$p" ".codelaw-packs/codelaw_rules_$p"
-done
-export CODELAW_SITE_PACKAGES="$PWD/.codelaw-packs"
-
-# 4. Opt in to the preview rules, then run
-echo 'preview = true' >> codelaw.toml
-codelaw check
-```
-
-- **`init` detects your languages** and writes the matching `recommended` presets into `codelaw.toml`.
-- **Every rule is `preview` in 0.1.0**, so `preview = true` is needed until rules are promoted to stable.
-- **Step 3 is temporary.** codelaw only reads the linked folders, so it works in any repo, Python-only included, and neither Node nor Python is run. `CODELAW_SITE_PACKAGES` is where codelaw looks for the PyPI packs, as an activated `.venv` would tell it. Add `node_modules/` and `.codelaw-packs/` to `.gitignore`.
-
-### After the first release
-
-Planned for the first release, and not published yet:
-
-```bash
-npx codelaw init      # Node projects: installs @codelaw/rules-* as dev dependencies
-uvx codelaw init      # Python projects: installs codelaw-rules-* with your package manager
-```
-
-The npm and PyPI packages will be the same engine and give byte-identical output.
+**For the person who owns the codebase:** the review comment you keep writing becomes a rule file, once. From then on a person, a CI job and every AI agent get the same answer — and the answer can be audited, because it is a file in your repo and not a model's opinion.
 
 ---
 
@@ -231,13 +236,9 @@ Eleven first-party packs: ten on npm as `@codelaw/rules-<pack>`, six on PyPI as 
 
 ---
 
-## Write your own rule in one Markdown file
+## A rule is one Markdown file
 
-```bash
-codelaw new-rule acme/no-console-log --lang typescript,tsx
-```
-
-Fill in the file it writes, `.codelaw/rules/acme/no-console-log.md`:
+Your convention, written once — people read it, agents read it, the engine runs it:
 
 ````markdown
 ---
@@ -286,133 +287,30 @@ $ codelaw test acme/no-console-log
 1 rules · 12 checks · 0 failed
 ```
 
-- **Local rules are picked up automatically** from `.codelaw/rules/<namespace>/<name>.md`, with no plugin build or publish step.
-- **`codelaw test` checks more than the examples:** every `Don't` must fire and fix to its `Do`, every `Do` must pass, and every fix must be a fixpoint.
-- **`codelaw tree`** shows the syntax tree the matcher sees: `codelaw tree -e 'console.log(1)' --lang typescript`.
-- **`codelaw rules lint`** checks rule files against the template.
-- **Matchers use ast-grep's pattern syntax** (`pattern`, `kind`, `has`, `inside`, `not`, `any`, …), plus codelaw's fix primitives for moving code: `strip-export-keyword`, `collect-into-block` and others. The full format is [SR-RULE-FORMAT](records/0112_rule-format.md).
+- **No plugin to build or publish:** a file in `.codelaw/rules/<namespace>/` is picked up on the next run.
+- **The examples are the tests:** every `Don't` must fire and fix to its `Do`.
+- **The full workflow** — `new-rule`, `test`, `tree`, `rules lint` — is in the [usage guide](USAGE.md#write-your-own-rules).
 
 ---
 
-## Configure
+## Get started
 
-`codelaw.toml` at the repo root. The same keys also work as `[tool.codelaw]` in `pyproject.toml` or `"codelaw"` in `package.json`.
+**Three steps: install, `codelaw init`, `codelaw check`.**
 
-```toml
-extends = [
-  "codelaw:js/recommended",
-  "codelaw:js/typescript",      # the core rules typescript-eslint switches on
-  "codelaw:ts/recommended",     # @codelaw/rules-ts, on npm
-  "codelaw:py/recommended",     # codelaw-rules-python, on PyPI
-  "codelaw:js/conventions",     # opt-in house style
-]
-preview = true                  # every rule is preview in 0.1.0
+- **Install.** Until 0.2.0 is on both registries, the full rule set is built from source; the [usage guide](USAGE.md#install) has the exact commands.
+- **`codelaw init`** detects your languages and writes `codelaw.toml` with the matching presets.
+- **`codelaw check`** reports every finding with its fix; **`codelaw fix`** applies the safe ones and formats.
+- **With an AI agent:** `codelaw init --agents claude,codex,copilot,kiro,cowork` installs the hooks and instruction files ([usage guide](USAGE.md#with-ai-agents)).
 
-[rules]
-"js/use-isnan" = "warn"         # change a severity, or "off"
-
-[[overrides]]
-files = ["src/legacy/**"]
-rules = { "ts/no-unused-vars" = "off" }
-```
-
-- **Validation is strict.** An unknown key stops the run and names the valid ones (`unknown key 'disable'; valid keys are 'files', 'exclude', 'rules'`).
-- **Monorepos:** a nested `codelaw.toml` inherits from the root and overrides it.
-- **Team packs:** `extends` also takes `npm:<package>`, `pypi:<distribution>` and `path:<folder>`.
-- **Full reference:** [SR-CONFIG](records/0110_config.md).
-
----
-
-## Use it with AI coding agents
-
-codelaw is built around one idea: **asking the agent to follow your rules is a hope, but checking its work after every edit is a guarantee.**
-
-```mermaid
-flowchart LR
-    A["agent edits a file"] --> H["hook runs<br/>codelaw fix --format agent"]
-    H -->|"clean, or auto-fixed"| D["done"]
-    H -->|"findings left"| F["one line per finding,<br/>with its fix, sent back"]
-    F --> A
-```
-
-<details>
-<summary><b>ASCII version</b></summary>
-
-```text
-   agent edits a file --> hook: codelaw fix --format agent --> clean / auto-fixed --> done
-                                       |
-                                       +--> findings left --> one line each, with its fix --> back to the agent
-```
-
-</details>
-
-**Works today with Claude Code.** Add this to `.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.file_path' | xargs codelaw fix --format agent 1>&2 || exit 2"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-- **`auto` fixes are applied silently**, so the file on disk is already correct.
-- **What's left goes back to the agent** (exit code 2), one line per finding with its fix:
-
-  ```text
-  src/math.ts:8:5 js/use-isnan Nothing equals NaN, not even NaN; use Number.isNaN(x) — fix: manual — Replace x === NaN or x == NaN with Number.isNaN(x). …
-  ```
-
-- **The same command works in any agent with post-edit hooks** (Codex, Copilot, Kiro), and in pre-commit and CI.
-- **`codelaw mcp`** lets an agent ask `rules_for_path` *before* writing, and `format_snippet` for the exact bytes `fix` would write.
-- **`codelaw hook`** is that recipe built in: it reads the agent's hook payload on stdin, fixes, and returns what is left. `codelaw init --agents claude,codex,copilot,kiro,cowork` installs the hooks and writes each agent's instruction files from the rules; `codelaw sync-agents` rewrites them when the rules change, and `--check` reports drift ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
-
----
-
-## Commands
-
-<!-- docs-sync:commands -->
-
-| command | what it does |
-|---|---|
-| `codelaw check [paths]` | Report every finding with its fix. `--format text\|json\|sarif\|agent`, `--max-warnings N`, `--lang`, `--rule`, `--timings`; `--no-adapters` skips the installed oxlint, Ruff, stylelint and html-validate |
-| `codelaw fix [paths]` | Apply `auto` fixes, format, then report what's left. `--unsafe` adds `suggest` fixes; `--dry-run` writes nothing; `--trace` shows each pass |
-| `codelaw format [paths]` | Format every file: Prettier-style JS/TS/JSON/CSS/HTML/YAML/Markdown, Black-style Python, taplo-style TOML. `--check` and `--diff` change nothing |
-| `codelaw mcp` · `codelaw lsp` | The MCP server for agents and the language server for editors, from the same binary |
-| `codelaw init` | Detect languages and write `codelaw.toml`, `.codelaw/rules/` and the `.gitignore` line. `--no-install` prints the pack install commands instead of running them; `--registry npm\|pypi`; `--agents` writes the agent hooks and files |
-| `codelaw config` | `--print` every resolved value and where it came from; `--schema` prints the config's JSON Schema; `--for <file>` resolves for one file |
-| `codelaw rules` | List active rules. `--for <file>` shows the ones that apply to that file. `rules lint` checks rule files |
-| `codelaw explain <id>` | What a rule requires, why, and how to fix it |
-| `codelaw test [rule\|folder] [--corpus <dir>]` | Run rules against their own examples; `--corpus` also runs them over real code |
-| `codelaw new-rule <ns/name>` | Write a rule file from the template |
-| `codelaw tree <file>` | Show the syntax tree the engine sees |
-| `codelaw match <id> <file>` | Which clause of a rule matched or failed, and what it captured. `--explain` shows every candidate node |
-| `codelaw graph refs\|why-unused <symbol>` | Query the project graph: every use of a symbol, or why `graph/no-unused-exports` held |
-| `codelaw baseline add\|prune\|check` | Grandfather a rule's existing findings with a deadline, lower the counts, or fail when the baseline got looser ([SR-BASELINE](records/0104_baseline-and-deprecations.md)) |
-| `codelaw deprecate <symbol>` | Deprecate a symbol: write the registry entry and baseline every current use, for `graph/no-deprecated-usage` |
-| `codelaw hook [paths]` | Check and fix the files an agent just edited; what is left goes back to it |
-| `codelaw sync-agents` | Write every agent's instruction files from the rules and skills; `--check` reports drift |
-| `codelaw daemon start\|stop\|status` | An opt-in warm process that `--prefer-warm` runs use; the output is the same |
-| `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
-| `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set ([L8](records/0010_LAW-8-performance-budgets.md)) |
-
-<!-- /docs-sync:commands -->
-
-**Exit codes:** `0` clean · `1` findings remain · `2` config or rule error.
+**→ [The usage guide](USAGE.md)**: install, configure, write rules, wire up agents, editors, pre-commit and CI, and every command.
 
 ---
 
 ## Is codelaw for you?
+
+**Built for codebases where people and AI write side by side:** years of human code, and an agent adding to it, held to the same rules.
+
+**The more of your code an agent writes, the more you need rules it can't skip.** Good docs and search help an agent get it right the first time; a check is what proves it did.
 
 **Choose codelaw when:**
 
@@ -456,6 +354,12 @@ The design for each item is a record in [`records/`](records/README.md); the ope
 ---
 
 ## FAQ
+
+**How is codelaw different from ESLint and Prettier, or Biome?**
+It does the same jobs — lint, fix, format — for nine languages from one binary and one config. The difference is the rule: a Markdown file your team writes without a plugin, that always carries a fix, and that an AI agent can ask for before it writes.
+
+**Does it work without AI?**
+Yes, completely. The CLI, the editor extension, pre-commit and CI need no agent at all. Agents are one more caller of the same engine.
 
 **Does codelaw use AI?**
 No. The engine has no model and makes no network calls. Agents are one more caller of the same deterministic engine ([L5](records/0007_LAW-5-no-model-in-the-engine.md)).

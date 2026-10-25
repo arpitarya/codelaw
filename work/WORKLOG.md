@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — npm 0.2.0 from CI made possible; PyPI merged into one blocked item; queue brought up to date  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"All codelaw npm packages are published. The PyPI packages will take 2 to 3 days … create just one work item, merge everything into it, and keep it blocked … Everything else related to npm, let's go ahead and build it out, even have the pipelines start working … Whatever Claude Code needs to do, create separate work items for it. Review open work file and get it up to date."*
+- **Done:** checked npm: 19 names exist, but `codelaw`, the `cli-*` and eight packs are at 0.1.0; only `rules-tanstack-query` and `rules-redux-toolkit` are at 0.2.0. `publish.yml` gains `workflow_dispatch` (npm only, `v*` tag only; `pypi` and `attach` run only for a Release) — YAML parsed, not run. L6 decision 9 and SR-PACKAGES decision 11 amended on the ruling; `RELEASING.md` gains the npm-first commands. Filed **W-37** (Claude Code: commit, tag, run, check) and **W-38** (🔴 PyPI by hand, absorbing W-30, W-31 step 7, W-04 step 5, W-03 step 6 and the inbox row). Closed and archived W-03, W-04, W-29, W-30, W-31, W-32 with IMPLEMENTATION rows and archive map rows; links repointed; W-03's *later* presets became B-048. Long rows for W-05 and W-35 trimmed. Nothing committed.
+- **Decided / left open:** the tag must be a commit carrying the new `publish.yml` (a run by hand reads the workflow from the tag), so not `f33b772`; W-38's Release reuses that tag so PyPI gets npm's binary.
+- **Mistakes:** none.
+- **Next:** W-37 in Claude Code — `actionlint`, commit with explicit paths; then Arpit pushes.
+
+## 2026-10-25 — README: who codelaw is built for; W-36 step 3a  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** by voice, whether the README should say codelaw is for mixed human/AI codebases and not needed for 100% AI code; then *"Let's go ahead and add those lines."*
+- **Done:** two lines open README's "Is codelaw for you?": built for people and AI side by side; the more an agent writes, the more you need rules it can't skip. W-36 gains step 3a, measuring violations with and without Fux. Nothing committed.
+- **Decided / left open:** the "not needed for 100% AI" half was dropped after the counter-argument (guidance is probabilistic, enforcement deterministic); step 3a's data can reverse it.
+- **Mistakes:** none.
+- **Next:** W-36 step 1.
+
 ## 2026-10-25 — W-19, W-35 (step 2) landed; 0.2.0 pushed and its dist verified; PyPI held by 429  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement all the green items and then implement the yellow items as and when they get unblocked … close them out … in parallel."*
@@ -31,6 +47,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Decided / left open:** Arpit's hand: `npm login` + the two new npm names + `npm-trust.sh`; six PyPI trusted publishers (pypi.org UI); `gh release create v0.2.0`. W-34 waits on Fux item 298; W-05 and W-36 are research.
 - **Mistakes:** a `git add -A` swept a concurrent session's uncommitted USAGE.md, W-36 and docs-sync changes into my commit; caught before push, reset, and recommitted with only my hunks (CLAUDE.md's "re-derive `git status` right before staging" — I had, one command earlier, and the other session wrote in between).
 - **Next:** the four PyPI uploads land; Arpit's steps above; then the release, W-29's 8-platform install check, and W-04/W-03/W-30/W-31/W-32 close.
+
+## 2026-10-25 — README rewritten around the story and four moments; USAGE.md; W-36 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"I want codelaw to be a linter, prettier for AI — before, while, after, and even without AI … like ESLint, Biome … a work item which can research all these things … edit README … a story which people can relate to … a separate file just for usage."*
+- **Done:** README rewritten: a two-line pitch, the story (an overnight agent PR breaking four rules), the four moments table (W-35's ruled wording kept; Without AI added), a diagram, an ESLint/Prettier/Biome comparison, "for the person who owns the codebase", two new FAQ answers. Install, config, rule workflow, agents (before/while/after), editor/pre-commit/CI and the command table moved to new `USAGE.md`. `docs-sync.py` now checks `USAGE.md`'s install loops and command table (`sync_usage`); a planted bad row fails it. W-36 filed (research). W-35 step 2a, IMPLEMENTATION, CHANGELOG Unreleased, registry rows. Nothing committed.
+- **Decided / left open:** the comparison table states structure only (tools, configs, where rules live), no claims about competitors' AI features — that is W-36's sourced step 1. Version wording left at 0.1.0 on npm: `npm view @codelaw/rules-js` still says 0.1.0.
+- **Mistakes:** none.
+- **Next:** Arpit reads the README on GitHub's renderer; W-36 step 1 in Cowork.
 
 ## 2026-10-25 — W-05 researched; W-34 and W-35 filed, Fux item 298 filed in Fux  ·  Claude, cloud linked to the Mac (Opus 5.5)
 

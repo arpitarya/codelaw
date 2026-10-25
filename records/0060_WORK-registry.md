@@ -95,12 +95,12 @@ into a scan anyone can do at task end.
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-25 | 2026-10-25 — the L6 line and the `packs/` layout line: eleven packs, ten on npm and six on PyPI (W-32, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-19 closed (`fix_one_file` unset, ruled); the inbox's budget row gone |
-| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-24 | 2026-10-24 — B-046 (the tree-sitter-css upstream PR), B-047 (the CSS-tree port) |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-37, W-38 filed; W-03, W-04, W-29–W-32 closed into them |
+| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-25 | 2026-10-25 — B-048, the later presets from W-03 |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §2: the Fux layer ruled (W-34, W-35) |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-25 | 2026-10-25 — W-24 closed (CI run 40185344678); 0.2.0 commit; the first PyPI pack uploads |
-| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-25 | 2026-10-25 — W-05 research, W-34/W-35 filed |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §2: release state (W-37, W-38); README/USAGE; the Fux layer |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-25 | 2026-10-25 — W-35 step 2a: the README rewrite and `USAGE.md` |
+| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-25 | 2026-10-25 — release split into W-37/W-38; the README rewrite; W-05 research |
 | `work/NOW.md` | kept by hooks: a row per live session; empty when nothing runs | 2026-10-24 | 2026-10-24 — after W-31: unpublish `@codelaw/rules-python`, push, 0.2.0 |
 | `work/LESSONS.md` | a failure teaches something durable | 2026-10-24 | 2026-10-24 — the cfg-split lesson and the two-sessions-one-checkout lesson |
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
@@ -109,10 +109,11 @@ into a scan anyone can do at task end.
 | `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-25 | 2026-10-25 — first-party pack: eleven packs (W-32) |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-25 | 2026-10-25 — the L6 and SR-RULE-PACKS rows: eleven packs (W-32) |
 | `records/README.md` | a record's state, ownership or number changes | 2026-10-25 | 2026-10-25 — the L6 and SR-PACKAGES rows and the `packs` row: eleven packs (W-32) |
-| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-25 | 2026-10-25 — step 4: one pending publisher per config; the six packs by hand, then trusted publishers (W-30) |
+| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-25 | 2026-10-25 — npm first by a run by hand on the tag, PyPI with the Release (L6 decision 9; W-37, W-38) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — the before/while/after section at the top (W-35), 438 rules (W-32) |
-| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-25 | 2026-10-25 — Unreleased: the two npm-only library packs (W-32) |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — rewritten: the story, the four moments, the ESLint/Prettier/Biome comparison; how-to moved to `USAGE.md` (W-35) |
+| `USAGE.md` | a command, flag, install step, config key or agent wiring changes | 2026-10-25 | 2026-10-25 — created from the README's how-to sections (W-35) |
+| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-25 | 2026-10-25 — Unreleased: the README rewrite, `USAGE.md`, the npm-only publish run (W-37) |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
 | `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
 | `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |

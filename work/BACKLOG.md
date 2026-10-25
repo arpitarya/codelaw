@@ -27,6 +27,7 @@ it, and do not read it top-down as a priority order.
 | B-043 | "Diagnostics: pull and push" and "Workspace diagnostics: for project rules" — the server pushes only, per open document | [SR-EDITOR](../records/0114_editor.md) decision 1 | `textDocument/diagnostic` and `workspace/diagnostic` served, with a server test; project rules wait on W-11 |
 | B-044 | the "Explain rule" and "Ignore here with reason" code actions | [SR-EDITOR](../records/0114_editor.md) §1 table, Quick fixes row | both offered as code actions, tested, writing nothing |
 | B-046 | the tree-sitter-css upstream PR: `grammar.patch`, a ready commit with `src/` regenerated (`0001-tree-sitter-css-modern.patch`) and `PR.md` in `crates/codelaw-lang/grammars/tree-sitter-css/upstream/`; not filed — **Arpit, 2026-10-24:** *"Then let's keep using the patch copy and put the PR in backlog."* | [SR-ARCHITECTURE](../records/0108_architecture.md) decision 3 · [W-21](../archive/open/W-21-pack-engine-gaps.md) | the PR is opened on tree-sitter/tree-sitter-css; the fork is dropped when a release carries it |
+| B-048 | The *later* presets: `js/strict` (typescript-eslint `strict`, jsx-a11y, unicorn), `react/a11y`, `py/strict`, and an opt-in pydocstyle `D` preset | [SR-RULE-PACKS](../records/0101_rule-packs.md) §1; the research table of [W-03](../archive/open/W-03-rule-packs.md) | each preset ships in its pack, or the decider rules it out |
 
 ---
 

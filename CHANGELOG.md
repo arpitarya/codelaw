@@ -4,6 +4,11 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+### Changed
+
+- **`publish.yml` can publish npm on its own:** a run by hand on a `v*` tag publishes npm only, and the GitHub Release on the same tag later adds PyPI and skips what npm already has (L6 decision 9, W-37). The rest of the release work of W-03, W-04, W-29, W-30 and W-31 is W-37 (npm) and W-38 (PyPI).
+- **The README tells codelaw's story** — the four moments (before, while and after an AI writes, and with no AI), and how it compares with ESLint + Prettier and Biome — and **the how-to moved to a new [`USAGE.md`](USAGE.md)**: install, configure, write rules, agents, editor, pre-commit, CI and every command (W-35).
+
 ## 0.2.0 — 2026-10-25
 
 ### Added

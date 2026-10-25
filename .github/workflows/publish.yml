@@ -1,6 +1,9 @@
 # Publishing (L6 decision 9; SR-PACKAGES; how to cut one: RELEASING.md). Runs
-# when a GitHub Release is published; nothing else publishes. No token
-# anywhere: npm and PyPI trusted publishing (OIDC).
+# when a GitHub Release is published — both registries — or by hand on a `v*`
+# tag, npm only, so a release can reach npm while PyPI's first uploads are still
+# made by hand (L6 decision 9, the decider 2026-10-25). The Release on that same
+# tag later runs both, skipping every version already published. Nothing else
+# publishes. No token anywhere: npm and PyPI trusted publishing (OIDC).
 #
 # Nothing is built here. ci.yml assembled and checked `dist` on the release
 # commit; this downloads THAT artifact, re-runs the checks, and uploads it.
@@ -17,6 +20,7 @@ name: publish
 on:
   release:
     types: [published]
+  workflow_dispatch: # npm only, from a v* tag: `gh workflow run publish.yml --ref v0.2.0`
 permissions:
   contents: read
 defaults:
@@ -40,6 +44,14 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false # nothing here pushes (W-18)
+      - name: a run by hand is npm only, and starts from a v* tag (L6 decision 9)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          [ "$GITHUB_REF_TYPE" = tag ] && [[ "$GITHUB_REF_NAME" == v* ]] || {
+            echo "::error::run publish.yml from a v* tag (gh workflow run publish.yml --ref vX.Y.Z), not the ${GITHUB_REF_TYPE} ${GITHUB_REF_NAME}"
+            exit 1
+          }
+          echo "npm only: PyPI and the release checksums wait for the GitHub Release on ${GITHUB_REF_NAME}"
       - id: ci
         name: ci.yml succeeded on this commit, on main
         env:
@@ -180,6 +192,7 @@ jobs:
 
   pypi:
     needs: [gate, trust]
+    if: github.event_name == 'release' # a run by hand is npm only (L6 decision 9)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -210,6 +223,7 @@ jobs:
   attach:
     # The checksums of what was published, on the GitHub Release itself.
     needs: [gate, npm, pypi]
+    if: github.event_name == 'release' # a run by hand has no Release to attach to
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

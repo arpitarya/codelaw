@@ -24,8 +24,8 @@ anywhere — both registries use trusted publishing (OIDC).
 
 | workflow | when | what | time |
 |---|---|---|---|
-| `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 24 packages (31 files: 17 npm tarballs, 14 wheels) assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](work/open/W-04-release-pipeline.md) §Measured |
-| `publish.yml` | a GitHub Release | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | see W-04 §Measured |
+| `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 24 packages (31 files: 17 npm tarballs, 14 wheels) assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](archive/open/W-04-release-pipeline.md) §Measured |
+| `publish.yml` | a GitHub Release (both registries), or by hand on a `v*` tag (npm only) | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | see W-04 §Measured |
 
 Every check `ci.yml` runs on the packages is `scripts/package.py check`:
 only the SR-PACKAGES names (B-020), one version (W-18), zero runtime
@@ -54,9 +54,9 @@ In this order. npm binds a trusted publisher only to a package that already
 exists, so the first npm publish cannot come from CI. PyPI can: a *pending*
 publisher creates the project on its first upload.
 
-**Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](work/open/W-29-first-npm-publish.md)). **Step 5 done 2026-10-24** (both environments, tag rule `v*`, [W-18](work/open/W-18-release-hardening.md)). Left: step 4.
+**Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](archive/open/W-29-first-npm-publish.md)). **Step 5 done 2026-10-24** (both environments, tag rule `v*`, [W-18](work/open/W-18-release-hardening.md)). Left: step 4.
 Steps 2–3 come back for **every pack name new to npm**: at 0.2.0,
-`@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](work/open/W-31-registry-pack-split.md)) —
+`@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](archive/open/W-31-registry-pack-split.md)) —
 publish just those tarballs by hand from the 0.2.0 `dist`, then run
 `npm-trust.sh` again (it skips nothing, and re-binding an existing package is
 harmless); `publish.yml` then skips the versions already on npm.
@@ -80,7 +80,7 @@ harmless); `publish.yml` then skips the versions already on npm.
      `twine upload dist/pypi/codelaw_rules_*.whl` from the release's `dist`
      with your account token, then a trusted publisher on each project's
      *Settings → Publishing*; `publish.yml` skips versions already uploaded.
-     ([W-30](work/open/W-30-first-pypi-publish.md); the decider, 2026-10-25.)
+     ([W-38](work/open/W-38-pypi-0-2-0-by-hand.md); the decider, 2026-10-25.)
 5. **GitHub environments** `npm` and `pypi` (*Settings → Environments*) —
    **required, both:**
    - *Deployment branches and tags* → **Selected branches and tags** → add one
@@ -103,6 +103,18 @@ After this, no release needs a token, a code or your machine.
 3. **Publish:** `gh release create v0.2.0 --title "v0.2.0 — <what it is>"
    --notes "<what changed>"`. A version with a `-` (`0.2.0-beta.1`) goes to
    npm's `next` tag and is a PyPI pre-release.
+   **npm first, PyPI later** (L6 decision 9, ruled 2026-10-25): tag the
+   green commit and run `publish.yml` by hand on the tag — it publishes npm
+   only. When PyPI is ready, step 3 on the same tag runs both registries and
+   skips what npm already has:
+
+   ```bash
+   git tag v0.2.0 <green-commit> && git push origin v0.2.0
+   gh workflow run publish.yml -R arpitarya/codelaw --ref v0.2.0   # npm only
+   # … PyPI's hand uploads and trusted publishers (W-38) …
+   gh release create v0.2.0 --title "v0.2.0 — <what it is>" --notes "<what changed>"   # both; npm skipped
+   ```
+
 4. A failed job is **re-run, not re-released**: versions already on a registry
    are skipped.
 5. **`dist` lives 30 days.** For an older commit, re-run its `ci.yml` push run

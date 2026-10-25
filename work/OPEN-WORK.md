@@ -22,8 +22,8 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
-| 🔴 **PyPI, ruled 2026-10-25: upload the six `codelaw-rules-*` 0.2.0 wheels by hand, then add a trusted publisher to each** — `codelaw` comes from CI through its pending publisher (registered 2026-10-25); commands in [W-30](open/W-30-first-pypi-publish.md) | 2026-10-20 |
-| ↳ **blocks:** W-04 step 5 (the first release on both registries) · W-03 step 6 · W-30 step 4 | |
+| 🔴 **PyPI 0.2.0 by hand, over 2–3 days** (four new projects a day): upload `codelaw-rules-{html,js,python,react}`, add six trusted publishers, then `gh release create v0.2.0` on W-37's tag — [W-38](open/W-38-pypi-0-2-0-by-hand.md) | 2026-10-20 |
+| ↳ **blocks:** W-38 itself; nothing else in the queue | |
 
 ---
 
@@ -31,21 +31,13 @@ here. Read that record before changing anything below it.
 
 ### build
 
-🔴 **W-04** `agent` The release pipeline, steps 1–4 done 2026-10-20. Step 5, the first release: blocked on the registry setup above; the engine is complete since 2026-10-21 (L7, L6 decision 3). Filed by Arpit (Claude Code). [detail](open/W-04-release-pipeline.md)
+🟢 **W-37** `agent` 0.2.0 on npm from CI now: `publish.yml` runs npm only by hand on a `v*` tag (in the tree). Claude Code commits it, tags `v0.2.0` once Arpit pushes, runs it, checks 19 names. Filed by Arpit (Cowork). [detail](open/W-37-npm-0-2-0-through-the-pipeline.md)
 
-🔴 **W-03** `agent` The rule packs: steps 2–5 done (419 rules), packaging done; nine packs since W-31. Step 6, publishing: blocked on the registry setup above. Filed by Arpit (Cowork). [detail](open/W-03-rule-packs.md)
-
-🟡 **W-29** `arpit` The first npm publish: 14 names live at 0.1.0, trusted publishing bound, the Mac install check passed 2026-10-25, records done; left: the 8-platform registry install, moved to 0.2.0 (ruled 2026-10-25). Filed by Arpit (Claude Code). [detail](open/W-29-first-npm-publish.md)
-
-🟡 **W-30** `arpit` The first PyPI publish at 0.2.0: CI's `dist` verified 2026-10-25; `codelaw-rules-css`, `-data` live, the other four held by PyPI's 429; left: those four, six trusted publishers, then `codelaw` from the release. Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
-
-🟢 **W-31** `arpit` 0.2.0 pushed, CI green on `f33b772` and its `dist` verified 2026-10-25; left (Arpit): npm's two new names by hand, `npm-trust.sh`, W-30, then `gh release create v0.2.0` from `main`. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
-
-🟡 **W-32** `arpit` A Redux Toolkit pack and a TanStack Query pack, npm only: steps 2–4 done in the tree 2026-10-25 (7 + 12 rules, all green, wired); pushed, CI run 40185344678 green; left: their first publish at 0.2.0 with W-31 step 7. Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
+🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
 🟡 **W-34** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; waiting on Fux item 298, then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
-🟡 **W-35** `agent` README leads with "your rules, before, while and after the AI writes" since 2026-10-25, Before and After as they ship; waiting on W-05 to drop While's "in design" and restore Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
+🟡 **W-35** `agent` README leads with "your rules, before, while and after the AI writes"; waiting on W-05 to drop While's "in design" and restore Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
 
 ### testing
 
@@ -53,6 +45,8 @@ here. Read that record before changing anything below it.
 
 ### research
 
-🟢 **W-05** `cowork` Research guiding an agent **while** it writes: a `brief` before writing (rules filtered by path and construct) and a `hook --pre` check before a write reaches disk; Fux as an optional free-text layer. Filed by Arpit (Cowork). [detail](open/W-05-write-time-guidance.md)
+🟢 **W-36** `cowork` Research codelaw as the linter and formatter for AI — before, while, after and with no AI — beside ESLint + Prettier, Biome, Ruff, oxlint: gaps, provable claims, who adopts it. Filed by Arpit (Cowork). [detail](open/W-36-position-against-eslint-and-biome.md)
+
+🟢 **W-05** `cowork` Research guiding an agent **while** it writes: a `brief` of the rules for a path and construct, and a `hook --pre` check before a write reaches disk; Fux as an optional layer. Filed by Arpit (Cowork). [detail](open/W-05-write-time-guidance.md)
 
 ---

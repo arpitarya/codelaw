@@ -164,7 +164,7 @@ The ones that shape results most:
 | `I002` missing-required-import | needs the project's list of required imports; not part of `I001` |
 
 The rest of Ruff 0.16's wider default (`UP`, `SIM`, `PL`, `C4`, …) is planned
-for a later `py/strict` preset ([W-03](../../work/open/W-03-rule-packs.md)).
+for a later `py/strict` preset (B-048 in [`work/BACKLOG.md`](../../work/BACKLOG.md)).
 
 ## Data
 
