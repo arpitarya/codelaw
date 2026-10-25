@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — W-51 (scheduled auto-fix PR) and W-52 (dependency latest versions) filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"schedule fix PR, create a work item for it … For type-aware rules, TypeScript Go. If TypeScript dependency is already present in a repo, do we still need the Go binary … Elaborate on this highlighting the latest version of each dependency. Let's go with it."*
+- **Done:** filed W-51 and W-52; W-52 records the decider's ruling that `deps refresh` is the one network command and the engine stays offline (L5 decision 3 to be amended in that item). Answered the type-aware question in chat: TypeScript 7 ships no programmatic API (expected in 7.1), so codelaw needs its own helper for now. Type-aware is not filed yet. Nothing committed.
+- **Decided / left open:** the decider chose typescript-go (Option A); L3's amendment and the "use the project's TypeScript once 7.1's API lands" mode are still to be filed.
+- **Mistakes:** none.
+- **Next:** file the type-aware item once the decider confirms the helper plan.
+
+## 2026-10-25 — W-44–W-50 filed: watch, CI formats, exceptions report, burn-down, migrate, dev-server plugins, git hooks  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"Watch mode, let's build it. Then CI report formats … Exception report … Baseline burn down over commits … Code law migrate from ESLint, flat config, Ruff, style lint, as well as biome … Remove OXLint. Dev server plugin for RSpack, Vite, Webpack, Next.js. Pre-commit hook, post-commit hook, create work items for all these."* Also: explain scheduled auto-fix PRs, type-aware option A (typescript-go), and highlighting the latest versions of Node and Python dependencies — chat only.
+- **Done:** filed W-44 (watch), W-45 (CI formats), W-46 (exceptions report, waits on W-40), W-47 (baseline history), W-48 (migrate, no oxlint), W-49 (dev-server plugins, waits on W-44), W-50 (git hooks). Explained the three discussion items in chat; nothing filed for them. Nothing committed; another session's uncommitted OPEN-WORK edits were left as they were.
+- **Decided / left open:** open for the decider: pre-commit's profile (W-50); L3's amendment for type-aware rules; whether a network `deps refresh` command fits L5.
+- **Mistakes:** none.
+- **Next:** the decider's answers on the three discussion items; then file them.
+
 ## 2026-10-25 — CI vs local severity, dated exceptions, React context: designed and filed as W-39–W-41  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** *"I want Code Law to work in a way that it can be used in CI/CD pipeline. As well as dev environment … for certain files it should never throw an error … every exception should have a date … an optional field … email ID … validated on commit or in CI/CD … React context … new implementation … should throw an error."*

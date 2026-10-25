@@ -26,6 +26,8 @@ entry.**
 
 **2026-10-25 (Cowork): new feature work filed, not built.** CI-vs-local severity (profiles, agents on `ci`), a per-glob severity `remap`, dated exceptions (`expires`, `warn_days`, `require_expiry`, git-checked `added_by`) and `react/no-context` — W-39, W-40, W-41, rulings in [the compare doc](compare/ci-profiles-and-dated-exceptions.compare.md). Each build writes its record, schema and loader in one change: SR-CONFIG §1 is parsed by `crates/codelaw-config/tests/schema.rs`.
 
+**Also filed 2026-10-25 (Cowork):** W-44 watch mode · W-45 CI formats · W-46 exceptions report (waits on W-40) · W-47 baseline history · W-48 `migrate` (ESLint, Ruff, stylelint, Biome; no oxlint) · W-49 dev-server plugins (waits on W-44) · W-50 git hooks. Then W-51 (scheduled auto-fix PR) and W-52 (dependency latest versions; the decider ruled `deps refresh` the one network command). Type-aware via typescript-go: chosen, not filed — TypeScript 7 has no programmatic API until 7.1, so codelaw needs its own helper; L3 must be amended.
+
 *Updated 2026-10-24 (the parallel session: W-20, W-21, W-24–W-28 merged to `main` `82df231`, unpushed).*
 **Where things stand:** the laws L0–L8 are accepted (L8's budgets still
 `unset`); every record 0101–0115 is accepted. **The engine is complete**

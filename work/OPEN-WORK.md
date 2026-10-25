@@ -13,7 +13,7 @@ how the inbox works, and what every session owes — is stated once in
 **[SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md)** and is not repeated
 here. Read that record before changing anything below it.
 
-**A ball on every row, always one:** 🔴 blocked on the decider, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
+**A ball on every row, always one:** 🔴 blocked on the decider, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item, named right after the id — `waits on **W-mm**`, or `**<project> W-mm**` for another project's · 🟢 no blockers.
 **Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (the decider only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
 
 ---
@@ -41,9 +41,27 @@ here. Read that record before changing anything below it.
 
 🟢 **W-43** `agent` More React hooks rules from eslint-plugin-react-hooks 7 and @eslint-react — set-state in render/effect, refs and purity in render, nested components, `useMemo` returns. Filed by Arpit (Claude Code). [detail](open/W-43-react-hooks-rules.md)
 
-🟡 **W-34** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; waiting on Fux item 298, then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
+🟢 **W-44** `agent` `codelaw check --watch`: re-check changed files and their dependents on every save; config reloads; NDJSON for tools. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
-🟡 **W-35** `agent` README leads with "your rules, before, while and after the AI writes"; waiting on W-05 to drop While's "in design" and restore Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
+🟢 **W-45** `agent` CI report formats: `--format github|gitlab|junit|checkstyle`, stable fingerprints. Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
+
+🟢 **W-47** `agent` `codelaw baseline history`: the burn-down per rule over commits, read from git, no re-lint. Filed by Arpit (Cowork). [detail](open/W-47-baseline-burn-down.md)
+
+🟢 **W-48** `agent` `codelaw migrate --from eslint|ruff|stylelint|biome` (no oxlint): `codelaw.toml` plus a mapped / adapter / dropped report. Filed by Arpit (Cowork). [detail](open/W-48-codelaw-migrate.md)
+
+🟢 **W-50** `agent` Git hooks: `codelaw init --git-hooks` — blocking pre-commit, non-blocking post-commit, `.pre-commit-hooks.yaml`, husky/lefthook recipes; post-commit's content follows W-46 and W-47. Filed by Arpit (Cowork). [detail](open/W-50-git-hooks.md)
+
+🟢 **W-51** `agent` A scheduled auto-fix PR: `init --ci github --autofix weekly`, one open PR with every safe fix, expiries and burn-down in its body. Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
+
+🟢 **W-52** `agent` Latest-version highlighting for npm and Python deps: network-only `deps refresh` writes a committed snapshot; offline `data/outdated-dependency` flags and bumps. Filed by Arpit (Cowork). [detail](open/W-52-dependency-latest-versions.md)
+
+🟡 **W-46** waits on **W-40** `agent` `codelaw exceptions --expiring 30d --group-by added_by`: every exception, days left, owner; MCP twin. Filed by Arpit (Cowork). [detail](open/W-46-exceptions-report.md)
+
+🟡 **W-49** waits on **W-44** `agent` Dev-server plugins for Vite, Webpack, Rspack, Next.js: overlay and terminal on `local`, builds fail on `ci`. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
+
+🟡 **W-34** waits on **fux W-299** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
+
+🟡 **W-35** waits on **W-05** `agent` README leads with "your rules, before, while and after the AI writes"; then it drops While's "in design" and restores Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
 
 ### testing
 

@@ -38,7 +38,7 @@ flowchart TD
     B["B-nnn row in BACKLOG"] -->|"about to be done"| W["W-nn file + queue row with a ball"]
     W --> R["🔴 inbox row + ↳ blocks"]
     W --> P["🟣 gated on a date"]
-    W --> Y["🟡 waiting on W-mm"]
+    W --> Y["🟡 W-nn waits on W-mm"]
     W --> G["🟢 an agent may pick it up"]
     G --> I["outcome in IMPLEMENTATION.md"]
     I --> X["row deleted · file moved to archive/open/ · map row"]
@@ -54,7 +54,7 @@ flowchart TD
    W-nn file + queue row with a ball
         |-- 🔴 blocked on the decider --> inbox row + "↳ blocks:" sub-row
         |-- 🟣 gated on a date
-        |-- 🟡 waiting on W-mm
+        |-- 🟡 **W-nn** waits on **W-mm**  (right after the id)
         '-- 🟢 no blockers ------------> an agent may pick it up
                                              |
                                              v
@@ -107,7 +107,8 @@ the top.
 **C · The shape of a row**
 
 13. One or two lines per item, always.
-14. A row is: ball · optional 🧨 · optional 🔺 · `**W-nn**` · `` `lane` `` ·
+14. A row is: ball · optional 🧨 · optional 🔺 · `**W-nn**` · on a 🟡 row its
+    blocker, `waits on **W-mm**` (rule 23b) · `` `lane` `` ·
     what is open · `Filed by <person> (<surface>).` (rule 63) ·
     `[detail](open/W-nn-slug.md)`.
 15. At most 280 characters.
@@ -132,6 +133,18 @@ the top.
     is, what producing it takes, and who or what can produce it. **A blocker
     that cannot be turned into an item is a reason to close**, or to put the
     fork to the decider — never a reason to stay 🟡.
+23b. **A 🟡 row shows its blocker right after its id, as visibly as the id**
+    (Arpit, 2026-10-25: *"The yellow balls in open work should always have the
+    other work item mentioned based on which it is on hold. Always, always,
+    always. If it is from another project, call out that project or give some
+    kind of reference, but it needs to be visible."*). The row opens
+    ``🟡 **W-nn** waits on **W-mm** `lane` …``; several blockers are
+    `waits on **W-mm**, **W-kk**`. **Another project's blocker names the
+    project:** `waits on **fux W-299**` — or, when that project has no item for
+    it, a reference a reader can follow: a record (`**fux SR-PKG-INDEX**`), a
+    version (`**fux 5.1.0**`) or an issue/PR (`**fux #12**`). A blocker in this
+    queue is an open row in it; one that has closed is rule 28's re-ball, never
+    a stale tag. Checked on every write by `scripts/check-open-work-inbox.py`.
 24. 🟢 no blockers, good to go.
 25. Red wins, then purple.
 26. A date-gated item is not in the inbox.
@@ -244,13 +257,13 @@ the top.
 under its header:
 
 ```text
-**A ball on every row, always one:** 🔴 blocked on the decider, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
+**A ball on every row, always one:** 🔴 blocked on the decider, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item, named right after the id — `waits on **W-mm**`, or `**<project> W-mm**` for another project's · 🟢 no blockers.
 **Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (the decider only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
 ```
 
 ### Consequences
 
-- **Enforced today:** rule 45a, by `.claude/hooks/guard-open-work-inbox.sh`
+- **Enforced today:** rules 45a and 23b, by `.claude/hooks/guard-open-work-inbox.sh`
   (PostToolUse), which runs `scripts/check-open-work-inbox.py`. Rules 33 and 41
   are supported by `.claude/hooks/inject-inbox.sh`, which puts the inbox in
   front of every prompt with each row's age computed (rule 40).

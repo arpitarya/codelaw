@@ -28,13 +28,17 @@ from pathlib import Path
 
 BALLS = ("🔴", "🟣", "🟡", "🟢")
 ROW_RE = re.compile(
-    r"^(?P<ball>🔴|🟣|🟡|🟢)(?:🧨)?(?:🔺)? \*\*(?P<id>W-\d+)\*\* `(?:arpit|agent|cowork)` .+"
+    r"^(?P<ball>🔴|🟣|🟡|🟢)(?:🧨)?(?:🔺)? \*\*(?P<id>W-\d+)\*\*"
+    r"(?: waits on \*\*[^*]+\*\*(?:(?:, | and )\*\*[^*]+\*\*)*)?"  # rule 23b: a 🟡 row's blocker, after the id
+    r" `(?:arpit|agent|cowork)` .+"
     r" Filed by [^()]+ \([^()]+\)\. \[detail\]\((?P<link>open/(?P<link_id>W-\d+)-[A-Za-z0-9-]+\.md)\)$"
 )
 LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
 LANE_RE = re.compile(r"\*\* `(arpit|agent|cowork)` ")
 COVERED = ("crates", "scripts", ".claude/hooks", "fixtures", "packs")
 W_RE = re.compile(r"\bW-\d+\b")
+#: Rule 23b: `**<project> W-nn**` is another project's item — not this queue's, never "lost".
+FOREIGN_W_RE = re.compile(r"\*\*[A-Za-z][A-Za-z0-9_.@/-]* W-\d+\*\*")
 SKIP_DIRS = {".git", "target", "node_modules", "worktrees"}
 
 
@@ -114,7 +118,7 @@ def check_queue(root):
         if len(physical) > 2:
             out.append(f"{name}: {len(physical)} lines; a row is one or two (SR-WORK-OPEN-QUEUE rule 13)")
         if not m:
-            out.append(f"`{name}…`: not `ball · **W-nn** · `lane` · what · Filed by <person> (<surface>). · [detail](open/W-nn-slug.md)` (SR-WORK-OPEN-QUEUE rule 14)")
+            out.append(f"`{name}…`: not `ball · **W-nn** · (🟡: waits on **W-mm**) · `lane` · what · Filed by <person> (<surface>). · [detail](open/W-nn-slug.md)` (SR-WORK-OPEN-QUEUE rule 14)")
         # Counted as read: the text of a link, not its target; no `**` or backticks.
         shown = LINK_RE.sub("]", text).replace("[", "").replace("]", "").replace("**", "").replace("`", "")
         if len(shown) > 280:
@@ -144,7 +148,7 @@ def check_lost(root):
     for d in ("work", "records", "docs"):
         files += sorted((root / d).rglob("*.md")) if (root / d).is_dir() else []
     for f in files:
-        for w in W_RE.findall(f.read_text(encoding="utf-8")):
+        for w in W_RE.findall(FOREIGN_W_RE.sub("", f.read_text(encoding="utf-8"))):
             named.setdefault(w, f.relative_to(root).as_posix())
     for w in sorted(set(named) - known, key=lambda x: int(x[2:])):
         out.append(f"lost: {w} (named in {named[w]}) has no file in work/open/ or archive/open/ (SR-WORK-OPEN-QUEUE veto)")

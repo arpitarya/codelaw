@@ -12,6 +12,7 @@ description: "Recurring terms, defined once."
 | W-nn | an open work item — a queue row plus a detail file |
 | B-nnn | a backlog row — named, unclaimed, no file |
 | ball | the one marker every queue row opens with: 🔴 🟣 🟡 🟢 |
+| blocker tag | `waits on **W-mm**`, right after a 🟡 row's id: the item it waits on — `**<project> W-mm**` when that item is another project's (SR-WORK-OPEN-QUEUE rule 23b) |
 | blocker | `work/BLOCKED.json` with a decision other than `PROCEED` |
 | veto condition | the checkable condition under which a decision reopens |
 | fix class | what a rule's fix is: `auto` (applied), `suggest` (a diff to accept) or `manual` (written steps); SR-LAW-4 |

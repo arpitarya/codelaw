@@ -43,6 +43,8 @@ Default is everything; he can say "inbox only" at any point.
 - **ELI5:** <one sentence a child would follow>
 ```
 
+A 🟡 card carries its blocker in the header, as its row does: `**[k/N] 🟡 W-nn waits on W-mm — <short title>**` (another project's: `waits on fux W-mm`).
+
 **Then ask** — AskUserQuestion, plain text if it is absent:
 
 - **Inbox row:** the recommended ruling first, labelled `(Recommended)` · the other ruling(s) · `Skip`. "Stop" comes through Other.
