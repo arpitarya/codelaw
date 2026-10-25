@@ -1,10 +1,11 @@
-//! `codelaw format [--check] [--diff] [--format text|json] [--import-config] <paths>`
+//! `codelaw format [--check] [--diff] [--format text|json|github|gitlab|junit|checkstyle] [--import-config] <paths>`
 //! (SR-FORMATTER decision 1; SR-CLI-MCP decisions 3 and 4).
 
 use crate::{Common, Ctx, Output, engine_options_in, json_line, load, timings, with_timings};
 use codelaw_report::Format;
 use clap::Args;
 use codelaw_config::Home;
+use codelaw_core::{Diagnostic, FixClass, Position, Severity, TextEdit};
 use codelaw_engine::{FormatReport, FormatRunOptions};
 use codelaw_format::import::{Imported, PRETTIER_FILES, PRETTIER_PROGRAMS};
 use std::path::{Path, PathBuf};
@@ -21,7 +22,7 @@ pub struct FormatArgs {
     /// Change nothing; print what formatting would change, as a unified diff.
     #[arg(long)]
     diff: bool,
-    /// text or json (the shape of the npm and Python `format`).
+    /// text or json (the shape of the npm and Python `format`), or a CI format: github, gitlab, junit or checkstyle.
     #[arg(long, default_value = "text")]
     format: String,
     /// Read `.prettierrc*`, `[tool.ruff]`/`[tool.ruff.format]` and
@@ -161,6 +162,34 @@ pub fn exit_code(report: &FormatReport, check: bool) -> u8 {
     }
 }
 
+/// What the CI formats report for `format`: the run's diagnostics, and under
+/// `--check` a `format/unformatted` finding for each file that would change
+/// (the finding `check` reports for it).
+fn ci_report(report: &FormatReport, check: bool) -> codelaw_engine::CheckReport {
+    let mut r = report.check.clone();
+    if check {
+        for f in &report.files {
+            r.diagnostics.push(Diagnostic {
+                rule: "format/unformatted".into(),
+                severity: Severity::Warn,
+                file: f.file.clone(),
+                start_byte: 0,
+                end_byte: 0,
+                start: Position { line: 1, column: 1 },
+                end: Position { line: 1, column: 1 },
+                message: "The file is not formatted; `codelaw format` formats it".into(),
+                fix: FixClass::Auto,
+                edits: vec![TextEdit::new(0, f.original.len(), &f.formatted)],
+                steps: vec![],
+                source: "engine".into(),
+                note: None,
+            });
+        }
+        r.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+    }
+    r
+}
+
 impl FormatArgs {
     pub fn prefer_warm(&self) -> bool {
         self.common.prefer_warm
@@ -168,13 +197,15 @@ impl FormatArgs {
 }
 
 pub fn format(args: FormatArgs, ctx: &Ctx) -> Output {
-    let json = match crate::format(&args.format) {
-        Ok(Format::Text) => false,
-        Ok(Format::Json) if !args.diff => true,
-        Ok(Format::Json) => return Output::fail("--diff prints a diff; it takes no --format json"),
-        Ok(_) => return Output::fail(format!("`format` takes --format text or json, not `{}`", args.format)),
+    let fmt = match crate::format(&args.format) {
+        Ok(f @ (Format::Text | Format::Json | Format::Github | Format::Gitlab | Format::Junit | Format::Checkstyle)) => f,
+        Ok(_) => return Output::fail(format!("`format` takes --format text, json, github, gitlab, junit or checkstyle, not `{}`", args.format)),
         Err(e) => return Output::fail(e),
     };
+    if args.diff && !matches!(fmt, Format::Text) {
+        return Output::fail(format!("--diff prints a diff; it takes no --format {}", args.format));
+    }
+    let json = fmt == Format::Json;
     let options = match engine_options_in(&args.common, ctx.env.clone()) {
         Ok(o) => o,
         Err(e) => return Output::fail(e),
@@ -198,6 +229,11 @@ pub fn format(args: FormatArgs, ctx: &Ctx) -> Output {
     let mut out = Output::default();
     if json {
         out.stdout = json_line(&with_timings(codelaw_report::format_json(&report, check), &project));
+        out.code = exit_code(&report, check);
+        return out;
+    }
+    if !matches!(fmt, Format::Text | Format::Json) {
+        out.stdout = crate::ci_output(fmt, &ci_report(&report, check));
         out.code = exit_code(&report, check);
         return out;
     }
