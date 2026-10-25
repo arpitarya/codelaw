@@ -11,6 +11,7 @@ against this file before an item may be closed
 
 | date | item | what landed | outcome | evidence |
 |---|---|---|---|---|
+| 2026-10-25 | W-37 | npm 0.2.0 from CI: `v0.2.0` tagged on `08b7158`, `publish.yml` run by hand (npm only) — `codelaw`, the eight `cli-*`, eight packs published with provenance; the two hand-published packs skipped. The 0.2.0 release notes in CHANGELOG | 19/19 npm names at `latest` 0.2.0; the eight-platform registry install not yet run | run 40207195373 (5 min 21 s); registry JSON; `npx codelaw --version` → 0.2.0 on the Mac |
 | 2026-10-25 | W-32 | both packs published at 0.2.0 by hand from CI run 40189751330's `dist` and bound to `publish.yml` (`npm trust list`) | **closed and archived** | `npm view @codelaw/rules-tanstack-query dist-tags.latest` and `@codelaw/rules-redux-toolkit`: `0.2.0` (2026-10-25) |
 | 2026-10-25 | W-29 | 0.1.0 on npm (14 names) and trusted publishing for all 19 npm names; DoD 2's 8-platform install moved to W-37 at 0.2.0 | **closed and archived**; merged into W-37 | the W-29 row of 2026-10-24; `npm trust list` (2026-10-25) |
 | 2026-10-25 | W-31 | steps 1–6 and step 7's npm hand publishes landed; what was left — npm 0.2.0 from CI and PyPI with the Release — split into W-37 and W-38 | **closed and archived**; merged into W-37 and W-38 | the W-31 row of 2026-10-24; CI run 40189751330 |

@@ -25,7 +25,7 @@ anywhere — both registries use trusted publishing (OIDC).
 | workflow | when | what | time |
 |---|---|---|---|
 | `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 24 packages (31 files: 17 npm tarballs, 14 wheels) assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](archive/open/W-04-release-pipeline.md) §Measured |
-| `publish.yml` | a GitHub Release (both registries), or by hand on a `v*` tag (npm only) | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | see W-04 §Measured |
+| `publish.yml` | a GitHub Release (both registries), or by hand on a `v*` tag (npm only) | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | the first run by hand, npm only: 5 min 21 s (run 40207195373, `v0.2.0`, 2026-10-25) — 17 names published with provenance, the two hand-published skipped |
 
 Every check `ci.yml` runs on the packages is `scripts/package.py check`:
 only the SR-PACKAGES names (B-020), one version (W-18), zero runtime

@@ -31,8 +31,6 @@ here. Read that record before changing anything below it.
 
 ### build
 
-🟢 **W-37** `agent` 0.2.0 on npm from CI now: `publish.yml` runs npm only by hand on a `v*` tag (in the tree). Claude Code commits it, tags `v0.2.0` once Arpit pushes, runs it, checks 19 names. Filed by Arpit (Cowork). [detail](open/W-37-npm-0-2-0-through-the-pipeline.md)
-
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
 🟢 **W-39** `agent` Warn on a laptop, fail in CI: auto `ci`/`local` profiles (agents run `ci`), a per-glob severity `remap`, and `js/no-console`. Filed by Arpit (Cowork). [detail](open/W-39-ci-and-local-profiles.md)

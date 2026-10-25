@@ -95,7 +95,7 @@ into a scan anyone can do at task end.
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-25 | 2026-10-25 — the L6 line and the `packs/` layout line: eleven packs, ten on npm and six on PyPI (W-32, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-37, W-38 filed; W-03, W-04, W-29–W-32 closed into them |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-37 closed (npm 0.2.0 from CI); W-42, W-43 filed |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-25 | 2026-10-25 — B-048, the later presets from W-03 |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §2: release state (W-37, W-38); README/USAGE; the Fux layer |
@@ -111,7 +111,7 @@ into a scan anyone can do at task end.
 | `records/README.md` | a record's state, ownership or number changes | 2026-10-25 | 2026-10-25 — the L6 and SR-PACKAGES rows and the `packs` row: eleven packs (W-32) |
 | `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-25 | 2026-10-25 — npm first by a run by hand on the tag, PyPI with the Release (L6 decision 9; W-37, W-38) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — rewritten: the story, the four moments, the ESLint/Prettier/Biome comparison; how-to moved to `USAGE.md` (W-35) |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — version 0.2.0: badge, preview note, roadmap (W-37) |
 | `USAGE.md` | a command, flag, install step, config key or agent wiring changes | 2026-10-25 | 2026-10-25 — created from the README's how-to sections (W-35) |
 | `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-25 | 2026-10-25 — Unreleased: the README rewrite, `USAGE.md`, the npm-only publish run (W-37) |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |

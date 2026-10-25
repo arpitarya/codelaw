@@ -6,8 +6,8 @@ item: W-37
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), 2026-10-25: closed — npm 0.2.0 live from CI"
+ball: done
 ---
 
 # W-37 — 0.2.0 on npm, through the pipeline, now
@@ -16,12 +16,12 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Let `publish.yml` publish npm on its own: a run by hand on a `v*` tag publishes npm only; the GitHub Release later does both and skips what is there | npm need not wait for PyPI | ✅ 2026-10-25 (Cowork), in the tree, uncommitted: `publish.yml`, L6 decision 9, SR-PACKAGES decision 11, `RELEASING.md` |
-| 2 | Claude Code checks the workflow (`actionlint`), commits it with explicit paths, and Arpit pushes `main` | the change is on `main` | 🟡 2026-10-25: `actionlint` 1.7.12 clean on `publish.yml` and `ci.yml`; committed; left: the push |
-| 3 | Wait for `ci.yml` green on that commit; tag it `v0.2.0` and push the tag | the release commit — the one PyPI's release (W-38) reuses | ⏳ Claude Code |
-| 4 | Run `gh workflow run publish.yml --ref v0.2.0` and watch it | the engine, eight binaries and eight packs at 0.2.0 on npm, from CI, with provenance; the two new packs skipped as already there | ⏳ Claude Code |
-| 5 | Check from the registry: all 19 npm names at `latest` 0.2.0, provenance on each; `npm i codelaw && npx codelaw --version` on the Mac; the install smoke from the registry on the eight platforms | npm works for real | ⏳ Claude Code |
-| 6 | Write it down: `IMPLEMENTATION.md`, the publish run's time in `RELEASING.md`, CHANGELOG, the README's version badge and preview note | the docs say npm is on 0.2.0 | ⏳ Claude Code |
+| 1 | Let `publish.yml` publish npm on its own: a run by hand on a `v*` tag publishes npm only; the GitHub Release later does both and skips what is there | npm need not wait for PyPI | ✅ 2026-10-25 (Cowork), committed `08b7158`: `publish.yml`, L6 decision 9, SR-PACKAGES decision 11, `RELEASING.md` |
+| 2 | Claude Code checks the workflow (`actionlint`), commits it with explicit paths, and Arpit pushes `main` | the change is on `main` | ✅ 2026-10-25: `actionlint` 1.7.12 clean; committed `08b7158`, pushed |
+| 3 | Wait for `ci.yml` green on that commit; tag it `v0.2.0` and push the tag | the release commit — the one PyPI's release (W-38) reuses | ✅ 2026-10-25: CI run 40194930874 green on `08b7158`; annotated tag `v0.2.0` on it, pushed |
+| 4 | Run `gh workflow run publish.yml --ref v0.2.0` and watch it | the engine, eight binaries and eight packs at 0.2.0 on npm, from CI, with provenance; the two new packs skipped as already there | ✅ 2026-10-25: run 40207195373 — gate, npm trust preflight, npm green; `pypi`, `attach` skipped; 5 min 21 s |
+| 5 | Check from the registry: all 19 npm names at `latest` 0.2.0, provenance on each; `npm i codelaw && npx codelaw --version` on the Mac; the install smoke from the registry on the eight platforms | npm works for real | 🟡 2026-10-25: 19/19 at `latest` 0.2.0; provenance on 17 (the two hand-published W-32 packs have none, and a published version cannot gain it); `npm i codelaw@0.2.0 && npx codelaw --version` → `codelaw 0.2.0` on the Mac (darwin-arm64); the eight-platform install from the registries moved to W-38 (below) |
+| 6 | Write it down: `IMPLEMENTATION.md`, the publish run's time in `RELEASING.md`, CHANGELOG, the README's version badge and preview note | the docs say npm is on 0.2.0 | ✅ 2026-10-25: IMPLEMENTATION, RELEASING's time, README badge, preview note and roadmap; the 0.2.0 release notes are CHANGELOG's section (`88b9c6f`) |
 
 **Arpit, 2026-10-25:** *"Everything else related to npm, let's go ahead and
 build it out, even have the pipelines start working and start publishing those
@@ -57,7 +57,7 @@ workflow run, which the Cowork bridge does not have.
 
 - `npm view <name> dist-tags.latest` is `0.2.0` for all 19 names; each 0.2.0
   shows provenance from `publish.yml`.
-- The install check passes on the eight platforms.
+- ~~The install check passes on the eight platforms.~~ **Moved to [W-38](W-38-pypi-0-2-0-by-hand.md), 2026-10-25 (Claude Code):** `scripts/smoke.sh` installs only from a staging index, so a registry check needs a new CI job; run once after the Release, it covers npm and PyPI together. The Mac install from npm passed.
 - The publish run's id and time are in `RELEASING.md` and `IMPLEMENTATION.md`.
 
 ## Hazards

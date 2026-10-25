@@ -69,6 +69,7 @@ gh release create v0.2.0 -R arpitarya/codelaw --verify-tag --title "v0.2.0 — t
   each pack with one wheel.
 - Each project's *Publishing* page lists `arpitarya/codelaw` · `publish.yml` · `pypi`.
 - Step 4's checks pass; step 5's rows are written.
+- **The install from the registries on the eight platforms** (from W-37, 2026-10-25): `codelaw` and a pack by name, from npm and from PyPI, `codelaw --version` on each — a CI job, since `scripts/smoke.sh` installs only from a staging index.
 
 ## Hazards
 
