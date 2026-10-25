@@ -4,6 +4,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+### Added
+
+- **Six TanStack Query rules from TanStack Query v5's own guides**, each where a guide states a rule a matcher can decide without types: `tanstack-query/no-renamed-v4-options` (`cacheTime` → `gcTime`, `useErrorBoundary` → `throwOnError`, fixed automatically), `no-removed-v4-options` (query `onSuccess` / `onError` / `onSettled`, `keepPreviousData`, `isDataEqual`, `context`), `object-syntax` (v4's positional `useQuery(key, fn, options)` and QueryClient calls, with a suggested rewrite), `array-query-key`, `no-mutating-set-query-data` and `no-unsupported-suspense-options` (`enabled`, `placeholderData`, `throwOnError` on a suspense query). All six are in `tanstack-query/recommended` (13 rules), and the pack now has a pinned corpus: `full-stack-fastapi-template`, `bulletproof-react` and TanStack Query's own repository (W-42).
+
 ### Changed
 
 - **`publish.yml` can publish npm on its own:** a run by hand on a `v*` tag publishes npm only, and the GitHub Release on the same tag later adds PyPI and skips what npm already has (L6 decision 9, W-37). The rest of the release work of W-03, W-04, W-29, W-30 and W-31 is W-37 (npm) and W-38 (PyPI).

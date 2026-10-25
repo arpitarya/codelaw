@@ -55,7 +55,7 @@
       "commit": "b1125d8839482cb7bbae603ddc6d0081bf87532e",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "python", "data", "ts", "react", "node"]
+      "packs": ["js", "python", "data", "ts", "react", "node", "tanstack-query"]
     },
     {
       "name": "html5-boilerplate",
@@ -88,6 +88,22 @@
       "licence": "MIT",
       "licence_file": "LICENSE",
       "packs": ["stencil", "ts"]
+    },
+    {
+      "name": "bulletproof-react",
+      "url": "https://github.com/alan2207/bulletproof-react",
+      "commit": "9506629ed003a561c6627735480cce4994244bb4",
+      "licence": "MIT",
+      "licence_file": "LICENSE",
+      "packs": ["tanstack-query"]
+    },
+    {
+      "name": "tanstack-query",
+      "url": "https://github.com/TanStack/query",
+      "commit": "cb3c3d5ba2a4c9e06dcb52c3006587dc53ac6318",
+      "licence": "MIT",
+      "licence_file": "LICENSE",
+      "packs": ["tanstack-query"]
     }
   ]
 }

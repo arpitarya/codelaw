@@ -1,10 +1,16 @@
-description = "@tanstack/eslint-plugin-query 5.104.5 recommended (all 7), reimplemented, at its severities"
+description = "@tanstack/eslint-plugin-query 5.104.5 recommended (all 7), reimplemented, at its severities, and 6 rules from TanStack Query v5's guides (W-42)"
 
 [rules]
+"tanstack-query/array-query-key" = "error"
 "tanstack-query/exhaustive-deps" = "error"
 "tanstack-query/infinite-query-property-order" = "error"
 "tanstack-query/mutation-property-order" = "error"
+"tanstack-query/no-mutating-set-query-data" = "warn"
+"tanstack-query/no-removed-v4-options" = "error"
+"tanstack-query/no-renamed-v4-options" = "error"
 "tanstack-query/no-rest-destructuring" = "warn"
 "tanstack-query/no-unstable-deps" = "error"
+"tanstack-query/no-unsupported-suspense-options" = "error"
 "tanstack-query/no-void-query-fn" = "error"
+"tanstack-query/object-syntax" = "error"
 "tanstack-query/stable-query-client" = "error"

@@ -5,7 +5,7 @@
 //! object's callbacks — or follows a hook's result through the file.
 
 use crate::js_ast::{
-    arguments, as_function, body, descendants_same_function, function_name, import_of, initial_value, is_async, is_function, is_named_import, member, member_name, member_value, members, outermost_function, root_of, unparen,
+    arguments, as_function, body, descendants_same_function, function_name, import_of, initial_value, is_async, is_function, is_named_import, member, member_name, member_value, members, outermost_function, params, root_of, unparen,
 };
 use crate::util::{children, named_children, text};
 use crate::{NativeContext, NativeFinding, NativeRule};
@@ -668,6 +668,574 @@ impl NativeRule for MutationPropertyOrder {
     }
 }
 
+// ---------------------------------------------------------------- option objects (W-42)
+//
+// The rules below come from TanStack Query v5's guides, not from the ESLint
+// plugin: they read the option objects the hooks, the `*Options` helpers,
+// `new QueryClient({ defaultOptions })` and the QueryClient methods take.
+
+/// What an option object configures.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum Opts {
+    Query,
+    /// `useSuspenseQuery` and `useSuspenseInfiniteQuery`, and `useSuspenseQueries`' entries.
+    Suspense,
+    Mutation,
+}
+
+/// The QueryClient methods that take a query's options as their first argument.
+const QUERY_METHODS: &[&str] = &["fetchQuery", "prefetchQuery", "ensureQueryData", "fetchInfiniteQuery", "prefetchInfiniteQuery", "ensureInfiniteQueryData"];
+
+/// The QueryClient methods that take query filters as their first argument.
+const FILTER_METHODS: &[&str] = &["isFetching", "getQueriesData", "setQueriesData", "removeQueries", "resetQueries", "cancelQueries", "invalidateQueries", "refetchQueries"];
+
+/// The name a callee was imported under from a TanStack Query package.
+fn imported_tanstack<'m>(model: &'m SemanticModel, callee: Node<'_>) -> Option<&'m str> {
+    if callee.kind() != "identifier" {
+        return None;
+    }
+    match &import_of(model, callee, &is_tanstack)?.imported {
+        Imported::Named(n) => Some(n.as_str()),
+        _ => None,
+    }
+}
+
+/// An argument that is an object literal, through parentheses and casts.
+fn object_arg<'t>(n: Option<&Node<'t>>) -> Option<Node<'t>> {
+    n.map(|n| unparen(*n)).filter(|n| n.kind() == "object")
+}
+
+/// The object literals in `queries: [ … ]`, or `queries: xs.map((x) => ({ … }))`.
+fn queries_entries<'t>(options: Node<'t>, src: &str) -> Vec<Node<'t>> {
+    let Some(value) = member(options, "queries", src).and_then(member_value).map(unparen) else { return Vec::new() };
+    match value.kind() {
+        "array" => named_children(value).into_iter().map(unparen).filter(|e| e.kind() == "object").collect(),
+        "call_expression" => {
+            let mapped = value.child_by_field_name("function").and_then(|f| f.child_by_field_name("property")).is_some_and(|p| text(p, src) == "map");
+            let f = arguments(value).first().copied().and_then(as_function);
+            match (mapped, f.and_then(body)) {
+                (true, Some(b)) if unparen(b).kind() == "object" => vec![unparen(b)],
+                _ => Vec::new(),
+            }
+        }
+        _ => Vec::new(),
+    }
+}
+
+/// The option objects a call or a `new` expression passes, with what each configures.
+fn option_objects<'t>(model: &SemanticModel, n: Node<'t>, src: &str) -> Vec<(Node<'t>, Opts)> {
+    let mut out = Vec::new();
+    let args = arguments(n);
+    if n.kind() == "new_expression" {
+        // `new QueryClient({ defaultOptions: { queries: {…}, mutations: {…} } })`
+        let Some(ctor) = n.child_by_field_name("constructor") else { return out };
+        if imported_tanstack(model, ctor) != Some("QueryClient") {
+            return out;
+        }
+        let defaults = object_arg(args.first()).and_then(|o| member(o, "defaultOptions", src)).and_then(member_value).map(unparen).filter(|d| d.kind() == "object");
+        if let Some(d) = defaults {
+            for (key, kind) in [("queries", Opts::Query), ("mutations", Opts::Mutation)] {
+                if let Some(o) = member(d, key, src).and_then(member_value).map(unparen).filter(|o| o.kind() == "object") {
+                    out.push((o, kind));
+                }
+            }
+        }
+        return out;
+    }
+    let Some(callee) = n.child_by_field_name("function") else { return out };
+    if callee.kind() == "member_expression" {
+        let Some(method) = callee.child_by_field_name("property").map(|p| text(p, src)) else { return out };
+        let (index, kind) = match method {
+            m if QUERY_METHODS.contains(&m) => (0, Opts::Query),
+            "setQueryDefaults" => (1, Opts::Query),
+            "setMutationDefaults" => (1, Opts::Mutation),
+            _ => return out,
+        };
+        if let Some(o) = object_arg(args.get(index)) {
+            out.push((o, kind));
+        }
+        return out;
+    }
+    let Some(name) = imported_tanstack(model, callee) else { return out };
+    let first = object_arg(args.first());
+    match name {
+        "useQuery" | "useInfiniteQuery" | "queryOptions" | "infiniteQueryOptions" | "usePrefetchQuery" | "usePrefetchInfiniteQuery" => out.extend(first.map(|o| (o, Opts::Query))),
+        "useSuspenseQuery" | "useSuspenseInfiniteQuery" => out.extend(first.map(|o| (o, Opts::Suspense))),
+        "useMutation" | "mutationOptions" => out.extend(first.map(|o| (o, Opts::Mutation))),
+        "useQueries" | "useSuspenseQueries" => {
+            let kind = if name == "useQueries" { Opts::Query } else { Opts::Suspense };
+            if let Some(o) = first {
+                out.extend(queries_entries(o, src).into_iter().map(|e| (e, kind)));
+            }
+        }
+        _ => {}
+    }
+    out
+}
+
+/// The node kinds the option-object rules are called on.
+const OPTION_KINDS: &[&str] = &["call_expression", "new_expression"];
+
+// ---------------------------------------------------------------- no-renamed-v4-options
+
+/// v4's option names v5 renamed, and the new name.
+const RENAMED: &[(&str, &str)] = &[("cacheTime", "gcTime"), ("useErrorBoundary", "throwOnError")];
+
+/// The edit that renames an object member's key, keeping its value.
+fn rename_key(m: Node<'_>, new: &str, src: &str) -> Option<TextEdit> {
+    match m.kind() {
+        "pair" => {
+            let k = m.child_by_field_name("key")?;
+            Some(TextEdit::new(k.start_byte(), k.end_byte(), new))
+        }
+        "shorthand_property_identifier" => Some(TextEdit::new(m.start_byte(), m.end_byte(), format!("{new}: {}", text(m, src)))),
+        "method_definition" => {
+            let k = m.child_by_field_name("name")?;
+            Some(TextEdit::new(k.start_byte(), k.end_byte(), new))
+        }
+        _ => None,
+    }
+}
+
+pub struct NoRenamedV4Options;
+
+impl NativeRule for NoRenamedV4Options {
+    fn id(&self) -> &'static str {
+        "tanstack-query/no-renamed-v4-options"
+    }
+    fn languages(&self) -> &'static [Language] {
+        JS
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        OPTION_KINDS
+    }
+    fn needs_semantic(&self) -> bool {
+        true
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(model) = ctx.semantic else { return };
+        let src = ctx.source;
+        for (object, _) in option_objects(model, node.get_inner_node(), src) {
+            for m in members(object) {
+                let Some(name) = member_name(m, src) else { continue };
+                let Some(&(old, new)) = RENAMED.iter().find(|(o, _)| *o == name) else { continue };
+                // Both names written: renaming would make a duplicate key.
+                let edits = if member(object, new, src).is_some() { Vec::new() } else { rename_key(m, new, src).into_iter().collect() };
+                out.push(finding(m, format!("TanStack Query v5 renamed `{old}` to `{new}`; under the old name the option does nothing"), edits));
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- no-removed-v4-options
+
+/// The query options v5 removed, and what replaces each.
+const REMOVED: &[(&str, &str)] = &[
+    ("onSuccess", "query callbacks were removed in v5 and never run; react to the data where it is rendered, or move the work into the `queryFn`"),
+    ("onError", "query callbacks were removed in v5 and never run; handle the error where the query is rendered, or with the `QueryCache`'s `onError`"),
+    ("onSettled", "query callbacks were removed in v5 and never run; react to the result where it is rendered, or move the work into the `queryFn`"),
+    ("keepPreviousData", "`keepPreviousData` was removed in v5; pass `placeholderData: keepPreviousData`, imported from TanStack Query"),
+    ("isDataEqual", "`isDataEqual` was removed in v5; pass a function to `structuralSharing` instead"),
+    ("context", "the `context` option was removed in v5; pass the `QueryClient` as the hook's second argument"),
+];
+
+pub struct NoRemovedV4Options;
+
+impl NativeRule for NoRemovedV4Options {
+    fn id(&self) -> &'static str {
+        "tanstack-query/no-removed-v4-options"
+    }
+    fn languages(&self) -> &'static [Language] {
+        JS
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        OPTION_KINDS
+    }
+    fn needs_semantic(&self) -> bool {
+        true
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(model) = ctx.semantic else { return };
+        let src = ctx.source;
+        for (object, kind) in option_objects(model, node.get_inner_node(), src) {
+            if kind == Opts::Mutation {
+                continue;
+            }
+            for m in members(object) {
+                let Some(name) = member_name(m, src) else { continue };
+                if let Some((_, why)) = REMOVED.iter().find(|(o, _)| *o == name) {
+                    out.push(finding(m, format!("`{name}` is not a TanStack Query v5 query option: {why}"), Vec::new()));
+                }
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- no-unsupported-suspense-options
+
+/// The options `useSuspenseQuery` and `useSuspenseInfiniteQuery` don't take.
+const NOT_SUSPENSE: &[(&str, &str)] = &[
+    ("enabled", "a suspense query can't be disabled; render the component only when the query should run"),
+    ("placeholderData", "a suspense query has no placeholder; wrap the update that changes the key in `startTransition`"),
+    ("throwOnError", "a suspense query decides when to throw; throw `error` yourself to send every error to the boundary"),
+];
+
+/// The edit that removes an object member with one comma next to it.
+fn remove_member(object: Node<'_>, m: Node<'_>) -> TextEdit {
+    let all = members(object);
+    let i = all.iter().position(|x| x.id() == m.id()).unwrap_or(0);
+    match (i.checked_sub(1).and_then(|p| all.get(p)), all.get(i + 1)) {
+        (_, Some(next)) => TextEdit::new(m.start_byte(), next.start_byte(), ""),
+        (Some(prev), None) => TextEdit::new(prev.end_byte(), m.end_byte(), ""),
+        (None, None) => {
+            // The only member: take a trailing comma with it.
+            let end = m.next_sibling().filter(|s| s.kind() == ",").map_or(m.end_byte(), |c| c.end_byte());
+            TextEdit::new(m.start_byte(), end, "")
+        }
+    }
+}
+
+pub struct NoUnsupportedSuspenseOptions;
+
+impl NativeRule for NoUnsupportedSuspenseOptions {
+    fn id(&self) -> &'static str {
+        "tanstack-query/no-unsupported-suspense-options"
+    }
+    fn languages(&self) -> &'static [Language] {
+        JS
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["call_expression"]
+    }
+    fn needs_semantic(&self) -> bool {
+        true
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(model) = ctx.semantic else { return };
+        let src = ctx.source;
+        for (object, kind) in option_objects(model, node.get_inner_node(), src) {
+            if kind != Opts::Suspense {
+                continue;
+            }
+            for m in members(object) {
+                let Some(name) = member_name(m, src) else { continue };
+                if let Some((_, why)) = NOT_SUSPENSE.iter().find(|(o, _)| *o == name) {
+                    out.push(finding(m, format!("`{name}` is not an option of the suspense hooks, which ignore it: {why}"), vec![remove_member(object, m)]));
+                }
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- object-syntax
+
+/// How a v4 positional call's arguments map onto v5's one object.
+#[derive(Clone, Copy)]
+enum Layout {
+    /// `(key, fn?, options?)` → `{ queryKey, queryFn, ...options }`.
+    Query,
+    /// `(fn, options?)` or `(key, fn?, options?)` → `{ mutationKey, mutationFn, ...options }`.
+    Mutation,
+    /// `(key, filters?, options?)` → `({ <field>: key, ...filters }, options)`.
+    Filters(&'static str),
+    /// `setQueriesData(key, updater, options?)` → `({ queryKey: key }, updater, options)`.
+    Updater,
+}
+
+/// A v4 key as a v5 array: `'todos'` becomes `['todos']`.
+fn key_text(key: Node<'_>, src: &str) -> String {
+    match key.kind() {
+        "string" | "template_string" => format!("[{}]", text(key, src)),
+        _ => text(key, src).to_owned(),
+    }
+}
+
+/// The members an argument spreads into the new object: an object
+/// literal's own members, otherwise `...arg`.
+fn spread(arg: Node<'_>, src: &str) -> Vec<String> {
+    let a = unparen(arg);
+    if a.kind() == "object" {
+        members(a).into_iter().map(|m| text(m, src).to_owned()).collect()
+    } else {
+        vec![format!("...{}", text(arg, src))]
+    }
+}
+
+fn object_text(entries: Vec<String>) -> String {
+    format!("{{ {} }}", entries.join(", "))
+}
+
+/// `(key, fn, options)` with the `fn` and `options` slots read: an object
+/// literal second argument is the options; anything else is the function
+/// only when it is written in place or a third argument follows.
+fn key_fn_options(key_field: &str, fn_field: &str, key: String, rest: &[Node<'_>], src: &str) -> Option<String> {
+    let mut entries = vec![format!("{key_field}: {key}")];
+    match rest {
+        [] => {}
+        [o] if unparen(*o).kind() == "object" => entries.extend(spread(*o, src)),
+        [f] if as_function(*f).is_some() => entries.push(format!("{fn_field}: {}", text(*f, src))),
+        [f, o] => {
+            entries.push(format!("{fn_field}: {}", text(*f, src)));
+            entries.extend(spread(*o, src));
+        }
+        _ => return None,
+    }
+    Some(object_text(entries))
+}
+
+/// v5's arguments for a v4 positional call, when they can be read off it.
+fn object_syntax_args(layout: Layout, args: &[Node<'_>], src: &str) -> Option<String> {
+    let first = unparen(*args.first()?);
+    match layout {
+        Layout::Query => key_fn_options("queryKey", "queryFn", key_text(first, src), &args[1..], src),
+        Layout::Mutation if !is_key_literal(first) => match &args[1..] {
+            [] => Some(object_text(vec![format!("mutationFn: {}", text(args[0], src))])),
+            [o] => Some(object_text(std::iter::once(format!("mutationFn: {}", text(args[0], src))).chain(spread(*o, src)).collect())),
+            _ => None,
+        },
+        Layout::Mutation => key_fn_options("mutationKey", "mutationFn", key_text(first, src), &args[1..], src),
+        Layout::Filters(field) => {
+            let mut entries = vec![format!("{field}: {}", key_text(first, src))];
+            match &args[1..] {
+                [] => Some(object_text(entries)),
+                [filters, rest @ ..] if rest.len() <= 1 => {
+                    entries.extend(spread(*filters, src));
+                    Some(std::iter::once(object_text(entries)).chain(rest.iter().map(|r| text(*r, src).to_owned())).collect::<Vec<_>>().join(", "))
+                }
+                _ => None,
+            }
+        }
+        Layout::Updater => match &args[1..] {
+            [updater, rest @ ..] if rest.len() <= 1 => Some(
+                std::iter::once(object_text(vec![format!("queryKey: {}", key_text(first, src))]))
+                    .chain(std::iter::once(text(*updater, src).to_owned()))
+                    .chain(rest.iter().map(|r| text(*r, src).to_owned()))
+                    .collect::<Vec<_>>()
+                    .join(", "),
+            ),
+            _ => None,
+        },
+    }
+}
+
+/// A first argument that is a v4 key: an array or a string.
+fn is_key_literal(n: Node<'_>) -> bool {
+    matches!(unparen(n).kind(), "array" | "string" | "template_string")
+}
+
+pub struct ObjectSyntax;
+
+impl NativeRule for ObjectSyntax {
+    fn id(&self) -> &'static str {
+        "tanstack-query/object-syntax"
+    }
+    fn languages(&self) -> &'static [Language] {
+        JS
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["call_expression"]
+    }
+    fn needs_semantic(&self) -> bool {
+        true
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(model) = ctx.semantic else { return };
+        let call = node.get_inner_node();
+        let src = ctx.source;
+        let Some(callee) = call.child_by_field_name("function") else { return };
+        let (name, layout) = if callee.kind() == "member_expression" {
+            let Some(method) = callee.child_by_field_name("property").map(|p| text(p, src)) else { return };
+            let layout = match method {
+                m if QUERY_METHODS.contains(&m) => Layout::Query,
+                "setQueriesData" => Layout::Updater,
+                m if FILTER_METHODS.contains(&m) => Layout::Filters("queryKey"),
+                _ => return,
+            };
+            (method, layout)
+        } else {
+            let Some(imported) = imported_tanstack(model, callee) else { return };
+            let layout = match imported {
+                "useQuery" | "useInfiniteQuery" => Layout::Query,
+                "useMutation" => Layout::Mutation,
+                "useIsFetching" => Layout::Filters("queryKey"),
+                "useIsMutating" => Layout::Filters("mutationKey"),
+                _ => return,
+            };
+            (text(callee, src), layout)
+        };
+        let args = arguments(call);
+        let Some(&first) = args.first() else { return };
+        // `useMutation(fn, { … })`: v5's second argument is a `QueryClient`, never an object literal.
+        // Solid's and Svelte's hooks take a function that returns the options.
+        let accessor_api = callee.kind() == "identifier" && import_of(model, callee, &|s| s.contains("solid") || s.contains("svelte")).is_some();
+        let mutation_fn = matches!(layout, Layout::Mutation) && !accessor_api && (as_function(first).is_some() || (unparen(first).kind() == "identifier" && object_arg(args.get(1)).is_some()));
+        let positional = is_key_literal(first) || mutation_fn;
+        if !positional {
+            return;
+        }
+        let edits = match (object_syntax_args(layout, &args, src), args.last()) {
+            (Some(new), Some(last)) => vec![TextEdit::new(first.start_byte(), last.end_byte(), new)],
+            _ => Vec::new(),
+        };
+        out.push(finding(call, format!("`{name}` takes one options object in TanStack Query v5; the positional arguments of v4 are not read"), edits));
+    }
+}
+
+// ---------------------------------------------------------------- array-query-key
+
+/// Whether an object literal is one TanStack Query reads: next to a
+/// `queryFn`, an argument of a TanStack import or a QueryClient method, or
+/// an entry of `queries`.
+fn read_by_tanstack(model: &SemanticModel, object: Node<'_>, src: &str) -> bool {
+    if member(object, "queryFn", src).is_some() {
+        return true;
+    }
+    let mut p = object.parent();
+    while let Some(x) = p.filter(|x| matches!(x.kind(), "parenthesized_expression" | "as_expression" | "satisfies_expression")) {
+        p = x.parent();
+    }
+    let Some(p) = p else { return false };
+    match p.kind() {
+        "arguments" => {
+            let Some(callee) = p.parent().and_then(|c| c.child_by_field_name("function")) else { return false };
+            match callee.kind() {
+                "member_expression" => callee.child_by_field_name("property").is_some_and(|m| {
+                    let m = text(m, src);
+                    QUERY_METHODS.contains(&m) || FILTER_METHODS.contains(&m) || matches!(m, "setQueryDefaults" | "getQueryDefaults")
+                }),
+                _ => imported_tanstack(model, callee).is_some(),
+            }
+        }
+        "array" => p.parent().is_some_and(|q| q.kind() == "pair" && member_name(q, src) == Some("queries")),
+        _ => false,
+    }
+}
+
+pub struct ArrayQueryKey;
+
+impl NativeRule for ArrayQueryKey {
+    fn id(&self) -> &'static str {
+        "tanstack-query/array-query-key"
+    }
+    fn languages(&self) -> &'static [Language] {
+        JS
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["pair"]
+    }
+    fn needs_semantic(&self) -> bool {
+        true
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(model) = ctx.semantic else { return };
+        let pair = node.get_inner_node();
+        let src = ctx.source;
+        if member_name(pair, src) != Some("queryKey") {
+            return;
+        }
+        let Some(value) = pair.child_by_field_name("value") else { return };
+        let v = unparen(value);
+        if !matches!(v.kind(), "string" | "template_string" | "number" | "object" | "true" | "false") {
+            return;
+        }
+        let Some(object) = pair.parent().filter(|o| o.kind() == "object") else { return };
+        if !read_by_tanstack(model, object, src) {
+            return;
+        }
+        let edit = TextEdit::new(value.start_byte(), value.end_byte(), format!("[{}]", text(value, src)));
+        out.push(finding(value, "A query key is an array at the top level; wrap it: `[…]`", vec![edit]));
+    }
+}
+
+// ---------------------------------------------------------------- no-mutating-set-query-data
+
+/// The array methods that change their array in place.
+const MUTATORS: &[&str] = &["push", "pop", "shift", "unshift", "splice", "sort", "reverse", "fill", "copyWithin"];
+
+/// The identifier a single-name parameter declares.
+fn param_ident(p: Node<'_>) -> Option<Node<'_>> {
+    match p.kind() {
+        "identifier" => Some(p),
+        "assignment_pattern" => p.child_by_field_name("left").filter(|l| l.kind() == "identifier"),
+        "required_parameter" | "optional_parameter" => p.child_by_field_name("pattern").and_then(param_ident),
+        _ => None,
+    }
+}
+
+/// The expression that changes, in place, the value a reference names:
+/// `old.a = …`, `old.a++`, `delete old.a`, `old.list.push(…)`,
+/// `Object.assign(old, …)`.
+fn mutation_at<'t>(ident: Node<'t>, src: &str) -> Option<Node<'t>> {
+    let top = chain_top(ident);
+    let parent = top.parent()?;
+    if top.id() == ident.id() {
+        // `Object.assign(old, …)`
+        let call = parent.parent().filter(|c| parent.kind() == "arguments" && c.kind() == "call_expression")?;
+        let callee = call.child_by_field_name("function")?;
+        let first = arguments(call).first().is_some_and(|a| a.id() == ident.id());
+        return (first && normalize(text(callee, src)) == "Object.assign").then_some(call);
+    }
+    match parent.kind() {
+        "assignment_expression" | "augmented_assignment_expression" => parent.child_by_field_name("left").filter(|l| l.id() == top.id()).map(|_| parent),
+        "update_expression" => Some(parent),
+        "unary_expression" if parent.child(0).is_some_and(|o| o.kind() == "delete") => Some(parent),
+        "call_expression" if is_callee(top) && top.kind() == "member_expression" => {
+            let method = top.child_by_field_name("property").map(|p| text(p, src))?;
+            MUTATORS.contains(&method).then_some(parent)
+        }
+        _ => None,
+    }
+}
+
+pub struct NoMutatingSetQueryData;
+
+impl NativeRule for NoMutatingSetQueryData {
+    fn id(&self) -> &'static str {
+        "tanstack-query/no-mutating-set-query-data"
+    }
+    fn languages(&self) -> &'static [Language] {
+        JS
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["call_expression"]
+    }
+    fn needs_semantic(&self) -> bool {
+        true
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(model) = ctx.semantic else { return };
+        let call = node.get_inner_node();
+        let src = ctx.source;
+        let Some(method) = call.child_by_field_name("function").filter(|f| f.kind() == "member_expression").and_then(|f| f.child_by_field_name("property")).map(|p| text(p, src)) else { return };
+        if !matches!(method, "setQueryData" | "setQueriesData") {
+            return;
+        }
+        let Some(updater) = arguments(call).get(1).copied().and_then(as_function) else { return };
+        let Some(param) = params(updater).first().copied().and_then(param_ident) else { return };
+        let Some(sym) = model.symbol_at(param.start_byte()) else { return };
+        let name = text(param, src);
+        let mut refs = Vec::new();
+        let mut stack = vec![updater];
+        while let Some(n) = stack.pop() {
+            stack.extend(named_children(n));
+            if n.kind() == "identifier" && n.id() != param.id() && text(n, src) == name && model.reference_at(n.start_byte()).and_then(|r| r.symbol) == Some(sym) {
+                refs.push(n);
+            }
+        }
+        // `old = { ...old }` makes `old` a copy: what follows changes the copy.
+        let reassigned = refs.iter().any(|r| r.parent().is_some_and(|p| p.kind() == "assignment_expression" && p.child_by_field_name("left").is_some_and(|l| l.id() == r.id())));
+        if reassigned {
+            return;
+        }
+        let mut found: Vec<Node> = refs.into_iter().filter_map(|r| mutation_at(r, src)).collect();
+        found.sort_by_key(|m| m.start_byte());
+        found.dedup_by_key(|m| m.id());
+        for m in found {
+            out.push(finding(m, format!("`{method}`'s updater changes the cached `{name}` in place; return a new value (`{{ ...{name}, … }}`, `[...{name}, …]`) so the cache and its observers see the change"), Vec::new()));
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -723,5 +1291,77 @@ mod tests {
         let src = "useMutation({ onError: (e, v, ctx) => undo(ctx), mutationFn: save, onMutate: () => snapshot() });";
         let f = found(&MutationPropertyOrder, Language::Tsx, src);
         assert_eq!(f[0].1.as_deref(), Some("onMutate: () => snapshot(), mutationFn: save, onError: (e, v, ctx) => undo(ctx)"));
+    }
+
+    const V5: &str = "import { useQuery, useQueries, useMutation, useSuspenseQuery, useSuspenseQueries, useIsFetching, queryOptions, QueryClient } from '@tanstack/react-query';\n";
+
+    #[test]
+    fn renamed_v4_options() {
+        let src = format!(
+            "{V5}useQuery({{ queryKey: ['a'], queryFn: f, cacheTime: 1000, useErrorBoundary: true }});\nuseMutation({{ mutationFn: f, useErrorBoundary }});\nconst c = new QueryClient({{ defaultOptions: {{ queries: {{ cacheTime: 5 }} }} }});\nqueryClient.prefetchQuery({{ queryKey: ['b'], cacheTime: 1, gcTime: 2 }});\nuseQueries({{ queries: ids.map((id) => ({{ queryKey: [id], cacheTime: 1 }})) }});\nfunction useQuery2() {{ return other({{ cacheTime: 1 }}); }}"
+        );
+        let f = found(&NoRenamedV4Options, Language::Tsx, &src);
+        let fixes: Vec<_> = f.iter().map(|(_, e)| e.clone()).collect();
+        assert_eq!(fixes, [Some("gcTime".to_owned()), Some("throwOnError".to_owned()), Some("throwOnError: useErrorBoundary".to_owned()), Some("gcTime".to_owned()), None, Some("gcTime".to_owned())], "{f:#?}");
+    }
+
+    #[test]
+    fn removed_v4_options() {
+        let src = format!(
+            "{V5}useQuery({{ queryKey: ['a'], queryFn: f, onSuccess: (d) => log(d), keepPreviousData: true, suspense: true }});\nuseMutation({{ mutationFn: f, onSuccess: () => done() }});\nqueryOptions({{ queryKey: ['b'], onError() {{}} }});\nconst c = new QueryClient({{ defaultOptions: {{ queries: {{ onSettled: s }}, mutations: {{ onError: e }} }} }});"
+        );
+        let f: Vec<String> = found(&NoRemovedV4Options, Language::Tsx, &src).into_iter().map(|(t, _)| t).collect();
+        assert_eq!(f, ["onSuccess: (d) => log(d)", "keepPreviousData: true", "onError() {}", "onSettled: s"]);
+    }
+
+    #[test]
+    fn unsupported_suspense_options() {
+        let src = format!("{V5}useSuspenseQuery({{ queryKey: ['a'], queryFn: f, enabled: !!id }});\nuseSuspenseQuery({{ placeholderData: p, queryKey: ['b'] }});\nuseSuspenseQueries({{ queries: [{{ queryKey: ['c'], throwOnError: true }}] }});\nuseQuery({{ queryKey: ['d'], enabled: false }});");
+        let f = found(&NoUnsupportedSuspenseOptions, Language::Tsx, &src);
+        assert_eq!(f.iter().map(|(t, _)| t.as_str()).collect::<Vec<_>>(), ["enabled: !!id", "placeholderData: p", "throwOnError: true"]);
+        let fixed = |i: usize| {
+            let e = crate::run(&NoUnsupportedSuspenseOptions, Language::Tsx, &src).remove(i).edits.remove(0);
+            format!("{}{}{}", &src[..e.start], e.text, &src[e.end..])
+        };
+        assert!(fixed(0).contains("useSuspenseQuery({ queryKey: ['a'], queryFn: f });"));
+        assert!(fixed(1).contains("useSuspenseQuery({ queryKey: ['b'] });"));
+    }
+
+    #[test]
+    fn object_syntax() {
+        let src = format!(
+            "{V5}useQuery(['todos'], fetchTodos, {{ staleTime: 5 }});\nuseQuery('todos', () => get());\nuseQuery(['a'], {{ queryFn: f }});\nuseMutation(addTodo, {{ onSuccess }});\nuseMutation((v) => post(v));\nqueryClient.invalidateQueries(['todos']);\nqueryClient.setQueriesData(['todos'], up);\nuseIsFetching(['todos'], {{ exact: true }});\nuseQuery(['x'], fn);\nuseQuery({{ queryKey: ['ok'] }});\nqueryClient.invalidateQueries({{ queryKey: ['ok'] }});\nuseMutation(options);\nimport {{ useMutation as useSolidMutation }} from '@tanstack/solid-query';\nuseSolidMutation(() => ({{ mutationFn: f }}));"
+        );
+        let f: Vec<Option<String>> = found(&ObjectSyntax, Language::Tsx, &src).into_iter().map(|(_, e)| e).collect();
+        assert_eq!(
+            f,
+            [
+                Some("{ queryKey: ['todos'], queryFn: fetchTodos, staleTime: 5 }".to_owned()),
+                Some("{ queryKey: ['todos'], queryFn: () => get() }".to_owned()),
+                Some("{ queryKey: ['a'], queryFn: f }".to_owned()),
+                Some("{ mutationFn: addTodo, onSuccess }".to_owned()),
+                Some("{ mutationFn: (v) => post(v) }".to_owned()),
+                Some("{ queryKey: ['todos'] }".to_owned()),
+                Some("{ queryKey: ['todos'] }, up".to_owned()),
+                Some("{ queryKey: ['todos'], exact: true }".to_owned()),
+                None,
+            ]
+        );
+    }
+
+    #[test]
+    fn array_query_key() {
+        let src = format!(
+            "{V5}useQuery({{ queryKey: 'todos', queryFn: f }});\nqueryClient.invalidateQueries({{ queryKey: `todo-${{id}}` }});\nconst o = {{ queryKey: {{ id }}, queryFn: g }};\nuseQuery({{ queryKey: ['ok'], queryFn: f }});\nconst p = {{ queryKey: 'q' }};\nuseQuery({{ queryKey: key, queryFn: f }});"
+        );
+        let f = found(&ArrayQueryKey, Language::Tsx, &src);
+        assert_eq!(f.into_iter().map(|(_, e)| e.unwrap_or_default()).collect::<Vec<_>>(), ["['todos']", "[`todo-${id}`]", "[{ id }]"]);
+    }
+
+    #[test]
+    fn mutating_set_query_data() {
+        let src = "queryClient.setQueryData(['p', id], (old) => { if (old) { old.title = 't'; } return old; });\nqc.setQueryData(k, (old) => { old.items.push(x); delete old.draft; old.count++; Object.assign(old, patch); return old; });\nqc.setQueryData(k, (old) => (old ? { ...old, title: 't' } : old));\nqc.setQueryData(k, (old) => { const copy = [...old]; copy.push(x); return copy; });\nqc.setQueryData(k, (old) => old.map((p) => { p.seen = true; return p; }));\nqc.setQueryData(k, (old) => { old = { ...old }; old.x = 1; return old; });";
+        let f: Vec<String> = found(&NoMutatingSetQueryData, Language::Tsx, src).into_iter().map(|(t, _)| t).collect();
+        assert_eq!(f, ["old.title = 't'", "old.items.push(x)", "delete old.draft", "old.count++", "Object.assign(old, patch)"]);
     }
 }

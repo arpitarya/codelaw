@@ -19,7 +19,7 @@ or `react-query`.
 
 | preset | rules | ported from |
 |---|---|---|
-| `tanstack-query/recommended` | 7 | @tanstack/eslint-plugin-query 5.104.5 `recommended` (all 7), at its severities |
+| `tanstack-query/recommended` | 13 | @tanstack/eslint-plugin-query 5.104.5 `recommended` (all 7), at its severities, and the 6 rules from TanStack Query v5's guides below |
 
 <!-- /docs-sync:presets -->
 
@@ -41,6 +41,19 @@ package, as upstream does.
 | `tanstack-query/infinite-query-property-order` | auto | `queryFn` before `getPreviousPageParam` / `getNextPageParam` |
 | `tanstack-query/mutation-property-order` | auto | `onMutate` before `onError` / `onSettled` |
 
+Six more rules come from TanStack Query v5's own guides — *Migrating to TanStack Query v5*, *Query Keys*,
+*Updates from Mutation Responses* and *Suspense* — where a guide states a rule a matcher can decide
+without types (W-42). Each rule page quotes the guide's words.
+
+| rule | fix | checks |
+|---|---|---|
+| `tanstack-query/no-renamed-v4-options` | auto | `gcTime` and `throwOnError`, not v4's `cacheTime` and `useErrorBoundary` |
+| `tanstack-query/no-removed-v4-options` | manual | no `onSuccess` / `onError` / `onSettled`, `keepPreviousData`, `isDataEqual` or `context` on a query |
+| `tanstack-query/object-syntax` | suggest | one options object, not v4's positional `(key, fn, options)` |
+| `tanstack-query/array-query-key` | suggest | a `queryKey` is an array |
+| `tanstack-query/no-mutating-set-query-data` | manual | a `setQueryData` updater doesn't change the cached data in place |
+| `tanstack-query/no-unsupported-suspense-options` | suggest | no `enabled`, `placeholderData` or `throwOnError` on a suspense query |
+
 ## How the ports differ
 
 Every rule matches its source's documented behaviour on the source's own
@@ -59,3 +72,4 @@ section says so. The larger ones:
 | rule | why |
 |---|---|
 | `@tanstack/query/prefer-query-options` | not in `recommended` (it is `recommended-strict`'s only addition), which is what this pack ports |
+| a returned `invalidateQueries` in a mutation callback (W-42 candidate) | *Invalidations from Mutations* says what returning the promise does ("makes sure the data is updated before the mutation is entirely complete") and that "you can wire up your invalidations … using any of the callbacks"; it describes a choice, not a rule |

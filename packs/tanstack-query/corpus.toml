@@ -1,0 +1,17 @@
+# `codelaw test --corpus` finding counts (SR-RULE-AUTHORING decision 4).
+# Rewrite with --update-snapshot, and review the change.
+
+[findings]
+"tanstack-query/array-query-key" = 7
+"tanstack-query/exhaustive-deps" = 361
+"tanstack-query/infinite-query-property-order" = 8
+"tanstack-query/mutation-property-order" = 0
+"tanstack-query/no-mutating-set-query-data" = 0
+"tanstack-query/no-removed-v4-options" = 76
+"tanstack-query/no-renamed-v4-options" = 3
+"tanstack-query/no-rest-destructuring" = 6
+"tanstack-query/no-unstable-deps" = 0
+"tanstack-query/no-unsupported-suspense-options" = 0
+"tanstack-query/no-void-query-fn" = 19
+"tanstack-query/object-syntax" = 193
+"tanstack-query/stable-query-client" = 10
