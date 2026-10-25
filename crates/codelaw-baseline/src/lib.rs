@@ -11,6 +11,7 @@ pub mod apply;
 pub mod date;
 pub mod exception;
 pub mod file;
+pub mod history;
 pub mod ratchet;
 pub mod registry;
 

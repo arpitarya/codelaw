@@ -10,7 +10,7 @@ feature: "grandfathering violations and deprecations"
 owns:
   - crates/codelaw-baseline
 laws: [L0, L4, L5]
-timestamp: 2026-10-25T12:00:00Z
+timestamp: 2026-10-25T14:00:00Z
 content_sha: ""
 ---
 
@@ -250,6 +250,36 @@ $ codelaw check --as-of 2027-04-01          # what breaks on the day it expires?
 - **`baseline add` and `deprecate`** take `--expires`, `--warn-days` and `--added-by` (default `git config user.email`), so nobody hand-writes an entry; `--until` stays as the alias.
 - **The four engine rules** carry their fix class and steps ([SR-RULE-PACKS](0101_rule-packs.md) decision 1): `codelaw/expiring-exception` (`warn`), `codelaw/expired-exception`, `codelaw/exception-without-expiry`, `codelaw/exception-author` (`error`), all `manual`.
 - **The hazard it names:** a branch with no new commit does not start failing on the day, because the as-of date is `HEAD`'s; a scheduled CI job passes `--as-of "$(date +%F)"`.
+
+#### 10. The burn-down: `codelaw baseline history`
+
+*The decider's ask, 2026-10-25 (W-47).*
+
+- **What it answers:** how many findings each rule's baseline allowed, commit by commit. It reads the **committed** baseline files only: `git log` for the commits that touched `.codelaw/baseline/`, then `git show` for each commit's files, summing `count` per rule. It lints nothing and reads no working-tree file, so uncommitted changes do not appear. A `--relint` that re-runs `check` per commit, for rules with no baseline, is a separate item.
+- **The series:** a point per commit, oldest first; a rule absent from a commit counts 0 there. A renamed rule file is the old rule falling to 0 and the new one rising; a deleted file or folder is 0. A commit whose baseline does not parse is skipped with a warning on stderr.
+- **Flags:**
+  - `--since <date|duration|ref>`: `2026-07-01`; `90d` or `12w`, counted back from the `HEAD` commit date, never the wall clock ([L5](0007_LAW-5-no-model-in-the-engine.md)); or a ref, whose own state opens the series. The state of the last commit before the window opens it too, so a window shows what changed in it. Not given: the whole history.
+  - `--by commit|day|week`: the last commit of each day or ISO week (Monday first) by commit date; default `commit`.
+  - `--rule <id>`: one rule; the total is then that rule's.
+  - `--format text|json|csv|markdown`, default `text`. `text` is a table of rule, start, now, change and a sparkline scaled to each row's own maximum (at most 24 bars, sampled evenly), with a `total` row. `markdown` is the same as a table for a PR comment. `csv` is `date,commit,rule,count`, one line per point and rule, `total` included. `json` is `{ schema_version, by, points[{commit,date}], rules[{rule,start,now,change,counts[]}], total }`.
+- **Deterministic:** the same range gives the same bytes on every machine and in every time zone; dates are commit dates in the committer's own zone, as in decision 4. Rules are sorted by id.
+- **Needs `git`:** with no `git` binary or no repository it is a usage error, exit 2, as `baseline check` is. A shallow clone prints a warning on stderr that the history is cut at the clone's depth and suggests `fetch-depth: 0` (`actions/checkout`) or `git fetch --unshallow`.
+- **Exit codes:** 0 whatever the trend; it reports, it does not gate (`baseline check` gates).
+- **A weekly CI job** that posts the trend (the full history is needed, so `fetch-depth: 0`):
+
+  ```yaml
+  on: { schedule: [{ cron: "0 7 * * 1" }] }
+  jobs:
+    burn-down:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+          with: { fetch-depth: 0 }
+        - run: codelaw baseline history --since 90d --by week --format markdown >> "$GITHUB_STEP_SUMMARY"
+  ```
+
+  `--format csv` or `json` feeds a dashboard the same way.
+- **The test:** `crates/codelaw-cli/tests/baseline_history.rs` builds five baseline commits, with a rule added, a rule file renamed and a file deleted, and checks hand-counted totals, the windows and buckets, the four formats, byte-identical output, the shallow warning and the exit-2 cases.
 
 ### Consequences
 
