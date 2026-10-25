@@ -69,7 +69,8 @@ impl Printer {
     }
 
     /// One run: the report as `check` prints it, then the watch's line
-    /// (text), or one JSON object on one line (json, sarif).
+    /// (text), one JSON object on one line (json, sarif), or each run's
+    /// report in the CI format asked for.
     fn report(&mut self, watch: &Watch, report: &CheckReport, rerun: Option<&Rerun>, fixed: Option<&FixReport>) {
         self.run += 1;
         let changed: &[String] = rerun.map(|r| r.changed.as_slice()).unwrap_or_default();
@@ -98,7 +99,8 @@ impl Printer {
                 out = serde_json::to_string(&v).expect("json") + "\n";
             }
             Format::Sarif => out = serde_json::to_string(&codelaw_report::check_sarif(report, watch.project())).expect("json") + "\n",
-            Format::Agent => out.push_str(&codelaw_report::check_agent(report)),
+            Format::Agent => out.push_str(&codelaw_report::check_agent_with(report, &codelaw_report::security_labels(watch.project()))),
+            ci => out = crate::ci_output(ci, report),
         }
         let mut stdout = std::io::stdout().lock();
         let _ = stdout.write_all(out.as_bytes());

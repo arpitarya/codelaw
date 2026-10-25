@@ -466,7 +466,7 @@ impl Watch {
             }
         }
         let redo: Vec<usize> = (0..parts.files.len())
-            .filter(|&i| changed.contains(parts.files[i].rel.as_str()) || (!parts.asked[i].is_empty() && !still_holds(&root, &parts.asked[i])))
+            .filter(|&i| changed.contains(parts.files[i].rel.as_str()) || (!parts.asked[i].is_empty() && !still_holds(&root, &parts.asked[i], &|| project.as_of_text())))
             .collect();
         let files = &parts.files;
         let fresh: Vec<(FileResult, Vec<Asked>)> = project.pool.install(|| redo.par_iter().map(|&i| project.check_file_asked(&files[i])).collect());
