@@ -92,10 +92,50 @@ files = ["src/legacy/**"]
 rules = { "ts/no-unused-vars" = "off" }
 ```
 
-- **Validation is strict.** An unknown key stops the run and names the valid ones (`unknown key 'disable'; valid keys are 'files', 'exclude', 'rules'`).
+- **Validation is strict.** An unknown key stops the run and names the valid ones (`unknown key 'disable'; valid keys are 'files', 'exclude', 'rules', 'remap'`).
 - **Monorepos:** a nested `codelaw.toml` inherits from the root and overrides it.
 - **Team packs:** `extends` also takes `npm:<package>`, `pypi:<distribution>` and `path:<folder>`.
 - **Full reference:** [SR-CONFIG](records/0110_config.md).
+
+### Warn on a laptop, fail in CI
+
+A **profile** is a named set of `rules` and `overrides` laid over the config. codelaw runs the `ci` profile when the `CI` environment variable is set (and not `false` or `0`), `local` otherwise; `--profile <name>` or `CODELAW_PROFILE` picks one by name. `codelaw hook` and the MCP server run `ci` — an agent gets CI's verdict — and the editor runs `local`.
+
+```toml
+[profiles.local.rules]
+"js/no-console"  = "warn"
+"js/no-debugger" = "warn"
+
+[profiles.ci.rules]
+"js/no-console"  = "error"
+"js/no-debugger" = "error"
+```
+
+```bash
+codelaw check                 # profile local (default): a console.log is a warning, exit 0
+CI=true codelaw check         # profile ci (CI=true): the same line is an error, exit 1
+codelaw check --profile ci    # a pipeline that doesn't set CI (some Jenkins setups)
+```
+
+When the config defines a profile, every report opens with the one in use (`profile ci (CI=true)`), and `codelaw config --print` names it with its source.
+
+### Globs that never error, or never warn
+
+`remap` on an `[[overrides]]` entry maps each severity of a finding in those files to another, or to `off`. It applies last — after the baseline — and never to codelaw's own `codelaw/*` diagnostics.
+
+```toml
+[[overrides]]                      # never fails the run
+files = ["scripts/**"]
+remap = { error = "warn" }
+
+[[overrides]]                      # silent
+files = ["**/*.generated.ts"]
+remap = { error = "off", warn = "off", info = "off" }
+
+[[overrides]]                      # strict: no warnings, only errors
+files = ["src/payments/**"]
+remap = { warn = "error" }
+```
 
 ---
 
@@ -215,7 +255,7 @@ flowchart LR
           run: codelaw check --staged -- {staged_files}
           stage_fixed: true
     ```
-- **CI:** `codelaw check --max-warnings 0` fails the job on any finding; `--changed-since origin/main` checks only what a branch touched; `--format sarif` feeds GitHub code scanning.
+- **CI:** `codelaw check --max-warnings 0` fails the job on any finding; `--changed-since origin/main` checks only what a branch touched; `--format sarif` feeds GitHub code scanning. A CI job runs the `ci` profile when `CI` is set, as GitHub Actions, GitLab CI and most runners do; where it is not, pass `--profile ci` ([Configure](#warn-on-a-laptop-fail-in-ci)).
 - **Adopting it in an old repo:** grandfather a rule's existing findings with a deadline — `codelaw baseline add --rule <id> --expires <date> --reason "<why>"` ([SR-BASELINE](records/0104_baseline-and-deprecations.md)).
 - **Exceptions with an expiry date:** a baseline entry, a deprecation or an inline ignore can carry `expires` — the first day it no longer holds. From `warn_days` before it (3 by default) it is a warning, `codelaw/expiring-exception`; on the day it is an error, `codelaw/expired-exception`, and the findings it covered come back. Set `[exceptions] require_expiry = true` in `codelaw.toml` to make the date mandatory. An optional `added_by` email (`by=` inline) is checked against git under `--staged` (your `git config user.email`) and `--changed-since` (the line's blame author):
 
@@ -225,6 +265,13 @@ flowchart LR
   ```
 
   The day is the as-of date — `HEAD`'s commit date — not the wall clock, so a branch with no new commit does not start failing on the day by itself. A scheduled CI job passes `codelaw check --as-of "$(date +%F)"`. `until`, the last allowed day, still works for one release and reads as `expires` the day after ([SR-BASELINE](records/0104_baseline-and-deprecations.md) decision 9).
+- **Old uses warn, new ones fail:** leave out `--expires` and pass `--warn-from <today> --on-touch keep`. Each file's existing findings stay warnings with no deadline; a new file with the finding, or one more finding in an old file, is an error. `react/no-context` is the worked example — turn it on, then:
+
+  ```bash
+  # codelaw.toml: [rules] "react/no-context" = "error"
+  codelaw baseline add --rule react/no-context \
+    --warn-from 2026-10-25 --on-touch keep --reason "legacy context, grandfathered"
+  ```
 
 ---
 

@@ -137,6 +137,14 @@ impl Config {
             }
         };
 
+        // The profile (decision 10): its name, from where the choice came.
+        let defined = root.is_some_and(|f| f.raw.profiles.contains_key(&self.profile.name));
+        let profile_source = match root.filter(|_| defined) {
+            Some(f) => format!("{} ({})", self.profile.source, self.source(f, &["profiles", &self.profile.name])),
+            None => format!("{} (not defined: no change)", self.profile.source),
+        };
+        push("profile", json!(self.profile.name), profile_source);
+
         let (v, s) = root_key(&["extends"], |r| (!r.extends.is_empty()).then(|| json!(r.extends)), json!([]));
         push("extends", v, s);
 
@@ -235,6 +243,23 @@ impl Config {
         push("exceptions.require_expiry", v, s);
         let (v, s) = root_key(&["exceptions", "warn_days"], |r| r.exceptions.as_ref().and_then(|e| e.warn_days).map(|x| json!(x)), json!(3));
         push("exceptions.warn_days", v, s);
+        // `remap` (decision 11): what the matching overrides make of each
+        // severity in this file, each from the override that set it.
+        for (f, in_profile, i, o) in self.overrides_for(&target) {
+            let Some(t) = &o.remap else { continue };
+            let n = i.to_string();
+            let path: Vec<&str> = if in_profile {
+                vec!["profiles", &self.profile.name, "overrides", &n, "remap"]
+            } else {
+                vec!["overrides", &n, "remap"]
+            };
+            let at = self.source(f, &path);
+            let at = if in_profile { format!("{at} profile {} override #{}", self.profile.name, i + 1) } else { format!("{at} override #{}", i + 1) };
+            for (from, to) in t {
+                push(&format!("remap.{from}"), json!(to), at.clone());
+            }
+        }
+
         // The sections not validated yet: shown as written.
         for (name, get) in [
             ("format", (|r: &RawConfig| r.format.clone()) as fn(&RawConfig) -> Option<toml::Table>),
@@ -261,17 +286,21 @@ impl Config {
                 out.push((self.source(f, &["rules", id]), s));
             }
         }
-        for f in self.governing(&target) {
-            let Some(relative) = f.relative(&target) else { continue };
-            for (i, (o, (files, exclude))) in f.raw.overrides.iter().zip(&f.overrides).enumerate() {
-                if files.is_match(relative)
-                    && !exclude.is_match(relative)
-                    && let Some(s) = o.rules.get(id)
-                {
-                    let n = i.to_string();
-                    out.push((format!("{} override #{}", self.source(f, &["overrides", &n, "rules", id]), i + 1), s));
-                }
-            }
+        let name = self.profile.name.as_str();
+        if let Some((f, p, _)) = self.active_profile().filter(|(f, _, _)| target.starts_with(&f.dir))
+            && let Some(s) = p.rules.get(id)
+        {
+            out.push((format!("{} profile {name}", self.source(f, &["profiles", name, "rules", id])), s));
+        }
+        for (f, in_profile, i, o) in self.overrides_for(&target) {
+            let Some(s) = o.rules.get(id) else { continue };
+            let n = i.to_string();
+            let source = if in_profile {
+                format!("{} profile {name} override #{}", self.source(f, &["profiles", name, "overrides", &n, "rules", id]), i + 1)
+            } else {
+                format!("{} override #{}", self.source(f, &["overrides", &n, "rules", id]), i + 1)
+            };
+            out.push((source, s));
         }
         out
     }

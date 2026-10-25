@@ -23,6 +23,10 @@ pub struct HookArgs {
     /// The files the agent edited. When none, they are read from the hook
     /// payload the agent writes on stdin (Claude Code, Codex, Copilot).
     pub paths: Vec<PathBuf>,
+    /// The profile to judge with; `ci` by default, so an agent gets CI's
+    /// verdict (SR-CONFIG decision 10).
+    #[arg(long)]
+    pub profile: Option<String>,
 }
 
 /// The paths a hook payload names. Every agent of the decision-2 matrix
@@ -92,14 +96,16 @@ fn checkable(paths: Vec<PathBuf>) -> Vec<PathBuf> {
 
 /// Run the hook on `paths`, or on the payload when there are none. Returns
 /// the text for the agent and whether it must go back to it.
-pub fn run(paths: Vec<PathBuf>, payload: Option<&str>) -> Result<Option<(String, bool)>, String> {
+pub fn run(paths: Vec<PathBuf>, payload: Option<&str>, profile: Option<String>) -> Result<Option<(String, bool)>, String> {
     let paths = if paths.is_empty() { payload.map(paths_from_payload).unwrap_or_default() } else { paths };
     let paths = checkable(paths);
     let Some(first) = paths.first() else { return Ok(None) };
     let start = first.parent().map(Path::to_path_buf).filter(|p| !p.as_os_str().is_empty()).unwrap_or_else(|| PathBuf::from("."));
     // The files the agent just edited are touched: a grandfathered finding
     // in one gets the verdict CI would give it (SR-BASELINE decision 8).
-    let options = EngineOptions { touched_paths: paths.clone(), ..EngineOptions::from_env() };
+    // The `ci` profile unless `--profile` or `CODELAW_PROFILE` says
+    // otherwise: an agent never leaves behind what CI would fail.
+    let options = EngineOptions { touched_paths: paths.clone(), profile, profile_surface: Some(("ci", "codelaw hook")), ..EngineOptions::from_env() };
     let mut project = Project::load(&start, options).map_err(|e| e.to_string())?;
     // `auto` only, written: L4 decision 8. `suggest` goes back as a diff.
     let report = project.fix(&paths, &FixOptions { unsafe_fixes: false, dry_run: false, trace: false }).map_err(|e| e.to_string())?;
@@ -115,7 +121,7 @@ pub fn hook(args: HookArgs) -> ExitCode {
     if args.paths.is_empty() && !std::io::stdin().is_terminal() {
         let _ = std::io::stdin().read_to_string(&mut payload);
     }
-    match run(args.paths, Some(&payload)) {
+    match run(args.paths, Some(&payload), args.profile) {
         Ok(None) => ExitCode::SUCCESS,
         Ok(Some((text, false))) => {
             print!("{text}");
@@ -152,6 +158,6 @@ mod tests {
 
     #[test]
     fn a_file_codelaw_does_not_check_is_left_alone() {
-        assert_eq!(run(vec![PathBuf::from("Cargo.toml.missing"), PathBuf::from("src/lib.rs")], None), Ok(None));
+        assert_eq!(run(vec![PathBuf::from("Cargo.toml.missing"), PathBuf::from("src/lib.rs")], None, None), Ok(None));
     }
 }

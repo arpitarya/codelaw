@@ -170,6 +170,12 @@ allow_pack_fixers = ["@acme/rules"]
 files = ["src/**/*.tsx"]
 exclude = ["src/legacy/**"]
 rules = { "js/exports-at-end" = "off" }
+remap = { error = "warn", warn = "off", info = "off" }
+[profiles.ci]
+rules = { "js/no-console" = "error" }
+overrides = [{ files = ["scripts/**"], remap = { error = "warn" } }]
+[profiles.local.rules]
+"js/no-console" = "warn"
 [files]
 follow_symlinks = false
 generated_markers = ["DO NOT EDIT"]
@@ -208,6 +214,10 @@ line_width = 100
         ("an unknown language", json!({ "languages": ["pyhton"] })),
         ("a bad size", json!({ "cache": { "max_size": "1 parsec" } })),
         ("a negative tree cache", json!({ "lsp": { "tree_cache": -1 } })),
+        ("an unknown remap key", json!({ "overrides": [{ "files": ["a"], "remap": { "eror": "warn" } }] })),
+        ("a bad remap value", json!({ "overrides": [{ "files": ["a"], "remap": { "error": "wran" } }] })),
+        ("an unknown profile key", json!({ "profiles": { "ci": { "rule": {} } } })),
+        ("a bad profile severity", json!({ "profiles": { "ci": { "rules": { "a/b": "eror" } } } })),
     ] {
         assert!(schemas.validate(&bad, idx).is_err(), "the schema accepts {what}");
         assert!(Config::from_toml(PathBuf::from("/x"), &toml::to_string(&bad).unwrap()).is_err(), "the loader accepts {what}");

@@ -137,6 +137,10 @@ pub fn check_json(report: &CheckReport) -> Value {
     if let Some(a) = &report.as_of {
         v["as_of"] = json!({ "date": a.date.map(|d| d.to_string()), "source": a.source });
     }
+    // Only when the config defines a profile (SR-CONFIG decision 10).
+    if let Some(p) = &report.profile {
+        v["profile"] = json!({ "name": p.name, "source": p.source });
+    }
     v
 }
 
@@ -235,6 +239,9 @@ pub fn fix_text(report: &FixReport, color: bool) -> String {
 fn text(report: &CheckReport, color: bool, fixed: Option<usize>) -> String {
     let paint = Paint(color);
     let mut out = String::new();
+    if let Some(p) = &report.profile {
+        out.push_str(&format!("{}\n", p.line()));
+    }
     if let Some(a) = &report.as_of {
         out.push_str(&format!("{}\n", a.line()));
     }
@@ -282,6 +289,9 @@ fn text(report: &CheckReport, color: bool, fixed: Option<usize>) -> String {
 /// Compact lines for hooks: one per diagnostic, with what to do next.
 pub fn check_agent(report: &CheckReport) -> String {
     let mut out = String::new();
+    if let Some(p) = &report.profile {
+        out.push_str(&format!("{}\n", p.line()));
+    }
     if let Some(a) = &report.as_of {
         out.push_str(&format!("{}\n", a.line()));
     }
@@ -345,6 +355,7 @@ mod tests {
             files_checked: 1,
             warnings: vec![],
             as_of: None,
+            ..Default::default()
         };
         let v = check_json(&r);
         assert_eq!(v["schema_version"], 1);
@@ -364,6 +375,7 @@ mod tests {
             files_checked: 1,
             warnings: vec![],
             as_of: None,
+            ..Default::default()
         };
         let t = check_text(&r, false);
         assert!(t.contains("src/a.js\n  1:1  error  Use ===  a/e [auto]"), "{t}");

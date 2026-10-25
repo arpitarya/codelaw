@@ -84,7 +84,30 @@
         "properties": {
           "files": { "$ref": "#/definitions/globs" },
           "exclude": { "$ref": "#/definitions/globs" },
-          "rules": { "$ref": "#/definitions/rules" }
+          "rules": { "$ref": "#/definitions/rules" },
+          "remap": {
+            "description": "Each severity of a finding in these files mapped to another, or to off; applied last, after the baseline. Never remaps codelaw/* diagnostics.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "error": { "$ref": "#/definitions/severity" },
+              "warn": { "$ref": "#/definitions/severity" },
+              "info": { "$ref": "#/definitions/severity" }
+            }
+          }
+        }
+      }
+    },
+    "profiles": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Named sets of rules and overrides, applied after the configs' own: `ci` when CI is set, `local` otherwise, or --profile / CODELAW_PROFILE. Root config only.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "rules": { "$ref": "#/definitions/rules" },
+          "overrides": { "$ref": "#/properties/overrides" }
         }
       }
     },

@@ -10,7 +10,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 
 ![status: preview](https://img.shields.io/badge/status-preview-orange)
 ![version 0.2.0](https://img.shields.io/badge/version-0.2.0-blue)
-![rules: 446](https://img.shields.io/badge/rules-446-informational)
+![rules: 458](https://img.shields.io/badge/rules-458-informational)
 ![languages: 9](https://img.shields.io/badge/languages-9-informational)
 ![licence: MIT](https://img.shields.io/badge/licence-MIT-green)
 ![engine: Rust](https://img.shields.io/badge/engine-Rust-b7410e)
@@ -94,7 +94,23 @@ Every door gets the same answer, because they all call the same engine.
 | **A rule's documentation** | kept apart from the code that runs it | the rule file itself, tested against its own examples |
 | **AI agents** | read your instructions file | ask codelaw for the rules, and are checked after every edit |
 
-You keep the rules you know: **440 rules are reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint**, and none of those tools needs to be installed.
+You keep the rules you know: **441 rules are reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint**, and none of those tools needs to be installed.
+
+**A warning on your laptop, an error in CI** — one config, no second file for the pipeline. codelaw runs the `ci` profile when `CI` is set, `local` otherwise, and an AI agent's hook runs `ci`, so an agent never leaves behind what CI would fail. A glob can be told never to fail the run, or never to warn ([usage guide](USAGE.md#warn-on-a-laptop-fail-in-ci)):
+
+```toml
+[profiles.local.rules]
+"js/no-console"  = "warn"
+"js/no-debugger" = "warn"
+
+[profiles.ci.rules]
+"js/no-console"  = "error"
+"js/no-debugger" = "error"
+
+[[overrides]]                      # never fails the run
+files = ["scripts/**"]
+remap = { error = "warn" }
+```
 
 ---
 
@@ -186,7 +202,7 @@ def greet(names=None):
 | 🧱 **Fixes can restructure code** | Fix primitives move and regroup code, for example gathering every `export` into one block at the end of the file. A plain node-for-node replace can't do that. |
 | 🔁 **Deterministic** | Same files and config in, same output out, with or without an AI agent. Every fix is re-parsed and checked before it's written, and a fix that would break the file is rolled back. |
 | 🤖 **Built for AI coding agents** | `--format agent` gives one line per finding with its fix, ready to feed back to an agent after every edit. |
-| 📦 **Standard rules included** | 446 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
+| 📦 **Standard rules included** | 458 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
 
 **For the person who owns the codebase:** the review comment you keep writing becomes a rule file, once. From then on a person, a CI job and every AI agent get the same answer — and the answer can be audited, because it is a file in your repo and not a model's opinion.
 
@@ -200,9 +216,9 @@ Eleven first-party packs: ten on npm as `@codelaw/rules-<pack>`, six on PyPI as 
 
 | pack | npm | PyPI | rules | presets | reimplemented from |
 |---|---|---|---|---|---|
-| [`js`](packs/js/README.md) | ✅ | ✅ | 72 | `js/recommended` · `js/typescript` · `js/conventions` · `js/project` | ESLint 10 recommended (all 64), and the four core rules typescript-eslint switches on for TypeScript |
+| [`js`](packs/js/README.md) | ✅ | ✅ | 73 | `js/recommended` · `js/typescript` · `js/conventions` · `js/project` | ESLint 10 recommended (all 64, plus `no-console` at `warn`), and the four core rules typescript-eslint switches on for TypeScript |
 | [`ts`](packs/ts/README.md) | ✅ | — | 21 | `ts/recommended` · `ts/conventions` | typescript-eslint 8 recommended (all 20) |
-| [`react`](packs/react/README.md) | ✅ | ✅ | 21 | `react/recommended` · `react/conventions` | eslint-plugin-react, react-hooks |
+| [`react`](packs/react/README.md) | ✅ | ✅ | 32 | `react/recommended` · `react/conventions` | eslint-plugin-react, react-hooks, @eslint-react |
 | [`node`](packs/node/README.md) | ✅ | — | 10 | `node/recommended` | eslint-plugin-n |
 | [`stencil`](packs/stencil/README.md) | ✅ | — | 18 | `stencil/recommended` · `stencil/conventions` | @stencil/eslint-plugin |
 | [`python`](packs/python/README.md) | — | ✅ | 99 | `py/recommended` · `py/conventions` · `py/project` | Ruff 0.17's default `E4`/`E7`/`E9`/`F`, every stable flake8-bugbear rule, isort `I001`, `RUF022` |
@@ -222,15 +238,15 @@ Eleven first-party packs: ten on npm as `@codelaw/rules-<pack>`, six on PyPI as 
 - **`*/project` presets are opt-in too**: the rules that read the whole repo, `graph/no-unused-exports` (`js/project`, `py/project`) and `graph/no-unused-css-classes` (`css/project`). `codelaw graph why-unused <symbol>` says why a finding held.
 - **The counts on this page are checked.** `python3 scripts/docs-sync.py --check` fails CI when a pack's rules, presets or fix classes and this page disagree.
 
-### Fix classes across all 446 rules
+### Fix classes across all 458 rules
 
 <!-- docs-sync:fix-classes -->
 
 | class | rules | what happens |
 |---|---|---|
 | `auto` | 70 | `codelaw fix` applies it. It's safe and meaning-preserving. |
-| `suggest` | 74 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
-| `manual` | 302 | The finding lists numbered steps, for a person or an agent to follow. |
+| `suggest` | 76 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
+| `manual` | 312 | The finding lists numbered steps, for a person or an agent to follow. |
 
 <!-- /docs-sync:fix-classes -->
 
@@ -334,7 +350,7 @@ $ codelaw test acme/no-console-log
 |---|---|---|---|
 | ✅ | Engine: nine languages, one binary, parse once, cache | [SR-ARCHITECTURE](records/0108_architecture.md) | built |
 | ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `match`, `config`, `new-rule`, `init`, `cache` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
-| ✅ | Eleven rule packs: 446 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
+| ✅ | Eleven rule packs: 458 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
 | ✅ | `--format agent`, `--format json` and `--format sarif`; `--timings` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | npm package (`npx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0 published from CI with provenance, ten packs |
 | 🔜 | PyPI package (`uvx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0: `codelaw-rules-css` and `-data` up; the other four packs and `codelaw` next (W-38) |

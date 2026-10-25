@@ -13,6 +13,7 @@
 "js/no-class-assign" = 0
 "js/no-compare-neg-zero" = 0
 "js/no-cond-assign" = 0
+"js/no-console" = 38
 "js/no-const-assign" = 0
 "js/no-constant-binary-expression" = 0
 "js/no-constant-condition" = 0

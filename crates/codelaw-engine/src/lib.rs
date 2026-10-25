@@ -77,6 +77,15 @@ pub struct EngineOptions {
     /// Files that count as touched whatever the change set says: the
     /// files an agent hook was given.
     pub touched_paths: Vec<PathBuf>,
+    /// `--profile` (SR-CONFIG decision 10).
+    pub profile: Option<String>,
+    /// `CODELAW_PROFILE`.
+    pub profile_env: Option<String>,
+    /// `CI`: set and not `false` or `0` picks the `ci` profile.
+    pub ci_env: Option<String>,
+    /// A surface's own default profile, which takes the place of the `CI`
+    /// check: `("ci", "codelaw hook")`, `("ci", "MCP")`, `("local", "LSP")`.
+    pub profile_surface: Option<(&'static str, &'static str)>,
 }
 
 impl EngineOptions {
@@ -89,8 +98,15 @@ impl EngineOptions {
             virtual_env: var("VIRTUAL_ENV"),
             path_env: std::env::var_os("PATH"),
             as_of_env: var("CODELAW_AS_OF"),
+            profile_env: var("CODELAW_PROFILE"),
+            ci_env: var("CI"),
             ..Default::default()
         }
+    }
+
+    /// What picks the profile (SR-CONFIG decision 10).
+    pub fn profile_choice(&self) -> codelaw_config::ProfileChoice {
+        codelaw_config::ProfileChoice { flag: self.profile.clone(), env: self.profile_env.clone(), ci: self.ci_env.clone(), surface: self.profile_surface }
     }
 }
 
@@ -139,6 +155,9 @@ pub struct CheckReport {
     /// The as-of line (`as-of 2026-10-18 (HEAD commit date)`), when a
     /// baseline or a deprecation was in play (SR-BASELINE decision 4).
     pub as_of: Option<AsOf>,
+    /// The profile line (`profile ci (CI=true)`), when the config defines
+    /// a profile (SR-CONFIG decision 10).
+    pub profile: Option<codelaw_config::Profile>,
 }
 
 impl CheckReport {
@@ -213,6 +232,8 @@ impl Project {
     /// A project from a rule set built elsewhere (the rule tester).
     pub fn from_parts(mut config: Config, rules: RuleSet, options: EngineOptions) -> Result<Project, EngineError> {
         baseline::check_dates(&options)?;
+        // Before anything keys on the config: the profile is part of it.
+        config.select_profile(&options.profile_choice()).map_err(|e| EngineError::Usage(e.to_string()))?;
         if let Some(only) = &options.rules {
             for id in only {
                 if rules.get(id).is_none() && codelaw_rules::engine_rule(id).is_none() {
@@ -272,9 +293,41 @@ impl Project {
     pub fn check(&mut self, paths: &[PathBuf]) -> Result<CheckReport, EngineError> {
         let (mut report, deprecated, ran) = self.check_raw(paths)?;
         self.apply_baselines(&mut report, deprecated, &ran);
+        self.finish(&mut report);
         report.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
         dedup_diagnostics(&mut report.diagnostics);
         Ok(report)
+    }
+
+    /// The last stage of a report (SR-CONFIG decisions 10–11): `remap`,
+    /// after the baseline, and the profile it ran under.
+    pub(crate) fn finish(&self, report: &mut CheckReport) {
+        self.remap(&mut report.diagnostics);
+        if self.config.profile_in_play() {
+            report.profile = Some(self.config.profile.clone());
+        }
+    }
+
+    /// Apply each file's `remap` (SR-CONFIG decision 11), once, last. A
+    /// finding remapped to `off` is dropped; `codelaw/*` is never remapped.
+    pub(crate) fn remap(&self, diagnostics: &mut Vec<Diagnostic>) {
+        if !self.config.has_remap() {
+            return;
+        }
+        let mut per_file: std::collections::HashMap<String, codelaw_config::Remap> = std::collections::HashMap::new();
+        diagnostics.retain_mut(|d| {
+            if d.rule.starts_with("codelaw/") {
+                return true;
+            }
+            let remap = per_file.entry(d.file.clone()).or_insert_with(|| self.config.remap_for(&self.config.root_dir.join(&d.file)));
+            match remap.apply(d.severity) {
+                Some(s) => {
+                    d.severity = s;
+                    true
+                }
+                None => false,
+            }
+        });
     }
 
     /// `check` before the baseline: every finding, the uses of deprecated
@@ -405,6 +458,7 @@ impl Project {
 
     fn check_document_with(&self, entry: &FileEntry, text: &str, host: Option<&codelaw_lang::Root>) -> Vec<Diagnostic> {
         let mut d = self.check_unsaved(entry, text, host).diagnostics;
+        self.remap(&mut d);
         if !self.rules.has_rules() {
             d.push(lint::no_rules(self));
         }

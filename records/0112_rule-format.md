@@ -104,6 +104,7 @@ The decider asked for a record of the rule-file template. The format so far exis
    - **Required:** `id`, `title`, `languages`, `fix`, plus `fix_reason` unless `fix: auto` ([L4](0006_LAW-4-every-rule-has-a-fix.md)).
    - **`ported_from:`** (optional) lists `<tool>/<rule>` ids, for example `[eslint/no-dupe-keys, ruff/F601]`: the source rules this one reimplements ([SR-RULE-PACKS](0101_rule-packs.md) decision 7). `codelaw-migrate` maps existing configs through it ([SR-AGENT-SURFACES](0102_agent-surfaces.md)).
    - **Unknown fields are a load error.**
+   - **`options:`** declares each option's type and default; a config value for one — in `[rules]`, an `[[overrides]]` entry or any `[profiles.<name>]`, not only the profile in use ([SR-CONFIG](0110_config.md) decision 10) — is checked against it at load, so a typo fails on a laptop as it would in CI.
 3. **The `codelaw` block takes exactly one of four forms:**
    - `match:` (an ast-grep rule with relational clauses and the semantic-model predicates of [SR-ARCHITECTURE](0108_architecture.md) decision 15a; `scope: file`);
    - `graph:` ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 6; `scope: project`);

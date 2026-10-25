@@ -22,6 +22,9 @@ pub struct RawConfig {
     pub rules: BTreeMap<String, RuleSetting>,
     #[serde(default)]
     pub overrides: Vec<RawOverride>,
+    /// SR-CONFIG decision 10: `[profiles.<name>]`, root-only.
+    #[serde(default)]
+    pub profiles: BTreeMap<String, RawProfile>,
     #[serde(default)]
     pub root: bool,
     pub requires: Option<String>,
@@ -95,6 +98,20 @@ pub struct RawOverride {
     pub exclude: Vec<String>,
     #[serde(default)]
     pub rules: BTreeMap<String, RuleSetting>,
+    /// SR-CONFIG decision 11: each severity of a finding in these files
+    /// mapped to another, or to `off`.
+    pub remap: Option<BTreeMap<String, String>>,
+}
+
+/// `[profiles.<name>]`: SR-CONFIG decision 10. The same shapes as the top
+/// level's `[rules]` and `[[overrides]]`.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawProfile {
+    #[serde(default)]
+    pub rules: BTreeMap<String, RuleSetting>,
+    #[serde(default)]
+    pub overrides: Vec<RawOverride>,
 }
 
 /// `[files]`: SR-ARCHITECTURE decisions 7 and 10.

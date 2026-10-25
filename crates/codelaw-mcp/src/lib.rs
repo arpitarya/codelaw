@@ -214,8 +214,10 @@ fn err(e: EngineError) -> String {
     e.to_string()
 }
 
+/// Every tool runs with the `ci` profile unless `CODELAW_PROFILE` says
+/// otherwise: an agent gets the verdict CI would give (SR-CONFIG decision 10).
 fn project(paths: &[PathBuf], options: EngineOptions) -> Result<Project, String> {
-    Project::load_for(paths, options).map_err(err)
+    Project::load_for(paths, EngineOptions { profile_surface: Some(("ci", "MCP")), ..options }).map_err(err)
 }
 
 /// Run one tool: the JSON object its CLI twin prints, or the error its CLI

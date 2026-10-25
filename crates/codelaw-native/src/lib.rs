@@ -31,6 +31,7 @@ mod html_document;
 mod html_dom;
 mod html_rules;
 mod js_ast;
+mod js_console;
 mod literals;
 mod no_undef;
 mod no_unreachable;
@@ -43,6 +44,7 @@ mod python_pycodestyle;
 mod python_pyflakes;
 mod python_util;
 mod react;
+mod react_hooks;
 mod tanstack_query;
 mod redux_toolkit;
 mod regexp;
@@ -344,6 +346,7 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &accessors::NoSetterReturn,
     &literals::NoSparseArrays,
     &classes::NoThisBeforeSuper,
+    &js_console::NoConsole,
     &no_undef::NoUndef,
     &literals::NoUnexpectedMultiline,
     &no_unreachable::NoUnreachable,
@@ -474,6 +477,17 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &python_pyflakes::YieldOutsideFunction,
     &python_bugbear::ZipWithoutExplicitStrict,
     &react::ExhaustiveDeps,
+    &react::NoContext,
+    &react_hooks::ErrorBoundaries,
+    &react_hooks::Globals,
+    &react_hooks::NoNestedComponents,
+    &react_hooks::NoRefInRender,
+    &react_hooks::NoSetStateInEffect,
+    &react_hooks::NoSetStateInRender,
+    &react_hooks::NoUnnecessaryUsePrefix,
+    &react_hooks::PreferLazyStateInit,
+    &react_hooks::Purity,
+    &react_hooks::UseMemo,
     &react::JsxNoDuplicateProps,
     &react::NoUnknownProperty,
     &conventions::PropsTypeName,

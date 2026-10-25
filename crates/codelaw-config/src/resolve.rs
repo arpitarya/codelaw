@@ -1,4 +1,4 @@
-use crate::raw::{RawConfig, RuleSetting};
+use crate::raw::{RawConfig, RawOverride, RawProfile, RuleSetting};
 use crate::{ConfigError, did_you_mean, explain_serde_error};
 use codelaw_cache::{Key, KeyBuilder};
 use codelaw_core::Language;
@@ -26,6 +26,9 @@ impl Home {
     }
 }
 
+/// An override's `files` and `exclude` globs.
+pub(crate) type OverrideGlobs = (GlobSet, GlobSet);
+
 /// One config file, parsed and validated.
 #[derive(Clone, Debug)]
 pub struct ConfigFile {
@@ -38,12 +41,107 @@ pub struct ConfigFile {
     include: Option<GlobSet>,
     exclude: GlobSet,
     pub(crate) overrides: Vec<(GlobSet, GlobSet)>,
+    /// Each profile's `[[overrides]]` globs, by profile name.
+    pub(crate) profile_overrides: BTreeMap<String, Vec<(GlobSet, GlobSet)>>,
 }
 
 /// One layer of rule settings that applies to a file.
 pub struct Layer<'a> {
     pub source: String,
     pub rules: &'a BTreeMap<String, RuleSetting>,
+}
+
+/// The profile a run uses and where the choice came from (SR-CONFIG
+/// decision 10): `ci` from `CI=true`, `local` by default.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Profile {
+    pub name: String,
+    /// `--profile`, `CODELAW_PROFILE`, `CI=<value>`, `<surface> default`
+    /// or `default`.
+    pub source: String,
+}
+
+impl Default for Profile {
+    fn default() -> Self {
+        Profile { name: "local".into(), source: "default".into() }
+    }
+}
+
+impl Profile {
+    /// The report header's line: `profile ci (CI=true)`.
+    pub fn line(&self) -> String {
+        format!("profile {} ({})", self.name, self.source)
+    }
+}
+
+/// What picks the profile (SR-CONFIG decision 10): `--profile` >
+/// `CODELAW_PROFILE` > the surface's own default > `CI` set and not `""`,
+/// `false` or `0` → `ci` > `local`.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ProfileChoice {
+    /// `--profile <name>`.
+    pub flag: Option<String>,
+    /// `CODELAW_PROFILE`.
+    pub env: Option<String>,
+    /// `CI`.
+    pub ci: Option<String>,
+    /// A surface's default, which takes the place of the `CI` check: the
+    /// profile and the surface, e.g. `("ci", "codelaw hook")`.
+    pub surface: Option<(&'static str, &'static str)>,
+}
+
+impl ProfileChoice {
+    pub fn resolve(&self) -> Profile {
+        let given = |v: &Option<String>| v.as_deref().map(str::trim).filter(|v| !v.is_empty()).map(str::to_owned);
+        if let Some(name) = given(&self.flag) {
+            return Profile { name, source: "--profile".into() };
+        }
+        if let Some(name) = given(&self.env) {
+            return Profile { name, source: "CODELAW_PROFILE".into() };
+        }
+        if let Some((name, surface)) = self.surface {
+            return Profile { name: name.into(), source: format!("{surface} default") };
+        }
+        match self.ci.as_deref() {
+            Some(v) if !v.is_empty() && !v.eq_ignore_ascii_case("false") && v != "0" => Profile { name: "ci".into(), source: format!("CI={v}") },
+            _ => Profile::default(),
+        }
+    }
+}
+
+/// What `remap` does to the findings of one file (SR-CONFIG decision 11):
+/// for `error`, `warn` and `info`, the severity it becomes, `None` being
+/// `off`. A severity no matching override names is kept.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Remap([Option<Option<codelaw_core::Severity>>; 3]);
+
+fn severity_slot(s: codelaw_core::Severity) -> usize {
+    match s {
+        codelaw_core::Severity::Error => 0,
+        codelaw_core::Severity::Warn => 1,
+        codelaw_core::Severity::Info => 2,
+    }
+}
+
+impl Remap {
+    /// Lay `table` over this one: later wins per key.
+    fn merge(&mut self, table: &BTreeMap<String, String>) {
+        for (from, to) in table {
+            if let Some(from) = codelaw_core::Severity::parse(from) {
+                self.0[severity_slot(from)] = Some(codelaw_core::Severity::parse(to));
+            }
+        }
+    }
+
+    /// Whether nothing changes.
+    pub fn is_identity(&self) -> bool {
+        self.0.iter().all(Option::is_none)
+    }
+
+    /// The severity `s` becomes; `None` is `off`.
+    pub fn apply(&self, s: codelaw_core::Severity) -> Option<codelaw_core::Severity> {
+        self.0[severity_slot(s)].unwrap_or(Some(s))
+    }
 }
 
 /// A rule's settings, resolved for one file.
@@ -79,6 +177,34 @@ fn validate_severity(file: &Path, id: &str, setting: &RuleSetting) -> Result<(),
     Ok(())
 }
 
+const REMAP_KEYS: [&str; 3] = ["error", "warn", "info"];
+const REMAP_VALUES: [&str; 4] = ["error", "warn", "info", "off"];
+
+/// An `[[overrides]]` entry's severities and `remap` (SR-CONFIG decision 11).
+fn validate_override(file: &Path, what: &str, o: &RawOverride) -> Result<(), ConfigError> {
+    for (id, s) in &o.rules {
+        validate_severity(file, id, s)?;
+    }
+    for (from, to) in o.remap.iter().flatten() {
+        if !REMAP_KEYS.contains(&from.as_str()) {
+            let near = did_you_mean(from, REMAP_KEYS).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
+            return Err(ConfigError::new(Some(file.to_owned()), format!("{what}: `remap` key `{from}`{near} (one of error, warn, info)")));
+        }
+        if !REMAP_VALUES.contains(&to.as_str()) {
+            let near = did_you_mean(to, REMAP_VALUES).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
+            return Err(ConfigError::new(
+                Some(file.to_owned()),
+                format!("{what}: `remap` maps `{from}` to `{to}`{near} (one of error, warn, info, off)"),
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn override_globs(overrides: &[RawOverride], path: &Path) -> Result<Vec<(GlobSet, GlobSet)>, ConfigError> {
+    overrides.iter().map(|o| Ok((glob_set(&o.files, path)?, glob_set(&o.exclude, path)?))).collect()
+}
+
 impl ConfigFile {
     fn new(path: PathBuf, home: Home, raw: RawConfig, text: String) -> Result<ConfigFile, ConfigError> {
         let dir = path.parent().map(Path::to_path_buf).unwrap_or_default();
@@ -106,19 +232,23 @@ impl ConfigFile {
         for (id, s) in &raw.rules {
             validate_severity(&path, id, s)?;
         }
-        for o in &raw.overrides {
-            for (id, s) in &o.rules {
+        for (i, o) in raw.overrides.iter().enumerate() {
+            validate_override(&path, &format!("override #{}", i + 1), o)?;
+        }
+        for (name, p) in &raw.profiles {
+            for (id, s) in &p.rules {
                 validate_severity(&path, id, s)?;
+            }
+            for (i, o) in p.overrides.iter().enumerate() {
+                validate_override(&path, &format!("profile `{name}` override #{}", i + 1), o)?;
             }
         }
         let include = if raw.include.is_empty() { None } else { Some(glob_set(&raw.include, &path)?) };
         let exclude = glob_set(&raw.exclude, &path)?;
-        let overrides = raw
-            .overrides
-            .iter()
-            .map(|o| Ok((glob_set(&o.files, &path)?, glob_set(&o.exclude, &path)?)))
-            .collect::<Result<Vec<_>, ConfigError>>()?;
-        Ok(ConfigFile { path, dir, home, raw, text, include, exclude, overrides })
+        let overrides = override_globs(&raw.overrides, &path)?;
+        let profile_overrides =
+            raw.profiles.iter().map(|(name, p)| Ok((name.clone(), override_globs(&p.overrides, &path)?))).collect::<Result<_, ConfigError>>()?;
+        Ok(ConfigFile { path, dir, home, raw, text, include, exclude, overrides, profile_overrides })
     }
 
     /// The path of `file` relative to this config's folder, if under it.
@@ -207,13 +337,17 @@ pub struct Config {
     /// Root config first, then nested configs, outermost first.
     pub files: Vec<ConfigFile>,
     pub warnings: Vec<String>,
+    /// The profile this run uses (SR-CONFIG decision 10); `local` until
+    /// [`Config::select_profile`] says otherwise.
+    pub profile: Profile,
 }
 
 /// Folders and files the walk never enters, before any config.
 pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codelaw/cache"];
 
 /// Keys a nested config may not set yet; they belong to the root config.
-const ROOT_ONLY: &[&str] = &["extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]"];
+const ROOT_ONLY: &[&str] =
+    &["extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profiles]"];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
     let set = [
@@ -228,6 +362,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.markdown != Default::default(),
         raw.daemon != Default::default(),
         raw.lsp != Default::default(),
+        !raw.profiles.is_empty(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -253,7 +388,7 @@ pub fn find_config(start: &Path) -> Result<Config, ConfigError> {
     }
     chain.reverse();
     let root_dir = chain.first().map(|f| f.dir.clone()).unwrap_or(start_dir);
-    let config = Config { root_dir, files: chain, warnings };
+    let config = Config { root_dir, files: chain, warnings, profile: Profile::default() };
     config.check_nested()?;
     Ok(config)
 }
@@ -261,7 +396,7 @@ pub fn find_config(start: &Path) -> Result<Config, ConfigError> {
 impl Config {
     /// A config with every default, rooted at `root_dir`.
     pub fn defaults(root_dir: PathBuf) -> Config {
-        Config { root_dir, files: Vec::new(), warnings: Vec::new() }
+        Config { root_dir, files: Vec::new(), warnings: Vec::new(), profile: Profile::default() }
     }
 
     /// A config from TOML text, as if it were `root_dir/codelaw.toml`.
@@ -269,7 +404,7 @@ impl Config {
         let path = root_dir.join("codelaw.toml");
         let raw = toml::from_str::<RawConfig>(text).map_err(|e| ConfigError::new(Some(path.clone()), toml_error(text, &e)))?;
         let file = ConfigFile::new(path, Home::CodelawToml, raw, text.to_owned())?;
-        Ok(Config { root_dir, files: vec![file], warnings: Vec::new() })
+        Ok(Config { root_dir, files: vec![file], warnings: Vec::new(), profile: Profile::default() })
     }
 
     fn check_nested(&self) -> Result<(), ConfigError> {
@@ -304,6 +439,38 @@ impl Config {
         self.files.sort_by_key(|f| f.dir.components().count());
         self.check_nested()?;
         Ok(true)
+    }
+
+    /// Pick the profile (SR-CONFIG decision 10). A name the root config
+    /// does not define is an error, except `ci` and `local`, which change
+    /// nothing when absent.
+    pub fn select_profile(&mut self, choice: &ProfileChoice) -> Result<(), ConfigError> {
+        let profile = choice.resolve();
+        let defined = self.root_raw().map(|r| &r.profiles);
+        if !matches!(profile.name.as_str(), "ci" | "local") && defined.is_none_or(|d| !d.contains_key(&profile.name)) {
+            let names: Vec<&str> = defined.into_iter().flat_map(|d| d.keys().map(String::as_str)).collect();
+            let near = did_you_mean(&profile.name, names.iter().copied()).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
+            let have = if names.is_empty() { "no profiles".to_owned() } else { names.iter().map(|n| format!("`{n}`")).collect::<Vec<_>>().join(", ") };
+            return Err(ConfigError::new(
+                self.root_file().map(Path::to_path_buf),
+                format!("profile `{}` (from {}) is not defined{near}; the config defines {have}", profile.name, profile.source),
+            ));
+        }
+        self.profile = profile;
+        Ok(())
+    }
+
+    /// Whether the root config defines any profile: then every report
+    /// names the one in use.
+    pub fn profile_in_play(&self) -> bool {
+        self.root_raw().is_some_and(|r| !r.profiles.is_empty())
+    }
+
+    /// The root config and the profile in use, when it defines it.
+    pub(crate) fn active_profile(&self) -> Option<(&ConfigFile, &RawProfile, &[OverrideGlobs])> {
+        let root = self.files.first()?;
+        let p = root.raw.profiles.get(&self.profile.name)?;
+        Some((root, p, root.profile_overrides.get(&self.profile.name).map(Vec::as_slice).unwrap_or_default()))
     }
 
     fn root_raw(&self) -> Option<&RawConfig> {
@@ -436,23 +603,69 @@ impl Config {
         })
     }
 
+    /// The `[[overrides]]` that match `file`, in precedence order: each
+    /// config's, outermost first and in file order, then the profile's
+    /// (SR-CONFIG decision 4); each with whether it is the profile's and
+    /// its index in its list.
+    pub(crate) fn overrides_for<'a>(&'a self, file: &Path) -> Vec<(&'a ConfigFile, bool, usize, &'a RawOverride)> {
+        let mut out = Vec::new();
+        let mut matching = |f: &'a ConfigFile, overrides: &'a [RawOverride], globs: &'a [(GlobSet, GlobSet)], in_profile: bool| {
+            let Some(rel) = f.relative(file) else { return };
+            for (i, (o, (files, exclude))) in overrides.iter().zip(globs).enumerate() {
+                if files.is_match(rel) && !exclude.is_match(rel) {
+                    out.push((f, in_profile, i, o));
+                }
+            }
+        };
+        for f in self.files.iter().filter(|f| file.starts_with(&f.dir)) {
+            matching(f, &f.raw.overrides, &f.overrides, false);
+        }
+        if let Some((f, p, globs)) = self.active_profile() {
+            matching(f, &p.overrides, globs, true);
+        }
+        out
+    }
+
+    /// `<config> override #n`, or `<config> profile <name> override #n`.
+    pub(crate) fn override_label(&self, f: &ConfigFile, in_profile: bool, i: usize) -> String {
+        let path = codelaw_core::normalize_path(&f.path);
+        if in_profile { format!("{path} profile {} override #{}", self.profile.name, i + 1) } else { format!("{path} override #{}", i + 1) }
+    }
+
     /// The rule-setting layers for `file`, lowest precedence first: each
-    /// config's `[rules]`, outermost first, then their matching
-    /// `[[overrides]]` in file order (SR-CONFIG decision 4).
+    /// config's `[rules]`, outermost first, then the profile's `rules`,
+    /// then the matching `[[overrides]]` in file order, then the profile's
+    /// (SR-CONFIG decision 4).
     pub fn layers_for<'a>(&'a self, file: &'a Path) -> Vec<Layer<'a>> {
         let mut layers = Vec::new();
         for f in self.chain_for(file) {
             layers.push(Layer { source: codelaw_core::normalize_path(&f.path), rules: &f.raw.rules });
         }
-        for f in self.chain_for(file) {
-            let Some(rel) = f.relative(file) else { continue };
-            for (i, (o, (files, exclude))) in f.raw.overrides.iter().zip(&f.overrides).enumerate() {
-                if files.is_match(rel) && !exclude.is_match(rel) {
-                    layers.push(Layer { source: format!("{} override #{}", codelaw_core::normalize_path(&f.path), i + 1), rules: &o.rules });
-                }
-            }
+        if let Some((f, p, _)) = self.active_profile().filter(|(f, _, _)| file.starts_with(&f.dir)) {
+            layers.push(Layer { source: format!("{} profile {}", codelaw_core::normalize_path(&f.path), self.profile.name), rules: &p.rules });
+        }
+        for (f, in_profile, i, o) in self.overrides_for(file) {
+            layers.push(Layer { source: self.override_label(f, in_profile, i), rules: &o.rules });
         }
         layers
+    }
+
+    /// Whether any override, a profile's included, sets `remap`: without
+    /// one the stage costs nothing.
+    pub fn has_remap(&self) -> bool {
+        self.files.iter().any(|f| f.raw.overrides.iter().chain(f.raw.profiles.values().flat_map(|p| &p.overrides)).any(|o| o.remap.is_some()))
+    }
+
+    /// What `remap` does to the findings in `file` (SR-CONFIG decision 11):
+    /// every matching override's table, later winning per key.
+    pub fn remap_for(&self, file: &Path) -> Remap {
+        let mut r = Remap::default();
+        for (_, _, _, o) in self.overrides_for(file) {
+            if let Some(t) = &o.remap {
+                r.merge(t);
+            }
+        }
+        r
     }
 
     /// Every rule id named anywhere in the config, with the file naming it.
@@ -467,6 +680,11 @@ impl Config {
                     out.push((id.clone(), f.path.clone()));
                 }
             }
+            for p in f.raw.profiles.values() {
+                for id in p.rules.keys().chain(p.overrides.iter().flat_map(|o| o.rules.keys())) {
+                    out.push((id.clone(), f.path.clone()));
+                }
+            }
         }
         out
     }
@@ -477,6 +695,11 @@ impl Config {
         for f in &self.files {
             k.push(codelaw_core::normalize_path(f.path.strip_prefix(&self.root_dir).unwrap_or(&f.path)));
             k.push(&f.text);
+        }
+        // The profile picks severities, so it is part of the key: a warm
+        // `hook` (ci) and an editor (local) never share a verdict.
+        if self.profile_in_play() {
+            k.push(format!("profile {}", self.profile.name));
         }
         k.key()
     }
@@ -566,6 +789,47 @@ mod tests {
         assert_eq!(c.languages_for(&d.join("b.ts")), None);
         assert!(!c.is_included(&d.join("dist/a.js")));
         assert!(c.is_included(&d.join("src/a.js")));
+    }
+
+    #[test]
+    fn the_profile_choice_in_order() {
+        let pick = |flag: Option<&str>, env: Option<&str>, ci: Option<&str>, surface| {
+            let p = ProfileChoice { flag: flag.map(Into::into), env: env.map(Into::into), ci: ci.map(Into::into), surface }.resolve();
+            p.line()
+        };
+        assert_eq!(pick(None, None, None, None), "profile local (default)");
+        assert_eq!(pick(None, None, Some("true"), None), "profile ci (CI=true)");
+        for not_ci in ["", "false", "False", "0"] {
+            assert_eq!(pick(None, None, Some(not_ci), None), "profile local (default)", "CI={not_ci}");
+        }
+        assert_eq!(pick(None, Some("staging"), Some("true"), None), "profile staging (CODELAW_PROFILE)");
+        assert_eq!(pick(Some("local"), Some("staging"), Some("true"), None), "profile local (--profile)");
+        // A surface's default takes the place of the CI check, not of the flag or env.
+        assert_eq!(pick(None, None, None, Some(("ci", "codelaw hook"))), "profile ci (codelaw hook default)");
+        assert_eq!(pick(None, None, Some("true"), Some(("local", "LSP"))), "profile local (LSP default)");
+        assert_eq!(pick(None, Some("ci"), None, Some(("local", "LSP"))), "profile ci (CODELAW_PROFILE)");
+    }
+
+    #[test]
+    fn profile_layers_and_remap_in_precedence_order() {
+        let text = "[rules]\n\"a/x\" = \"warn\"\n\n[[overrides]]\nfiles = [\"s/**\"]\nrules = { \"a/x\" = \"info\" }\nremap = { error = \"warn\", info = \"off\" }\n\n[profiles.ci]\nrules = { \"a/x\" = \"error\" }\noverrides = [{ files = [\"s/**\"], remap = { error = \"info\" } }]\n";
+        let mut c = Config::from_toml(PathBuf::from("/x"), text).unwrap();
+        let file = PathBuf::from("/x/s/a.ts");
+        let sources = |c: &Config| c.layers_for(&file).into_iter().map(|l| l.source).collect::<Vec<_>>();
+        assert_eq!(sources(&c), ["/x/codelaw.toml", "/x/codelaw.toml override #1"], "`local` is not defined: no change");
+        let local_key = c.fingerprint();
+        c.select_profile(&ProfileChoice { ci: Some("true".into()), ..Default::default() }).unwrap();
+        assert_eq!(sources(&c), ["/x/codelaw.toml", "/x/codelaw.toml profile ci", "/x/codelaw.toml override #1", "/x/codelaw.toml profile ci override #1"]);
+        assert_ne!(c.fingerprint(), local_key, "the profile is part of every cache key");
+        use codelaw_core::Severity::*;
+        let r = c.remap_for(&file);
+        assert_eq!((r.apply(Error), r.apply(Warn), r.apply(Info)), (Some(Info), Some(Warn), None), "the later override wins per key");
+        assert!(c.remap_for(&PathBuf::from("/x/t/a.ts")).is_identity());
+        assert!(c.has_remap());
+        let err = c.select_profile(&ProfileChoice { flag: Some("cis".into()), ..Default::default() }).unwrap_err();
+        assert!(err.message.contains("profile `cis` (from --profile) is not defined; did you mean `ci`?"), "{}", err.message);
+        let err = Config::from_toml(PathBuf::from("/x"), "[profiles.ci]\noverrides = [{ files = [\"a\"], remap = { eror = \"warn\" } }]\n").unwrap_err();
+        assert!(err.message.contains("profile `ci` override #1: `remap` key `eror`; did you mean `error`?"), "{}", err.message);
     }
 
     #[test]

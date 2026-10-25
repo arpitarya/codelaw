@@ -315,8 +315,10 @@ impl RuleSet {
                 match merged.get(id) {
                     Some(r) => {
                         check_options(&r.rule, setting, &f.path, &mut errors);
-                        if r.preview_blocked && setting.severity() != Some("off") {
-                            warnings.push(format!("`{id}` is a preview rule and runs only with `preview = true`"));
+                        let w = format!("`{id}` is a preview rule and runs only with `preview = true`");
+                        // Once, however many places (profiles included) name it.
+                        if r.preview_blocked && setting.severity() != Some("off") && !warnings.contains(&w) {
+                            warnings.push(w);
                         }
                     }
                     None => {
@@ -332,6 +334,13 @@ impl RuleSet {
             }
             for o in &f.raw.overrides {
                 for (id, s) in &o.rules {
+                    check(id, s);
+                }
+            }
+            // Every profile's, not only the one in use: a typo fails on a
+            // laptop as it would in CI (SR-CONFIG decision 10).
+            for p in f.raw.profiles.values() {
+                for (id, s) in p.rules.iter().chain(p.overrides.iter().flat_map(|o| &o.rules)) {
                     check(id, s);
                 }
             }

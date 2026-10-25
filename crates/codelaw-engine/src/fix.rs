@@ -387,6 +387,7 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
         report.pruned = project.prune_with(&codelaw_baseline::counts(&occ), &ran)?;
     }
     project.apply_baselines(&mut report.check, deprecated, &ran);
+    project.finish(&mut report.check);
     report.check.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
     // The same dedupe as `check`, so both report one diagnostic per finding.
     crate::dedup_diagnostics(&mut report.check.diagnostics);

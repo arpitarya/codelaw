@@ -9,6 +9,7 @@ description = "The correctness core of ESLint's recommended preset (@eslint/js 1
 "js/no-class-assign" = "error"
 "js/no-compare-neg-zero" = "error"
 "js/no-cond-assign" = "error"
+"js/no-console" = "warn"
 "js/no-const-assign" = "error"
 "js/no-constant-binary-expression" = "error"
 "js/no-constant-condition" = "error"

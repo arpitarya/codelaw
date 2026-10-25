@@ -134,6 +134,10 @@ pub struct Common {
     /// Files in the index count as touched (needs git).
     #[arg(long)]
     staged: bool,
+    /// The `[profiles.<name>]` to run with; by default `ci` when `CI` is
+    /// set, else `local` (or `CODELAW_PROFILE`).
+    #[arg(long, value_name = "NAME")]
+    profile: Option<String>,
 }
 
 #[derive(Args)]
@@ -305,6 +309,7 @@ pub fn engine_options_in(common: &Common, env: EngineOptions) -> Result<EngineOp
     o.as_of = common.as_of.clone().or(o.as_of);
     o.changed_since = common.changed_since.clone();
     o.staged = common.staged;
+    o.profile = common.profile.clone();
     Ok(o)
 }
 

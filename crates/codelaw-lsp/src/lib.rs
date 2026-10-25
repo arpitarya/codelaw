@@ -282,7 +282,9 @@ impl<'c> Server<'c> {
         let key = config.config_dir().to_path_buf();
         if !self.projects.contains_key(&key) {
             // The editor reads no cache and writes none.
-            let options = EngineOptions { no_cache: true, ..EngineOptions::from_env() };
+            // A person's editor: the `local` profile unless CODELAW_PROFILE says
+            // otherwise (SR-CONFIG decision 10).
+            let options = EngineOptions { no_cache: true, profile_surface: Some(("local", "LSP")), ..EngineOptions::from_env() };
             let loaded = Project::from_config(config, options).map_err(|e| e.to_string());
             match &loaded {
                 Ok(p) => {
