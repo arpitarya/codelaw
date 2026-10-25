@@ -6,8 +6,8 @@ item: W-50
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), parallel merge"
+ball: arpit
 ---
 
 # W-50 — Git hooks — pre-commit and post-commit, installed in one command
@@ -42,6 +42,8 @@ ball: agent
 | 5 · | pre-commit framework installs codelaw from the repo's tag | ❌ not met: the hooks are `language: system` (`codelaw` on `PATH`). The repo root has no `pyproject.toml`, `package.json` or buildable root crate for the framework to install from; the decider rules whether to add one |
 
 ## Blockers
+
+**The decider's move (2026-10-25):** (1) the hook passes no profile and so follows W-39's detection (`local` on a laptop); `CODELAW_HOOK_ARGS="--profile ci"` flips it — confirm or change; (2) DoD 5: add a root manifest so the pre-commit framework installs codelaw from the tag, or accept `language: system` (codelaw on `PATH`) and amend DoD 5. Post-commit's two reminders are still to wire once W-46 lands (W-47 has).
 
 post-commit's two reminders wait on **W-46** and **W-47**. The hook, its extension point and the pre-commit half landed (W-50, 2026-10-25). **Left:** when W-46 and W-47 land, each adds one executable to `.codelaw/hooks/post-commit.d/` that runs `codelaw exceptions --mine --expiring 7d` and the burn-down delta command, and `init --git-hooks` is taught to write them (or the post-commit script calls them directly).
 

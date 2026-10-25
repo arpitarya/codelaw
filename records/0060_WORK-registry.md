@@ -93,14 +93,14 @@ into a scan anyone can do at task end.
 
 | Document | Update trigger | Last verified | Notes |
 |---|---|---|---|
-| `CLAUDE.md` | any rule or pointer changes | 2026-10-25 | 2026-10-25 — the L6 line and the `packs/` layout line: eleven packs, ten on npm and six on PyPI (W-32, the decider's ruling) |
+| `CLAUDE.md` | any rule or pointer changes | 2026-10-25 | 2026-10-25 — the L5 line (no network in the engine) and the L6 and `packs/` lines: fifteen packs, thirteen on npm and nine on PyPI (W-52, W-53, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-39, W-40 closed (CI perf within budget); W-46 unblocked |
-| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-25 | 2026-10-25 — B-048, the later presets from W-03 |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-47, W-52, W-53 closed; W-44, W-45, W-50 to the inbox; W-54–W-57 unblocked |
+| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-25 | 2026-10-25 — B-050 (`migrate`), B-051 (`requirements*.txt`), B-052 (the deps agent hint) |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §2: release state (W-37, W-38); README/USAGE; the Fux layer |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-25 | 2026-10-25 — W-35 step 2a: the README rewrite and `USAGE.md` |
-| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-25 | 2026-10-25 — release split into W-37/W-38; the README rewrite; W-05 research |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §1: the six parallel builds |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-25 | 2026-10-25 — W-44, W-45, W-47, W-50, W-52, W-53 merged |
+| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-25 | 2026-10-25 — six items built in parallel and merged |
 | `work/NOW.md` | kept by hooks: a row per live session; empty when nothing runs | 2026-10-24 | 2026-10-24 — after W-31: unpublish `@codelaw/rules-python`, push, 0.2.0 |
 | `work/LESSONS.md` | a failure teaches something durable | 2026-10-24 | 2026-10-24 — the cfg-split lesson and the two-sessions-one-checkout lesson |
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |

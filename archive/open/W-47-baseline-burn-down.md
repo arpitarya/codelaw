@@ -6,8 +6,8 @@ item: W-47
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Opus 5.5 (agent, W-47)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), parallel merge"
+ball: done
 ---
 
 # W-47 — `codelaw baseline history` — the burn-down over commits

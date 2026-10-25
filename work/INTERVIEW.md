@@ -26,6 +26,8 @@ entry.**
 
 **2026-10-25 (Cowork): new feature work filed, not built.** CI-vs-local severity (profiles, agents on `ci`), a per-glob severity `remap`, dated exceptions (`expires`, `warn_days`, `require_expiry`, git-checked `added_by`) and `react/no-context` — W-39, W-40, W-41, rulings in [the compare doc](compare/ci-profiles-and-dated-exceptions.compare.md). Each build writes its record, schema and loader in one change: SR-CONFIG §1 is parsed by `crates/codelaw-config/tests/schema.rs`.
 
+**Built 2026-10-25 (Claude Code, six parallel worktrees, merged):** W-47 baseline history, W-52 `deps refresh` (L5 amended: the one networked command), W-53 security-pack groundwork (L6: fifteen packs) — closed; W-44 watch, W-45 CI formats, W-50 git hooks — built, each waiting on a ruling or a PR from the decider. W-54–W-57 are now open to an agent.
+
 **Also filed 2026-10-25 (Cowork):** W-44 watch mode · W-45 CI formats · W-46 exceptions report (waits on W-40) · W-47 baseline history · W-48 `migrate` (ESLint, Ruff, stylelint, Biome; no oxlint — moved to the backlog as B-050 the same day) · W-49 dev-server plugins (waits on W-44) · W-50 git hooks. Then W-51 (scheduled auto-fix PR) and W-52 (dependency latest versions; the decider ruled `deps refresh` the one network command). Type-aware via typescript-go: parked as B-049 with [a proposal](proposals/type-aware-rules.md). Security: W-53 (groundwork, amends L6 to fifteen packs) then W-54–W-57 (`security-js`, `-ts`, `-html`, `-python`).
 
 *Updated 2026-10-24 (the parallel session: W-20, W-21, W-24–W-28 merged to `main` `82df231`, unpushed).*

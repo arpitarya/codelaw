@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — six items built in parallel (W-44, W-45, W-47, W-50, W-52, W-53) and merged  ·  Claude Code, VS Code (Opus 5.5)
+
+- **Asked:** *"implement whatever possible in parallel"*; on disk, *"cargo clean first then 6 agents"*; on W-52's and W-53's law amendments, *"Yes, include them."*
+- **Done:** `cargo clean` (10 GB freed; it also pulled `target/` from under session f38f16ad's running `cargo test`). Six sub-agents in worktrees, merged on `integrate-parallel` with main merged in; two cross-branch breaks fixed (`4707d43`). `cargo test --workspace` 555 passed, 0 failed; clippy `-D warnings` clean. W-47, W-52, W-53 closed and archived; W-44, W-45, W-50 to the inbox; W-54–W-57 unblocked; B-051, B-052 filed. **CLAUDE.md changed** (SR-WORK-DOCS decision 7a): the L5 line (no network in the engine, `deps refresh` the one networked command) and the L6 and `packs/` lines (fifteen packs, thirteen on npm, nine on PyPI), on the decider's ruling above.
+- **Decided / left open:** for the decider — W-44 (`notify` is CC0; what DoD 1 times), W-45 (a real PR for DoD 2), W-50 (the hook's profile; DoD 5), B-051 (`requirements*.txt` and L3), W-53's six first hand uploads and `min_codelaw` at the release.
+- **Mistakes:** the shared `CARGO_TARGET_DIR` let worktrees overwrite each other's artifacts and `target/debug/codelaw`, so every branch's green tests were suspect until the one clean run on the merge; the `cargo clean` broke another session's run. Lesson for LESSONS.md: parallel worktrees on one target dir are not isolated.
+- **Next:** the decider's inbox; then W-54 (`security-js`).
+
 ## 2026-10-25 — npm 0.2.0 from CI (W-37); W-39–W-43 merged, W-41/W-42/W-43 closed  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"go ahead and run it"*; then *"Whatever is in green implement it … till the closure. And I want more React query hooks and React hooks. Rules."*

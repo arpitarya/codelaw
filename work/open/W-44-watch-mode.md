@@ -6,8 +6,8 @@ item: W-44
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), W-44 build"
-ball: decider
+updated_by: "Claude Code (Opus 5.5), parallel merge"
+ball: arpit
 ---
 
 # W-44 — `codelaw check --watch` — re-check on every save

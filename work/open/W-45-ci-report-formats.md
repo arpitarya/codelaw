@@ -6,8 +6,8 @@ item: W-45
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), parallel merge"
+ball: arpit
 ---
 
 # W-45 — CI report formats — GitHub, GitLab, JUnit, Checkstyle
@@ -47,6 +47,8 @@ ball: agent
 - JUnit/Checkstyle schema checks need `xmllint` (libxml2); the test skips loudly without it. Checkstyle publishes no schema, so `checkstyle.xsd` is its format description written down.
 
 ## Blockers
+
+**The decider's move (2026-10-25):** DoD 2 needs a real pull request with `codelaw check --format github` in a workflow, so the annotations can be seen on GitHub — an agent cannot push or open one here.
 
 None.
 

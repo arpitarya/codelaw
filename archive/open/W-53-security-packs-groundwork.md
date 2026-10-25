@@ -6,8 +6,8 @@ item: W-53
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), W-53 implementation"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), parallel merge"
+ball: done
 ---
 
 # W-53 — Security packs — the groundwork: four packs, CWE/OWASP metadata, a request-source predicate
