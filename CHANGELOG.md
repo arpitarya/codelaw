@@ -18,6 +18,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Changed
 
+- **The README opens with what codelaw does for an AI agent before, while and after it writes**, each with where it stands today; the while-writing check is in design (W-35).
 - **Nine rule packs, each on the registry its users install from** (W-31). `rules-js` is split into `rules-js`, `rules-ts`, `rules-react`, `rules-node` and `rules-stencil`. npm carries eight packs (`js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `data`); PyPI carries six (`js`, `react`, `html`, `css`, `python`, `data`). `@codelaw/rules-python` is no longer on npm, and `ts`, `node` and `stencil` are not on PyPI. The rules themselves are unchanged (419).
   - **Before you upgrade:** `codelaw:ts/recommended` no longer turns on `js/no-var`, `js/prefer-const`, `js/prefer-rest-params` and `js/prefer-spread`; add `codelaw:js/typescript` for them (`codelaw init` writes it for a TypeScript repo). `codelaw:js/conventions` holds only the `js/*` conventions; the others are `ts/conventions`, `react/conventions` and `stencil/conventions`.
   - **`codelaw init`** installs `rules-ts` for TypeScript and `rules-react` or `rules-stencil` when `package.json` depends on them, and leaves out, with a `note:`, a pack the repo's registry does not publish.

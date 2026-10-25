@@ -6,7 +6,7 @@ item: W-35
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5), 2026-10-25: step 2 landed"
 ball: agent
 ---
 
@@ -17,8 +17,8 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Agree the line and the three beats | the story | ✅ 2026-10-25, below |
-| 2 | Put it at the top of the README: before and after as they are today, while marked "in design" with a link | the pitch on the front page, true on the day it lands | ⏳ |
-| 3 | When the while-writing check ships, drop the "in design" label | the full story | ⏳ |
+| 2 | Put it at the top of the README: before and after as they are today, while marked "in design" with a link | the pitch on the front page, true on the day it lands | ✅ 2026-10-25: README's top section. **Arpit, 2026-10-25:** *"Say what ships"* — Before reads "gets the rules for it" until `brief_for_task` (W-05) narrows them; the "handful, not a wall" line returns with it |
+| 3 | When the while-writing check ships, drop the "in design" label; when `brief_for_task` ships, restore Before's "the handful of rules that matter" | the full story | ⏳ waits on W-05 |
 
 **Arpit, 2026-10-25 (voice):** *"I want it as a marketing thing where codelaw can
 help agents before writing a code, while writing a code and after writing a

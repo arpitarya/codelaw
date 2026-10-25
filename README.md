@@ -26,7 +26,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 
 | | what the agent gets | where it stands |
 |---|---|---|
-| **Before** | it asks what applies to this file and gets the handful of rules that matter, not a wall of 132 | ✅ today: the MCP tool `rules_for_path` (or `codelaw rules --for <path>`) gives the rules for that path, and `codelaw init --agents` installs the skills. Cutting that list to the handful for the task (`brief_for_task`) is in design, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
+| **Before** | it asks what applies to this file and gets the rules for it | ✅ today: the MCP tool `rules_for_path` (or `codelaw rules --for <path>`), and the skills `codelaw init --agents` installs. Narrowing that list to the few rules a task needs (`brief_for_task`) is in design, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
 | **While** | every edit is checked before it reaches disk; a bad line is refused with the reason and the fix | 🧪 **in design**: `codelaw hook --pre`, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
 | **After** | anything that slips through is fixed on save, in the hook and in CI | ✅ today: `codelaw hook`, `codelaw check`, `codelaw fix`, and fix-on-save in the editor extension |
 

@@ -45,7 +45,7 @@ here. Read that record before changing anything below it.
 
 🟡 **W-34** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; waiting on Fux item 298, then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
-🟢 **W-35** `agent` Lead the README with "your rules, before, while and after the AI writes"; the while beat labelled in design until W-05's check ships. Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
+🟡 **W-35** `agent` README leads with "your rules, before, while and after the AI writes" since 2026-10-25, Before and After as they ship; waiting on W-05 to drop While's "in design" and restore Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
 
 ### testing
 
