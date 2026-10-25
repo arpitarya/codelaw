@@ -2,9 +2,11 @@
 //! format carries the L4 fix fields: the class, and the edits or the steps.
 //! SARIF is `sarif.rs`; the debug commands' output is `debug.rs`.
 
+mod ci;
 mod debug;
 mod sarif;
 
+pub use ci::{check_checkstyle, check_github, check_gitlab, check_junit, fingerprints};
 pub use debug::{config_json, config_text, match_json, match_text, timings_json, timings_text, trace_json, trace_text};
 pub use sarif::{SARIF_SCHEMA, check_sarif};
 
@@ -33,6 +35,10 @@ pub enum Format {
     Json,
     Sarif,
     Agent,
+    Github,
+    Gitlab,
+    Junit,
+    Checkstyle,
 }
 
 impl Format {
@@ -42,6 +48,10 @@ impl Format {
             "json" => Format::Json,
             "sarif" => Format::Sarif,
             "agent" => Format::Agent,
+            "github" => Format::Github,
+            "gitlab" => Format::Gitlab,
+            "junit" => Format::Junit,
+            "checkstyle" => Format::Checkstyle,
             _ => return None,
         })
     }

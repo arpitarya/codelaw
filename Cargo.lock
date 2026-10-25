@@ -1203,6 +1203,7 @@ dependencies = [
 name = "codelaw-report"
 version = "0.2.0"
 dependencies = [
+ "blake3",
  "codelaw-config",
  "codelaw-core",
  "codelaw-engine",

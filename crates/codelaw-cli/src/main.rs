@@ -141,7 +141,7 @@ struct CheckArgs {
     paths: Vec<PathBuf>,
     #[command(flatten)]
     common: Common,
-    /// text, json, sarif or agent.
+    /// text, json, sarif, agent, github, gitlab, junit or checkstyle.
     #[arg(long, default_value = "text")]
     format: String,
     /// Fail when there are more warnings than this.
@@ -167,7 +167,7 @@ struct FixArgs {
     /// Show each pass of the fix loop: what was offered, applied or refused, and why.
     #[arg(long)]
     trace: bool,
-    /// text, json, sarif or agent.
+    /// text, json, sarif, agent, github, gitlab, junit or checkstyle.
     #[arg(long, default_value = "text")]
     format: String,
     #[arg(long)]
@@ -316,7 +316,7 @@ pub fn load(paths: &[PathBuf], options: EngineOptions) -> Result<Project, Engine
 }
 
 pub fn format(s: &str) -> Result<Format, String> {
-    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif or agent)"))
+    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif, agent, github, gitlab, junit or checkstyle)"))
 }
 
 fn check(args: CheckArgs, ctx: &Ctx) -> Output {
@@ -344,10 +344,23 @@ fn check(args: CheckArgs, ctx: &Ctx) -> Output {
         Format::Json => out.stdout = json_line(&with_timings(codelaw_report::check_json(&report), &project)),
         Format::Sarif => out.stdout = json_line(&codelaw_report::check_sarif(&report, &project)),
         Format::Agent => out.stdout.push_str(&codelaw_report::check_agent(&report)),
+        ci => out.stdout = ci_output(ci, &report),
     }
     timings(&project, fmt, &mut out);
     out.code = codelaw_report::exit_code(&report, args.max_warnings) as u8;
     out
+}
+
+/// What a CI platform reads (SR-CLI-MCP decision 4). Only the four CI
+/// formats come here.
+pub fn ci_output(fmt: Format, report: &codelaw_engine::CheckReport) -> String {
+    match fmt {
+        Format::Github => codelaw_report::check_github(report),
+        Format::Gitlab => json_line(&codelaw_report::check_gitlab(report)),
+        Format::Junit => codelaw_report::check_junit(report),
+        Format::Checkstyle => codelaw_report::check_checkstyle(report),
+        other => unreachable!("{other:?} is not a CI format"),
+    }
 }
 
 /// A JSON value as `println!` of its pretty form prints it.
@@ -413,11 +426,12 @@ fn fix(args: FixArgs, ctx: &Ctx) -> Option<Output> {
         }
         Format::Sarif => out.stdout = json_line(&codelaw_report::check_sarif(&report.check, &project)),
         Format::Agent => out.stdout.push_str(&codelaw_report::check_agent(&report.check)),
+        ci => out.stdout = ci_output(ci, &report.check),
     }
     // Text: on stdout after the report; SARIF and agent: on stderr.
     match (trace, fmt) {
         (Some(t), Format::Text) => out.stdout.push_str(&codelaw_report::trace_text(t)),
-        (Some(t), Format::Sarif | Format::Agent) => out.stderr.push_str(&codelaw_report::trace_text(t)),
+        (Some(t), _) => out.stderr.push_str(&codelaw_report::trace_text(t)),
         _ => {}
     }
     timings(&project, fmt, &mut out);

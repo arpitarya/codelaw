@@ -16,11 +16,11 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Add the four formats to SR-CLI-MCP decision 4 | the record is the spec | ⏳ |
-| 2 | `github`: workflow commands `::error file=…,line=…,col=…,title=<rule>::<msg>` (warn → `::warning`, info → `::notice`) | annotations on the PR diff | ⏳ |
-| 3 | `gitlab`: Code Quality JSON (`check_name`, `description`, `severity`, `fingerprint`, `location.path`, `lines.begin`) | the MR widget | ⏳ |
-| 4 | `junit` and `checkstyle` XML | Jenkins, Azure DevOps, Bitbucket, SonarQube | ⏳ |
-| 5 | Docs: one CI snippet per platform in USAGE | copy-paste setup | ⏳ |
+| 1 | Add the four formats to SR-CLI-MCP decision 4 | the record is the spec | ✅ |
+| 2 | `github`: workflow commands `::error file=…,line=…,col=…,title=<rule>::<msg>` (warn → `::warning`, info → `::notice`) | annotations on the PR diff | ✅ |
+| 3 | `gitlab`: Code Quality JSON (`check_name`, `description`, `severity`, `fingerprint`, `location.path`, `lines.begin`) | the MR widget | ✅ |
+| 4 | `junit` and `checkstyle` XML | Jenkins, Azure DevOps, Bitbucket, SonarQube | ✅ |
+| 5 | Docs: one CI snippet per platform in USAGE | copy-paste setup | ✅ |
 
 **Arpit, 2026-10-25:** *"Watch mode, let's build it. Then CI report formats, let's build it. Exception report, that is code law exceptions, expiring 30 days, group added by … build it. Baseline burn down over commits, build it. Code law migrate from ESLint, flat config, Ruff, style lint, as well as biome … Remove OXLint. Dev server plugin for RSpack, Vite, Webpack, Next.js. Pre-commit hook, post-commit hook, create work items for all these."*
 
@@ -36,10 +36,15 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | each format validated against its published schema/XSD in a test | ⏳ |
+| 1 · | each format validated against its published schema/XSD in a test | ✅ |
 | 2 · | GitHub: a real run on this repo shows annotations on a PR | ⏳ |
-| 3 · | the same input gives byte-identical output (L5) | ⏳ |
-| 4 · | exit codes unchanged | ⏳ |
+| 3 · | the same input gives byte-identical output (L5) | ✅ |
+| 4 · | exit codes unchanged | ✅ |
+
+## What is left
+
+- DoD 2: push, open a PR with `codelaw check --format github` in the workflow, and look at the annotations. Nothing else.
+- JUnit/Checkstyle schema checks need `xmllint` (libxml2); the test skips loudly without it. Checkstyle publishes no schema, so `checkstyle.xsd` is its format description written down.
 
 ## Blockers
 
@@ -47,7 +52,7 @@ None.
 
 ## Record affected
 
-SR-CLI-MCP decision 4.
+SR-CLI-MCP decision 4 (amended: the formats, the `format --check` mapping, the fingerprint, the tests).
 
 ## Hazards
 
