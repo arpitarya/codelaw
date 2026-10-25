@@ -21,6 +21,10 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 <!-- /docs-sync:presets -->
 
+**In no preset:** `react/no-context` — no `createContext` or `useContext` — is a team's choice, so
+turn it on under `[rules]`. Its page shows how to keep today's context as warnings while new
+context fails, with a baseline.
+
 Every rule is **reimplemented**, not vendored: the matchers, messages and docs
 are written fresh, and each rule's `ported_from:` names the source rule.
 

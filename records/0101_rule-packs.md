@@ -9,6 +9,8 @@ date: 2026-10-18
 feature: "predefined rules and rule packs"
 owns:
   - packs
+  - fixtures/react-no-context
+  - crates/codelaw-cli/tests/react_no_context.rs
 laws: [L0, L2, L3, L4, L5, L6, L7]
 timestamp: 2026-10-25T09:00:00Z
 content_sha: ""
@@ -160,6 +162,7 @@ The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the
 8. **The v0 starter catalogue is kept** (below). Each starter rule goes to the pack named by its namespace.
    - A starter rule that matches a ported source rule carries it in `ported_from:` and sits in `recommended`.
    - The rest are house conventions (`js/exports-at-end`, `py/no-print`, …) and form each pack's opt-in `conventions` preset.
+   - **A rule that is a team's policy, not a defect, is in no preset:** the team turns it on under `[rules]`. `react/no-context` (no `createContext` or `useContext` from `react`) is the first; its page carries the adoption recipe — a baseline with `--warn-from` and `--on-touch keep` and no deadline, so today's uses warn and new ones fail with no engine code of its own ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 1–2). `fixtures/react-no-context/` is that recipe as a repo, run by `crates/codelaw-cli/tests/react_no_context.rs` (W-41, 2026-10-25).
 9. **Stability.** Each rule is `stable` or `preview`. Preview pack rules run only with `preview = true`; a local rule runs whatever its stability. A stable rule that starts finding new violations, or changes its fix, is a minor release and is listed in the changelog.
 10. **Eject to customise.** `codelaw rules eject <id>` copies a pack rule into `.codelaw/rules/`, and a local rule with the same id shadows it. `codelaw rules --why <id>` shows which copy is active.
     - An ejected `native:` rule keeps its `native:` id: the copy can change the docs, severity, options and examples, but the matcher stays in the engine.

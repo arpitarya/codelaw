@@ -474,6 +474,7 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &python_pyflakes::YieldOutsideFunction,
     &python_bugbear::ZipWithoutExplicitStrict,
     &react::ExhaustiveDeps,
+    &react::NoContext,
     &react::JsxNoDuplicateProps,
     &react::NoUnknownProperty,
     &conventions::PropsTypeName,

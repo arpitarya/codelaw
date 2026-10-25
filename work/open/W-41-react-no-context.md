@@ -6,8 +6,8 @@ item: W-41
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), sub-agent"
+ball: done
 ---
 
 # W-41 — old React context warns, new React context fails
@@ -17,9 +17,9 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | The decider rules what "new" means | `createContext` and `useContext` both | ✅ 2026-10-25 — [compare](../compare/ci-profiles-and-dated-exceptions.compare.md) fork 5 |
-| 2 | Add `react/no-context` to the react pack, with cases | the rule | ⏳ |
-| 3 | Document the adoption recipe (below) in the rule's page and USAGE | old uses warn, new ones fail | ⏳ |
-| 4 | Fixture: a repo with two context files; the recipe; then a new `useContext` → exit 1, untouched old ones → warnings | proof the recipe works end to end | ⏳ |
+| 2 | Add `react/no-context` to the react pack, with cases | the rule | ✅ 2026-10-25 — `native: react/no-context` in `react.rs`; 4 Don't/Do pairs, unit test `react::tests::no_context` |
+| 3 | Document the adoption recipe (below) in the rule's page and USAGE | old uses warn, new ones fail | ✅ 2026-10-25 — the page's summary, step 2 of *How to fix* and *Adopting it…*; USAGE *Without AI* |
+| 4 | Fixture: a repo with two context files; the recipe; then a new `useContext` → exit 1, untouched old ones → warnings | proof the recipe works end to end | ✅ 2026-10-25 — `fixtures/react-no-context/`, run by `crates/codelaw-cli/tests/react_no_context.rs` |
 
 **Arpit, 2026-10-25:** *"wherever we were using React context, that's okay. It should just throw a warning. But if there is a new implementation, it shouldn't be allowed and it should throw an error."*
 
@@ -49,9 +49,9 @@ codelaw baseline add --rule react/no-context \
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | `codelaw test packs/react` green with cases: named, aliased, `React.*`, shadowed local, `use()` not flagged | ⏳ |
-| 2 · | the fixture in step 4 gives the stated exit codes | ⏳ |
-| 3 · | `codelaw explain react/no-context` shows the recipe | ⏳ |
+| 1 · | `codelaw test packs/react` green with cases: named, aliased, `React.*`, shadowed local, `use()` not flagged | ✅ `codelaw test packs/react`: 22 rules · 305 checks · 0 failed; the aliased, namespace, shadowed-local, other-module and `use()` cases are `react::tests::no_context` (a manual rule's page examples can't hold a Do that only differs by import) |
+| 2 · | the fixture in step 4 gives the stated exit codes | ✅ `cargo test -p codelaw-cli --test react_no_context`: 1 passed — before the baseline 3 errors, exit 1; `baseline add` exit 0 ("2 entries, 3 findings allowed"); untouched 3 warnings, exit 0; a new file → its use errors, exit 1; one more use in `Header.jsx` → "(2 in this file; the baseline allows 1)", exit 1 |
+| 3 · | `codelaw explain react/no-context` shows the recipe | ✅ the summary and *How to fix* step 2 carry the `codelaw baseline add … --warn-from <today> --on-touch keep` command; asserted in the same test |
 
 ## Blockers
 
@@ -60,6 +60,8 @@ None.
 ## Record affected
 
 **No SR affected** — a pack rule (its page is its spec, SR-RULE-FORMAT) using SR-BASELINE as it stands. SR-RULE-PACKS' rule counts, if they are stated, move by one.
+
+**As landed (2026-10-25):** SR-BASELINE is unchanged. [SR-RULE-PACKS](../../records/0101_rule-packs.md) decision 8 gains a sub-bullet (a team-policy rule sits in no preset; `react/no-context` and its recipe) and now owns `fixtures/react-no-context` and `crates/codelaw-cli/tests/react_no_context.rs` (two rows in the register's Ownership table); [SR-ARCHITECTURE](../../records/0108_architecture.md) 15b gains a sub-bullet for the matcher. The corpus count is `react/no-context` = 10 (zustand and jotai make context — the rule is a ban, so these are true positives).
 
 ## Hazards
 

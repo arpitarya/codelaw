@@ -197,6 +197,13 @@ flowchart LR
   ```
 
   The day is the as-of date — `HEAD`'s commit date — not the wall clock, so a branch with no new commit does not start failing on the day by itself. A scheduled CI job passes `codelaw check --as-of "$(date +%F)"`. `until`, the last allowed day, still works for one release and reads as `expires` the day after ([SR-BASELINE](records/0104_baseline-and-deprecations.md) decision 9).
+- **Old uses warn, new ones fail:** leave out `--expires` and pass `--warn-from <today> --on-touch keep`. Each file's existing findings stay warnings with no deadline; a new file with the finding, or one more finding in an old file, is an error. `react/no-context` is the worked example — turn it on, then:
+
+  ```bash
+  # codelaw.toml: [rules] "react/no-context" = "error"
+  codelaw baseline add --rule react/no-context \
+    --warn-from 2026-10-25 --on-touch keep --reason "legacy context, grandfathered"
+  ```
 
 ---
 

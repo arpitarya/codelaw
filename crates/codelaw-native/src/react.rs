@@ -1,7 +1,8 @@
 //! Native rules behind `react/recommended`: duplicate JSX props, HTML
 //! attribute names on DOM elements, a class component's `render()` that
-//! doesn't return, and the two Rules of Hooks — `rules-of-hooks` (call
-//! order) and `exhaustive-deps` (dependency lists).
+//! doesn't return, the two Rules of Hooks — `rules-of-hooks` (call
+//! order) and `exhaustive-deps` (dependency lists) — and `no-context`, a
+//! team's ban on React context.
 
 use crate::util::{children, is_function, named_children, returns_value, text};
 use crate::{NativeContext, NativeFinding, NativeRule};
@@ -126,16 +127,16 @@ impl NativeRule for RequireRenderReturn {
 }
 
 /// `useX` with a capital after `use`; `use` itself is a hook too.
-fn is_hook_name(name: &str) -> bool {
+pub(crate) fn is_hook_name(name: &str) -> bool {
     name == "use" || name.strip_prefix("use").is_some_and(|r| r.starts_with(|c: char| c.is_ascii_uppercase()))
 }
 
-fn is_component_name(name: &str) -> bool {
+pub(crate) fn is_component_name(name: &str) -> bool {
     name.starts_with(|c: char| c.is_ascii_uppercase())
 }
 
 /// The hook a call calls: `useX(...)` or `React.useX(...)`.
-fn hook_called<'s>(call: Node<'_>, src: &'s str) -> Option<&'s str> {
+pub(crate) fn hook_called<'s>(call: Node<'_>, src: &'s str) -> Option<&'s str> {
     let f = call.child_by_field_name("function")?;
     let name = match f.kind() {
         "identifier" => text(f, src),
@@ -145,11 +146,11 @@ fn hook_called<'s>(call: Node<'_>, src: &'s str) -> Option<&'s str> {
     is_hook_name(name).then_some(name)
 }
 
-const FUNCTION_KINDS: &[&str] = &["function_declaration", "function_expression", "function", "arrow_function", "method_definition", "generator_function_declaration"];
+pub(crate) const FUNCTION_KINDS: &[&str] = &["function_declaration", "function_expression", "function", "arrow_function", "method_definition", "generator_function_declaration"];
 
 /// The function a node is inside, and that function's name as the Rules
 /// of Hooks see it.
-fn enclosing_function<'t>(n: Node<'t>, src: &str) -> Option<(Node<'t>, Option<String>, bool)> {
+pub(crate) fn enclosing_function<'t>(n: Node<'t>, src: &str) -> Option<(Node<'t>, Option<String>, bool)> {
     let mut p = n.parent();
     while let Some(f) = p {
         if FUNCTION_KINDS.contains(&f.kind()) {
@@ -406,6 +407,56 @@ impl NativeRule for ExhaustiveDeps {
     }
 }
 
+/// The React API a call calls, when it is one of `names` imported from
+/// `react`: the named import under any alias, or a member of the default or
+/// namespace import (`React.name`).
+pub(crate) fn react_api_call(model: &SemanticModel, call: Node<'_>, src: &str, names: &[&'static str]) -> Option<&'static str> {
+    use crate::js_ast::{import_of, unparen};
+    use codelaw_semantic::Imported;
+    let f = unparen(call.child_by_field_name("function")?);
+    let from_react = |s: &str| s == "react";
+    match f.kind() {
+        "identifier" => match &import_of(model, f, &from_react)?.imported {
+            Imported::Named(n) => names.iter().copied().find(|x| x == n),
+            _ => None,
+        },
+        "member_expression" => {
+            let object = unparen(f.child_by_field_name("object")?);
+            let property = text(f.child_by_field_name("property")?, src);
+            if object.kind() != "identifier" || !matches!(import_of(model, object, &from_react)?.imported, Imported::Default | Imported::Namespace) {
+                return None;
+            }
+            names.iter().copied().find(|x| *x == property)
+        }
+        _ => None,
+    }
+}
+
+pub struct NoContext;
+
+impl NativeRule for NoContext {
+    fn id(&self) -> &'static str {
+        "react/no-context"
+    }
+    fn languages(&self) -> &'static [Language] {
+        JSX
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["call_expression"]
+    }
+    fn needs_semantic(&self) -> bool {
+        true
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(model) = ctx.semantic else { return };
+        let call = node.get_inner_node();
+        let Some(api) = react_api_call(model, call, ctx.source, &["createContext", "useContext"]) else { return };
+        let instead = ctx.options.get("use_instead").and_then(|v| v.as_str()).filter(|s| !s.is_empty()).unwrap_or("props or the app's state store");
+        let what = if api == "createContext" { "creates a React context" } else { "reads a React context" };
+        out.push(finding(call, format!("`{api}` {what}; pass the data with {instead} instead"), Vec::new()));
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -442,6 +493,15 @@ mod tests {
             ("`useCallback` has unnecessary `api` in its dependency list".to_string(), "[n]".to_string()),
             ("`useCallback` without a dependency list does nothing; pass one".to_string(), String::new()),
         ]);
+    }
+
+    #[test]
+    fn no_context() {
+        let src = "import React, { createContext, useContext as useCtx } from 'react';\nimport * as R from 'react';\nconst A = createContext(null);\nfunction B() { return useCtx(A); }\nfunction C() { return React.useContext(A) + R.createContext(1); }\nfunction D() { return use(A); }";
+        assert_eq!(found(&NoContext, src).len(), 4);
+        // A local `useContext`, or one from another module, is not React's.
+        let src = "function useContext(x) { return x; }\nconst v = useContext(1);\nimport { useContext as u } from 'other';\nu(1);";
+        assert!(found(&NoContext, src).is_empty());
     }
 
     #[test]

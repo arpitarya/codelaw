@@ -1,0 +1,5 @@
+extends = ["codelaw:react/recommended"]
+preview = true
+
+[rules]
+"react/no-context" = "error"
