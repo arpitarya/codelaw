@@ -19,8 +19,8 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | The names are free: `codelaw` and `codelaw-rules-{js,react,html,css,python,data}` | nobody else owns them | 🟡 all seven are a 404 on PyPI's JSON API (2026-10-24); a 404 is not a guarantee — the first upload is the proof |
-| 2 | The 0.2.0 `dist` (W-31 step 7: bumped, pushed, CI green) | the wheels hold the same binary as npm's 0.2.0 (L6 decision 2) | 🟡 waits on W-31 |
-| 3 | `twine check`, then upload the six `codelaw_rules_*` wheels with Arpit's account token (not `codelaw`'s: CI creates it through its pending publisher) | the six projects exist, owned by Arpit | ⏳ Arpit runs it |
+| 2 | The 0.2.0 `dist` (W-31 step 7: bumped, pushed, CI green) | the wheels hold the same binary as npm's 0.2.0 (L6 decision 2) | ✅ 2026-10-25: CI run 40189751330 on `f33b772`, every job green (perf with the seven budgets); its `dist` passes `package.py check` (19 npm, 14 wheels at 0.2.0), `law-gate.py` and `SHA256SUMS` |
+| 3 | `twine check`, then upload the six `codelaw_rules_*` wheels with Arpit's account token (not `codelaw`'s: CI creates it through its pending publisher) | the six projects exist, owned by Arpit | 🟡 2026-10-25: built locally (`build-packs.py --release`, byte-identical to CI's six), `twine check` passed; `codelaw-rules-css` and `-data` uploaded; `html`, `js`, `python`, `react` refused by PyPI's new-project rate limit (429) for over an hour — `twine upload --skip-existing dist/pypi/codelaw_rules_*.whl` later |
 | 4 | Add a trusted publisher to each of the six (now existing) projects: `arpitarya` / `codelaw` / `publish.yml` / environment `pypi` | every later release comes from CI, no token | ⏳ Arpit, on pypi.org |
 | 5 | `RELEASING.md` §One time step 4: "pending publishers" becomes "trusted publishers on the existing projects", and the first PyPI publish is by hand like npm's | the release doc matches what was done | ✅ 2026-10-25 |
 

@@ -37,9 +37,9 @@ here. Read that record before changing anything below it.
 
 🟡 **W-29** `arpit` The first npm publish: 14 names live at 0.1.0, trusted publishing bound, the Mac install check passed 2026-10-25, records done; left: the 8-platform registry install, moved to 0.2.0 (ruled 2026-10-25). Filed by Arpit (Claude Code). [detail](open/W-29-first-npm-publish.md)
 
-🟡 **W-30** `arpit` The first PyPI publish: `codelaw` (8 wheels) and the six `codelaw-rules-*` of W-31's layout, at 0.2.0 rather than 0.1.0; waiting on W-31 (0.2.0). Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
+🟡 **W-30** `arpit` The first PyPI publish at 0.2.0: CI's `dist` verified 2026-10-25; `codelaw-rules-css`, `-data` live, the other four held by PyPI's 429; left: those four, six trusted publishers, then `codelaw` from the release. Filed by Arpit (Claude Code). [detail](open/W-30-first-pypi-publish.md)
 
-🟢 **W-31** `arpit` Eight packs on npm, six on PyPI: landed and pushed; 0.2.0 committed 2026-10-25 (`f40b2e6`, unpushed); two PyPI packs live, four uploading; left: Arpit pushes, publishes npm's two new names, cuts the release. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
+🟢 **W-31** `arpit` 0.2.0 pushed, CI green on `f33b772` and its `dist` verified 2026-10-25; left (Arpit): npm's two new names by hand, `npm-trust.sh`, W-30, then `gh release create v0.2.0` from `main`. Filed by Arpit (Claude Code). [detail](open/W-31-registry-pack-split.md)
 
 🟡 **W-32** `arpit` A Redux Toolkit pack and a TanStack Query pack, npm only: steps 2–4 done in the tree 2026-10-25 (7 + 12 rules, all green, wired); pushed, CI run 40185344678 green; left: their first publish at 0.2.0 with W-31 step 7. Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
 
