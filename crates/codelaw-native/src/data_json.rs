@@ -65,7 +65,7 @@ pub(crate) fn pairs<'t>(obj: Node<'t>, src: &str) -> Vec<(String, Node<'t>, Opti
         .collect()
 }
 
-fn top_object(doc: Node<'_>) -> Option<Node<'_>> {
+pub(crate) fn top_object(doc: Node<'_>) -> Option<Node<'_>> {
     named_children(doc).into_iter().find(|n| n.kind() == "object")
 }
 

@@ -260,6 +260,27 @@ impl Config {
             }
         }
 
+        // `[deps]` (SR-RULE-PACKS decision 15).
+        macro_rules! grade {
+            ($g:ident, $default:literal) => {
+                let (v, s) = root_key(&["deps", "severity", stringify!($g)], |r| r.deps.severity.as_ref().and_then(|x| x.$g.as_ref()).map(|x| json!(x.0)), json!($default));
+                push(concat!("deps.severity.", stringify!($g)), v, s);
+            };
+        }
+        grade!(major, "warn");
+        grade!(minor, "info");
+        grade!(patch, "info");
+        grade!(deprecated, "error");
+        grade!(yanked, "error");
+        grade!(lockfile, "info");
+        let (v, s) = root_key(&["deps", "min_release_age"], |r| r.deps.min_release_age.map(|d| json!(d.0)), json!(0));
+        push("deps.min_release_age", v, s);
+        let (v, s) = root_key(&["deps", "prerelease"], |r| r.deps.prerelease.map(|x| json!(x)), json!(false));
+        push("deps.prerelease", v, s);
+        let (v, s) = root_key(&["deps", "ignore"], |r| r.deps.ignore.as_ref().and_then(|x| serde_json::to_value(x).ok()), json!([]));
+        push("deps.ignore", v, s);
+        let (v, s) = root_key(&["deps", "max_snapshot_age"], |r| r.deps.max_snapshot_age.map(|d| json!(d.0)), json!(14));
+        push("deps.max_snapshot_age", v, s);
         // The sections not validated yet: shown as written.
         for (name, get) in [
             ("format", (|r: &RawConfig| r.format.clone()) as fn(&RawConfig) -> Option<toml::Table>),

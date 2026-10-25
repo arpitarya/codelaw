@@ -236,6 +236,9 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 |---|---|---|
 | `crates/codelaw-rules` | SR-RULE-PACKS | pack layout, resolution, presets and precedence (decisions 3–5, 10–14) are the loader's |
 | `crates/codelaw-cli/src/init.rs` | SR-RULE-PACKS | decision 6 is what `codelaw init` does |
+| `crates/codelaw-native/src/deps` | SR-RULE-PACKS | decision 15: the manifests, lockfiles, snapshot and version order the dependency rules read |
+| `crates/codelaw-cli/src/deps_cmd.rs` | SR-RULE-PACKS | decision 15: what `codelaw deps refresh` reads, sends and writes |
+| `crates/codelaw-cli/src/deps_cmd.rs` | SR-LAW-5 | decision 3: the one command that may use the network |
 | `crates/codelaw-engine/src/suppress.rs` | SR-LINTER | decision 6: the suppression syntax and what it covers |
 | `crates/codelaw-match/src/data.rs` | SR-RULE-FORMAT | decision 3e: the data tree a `target:` rule reads |
 | `crates/codelaw-match/src/target.rs` | SR-RULE-FORMAT | decision 3e: `target:` paths and `assert:` checks |

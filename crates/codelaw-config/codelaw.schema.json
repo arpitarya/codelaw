@@ -251,6 +251,62 @@
         }
       }
     },
+    "deps": {
+      "x-codelaw-record": "SR-RULE-PACKS",
+      "description": "The dependency rules, `data/outdated-dependency` and `data/stale-deps-snapshot`, read against `.codelaw/deps-snapshot.json`, which `codelaw deps refresh` writes (SR-RULE-PACKS decision 15). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "description": "The severity of each kind of finding, or `off`: a major, minor or patch version behind, a deprecated (npm) or yanked (PyPI) version in use, a lockfile behind a range that allows the latest.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "major": { "enum": ["error", "warn", "info", "off"], "default": "warn" },
+            "minor": { "enum": ["error", "warn", "info", "off"], "default": "info" },
+            "patch": { "enum": ["error", "warn", "info", "off"], "default": "info" },
+            "deprecated": { "enum": ["error", "warn", "info", "off"], "default": "error" },
+            "yanked": { "enum": ["error", "warn", "info", "off"], "default": "error" },
+            "lockfile": { "enum": ["error", "warn", "info", "off"], "default": "info" }
+          }
+        },
+        "min_release_age": {
+          "description": "Releases younger than this on the snapshot's `fetched` date are not offered: days, or a string like \"7d\" or \"2w\".",
+          "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "string", "pattern": "^\\s*[0-9]+\\s*[dw]$" }],
+          "default": 0
+        },
+        "prerelease": {
+          "description": "Offer prereleases. `deps refresh` keeps them in the snapshot only when this is on.",
+          "type": "boolean",
+          "default": false
+        },
+        "ignore": {
+          "description": "Packages never reported: `npm:<name>` or `pypi:<name>`, or a table with `package` and an `expires` date (the first day it no longer holds), `added_by` and `reason`.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string", "pattern": "^(npm|pypi):.+" },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["package"],
+                "properties": {
+                  "package": { "type": "string", "pattern": "^(npm|pypi):.+" },
+                  "expires": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+                  "added_by": { "type": "string" },
+                  "reason": { "type": "string" }
+                }
+              }
+            ]
+          }
+        },
+        "max_snapshot_age": {
+          "description": "A snapshot older than this on the as-of date is `data/stale-deps-snapshot`: days, or a string like \"14d\".",
+          "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "string", "pattern": "^\\s*[0-9]+\\s*[dw]$" }],
+          "default": 14
+        }
+      }
+    },
     "adapters": {
       "x-codelaw-record": "SR-LINTER",
       "description": "Optional external linters run by `check` and `fix` (SR-LINTER decision 2). Root config only.",

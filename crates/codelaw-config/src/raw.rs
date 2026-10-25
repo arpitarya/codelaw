@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 /// The keys of one config file, exactly as written. Every section is
@@ -52,6 +52,9 @@ pub struct RawConfig {
     pub deprecation: Option<RawDeprecation>,
     /// SR-BASELINE decision 9: dated exceptions. Root config only.
     pub exceptions: Option<RawExceptions>,
+    /// SR-RULE-PACKS decision 15: the dependency rules. Root config only.
+    #[serde(default)]
+    pub deps: RawDeps,
     #[serde(default)]
     pub adapters: RawAdapters,
     #[serde(default)]
@@ -165,6 +168,113 @@ pub struct RawDeprecation {
 pub struct RawExceptions {
     pub require_expiry: Option<bool>,
     pub warn_days: Option<i64>,
+}
+
+/// `[deps]`: SR-RULE-PACKS decision 15. The dependency rules read it as
+/// their options, so it serialises to the JSON they read.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawDeps {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub severity: Option<RawDepsSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_release_age: Option<Days>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prerelease: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ignore: Option<Vec<RawDepsIgnore>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_snapshot_age: Option<Days>,
+}
+
+/// `[deps] severity`: a severity, or `off`, per kind of finding.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawDepsSeverity {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub major: Option<GradeSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minor: Option<GradeSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub patch: Option<GradeSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deprecated: Option<GradeSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub yanked: Option<GradeSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lockfile: Option<GradeSeverity>,
+}
+
+/// `error`, `warn`, `info` or `off`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct GradeSeverity(pub String);
+
+impl<'de> Deserialize<'de> for GradeSeverity {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(d)?;
+        if matches!(s.as_str(), "error" | "warn" | "info" | "off") {
+            return Ok(GradeSeverity(s));
+        }
+        Err(serde::de::Error::custom(format!("invalid severity `{s}` (one of error, warn, info, off)")))
+    }
+}
+
+/// One `[deps] ignore` entry: `"npm:typescript"`, or a dated one.
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum RawDepsIgnore {
+    Package(String),
+    Dated(RawDatedIgnore),
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawDatedIgnore {
+    pub package: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub added_by: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+
+impl RawDepsIgnore {
+    pub fn package(&self) -> &str {
+        match self {
+            RawDepsIgnore::Package(p) => p,
+            RawDepsIgnore::Dated(d) => &d.package,
+        }
+    }
+}
+
+/// A number of days: an integer, or a string like `"7d"` or `"2w"`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+pub struct Days(pub u64);
+
+impl<'de> Deserialize<'de> for Days {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Either {
+            N(u64),
+            S(String),
+        }
+        let parsed = match Either::deserialize(d)? {
+            Either::N(n) => Some(n),
+            Either::S(s) => {
+                let s = s.trim();
+                if let Some(n) = s.strip_suffix('d') {
+                    n.trim().parse().ok()
+                } else if let Some(n) = s.strip_suffix('w') {
+                    n.trim().parse::<u64>().ok().map(|n| n * 7)
+                } else {
+                    None
+                }
+            }
+        };
+        parsed.map(Days).ok_or_else(|| serde::de::Error::custom("invalid number of days; write e.g. 7, \"7d\" or \"2w\""))
+    }
 }
 
 /// `[daemon]`: SR-ARCHITECTURE decision 22.

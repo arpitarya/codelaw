@@ -32,6 +32,8 @@ pub(crate) enum Question {
     IsDir(String),
     Read(String),
     List(String),
+    /// The as-of date (L5 decision 2).
+    AsOf,
 }
 
 /// A question and the hash of its answer.
@@ -41,12 +43,16 @@ pub(crate) struct Asked {
     pub answer: [u8; 32],
 }
 
+/// The as-of date, asked for only when a rule needs it.
+pub(crate) type AsOfFn<'a> = &'a (dyn Fn() -> Option<String> + Sync);
+
 /// A file as a native rule sees it.
 pub(crate) struct ProjectFile<'a> {
     path: &'a str,
     bytes: Vec<u8>,
     root: &'a Path,
     tree: Tree<'a>,
+    as_of: Option<AsOfFn<'a>>,
     asked: Mutex<Vec<Asked>>,
 }
 
@@ -59,7 +65,13 @@ impl<'a> ProjectFile<'a> {
             bytes.extend_from_slice("\u{feff}".as_bytes());
         }
         bytes.extend_from_slice(text.as_bytes());
-        ProjectFile { path, bytes, root, tree, asked: Mutex::new(Vec::new()) }
+        ProjectFile { path, bytes, root, tree, as_of: None, asked: Mutex::new(Vec::new()) }
+    }
+
+    /// Where the as-of date comes from.
+    pub fn with_as_of(mut self, as_of: AsOfFn<'a>) -> Self {
+        self.as_of = Some(as_of);
+        self
     }
 
     /// Every question asked so far, in order, without repeats.
@@ -102,8 +114,9 @@ fn hash_list(l: &Option<Vec<String>>) -> Key {
 }
 
 /// The answer to a question, from `tree`.
-fn answer(root: &Path, tree: Tree<'_>, q: &Question) -> Key {
+fn answer(root: &Path, tree: Tree<'_>, q: &Question, as_of: &dyn Fn() -> Option<String>) -> Key {
     match q {
+        Question::AsOf => hash_text(&as_of()),
         Question::Exists(p) => hash_bool(exists(root, tree, p)),
         Question::IsDir(p) => hash_bool(is_dir(root, tree, p)),
         Question::Read(p) => hash_text(&read(root, tree, p)),
@@ -111,10 +124,10 @@ fn answer(root: &Path, tree: Tree<'_>, q: &Question) -> Key {
     }
 }
 
-/// Whether every recorded answer still holds against the disk (a cached
-/// result's check before it is reused).
-pub(crate) fn still_holds(root: &Path, asked: &[Asked]) -> bool {
-    asked.iter().all(|a| answer(root, Tree::Disk, &a.question).0 == a.answer)
+/// Whether every recorded answer still holds against the disk and the
+/// as-of date (a cached result's check before it is reused).
+pub(crate) fn still_holds(root: &Path, asked: &[Asked], as_of: &dyn Fn() -> Option<String>) -> bool {
+    asked.iter().all(|a| answer(root, Tree::Disk, &a.question, as_of).0 == a.answer)
 }
 
 fn exists(root: &Path, tree: Tree<'_>, path: &str) -> bool {
@@ -198,6 +211,11 @@ impl FileContext for ProjectFile<'_> {
         self.record(Question::List(path.to_owned()), hash_list(&a));
         a
     }
+    fn as_of(&self) -> Option<String> {
+        let a = self.as_of.and_then(|f| f());
+        self.record(Question::AsOf, hash_text(&a));
+        a
+    }
 }
 
 #[cfg(test)]
@@ -236,9 +254,22 @@ mod tests {
         let f = ProjectFile::new("a.md", "", false, &dir, Tree::Disk);
         assert!(!f.exists("b.md"));
         let asked = f.asked();
-        assert!(still_holds(&dir, &asked));
+        assert!(still_holds(&dir, &asked, &|| None));
         std::fs::write(dir.join("b.md"), "x").unwrap();
-        assert!(!still_holds(&dir, &asked), "the file now exists, so the cached answer is stale");
+        assert!(!still_holds(&dir, &asked, &|| None), "the file now exists, so the cached answer is stale");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_as_of_date_is_an_answer_too() {
+        let date = || Some("2026-10-25".to_owned());
+        let f = ProjectFile::new("package.json", "{}", false, Path::new("/nowhere"), Tree::Disk).with_as_of(&date);
+        assert_eq!(f.as_of().as_deref(), Some("2026-10-25"));
+        let asked = f.asked();
+        assert_eq!(asked.len(), 1);
+        assert!(still_holds(Path::new("/nowhere"), &asked, &date));
+        assert!(!still_holds(Path::new("/nowhere"), &asked, &|| Some("2026-10-26".to_owned())), "a new as-of date is a new answer");
+        let plain = ProjectFile::new("a.md", "", false, Path::new("/nowhere"), Tree::Disk);
+        assert_eq!(plain.as_of(), None);
     }
 }

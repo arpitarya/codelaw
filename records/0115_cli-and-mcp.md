@@ -13,7 +13,7 @@ owns:
   - crates/codelaw-mcp
   - .pre-commit-hooks.yaml
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-25T09:00:00Z
+timestamp: 2026-10-25T18:00:00Z
 content_sha: ""
 ---
 
@@ -73,7 +73,9 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | baseline | `baseline add --rule <id> [--file …] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` · `baseline prune [paths]` · `baseline check --since <ref>` · `baseline history [--since <date\|90d\|ref>] [--by commit\|day\|week] [--rule <id>] [--format text\|json\|csv\|markdown]` · `deprecate <symbol> [--replacement] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 5, 6, 9 and 10; `--added-by` defaults to `git config user.email`; the MCP twins are unchanged) |
    | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` ([SR-ARCHITECTURE](0108_architecture.md) decision 22) · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
+   | dependencies | `deps refresh [--as-of <date>] [--jobs N]` — the one command that uses the network ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3) |
 
+   - **`deps refresh`** reads every `package.json` and `pyproject.toml` the project's discovery finds and their lockfiles, asks npm and the Python index about each dependency (through `curl`, `--jobs` requests at a time, 8 by default), and writes `.codelaw/deps-snapshot.json` with `fetched` set to `--as-of` or today in UTC; what it reads, sends and writes is [SR-RULE-PACKS](0101_rule-packs.md) decision 15. It prints `wrote .codelaw/deps-snapshot.json: <n> npm and <m> PyPI package(s), fetched <date>` and a `warning:` per package its registry does not have, and exits `0`; a request that fails, a registry that refuses the token, or a bad `--as-of` exits `2` and writes nothing (`crates/codelaw-cli/src/deps_cmd.rs`; W-52, 2026-10-25). It has no MCP twin: the MCP server stays offline (decision 5).
    - **`init` picks the packs** from the repo's languages and `package.json`, by [SR-RULE-PACKS](0101_rule-packs.md) decision 6: `react`, `stencil`, `tanstack-query` (`@tanstack/react-query` or `react-query`) and `redux-toolkit` (`@reduxjs/toolkit` or `redux`) join when the repo depends on that library (`crates/codelaw-cli/src/init.rs`; W-32, 2026-10-25).
 
 2. **Common flags:**
