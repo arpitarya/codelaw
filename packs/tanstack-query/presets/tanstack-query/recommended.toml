@@ -1,0 +1,10 @@
+description = "@tanstack/eslint-plugin-query 5.104.5 recommended (all 7), reimplemented, at its severities"
+
+[rules]
+"tanstack-query/exhaustive-deps" = "error"
+"tanstack-query/infinite-query-property-order" = "error"
+"tanstack-query/mutation-property-order" = "error"
+"tanstack-query/no-rest-destructuring" = "warn"
+"tanstack-query/no-unstable-deps" = "error"
+"tanstack-query/no-void-query-fn" = "error"
+"tanstack-query/stable-query-client" = "error"

@@ -1,0 +1,15 @@
+description = "The Redux Style Guide's Priority A rules as errors and its Priority B rules as warnings, where a rule has a deterministic match"
+
+[rules]
+"redux-toolkit/no-blind-payload-return" = "warn"
+"redux-toolkit/no-immutable-js" = "warn"
+"redux-toolkit/no-legacy-create-store" = "warn"
+"redux-toolkit/no-mutating-reducer" = "error"
+"redux-toolkit/no-non-serializable-state" = "error"
+"redux-toolkit/no-object-selector" = "warn"
+"redux-toolkit/no-sequential-dispatch" = "warn"
+"redux-toolkit/no-side-effects-in-reducer" = "error"
+"redux-toolkit/object-shorthand-mapdispatch" = "warn"
+"redux-toolkit/prefer-create-slice" = "warn"
+"redux-toolkit/prefer-hooks-api" = "warn"
+"redux-toolkit/slice-key-names" = "warn"

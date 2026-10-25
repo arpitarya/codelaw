@@ -38,7 +38,7 @@ description: "Recurring terms, defined once."
 | data table | a JSON file in a pack's `data/` (CSS properties, HTML elements, globals), read once and shared by the rules that name it; SR-RULE-PACKS decision 3 |
 | fixpoint | a file the fixes no longer change: the apply loop runs until it reaches one, at most ten passes; SR-ARCHITECTURE decision 5 |
 | group fix | a fix computed once over every match in a file (`collect-into-block`); each diagnostic carries the whole edit set; SR-RULE-FORMAT decision 3c |
-| first-party pack | one of codelaw's nine packs, recognised by its manifest name (`@codelaw/rules-*`, or `codelaw-rules-python` for the PyPI-only pack); only these may use `native:`; SR-RULE-PACKS decision 4 |
+| first-party pack | one of codelaw's eleven packs, recognised by its manifest name (`@codelaw/rules-*`, or `codelaw-rules-python` for the PyPI-only pack); only these may use `native:`; SR-RULE-PACKS decision 4 |
 | trusted publishing | a registry (npm, PyPI) accepting an upload because GitHub's OIDC token proves it came from one named workflow and environment — no stored token; SR-PACKAGES decision 11 |
 | `dist` | the checked set of 17 npm tarballs and 14 wheels one `ci.yml` run assembles; `publish.yml` uploads exactly that set and never builds its own; SR-PACKAGES decision 11 |
 | half-published | a release some of whose packages reached a registry before a publish failed; withdrawn by the decider with `scripts/withdraw.sh`; SR-PACKAGES decision 12 |

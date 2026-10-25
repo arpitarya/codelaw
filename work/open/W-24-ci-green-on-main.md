@@ -6,8 +6,8 @@ item: W-24
 filed: 2026-10-23
 filed_by: "Arpit (Claude Code, Fable 5.1)"
 updated: 2026-10-25
-updated_by: "Arpit (Claude Code, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5): DoD 5 proven; main red on docs-sync, fixed in the tree"
+ball: arpit
 ---
 
 # W-24 — Make CI pass on `main`, and make a green verdict mean something
@@ -27,6 +27,8 @@ ball: agent
 
 | 7 | Found 2026-10-24 in run 40039203859: `smoke darwin-*` fail with "the staging index did not start" — `HTTPServer.server_bind` calls `socket.getfqdn("127.0.0.1")`, a reverse-DNS lookup that stalls on the macOS runners | the two macOS smokes pass | ✅ CI run 40124005285: `smoke darwin-arm64` and `darwin-x64` installed from the staging index and passed — the reverse-DNS diagnosis held |
 
+| 8 | Found 2026-10-25: `main` red since run 40125039176 — `lint`'s docs-sync step: CHANGELOG *Unreleased* named neither W-18 nor W-19, which `work/IMPLEMENTATION.md` dates after 0.1.0 | `lint` green again | ✅ in the tree, uncommitted: a line each under *Unreleased*; `docs-sync.py --check` passes. Proven by the push of it |
+
 **Model:** Sonnet: six concrete edits, each with a mechanical pass condition; step 2 needs care with the reason text.
 
 ## Goal
@@ -41,9 +43,9 @@ A push of `main` as it stands is green on all eight platforms, and a green verdi
 | 2 · replay | `for c in $(git rev-list --no-merges $(grep -v '^#' records/RULE-SINCE)..HEAD); do SR_GUARD_COMMIT=$c scripts/sr-guard.sh; done` exits 0 on `main`; `RULE-SINCE` names the reason and the date of the move | ✅ locally: 0 commits after `5e489f4` fail; CI replays the merged branches |
 | 3 · keys | the `test`, `clippy` and `wheel` cache keys hash every path a test under `crates/*/tests` reads (`grep -rn "include_str!\|read_to_string\|\.\./\.\./" crates/*/tests crates/*/src | grep -v target` is the list) | ✅ |
 | 4 · gate | `ci.yml`'s law-gate step fails on a binary missing `format`, `mcp` or `lsp` | ✅ (law-gate.py exits 1 without `--report`) |
-| 5 · perf | a push touching only `*.md` does not run `perf` | 🟡 the step, run locally on `4b19bd1..32ff82a` (work/ only), says skip; on `32ff82a..5e489f4` (crates), run; proven by the first docs-only push |
+| 5 · perf | a push touching only `*.md` does not run `perf` | ✅ CI run 40125039176 on `0473bcd` (work/, archive/, records/ only): "perf: skipped — nothing it times changed since ae909824" |
 | 6 · hook | `LC_ALL=C python3 scripts/check-open-work-inbox.py` passes | ✅ (and its failure path, under `LC_ALL=C`) |
-| 7 · green | a push of `main` with this change is green on all eight platforms | ✅ CI run 40124005285 on `483b2a1` (2026-10-24): every job green — all eight builds, packages and smokes, `lint` (guard replay), `test`, `msrv`, `corpus`, `perf` |
+| 7 · green | a push of `main` with this change is green on all eight platforms | 🟡 was ✅ (run 40124005285), red again since 40125039176 (step 8); back to ✅ on the push of step 8 —  CI run 40124005285 on `483b2a1` (2026-10-24): every job green — all eight builds, packages and smokes, `lint` (guard replay), `test`, `msrv`, `corpus`, `perf` |
 
 ## Blockers
 

@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — W-32's two packs finished and verified; `main`'s red lint found and fixed  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement all OpenWork tasks in parallel."*
+- **Done:** triage: of the 🟢 items only W-32 was agent-closable code. Its steps 2–4 were already in the tree from an earlier session, uncommitted; this session built them and verified them (both packs green, workspace 463 passed, clippy clean after one elided lifetime in `tanstack_query.rs`). Found `main` red since run 40125039176: `lint`'s docs-sync, the CHANGELOG missing W-18 and W-19. Added both lines, which also proved W-24 DoD 5 from that run's skipped `perf`. W-29 DoD 2, the Mac half: `npm i codelaw@0.1.0` works in an empty folder. Nothing committed.
+- **Decided / left open:** not parallel. There was one code item, and L9 (4.2 GB of 5 at the start) leaves no room for extra worktrees with their own builds. W-32 and W-24 moved to the `arpit` lane: they wait on the commit and push.
+- **Mistakes:** the test and clippy builds took the project to 5.7 GB, past L9. Brought back to 3.1 GB by deleting `target/debug/incremental` and the test binaries, all of which can be rebuilt. The next session should build with `CARGO_INCREMENTAL=0`. One `warm.rs` socket test timed out under that load and passed on the rerun.
+- **Next:** Arpit commits and pushes. CI turns green, which closes W-24; then 0.2.0 (W-31 step 7) carries W-32's first publish.
+
 ## 2026-10-25 — W-32: the query pack is `tanstack-query`  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** *"rename react-query > tanstack query"*

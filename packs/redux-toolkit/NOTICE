@@ -1,0 +1,7 @@
+@codelaw/rules-redux-toolkit
+
+The rules are codelaw's own, written for this pack from the Redux Style
+Guide (redux.js.org/style-guide), Priority A ("Essential") and Priority B
+("Strongly Recommended"). Each rule's text names the guide section it checks.
+No rule is ported from an ESLint plugin, so no rule has a `ported_from:`; no
+text or code from the Redux documentation or from Redux Toolkit is included.

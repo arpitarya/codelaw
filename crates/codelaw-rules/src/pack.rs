@@ -54,8 +54,9 @@ const fn pypi_only(short: &'static str, pypi: &'static str) -> FirstPartyPack {
     FirstPartyPack { short, manifest: pypi, npm: None, pypi: Some(pypi) }
 }
 
-/// The nine first-party packs: eight on npm, six on PyPI (the decider's
-/// ruling of 2026-10-24). `scripts/package.py` reads this table, so it is
+/// The eleven first-party packs: ten on npm, six on PyPI (the decider's
+/// rulings of 2026-10-24: W-31's split, and W-32's two npm-only library
+/// packs). `scripts/package.py` reads this table, so it is
 /// the one list of what is published where.
 pub const FIRST_PARTY_PACKS: &[FirstPartyPack] = &[
     both("js", "@codelaw/rules-js", "codelaw-rules-js"),
@@ -67,6 +68,8 @@ pub const FIRST_PARTY_PACKS: &[FirstPartyPack] = &[
     both("css", "@codelaw/rules-css", "codelaw-rules-css"),
     pypi_only("python", "codelaw-rules-python"),
     both("data", "@codelaw/rules-data", "codelaw-rules-data"),
+    npm_only("tanstack-query", "@codelaw/rules-tanstack-query"),
+    npm_only("redux-toolkit", "@codelaw/rules-redux-toolkit"),
 ];
 
 /// The fixed namespace-to-pack map (decision 4).
@@ -81,6 +84,8 @@ pub fn namespace_pack(namespace: &str) -> Option<&'static str> {
         "css" => "css",
         "py" => "python",
         "data" | "md" | "json" | "yaml" | "toml" => "data",
+        "tanstack-query" => "tanstack-query",
+        "redux-toolkit" => "redux-toolkit",
         _ => return None,
     })
 }
@@ -122,7 +127,7 @@ impl ExtendsSpec {
                 return Err(format!("`{spec}`: a first-party preset is `codelaw:<namespace>/<preset>`, e.g. `codelaw:js/recommended`"));
             };
             let Some(pack) = namespace_pack(ns) else {
-                let known = ["js", "ts", "react", "node", "stencil", "html", "css", "py", "data", "md", "json", "yaml", "toml"];
+                let known = ["js", "ts", "react", "node", "stencil", "html", "css", "py", "data", "md", "json", "yaml", "toml", "tanstack-query", "redux-toolkit"];
                 let near = codelaw_config::did_you_mean(ns, known).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
                 return Err(format!("`{spec}`: no first-party pack has the namespace `{ns}`{near}"));
             };
@@ -504,11 +509,11 @@ mod tests {
     }
 
     #[test]
-    fn eight_packs_on_npm_and_six_on_pypi() {
-        // The decider's ruling of 2026-10-24 (L6 decision 11).
+    fn ten_packs_on_npm_and_six_on_pypi() {
+        // The decider's rulings of 2026-10-24 (L6 decision 11; W-31, W-32).
         let npm: Vec<&str> = FIRST_PARTY_PACKS.iter().filter(|p| p.npm.is_some()).map(|p| p.short).collect();
         let pypi: Vec<&str> = FIRST_PARTY_PACKS.iter().filter(|p| p.pypi.is_some()).map(|p| p.short).collect();
-        assert_eq!(npm, ["js", "ts", "react", "node", "stencil", "html", "css", "data"]);
+        assert_eq!(npm, ["js", "ts", "react", "node", "stencil", "html", "css", "data", "tanstack-query", "redux-toolkit"]);
         assert_eq!(pypi, ["js", "react", "html", "css", "python", "data"]);
         for p in FIRST_PARTY_PACKS {
             assert_eq!(Some(p.manifest), p.npm.or(p.pypi), "{}", p.short);
@@ -520,7 +525,7 @@ mod tests {
             }
         }
         // Every namespace a first-party pack owns maps to a pack in the table.
-        for ns in ["js", "ts", "react", "node", "stencil", "html", "css", "py", "data", "md", "json", "yaml", "toml"] {
+        for ns in ["js", "ts", "react", "node", "stencil", "html", "css", "py", "data", "md", "json", "yaml", "toml", "tanstack-query", "redux-toolkit"] {
             let short = namespace_pack(ns).unwrap();
             assert!(FIRST_PARTY_PACKS.iter().any(|p| p.short == short), "{ns}");
         }

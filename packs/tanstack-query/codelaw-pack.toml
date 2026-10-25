@@ -1,0 +1,6 @@
+name = "@codelaw/rules-tanstack-query"
+version = "0.1.0"
+min_codelaw = "0.1.0"
+languages = ["javascript", "jsx", "typescript", "tsx"]
+presets = ["tanstack-query/recommended"]
+description = "codelaw's TanStack Query rules, from @tanstack/eslint-plugin-query (SR-RULE-PACKS)"

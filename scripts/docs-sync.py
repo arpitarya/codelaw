@@ -257,8 +257,8 @@ def sync_readme(packs, subcommands, checks):
     doc.anchor(r"all (\w+) rule packs work today", [word(len(packs))])
     doc.anchor(r"(\w+) first-party packs: (\w+) on npm as `@codelaw/rules-<pack>`, (\w+) on PyPI",
                [word(len(packs), True), word(len(npm)), word(len(pypi))])
-    doc.anchor(r'for p in ([a-z ]+); do\n  ln -s "\$OLDPWD/codelaw/packs/\$p" "node_modules/', [" ".join(npm)])
-    doc.anchor(r'for p in ([a-z ]+); do\n  ln -s "\$OLDPWD/codelaw/packs/\$p" "\.codelaw-packs/',
+    doc.anchor(r'for p in ([a-z -]+); do\n  ln -s "\$OLDPWD/codelaw/packs/\$p" "node_modules/', [" ".join(npm)])
+    doc.anchor(r'for p in ([a-z -]+); do\n  ln -s "\$OLDPWD/codelaw/packs/\$p" "\.codelaw-packs/',
                [" ".join(p for p in pypi if p not in npm)])
     doc.anchor(r"### Fix classes across all (\d+) rules", [total])
     doc.anchor(r"\| (\w+) rule packs: (\d+) rules \|", [word(len(packs), True), total])

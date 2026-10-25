@@ -30,6 +30,7 @@ mod html_content;
 mod html_document;
 mod html_dom;
 mod html_rules;
+mod js_ast;
 mod literals;
 mod no_undef;
 mod no_unreachable;
@@ -42,6 +43,8 @@ mod python_pycodestyle;
 mod python_pyflakes;
 mod python_util;
 mod react;
+mod tanstack_query;
+mod redux_toolkit;
 mod regexp;
 mod stencil;
 mod typescript;
@@ -476,6 +479,22 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &conventions::PropsTypeName,
     &react::RequireRenderReturn,
     &react::RulesOfHooks,
+    &tanstack_query::ExhaustiveDeps,
+    &tanstack_query::InfiniteQueryPropertyOrder,
+    &tanstack_query::MutationPropertyOrder,
+    &tanstack_query::NoRestDestructuring,
+    &tanstack_query::NoUnstableDeps,
+    &tanstack_query::NoVoidQueryFn,
+    &tanstack_query::StableQueryClient,
+    &redux_toolkit::NoBlindPayloadReturn,
+    &redux_toolkit::NoMutatingReducer,
+    &redux_toolkit::NoNonSerializableState,
+    &redux_toolkit::NoObjectSelector,
+    &redux_toolkit::NoSequentialDispatch,
+    &redux_toolkit::NoSideEffectsInReducer,
+    &redux_toolkit::ObjectShorthandMapDispatch,
+    &redux_toolkit::PreferCreateSlice,
+    &redux_toolkit::SliceKeyNames,
     &stencil::BanDefaultTrue,
     &stencil::BanExportedConstEnums,
     &stencil::BanPrefix,

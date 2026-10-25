@@ -32,7 +32,8 @@ enum Registry {
 }
 
 /// The packs a repo needs (decision 6): one per language, `ts` for
-/// TypeScript, and `react` or `stencil` when `package.json` depends on it.
+/// TypeScript, and `react`, `stencil`, `tanstack-query` or `redux-toolkit`
+/// when `package.json` depends on the library.
 fn packs_for(languages: &BTreeSet<Language>, package_json: Option<&str>) -> BTreeSet<&'static str> {
     let mut out = BTreeSet::new();
     for l in languages {
@@ -53,6 +54,12 @@ fn packs_for(languages: &BTreeSet<Language>, package_json: Option<&str>) -> BTre
         }
         if package_json.is_some_and(|j| depends_on(j, "@stencil/core")) {
             out.insert("stencil");
+        }
+        if package_json.is_some_and(|j| depends_on(j, "@tanstack/react-query") || depends_on(j, "react-query")) {
+            out.insert("tanstack-query");
+        }
+        if package_json.is_some_and(|j| depends_on(j, "@reduxjs/toolkit") || depends_on(j, "redux")) {
+            out.insert("redux-toolkit");
         }
     }
     out
@@ -95,6 +102,8 @@ fn presets(packs: &BTreeSet<&str>, languages: &BTreeSet<Language>) -> Vec<String
             "ts" => out.push("codelaw:ts/recommended".into()),
             "react" => out.push("codelaw:react/recommended".into()),
             "stencil" => out.push("codelaw:stencil/recommended".into()),
+            "tanstack-query" => out.push("codelaw:tanstack-query/recommended".into()),
+            "redux-toolkit" => out.push("codelaw:redux-toolkit/recommended".into()),
             "html" => out.push("codelaw:html/recommended".into()),
             "css" => out.push("codelaw:css/recommended".into()),
             "python" => out.push("codelaw:py/recommended".into()),
@@ -330,5 +339,18 @@ mod tests {
         let langs: BTreeSet<Language> = [Language::Python].into();
         let pj = r#"{"dependencies":{"react":"^19","@stencil/core":"^4"}}"#;
         assert_eq!(packs_for(&langs, Some(pj)).into_iter().collect::<Vec<_>>(), ["python"]);
+    }
+
+    #[test]
+    fn library_packs_follow_package_json() {
+        let langs: BTreeSet<Language> = [Language::Tsx].into();
+        let pj = r#"{"dependencies":{"@tanstack/react-query":"^5","@reduxjs/toolkit":"^2"}}"#;
+        let packs = packs_for(&langs, Some(pj));
+        assert_eq!(packs.iter().copied().collect::<Vec<_>>(), ["js", "redux-toolkit", "tanstack-query", "ts"]);
+        assert!(presets(&packs, &langs).contains(&"codelaw:tanstack-query/recommended".to_owned()));
+        assert!(presets(&packs, &langs).contains(&"codelaw:redux-toolkit/recommended".to_owned()));
+        let legacy = r#"{"devDependencies":{"react-query":"^3","redux":"^4"}}"#;
+        assert_eq!(packs_for(&langs, Some(legacy)).into_iter().collect::<Vec<_>>(), ["js", "redux-toolkit", "tanstack-query", "ts"]);
+        assert_eq!(packs_for(&[Language::Python].into(), Some(pj)).into_iter().collect::<Vec<_>>(), ["python"]);
     }
 }

@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-cli
   - crates/codelaw-mcp
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-24T08:00:00Z
+timestamp: 2026-10-25T09:00:00Z
 content_sha: ""
 ---
 
@@ -72,6 +72,8 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | baseline | `baseline add --rule <id> [--file …] [--until] [--warn-from] [--on-touch] [--reason]` · `baseline prune [paths]` · `baseline check --since <ref>` · `deprecate <symbol> [--replacement] [--until] [--warn-from] [--on-touch] [--reason]` ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 5 and 6) |
    | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` ([SR-ARCHITECTURE](0108_architecture.md) decision 22) · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
+
+   - **`init` picks the packs** from the repo's languages and `package.json`, by [SR-RULE-PACKS](0101_rule-packs.md) decision 6: `react`, `stencil`, `tanstack-query` (`@tanstack/react-query` or `react-query`) and `redux-toolkit` (`@reduxjs/toolkit` or `redux`) join when the repo depends on that library (`crates/codelaw-cli/src/init.rs`; W-32, 2026-10-25).
 
 2. **Common flags:**
    - `--lang <list>`, `--rule <id>`;

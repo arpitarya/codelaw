@@ -12,7 +12,8 @@ Rule: [SR-WORK-NOW](../records/0061_WORK-now.md).
 
 | session | surface | started | working on |
 |---|---|---|---|
-| c8d31825-fea6-4918-83c7-0e4f405e3c4a | Claude Code | 2026-10-24 23:50 | the open queue: L9 hooks, then commit + push main for W-24/W-27/W-18/W-20; W-32 in a sub-agent |
+| c96062ca-828a-4388-a925-eba8ab17fa75 | Claude Code | 2026-10-25 15:50 | W-32 steps 2–4 verified, W-24 lint fix, W-29 Mac install check — committed, awaiting Arpit's push |
+| 3e47b744-de3b-4cb1-a688-bb0caba84309 | Claude Code | 2026-10-25 15:58 | W-04 step 5 — answered how the first PyPI publish runs (chat only, no change) |
 
 ## Resources this session created
 

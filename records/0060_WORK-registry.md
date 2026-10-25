@@ -93,7 +93,7 @@ into a scan anyone can do at task end.
 
 | Document | Update trigger | Last verified | Notes |
 |---|---|---|---|
-| `CLAUDE.md` | any rule or pointer changes | 2026-10-24 | 2026-10-24 — the L6 line and the `packs/` layout line: nine packs, eight on npm and six on PyPI (W-31, the decider's ruling) |
+| `CLAUDE.md` | any rule or pointer changes | 2026-10-25 | 2026-10-25 — the L6 line and the `packs/` layout line: eleven packs, ten on npm and six on PyPI (W-32, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-18, W-20, W-27 closed (CI green on `main`); W-19 red on the budgets; W-32's query pack renamed `tanstack-query`; 2026-10-24 docket rulings, W-21/W-25/W-26/W-28 closed |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-24 | 2026-10-24 — B-046 (the tree-sitter-css upstream PR), B-047 (the CSS-tree port) |
@@ -106,13 +106,13 @@ into a scan anyone can do at task end.
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
-| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-24 | 2026-10-24 — pack, first-party pack and `dist` for the nine packs (W-31) |
-| `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-24 | 2026-10-24 — the L6 and SR-RULE-PACKS rows: nine packs (W-31) |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-24 | 2026-10-24 — the L6 and SR-PACKAGES rows and the `packs` row: nine packs (W-31) |
+| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-25 | 2026-10-25 — first-party pack: eleven packs (W-32) |
+| `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-25 | 2026-10-25 — the L6 and SR-RULE-PACKS rows: eleven packs (W-32) |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-25 | 2026-10-25 — the L6 and SR-PACKAGES rows and the `packs` row: eleven packs (W-32) |
 | `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-24 | 2026-10-24 — step 5 done: the `npm`/`pypi` environments, tag rule `v*` (W-18) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-24 | 2026-10-24 — the rule-pack table per registry, the config example (W-31) |
-| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-24 | 2026-10-24 — Unreleased: the nine packs and the preset changes (W-31) |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — the `tanstack-query` and `redux-toolkit` rows, 438 rules (W-32) |
+| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-25 | 2026-10-25 — Unreleased: the two npm-only library packs (W-32) |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
 | `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
 | `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |

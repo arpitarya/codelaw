@@ -8,7 +8,7 @@ build jobs in `.github/workflows/ci.yml`.
     package.py prepare-wheel                 copy LICENSE and README into packaging/python for maturin
     package.py extract WHEEL OUTDIR          take the binary out of a maturin wheel (the npm copy)
     package.py assemble --bins B --wheels W --out dist
-                                             build the 17 npm tarballs and the 6 pack wheels; copy the 8 engine wheels
+                                             build the 19 npm tarballs and the 6 pack wheels; copy the 8 engine wheels
     package.py check dist                    the release checks, against what was assembled
     package.py names                         every name codelaw publishes (SR-PACKAGES §1)
 
@@ -53,7 +53,7 @@ def read_packs() -> tuple[tuple[str, ...], tuple[str, ...]]:
     body = body[:body.index("];")]
     npm: list[str] = []
     pypi: list[str] = []
-    for kind, short in re.findall(r'\b(both|npm_only|pypi_only)\("([a-z]+)"', body):
+    for kind, short in re.findall(r'\b(both|npm_only|pypi_only)\("([a-z-]+)"', body):
         if kind in ("both", "npm_only"):
             npm.append(short)
         if kind in ("both", "pypi_only"):

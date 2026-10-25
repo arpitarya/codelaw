@@ -63,7 +63,7 @@ All 14 npm packages exist at the release version, published from CI's checked `d
 | DoD | what | state |
 |---|---|---|
 | 1 · live | `npm view <name> version` prints the version for all 14 names in `package.py names` | ✅ 2026-10-24 (the 0.1.0 names) |
-| 2 · works | in an empty folder: `npm i codelaw && npx codelaw --version` on the Mac; the `smoke` job's install from the registry passes on the 8 platforms | ⏳ |
+| 2 · works | in an empty folder: `npm i codelaw && npx codelaw --version` on the Mac; the `smoke` job's install from the registry passes on the 8 platforms | 🟡 the Mac half ✅ 2026-10-25: in an empty folder `npm i codelaw@0.1.0` added 2 packages, `npx codelaw --version` printed `codelaw 0.1.0`, `npx codelaw check a.js` ran (exit 0); `smoke` still installs from the staging index, not the registry |
 | 3 · trusted | `npm trust list <name>` shows `arpitarya/codelaw` · `publish.yml` · `npm` for each package | ✅ 2026-10-24 (`npm-trust.sh`'s output) |
 | 4 · recorded | `work/IMPLEMENTATION.md` row; `RELEASING.md` §One time step 2 marked done with the date | ⏳ |
 

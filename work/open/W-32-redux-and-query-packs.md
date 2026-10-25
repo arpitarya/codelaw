@@ -6,8 +6,8 @@ item: W-32
 filed: 2026-10-24
 filed_by: "Arpit (Claude Code, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude (Opus 5.5), cloud session: react-query renamed tanstack-query"
-ball: agent
+updated_by: "Claude Code (Opus 5.5): steps 2–4 landed in the tree, uncommitted"
+ball: arpit
 ---
 
 # W-32 — A Redux Toolkit pack and a React Query pack, on npm
@@ -17,9 +17,9 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | The decider picks the names and the Redux Toolkit source (below) | the two packs can be scoped | ✅ 2026-10-24: `@codelaw/rules-redux-toolkit` (namespace `redux-toolkit`), `@codelaw/rules-tanstack-query` (namespace `tanstack-query`, renamed 2026-10-25 from `react-query`); source (a) |
-| 2 | Port TanStack's `@tanstack/eslint-plugin-query` `recommended` into `packs/tanstack-query/` | TanStack Query rules | ⏳ |
-| 3 | Write the Redux rules from the chosen source into `packs/redux/` | Redux Toolkit rules | ⏳ |
-| 4 | Add both to `FIRST_PARTY_PACKS` as `npm_only`, their namespaces to the reserved list and `namespace_pack`, `init` detection by `package.json` dependency | `init` installs them in a repo that uses them | ⏳ |
+| 2 | Port TanStack's `@tanstack/eslint-plugin-query` `recommended` into `packs/tanstack-query/` | TanStack Query rules | ✅ 2026-10-25: 7 rules, all of `recommended`, `native:` on the JS AST (`tanstack_query.rs`) |
+| 3 | Write the Redux rules from the chosen source into `packs/redux-toolkit/` | Redux Toolkit rules | ✅ 2026-10-25: 12 rules, 9 `native:` (`redux_toolkit.rs`), 3 matcher-only |
+| 4 | Add both to `FIRST_PARTY_PACKS` as `npm_only`, their namespaces to the reserved list and `namespace_pack`, `init` detection by `package.json` dependency | `init` installs them in a repo that uses them | ✅ 2026-10-25: `init` keys on `@tanstack/react-query`/`react-query` and `@reduxjs/toolkit`/`redux` |
 | 5 | First hand publish of the two names, then `npm-trust.sh` (as W-31 step 7) | released | ⏳ Arpit |
 
 **Arpit, 2026-10-24:** *"i want a redux tool kit and react query pack as well in npm"*
@@ -48,9 +48,9 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · ruled | names and the Redux source ruled | 🔴 |
-| 2 · packs | `codelaw test packs/tanstack-query` and `packs/redux-toolkit` green; every rule has a fix class (L4) | ⏳ |
-| 3 · wired | `FIRST_PARTY_PACKS`, `RESERVED_NAMESPACES`, `init` and the pack tables in L6, SR-RULE-PACKS, SR-PACKAGES name them | ⏳ |
+| 1 · ruled | names and the Redux source ruled | ✅ 2026-10-24/25 |
+| 2 · packs | `codelaw test packs/tanstack-query` and `packs/redux-toolkit` green; every rule has a fix class (L4) | ✅ 2026-10-25: 7 rules · 160 checks and 12 rules · 192 checks, 0 failed; `cargo test --workspace` 463 passed; clippy clean; `docs-sync.py --check` 11 packs, 438 rules |
+| 3 · wired | `FIRST_PARTY_PACKS`, `RESERVED_NAMESPACES`, `init` and the pack tables in L6, SR-RULE-PACKS, SR-PACKAGES name them | ✅ 2026-10-25 (uncommitted; `package.py names` lists 19 npm names) |
 | 4 · released | both on npm at the release version, trusted publishing bound | ⏳ |
 
 ## Blockers

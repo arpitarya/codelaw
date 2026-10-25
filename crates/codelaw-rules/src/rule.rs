@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 /// (SR-RULE-FORMAT decision 1).
 pub const RESERVED_NAMESPACES: &[&str] = &[
     "js", "ts", "react", "node", "stencil", "py", "json", "yaml", "toml", "md", "data", "css", "html", "graph", "format",
-    "codelaw",
+    "codelaw", "tanstack-query", "redux-toolkit",
 ];
 
 /// The skills a `fix_skill:` may name: those codelaw ships

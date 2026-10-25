@@ -1,0 +1,6 @@
+name = "@codelaw/rules-redux-toolkit"
+version = "0.1.0"
+min_codelaw = "0.1.0"
+languages = ["javascript", "jsx", "typescript", "tsx"]
+presets = ["redux-toolkit/recommended"]
+description = "codelaw's Redux Toolkit rules, written from the Redux Style Guide's Priority A and B rules (SR-RULE-PACKS)"

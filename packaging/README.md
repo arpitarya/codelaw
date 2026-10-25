@@ -22,7 +22,7 @@ says so (`codelaw/no-rules`).
 
 | registry | named | packs |
 |---|---|---|
-| npm | `@codelaw/rules-<name>` | `js` · `ts` · `react` · `node` · `stencil` · `html` · `css` · `data` |
+| npm | `@codelaw/rules-<name>` | `js` · `ts` · `react` · `node` · `stencil` · `html` · `css` · `data` · `tanstack-query` · `redux-toolkit` |
 | PyPI | `codelaw-rules-<name>` | `js` · `react` · `html` · `css` · `python` · `data` |
 
 <!-- /docs-sync:registries -->

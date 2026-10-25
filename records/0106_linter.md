@@ -149,7 +149,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    - warm-cache `check` on 10,000 files: under 2 s;
    - hook mode on one file: under 100 ms.
 
-9. **Rules per language** live in the nine rule packs of [SR-RULE-PACKS](0101_rule-packs.md), `rules-css` and `rules-html` included. The engine carries none.
+9. **Rules per language** live in the eleven rule packs of [SR-RULE-PACKS](0101_rule-packs.md), `rules-css` and `rules-html` included. The engine carries none.
 
 ### Consequences
 
