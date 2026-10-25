@@ -88,21 +88,24 @@ impl Project {
 
     /// Link the graph over a set of sources.
     pub(crate) fn build_graph(&self, sources: &[Source], config: GraphConfig) -> Graph {
-        let facts: Vec<Option<codelaw_graph::FileFacts>> = self.pool.install(|| {
-            sources
-                .par_iter()
-                .map(|s| {
-                    let language = s.language.filter(|l| codelaw_graph::reads(*l))?;
-                    let key = KeyBuilder::new("graph-facts").part(codelaw_graph::FACTS_VERSION).part(language.name()).part(&s.text).part(codelaw_lang::GRAMMARS_FINGERPRINT).key();
-                    if let Some(f) = self.cache.get(&key) {
-                        return Some(f);
-                    }
-                    let f = std::panic::catch_unwind(|| codelaw_graph::extract(language, &s.text)).ok().flatten()?;
-                    self.cache.put(&key, &f);
-                    Some(f)
-                })
-                .collect()
-        });
+        let facts = self.pool.install(|| sources.par_iter().map(|s| self.source_facts(s)).collect());
+        self.link_graph(sources, facts, config)
+    }
+
+    /// One source's graph facts, from the cache when it has them.
+    pub(crate) fn source_facts(&self, s: &Source) -> Option<codelaw_graph::FileFacts> {
+        let language = s.language.filter(|l| codelaw_graph::reads(*l))?;
+        let key = KeyBuilder::new("graph-facts").part(codelaw_graph::FACTS_VERSION).part(language.name()).part(&s.text).part(codelaw_lang::GRAMMARS_FINGERPRINT).key();
+        if let Some(f) = self.cache.get(&key) {
+            return Some(f);
+        }
+        let f = std::panic::catch_unwind(|| codelaw_graph::extract(language, &s.text)).ok().flatten()?;
+        self.cache.put(&key, &f);
+        Some(f)
+    }
+
+    /// Link the graph over sources whose facts are known, one per source.
+    pub(crate) fn link_graph(&self, sources: &[Source], facts: Vec<Option<codelaw_graph::FileFacts>>, config: GraphConfig) -> Graph {
         let mut inputs = Vec::new();
         let mut manifests = Vec::new();
         for (s, f) in sources.iter().zip(facts) {

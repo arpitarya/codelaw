@@ -12,6 +12,7 @@ mod match_cmd;
 mod rules_cmd;
 mod tree;
 mod warm;
+mod watch_cmd;
 
 use clap::{Args, Parser, Subcommand};
 use codelaw_core::Language;
@@ -155,6 +156,9 @@ struct CheckArgs {
     /// html-validate) this command runs otherwise.
     #[arg(long)]
     no_adapters: bool,
+    /// Keep running: check again each time a file is saved, until Ctrl-C.
+    #[arg(long)]
+    watch: bool,
 }
 
 #[derive(Args)]
@@ -180,6 +184,9 @@ struct FixArgs {
     /// html-validate) this command runs otherwise.
     #[arg(long)]
     no_adapters: bool,
+    /// Keep running: fix each file again when it is saved, until Ctrl-C.
+    #[arg(long, conflicts_with = "trace")]
+    watch: bool,
 }
 
 #[derive(Args)]
@@ -267,6 +274,9 @@ fn run(prefer_warm: bool, paths: &[PathBuf], local: impl FnOnce(&Ctx) -> Output)
 pub fn serve_command(argv: &[String], ctx: &Ctx) -> Option<Output> {
     let cli = Cli::try_parse_from(argv).ok()?;
     match cli.command {
+        // A watch runs for as long as its own process does.
+        Command::Check(a) if a.watch => None,
+        Command::Fix(a) if a.watch => None,
         Command::Check(a) => Some(check(a, ctx)),
         Command::Fix(a) => fix(a, ctx),
         Command::Format(a) => Some(format_cmd::format(a, ctx)),
@@ -527,6 +537,8 @@ fn cache(action: CacheAction) -> ExitCode {
 fn main() -> ExitCode {
     let cli = Cli::parse();
     match cli.command {
+        Command::Check(a) if a.watch => watch_cmd::check(a),
+        Command::Fix(a) if a.watch => watch_cmd::fix(a),
         Command::Check(a) => run(a.common.prefer_warm, &a.paths.clone(), |ctx| check(a, ctx)),
         // Only a warm process declines a fix; here it always runs.
         Command::Fix(a) => run(a.common.prefer_warm, &a.paths.clone(), |ctx| fix(a, ctx).unwrap_or_default()),

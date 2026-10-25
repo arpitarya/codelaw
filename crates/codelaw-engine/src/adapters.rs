@@ -179,13 +179,6 @@ fn ported_id(rule: &str) -> Option<String> {
     codelaw_adapters::manifests().iter().find_map(|m| rest.strip_prefix(&m.name)?.strip_prefix('/').map(|r| m.ported_id(r)))
 }
 
-/// The adapter step of `check`.
-pub(crate) fn check(project: &Project, files: &[&FileEntry], own: &[Diagnostic]) -> AdapterRun {
-    let mut run = project.run_adapters(files);
-    project.drop_ported(&mut run.diagnostics, own);
-    run
-}
-
 /// The adapter step of `fix`, after codelaw's own fixes are written: the
 /// adapters run over the files as they are now, and the `auto` edits they
 /// offer (and `suggest` with `--unsafe`) are applied once per file, under

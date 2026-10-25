@@ -352,6 +352,7 @@ $ codelaw test acme/no-console-log
 | ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `match`, `config`, `new-rule`, `init`, `cache` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | Eleven rule packs: 458 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
 | ✅ | `--format agent`, `--format json` and `--format sarif`; `--timings` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
+| ✅ | Watch mode: `check --watch` and `fix --watch` re-check on every save | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | npm package (`npx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0 published from CI with provenance, ten packs |
 | 🔜 | PyPI package (`uvx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0: `codelaw-rules-css` and `-data` up; the other four packs and `codelaw` next (W-38) |
 | ✅ | Formatter (`codelaw format`, and the last step of `fix`): Prettier-style JS/TS/JSON, Black-style Python | [SR-FORMATTER](records/0105_formatter.md) | built |
