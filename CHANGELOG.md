@@ -11,6 +11,25 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## 0.2.0 — 2026-10-25
 
+**The rule packs, one per ecosystem, on the registry its users install from.**
+`rules-js` splits into `js`, `ts`, `react`, `node` and `stencil`; two library
+packs arrive, TanStack Query and Redux Toolkit; and codelaw is on PyPI for the
+first time, with the six packs a Python repo needs. 440 rules in eleven packs,
+one engine, the same verdict from npm and from PyPI.
+
+```bash
+npx codelaw@0.2.0 init     # a Node repo: installs the @codelaw/rules-* it needs
+uvx codelaw@0.2.0 init     # a Python repo: installs the codelaw-rules-* it needs
+```
+
+**Before you upgrade from 0.1.0:** a config that names only
+`codelaw:ts/recommended` loses `js/no-var`, `js/prefer-const`,
+`js/prefer-rest-params` and `js/prefer-spread` — add `codelaw:js/typescript`
+(`codelaw init` writes it for a TypeScript repo). `codelaw:js/conventions` now
+holds only the `js/*` conventions; the rest moved to `ts/`, `react/` and
+`stencil/conventions`. On npm, the 0.1.0 `@codelaw/rules-js` keeps the rules
+that moved, so pin every `@codelaw/rules-*` to 0.2.0 together.
+
 ### Added
 
 - **`stencil/recommended` gains `stencil/ban-side-effects` and `stencil/enforce-slot-jsdoc`**, the two rules of @stencil/eslint-plugin 1.4.0's `recommended` that need no type information and were not yet ported: a call at a module's top level, and a component whose `@slot` JSDoc tags and rendered `<slot>`s disagree. The preset now holds 17 rules, and the pack README counts against the 23 upstream turns on (W-33).

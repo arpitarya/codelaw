@@ -52,7 +52,9 @@ twine upload --skip-existing dist/pypi/codelaw_rules_{html,js,python,react}-0.2.
 #     owner arpitarya · repository codelaw · workflow publish.yml · environment pypi
 
 # 3 · after W-37 has made the v0.2.0 tag and npm is live
-gh release create v0.2.0 -R arpitarya/codelaw --title "v0.2.0 — nine-pack layout, PyPI" --notes-file <notes>
+#     the notes are CHANGELOG's 0.2.0 section, word for word (RELEASING.md step 3)
+awk '/^## 0\.2\.0/{f=1;next} /^## /{f=0} f' CHANGELOG.md | awk 'NF||p{p=1;print}' > /tmp/v0.2.0-notes.md
+gh release create v0.2.0 -R arpitarya/codelaw --verify-tag --title "v0.2.0 — the rule packs, one per ecosystem" --notes-file /tmp/v0.2.0-notes.md
 ```
 
 - **Step 3 must wait for step 2 on all six.** The release's PyPI job uploads with

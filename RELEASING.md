@@ -101,7 +101,13 @@ After this, no release needs a token, a code or your machine.
 2. **Wait for `ci.yml` to go green on that commit, on `main`.** `publish.yml`
    refuses anything else.
 3. **Publish:** `gh release create v0.2.0 --title "v0.2.0 — <what it is>"
-   --notes "<what changed>"`. A version with a `-` (`0.2.0-beta.1`) goes to
+   --notes-file notes.md`. **The notes are CHANGELOG's section for that
+   version, word for word** — a bold lead line, the install commands, a
+   *Before you upgrade* paragraph when anything breaks, then *Added* /
+   *Changed* / *Fixed*; the title's `<what it is>` is the lead line. Write the
+   section before tagging, then take it out with:
+   `awk '/^## 0\.2\.0/{f=1;next} /^## /{f=0} f' CHANGELOG.md | awk 'NF||p{p=1;print}' > notes.md`.
+   A version with a `-` (`0.2.0-beta.1`) goes to
    npm's `next` tag and is a PyPI pre-release.
    **npm first, PyPI later** (L6 decision 9, ruled 2026-10-25): tag the
    green commit and run `publish.yml` by hand on the tag — it publishes npm
@@ -112,7 +118,7 @@ After this, no release needs a token, a code or your machine.
    git tag v0.2.0 <green-commit> && git push origin v0.2.0
    gh workflow run publish.yml -R arpitarya/codelaw --ref v0.2.0   # npm only
    # … PyPI's hand uploads and trusted publishers (W-38) …
-   gh release create v0.2.0 --title "v0.2.0 — <what it is>" --notes "<what changed>"   # both; npm skipped
+   gh release create v0.2.0 --verify-tag --title "v0.2.0 — the rule packs, one per ecosystem" --notes-file notes.md   # both; npm skipped
    ```
 
 4. A failed job is **re-run, not re-released**: versions already on a registry
