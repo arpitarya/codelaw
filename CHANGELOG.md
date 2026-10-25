@@ -2,7 +2,7 @@
 
 Every user-visible change, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/). Each line names the work item it came from (`W-nn`); `python3 scripts/docs-sync.py --check` fails when an item `work/IMPLEMENTATION.md` dates after the last release is not named under *Unreleased*.
 
-## Unreleased
+## 0.2.0 — 2026-10-25
 
 ### Added
 
