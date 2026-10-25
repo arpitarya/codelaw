@@ -20,7 +20,7 @@ ball: arpit
 | 2 | Port TanStack's `@tanstack/eslint-plugin-query` `recommended` into `packs/tanstack-query/` | TanStack Query rules | ✅ 2026-10-25: 7 rules, all of `recommended`, `native:` on the JS AST (`tanstack_query.rs`) |
 | 3 | Write the Redux rules from the chosen source into `packs/redux-toolkit/` | Redux Toolkit rules | ✅ 2026-10-25: 12 rules, 9 `native:` (`redux_toolkit.rs`), 3 matcher-only |
 | 4 | Add both to `FIRST_PARTY_PACKS` as `npm_only`, their namespaces to the reserved list and `namespace_pack`, `init` detection by `package.json` dependency | `init` installs them in a repo that uses them | ✅ 2026-10-25: `init` keys on `@tanstack/react-query`/`react-query` and `@reduxjs/toolkit`/`redux` |
-| 5 | First hand publish of the two names, then `npm-trust.sh` (as W-31 step 7) | released | ✅ 2026-10-25: Arpit published both 0.2.0 tarballs from CI run 40189751330's `dist` (npm: "+ @codelaw/rules-tanstack-query@0.2.0", "+ @codelaw/rules-redux-toolkit@0.2.0") and bound both to `publish.yml` (`npm trust list`); npm still "processing" them — the registry serves 404 for the version 30 min on |
+| 5 | First hand publish of the two names, then `npm-trust.sh` (as W-31 step 7) | released | ✅ 2026-10-25: Arpit published both 0.2.0 tarballs from CI run 40189751330's `dist` (npm: "+ @codelaw/rules-tanstack-query@0.2.0", "+ @codelaw/rules-redux-toolkit@0.2.0") and bound both to `publish.yml` (`npm trust list`); live at 17:45 |
 
 **Arpit, 2026-10-24:** *"i want a redux tool kit and react query pack as well in npm"*
 
@@ -51,7 +51,7 @@ ball: arpit
 | 1 · ruled | names and the Redux source ruled | ✅ 2026-10-24/25 |
 | 2 · packs | `codelaw test packs/tanstack-query` and `packs/redux-toolkit` green; every rule has a fix class (L4) | ✅ 2026-10-25: 7 rules · 160 checks and 12 rules · 192 checks, 0 failed; `cargo test --workspace` 463 passed; clippy clean; `docs-sync.py --check` 11 packs, 438 rules |
 | 3 · wired | `FIRST_PARTY_PACKS`, `RESERVED_NAMESPACES`, `init` and the pack tables in L6, SR-RULE-PACKS, SR-PACKAGES name them | ✅ 2026-10-25 (uncommitted; `package.py names` lists 19 npm names) |
-| 4 · released | both on npm at the release version, trusted publishing bound | 🟡 published and bound 2026-10-25; done when the registry serves 0.2.0 |
+| 4 · released | both on npm at the release version, trusted publishing bound | ✅ 2026-10-25 17:45: the registry serves `latest: 0.2.0` for both; `npm trust list` binds both to `publish.yml` — every DoD met, to close |
 
 ## Blockers
 
