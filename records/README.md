@@ -178,7 +178,7 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-semantic` | SR-ARCHITECTURE | decision 15a |
 | `crates/codelaw-match` | SR-LINTER | decision 2: file-scope `match:` rules |
 | `crates/codelaw-adapters` | SR-LINTER | decision 2: the adapters' manifests, runner and output mapping |
-| `crates/codelaw-baseline` | SR-BASELINE | decisions 1, 2, 5 and 6: the baseline files, what a finding becomes under them, the ratchet and the deprecations registry |
+| `crates/codelaw-baseline` | SR-BASELINE | decisions 1, 2, 5, 6 and 9: the baseline files, what a finding becomes under them, the ratchet, the deprecations registry and the dated-exception timeline |
 | `crates/codelaw-native` | SR-ARCHITECTURE | decision 15b |
 | `crates/codelaw-fix` | SR-ARCHITECTURE | decisions 5 and 18: the apply loop, verifier and external fixers |
 | `crates/codelaw-format` | SR-FORMATTER | decisions 2, 4, 5 and 7: the embedded engines, their options and the verifier; `shims/option-ext` is SR-PACKAGES decision 1's L2 patch |
@@ -240,7 +240,7 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 | `crates/codelaw-fix/src/structured.rs` | SR-RULE-FORMAT | decisions 3c and 3e: a `target:` rule's fix steps and their verification |
 | `crates/codelaw-adapters` | SR-ARCHITECTURE | decision 19: the adapter contract (lookup, versions, process handling, cache key) the crate implements |
 | `crates/codelaw-engine/src/adapters.rs` | SR-LINTER | decision 2: which adapters run, the per-tool mapping and the ported-rule dedupe |
-| `crates/codelaw-engine/src/baseline.rs` | SR-BASELINE | decisions 2–6 and 8: the as-of date, the change set, `graph/no-deprecated-usage` and the baseline stage |
+| `crates/codelaw-engine/src/baseline.rs` | SR-BASELINE | decisions 2–6, 8 and 9: the as-of date, the change set, `graph/no-deprecated-usage`, the baseline stage and the `added_by` check |
 | `crates/codelaw-cli/src/baseline_cmd.rs` | SR-BASELINE | decisions 5 and 6: `baseline add`, `prune`, `check` and `deprecate` |
 | `scripts/check-work-system.py` | SR-WORK-OWNERSHIP | decision 2: its `owns:` ↔ Ownership-table check |
 | `scripts/check-work-system.py` | SR-WORK-REGISTRY | decisions 5–8: its registry check |

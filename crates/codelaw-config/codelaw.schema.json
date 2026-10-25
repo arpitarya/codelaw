@@ -184,18 +184,47 @@
       "additionalProperties": false,
       "properties": {
         "until": {
-          "description": "The deadline, YYYY-MM-DD: after it every use is an error.",
+          "description": "Deprecated alias of `expires`, for one minor release: the last allowed day, read as `expires` the day after (SR-BASELINE decision 9).",
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "expires": {
+          "description": "The first day, YYYY-MM-DD, a grandfathered use is no longer allowed (SR-BASELINE decision 9).",
           "type": "string",
           "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
         },
         "warn_from": {
-          "description": "From this date, YYYY-MM-DD, a grandfathered use is a warning.",
+          "description": "From this date, YYYY-MM-DD, the grandfathering warns that it expires; it wins over `warn_days`.",
           "type": "string",
           "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "warn_days": {
+          "description": "Days of warning before `expires`; `[exceptions] warn_days` when unset.",
+          "type": "integer",
+          "minimum": 0
         },
         "on_touch": {
           "description": "What a grandfathered use becomes when its file is touched.",
           "enum": ["error", "warn", "keep"]
+        }
+      }
+    },
+    "exceptions": {
+      "x-codelaw-record": "SR-BASELINE",
+      "description": "Dated exceptions: baseline entries, deprecations-registry entries and inline `codelaw-ignore` comments (SR-BASELINE decision 9). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "require_expiry": {
+          "description": "Every exception must carry `expires`; one without is an error, `codelaw/exception-without-expiry`.",
+          "type": "boolean",
+          "default": false
+        },
+        "warn_days": {
+          "description": "How many days before its `expires` an exception becomes a warning, `codelaw/expiring-exception`.",
+          "type": "integer",
+          "minimum": 0,
+          "default": 3
         }
       }
     },

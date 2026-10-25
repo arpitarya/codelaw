@@ -110,6 +110,40 @@ pub const ENGINE_RULES: &[EngineRule] = &[
         steps: &["Run `codelaw baseline prune` (or `codelaw fix`, which prunes too) to lower the entry; lowering is always safe."],
     },
     EngineRule {
+        id: "codelaw/expiring-exception",
+        title: "An exception (a baseline entry, a deprecation, a `codelaw-ignore`) expires within its warning window",
+        severity: Severity::Warn,
+        fix: FixClass::Manual,
+        steps: &[
+            "Fix the findings the exception covers before its `expires` date: on that day they are reported again and the exception is an error.",
+            "To keep it longer, a person moves `expires` later with `codelaw baseline add --expires …` (a baseline entry) or edits the comment; `codelaw baseline check` flags an extended deadline for review.",
+        ],
+    },
+    EngineRule {
+        id: "codelaw/expired-exception",
+        title: "An exception reached its `expires` date and no longer covers anything",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &[
+            "Fix the findings it covered; they are reported again at their rule's own severity.",
+            "Then remove the exception: `codelaw baseline prune` (or `codelaw fix`) lowers a baseline entry, and the `codelaw-ignore` comment is deleted by hand.",
+        ],
+    },
+    EngineRule {
+        id: "codelaw/exception-without-expiry",
+        title: "An exception has no `expires` date while `[exceptions] require_expiry` is on",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &["Add `expires = \"YYYY-MM-DD\"` (the first day it no longer holds): `codelaw baseline add --expires …` rewrites a baseline entry; a `codelaw-ignore` takes `expires=YYYY-MM-DD` before its colon."],
+    },
+    EngineRule {
+        id: "codelaw/exception-author",
+        title: "An exception's `added_by` is not an email address, or not the git author of the change",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &["Set `added_by` (`by=` in a `codelaw-ignore`) to your own git email, `git config user.email`; `codelaw baseline add` writes it for you."],
+    },
+    EngineRule {
         id: "codelaw/unknown-suppression",
         title: "A `codelaw-ignore` comment names a rule that does not exist",
         severity: Severity::Error,

@@ -67,6 +67,11 @@ impl Date {
         Date { year, month, day }
     }
 
+    /// The date `n` days after `self` (before it when `n` is negative).
+    pub fn add_days(self, n: i64) -> Date {
+        Date::from_days(self.days() + n)
+    }
+
     /// Days from `self` to `later` (negative when `later` is earlier).
     pub fn days_until(self, later: Date) -> i64 {
         later.days() - self.days()

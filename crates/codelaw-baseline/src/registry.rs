@@ -2,6 +2,7 @@
 //! `[deprecation]` defaults of `codelaw.toml` (SR-BASELINE decision 6).
 
 use crate::date::{Date, from_toml};
+use crate::exception::{expires_of, header_lines};
 use crate::file::OnTouch;
 use std::path::{Path, PathBuf};
 
@@ -9,8 +10,10 @@ use std::path::{Path, PathBuf};
 /// touch does.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Policy {
-    pub until: Option<Date>,
+    /// The first day the grandfathered uses fail (decision 9).
+    pub expires: Option<Date>,
     pub warn_from: Option<Date>,
+    pub warn_days: Option<u32>,
     pub on_touch: Option<OnTouch>,
 }
 
@@ -30,6 +33,10 @@ pub struct Deprecation {
     pub policy: Policy,
     pub reason: Option<String>,
     pub rewrite: Option<Rewrite>,
+    /// Who added it: an email (decision 9).
+    pub added_by: Option<String>,
+    /// The 1-based line of its `[[deprecated]]`; 0 when not read from one.
+    pub line: u32,
 }
 
 /// The registry.
@@ -45,7 +52,7 @@ pub fn registry_path(root: &Path) -> PathBuf {
 
 pub const REGISTRY_REL: &str = ".codelaw/deprecations.toml";
 
-const KEYS: &[&str] = &["symbol", "replacement", "until", "warn_from", "on_touch", "reason", "rewrite"];
+const KEYS: &[&str] = &["symbol", "replacement", "expires", "until", "warn_from", "warn_days", "on_touch", "reason", "rewrite", "added_by"];
 
 fn policy(t: &toml::Table, at: &dyn Fn(String) -> String) -> Result<Policy, String> {
     let date = |k: &str| t.get(k).map(from_toml).transpose().map_err(|e| at(format!("`{k}`: {e}")));
@@ -54,11 +61,13 @@ fn policy(t: &toml::Table, at: &dyn Fn(String) -> String) -> Result<Policy, Stri
         Some(toml::Value::String(s)) => Some(OnTouch::parse(s).map_err(at)?),
         Some(_) => return Err(at("`on_touch` must be a string".into())),
     };
-    let p = Policy { until: date("until")?, warn_from: date("warn_from")?, on_touch };
-    if let (Some(w), Some(u)) = (p.warn_from, p.until)
-        && w > u
+    let expires = expires_of(date("until")?, date("expires")?).map_err(at)?;
+    let warn_days = crate::file::warn_days(t.get("warn_days")).map_err(at)?;
+    let p = Policy { expires, warn_from: date("warn_from")?, warn_days, on_touch };
+    if let (Some(w), Some(e)) = (p.warn_from, p.expires)
+        && w >= e
     {
-        return Err(at(format!("`warn_from` ({w}) is after `until` ({u})")));
+        return Err(at(format!("`warn_from` ({w}) is not before `expires` ({e})")));
     }
     Ok(p)
 }
@@ -77,6 +86,7 @@ impl Registry {
             Some(_) => return Err("`deprecated` must be an array of tables (`[[deprecated]]`)".into()),
         };
         let mut out = Registry::default();
+        let lines = header_lines(text, "deprecated");
         for (i, d) in list.iter().enumerate() {
             let at = |m: String| format!("[[deprecated]] #{}: {m}", i + 1);
             let toml::Value::Table(t) = d else { return Err(at("not a table".into())) };
@@ -107,7 +117,15 @@ impl Registry {
             if out.deprecated.iter().any(|d: &Deprecation| d.symbol == symbol) {
                 return Err(at(format!("`{symbol}` is deprecated twice")));
             }
-            out.deprecated.push(Deprecation { symbol, replacement: string("replacement")?, policy: policy(t, &at)?, reason: string("reason")?, rewrite });
+            out.deprecated.push(Deprecation {
+                symbol,
+                replacement: string("replacement")?,
+                policy: policy(t, &at)?,
+                reason: string("reason")?,
+                rewrite,
+                added_by: string("added_by")?,
+                line: lines.get(i).copied().unwrap_or(0),
+            });
         }
         Ok(out)
     }
@@ -130,15 +148,29 @@ impl Registry {
 /// marked deprecated in code (JSDoc `@deprecated`, PEP 702) that the
 /// registry does not list.
 /// The loader has already refused an unknown key (SR-CONFIG decision 5);
-/// this checks the values.
-pub fn defaults(until: Option<&str>, warn_from: Option<&str>, on_touch: Option<&str>) -> Result<Policy, String> {
+/// this checks the values. Its `until` is the last allowed day, so the
+/// policy expires the day after (decision 9).
+pub fn defaults(table: &DefaultsTable<'_>) -> Result<Policy, String> {
     let mut t = toml::Table::new();
-    for (k, v) in [("until", until), ("warn_from", warn_from), ("on_touch", on_touch)] {
+    for (k, v) in [("until", table.until), ("expires", table.expires), ("warn_from", table.warn_from), ("on_touch", table.on_touch)] {
         if let Some(v) = v {
             t.insert(k.to_owned(), toml::Value::String(v.to_owned()));
         }
     }
+    if let Some(n) = table.warn_days {
+        t.insert("warn_days".to_owned(), toml::Value::Integer(n));
+    }
     policy(&t, &|m| format!("[deprecation]: {m}"))
+}
+
+/// The keys of `[deprecation]`, as written.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct DefaultsTable<'a> {
+    pub until: Option<&'a str>,
+    pub expires: Option<&'a str>,
+    pub warn_from: Option<&'a str>,
+    pub warn_days: Option<i64>,
+    pub on_touch: Option<&'a str>,
 }
 
 /// The text `codelaw deprecate` appends to the registry: the file stays
@@ -149,17 +181,23 @@ pub fn entry_text(d: &Deprecation) -> String {
     if let Some(r) = &d.replacement {
         out.push_str(&format!("replacement = {}\n", q(r)));
     }
-    if let Some(u) = d.policy.until {
-        out.push_str(&format!("until = \"{u}\"\n"));
+    if let Some(e) = d.policy.expires {
+        out.push_str(&format!("expires = \"{e}\"\n"));
     }
     if let Some(w) = d.policy.warn_from {
         out.push_str(&format!("warn_from = \"{w}\"\n"));
+    }
+    if let Some(n) = d.policy.warn_days {
+        out.push_str(&format!("warn_days = {n}\n"));
     }
     if let Some(o) = d.policy.on_touch {
         out.push_str(&format!("on_touch = \"{}\"\n", o.name()));
     }
     if let Some(r) = &d.reason {
         out.push_str(&format!("reason = {}\n", q(r)));
+    }
+    if let Some(a) = &d.added_by {
+        out.push_str(&format!("added_by = {}\n", q(a)));
     }
     out
 }

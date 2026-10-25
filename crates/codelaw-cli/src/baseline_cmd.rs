@@ -28,18 +28,27 @@ pub struct AddArgs {
     /// Only these files (repeatable); every file when none.
     #[arg(long = "file")]
     files: Vec<PathBuf>,
-    /// The deadline, YYYY-MM-DD: after it every grandfathered finding is an error.
+    /// The first day, YYYY-MM-DD, the entries no longer hold: from then their findings are reported again.
+    #[arg(long, conflicts_with = "until")]
+    expires: Option<String>,
+    /// The last allowed day, YYYY-MM-DD: the same as `--expires` the day after (kept for one minor release).
     #[arg(long)]
     until: Option<String>,
-    /// From this date, YYYY-MM-DD, a grandfathered finding is a warning.
+    /// From this date, YYYY-MM-DD, the entries warn that they expire (wins over `--warn-days`).
     #[arg(long)]
     warn_from: Option<String>,
+    /// Days of warning before `--expires`; `[exceptions] warn_days` when not given.
+    #[arg(long)]
+    warn_days: Option<u32>,
     /// What a grandfathered finding becomes when its file is touched: error, warn or keep.
     #[arg(long)]
     on_touch: Option<String>,
     /// Why, for the reviewer.
     #[arg(long)]
     reason: Option<String>,
+    /// Who adds the entries, an email; `git config user.email` when not given.
+    #[arg(long)]
+    added_by: Option<String>,
 }
 
 #[derive(Args)]
@@ -62,18 +71,42 @@ pub struct DeprecateArgs {
     /// What to use instead, named the same way.
     #[arg(long)]
     replacement: Option<String>,
+    /// The first day, YYYY-MM-DD, a grandfathered use fails.
+    #[arg(long, conflicts_with = "until")]
+    expires: Option<String>,
+    /// The last allowed day: the same as `--expires` the day after (kept for one minor release).
     #[arg(long)]
     until: Option<String>,
     #[arg(long)]
     warn_from: Option<String>,
+    /// Days of warning before `--expires`.
+    #[arg(long)]
+    warn_days: Option<u32>,
     #[arg(long)]
     on_touch: Option<String>,
     #[arg(long)]
     reason: Option<String>,
+    /// Who deprecates it, an email; `git config user.email` when not given.
+    #[arg(long)]
+    added_by: Option<String>,
 }
 
 fn date(flag: &str, v: &Option<String>) -> Result<Option<Date>, String> {
     v.as_deref().map(|s| Date::parse(s).map_err(|e| format!("--{flag}: {e}"))).transpose()
+}
+
+/// `--expires`, or `--until` read as the day after (SR-BASELINE decision 9).
+fn expires(expires: &Option<String>, until: &Option<String>) -> Result<Option<Date>, String> {
+    codelaw_baseline::exception::expires_of(date("until", until)?, date("expires", expires)?)
+}
+
+/// `--added-by`, else `git config user.email`; a malformed one is refused.
+fn added_by(given: &Option<String>, p: &codelaw_engine::Project) -> Result<Option<String>, String> {
+    let who = given.clone().or_else(|| p.git_user_email());
+    match who {
+        Some(w) if !codelaw_baseline::exception::valid_email(&w) => Err(format!("--added-by: `{w}` is not an email address")),
+        w => Ok(w),
+    }
 }
 
 fn on_touch(v: &Option<String>) -> Result<Option<OnTouch>, String> {
@@ -94,22 +127,31 @@ pub fn baseline(action: BaselineAction) -> ExitCode {
 }
 
 fn add(a: AddArgs) -> ExitCode {
+    let mut p = match project(&a.files) {
+        Ok(p) => p,
+        Err(e) => return fail(e),
+    };
     let parsed = (|| -> Result<BaselineAdd, String> {
+        let expires = expires(&a.expires, &a.until)?;
+        let warn_from = date("warn-from", &a.warn_from)?;
+        if let (Some(w), Some(e)) = (warn_from, expires)
+            && w >= e
+        {
+            return Err(format!("--warn-from ({w}) is not before the expiry ({e})"));
+        }
         Ok(BaselineAdd {
             rule: a.rule.clone(),
             symbol: None,
-            until: date("until", &a.until)?,
-            warn_from: date("warn-from", &a.warn_from)?,
+            expires,
+            warn_from,
+            warn_days: a.warn_days,
             on_touch: on_touch(&a.on_touch)?,
             reason: a.reason.clone(),
+            added_by: added_by(&a.added_by, &p)?,
         })
     })();
     let options = match parsed {
         Ok(o) => o,
-        Err(e) => return fail(e),
-    };
-    let mut p = match project(&a.files) {
-        Ok(p) => p,
         Err(e) => return fail(e),
     };
     match p.baseline_add(&a.files, &options) {
@@ -167,18 +209,26 @@ fn check(a: CheckArgs) -> ExitCode {
 }
 
 pub fn deprecate(a: DeprecateArgs) -> ExitCode {
+    let mut p = match project(&[]) {
+        Ok(p) => p,
+        Err(e) => return fail(e),
+    };
     let parsed = (|| -> Result<Deprecation, String> {
-        let policy = Policy { until: date("until", &a.until)?, warn_from: date("warn-from", &a.warn_from)?, on_touch: on_touch(&a.on_touch)? };
-        let text = codelaw_baseline::registry::entry_text(&Deprecation { symbol: a.symbol.clone(), replacement: a.replacement.clone(), policy, reason: a.reason.clone(), rewrite: None });
+        let policy = Policy { expires: expires(&a.expires, &a.until)?, warn_from: date("warn-from", &a.warn_from)?, warn_days: a.warn_days, on_touch: on_touch(&a.on_touch)? };
+        let text = codelaw_baseline::registry::entry_text(&Deprecation {
+            symbol: a.symbol.clone(),
+            replacement: a.replacement.clone(),
+            policy,
+            reason: a.reason.clone(),
+            rewrite: None,
+            added_by: added_by(&a.added_by, &p)?,
+            line: 0,
+        });
         // Through the parser, so a flag the registry would refuse is refused here.
         codelaw_baseline::Registry::parse(&text).map(|r| r.deprecated.into_iter().next().expect("one entry"))
     })();
     let d = match parsed {
         Ok(d) => d,
-        Err(e) => return fail(e),
-    };
-    let mut p = match project(&[]) {
-        Ok(p) => p,
         Err(e) => return fail(e),
     };
     match p.deprecate(&d, None) {

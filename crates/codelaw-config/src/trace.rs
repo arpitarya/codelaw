@@ -222,10 +222,19 @@ impl Config {
         // `[deprecation]` (SR-BASELINE decision 6).
         let (v, s) = root_key(&["deprecation", "until"], |r| r.deprecation.as_ref().and_then(|d| d.until.as_ref()).map(|x| json!(x)), Value::Null);
         push("deprecation.until", v, s);
+        let (v, s) = root_key(&["deprecation", "expires"], |r| r.deprecation.as_ref().and_then(|d| d.expires.as_ref()).map(|x| json!(x)), Value::Null);
+        push("deprecation.expires", v, s);
         let (v, s) = root_key(&["deprecation", "warn_from"], |r| r.deprecation.as_ref().and_then(|d| d.warn_from.as_ref()).map(|x| json!(x)), Value::Null);
         push("deprecation.warn_from", v, s);
+        let (v, s) = root_key(&["deprecation", "warn_days"], |r| r.deprecation.as_ref().and_then(|d| d.warn_days).map(|x| json!(x)), Value::Null);
+        push("deprecation.warn_days", v, s);
         let (v, s) = root_key(&["deprecation", "on_touch"], |r| r.deprecation.as_ref().and_then(|d| d.on_touch.as_ref()).map(|x| json!(x)), json!("error"));
         push("deprecation.on_touch", v, s);
+        // `[exceptions]` (SR-BASELINE decision 9).
+        let (v, s) = root_key(&["exceptions", "require_expiry"], |r| r.exceptions.as_ref().and_then(|e| e.require_expiry).map(|x| json!(x)), json!(false));
+        push("exceptions.require_expiry", v, s);
+        let (v, s) = root_key(&["exceptions", "warn_days"], |r| r.exceptions.as_ref().and_then(|e| e.warn_days).map(|x| json!(x)), json!(3));
+        push("exceptions.warn_days", v, s);
         // The sections not validated yet: shown as written.
         for (name, get) in [
             ("format", (|r: &RawConfig| r.format.clone()) as fn(&RawConfig) -> Option<toml::Table>),

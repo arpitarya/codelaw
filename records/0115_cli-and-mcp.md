@@ -69,7 +69,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | rules | `rules [--for <path>] [--why <id>]` · `new-rule` · `rules eject` · `rules lint` · `test [--case <title>] [--corpus <dir> [--snapshot <file> [--update-snapshot]]]` (SR-RULE-AUTHORING decision 4) |
    | debug | `tree` · `match <id> <file> [--explain] [--line N]` · `fix --trace` · `graph refs` · `graph why-unused` |
    | project | `init [--agents …] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print [--for <file>]` · `config --schema` |
-   | baseline | `baseline add --rule <id> [--file …] [--until] [--warn-from] [--on-touch] [--reason]` · `baseline prune [paths]` · `baseline check --since <ref>` · `deprecate <symbol> [--replacement] [--until] [--warn-from] [--on-touch] [--reason]` ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 5 and 6) |
+   | baseline | `baseline add --rule <id> [--file …] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` · `baseline prune [paths]` · `baseline check --since <ref>` · `deprecate <symbol> [--replacement] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 5, 6 and 9; `--added-by` defaults to `git config user.email`; the MCP twins are unchanged) |
    | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` ([SR-ARCHITECTURE](0108_architecture.md) decision 22) · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
 

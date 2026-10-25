@@ -8,6 +8,8 @@ use crate::discover::{FileEntry, language_enabled};
 use crate::files::{Asked, ProjectFile, Tree};
 use crate::timings::Phase;
 use crate::{Project, suppress};
+use codelaw_baseline::exception::{Expiry, expiry};
+use codelaw_baseline::{AUTHOR_RULE, EXPIRED_RULE, EXPIRING_RULE, WITHOUT_EXPIRY_RULE};
 use codelaw_cache::KeyBuilder;
 use codelaw_config::{Layer, RuleConfig};
 use codelaw_core::{Diagnostic, FixClass, Language, LineIndex, Severity, Skipped, TextEdit};
@@ -211,6 +213,8 @@ impl Project {
             // config fingerprint.
             .part(format!("{:?}", self.formatting.options_for(&entry.abs)))
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
+            // A dated `codelaw-ignore` is judged on the as-of date.
+            .part(self.exception_key(&file.text))
             .key();
         // A result that read other files holds only while their answers do.
         let cached = self.cache.get::<CachedFile>(&key).filter(|c| crate::files::still_holds(self.root(), &c.asked));
@@ -527,11 +531,19 @@ fn apply_suppressions(
     if sups.is_empty() {
         return;
     }
+    // Dated exceptions (SR-BASELINE decision 9): the as-of date is read
+    // only when a comment carries a date; an expired one covers nothing.
+    let exceptions = project.exceptions;
+    let as_of = if sups.iter().any(|s| s.dated.expires.is_some()) { project.as_of().date } else { None };
+    let states: Vec<Expiry> = sups.iter().map(|s| expiry(as_of, s.dated.expires, None, s.dated.warn_days.unwrap_or(exceptions.warn_days))).collect();
     diagnostics.retain(|d| {
         if d.rule.starts_with("codelaw/") {
             return true;
         }
-        for s in sups.iter_mut() {
+        for (i, s) in sups.iter_mut().enumerate() {
+            if s.dated.bad.is_some() || matches!(states[i], Expiry::Expired { .. }) {
+                continue;
+            }
             if s.reason.is_some() && s.target_line == d.start.line && s.rules.contains(&d.rule) {
                 s.used = true;
                 return false;
@@ -539,7 +551,7 @@ fn apply_suppressions(
         }
         true
     });
-    for s in &sups {
+    for (s, state) in sups.iter().zip(&states) {
         let meta = |id: &str, message: String, fix: Option<TextEdit>| -> Option<Diagnostic> {
             let mut d = meta_diagnostic(rel, layers, id, message)?;
             d.start_byte = s.start;
@@ -569,6 +581,31 @@ fn apply_suppressions(
                 None,
             ));
             continue;
+        }
+        if let Some(bad) = &s.dated.bad {
+            diagnostics.extend(meta("codelaw/unknown-suppression", format!("This `codelaw-ignore` cannot be read, so it suppresses nothing: {bad}"), None));
+            continue;
+        }
+        let ids = s.rules.join(", ");
+        if let Some(by) = s.dated.by.as_deref().filter(|b| !codelaw_baseline::exception::valid_email(b)) {
+            diagnostics.extend(meta(AUTHOR_RULE, format!("This `codelaw-ignore {ids}` has `by={by}`, which is not an email address"), None));
+        }
+        if exceptions.require_expiry && s.dated.expires.is_none() {
+            diagnostics.extend(meta(
+                WITHOUT_EXPIRY_RULE,
+                format!("This `codelaw-ignore {ids}` has no `expires=`, and `[exceptions] require_expiry` is on"),
+                None,
+            ));
+        }
+        match *state {
+            Expiry::Expired { expires } => {
+                diagnostics.extend(meta(EXPIRED_RULE, format!("This `codelaw-ignore {ids}` expired on {expires}: it no longer suppresses anything"), None));
+                continue;
+            }
+            Expiry::Expiring { days, expires } => {
+                diagnostics.extend(meta(EXPIRING_RULE, format!("This `codelaw-ignore {ids}` expires {}", codelaw_baseline::exception::when(days, expires)), None));
+            }
+            Expiry::Holds => {}
         }
         let all_ran = s.rules.iter().all(|r| active.iter().any(|(_, a, _)| a.id() == r));
         if !s.used && all_ran {

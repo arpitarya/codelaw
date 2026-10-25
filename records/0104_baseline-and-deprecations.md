@@ -10,7 +10,7 @@ feature: "grandfathering violations and deprecations"
 owns:
   - crates/codelaw-baseline
 laws: [L0, L4, L5]
-timestamp: 2026-10-22T18:00:00Z
+timestamp: 2026-10-25T12:00:00Z
 content_sha: ""
 ---
 
@@ -44,7 +44,7 @@ flowchart LR
     N -->|no| E["error: new use"]
     N -->|yes| T{"file touched?"}
     T -->|yes| E2["error: migrate this file"]
-    T -->|no| D{"past until (as-of date)?"}
+    T -->|no| D{"on or after expires (as-of date)?"}
     D -->|yes| E3["error: expired"]
     D -->|no| I["info / warning: grandfathered"]
 ```
@@ -59,7 +59,7 @@ flowchart LR
            file touched? --yes--> error (migrate now)
                  | no
                  v
-           past `until`? --yes--> error (expired)
+           on/after `expires`? --yes--> error (expired)
                  | no
                  v
            info / warning (grandfathered)
@@ -88,15 +88,16 @@ Deprecating a function means three things: no new uses, old uses allowed until a
 file      = "packages/web/src/orders/list.tsx"
 symbol    = "@acme/utils#formatDate"      # omitted for rules that aren't symbol-based
 count     = 3                             # occurrences this file may keep
-until     = "2027-03-31"                  # inherited from the deprecation; may be set per entry
+expires   = "2027-04-01"                  # the first day it fails; inherited from the deprecation; may be set per entry
 on_touch  = "error"                       # error | warn | keep
 reason    = "ORD-1432 migration"
+added_by  = "lead@example.com"            # optional; checked against git (decision 9)
 ```
 
 - **Counts per file, not line numbers.** Moving code around doesn't invalidate the baseline; adding a use does.
 - **One file per rule** keeps diffs small and merge conflicts rare. The file name is the rule id with `/` written `--`. Entries are sorted by file, then symbol, so the output is deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)).
-- **Keys:** `file` and `count` are required; `symbol`, `until`, `warn_from` (the start of the warning window), `on_touch` and `reason` are optional. An unknown key, a malformed date or two entries for the same file and symbol make the run fail with exit 2, as a config error does. Dates are `YYYY-MM-DD`, quoted or bare.
-- **Defaults:** an entry without `until`, `warn_from` or `on_touch` inherits the deprecation's; with none there either, `on_touch` is `error` and there is no deadline. `baseline add` writes `on_touch` explicitly.
+- **Keys:** `file` and `count` are required; `symbol`, `expires` (the first day the entry no longer holds), `warn_from` (the start of the warning window), `warn_days`, `on_touch`, `reason` and `added_by` are optional — decision 9 gives the dated ones. `until`, the last allowed day, is still read for one minor release as `expires` the day after. An unknown key, a malformed date, `until` and `expires` on one entry, a `warn_from` not before `expires`, or two entries for the same file and symbol make the run fail with exit 2, as a config error does. Dates are `YYYY-MM-DD`, quoted or bare.
+- **Defaults:** an entry without `expires`, `warn_from`, `warn_days` or `on_touch` inherits the deprecation's; with none there either, `on_touch` is `error` and there is no deadline. `baseline add` writes `on_touch` explicitly, and writes `expires` where a file said `until`.
 - **The engine reads the folder at load,** so a warm process ([SR-ARCHITECTURE](0108_architecture.md) decision 22), which loads per request, serves a changed baseline at once.
 
 #### 2. What each occurrence becomes
@@ -105,13 +106,13 @@ reason    = "ORD-1432 migration"
 |---|---|
 | Use in a file with no baseline entry | the rule's own finding, unchanged: for `graph/no-deprecated-usage` an **error** ("`formatDate` is deprecated; use `formatISO` (deadline 2027-03-31)") |
 | More occurrences than the file's `count` | **every occurrence in the file at the rule's own severity**, each saying "4 in this file; the baseline allows 3": counts can't tell which one is new (ESLint's bulk suppressions do the same) |
-| Within allowance, before `warn_from` | **info:** "grandfathered until 2027-03-31 (3 left in this file)"; exit 0 |
-| Within allowance, after `warn_from`, before `until` | **warning:** "expires in 12 days" |
-| After `until` | **error**, everywhere |
+| Within allowance, before the warning window | **info:** "grandfathered, expires 2027-04-01 (3 left in this file)"; exit 0 |
+| Within allowance, in the warning window (from `warn_from`, else `expires` − `warn_days`) | the findings stay **info**; the entry itself gets one **warning**, `codelaw/expiring-exception`, at its `[[allow]]` line: "expires in 12 days (2027-04-01)" (decision 9) |
+| On or after `expires` | the entry covers nothing: **every finding is back at its rule's own severity**, and the entry is an **error**, `codelaw/expired-exception`, at its own line (decision 9) |
 | Within allowance, but **the file is touched** and `on_touch = "error"` | **error for every occurrence in that file:** "you edited this file; migrate its 3 uses of `formatDate` now" |
 | Baseline allows 3, file now has 2 | **error, `codelaw/stale-baseline`,** on that file. `codelaw baseline prune` lowers it, and `codelaw fix` prunes too (always safe). An entry is judged stale only when the run saw the whole of its rule in its file: a run of other paths, or `--rule` of another rule, leaves it alone |
 
-- **The order** is the flowchart's: the count first, then the touch, then the dates. A finding past `until` is an error whether or not its file was touched.
+- **The order** is the flowchart's: the count first, then the touch, then the dates — except that on or after `expires` the entry covers nothing, so its findings are back whether or not their file was touched.
 - **Without an as-of date** (no `git`, no `--as-of`), a grandfathered finding stays `info` and the header says deadlines were not evaluated.
 
 #### 3. What "touched" means
@@ -142,12 +143,12 @@ A file is touched when it's in the **change set**, and the change set always com
 #### 5. The ratchet: counts only go down
 
 - **Lowering is automatic:** `codelaw fix` and the pre-commit hook run `baseline prune`. Fixing a use is never blocked by bookkeeping.
-- **Raising a count, adding an entry or extending an `until` takes one explicit command:** `codelaw baseline add --rule <id> [--file …] --reason "…"`.
-- **CI enforces it:** `codelaw baseline check --since origin/main` compares the baseline files at the merge base (read with `git show`) with the working tree, and exits 1 if any count rose, any entry was added, any deadline moved later or was removed, or any `on_touch` got less strict (`error` > `warn` > `keep`). Lowering a count and removing an entry always pass. Without `git` it is a usage error, exit 2.
+- **Raising a count, adding an entry or moving an `expires` later takes one explicit command:** `codelaw baseline add --rule <id> [--file …] --reason "…"`.
+- **CI enforces it:** `codelaw baseline check --since origin/main` compares the baseline files at the merge base (read with `git show`) with the working tree, and exits 1 if any count rose, any entry was added, any deadline (`expires`) moved later or was removed, or any `on_touch` got less strict (`error` > `warn` > `keep`). Lowering a count and removing an entry always pass, and so do adding a `reason` or an `added_by` and rewriting an `until` as the `expires` the day after. Without `git` it is a usage error, exit 2.
 - **Approval** comes from a `CODEOWNERS` entry on `.codelaw/baseline/`, the platform's own review, with nothing invented. `baseline check` warns on stderr when no `CODEOWNERS` (`.github/`, the root, `docs/`, `.gitlab/`) assigns an owner to that folder.
-- **`baseline add`** records the rule's current counts for every file (or the `--file`s given), sets `--until`, `--warn-from`, `--on-touch` and `--reason` on the entries it writes, and is the one command that raises a count. `baseline prune [paths]` and `fix` only lower.
+- **`baseline add`** records the rule's current counts for every file (or the `--file`s given), sets `--expires` (or `--until`, read as the day after), `--warn-from`, `--warn-days`, `--on-touch`, `--reason` and `--added-by` (by default `git config user.email`) on the entries it writes, and is the one command that raises a count. `baseline prune [paths]` and `fix` only lower.
 - **Adopting a new rule in a legacy repo:**
-  1. `codelaw baseline add --rule js/exports-at-end --until 2027-06-30`
+  1. `codelaw baseline add --rule js/exports-at-end --expires 2027-07-01`
   2. From then on, new violations fail and old ones count down.
 
 #### 6. The deprecations registry
@@ -158,7 +159,7 @@ A file is touched when it's in the **change set**, and the change set always com
 [[deprecated]]
 symbol      = "@acme/utils#formatDate"         # JS/TS: <package or path>#<export>
 replacement = "@acme/utils#formatISO"
-until       = "2027-03-31"
+expires     = "2027-04-01"
 warn_from   = "2027-03-01"
 on_touch    = "error"
 reason      = "Timezone bugs — see ADR-0042"
@@ -167,7 +168,7 @@ rewrite     = { from = "formatDate($D)", to = "formatISO($D)" }   # optional →
 [[deprecated]]
 symbol      = "acme.billing.legacy:compute_tax"  # Python: <module>:<qualname>
 replacement = "acme.billing.tax:compute"
-until       = "2027-06-30"
+expires     = "2027-07-01"
 on_touch    = "error"
 reason      = "Replaced by the new tax engine"
 ```
@@ -176,30 +177,30 @@ reason      = "Replaced by the new tax engine"
   - JSDoc `@deprecated` on an export;
   - Python `@deprecated(...)` (PEP 702: `warnings.deprecated` from Python 3.13, `typing_extensions` before that).
 
-  A marked symbol with no registry entry gets the `[deprecation]` defaults from `codelaw.toml` — `[deprecation] until`, `[deprecation] warn_from` and `[deprecation] on_touch`, the same three keys as an entry — and the marker's message becomes the finding's "Why". The registry adds deadlines and policy.
+  A marked symbol with no registry entry gets the `[deprecation]` defaults from `codelaw.toml` — `[deprecation] expires` (or `[deprecation] until`, read as the day after), `[deprecation] warn_from`, `[deprecation] warn_days` and `[deprecation] on_touch`, the same keys as an entry — and the marker's message becomes the finding's "Why". The registry adds deadlines and policy.
 - **When the rule runs.** It needs the whole graph, so it runs only when the project asks: a `.codelaw/deprecations.toml`, a `[deprecation]` table, or `graph/no-deprecated-usage` named in `[rules]`. It is an engine rule ([SR-RULE-PACKS](0101_rule-packs.md) decision 1): `codelaw explain` shows it, `--rule` selects it, and `[rules]` sets its severity or turns it `off`. `codelaw-ignore graph/no-deprecated-usage: <reason>` suppresses one use.
 - **What counts as a use:** each read of the imported binding, or the import itself when it is never read; a re-export only passes the name on, and the uses through it are counted where they are. A symbol of a package outside the project (`date-fns#format`) is found by its import specifier.
 - **Identity comes from the [project graph](0103_project-graph.md).** `import { formatDate as fd } from "@acme/utils"`, a barrel re-export, and `from acme.billing.legacy import compute_tax as ct` are all caught. A local function that happens to be named `formatDate` is not.
 - **Fix ([L4](0006_LAW-4-every-rule-has-a-fix.md)):** with a `rewrite`, the fix is `suggest` (a diff, because call semantics may differ). Without one, it's `manual`, and the steps name the replacement and quote `reason`. The `rewrite` is read and checked but not applied yet, so every finding is `manual` for now.
-- **Seeding the baseline:** `codelaw deprecate @acme/utils#formatDate --replacement … --until …` does two things in one reviewed change:
+- **Seeding the baseline:** `codelaw deprecate @acme/utils#formatDate --replacement … --expires …` does two things in one reviewed change:
   1. appends the registry entry, leaving the rest of the file as written;
-  2. runs `baseline add` for every current use of that symbol, copying its `until`, `warn_from` and `on_touch` into the entries so the ratchet guards them.
+  2. runs `baseline add` for every current use of that symbol, copying its `expires`, `warn_from`, `warn_days`, `on_touch` and `added_by` into the entries so the ratchet guards them.
 
 #### 7. Running it
 
 ```
 $ codelaw check --changed-since origin/main --format agent
 as-of 2026-10-18 (HEAD commit date)
-packages/web/src/cart/total.ts:8:10 graph/no-deprecated-usage `formatDate` is deprecated; use `formatISO` (deadline 2027-03-31) — fix: manual — …
-packages/web/src/orders/list.tsx:22:7 graph/no-deprecated-usage `formatDate` is deprecated; use `formatISO` (deadline 2027-03-31); you edited this file: migrate its 3 occurrences now (on_touch = error) — fix: manual — …
+packages/web/src/cart/total.ts:8:10 graph/no-deprecated-usage `formatDate` is deprecated; use `formatISO` (expires 2027-04-01) — fix: manual — …
+packages/web/src/orders/list.tsx:22:7 graph/no-deprecated-usage `formatDate` is deprecated; use `formatISO` (expires 2027-04-01); you edited this file: migrate its 3 occurrences now (on_touch = error) — fix: manual — …
 packages/web/src/orders/list.tsx:40:7 …
 packages/web/src/orders/list.tsx:61:12 …
-packages/api/app/billing.py:31:12 graph/no-deprecated-usage `compute_tax` is deprecated; use `compute` (deadline 2027-06-30); grandfathered until 2027-06-30 (1 left in this file) — fix: manual — …
+packages/api/app/billing.py:31:12 graph/no-deprecated-usage `compute_tax` is deprecated; use `compute` (expires 2027-07-01); grandfathered, expires 2027-07-01 (1 left in this file) — fix: manual — …
 4 errors, 0 warnings, 1 infos
 exit 1
 
-$ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
-… 47 errors: every remaining use of `formatDate` is past its 2027-03-31 deadline
+$ codelaw check --as-of 2027-04-01          # what breaks on the day it expires?
+… 47 errors: every remaining use of `formatDate` reached its `expires`, 2027-04-01
 ```
 
 #### 8. Agents get the same rules, earlier
@@ -208,6 +209,47 @@ $ codelaw check --as-of 2027-04-01          # what breaks after the deadline?
 - **The hook** treats the agent's edited file as touched, so it gets exactly the CI verdict ([L5](0007_LAW-5-no-model-in-the-engine.md) parity).
 - **MCP:** `check_paths` and `fix_paths` take `as_of`, `changed_since` and `staged`, the twins of the three flags; `check_snippet` applies the baseline to the file's own rules as `check` does ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 5).
 - **No skill may raise a baseline count or extend a deadline** ([SR-AGENT-SURFACES](0102_agent-surfaces.md) §4). Only a person runs `baseline add`.
+
+#### 9. Dated exceptions: `expires`, a warning before it, an optional reason and author
+
+*The decider's ruling, 2026-10-25 (W-40; [the compare](../work/compare/ci-profiles-and-dated-exceptions.compare.md) forks 4 and 6).*
+
+- **What an exception is:** a baseline entry, a deprecations-registry entry, an inline `codelaw-ignore` ([SR-LINTER](0106_linter.md) decision 6). The same keys on each — inline they are `key=value` words before the colon, `by=` for `added_by`, and the reason after it:
+
+  ```toml
+  # codelaw.toml
+  [exceptions]
+  require_expiry = true   # default false: an exception without a date is fine
+  warn_days      = 3      # default 3
+  ```
+
+  ```ts
+  // codelaw-ignore js/no-console expires=2026-11-15 by=arpit@example.com: needed until the logger lands
+  ```
+
+- **`expires`** is `YYYY-MM-DD`, the **first day the exception no longer holds**. `until` (the last allowed day) is read for one minor release as `expires = until + 1`, then removed (SR-CONFIG's rename rule); both on one entry is a load error, exit 2 (inline: the comment is reported as unreadable and covers nothing).
+- **`warn_days`** — optional; default `[exceptions] warn_days` (3). Where `warn_from` is allowed (a baseline or registry entry) it still wins.
+- **`reason`** — optional on a file, required inline (SR-LINTER decision 6, unchanged).
+- **`added_by`** (`by=` inline) — optional; an email.
+- **The timeline**, on the as-of date (decision 4, never the wall clock):
+
+  | as-of date | result |
+  |---|---|
+  | before `expires` − `warn_days` (or `warn_from`) | as without a date: suppressed (inline) or `info` (baseline) |
+  | from then | **warning**, `codelaw/expiring-exception`, at the exception's own line: "expires in 2 days (2026-11-15)" |
+  | on or after `expires` | **error**, `codelaw/expired-exception`, at the exception's own line, and the exception covers nothing — the rule's findings come back at their own severity |
+
+  A baseline entry's line is its `[[allow]]` in its baseline file; an entry that inherits its date from the registry is reported at its own line too. Without an as-of date nothing expires, as in decision 4. A cached result of a file holding a dated `codelaw-ignore` is keyed by the as-of date.
+- **`[exceptions] require_expiry = true`:** each exception without a date is an **error**, `codelaw/exception-without-expiry`, at its line — a baseline entry counts as dated when it inherits `expires` from its deprecation. Fix `manual`: add `expires`; `baseline add --expires` rewrites an entry. `[[overrides]]` are configuration, not exceptions: the switch never applies to them.
+- **The `added_by` check**, `codelaw/exception-author` (error):
+  - always: a malformed email;
+  - under `--staged`: each exception the index adds or changes (a line of it in `git diff --cached -U0`) whose `added_by` is not `git config user.email`, ignoring case;
+  - under `--changed-since <ref>`: each exception changed since the merge base whose `added_by` is not the `author-mail` of `git blame --porcelain` on its line (its `added_by` line, else its first); a line not committed yet is the committer's own, `git config user.email`. One `git blame` per changed file that holds such an exception;
+  - plain `check`, the hook and the editor: the format only. Without `git` the flag's warning says the author was checked for its format only. An absent `added_by` is never an error.
+- **The ratchet** (decision 5) compares `expires`: moving it later is extending a deadline and fails `baseline check`; adding `added_by` or a `reason` never does.
+- **`baseline add` and `deprecate`** take `--expires`, `--warn-days` and `--added-by` (default `git config user.email`), so nobody hand-writes an entry; `--until` stays as the alias.
+- **The four engine rules** carry their fix class and steps ([SR-RULE-PACKS](0101_rule-packs.md) decision 1): `codelaw/expiring-exception` (`warn`), `codelaw/expired-exception`, `codelaw/exception-without-expiry`, `codelaw/exception-author` (`error`), all `manual`.
+- **The hazard it names:** a branch with no new commit does not start failing on the day, because the as-of date is `HEAD`'s; a scheduled CI job passes `--as-of "$(date +%F)"`.
 
 ### Consequences
 

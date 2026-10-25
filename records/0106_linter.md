@@ -141,6 +141,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    - **What it covers:** a comment alone on its line covers the next line with code; a trailing comment covers its own line. Several rules are comma-separated before the colon.
    - A suppression with no reason is an error, and so is one naming a rule that doesn't exist (`codelaw/unknown-suppression`).
    - A suppression that suppresses nothing is reported as `info` with an `auto` fix that removes it.
+   - **Dated:** before the colon, beside the rule ids, it may carry `expires=YYYY-MM-DD` (the first day it no longer covers; `until=` the day before, for one minor release), `warn_days=N` and `by=<email>`: `// codelaw-ignore js/no-console expires=2026-11-15 by=a@example.com: needed until the logger lands`. What they do — the warning before, the error on the day, the author check — is [SR-BASELINE](0104_baseline-and-deprecations.md) decision 9; a key that cannot be read makes the comment cover nothing and is reported as `codelaw/unknown-suppression`.
    - Bulk freezing of existing violations is [SR-BASELINE](0104_baseline-and-deprecations.md)'s job, never a wall of inline ignores.
 
 7. **The linter never judges layout.** A layout-only rule is refused at load ([SR-FORMATTER](0105_formatter.md) decision 3). Adapter rules that only concern layout are switched off by default (for example stylelint's stylistic rules).

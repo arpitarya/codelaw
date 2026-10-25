@@ -27,9 +27,11 @@ pub fn loosened(before: &Baselines, after: &Baselines) -> Vec<String> {
             if e.count > o.count {
                 out.push(format!("{}: count rose from {} to {}", label(rule, e), o.count, e.count));
             }
-            match (o.until, e.until) {
-                (Some(a), Some(z)) if z > a => out.push(format!("{}: deadline moved from {a} to {z}", label(rule, e))),
-                (Some(a), None) => out.push(format!("{}: deadline {a} removed", label(rule, e))),
+            // `expires` is compared, so an `until` rewritten as the
+            // `expires` the day after is no change (decision 9).
+            match (o.expires, e.expires) {
+                (Some(a), Some(z)) if z > a => out.push(format!("{}: deadline extended, expires moved from {a} to {z}", label(rule, e))),
+                (Some(a), None) => out.push(format!("{}: deadline removed (expires {a})", label(rule, e))),
                 _ => {}
             }
             let strict = |x: Option<crate::OnTouch>| x.unwrap_or_default().strictness();

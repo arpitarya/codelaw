@@ -2,6 +2,7 @@
 //! per rule, one `[[allow]]` per file (and symbol), counts not lines.
 
 use crate::date::{Date, from_toml};
+use crate::exception::{expires_of, header_lines};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
@@ -54,12 +55,22 @@ pub struct Entry {
     /// For symbol-based rules (`graph/no-deprecated-usage`).
     pub symbol: Option<String>,
     pub count: usize,
-    /// Inherited from the deprecation when unset.
-    pub until: Option<Date>,
+    /// The first day the entry no longer holds (decision 9); a written
+    /// `until` is read as `until + 1`. Inherited from the deprecation when
+    /// unset.
+    pub expires: Option<Date>,
     pub warn_from: Option<Date>,
+    /// Days of warning before `expires`; `[exceptions] warn_days` when
+    /// unset. `warn_from` wins.
+    pub warn_days: Option<u32>,
     /// Inherited from the deprecation, else `error`, when unset.
     pub on_touch: Option<OnTouch>,
     pub reason: Option<String>,
+    /// Who added it: an email, checked against the git author (decision 9).
+    pub added_by: Option<String>,
+    /// The 1-based line of its `[[allow]]` in the file; 0 when it was not
+    /// read from one.
+    pub line: u32,
 }
 
 impl Entry {
@@ -98,7 +109,16 @@ pub fn rel_path(rule: &str) -> String {
     format!(".codelaw/baseline/{}", file_name(rule))
 }
 
-const ALLOW_KEYS: &[&str] = &["file", "symbol", "count", "until", "warn_from", "on_touch", "reason"];
+const ALLOW_KEYS: &[&str] = &["file", "symbol", "count", "expires", "until", "warn_from", "warn_days", "on_touch", "reason", "added_by"];
+
+/// A `warn_days` value: a whole number of days, 0 or more.
+pub(crate) fn warn_days(v: Option<&toml::Value>) -> Result<Option<u32>, String> {
+    match v {
+        None => Ok(None),
+        Some(toml::Value::Integer(n)) if *n >= 0 && *n <= i64::from(u32::MAX) => Ok(Some(*n as u32)),
+        Some(_) => Err("`warn_days` must be a whole number of days, 0 or more".into()),
+    }
+}
 
 impl BaselineFile {
     /// Parse one baseline file. Every key is checked: an unknown one is
@@ -111,6 +131,7 @@ impl BaselineFile {
             }
         }
         let mut entries = Vec::new();
+        let lines = header_lines(text, "allow");
         let allows = match table.get("allow") {
             None => &Vec::new(),
             Some(toml::Value::Array(a)) => a,
@@ -139,14 +160,24 @@ impl BaselineFile {
                 None => return Err(at("`count` is required".into())),
             };
             let on_touch = string("on_touch")?.map(|s| OnTouch::parse(&s)).transpose().map_err(at)?;
+            let expires = expires_of(date("until")?, date("expires")?).map_err(at)?;
+            let warn_from = date("warn_from")?;
+            if let (Some(w), Some(e)) = (warn_from, expires)
+                && w >= e
+            {
+                return Err(at(format!("`warn_from` ({w}) is not before `expires` ({e})")));
+            }
             entries.push(Entry {
                 file: file.replace('\\', "/"),
                 symbol: string("symbol")?,
                 count,
-                until: date("until")?,
-                warn_from: date("warn_from")?,
+                expires,
+                warn_from,
+                warn_days: warn_days(t.get("warn_days")).map_err(at)?,
                 on_touch,
                 reason: string("reason")?,
+                added_by: string("added_by")?,
+                line: lines.get(i).copied().unwrap_or(0),
             });
         }
         let mut b = BaselineFile { rule: rule.to_owned(), entries };
@@ -182,17 +213,23 @@ impl BaselineFile {
                 out.push_str(&format!("symbol = {}\n", q(s)));
             }
             out.push_str(&format!("count = {}\n", e.count));
-            if let Some(d) = e.until {
-                out.push_str(&format!("until = \"{d}\"\n"));
+            if let Some(d) = e.expires {
+                out.push_str(&format!("expires = \"{d}\"\n"));
             }
             if let Some(d) = e.warn_from {
                 out.push_str(&format!("warn_from = \"{d}\"\n"));
+            }
+            if let Some(n) = e.warn_days {
+                out.push_str(&format!("warn_days = {n}\n"));
             }
             if let Some(o) = e.on_touch {
                 out.push_str(&format!("on_touch = \"{}\"\n", o.name()));
             }
             if let Some(r) = &e.reason {
                 out.push_str(&format!("reason = {}\n", q(r)));
+            }
+            if let Some(a) = &e.added_by {
+                out.push_str(&format!("added_by = {}\n", q(a)));
             }
         }
         out

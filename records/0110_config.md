@@ -41,6 +41,7 @@ rules = { "js/exports-at-end" = "off" }
 [daemon]   # SR-ARCHITECTURE  [lsp]      # SR-ARCHITECTURE
 [fix]      # SR-ARCHITECTURE  [markdown] # SR-CONFIG (its one key is L3's)
 [deprecation] # SR-BASELINE (the policy of a symbol marked deprecated in code)
+[exceptions]  # SR-BASELINE (dated exceptions: require_expiry, warn_days)
 ```
 
 ```mermaid
@@ -93,7 +94,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
    `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11).
 
-   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]` and `[deprecation]` are validated by the loader like `[fix]` and `[lint]`; `[format]`, `[graph]` and `[baseline]` are still read as tables.
+   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]`, `[deprecation]` and `[exceptions]` are validated by the loader like `[fix]` and `[lint]`; `[format]`, `[graph]` and `[baseline]` are still read as tables.
 4. **Precedence, last wins:**
    1. Built-in defaults.
    2. `.editorconfig` (formatter keys only).

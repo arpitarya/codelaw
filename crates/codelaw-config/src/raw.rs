@@ -47,6 +47,8 @@ pub struct RawConfig {
     /// code that the registry does not list. Its values are checked when
     /// the project loads.
     pub deprecation: Option<RawDeprecation>,
+    /// SR-BASELINE decision 9: dated exceptions. Root config only.
+    pub exceptions: Option<RawExceptions>,
     #[serde(default)]
     pub adapters: RawAdapters,
     #[serde(default)]
@@ -134,8 +136,18 @@ pub struct RawAdapters {
 #[serde(deny_unknown_fields)]
 pub struct RawDeprecation {
     pub until: Option<String>,
+    pub expires: Option<String>,
     pub warn_from: Option<String>,
+    pub warn_days: Option<i64>,
     pub on_touch: Option<String>,
+}
+
+/// `[exceptions]`: SR-BASELINE decision 9.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawExceptions {
+    pub require_expiry: Option<bool>,
+    pub warn_days: Option<i64>,
 }
 
 /// `[daemon]`: SR-ARCHITECTURE decision 22.

@@ -175,6 +175,8 @@ pub struct Project {
     /// The deprecations registry and `[deprecation]`, when the project
     /// runs `graph/no-deprecated-usage`.
     deprecations: Option<baseline::Deprecations>,
+    /// `[exceptions]` (SR-BASELINE decision 9).
+    pub(crate) exceptions: codelaw_baseline::Exceptions,
     /// The as-of date and the change set, read on first use.
     as_of: std::sync::OnceLock<AsOf>,
     touched: std::sync::OnceLock<(BTreeSet<String>, Vec<String>)>,
@@ -240,7 +242,7 @@ impl Project {
         if let Err(e) = codelaw_adapters::selected(config.adapters_enabled()) {
             return Err(EngineError::Config(codelaw_config::ConfigError::new(config.files.first().map(|f| f.path.clone()), e)));
         }
-        let (baselines, deprecations) = baseline::load(&config)?;
+        let (baselines, deprecations, exceptions) = baseline::load(&config)?;
         let pool = pool(options.threads);
         let adapters = std::sync::OnceLock::new();
         Ok(Project {
@@ -256,6 +258,7 @@ impl Project {
             adapters,
             baselines,
             deprecations,
+            exceptions,
             as_of: std::sync::OnceLock::new(),
             touched: std::sync::OnceLock::new(),
         })

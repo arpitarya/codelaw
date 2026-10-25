@@ -7,8 +7,13 @@
 use crate::lint::{meta_diagnostic, meta_severity};
 use crate::project::{Source, suppressed, suppressions};
 use crate::{CheckReport, EngineError, Project, git};
-use codelaw_baseline::{AddOptions, BaselineFile, Baselines, Context, DEPRECATED_RULE, Date, Deprecation, OnTouch, Occurrence, Policy, Registry, STALE_RULE};
-use codelaw_core::{Diagnostic, FixClass, LineIndex};
+use crate::suppress::Suppression;
+use codelaw_baseline::exception::{Expiry, expiry, valid_email};
+use codelaw_baseline::{
+    AUTHOR_RULE, AddOptions, BaselineFile, Baselines, Context, DEPRECATED_RULE, Date, Deprecation, Exceptions, OnTouch, Occurrence, Policy, Registry,
+    STALE_RULE, WITHOUT_EXPIRY_RULE,
+};
+use codelaw_core::{Diagnostic, FixClass, Language, LineIndex};
 use codelaw_graph::Graph;
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -57,21 +62,31 @@ fn config_error(project_root_file: Option<&Path>, e: String) -> EngineError {
 }
 
 /// The baselines and deprecations of a project root, read at load.
-pub(crate) fn load(config: &codelaw_config::Config) -> Result<(Baselines, Option<Deprecations>), EngineError> {
+pub(crate) fn load(config: &codelaw_config::Config) -> Result<(Baselines, Option<Deprecations>, Exceptions), EngineError> {
     let root = &config.root_dir;
     let baselines = Baselines::load(root).map_err(|e| config_error(None, e))?;
     let registry = Registry::load(root).map_err(|e| config_error(None, e))?;
     let table = config.files.first().and_then(|f| f.raw.deprecation.as_ref());
     let defaults = match table {
-        Some(d) => codelaw_baseline::registry::defaults(d.until.as_deref(), d.warn_from.as_deref(), d.on_touch.as_deref()),
+        Some(d) => codelaw_baseline::registry::defaults(&codelaw_baseline::registry::DefaultsTable {
+            until: d.until.as_deref(),
+            expires: d.expires.as_deref(),
+            warn_from: d.warn_from.as_deref(),
+            warn_days: d.warn_days,
+            on_touch: d.on_touch.as_deref(),
+        }),
         None => Ok(Policy::default()),
     }
     .map_err(|e| config_error(config.root_file(), e))?;
+    let exceptions = match config.files.first().and_then(|f| f.raw.exceptions.as_ref()) {
+        Some(x) => Exceptions::from_table(x.require_expiry, x.warn_days).map_err(|e| config_error(config.root_file(), e))?,
+        None => Exceptions::default(),
+    };
     let named = config.named_rule_ids().iter().any(|(id, _)| id == DEPRECATED_RULE);
     // The rule needs the whole graph, so it runs only when the project
     // asks for it: a registry, a `[deprecation]` table or the rule named.
     let on = registry.is_some() || table.is_some() || named;
-    Ok((baselines, on.then(|| Deprecations { registry: registry.unwrap_or_default(), defaults })))
+    Ok((baselines, on.then(|| Deprecations { registry: registry.unwrap_or_default(), defaults }), exceptions))
 }
 
 /// A date flag or variable, checked at load: a bad one is a usage error.
@@ -175,8 +190,8 @@ impl Project {
             if let Some(r) = replacement {
                 message.push_str(&format!("; use `{}`", short(r)));
             }
-            if let Some(until) = policy.until {
-                message.push_str(&format!(" (deadline {until})"));
+            if let Some(expires) = policy.expires {
+                message.push_str(&format!(" (expires {expires})"));
             }
             let mut steps = vec![match replacement {
                 Some(r) => format!("Replace `{}` with `{r}`.", u.symbol),
@@ -205,7 +220,7 @@ impl Project {
         }
         let mut out = Vec::new();
         for (file, list) in per_file {
-            let sups = suppressions(by_rel[file]);
+            let sups = self.live(suppressions(by_rel[file]));
             for (diag, symbol, policy) in list {
                 if !suppressed(&sups, &diag) {
                     out.push(Occurrence { diag, symbol: Some(symbol), policy });
@@ -239,6 +254,11 @@ impl Project {
         let in_play = !self.baselines.is_empty() || (ran.project && self.deprecations_on());
         if !in_play {
             report.diagnostics.extend(deprecated.into_iter().map(|o| o.diag));
+            self.check_authors(report, ran);
+            // A dated `codelaw-ignore` was judged on the as-of date: say which.
+            if report.diagnostics.iter().any(|d| d.rule == codelaw_baseline::EXPIRING_RULE || d.rule == codelaw_baseline::EXPIRED_RULE) {
+                report.as_of = Some(self.as_of().clone());
+            }
             return;
         }
         let as_of = self.as_of().clone();
@@ -248,10 +268,15 @@ impl Project {
         let mut occurrences: Vec<Occurrence> = mine.into_iter().map(Occurrence::plain).collect();
         occurrences.extend(deprecated);
         let evaluated = |rule: &str, file: &str| self.evaluated(ran, rule, file);
-        let ctx = Context { as_of: as_of.date, touched: &self.touched().0, evaluated: &evaluated };
+        let ctx = Context { as_of: as_of.date, touched: &self.touched().0, evaluated: &evaluated, exceptions: self.exceptions };
         let outcome = codelaw_baseline::apply(occurrences, &self.baselines, &ctx);
         report.diagnostics = rest;
         report.diagnostics.extend(outcome.diagnostics);
+        for n in outcome.notes {
+            report.diagnostics.extend(self.at_line(&codelaw_baseline::file::rel_path(&n.baseline), n.line, n.rule, n.message));
+        }
+        self.check_entries(report, ran);
+        self.check_authors(report, ran);
         for s in outcome.stale {
             let abs = self.root().join(&s.file);
             let layers = self.config.layers_for(&abs);
@@ -261,6 +286,207 @@ impl Project {
                 s.rule, s.allowed, s.found
             );
             report.diagnostics.extend(meta_diagnostic(&s.file, &layers, STALE_RULE, message));
+        }
+    }
+
+    /// The part of a file's cache key its dated `codelaw-ignore` comments
+    /// add: the as-of date they are judged on (SR-BASELINE decision 9).
+    /// Empty for a file without one, so no other file pays for the date.
+    pub(crate) fn exception_key(&self, text: &str) -> String {
+        if !text.contains(crate::suppress::MARKER) || !(text.contains("expires=") || text.contains("until=")) {
+            return String::new();
+        }
+        self.as_of().date.map(|d| d.to_string()).unwrap_or_else(|| "none".into())
+    }
+
+    /// The suppressions that still cover: an expired one, or one whose
+    /// keys cannot be read, covers nothing (decision 9).
+    pub(crate) fn live(&self, sups: Vec<Suppression>) -> Vec<Suppression> {
+        if sups.iter().all(|s| s.dated.expires.is_none() && s.dated.bad.is_none()) {
+            return sups;
+        }
+        let today = self.as_of().date;
+        sups.into_iter()
+            .filter(|s| s.dated.bad.is_none() && !matches!(expiry(today, s.dated.expires, None, 0), Expiry::Expired { .. }))
+            .collect()
+    }
+
+    /// An engine diagnostic on one line of a project file (a baseline file,
+    /// the registry): the line's text is its range.
+    fn at_line(&self, rel: &str, line: u32, rule: &str, message: String) -> Option<Diagnostic> {
+        let abs = self.root().join(rel);
+        let layers = self.config.layers_for(&abs);
+        let mut d = meta_diagnostic(rel, &layers, rule, message)?;
+        let text = std::fs::read_to_string(self.root().join(rel)).unwrap_or_default();
+        let index = LineIndex::new(&text);
+        if let Some(start) = index.line_start(line) {
+            let end = text[start..].find('\n').map(|i| start + i).unwrap_or(text.len());
+            let end = start + text[start..end].trim_end().len();
+            d.start_byte = start;
+            d.end_byte = end;
+            d.start = index.position(start);
+            d.end = index.position(end);
+        }
+        Some(d)
+    }
+
+    /// The effective `expires` of a baseline entry: its own, else its
+    /// deprecation's (decision 6's inheritance).
+    fn entry_expires(&self, e: &codelaw_baseline::Entry) -> Option<Date> {
+        e.expires.or_else(|| {
+            let symbol = e.symbol.as_deref()?;
+            let dep = self.deprecations.as_ref()?;
+            match dep.registry.find(symbol) {
+                Some(d) => d.policy.expires,
+                None => dep.defaults.expires,
+            }
+        })
+    }
+
+    /// `[exceptions] require_expiry` and the `added_by` format on the
+    /// baseline entries and registry entries the run saw (decision 9).
+    fn check_entries(&self, report: &mut CheckReport, ran: &Ran) {
+        let require = self.exceptions.require_expiry;
+        for b in self.baselines.rules.values() {
+            let rel = codelaw_baseline::file::rel_path(&b.rule);
+            for e in b.entries.iter().filter(|e| self.evaluated(ran, &b.rule, &e.file)) {
+                if require && self.entry_expires(e).is_none() {
+                    let m = format!("The baseline entry of `{}` for `{}` has no `expires`, and `[exceptions] require_expiry` is on", b.rule, e.file);
+                    report.diagnostics.extend(self.at_line(&rel, e.line, WITHOUT_EXPIRY_RULE, m));
+                }
+                if let Some(a) = e.added_by.as_deref().filter(|a| !valid_email(a)) {
+                    let m = format!("The baseline entry of `{}` for `{}` has `added_by = \"{a}\"`, which is not an email address", b.rule, e.file);
+                    report.diagnostics.extend(self.at_line(&rel, e.line, AUTHOR_RULE, m));
+                }
+            }
+        }
+        let Some(dep) = self.deprecations.as_ref().filter(|_| ran.project && self.deprecations_on()) else { return };
+        for d in &dep.registry.deprecated {
+            if require && d.policy.expires.is_none() {
+                let m = format!("The deprecation of `{}` has no `expires`, and `[exceptions] require_expiry` is on", d.symbol);
+                report.diagnostics.extend(self.at_line(codelaw_baseline::REGISTRY_REL, d.line, WITHOUT_EXPIRY_RULE, m));
+            }
+            if let Some(a) = d.added_by.as_deref().filter(|a| !valid_email(a)) {
+                let m = format!("The deprecation of `{}` has `added_by = \"{a}\"`, which is not an email address", d.symbol);
+                report.diagnostics.extend(self.at_line(codelaw_baseline::REGISTRY_REL, d.line, AUTHOR_RULE, m));
+            }
+        }
+    }
+
+    /// `git config user.email`, for `--added-by`'s default.
+    pub fn git_user_email(&self) -> Option<String> {
+        git::user_email(self.root()).ok()
+    }
+
+    /// Every exception that names its author, in the files the change set
+    /// changed: (file, its lines, the line to blame, `added_by`, what).
+    fn authored(&self, ran: &Ran, changed: &git::Lines) -> Vec<(String, std::ops::RangeInclusive<u32>, u32, String, String)> {
+        let mut out = Vec::new();
+        for b in self.baselines.rules.values() {
+            let rel = codelaw_baseline::file::rel_path(&b.rule);
+            if !changed.contains_key(&rel) {
+                continue;
+            }
+            let text = std::fs::read_to_string(self.root().join(&rel)).unwrap_or_default();
+            let total = text.lines().count() as u32;
+            let mut starts: Vec<u32> = b.entries.iter().map(|e| e.line).filter(|l| *l > 0).collect();
+            starts.sort();
+            for e in b.entries.iter().filter(|e| e.line > 0) {
+                let Some(a) = &e.added_by else { continue };
+                let end = starts.iter().find(|s| **s > e.line).map(|s| s - 1).unwrap_or(total.max(e.line));
+                let blame = (e.line..=end).find(|l| text.lines().nth(*l as usize - 1).is_some_and(|t| t.trim_start().starts_with("added_by"))).unwrap_or(e.line);
+                out.push((rel.clone(), e.line..=end, blame, a.clone(), format!("The baseline entry of `{}` for `{}`", b.rule, e.file)));
+            }
+        }
+        if let Some(dep) = &self.deprecations
+            && changed.contains_key(codelaw_baseline::REGISTRY_REL)
+        {
+            let text = std::fs::read_to_string(self.root().join(codelaw_baseline::REGISTRY_REL)).unwrap_or_default();
+            let total = text.lines().count() as u32;
+            let starts: Vec<u32> = dep.registry.deprecated.iter().map(|d| d.line).filter(|l| *l > 0).collect();
+            for d in dep.registry.deprecated.iter().filter(|d| d.line > 0) {
+                let Some(a) = &d.added_by else { continue };
+                let end = starts.iter().filter(|s| **s > d.line).min().map(|s| s - 1).unwrap_or(total.max(d.line));
+                let blame = (d.line..=end).find(|l| text.lines().nth(*l as usize - 1).is_some_and(|t| t.trim_start().starts_with("added_by"))).unwrap_or(d.line);
+                out.push((codelaw_baseline::REGISTRY_REL.to_owned(), d.line..=end, blame, a.clone(), format!("The deprecation of `{}`", d.symbol)));
+            }
+        }
+        for file in changed.keys().filter(|f| ran.files.contains(*f)) {
+            let abs = self.root().join(file);
+            let Ok(text) = std::fs::read_to_string(&abs) else { continue };
+            if !text.contains(crate::suppress::MARKER) || !text.contains("by=") {
+                continue;
+            }
+            let src = Source { rel: file.clone(), abs: abs.clone(), language: Language::from_path(&abs), text, reported: true };
+            let index = LineIndex::new(&src.text);
+            for s in suppressions(&src) {
+                let Some(by) = &s.dated.by else { continue };
+                let (from, to) = (index.position(s.start).line, index.position(s.end).line);
+                out.push((file.clone(), from..=to, from, by.clone(), format!("This `codelaw-ignore {}`", s.rules.join(", "))));
+            }
+        }
+        out
+    }
+
+    /// The `added_by` check against git (decision 9): under `--staged`
+    /// each exception the index adds or changes must name `git config
+    /// user.email`; under `--changed-since` each one changed since the
+    /// merge base must name the blame author of its line. Neither flag (a
+    /// plain `check`, the hook, the editor): the format only.
+    fn check_authors(&self, report: &mut CheckReport, ran: &Ran) {
+        let root = self.root();
+        let mut checks: Vec<(git::Lines, &'static str)> = Vec::new();
+        if self.options.staged {
+            match git::staged_lines(root) {
+                Ok(l) => checks.push((l, "staged")),
+                Err(e) => report.warnings.push(format!("--staged: {e}; `added_by` is checked for its format only")),
+            }
+        }
+        if let Some(r) = &self.options.changed_since {
+            match git::lines_since(root, r) {
+                Ok(l) => checks.push((l, "since")),
+                Err(e) => report.warnings.push(format!("--changed-since {r}: {e}; `added_by` is checked for its format only")),
+            }
+        }
+        if checks.is_empty() {
+            return;
+        }
+        let me = std::sync::OnceLock::new();
+        let me = || me.get_or_init(|| git::user_email(root)).clone();
+        let mut seen = BTreeSet::new();
+        for (changed, how) in &checks {
+            // Only an exception the change adds or changes, with an email.
+            let list: Vec<_> = self
+                .authored(ran, changed)
+                .into_iter()
+                .filter(|(file, lines, _, by, _)| valid_email(by) && changed.get(file).is_some_and(|c| c.range(lines.clone()).next().is_some()))
+                .collect();
+            let mut blamed: BTreeMap<String, BTreeMap<u32, String>> = BTreeMap::new();
+            for (file, lines, blame_line, by, what) in &list {
+                let (file, blame_line) = (file.clone(), *blame_line);
+                let expected = if *how == "staged" {
+                    me()
+                } else {
+                    // One `git blame` per file, of only its exceptions' lines.
+                    let authors = blamed.entry(file.clone()).or_insert_with(|| {
+                        let wanted: BTreeSet<u32> = list.iter().filter(|x| x.0 == file).map(|x| x.2).collect();
+                        git::blame_authors(root, &file, &wanted).unwrap_or_default()
+                    });
+                    // A line not committed yet is the committer's own.
+                    authors.get(&blame_line).cloned().map(Ok).unwrap_or_else(me)
+                };
+                let message = match expected {
+                    Ok(who) if who.eq_ignore_ascii_case(by) => continue,
+                    Ok(who) => format!("{what} names `{by}` as its author, but git names `{who}`"),
+                    Err(e) => {
+                        report.warnings.push(format!("`added_by` of {file}:{blame_line} not checked against git: {e}"));
+                        continue;
+                    }
+                };
+                if seen.insert((file.clone(), blame_line)) {
+                    report.diagnostics.extend(self.at_line(&file, *lines.start(), AUTHOR_RULE, message));
+                }
+            }
         }
     }
 
@@ -330,10 +556,12 @@ impl Project {
                 rule,
                 files: &wanted,
                 symbol: options.symbol.as_deref(),
-                until: options.until,
+                expires: options.expires,
                 warn_from: options.warn_from,
+                warn_days: options.warn_days,
                 on_touch: options.on_touch,
                 reason: options.reason.as_deref(),
+                added_by: options.added_by.as_deref(),
             },
         );
         Baselines::save(&root, &b).map_err(|e| EngineError::Usage(format!("{}: {e}", codelaw_baseline::file::rel_path(rule))))?;
@@ -393,10 +621,12 @@ impl Project {
             &BaselineAdd {
                 rule: DEPRECATED_RULE.into(),
                 symbol: Some(d.symbol.clone()),
-                until: d.policy.until,
+                expires: d.policy.expires,
                 warn_from: d.policy.warn_from,
+                warn_days: d.policy.warn_days,
                 on_touch: d.policy.on_touch,
                 reason: reason.map(str::to_owned).or_else(|| d.reason.clone()),
+                added_by: d.added_by.clone(),
             },
         )
     }
@@ -407,10 +637,14 @@ impl Project {
 pub struct BaselineAdd {
     pub rule: String,
     pub symbol: Option<String>,
-    pub until: Option<Date>,
+    /// The first day the entries no longer hold (decision 9).
+    pub expires: Option<Date>,
     pub warn_from: Option<Date>,
+    pub warn_days: Option<u32>,
     pub on_touch: Option<OnTouch>,
     pub reason: Option<String>,
+    /// Who adds them: an email (decision 9).
+    pub added_by: Option<String>,
 }
 
 /// `baseline check`'s verdict.

@@ -9,12 +9,14 @@
 
 pub mod apply;
 pub mod date;
+pub mod exception;
 pub mod file;
 pub mod ratchet;
 pub mod registry;
 
-pub use apply::{AddOptions, Context, Occurrence, Outcome, Stale, add, apply, counts, prune};
+pub use apply::{AddOptions, Context, Note, Occurrence, Outcome, Stale, add, apply, counts, prune};
 pub use date::Date;
+pub use exception::{AUTHOR_RULE, EXPIRED_RULE, EXPIRING_RULE, Exceptions, Expiry, WITHOUT_EXPIRY_RULE};
 pub use file::{BaselineFile, Baselines, Entry, OnTouch};
 pub use ratchet::{CODEOWNERS_PATHS, codeowners_covers, loosened};
 pub use registry::{Deprecation, Policy, REGISTRY_REL, Registry, Rewrite};

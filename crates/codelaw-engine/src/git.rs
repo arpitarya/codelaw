@@ -81,3 +81,107 @@ pub(crate) fn files_at(dir: &Path, rev: &str, folder: &str) -> Result<Vec<(Strin
     out.sort();
     Ok(out)
 }
+
+/// `git config user.email`: who a commit made here would name.
+pub(crate) fn user_email(dir: &Path) -> Result<String, String> {
+    let e = text(git(dir, &["config", "user.email"]).map_err(|e| if e.contains("config") || e.is_empty() { "no `user.email` is set".to_owned() } else { e })?);
+    if e.is_empty() { Err("no `user.email` is set".into()) } else { Ok(e) }
+}
+
+/// The lines each file has after a change, by file (relative to `dir`)
+/// and 1-based line: the `+` side of `git diff -U0`.
+pub(crate) type Lines = std::collections::BTreeMap<String, BTreeSet<u32>>;
+
+fn added_lines(bytes: Vec<u8>) -> Lines {
+    let mut out = Lines::new();
+    let mut file: Option<String> = None;
+    for line in String::from_utf8_lossy(&bytes).lines() {
+        if let Some(p) = line.strip_prefix("+++ ") {
+            file = p.strip_prefix("b/").map(str::to_owned);
+            continue;
+        }
+        let (Some(f), Some(hunk)) = (&file, line.strip_prefix("@@ ")) else { continue };
+        // `@@ -a,b +c,d @@`: `d` lines from `c`; no `,d` is one line.
+        let Some(plus) = hunk.split_whitespace().find_map(|w| w.strip_prefix('+')) else { continue };
+        let (start, count) = match plus.split_once(',') {
+            Some((s, c)) => (s.parse::<u32>().unwrap_or(0), c.parse::<u32>().unwrap_or(0)),
+            None => (plus.parse::<u32>().unwrap_or(0), 1),
+        };
+        if count > 0 && start > 0 {
+            out.entry(f.clone()).or_default().extend(start..start + count);
+        }
+    }
+    out
+}
+
+const DIFF_LINES: &[&str] = &["diff", "-U0", "--relative", "--no-renames", "--no-color", "--no-ext-diff", "--src-prefix=a/", "--dst-prefix=b/"];
+
+/// The lines the index adds or changes against `HEAD`.
+pub(crate) fn staged_lines(dir: &Path) -> Result<Lines, String> {
+    let mut args = DIFF_LINES.to_vec();
+    args.extend(["--cached", "--"]);
+    Ok(added_lines(git(dir, &args)?))
+}
+
+/// The lines the working tree adds or changes since the merge base of
+/// `reference` and `HEAD`.
+pub(crate) fn lines_since(dir: &Path, reference: &str) -> Result<Lines, String> {
+    let base = merge_base(dir, reference)?;
+    let mut args = DIFF_LINES.to_vec();
+    args.extend([base.as_str(), "--"]);
+    Ok(added_lines(git(dir, &args)?))
+}
+
+/// The author email of each of `lines` of `file` (relative to `dir`), as
+/// `git blame --porcelain` gives it; a line not committed yet has none.
+pub(crate) fn blame_authors(dir: &Path, file: &str, lines: &BTreeSet<u32>) -> Result<std::collections::BTreeMap<u32, String>, String> {
+    let ranges: Vec<String> = lines.iter().map(|l| format!("-L{l},{l}")).collect();
+    let mut args = vec!["blame", "--porcelain"];
+    args.extend(ranges.iter().map(String::as_str));
+    args.extend(["--", file]);
+    let out = git(dir, &args)?;
+    let mut mails: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    let mut by_line = std::collections::BTreeMap::new();
+    let mut current: Option<(String, u32)> = None;
+    for l in String::from_utf8_lossy(&out).lines() {
+        if l.starts_with('\t') {
+            if let Some((sha, line)) = current.take() {
+                by_line.insert(line, sha);
+            }
+            continue;
+        }
+        if let Some(m) = l.strip_prefix("author-mail ") {
+            if let Some((sha, _)) = &current {
+                mails.insert(sha.clone(), m.trim().trim_start_matches('<').trim_end_matches('>').to_owned());
+            }
+            continue;
+        }
+        let mut parts = l.split(' ');
+        if let (Some(sha), Some(_), Some(fin)) = (parts.next(), parts.next(), parts.next())
+            && sha.len() >= 40
+            && sha.bytes().all(|b| b.is_ascii_hexdigit())
+            && let Ok(n) = fin.parse::<u32>()
+        {
+            current = Some((sha.to_owned(), n));
+        }
+    }
+    Ok(by_line
+        .into_iter()
+        .filter_map(|(line, sha)| {
+            let mail = mails.get(&sha)?;
+            let uncommitted = sha.bytes().all(|b| b == b'0') || mail == "not.committed.yet";
+            (!uncommitted).then(|| (line, mail.clone()))
+        })
+        .collect())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn the_plus_side_of_a_zero_context_diff() {
+        let diff = b"diff --git a/x.py b/x.py\n--- a/x.py\n+++ b/x.py\n@@ -1,0 +2,3 @@\n+a\n+b\n+c\n@@ -9 +12 @@\n-x\n+y\n@@ -20,2 +22,0 @@\n-gone\n-gone\n--- a/gone.py\n+++ /dev/null\n@@ -1 +0,0 @@\n-z\n".to_vec();
+        let l = super::added_lines(diff);
+        assert_eq!(l.len(), 1);
+        assert_eq!(l["x.py"].iter().copied().collect::<Vec<_>>(), vec![2, 3, 4, 12]);
+    }
+}

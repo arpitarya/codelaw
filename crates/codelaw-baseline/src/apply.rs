@@ -3,6 +3,7 @@
 //! records the current ones (decision 5).
 
 use crate::date::Date;
+use crate::exception::{EXPIRED_RULE, EXPIRING_RULE, Exceptions, Expiry, expiry, when};
 use crate::file::{BaselineFile, Baselines, Entry, OnTouch};
 use crate::registry::Policy;
 use codelaw_core::{Diagnostic, Severity};
@@ -34,6 +35,8 @@ pub struct Context<'a> {
     /// Whether the run saw every finding of `rule` in `file`, so a count
     /// below the entry's is real (a stale entry), not a partial run.
     pub evaluated: &'a dyn Fn(&str, &str) -> bool,
+    /// `[exceptions]`: the default warning window.
+    pub exceptions: Exceptions,
 }
 
 /// An entry whose file now has fewer occurrences than it allows.
@@ -49,6 +52,20 @@ pub struct Stale {
 pub struct Outcome {
     pub diagnostics: Vec<Diagnostic>,
     pub stale: Vec<Stale>,
+    /// `codelaw/expiring-exception` and `codelaw/expired-exception`, at
+    /// the entry's own line (decision 9).
+    pub notes: Vec<Note>,
+}
+
+/// A diagnostic about a baseline entry itself, reported in its baseline
+/// file at its `[[allow]]` line.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Note {
+    pub rule: &'static str,
+    /// The rule whose baseline file holds the entry.
+    pub baseline: String,
+    pub line: u32,
+    pub message: String,
 }
 
 /// A rule, a file and a symbol.
@@ -81,6 +98,7 @@ pub fn apply(occurrences: Vec<Occurrence>, baselines: &Baselines, ctx: &Context<
         groups.entry(key(&o)).or_default().push(o);
     }
     let mut diagnostics = Vec::new();
+    let mut notes = Vec::new();
     let mut found: BTreeMap<Key, usize> = BTreeMap::new();
     for ((rule, file, symbol), group) in groups {
         let n = group.len();
@@ -101,24 +119,48 @@ pub fn apply(occurrences: Vec<Occurrence>, baselines: &Baselines, ctx: &Context<
             continue;
         }
         let policy = &group[0].policy;
-        let until = e.until.or(policy.until);
+        let expires = e.expires.or(policy.expires);
         let warn_from = e.warn_from.or(policy.warn_from);
+        let warn_days = e.warn_days.or(policy.warn_days).unwrap_or(ctx.exceptions.warn_days);
         let on_touch = e.on_touch.or(policy.on_touch).unwrap_or_default();
+        let whose = match &symbol {
+            Some(s) => format!("The baseline entry of `{rule}` for `{file}` (`{s}`)"),
+            None => format!("The baseline entry of `{rule}` for `{file}`"),
+        };
+        // Decision 9: on and after `expires` the entry covers nothing, and
+        // the findings come back at the rule's own severity, touched or not.
+        match expiry(ctx.as_of, expires, warn_from, warn_days) {
+            Expiry::Expired { expires } => {
+                notes.push(Note {
+                    rule: EXPIRED_RULE,
+                    baseline: rule.clone(),
+                    line: e.line,
+                    message: format!("{whose} expired on {expires}: its {} are reported again", uses(n)),
+                });
+                for o in group {
+                    let mut d = o.diag;
+                    d.message = format!("{}; its baseline entry expired on {expires}", d.message);
+                    diagnostics.push(d);
+                }
+                continue;
+            }
+            Expiry::Expiring { days, expires } => notes.push(Note {
+                rule: EXPIRING_RULE,
+                baseline: rule.clone(),
+                line: e.line,
+                message: format!("{whose} expires {}: then its {} fail", when(days, expires), uses(n)),
+            }),
+            Expiry::Holds => {}
+        }
         let touched = ctx.touched.contains(&file);
         let (severity, status) = if touched && on_touch != OnTouch::Keep {
             let sev = if on_touch == OnTouch::Error { Severity::Error } else { Severity::Warn };
             (sev, format!("you edited this file: migrate its {} now (on_touch = {})", uses(n), on_touch.name()))
         } else {
-            match (ctx.as_of, until, warn_from) {
-                (Some(today), Some(u), _) if today > u => (Severity::Error, format!("its baseline deadline {u} has passed")),
-                (Some(today), Some(u), Some(w)) if today >= w => {
-                    let days = today.days_until(u);
-                    let when = if days == 0 { "today".to_owned() } else if days == 1 { "in 1 day".to_owned() } else { format!("in {days} days") };
-                    (Severity::Warn, format!("grandfathered until {u}: expires {when}"))
-                }
+            match (ctx.as_of, expires, warn_from) {
                 (Some(today), None, Some(w)) if today >= w => (Severity::Warn, format!("grandfathered, warning since {w}")),
-                (_, Some(u), _) => (Severity::Info, format!("grandfathered until {u} ({} left in this file)", n)),
-                (_, None, _) => (Severity::Info, format!("grandfathered ({} left in this file)", n)),
+                (_, Some(x), _) => (Severity::Info, format!("grandfathered, expires {x} ({n} left in this file)")),
+                (_, None, _) => (Severity::Info, format!("grandfathered ({n} left in this file)")),
             }
         };
         for o in group {
@@ -140,7 +182,7 @@ pub fn apply(occurrences: Vec<Occurrence>, baselines: &Baselines, ctx: &Context<
             }
         }
     }
-    Outcome { diagnostics, stale }
+    Outcome { diagnostics, stale, notes }
 }
 
 /// Lower every evaluated entry to what the run found and drop the ones at
@@ -171,10 +213,12 @@ pub struct AddOptions<'a> {
     pub files: &'a BTreeSet<String>,
     /// Only this symbol (`codelaw deprecate`).
     pub symbol: Option<&'a str>,
-    pub until: Option<Date>,
+    pub expires: Option<Date>,
     pub warn_from: Option<Date>,
+    pub warn_days: Option<u32>,
     pub on_touch: Option<OnTouch>,
     pub reason: Option<&'a str>,
+    pub added_by: Option<&'a str>,
 }
 
 /// Record the current counts of a rule: a new entry per file (and symbol)
@@ -189,21 +233,28 @@ pub fn add(existing: Option<&BaselineFile>, counts: &BTreeMap<Key, usize>, o: &A
         match b.entries.iter_mut().find(|e| e.file == *file && e.symbol == *symbol) {
             Some(e) => {
                 e.count = n;
-                e.until = o.until.or(e.until);
+                e.expires = o.expires.or(e.expires);
                 e.warn_from = o.warn_from.or(e.warn_from);
+                e.warn_days = o.warn_days.or(e.warn_days);
                 e.on_touch = o.on_touch.or(e.on_touch);
                 if let Some(r) = o.reason {
                     e.reason = Some(r.to_owned());
+                }
+                if let Some(a) = o.added_by {
+                    e.added_by = Some(a.to_owned());
                 }
             }
             None => b.entries.push(Entry {
                 file: file.clone(),
                 symbol: symbol.clone(),
                 count: n,
-                until: o.until,
+                expires: o.expires,
                 warn_from: o.warn_from,
+                warn_days: o.warn_days,
                 on_touch: Some(o.on_touch.unwrap_or_default()),
                 reason: o.reason.map(str::to_owned),
+                added_by: o.added_by.map(str::to_owned),
+                line: 0,
             }),
         }
     }

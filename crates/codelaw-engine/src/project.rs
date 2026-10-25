@@ -196,7 +196,7 @@ impl Project {
         }
         let mut out = Vec::new();
         for (file, mut diags) in per_file {
-            let sups = suppressions(by_rel[file.as_str()]);
+            let sups = self.live(suppressions(by_rel[file.as_str()]));
             diags.retain(|d| !suppressed(&sups, d));
             out.extend(diags);
         }

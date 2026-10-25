@@ -35,6 +35,8 @@ description: "Recurring terms, defined once."
 | change set | the files counted as touched: from `--changed-since`, `--staged` or the agent hook, never inferred; SR-BASELINE |
 | ratchet | a baseline may only shrink: `fix` and `baseline prune` lower counts, only `baseline add` raises one, and `baseline check --since` fails CI on any loosening; SR-BASELINE decision 5 |
 | deprecations registry | `.codelaw/deprecations.toml`: deprecated symbols, their replacements and deadlines, read by `graph/no-deprecated-usage`; SR-BASELINE decision 6 |
+| exception | a finding allowed to stay: a baseline entry, a deprecations-registry entry or an inline `codelaw-ignore`; each may carry `expires`, `warn_days`, a reason and `added_by`, and `[exceptions] require_expiry` makes the date mandatory; SR-BASELINE decision 9 |
+| expires | the first day an exception no longer holds: from `warn_days` before it a warning, on it an error and the findings come back; `until`, the last allowed day, is read as the day before it; SR-BASELINE decision 9 |
 | predicate | a semantic-model condition on a capture, written under `where:` in a `match:` rule — `unused`, `undeclared`, `shadowed`, `reassigned`, `imported-from`; SR-RULE-FORMAT decision 3a |
 | data table | a JSON file in a pack's `data/` (CSS properties, HTML elements, globals), read once and shared by the rules that name it; SR-RULE-PACKS decision 3 |
 | fixpoint | a file the fixes no longer change: the apply loop runs until it reaches one, at most ten passes; SR-ARCHITECTURE decision 5 |

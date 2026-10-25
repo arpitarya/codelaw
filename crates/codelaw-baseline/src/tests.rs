@@ -41,7 +41,7 @@ fn all(_: &str, _: &str) -> bool {
 
 fn run(occurrences: Vec<Occurrence>, b: &Baselines, as_of: Option<&str>, touched: &[&str]) -> Outcome {
     let touched: BTreeSet<String> = touched.iter().map(|s| s.to_string()).collect();
-    apply(occurrences, b, &Context { as_of: as_of.map(date), touched: &touched, evaluated: &all })
+    apply(occurrences, b, &Context { as_of: as_of.map(date), touched: &touched, evaluated: &all, exceptions: Exceptions::default() })
 }
 
 const ONE: &str = r#"
@@ -77,29 +77,47 @@ fn file_names_round_trip() {
 #[test]
 fn a_baseline_writes_what_it_parses_and_refuses_unknown_keys() {
     let b = BaselineFile::parse("js/x", ONE).unwrap();
-    assert_eq!(BaselineFile::parse("js/x", &b.write()).unwrap(), b);
+    assert_eq!(b.entries[0].line, 2, "the line of its `[[allow]]`");
+    let mut again = BaselineFile::parse("js/x", &b.write()).unwrap();
+    again.entries[0].line = b.entries[0].line;
+    assert_eq!(again, b);
     assert!(BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\ncount = 1\nline = 3\n").unwrap_err().contains("unknown key `line`"));
     assert!(BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\n").unwrap_err().contains("`count` is required"));
     assert!(BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\ncount = 1\n[[allow]]\nfile = \"a\"\ncount = 2\n").unwrap_err().contains("two"));
     // Bare TOML dates are dates too.
-    assert_eq!(BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\ncount = 1\nuntil = 2027-03-31\n").unwrap().entries[0].until, Some(date("2027-03-31")));
+    assert_eq!(BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\ncount = 1\nexpires = 2027-03-31\n").unwrap().entries[0].expires, Some(date("2027-03-31")));
+    // `until` is the last allowed day: it reads as `expires` the day after;
+    // both on one entry is refused.
+    assert_eq!(BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\ncount = 1\nuntil = 2027-03-31\n").unwrap().entries[0].expires, Some(date("2027-04-01")));
+    assert!(BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\ncount = 1\nuntil = 2027-03-31\nexpires = 2027-04-01\n").unwrap_err().contains("`until` and `expires`"));
+    assert!(BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\ncount = 1\nwarn_days = -1\n").unwrap_err().contains("warn_days"));
+    let full = BaselineFile::parse("js/x", "[[allow]]\nfile = \"a\"\ncount = 1\nexpires = \"2026-11-15\"\nwarn_days = 5\nreason = \"r\"\nadded_by = \"a@example.com\"\n").unwrap();
+    assert_eq!((full.entries[0].warn_days, full.entries[0].added_by.as_deref()), (Some(5), Some("a@example.com")));
+    assert!(full.write().ends_with("count = 1\nexpires = \"2026-11-15\"\nwarn_days = 5\nreason = \"r\"\nadded_by = \"a@example.com\"\n"), "{}", full.write());
 }
 
 #[test]
 fn each_situation_of_decision_2() {
     let b = baselines("js/x", ONE);
-    // Within allowance, before warn_from: info.
+    // Within allowance, before warn_from: info. `until = 2027-03-31` is
+    // `expires = 2027-04-01`.
     let o = run(occ("js/x", "a.ts", &[1, 2]), &b, Some("2026-10-18"), &[]);
     assert!(o.diagnostics.iter().all(|d| d.severity == Severity::Info), "{:?}", o.diagnostics);
-    assert!(o.diagnostics[0].message.contains("grandfathered until 2027-03-31 (2 left in this file)"));
-    // After warn_from: warning, with the days left.
-    let o = run(occ("js/x", "a.ts", &[1, 2]), &b, Some("2027-03-19"), &[]);
-    assert!(o.diagnostics.iter().all(|d| d.severity == Severity::Warn));
-    assert!(o.diagnostics[0].message.contains("expires in 12 days"), "{}", o.diagnostics[0].message);
-    // After until: error.
+    assert!(o.diagnostics[0].message.contains("grandfathered, expires 2027-04-01 (2 left in this file)"));
+    assert!(o.notes.is_empty());
+    // After warn_from: the findings stay info, and the entry gets one
+    // warning at its own line, with the days left.
+    let o = run(occ("js/x", "a.ts", &[1, 2]), &b, Some("2027-03-20"), &[]);
+    assert!(o.diagnostics.iter().all(|d| d.severity == Severity::Info));
+    assert_eq!(o.notes.len(), 1);
+    assert_eq!((o.notes[0].rule, o.notes[0].line), (EXPIRING_RULE, 2));
+    assert!(o.notes[0].message.contains("expires in 12 days (2027-04-01)"), "{}", o.notes[0].message);
+    // On `expires`: the entry covers nothing; the findings are back at the
+    // rule's own severity, and the entry is an error.
     let o = run(occ("js/x", "a.ts", &[1, 2]), &b, Some("2027-04-01"), &[]);
     assert!(o.diagnostics.iter().all(|d| d.severity == Severity::Error));
-    assert!(o.diagnostics[0].message.contains("deadline 2027-03-31 has passed"));
+    assert!(o.diagnostics[0].message.contains("its baseline entry expired on 2027-04-01"));
+    assert_eq!(o.notes[0].rule, EXPIRED_RULE);
     // Touched: every occurrence in the file is an error.
     let o = run(occ("js/x", "a.ts", &[1, 2]), &b, Some("2026-10-18"), &["a.ts"]);
     assert!(o.diagnostics.iter().all(|d| d.severity == Severity::Error && d.message.contains("migrate its 2 occurrences now")));
@@ -132,7 +150,7 @@ fn an_entry_inherits_the_deprecation_policy() {
     let b = baselines(DEPRECATED_RULE, "[[allow]]\nfile = \"a.ts\"\nsymbol = \"p#f\"\ncount = 1\n");
     let mut o = Occurrence::plain(d(DEPRECATED_RULE, "a.ts", 1));
     o.symbol = Some("p#f".into());
-    o.policy = Policy { until: Some(date("2027-01-01")), warn_from: None, on_touch: Some(OnTouch::Keep) };
+    o.policy = Policy { expires: Some(date("2027-01-02")), warn_from: None, warn_days: None, on_touch: Some(OnTouch::Keep) };
     let out = run(vec![o.clone()], &b, Some("2027-01-02"), &[]);
     assert_eq!(out.diagnostics[0].severity, Severity::Error);
     let out = run(vec![o], &b, Some("2026-01-02"), &["a.ts"]);
@@ -153,10 +171,10 @@ fn prune_only_lowers_and_add_records_current_counts() {
     // Not evaluated: kept.
     assert!(prune(&b, &counts(&[]), &|_, _| false).is_empty());
     let none = BTreeSet::new();
-    let added = add(None, &counts(&occ("js/x", "z.ts", &[1, 2])), &AddOptions { rule: "js/x", files: &none, symbol: None, until: Some(date("2027-06-30")), warn_from: None, on_touch: None, reason: Some("adopt") });
+    let added = add(None, &counts(&occ("js/x", "z.ts", &[1, 2])), &AddOptions { rule: "js/x", files: &none, symbol: None, expires: Some(date("2027-07-01")), warn_from: None, warn_days: Some(5), on_touch: None, reason: Some("adopt"), added_by: Some("a@example.com") });
     assert_eq!(added.entries[0].count, 2);
     assert_eq!(added.entries[0].on_touch, Some(OnTouch::Error));
-    assert_eq!(added.write(), "# The baseline of `js/x` (SR-BASELINE). Written by `codelaw baseline`;\n# review every change: a count may only go down.\n\n[[allow]]\nfile = \"z.ts\"\ncount = 2\nuntil = \"2027-06-30\"\non_touch = \"error\"\nreason = \"adopt\"\n");
+    assert_eq!(added.write(), "# The baseline of `js/x` (SR-BASELINE). Written by `codelaw baseline`;\n# review every change: a count may only go down.\n\n[[allow]]\nfile = \"z.ts\"\ncount = 2\nexpires = \"2027-07-01\"\nwarn_days = 5\non_touch = \"error\"\nreason = \"adopt\"\nadded_by = \"a@example.com\"\n");
 }
 
 #[test]
@@ -167,12 +185,18 @@ fn the_ratchet_refuses_every_loosening() {
     let l = loosened(&before, &after);
     assert_eq!(l.len(), 4, "{l:?}");
     assert!(l.iter().any(|m| m.contains("count rose from 2 to 3")));
-    assert!(l.iter().any(|m| m.contains("deadline moved from 2027-03-31 to 2027-04-30")));
+    assert!(l.iter().any(|m| m.contains("deadline extended, expires moved from 2027-04-01 to 2027-05-01")), "{l:?}");
     assert!(l.iter().any(|m| m.contains("on_touch loosened from error to keep")));
     assert!(l.iter().any(|m| m.contains("b.ts: entry added")));
     // Lowering and removing are always allowed.
     let lower = baselines("js/x", "[[allow]]\nfile = \"a.ts\"\ncount = 1\nuntil = \"2027-01-31\"\non_touch = \"error\"\n");
     assert!(loosened(&before, &lower).is_empty());
+    // `until = D-1` rewritten as `expires = D` is no change; a reason or an
+    // author added never loosens; `expires` one day later does.
+    let same = baselines("js/x", "[[allow]]\nfile = \"a.ts\"\ncount = 2\nexpires = \"2027-04-01\"\nwarn_from = \"2027-03-01\"\non_touch = \"error\"\nreason = \"other\"\nadded_by = \"a@example.com\"\n");
+    assert!(loosened(&before, &same).is_empty(), "{:?}", loosened(&before, &same));
+    let later = baselines("js/x", "[[allow]]\nfile = \"a.ts\"\ncount = 2\nexpires = \"2027-04-02\"\non_touch = \"error\"\n");
+    assert_eq!(loosened(&before, &later).len(), 1);
     assert!(loosened(&before, &Baselines::default()).is_empty());
 }
 
@@ -220,12 +244,62 @@ rewrite = { from = "formatDate($D)", to = "formatISO($D)" }
 "#,
     )
     .unwrap();
-    assert_eq!(r.deprecated[0].policy.until, Some(date("2027-03-31")));
+    assert_eq!(r.deprecated[0].policy.expires, Some(date("2027-04-01")));
+    assert_eq!(r.deprecated[0].line, 2);
     assert!(r.deprecated[0].rewrite.is_some());
     assert!(Registry::parse("[[deprecated]]\nsymbol = \"nohash\"\n").is_err());
-    assert!(Registry::parse("[[deprecated]]\nsymbol = \"a#b\"\nuntil = \"2027-01-01\"\nwarn_from = \"2027-02-01\"\n").unwrap_err().contains("after"));
-    assert!(registry::defaults(Some("2027-13-01"), None, None).unwrap_err().contains("[deprecation]: `until`"));
-    assert!(registry::defaults(None, None, Some("never")).unwrap_err().contains("on_touch"));
-    assert_eq!(registry::defaults(Some("2027-01-31"), None, None).unwrap().until, Some(date("2027-01-31")));
+    assert!(Registry::parse("[[deprecated]]\nsymbol = \"a#b\"\nuntil = \"2027-01-01\"\nwarn_from = \"2027-02-01\"\n").unwrap_err().contains("not before"));
+    let t = |until, expires, on_touch| registry::DefaultsTable { until, expires, on_touch, ..Default::default() };
+    assert!(registry::defaults(&t(Some("2027-13-01"), None, None)).unwrap_err().contains("[deprecation]: `until`"));
+    assert!(registry::defaults(&t(None, None, Some("never"))).unwrap_err().contains("on_touch"));
+    assert_eq!(registry::defaults(&t(Some("2027-01-31"), None, None)).unwrap().expires, Some(date("2027-02-01")));
+    assert_eq!(registry::defaults(&t(None, Some("2027-02-01"), None)).unwrap().expires, Some(date("2027-02-01")));
+    assert!(registry::defaults(&t(Some("2027-01-31"), Some("2027-02-01"), None)).is_err());
     assert_eq!(Registry::parse(&registry::entry_text(&r.deprecated[0])).unwrap().deprecated[0].policy, r.deprecated[0].policy);
+}
+
+/// Decision 9's day boundary, written first (the item's hazard): `expires`
+/// is the first failing day; the warning starts `warn_days` before it.
+#[test]
+fn the_expiry_timeline_and_its_day_boundary() {
+    let e = Some(date("2026-11-15"));
+    let at = |d: &str| exception::expiry(Some(date(d)), e, None, 3);
+    assert_eq!(at("2026-11-11"), Expiry::Holds, "D-4");
+    assert_eq!(at("2026-11-12"), Expiry::Expiring { days: 3, expires: date("2026-11-15") }, "D-3");
+    assert_eq!(at("2026-11-14"), Expiry::Expiring { days: 1, expires: date("2026-11-15") }, "D-1");
+    assert_eq!(at("2026-11-15"), Expiry::Expired { expires: date("2026-11-15") }, "D");
+    assert_eq!(at("2027-01-01"), Expiry::Expired { expires: date("2026-11-15") });
+    // `warn_from` wins over `warn_days`; no as-of date, no verdict.
+    assert_eq!(exception::expiry(Some(date("2026-11-01")), e, Some(date("2026-11-01")), 3), Expiry::Expiring { days: 14, expires: date("2026-11-15") });
+    assert_eq!(exception::expiry(None, e, None, 3), Expiry::Holds);
+    assert_eq!(exception::expiry(Some(date("2026-11-15")), None, None, 3), Expiry::Holds);
+    // `warn_days = 0`: no warning, straight to the error.
+    assert_eq!(exception::expiry(Some(date("2026-11-14")), e, None, 0), Expiry::Holds);
+    assert_eq!(exception::when(1, date("2026-11-15")), "in 1 day (2026-11-15)");
+    assert_eq!(exception::when(2, date("2026-11-15")), "in 2 days (2026-11-15)");
+}
+
+#[test]
+fn until_d_minus_1_and_expires_d_are_the_same_entry() {
+    let a = baselines("js/x", "[[allow]]\nfile = \"a.ts\"\ncount = 1\nuntil = \"2026-11-14\"\n");
+    let b = baselines("js/x", "[[allow]]\nfile = \"a.ts\"\ncount = 1\nexpires = \"2026-11-15\"\n");
+    assert_eq!(a, b);
+    for day in ["2026-11-11", "2026-11-12", "2026-11-15"] {
+        let x = run(occ("js/x", "a.ts", &[1]), &a, Some(day), &[]);
+        let y = run(occ("js/x", "a.ts", &[1]), &b, Some(day), &[]);
+        assert_eq!(format!("{:?}{:?}", x.diagnostics, x.notes), format!("{:?}{:?}", y.diagnostics, y.notes), "{day}");
+    }
+}
+
+#[test]
+fn emails_and_header_lines() {
+    for ok in ["a@example.com", "first.last+tag@sub.example.org"] {
+        assert!(exception::valid_email(ok), "{ok}");
+    }
+    for bad in ["", "a", "a@b", "@example.com", "a@.com", "a@example.", "a b@example.com", "a@@example.com", "<a@example.com>"] {
+        assert!(!exception::valid_email(bad), "{bad}");
+    }
+    assert_eq!(exception::header_lines("# x\n[[allow]]\nfile = 1\n\n [[ allow ]] # two\n", "allow"), vec![2, 5]);
+    assert_eq!(Exceptions::from_table(None, None).unwrap(), Exceptions { require_expiry: false, warn_days: 3 });
+    assert!(Exceptions::from_table(Some(true), Some(-1)).is_err());
 }

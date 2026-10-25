@@ -6,7 +6,7 @@ item: W-40
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5), W-40 implementation"
 ball: agent
 ---
 
@@ -17,12 +17,12 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | The decider rules the forks | the design below | ✅ 2026-10-25 — [compare](../compare/ci-profiles-and-dated-exceptions.compare.md) forks 4 and 6 |
-| 2 | Write SR-BASELINE decision 9 and SR-LINTER decision 6's inline form, with the schema, in one change | the record is the spec | ⏳ |
-| 3 | `expires` + `warn_days` on baseline, deprecation and inline exceptions; `until` as an alias | warning before the day, error on it | ⏳ |
-| 4 | `[exceptions] require_expiry` | dates become mandatory when switched on | ⏳ |
-| 5 | `added_by` and its git check | who added it, verified on commit and in CI | ⏳ |
-| 6 | `baseline add` / `deprecate` take `--expires`, `--warn-days`, `--added-by` (default `git config user.email`) | people never hand-write the entry | ⏳ |
-| 7 | Docs: USAGE, CHANGELOG, GLOSSARY (`expires`, `exception`) | users can find it | ⏳ |
+| 2 | Write SR-BASELINE decision 9 and SR-LINTER decision 6's inline form, with the schema, in one change | the record is the spec | ✅ 2026-10-25 — decision 9, decisions 1/2/5/6 rewritten for `expires`; SR-LINTER 6, SR-CONFIG §1 (`[exceptions]`), SR-CLI-MCP 1, SR-ARCHITECTURE 14, SR-RULE-FORMAT 1, SR-RULE-PACKS 1; `codelaw.schema.json` |
+| 3 | `expires` + `warn_days` on baseline, deprecation and inline exceptions; `until` as an alias | warning before the day, error on it | ✅ 2026-10-25 — `crates/codelaw-baseline/src/exception.rs`; `codelaw/expiring-exception`, `codelaw/expired-exception` |
+| 4 | `[exceptions] require_expiry` | dates become mandatory when switched on | ✅ 2026-10-25 — `codelaw/exception-without-expiry` |
+| 5 | `added_by` and its git check | who added it, verified on commit and in CI | ✅ 2026-10-25 — `codelaw/exception-author`; `git diff -U0`, `git blame --porcelain` in `crates/codelaw-engine/src/git.rs` |
+| 6 | `baseline add` / `deprecate` take `--expires`, `--warn-days`, `--added-by` (default `git config user.email`) | people never hand-write the entry | ✅ 2026-10-25 |
+| 7 | Docs: USAGE, CHANGELOG, GLOSSARY (`expires`, `exception`) | users can find it | ✅ 2026-10-25 |
 
 **Arpit, 2026-10-25:** *"if I mark that feature as true, then every exception should have a date. If I mark it as false, then exception is just an exception … till that date, there shouldn't be an error. As that date is coming nearby, maybe 2 days, 3 days in advance, we should start getting warnings. And on that particular day, it should start giving error and should start to fail. I want an optional field over there where we can add some comments. And … an optional field where we can add email ID, that is who added that exception, which can be validated on commit or in CI/CD pipeline."*
 
@@ -86,12 +86,14 @@ console.log(state);
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | with `expires = D`, `warn_days = 3`: `--as-of D-4` exit 0, no warning · `--as-of D-3` warning · `--as-of D` exit 1 — for baseline, deprecation and inline forms | ⏳ |
-| 2 · | `require_expiry = true` + an undated inline ignore → exit 1; `false` → exit 0 | ⏳ |
-| 3 · | `added_by` of someone else in a staged change → exit 1; matching → exit 0; under `--changed-since` the blame author is used | ⏳ |
-| 4 · | `until = D-1` and `expires = D` give byte-identical output | ⏳ |
-| 5 · | `baseline check --since` fails when `expires` moves later | ⏳ |
-| 6 · | SR-BASELINE's UTC+14 / UTC−12 test still byte-identical; L8 budgets unchanged | ⏳ |
+| 1 · | with `expires = D`, `warn_days = 3`: `--as-of D-4` exit 0, no warning · `--as-of D-3` warning · `--as-of D` exit 1 — for baseline, deprecation and inline forms | ✅ 2026-10-25 — `cargo test -p codelaw-cli --test baseline dated_exceptions_warn_before_and_fail_on_the_day` |
+| 2 · | `require_expiry = true` + an undated inline ignore → exit 1; `false` → exit 0 | ✅ 2026-10-25 — `require_expiry_makes_the_date_mandatory` |
+| 3 · | `added_by` of someone else in a staged change → exit 1; matching → exit 0; under `--changed-since` the blame author is used | ✅ 2026-10-25 — `added_by_is_checked_against_git_and_expires_only_moves_earlier` |
+| 4 · | `until = D-1` and `expires = D` give byte-identical output | ✅ 2026-10-25 — `until_is_read_as_expires_the_day_after` (baseline and inline, four as-of dates) |
+| 5 · | `baseline check --since` fails when `expires` moves later | ✅ 2026-10-25 — `added_by_is_checked_against_git_and_expires_only_moves_earlier` |
+| 6 · | SR-BASELINE's UTC+14 / UTC−12 test still byte-identical; L8 budgets unchanged | ⏳ the UTC test passes unchanged (`the_same_repo_on_two_dates_gives_the_same_output`); L8 not measured here — `codelaw bench --budgets perf/budgets.toml` is ci.yml's `perf` job on ubuntu, and a debug build on a loaded dev Mac is no evidence (LESSONS). The per-file cost is one `contains` on files holding `codelaw-ignore`; `git` runs only for a dated comment or under `--staged`/`--changed-since` with an `added_by` |
+
+**Open after the implementation (2026-10-25):** DoD 6's L8 half waits for ci.yml's `perf` run on the merge; the "never remapped" line (`codelaw/*` diagnostics are never remapped by W-39's `remap`) is checked once W-39 lands, as Blockers says.
 
 ## Blockers
 
