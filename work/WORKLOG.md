@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — W-05 researched; W-34 and W-35 filed, Fux item 298 filed in Fux  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"research W05 … if Fux can be utilized, enhanced, for code law … propose just within chat"*, then by voice the shape, then *"file all the work items discussed here."*
+- **Done:** W-05 researched in chat (pre-write hooks: Claude Code confirmed; Codex, Copilot CLI and Kiro have a `PreToolUse` but their edit payloads are undocumented); W-05 updated with the voice rulings and step 4 moved to Fux. Filed **W-34** (an optional `-fux-index` package per pack, npm and PyPI) and **W-35** (README: "before, while and after the AI writes"). In the Fux repo, filed **item 298** (packages ship their own index; one query over many). Nothing committed.
+- **Decided / left open:** ruled by voice — the index is built where the pack is built, shipped as its own package, never a default, on both registries; options A and B in W-05 are dead. Left for the decider: L6's amendment text (W-34 step 2), and W-34's two open questions.
+- **Mistakes:** the first W-34 row named the Fux item by its bare id and `check-work-system.py` read it as a lost codelaw id; it is now spelled "Fux item 298". The guard has no cross-repo id form, so rule 23's "waiting on W-mm" cannot name a Fux item.
+- **Next:** Fux item 298 step 1 — the 20-intent spike, bar 16 of 20.
+
 ## 2026-10-25 — 0.2.0 committed, PyPI packs uploading; W-24, W-33 closed, W-19's budgets set  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"commit everything generate a build and then use the terminal to publish PyPy packages"*; then *"implement everything green in open work file. In parallel"*.

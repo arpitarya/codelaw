@@ -105,6 +105,8 @@ proposals (`check_cold_10k` 8701 ms, `format_warm_10k` 1353 ms, `mcp_rules_for_p
 
 **Docket 2026-10-25:** `main` pushed; L8's budgets ruled by method (min(target, 1.5 × worst CI p95), a capped one back to the decider; W-19 applies it with `gh` on the Mac); PyPI step 4 — Arpit logs in, Claude adds the seven; 0.2.0 bumped in the tree (uncommitted), command list in W-31; W-29's 8-platform check moved to 0.2.0; W-33 filed (two Stencil rules).
 
+**2026-10-25 (Cowork, W-05):** the Fux layer is ruled — each pack's Fux index is its own optional package, built in codelaw's CI, on npm and PyPI (W-34, waiting on Fux item 298's spike and design; then L6's amendment). W-35 puts "before, while and after the AI writes" on the README, the while beat labelled until W-05's `hook --pre` ships. W-05's next step is its step 1 payload capture (Codex, Copilot CLI, Kiro).
+
 **Open questions for the decider, carried from earlier sessions:** W-11's two default
 gaps (self-aliased private packages; CSS only for linked stylesheets); W-13's
 `on_touch` default for non-deprecation baselines and `codelaw/stale-baseline`

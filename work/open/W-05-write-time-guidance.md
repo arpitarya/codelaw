@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-20: codelaw guides an agent while it writes code, n
 item: W-05
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-24
-updated_by: "Claude (Opus 5.5), W-25/W-26 close-out 2026-10-24"
+updated: 2026-10-25
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: cowork
 ---
 
@@ -19,11 +19,13 @@ ball: cowork
 | 1 | Check which agents can inspect a write **before** it lands: Claude Code, Codex, Copilot, Kiro — the exact input and output fields of each | a pre-write row for the SR-AGENT-SURFACES matrix | ⬜ (Claude Code confirmed in chat, 2026-10-20) |
 | 2 | Prototype `codelaw hook --pre` on the 0.1.0 binary: build the file as it would be after the edit, in memory, check it under its path, and report only **new** diagnostics | a timing against the one-file hook target (W-19) | ⬜ |
 | 3 | Work out "construct → rules" from each rule's matcher root node kind, over all 401 pack rules | a coverage count; the list of `native:` rules that must declare their constructs | ⬜ |
-| 4 | Fux spike (optional): list one pack's installed `rules/` folder in `.fux/sources/dirs` (the stop-gap), write 20 intents, and measure whether `fux_search` puts the right rule in the top 5 | evidence for or against Fux as the free-text layer, before a Fux SR for package sources is drafted | ⬜ |
+| 4 | Fux spike (optional): one pack's installed `rules/` in `.fux/sources.yaml`, 20 intents, the right rule in the top 5 at least 16 times | evidence for or against Fux as the free-text layer | ⬜ moved to Fux item 298 step 1 (2026-10-25) |
 | 5 | Draft the amendments: SR-AGENT-SURFACES (pre-write row, brief surface), SR-CLI-MCP (`brief`, `brief_for_task`, `hook --pre`), SR-LAW-8 (a `hook_pre` budgeted operation), glossary | records ready for the decider to rule on | ⬜ |
 | 6 | On the ruling, file the build `W-nn` (it rides with W-08 MCP and W-10 hooks) | the feature built | ⬜ |
 
 **Arpit, 2026-10-20:** *"It shouldn't be like that, okay, after I have written the code, then you go ahead and fix it. Well, that should be there, but even while writing the code, if it can tell AI agents that this is how you should write it, that's even better. … can we use Fux for it since it is already doing most of it"*
+
+**Arpit, 2026-10-25 (voice), on the Fux layer:** the package author builds the index — *"rather than Fux trying to re-ingest it, it can search through multiple indexes … one Fux index present at the root of a project … another index present inside node modules package"* — and codelaw ships it as *"a separate package for Fux index. It shouldn't be added as a default one"*, `@codelaw/rules-js-fux-index`, on *"NPM as well as PyPI"*. So: **neither A nor B below** — the Fux half is Fux's item 298 and codelaw's W-34; the before/while/after story is W-35.
 
 **Model:** Cowork — research; step 2's prototype may hand to Claude Code once step 1 is done.
 
@@ -68,12 +70,12 @@ An agent learns codelaw's rules **at three moments**, and the first two are new:
 | F5 | optional `see:` on a rule, linking the ADR or doc behind it; Fux turns it into a `ref` edge for `fux_related` | codelaw, SR-RULE-FORMAT | the reason behind a rule is one hop away |
 | F6 | the `codelaw-write` skill: if a `fux` MCP server is registered, `fux_search` for examples; codelaw's verdict wins any conflict | codelaw | the agent joins the two answers |
 
-**Arpit, 2026-10-20:** packaged rules (`rules-js`, `rules-python`, …) must not be duplicated in the **consumer** repository. Nothing is copied under F1–F3; the open choice is where Fux keeps its *index* of a package:
+**Arpit, 2026-10-20:** packaged rules (`rules-js`, `rules-python`, …) must not be duplicated in the **consumer** repository. Nothing is copied under F1–F3. **Ruled 2026-10-25: neither option below** — the index is built once in codelaw's CI and shipped as its own optional package (W-34); the multi-index query is Fux item 298. The two options as they were weighed:
 
 - **A — committed**, like every other Fux source: the consumer repo carries index statistics for the pack (never its text, Fux L3), and they change on every pack upgrade.
 - **B — local only** (proposed): package sources are indexed into gitignored `.fux/runtime/` after install, and a query merges that local segment with the committed index. The consumer repo carries **zero** pack-derived bytes, only the purl line. Costs a new Fux design: a merged two-segment query whose document statistics stay deterministic for a given pinned install.
 
-**F1–F3 are a Fux feature.** They need a Fux SR and the decider's sign-off in Fux's own queue, and they are generic (any package that ships docs), not codelaw-specific. **Until they land**, a repo can list `node_modules/@codelaw/rules-js/rules` as a plain dir. That works for npm but pins nothing.
+**F1–F3 are a Fux feature — now Fux item 298** (2026-10-25); F4 moves to W-34. They need a Fux SR and the decider's sign-off in Fux's own queue, and they are generic (any package that ships docs), not codelaw-specific. **Until they land**, a repo can list `node_modules/@codelaw/rules-js/rules` as a plain dir. That works for npm but pins nothing.
 
 ## Why not build this inside Fux
 

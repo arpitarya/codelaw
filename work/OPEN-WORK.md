@@ -45,6 +45,10 @@ here. Read that record before changing anything below it.
 
 🟡 **W-32** `arpit` A Redux Toolkit pack and a TanStack Query pack, npm only: steps 2–4 done in the tree 2026-10-25 (7 + 12 rules, all green, wired); pushed, CI run 40185344678 green; left: their first publish at 0.2.0 with W-31 step 7. Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
 
+🟡 **W-34** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; waiting on Fux item 298, then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
+
+🟢 **W-35** `agent` Lead the README with "your rules, before, while and after the AI writes"; the while beat labelled in design until W-05's check ships. Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
+
 ### testing
 
 🔴 **W-19** `agent` Seven of L8's eight budgets set 2026-10-25 from CI's three `ubuntu-24.04` runs by the ruled method; `fix_one_file` held back by the guard — blocked on its ruling above. Filed by Arpit (Cowork). [detail](open/W-19-performance-budgets.md)
