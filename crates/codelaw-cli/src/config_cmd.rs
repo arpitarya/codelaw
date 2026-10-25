@@ -25,6 +25,9 @@ pub struct ConfigArgs {
     /// Show the cache as `--no-cache` would leave it.
     #[arg(long)]
     no_cache: bool,
+    /// Resolve with this profile, as `check --profile` would.
+    #[arg(long, value_name = "NAME")]
+    profile: Option<String>,
 }
 
 pub fn run(args: ConfigArgs) -> ExitCode {
@@ -40,7 +43,7 @@ pub fn run(args: ConfigArgs) -> ExitCode {
         "json" => true,
         other => return fail(format!("unknown --format `{other}` (text or json)")),
     };
-    let options = EngineOptions { no_cache: true, ..EngineOptions::from_env() };
+    let options = EngineOptions { no_cache: true, profile: args.profile.clone(), ..EngineOptions::from_env() };
     let project = match load(&args.for_path.iter().cloned().collect::<Vec<_>>(), options) {
         Ok(p) => p,
         Err(e) => return fail(e),

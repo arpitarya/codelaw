@@ -31,6 +31,7 @@ mod html_document;
 mod html_dom;
 mod html_rules;
 mod js_ast;
+mod js_console;
 mod literals;
 mod no_undef;
 mod no_unreachable;
@@ -345,6 +346,7 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &accessors::NoSetterReturn,
     &literals::NoSparseArrays,
     &classes::NoThisBeforeSuper,
+    &js_console::NoConsole,
     &no_undef::NoUndef,
     &literals::NoUnexpectedMultiline,
     &no_unreachable::NoUnreachable,

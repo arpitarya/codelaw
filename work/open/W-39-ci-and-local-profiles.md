@@ -6,7 +6,7 @@ item: W-39
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5), W-39 build"
 ball: agent
 ---
 
@@ -17,11 +17,11 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | The decider rules the forks | the design below | ✅ 2026-10-25 — [compare](../compare/ci-profiles-and-dated-exceptions.compare.md) forks 1–3 |
-| 2 | Write SR-CONFIG decisions 10–11 and the §1/decision 3/4 lines, and the schema, in one change | the record is the spec | ⏳ |
-| 3 | Build profiles: selection, `[profiles.<name>]`, the header, `config --print` | console warns locally, fails in CI | ⏳ |
-| 4 | Build `remap` in `[[overrides]]` | a glob that never errors, or never warns | ⏳ |
-| 5 | Add `js/no-console` to the js pack with cases | the rule the ask is about | ⏳ |
-| 6 | Docs: USAGE, README config example, CHANGELOG, GLOSSARY (`profile`, `remap`) | users can find it | ⏳ |
+| 2 | Write SR-CONFIG decisions 10–11 and the §1/decision 3/4 lines, and the schema, in one change | the record is the spec | ✅ 2026-10-25 — with the cites in SR-LINTER 5, SR-AGENT-SURFACES (hook), SR-CLI-MCP 2/4/5, SR-EDITOR 3, SR-ARCHITECTURE 4, SR-RULE-FORMAT 2, SR-RULE-PACKS 7 |
+| 3 | Build profiles: selection, `[profiles.<name>]`, the header, `config --print` | console warns locally, fails in CI | ✅ 2026-10-25 — `--profile` on the common flags, `hook` and `config`; the warm client forwards `CI` and `CODELAW_PROFILE` |
+| 4 | Build `remap` in `[[overrides]]` | a glob that never errors, or never warns | ✅ 2026-10-25 — `check`, `fix`, `hook`, MCP and the editor |
+| 5 | Add `js/no-console` to the js pack with cases | the rule the ask is about | ✅ 2026-10-25 — native (`js_console.rs`), `suggest`; corpus count 38 |
+| 6 | Docs: USAGE, README config example, CHANGELOG, GLOSSARY (`profile`, `remap`) | users can find it | ✅ 2026-10-25 |
 
 **Arpit, 2026-10-25:** *"while I'm starting my dev server or doing it in my local, having debugger or console logs is fine. But when we are running it in CI/CD pipeline, it should throw an error. In local, it should give you a warning … for certain files it should never throw an error. For certain files, it should never throw a warning."*
 
@@ -76,12 +76,12 @@ remap = { warn = "error" }
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | `CI=true codelaw check` exits 1 on a `console.log`; without `CI`, exit 0 with a warning; `--profile local` under `CI=true` exits 0 | ⏳ |
-| 2 · | `codelaw hook` on the same file reports an error without `CI` set | ⏳ |
-| 3 · | each `remap` example above behaves as commented; `codelaw/stale-baseline` is not remapped | ⏳ |
-| 4 · | `config --print --for <f>` names the profile and its source | ⏳ |
-| 5 · | `cargo test -p codelaw-config --test schema` green with the new keys; `codelaw test packs/js` green with `no-console` cases | ⏳ |
-| 6 · | L8 budgets unchanged (`codelaw bench`) | ⏳ |
+| 1 · | `CI=true codelaw check` exits 1 on a `console.log`; without `CI`, exit 0 with a warning; `--profile local` under `CI=true` exits 0 | ✅ `crates/codelaw-cli/tests/profiles.rs` `warn_on_a_laptop_fail_in_ci`; by hand on a `codelaw:js/recommended` repo, `console.log` is `warn` (local) and `error` (`CI=true`) |
+| 2 · | `codelaw hook` on the same file reports an error without `CI` set | ✅ same test: `hook a.py` → `error`, exit 2; `hook --profile local` → `warn` |
+| 3 · | each `remap` example above behaves as commented; `codelaw/stale-baseline` is not remapped | ✅ `profiles.rs` `remap_never_errors_never_warns_or_only_errors`: `scripts/` warns, `gen/` silent, `payments/` errors, an expired entry in `scripts/` warns, `codelaw/stale-baseline` stays `error` |
+| 4 · | `config --print --for <f>` names the profile and its source | ✅ `profile = "ci"  # CI=1 (codelaw.toml:4)`; `remap.<sev>` lines name their override |
+| 5 · | `cargo test -p codelaw-config --test schema` green with the new keys; `codelaw test packs/js` green with `no-console` cases | ✅ schema 4/4; `codelaw test packs/js` 73 rules · 1255 checks · 0 failed; corpus 73 rules · 2154 checks · 0 failed |
+| 6 · | L8 budgets unchanged (`codelaw bench`) | ⏳ not measured here: the budgets are CI's `ubuntu-24.04` release numbers, and this machine is a loaded Mac building debug under L9's disk ceiling. CI's `perf` job on the branch is the check. By construction a config with no `remap` skips the stage (`has_remap`), and the profile adds one key part only when `[profiles]` exists; the reference workload has neither |
 
 ## Blockers
 

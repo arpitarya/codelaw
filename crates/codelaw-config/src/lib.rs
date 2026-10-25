@@ -9,8 +9,8 @@ mod raw;
 mod resolve;
 mod trace;
 
-pub use raw::{RawConfig, RuleSetting};
-pub use resolve::{Config, ConfigFile, DEFAULT_EXCLUDES, Home, Layer, RuleConfig, find_config, load_file};
+pub use raw::{RawConfig, RawOverride, RawProfile, RuleSetting};
+pub use resolve::{Config, ConfigFile, DEFAULT_EXCLUDES, Home, Layer, Profile, ProfileChoice, Remap, RuleConfig, find_config, load_file};
 pub use trace::{TraceEnv, Traced};
 
 /// `codelaw.schema.json`: every key a config may set, each naming the one
