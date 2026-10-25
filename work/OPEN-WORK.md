@@ -35,7 +35,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-39** `agent` Warn on a laptop, fail in CI: auto `ci`/`local` profiles (agents run `ci`), a per-glob severity `remap`, and `js/no-console`. Filed by Arpit (Cowork). [detail](open/W-39-ci-and-local-profiles.md)
 
-🟢 **W-40** `agent` Exceptions with an expiry: opt-in `require_expiry`, a warning `warn_days` before, an error on the day, an optional `reason` and a git-checked `added_by`. Filed by Arpit (Cowork). [detail](open/W-40-dated-exceptions.md)
+🟢 **W-40** `agent` Exceptions with an expiry, merged 2026-10-25 (`42bdd82`; workspace 480 tests green); left: CI's `perf` on the push for L8 (DoD 6), the never-remapped check once W-39 lands. Filed by Arpit (Cowork). [detail](open/W-40-dated-exceptions.md)
 
 🟢 **W-41** `agent` `react/no-context`: old context use warns through a baseline, any new `createContext`/`useContext` errors. Filed by Arpit (Cowork). [detail](open/W-41-react-no-context.md)
 
@@ -55,9 +55,19 @@ here. Read that record before changing anything below it.
 
 🟢 **W-52** `agent` Latest-version highlighting for npm and Python deps: network-only `deps refresh` writes a committed snapshot; offline `data/outdated-dependency` flags and bumps. Filed by Arpit (Cowork). [detail](open/W-52-dependency-latest-versions.md)
 
+🟢 **W-53** `agent` Security packs' groundwork: L6 to fifteen packs (`security-js`, `-ts`, `-html`, `-python`), CWE/OWASP metadata, SARIF `security-severity`, a same-function request-source predicate. Filed by Arpit (Cowork). [detail](open/W-53-security-packs-groundwork.md)
+
 🟡 **W-46** waits on **W-40** `agent` `codelaw exceptions --expiring 30d --group-by added_by`: every exception, days left, owner; MCP twin. Filed by Arpit (Cowork). [detail](open/W-46-exceptions-report.md)
 
 🟡 **W-49** waits on **W-44** `agent` Dev-server plugins for Vite, Webpack, Rspack, Next.js: overlay and terminal on `local`, builds fail on `ci`. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
+
+🟡 **W-54** waits on **W-53** `agent` `security-js`: 32 rules — injection, XSS, traversal, SSRF, crypto, secrets, cookies, TLS, ReDoS, prototype pollution, LLM output to sinks. Filed by Arpit (Cowork). [detail](open/W-54-security-js-pack.md)
+
+🟡 **W-55** waits on **W-53** `agent` `security-ts`: extends security-js; unchecked casts of input, Angular sanitizer bypass, NestJS whitelist, Prisma/TypeORM raw queries. Filed by Arpit (Cowork). [detail](open/W-55-security-ts-pack.md)
+
+🟡 **W-56** waits on **W-53** `agent` `security-html`: inline handlers, `javascript:` URLs, mixed content, iframe sandbox, CSP meta, password forms, template sinks. Filed by Arpit (Cowork). [detail](open/W-56-security-html-pack.md)
+
+🟡 **W-57** waits on **W-53** `agent` `security-python`: Bandit's set ported, Django/Flask/FastAPI settings and sinks, ML loaders, LLM output to sinks. Filed by Arpit (Cowork). [detail](open/W-57-security-python-pack.md)
 
 🟡 **W-34** waits on **fux W-299** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
