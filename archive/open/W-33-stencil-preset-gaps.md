@@ -6,8 +6,8 @@ item: W-33
 filed: 2026-10-25
 filed_by: "Arpit (Claude, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Claude Code, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5): closed — merged to main as 3cb762e"
+ball: done
 ---
 
 # W-33 — Port the two Stencil rules `stencil/recommended` is missing

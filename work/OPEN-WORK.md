@@ -45,8 +45,6 @@ here. Read that record before changing anything below it.
 
 🟡 **W-32** `arpit` A Redux Toolkit pack and a TanStack Query pack, npm only: steps 2–4 done in the tree 2026-10-25 (7 + 12 rules, all green, wired); pushed, CI run 40185344678 green; left: their first publish at 0.2.0 with W-31 step 7. Filed by Arpit (Claude Code). [detail](open/W-32-redux-and-query-packs.md)
 
-🟢 **W-33** `agent` Stencil's `ban-side-effects` and `enforce-slot-jsdoc` ported 2026-10-25: `stencil/recommended` holds 17 rules, 16 of upstream's 23; corpus clean; on branch `worktree-agent-a46bf2b8666b9da0f`. Left: merge, then close. Filed by Arpit (Claude). [detail](open/W-33-stencil-preset-gaps.md)
-
 ### testing
 
 🔴 **W-19** `agent` Seven of L8's eight budgets set 2026-10-25 from CI's three `ubuntu-24.04` runs by the ruled method; `fix_one_file` held back by the guard — blocked on its ruling above. Filed by Arpit (Cowork). [detail](open/W-19-performance-budgets.md)

@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-25 — 0.2.0 committed, PyPI packs uploading; W-24, W-33 closed, W-19's budgets set  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"commit everything generate a build and then use the terminal to publish PyPy packages"*; then *"implement everything green in open work file. In parallel"*.
+- **Done:** `f40b2e6 release: 0.2.0` and the docket commit (SR-PACKAGES gained the by-hand PyPI sentence the guard asked for). `build-packs.py --release` → six `codelaw_rules_*` wheels, `twine check` passed; `codelaw-rules-css` and `-data` uploaded, then PyPI's new-project 429 — the other four retried every 5 min. W-24 closed on CI run 40185344678 (22/22 green). W-19 (agent, worktree): seven budgets by the ruled method, `fix_one_file` capped → inbox; p95s spot-checked against the raw CI log. W-33 (agent, worktree): both Stencil rules ported, closed. W-05 not picked (research, rule 37a).
+- **Decided / left open:** `fix_one_file`'s budget (inbox). Trusted publishers on the six PyPI projects, the push, npm's two new names and the release stay Arpit's.
+- **Mistakes:** my W-30 row in IMPLEMENTATION would have turned `lint` red (docs-sync: CHANGELOG did not name W-30); caught by running docs-sync after the W-33 merge, fixed in 0.2.0's section.
+- **Next:** the four PyPI uploads finish; Arpit pushes. W-33's rules carry `since: 0.3.0`: if `v0.2.0` is cut from a commit after `3cb762e`, they ship in 0.2.0 and `since` is wrong.
+
 ## 2026-10-25 — Docket: L8 by method, PyPI step 4 rethought, 0.2.0 prepared, W-33 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** *"What are the blockers? Let's go through them one by one … provide a recommendation."*

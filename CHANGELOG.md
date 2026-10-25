@@ -12,6 +12,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Added
 
+- **On PyPI for the first time:** the six `codelaw-rules-*` packs (`js`, `react`, `html`, `css`, `python`, `data`) at 0.2.0, `pip install codelaw-rules-python` and the rest; `codelaw` itself follows with the release (W-30).
 - **Two npm-only library packs** (W-32): `@codelaw/rules-tanstack-query` (`tanstack-query/recommended`, 7 rules: @tanstack/eslint-plugin-query's `recommended`, reimplemented) and `@codelaw/rules-redux-toolkit` (`redux-toolkit/recommended`, 12 rules codelaw wrote from the Redux Style Guide's Priority A and B rules). `codelaw init` adds them when `package.json` depends on `@tanstack/react-query` or `react-query`, and on `@reduxjs/toolkit` or `redux`. npm now carries ten packs.
 - **`codelaw bench --repo <dir>`** times `check`, cold and warm, on a copy of a real repository with the reference workload's config and packs; CI's `perf` job runs it on L8's three pinned repos (W-19).
 - **`js/project`, `py/project` and `css/project`**, opt-in presets for the rules that read the whole repo: `graph/no-unused-exports` and `graph/no-unused-css-classes` were in no preset, so nothing turned them on but a `[rules]` line (W-26).
