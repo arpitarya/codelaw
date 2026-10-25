@@ -185,7 +185,8 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-engine` | SR-ARCHITECTURE | decisions 4–28: the pipelines |
 | `crates/codelaw-report` | SR-CLI-MCP | decisions 3 and 4 |
 | `crates/codelaw-test` | SR-RULE-AUTHORING | decision 4 |
-| `crates/codelaw-cli` | SR-CLI-MCP | decisions 1–3 |
+| `crates/codelaw-cli` | SR-CLI-MCP | decisions 1–3 and 11 |
+| `.pre-commit-hooks.yaml` | SR-CLI-MCP | decision 11: the pre-commit framework's hook definitions |
 | `crates/codelaw-lsp` | SR-EDITOR | decisions 1–3: the language server |
 | `crates/codelaw-mcp` | SR-CLI-MCP | decisions 5–6: the MCP server and its parity with the CLI |
 | `crates/codelaw-graph` | SR-PROJECT-GRAPH | decisions 1–6: the symbol graph, its resolver and the `graph:` queries |

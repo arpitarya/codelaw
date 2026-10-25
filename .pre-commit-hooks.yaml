@@ -1,0 +1,26 @@
+# Hooks for the pre-commit framework (https://pre-commit.com), SR-CLI-MCP
+# decision 11. `codelaw` must be on PATH (npm i -D codelaw, or pip install
+# codelaw): the framework builds nothing from this repository.
+#
+#   repos:
+#     - repo: https://github.com/arpitarya/codelaw
+#       rev: v0.2.0
+#       hooks:
+#         - id: codelaw-fix
+#         - id: codelaw-check
+
+- id: codelaw-check
+  name: codelaw check
+  description: Check the staged files; an error blocks the commit.
+  entry: codelaw check --staged
+  language: system
+  pass_filenames: true
+  require_serial: true
+
+- id: codelaw-fix
+  name: codelaw fix
+  description: Apply the safe (auto) fixes to the staged files; the framework fails the hook when a file changed, so re-stage and commit again.
+  entry: codelaw fix --staged
+  language: system
+  pass_filenames: true
+  require_serial: true

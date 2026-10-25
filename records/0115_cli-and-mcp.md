@@ -11,6 +11,7 @@ owns:
   - crates/codelaw-report
   - crates/codelaw-cli
   - crates/codelaw-mcp
+  - .pre-commit-hooks.yaml
 laws: [L0, L3, L4, L5, L7, L8]
 timestamp: 2026-10-25T09:00:00Z
 content_sha: ""
@@ -68,7 +69,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | everyday | `check` · `fix` · `format` · `explain` |
    | rules | `rules [--for <path>] [--why <id>]` · `new-rule` · `rules eject` · `rules lint` · `test [--case <title>] [--corpus <dir> [--snapshot <file> [--update-snapshot]]]` (SR-RULE-AUTHORING decision 4) |
    | debug | `tree` · `match <id> <file> [--explain] [--line N]` · `fix --trace` · `graph refs` · `graph why-unused` |
-   | project | `init [--agents …] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print [--for <file>]` · `config --schema` |
+   | project | `init [--agents …] [--git-hooks [pre-commit,post-commit]] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print [--for <file>]` · `config --schema` |
    | baseline | `baseline add --rule <id> [--file …] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` · `baseline prune [paths]` · `baseline check --since <ref>` · `deprecate <symbol> [--replacement] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 5, 6 and 9; `--added-by` defaults to `git config user.email`; the MCP twins are unchanged) |
    | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` ([SR-ARCHITECTURE](0108_architecture.md) decision 22) · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
@@ -133,6 +134,13 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
     - **Runs:** `--runs N` (10) per operation; the first is discarded; the report gives median, p95 (nearest rank), min and max. `--only <ops>` narrows it.
     - **Output:** `--format text|json`; `--output <file>` also writes the JSON report (`schema_version`, `codelaw_version`, `workload {seed, files, digest, reference}`, `runs`, `repos[]` with `name`, `files`, `path`, `operations[]` with `repo` (a repo row's name; `null` on the workload), `samples`, `median`, `p95`, `min`, `max`, `budget`, `proposed`, `verdict`).
     - **Exit codes:** `0` measured, nothing over a set budget · `1` a p95 over a budget the decider set (`--budgets <file>`) · `2` a usage error, a malformed budgets file, or an operation that failed to run.
+
+11. **Git hooks: `init --git-hooks [pre-commit,post-commit]`** (W-50, 2026-10-25). `crates/codelaw-cli/src/git_hooks.rs`; the two POSIX `sh` scripts are in `crates/codelaw-cli/src/hooks/`. The hooks need no agent and no Node ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 4).
+    - **Where it writes:** the folder git itself resolves for hooks (`git rev-parse --git-path hooks`: `core.hooksPath`, else `.git/hooks`, a linked worktree included). In a repo `codelaw.toml` already configures, `--git-hooks` installs only the hooks; in an unconfigured one it runs the rest of `init` first. Outside a git repository it exits `2` and writes nothing.
+    - **Never overwrites:** a hook of ours (its second line is `# codelaw-hook: <name>`) is rewritten to the current script, or reported `already installed`. Any other hook is renamed to `<name>.pre-codelaw` and the new one runs it first; an earlier pre-commit's failure blocks, an earlier post-commit's does not. When `<name>.pre-codelaw` exists too, `init` exits `2` and changes nothing. Uninstalling is deleting the file.
+    - **`pre-commit` blocks.** It takes the staged files (added, copied, modified, renamed). The ones with no unstaged change run `codelaw fix --staged -- <files>` and are re-staged with `git add`; a **partly staged file is checked and never fixed**, so an unstaged hunk is never committed or overwritten. Then `codelaw check --staged -- <all staged files>`; its exit code is the hook's (`1` blocks the commit, warnings do not). `check` reads the working-tree text of a partly staged file, not the index's. `CODELAW_HOOK_ARGS` adds flags to both commands (a team sets `--profile ci` there once W-39 lands; until then the profile is whatever the run detects). Without `codelaw` on `PATH` the hook prints a note and lets the commit through.
+    - **`post-commit` never blocks.** It runs every executable in `.codelaw/hooks/post-commit.d/` in name order and always exits `0`. That folder is its extension point: the reminders W-46 (`exceptions --mine --expiring 7d`) and W-47 (a one-line burn-down delta) add land there as steps, not as edits to the script.
+    - **The pre-commit framework, husky and lefthook** need no installer: `.pre-commit-hooks.yaml` at the repository root defines hooks `codelaw-check` and `codelaw-fix` (`language: system`, so `codelaw` must be on `PATH`), and [USAGE.md](../USAGE.md) carries the husky and lefthook recipes. The framework stashes unstaged changes itself, so its fix hook has no partly-staged hazard.
 
 ### Consequences
 

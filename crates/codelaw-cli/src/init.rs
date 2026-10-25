@@ -23,6 +23,9 @@ pub struct InitArgs {
     /// Agent files to write: claude, cowork, copilot, codex, kiro (SR-AGENT-SURFACES).
     #[arg(long, value_delimiter = ',')]
     agents: Vec<String>,
+    /// Install git hooks: `pre-commit` (blocks) and `post-commit` (reminds, never blocks); both when none is named. In a repo codelaw already configures, it installs only the hooks (SR-CLI-MCP decision 7).
+    #[arg(long, value_delimiter = ',', num_args = 0.., value_name = "HOOKS")]
+    git_hooks: Option<Vec<String>>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -163,6 +166,10 @@ pub fn init(args: InitArgs) -> ExitCode {
         Ok(t) => t,
         Err(e) => return fail(format!("--agents: {e}")),
     };
+    let hooks = match args.git_hooks.as_deref().map(crate::git_hooks::parse).transpose() {
+        Ok(h) => h,
+        Err(e) => return fail(e),
+    };
     let forced = match args.registry.as_deref() {
         None => None,
         Some("npm") => Some(Registry::Npm),
@@ -175,6 +182,9 @@ pub fn init(args: InitArgs) -> ExitCode {
     };
     let mut warnings = Vec::new();
     if let Ok(Some(existing)) = codelaw_config::load_file(&root, &mut warnings) {
+        if let Some(hooks) = &hooks {
+            return install_hooks(&root, hooks);
+        }
         return fail(format!("{} already configures codelaw here", codelaw_core::normalize_path(&existing.path)));
     }
 
@@ -307,7 +317,22 @@ pub fn init(args: InitArgs) -> ExitCode {
             Err(e) => return fail(e),
         }
     }
+    if let Some(hooks) = &hooks {
+        return install_hooks(&root, hooks);
+    }
     ExitCode::SUCCESS
+}
+
+fn install_hooks(root: &Path, hooks: &[&str]) -> ExitCode {
+    match crate::git_hooks::install(root, hooks) {
+        Ok(lines) => {
+            for l in lines {
+                println!("{l}");
+            }
+            ExitCode::SUCCESS
+        }
+        Err(e) => fail(e),
+    }
 }
 
 #[cfg(test)]

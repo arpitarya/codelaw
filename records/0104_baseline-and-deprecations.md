@@ -122,7 +122,7 @@ A file is touched when it's in the **change set**, and the change set always com
 | Where codelaw runs | Change set |
 |---|---|
 | CI on a PR | `--changed-since origin/main` (diff against the merge base) |
-| Pre-commit | `--staged` |
+| Pre-commit | `--staged` (what `codelaw init --git-hooks` installs: [SR-CLI-MCP](0115_cli-and-mcp.md) decision 11) |
 | Agent hook | The file the agent just edited |
 | Plain `codelaw check` | **Empty:** nothing counts as touched |
 

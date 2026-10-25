@@ -5,6 +5,7 @@
 mod baseline_cmd;
 mod bench;
 mod format_cmd;
+mod git_hooks;
 mod graph_cmd;
 mod config_cmd;
 mod init;
