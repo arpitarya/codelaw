@@ -1,7 +1,7 @@
 ---
 id: css/at-rule-descriptor-value-no-unknown
 title: "No unknown keyword values for at-rule descriptors"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended value is the author's call"
 stability: preview
@@ -38,6 +38,28 @@ native: css/at-rule-descriptor-value-no-unknown
 #### Do
 
 ```css
+@font-face {
+  font-family: "Inter";
+  src: url("inter.woff2");
+  font-display: swap;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+@font-face {
+  font-family: "Inter";
+  src: url("inter.woff2");
+  font-display: quick;
+}
+```
+
+#### Do
+
+```scss
 @font-face {
   font-family: "Inter";
   src: url("inter.woff2");

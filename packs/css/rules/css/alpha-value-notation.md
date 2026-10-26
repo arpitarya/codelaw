@@ -1,7 +1,7 @@
 ---
 id: css/alpha-value-notation
 title: "Alpha values are percentages"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "old browsers accept only numbers for alpha in `rgba()`"
 stability: preview
@@ -34,6 +34,24 @@ a {
 #### Do
 
 ```css
+a {
+  color: rgb(0 0 0 / 50%);
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: rgb(0 0 0 / 0.5);
+}
+```
+
+#### Do
+
+```scss
 a {
   color: rgb(0 0 0 / 50%);
 }

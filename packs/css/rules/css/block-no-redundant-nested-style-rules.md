@@ -1,7 +1,7 @@
 ---
 id: css/block-no-redundant-nested-style-rules
 title: "No `& { \u2026 }` wrapper"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "declarations moved out of the wrapper change place relative to the nested rules around it"
 stability: preview
@@ -34,6 +34,25 @@ a {
 #### Do
 
 ```css
+a {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  & {
+    color: red;
+  }
+}
+```
+
+#### Do
+
+```scss
 a {
   color: red;
 }

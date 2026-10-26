@@ -92,6 +92,7 @@ fn glob(language: Language) -> &'static str {
         Language::Toml => "**/*.toml",
         Language::Markdown => "**/*.{md,mdx}",
         Language::Css => "**/*.css",
+        Language::Scss => "**/*.scss",
         Language::Html => "**/*.{html,htm}",
     }
 }

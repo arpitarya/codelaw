@@ -80,10 +80,10 @@ Each law is stated in exactly one record and is **not restated here**:
 - **L0** — SRs are the only source of truth; Law records outrank every other record — [SR-LAW-0](records/0002_LAW-0-authority.md)
 - **L1** — a retired record is archived, never deleted — [SR-LAW-1](records/0003_LAW-1-retired-records-archived.md)
 - **L2** — every dependency is free, open source and permissive; nothing paid, nothing copyleft — [SR-LAW-2](records/0004_LAW-2-foss-dependencies.md)
-- **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, HTML — each alone or in any combination — [SR-LAW-3](records/0005_LAW-3-languages.md)
+- **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS (with its dialect SCSS), HTML — each alone or in any combination — [SR-LAW-3](records/0005_LAW-3-languages.md)
 - **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix — [SR-LAW-4](records/0006_LAW-4-every-rule-has-a-fix.md)
 - **L5** — no model in the engine, and no network in it: `codelaw deps refresh` is the one networked command, outside the engine; works the same with or without an agent — [SR-LAW-5](records/0007_LAW-5-no-model-in-the-engine.md)
-- **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as fifteen packs, thirteen on npm (`@codelaw/rules-*`) and nine on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` — [SR-LAW-6](records/0008_LAW-6-python-and-node-packages.md)
+- **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as sixteen packs, fourteen on npm (`@codelaw/rules-*`) and ten on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` — [SR-LAW-6](records/0008_LAW-6-python-and-node-packages.md)
 - **L7** — always both a linter and a formatter, for every L3 language — [SR-LAW-7](records/0009_LAW-7-linter-and-formatter.md)
 - **L8** — performance budgets — set from measurement, never exceeded, never loosened — [SR-LAW-8](records/0010_LAW-8-performance-budgets.md)
 - **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it needs the decider's approval — [SR-LAW-9](records/0011_LAW-9-machine-budget.md)
@@ -140,7 +140,7 @@ docs/        WHAT THE PROJECT IS — the glossary
 archive/     THE ONE ARCHIVE — everything retired, mirroring the live tree
 crates/      THE ENGINE — one Cargo workspace (Cargo.toml); each crate's owner is in the register
 fixtures/    test repos the law checks run on
-packs/       THE FIFTEEN RULE PACKS — each folder is its package on npm, PyPI or both (pack.rs FIRST_PARTY_PACKS)
+packs/       THE SIXTEEN RULE PACKS — each folder is its package on npm, PyPI or both (pack.rs FIRST_PARTY_PACKS)
 packaging/   the npm launcher and API, the PyPI module — every manifest is generated (SR-PACKAGES)
 scripts/     the commit guard, the inbox check, the version and the release scripts
 .github/     ci.yml builds and checks every package; publish.yml uploads them — RELEASING.md

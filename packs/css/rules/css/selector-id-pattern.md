@@ -1,7 +1,7 @@
 ---
 id: css/selector-id-pattern
 title: "Id selectors are kebab-case"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "renaming must update the markup and scripts that use the id"
 stability: preview
@@ -39,6 +39,23 @@ native: css/selector-id-pattern
 #### Do
 
 ```css
+#main-nav {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+#mainNav {
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 #main-nav {
   color: red;
 }

@@ -1,0 +1,19 @@
+// Mistakes the css/* rules must still catch in SCSS.
+.a {
+  color: red;
+  color: blue;
+  margin: 0px;
+}
+
+.b {
+  color: #FFFFFF;
+  unknown-prop: 1;
+}
+
+.empty {}
+
+@keyframe fade {
+  from {
+    opacity: 0;
+  }
+}

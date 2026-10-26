@@ -1,7 +1,7 @@
 ---
 id: css/keyframe-block-no-duplicate-selectors
 title: "No keyframe selector twice in one `@keyframes`"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "which keyframe was meant can't be known from the code"
 stability: preview
@@ -42,6 +42,35 @@ native: css/keyframe-block-no-duplicate-selectors
 #### Do
 
 ```css
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+
+  0% {
+    opacity: 1;
+  }
+}
+```
+
+#### Do
+
+```scss
 @keyframes fade {
   0% {
     opacity: 0;

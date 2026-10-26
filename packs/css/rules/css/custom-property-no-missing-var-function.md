@@ -1,7 +1,7 @@
 ---
 id: css/custom-property-no-missing-var-function
 title: "Custom properties are read with `var()`"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "wrapping in `var()` makes a dropped declaration apply, which changes the page"
 stability: preview
@@ -36,6 +36,31 @@ a {
 #### Do
 
 ```css
+:root {
+  --brand: red;
+}
+
+a {
+  color: var(--brand);
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+:root {
+  --brand: red;
+}
+
+a {
+  color: --brand;
+}
+```
+
+#### Do
+
+```scss
 :root {
   --brand: red;
 }

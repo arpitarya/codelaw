@@ -1,7 +1,7 @@
 ---
 id: css/color-function-alias-notation
 title: "`rgb()` and `hsl()`, not `rgba()` and `hsla()`"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "browsers before 2018 ignore an alpha channel in `rgb()`"
 stability: preview
@@ -32,6 +32,24 @@ a {
 #### Do
 
 ```css
+a {
+  color: rgb(0 0 0 / 50%);
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: rgba(0 0 0 / 50%);
+}
+```
+
+#### Do
+
+```scss
 a {
   color: rgb(0 0 0 / 50%);
 }

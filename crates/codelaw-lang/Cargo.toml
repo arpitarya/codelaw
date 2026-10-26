@@ -12,3 +12,4 @@ ast-grep-language.workspace = true
 tree-sitter.workspace = true
 tree-sitter-toml-ng.workspace = true
 tree-sitter-md.workspace = true
+tree-sitter-scss.workspace = true

@@ -1,7 +1,7 @@
 ---
 id: css/container-name-pattern
 title: "Container names are kebab-case"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "renaming must update every use of the name"
 stability: preview
@@ -39,6 +39,23 @@ native: css/container-name-pattern
 #### Do
 
 ```css
+.card {
+  container-name: card-grid;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+.card {
+  container-name: cardGrid;
+}
+```
+
+#### Do
+
+```scss
 .card {
   container-name: card-grid;
 }

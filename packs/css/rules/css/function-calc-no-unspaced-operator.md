@@ -1,7 +1,7 @@
 ---
 id: css/function-calc-no-unspaced-operator
 title: "Spaces around `+` and `-` in math functions"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "the fix makes an invalid, dropped declaration apply, which changes the page"
 stability: preview
@@ -32,6 +32,24 @@ a {
 #### Do
 
 ```css
+a {
+  width: calc(100% - 10px);
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  width: calc(100%-10px);
+}
+```
+
+#### Do
+
+```scss
 a {
   width: calc(100% - 10px);
 }

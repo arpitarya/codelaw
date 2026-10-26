@@ -1,7 +1,7 @@
 ---
 id: css/nesting-selector-no-missing-scoping-root
 title: "Nesting selectors have a parent"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended parent selector is the author's call"
 stability: preview
@@ -36,6 +36,25 @@ native: css/nesting-selector-no-missing-scoping-root
 #### Do
 
 ```css
+.list {
+  & .item {
+    color: red;
+  }
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+& .item {
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 .list {
   & .item {
     color: red;

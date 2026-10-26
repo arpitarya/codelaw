@@ -1,7 +1,7 @@
 ---
 id: css/selector-type-no-unknown
 title: "No unknown type selectors"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended element is the author's call"
 stability: preview
@@ -39,6 +39,23 @@ tabel {
 #### Do
 
 ```css
+table {
+  border-collapse: collapse;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+tabel {
+  border-collapse: collapse;
+}
+```
+
+#### Do
+
+```scss
 table {
   border-collapse: collapse;
 }

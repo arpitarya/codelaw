@@ -1,7 +1,7 @@
 ---
 id: css/property-no-deprecated
 title: "No deprecated properties"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "older browsers may support only the deprecated name"
 stability: preview
@@ -34,6 +34,23 @@ a {
 #### Do
 
 ```css
+a {
+  overflow-wrap: break-word;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  word-wrap: break-word;
+}
+```
+
+#### Do
+
+```scss
 a {
   overflow-wrap: break-word;
 }

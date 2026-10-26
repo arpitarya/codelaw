@@ -70,7 +70,9 @@ css_rule!(AnnotationNoUnknown, "css/annotation-no-unknown", |sheet, src, ctx, ou
     for i in sheet.decls() {
         let Some((s, e)) = sheet.nodes[i].important else { continue };
         let word = src[s + 1..e].trim();
-        if !word.eq_ignore_ascii_case("important") && !matches_any(&ignore, word) {
+        // Sass's own flags: `!default`, `!global`, `!optional`.
+        let sass = sheet.scss && matches!(word.to_ascii_lowercase().as_str(), "default" | "global" | "optional");
+        if !word.eq_ignore_ascii_case("important") && !sass && !matches_any(&ignore, word) {
             out.push(finding(s, e, format!("Unknown annotation `!{word}`; the only one CSS has is `!important`")));
         }
     }

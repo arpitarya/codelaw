@@ -1,0 +1,12 @@
+extends = ["codelaw:scss/recommended"]
+description = "scss/recommended plus Dart Sass's module-system migrations (no @import, no global functions, no slash division), unknown functions, naming patterns and a nesting limit"
+
+[rules]
+"scss/at-mixin-pattern" = "error"
+"scss/dollar-variable-pattern" = "error"
+"scss/function-no-unknown" = "error"
+"scss/max-nesting-depth" = "error"
+"scss/no-global-function-names" = "error"
+"scss/no-import" = "error"
+"scss/no-slash-division" = "error"
+"scss/percent-placeholder-pattern" = "error"

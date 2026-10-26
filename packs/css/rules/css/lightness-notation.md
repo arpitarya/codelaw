@@ -1,7 +1,7 @@
 ---
 id: css/lightness-notation
 title: "Lightness is a percentage"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 ported_from: [stylelint/lightness-notation]
@@ -31,6 +31,24 @@ a {
 #### Do
 
 ```css
+a {
+  color: oklch(70% 0.1 200deg);
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: oklch(0.7 0.1 200deg);
+}
+```
+
+#### Do
+
+```scss
 a {
   color: oklch(70% 0.1 200deg);
 }

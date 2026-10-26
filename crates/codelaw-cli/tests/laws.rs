@@ -8,7 +8,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-const LANGUAGES: &[&str] = &["javascript", "typescript", "python", "json", "yaml", "toml", "markdown", "css", "html"];
+const LANGUAGES: &[&str] = &["javascript", "typescript", "python", "json", "yaml", "toml", "markdown", "css", "scss", "html"];
 
 fn repo_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().to_path_buf()
@@ -99,7 +99,7 @@ fn l3_each_language_alone_and_together() {
     let all = by_file(&together);
     // Together: one invocation, one report, one exit code (L3 decision 3).
     let rules: std::collections::BTreeSet<&str> = together["diagnostics"].as_array().unwrap().iter().map(|d| d["rule"].as_str().unwrap()).collect();
-    assert_eq!(rules.len(), 9, "every language's rule fires in the combined repo: {rules:?}");
+    assert_eq!(rules.len(), 10, "every language's rule fires in the combined repo: {rules:?}");
     for lang in LANGUAGES {
         let single = build_repo(lang, &[lang]);
         let v = check_json(&single, &[]);
@@ -223,6 +223,7 @@ const MESSY: &[(&str, &str, &str)] = &[
     ("toml", "m.toml", "a=1\n"),
     ("markdown", "m.md", "# T\n* a\n"),
     ("css", "m.css", "a{color:red}\n"),
+    ("scss", "m.scss", "$a:1px;a{b:{c:$a}}\n"),
     ("html", "m.html", "<div><p>x</p>\n\n\n</div>\n"),
 ];
 

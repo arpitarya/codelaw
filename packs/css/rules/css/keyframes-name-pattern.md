@@ -1,7 +1,7 @@
 ---
 id: css/keyframes-name-pattern
 title: "Keyframes names are kebab-case"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "renaming must update every `animation` that uses the name"
 stability: preview
@@ -41,6 +41,27 @@ native: css/keyframes-name-pattern
 #### Do
 
 ```css
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+```
+
+#### Do
+
+```scss
 @keyframes fade-in {
   from {
     opacity: 0;

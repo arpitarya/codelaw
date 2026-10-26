@@ -1,7 +1,7 @@
 ---
 id: css/media-query-no-invalid
 title: "Media queries follow the grammar"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended query is the author's call"
 stability: preview
@@ -40,6 +40,27 @@ native: css/media-query-no-invalid
 #### Do
 
 ```css
+@media (color) and ((hover) or (width >= 600px)) {
+  a {
+    color: red;
+  }
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@media (color) and (hover) or (width >= 600px) {
+  a {
+    color: red;
+  }
+}
+```
+
+#### Do
+
+```scss
 @media (color) and ((hover) or (width >= 600px)) {
   a {
     color: red;

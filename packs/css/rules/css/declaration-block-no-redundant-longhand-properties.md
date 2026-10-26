@@ -1,7 +1,7 @@
 ---
 id: css/declaration-block-no-redundant-longhand-properties
 title: "Shorthands instead of complete sets of longhands"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "combining longhands into a shorthand value needs the shorthand's grammar"
 stability: preview
@@ -39,6 +39,27 @@ a {
 #### Do
 
 ```css
+a {
+  margin: 1px 2px 3px 4px;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  margin-top: 1px;
+  margin-right: 2px;
+  margin-bottom: 3px;
+  margin-left: 4px;
+}
+```
+
+#### Do
+
+```scss
 a {
   margin: 1px 2px 3px 4px;
 }

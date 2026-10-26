@@ -1,0 +1,10 @@
+description = "SCSS correctness: unknown at-rules and functions' neighbours, duplicate definitions, placeholders, null tests"
+
+[rules]
+"scss/at-extend-no-missing-placeholder" = "error"
+"scss/at-if-no-null" = "error"
+"scss/at-rule-no-unknown" = "error"
+"scss/double-slash-comment-empty" = "error"
+"scss/load-no-partial-leading-underscore" = "error"
+"scss/no-duplicate-dollar-variables" = "error"
+"scss/no-duplicate-mixins" = "error"

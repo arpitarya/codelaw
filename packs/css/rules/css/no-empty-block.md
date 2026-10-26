@@ -1,7 +1,7 @@
 ---
 id: css/no-empty-block
 title: "No empty blocks"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 ported_from: [stylelint/block-no-empty]
@@ -32,6 +32,25 @@ a {
 #### Do
 
 ```css
+a {
+  color: red;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+.unused {}
+a {
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 a {
   color: red;
 }

@@ -1,7 +1,7 @@
 ---
 id: css/number-max-precision
 title: "At most four decimal places"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "rounding changes the value slightly"
 stability: preview
@@ -35,6 +35,23 @@ a {
 #### Do
 
 ```css
+a {
+  line-height: 1.3333;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  line-height: 1.333333;
+}
+```
+
+#### Do
+
+```scss
 a {
   line-height: 1.3333;
 }

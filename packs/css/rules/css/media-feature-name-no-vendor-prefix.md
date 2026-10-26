@@ -1,7 +1,7 @@
 ---
 id: css/media-feature-name-no-vendor-prefix
 title: "No vendor-prefixed media features"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the value needs converting to a `dppx` resolution"
 stability: preview
@@ -38,6 +38,28 @@ native: css/media-feature-name-no-vendor-prefix
 #### Do
 
 ```css
+@media (min-resolution: 2dppx) {
+  a {
+    color: red;
+  }
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+@media (-webkit-min-device-pixel-ratio: 2) {
+  a {
+    color: red;
+  }
+}
+```
+
+#### Do
+
+```scss
 @media (min-resolution: 2dppx) {
   a {
     color: red;

@@ -1,7 +1,7 @@
 ---
 id: css/color-function-notation
 title: "Space-separated colour functions"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "browsers before 2018 understand only the comma syntax"
 stability: preview
@@ -32,6 +32,24 @@ a {
 #### Do
 
 ```css
+a {
+  color: rgb(0 0 0);
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: rgb(0, 0, 0);
+}
+```
+
+#### Do
+
+```scss
 a {
   color: rgb(0 0 0);
 }

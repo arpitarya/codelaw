@@ -1,7 +1,7 @@
 ---
 id: css/property-no-vendor-prefix
 title: "No vendor-prefixed properties"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "browsers that need the prefix lose the declaration"
 stability: preview
@@ -34,6 +34,23 @@ a {
 #### Do
 
 ```css
+a {
+  transform: scale(2);
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  -webkit-transform: scale(2);
+}
+```
+
+#### Do
+
+```scss
 a {
   transform: scale(2);
 }

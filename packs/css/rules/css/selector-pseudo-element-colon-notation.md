@@ -1,7 +1,7 @@
 ---
 id: css/selector-pseudo-element-colon-notation
 title: "Pseudo-elements with `::`"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 ported_from: [stylelint/selector-pseudo-element-colon-notation]
@@ -31,6 +31,24 @@ a:before {
 #### Do
 
 ```css
+a::before {
+  content: "";
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a:before {
+  content: "";
+}
+```
+
+#### Do
+
+```scss
 a::before {
   content: "";
 }

@@ -1,7 +1,7 @@
 ---
 id: css/selector-not-notation
 title: "One `:not()` with a list"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "the merged form has a lower specificity, which can change which rule wins"
 stability: preview
@@ -32,6 +32,24 @@ a:not(.active):not(.disabled) {
 #### Do
 
 ```css
+a:not(.active, .disabled) {
+  color: gray;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a:not(.active):not(.disabled) {
+  color: gray;
+}
+```
+
+#### Do
+
+```scss
 a:not(.active, .disabled) {
   color: gray;
 }

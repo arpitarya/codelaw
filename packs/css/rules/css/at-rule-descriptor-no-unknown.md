@@ -1,7 +1,7 @@
 ---
 id: css/at-rule-descriptor-no-unknown
 title: "No unknown descriptors inside at-rules"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "whether to remove or move the declaration is the author's call"
 stability: preview
@@ -39,6 +39,26 @@ native: css/at-rule-descriptor-no-unknown
 #### Do
 
 ```css
+@font-face {
+  font-family: "Inter";
+  src: url("inter.woff2");
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@font-face {
+  font-family: "Inter";
+  src: url("inter.woff2");
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 @font-face {
   font-family: "Inter";
   src: url("inter.woff2");

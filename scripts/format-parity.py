@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """format-parity — how close `codelaw format` is to Prettier and Black.
 
-SR-FORMATTER promises Prettier-compatible JS/TS/JSON/CSS/HTML/YAML/Markdown
+SR-FORMATTER promises Prettier-compatible JS/TS/JSON/CSS/SCSS/HTML/YAML/Markdown
 and Black-compatible Python, "compatible" not "identical". This script
 measures the gap on a pinned corpus and prints one table, which goes into
 SR-FORMATTER's Consequences.
@@ -34,12 +34,12 @@ BLACK = "black==25.9.0"
 # fence tag -> (extension, reference tool)
 FENCES = {
     "js": ("js", "prettier"), "jsx": ("jsx", "prettier"), "ts": ("ts", "prettier"), "tsx": ("tsx", "prettier"),
-    "json": ("json", "prettier"), "css": ("css", "prettier"), "html": ("html", "prettier"),
+    "json": ("json", "prettier"), "css": ("css", "prettier"), "scss": ("scss", "prettier"), "html": ("html", "prettier"),
     "yaml": ("yaml", "prettier"), "py": ("py", "black"),
 }
-EXTENSIONS = {"js", "jsx", "mjs", "cjs", "ts", "tsx", "json", "css", "html", "yaml", "yml", "md", "py"}
+EXTENSIONS = {"js", "jsx", "mjs", "cjs", "ts", "tsx", "json", "css", "scss", "html", "yaml", "yml", "md", "py"}
 LANGUAGE = {"js": "JS · JSX", "jsx": "JS · JSX", "mjs": "JS · JSX", "cjs": "JS · JSX", "ts": "TS · TSX", "tsx": "TS · TSX",
-            "json": "JSON", "css": "CSS", "html": "HTML", "yaml": "YAML", "yml": "YAML", "md": "Markdown", "py": "Python"}
+            "json": "JSON", "css": "CSS", "scss": "SCSS", "html": "HTML", "yaml": "YAML", "yml": "YAML", "md": "Markdown", "py": "Python"}
 FENCE = re.compile(r"^```([a-z]+)\n(.*?)^```", re.M | re.S)
 
 

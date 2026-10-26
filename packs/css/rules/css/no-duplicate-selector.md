@@ -1,7 +1,7 @@
 ---
 id: css/no-duplicate-selector
 title: "No selector declared twice"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "merging the rules depends on cascade order"
 stability: preview
@@ -41,6 +41,28 @@ native: css/no-duplicate-selector
 #### Do
 
 ```css
+.card {
+  color: red;
+  margin: 0;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+.card {
+  color: red;
+}
+
+.card {
+  margin: 0;
+}
+```
+
+#### Do
+
+```scss
 .card {
   color: red;
   margin: 0;

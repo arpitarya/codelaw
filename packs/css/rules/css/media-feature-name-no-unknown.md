@@ -1,7 +1,7 @@
 ---
 id: css/media-feature-name-no-unknown
 title: "No unknown media features"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended feature is the author's call"
 stability: preview
@@ -40,6 +40,27 @@ native: css/media-feature-name-no-unknown
 #### Do
 
 ```css
+@media (min-width: 600px) {
+  a {
+    color: red;
+  }
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@media (min-widht: 600px) {
+  a {
+    color: red;
+  }
+}
+```
+
+#### Do
+
+```scss
 @media (min-width: 600px) {
   a {
     color: red;

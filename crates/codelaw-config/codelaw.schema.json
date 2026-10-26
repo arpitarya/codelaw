@@ -62,7 +62,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["javascript", "jsx", "typescript", "tsx", "python", "json", "yaml", "toml", "markdown", "css", "html"]
+        "enum": ["javascript", "jsx", "typescript", "tsx", "python", "json", "yaml", "toml", "markdown", "css", "scss", "html"]
       }
     },
     "include": { "x-codelaw-record": "SR-CONFIG", "$ref": "#/definitions/globs" },

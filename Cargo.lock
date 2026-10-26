@@ -1144,6 +1144,7 @@ dependencies = [
  "codelaw-core",
  "tree-sitter",
  "tree-sitter-md",
+ "tree-sitter-scss",
  "tree-sitter-toml-ng",
 ]
 
@@ -3668,6 +3669,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bf85fd39652e740bf60f46f4cda9492c3a9ad75880575bf14960f775cb74a1c"
 dependencies = [
  "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-scss"
+version = "1.0.0"
+dependencies = [
+ "cc",
+ "tree-sitter",
  "tree-sitter-language",
 ]
 

@@ -42,6 +42,7 @@ governed_by_path: records/0013_LAW-11-no-dependencies.md
 | D-23 | **strsim** | `strsim` | "did you mean …?" suggestions | 0.11.1 | 1 | **remove** — *"Remove"* (2026-10-26, voice) → W-67 |
 | D-24 | **anyhow** | `anyhow` | error type in the format crate | 1.0.104 | 1 | **remove** — *"Remove"* (2026-10-26, voice) → W-67 |
 | D-25 | **libc** | `libc` | OS calls (signals, Unix sockets) | 0.2.191 | 1 | ratified 2026-10-26 — *"Ratify."* |
+| D-33 | **tree-sitter-scss (vendored)** | in-tree copy of `tree-sitter-scss` 1.0.0, commit `5da5ba7` (MIT, +`tree-sitter-language`, `cc` already counted) | the SCSS grammar (W-62; B-047) | vendored | 0 new | ratified 2026-10-26 — *"Own grammar / tree-sitter-scss"* (B-047, docket) |
 
 ## Rust — tests and build only
 

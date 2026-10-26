@@ -21,6 +21,7 @@ const LANGUAGES = [
   "toml",
   "markdown",
   "css",
+  "scss",
   "html",
 ];
 

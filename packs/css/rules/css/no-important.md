@@ -1,7 +1,7 @@
 ---
 id: css/no-important
 title: "No `!important`"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the selector or layer that should win instead is a design call"
 stability: preview
@@ -37,6 +37,23 @@ a {
 #### Do
 
 ```css
+a.highlight {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: red !important;
+}
+```
+
+#### Do
+
+```scss
 a.highlight {
   color: red;
 }

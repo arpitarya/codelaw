@@ -1,0 +1,33 @@
+# codelaw's in-tree copy of tree-sitter-scss 1.0.0 (MIT, see LICENSE), commit
+# 5da5ba71a558b007b352c505bfcd9095ae337022 of tree-sitter-grammars/tree-sitter-scss.
+# Vendored unchanged (SR-LAW-11: a copy is a dependency, ratified as D-33;
+# B-047 ruled 2026-10-26: "Own grammar / tree-sitter-scss"). The generated
+# src/ is upstream's, not regenerated; bindings/rust is codelaw's, on
+# tree-sitter-language like the CSS fork's.
+[package]
+name = "tree-sitter-scss"
+description = "SCSS grammar for tree-sitter (codelaw's in-tree copy of 1.0.0)"
+version = "1.0.0"
+authors = ["Amaan Qureshi <amaanq12@gmail.com>"]
+license = "MIT"
+keywords = ["incremental", "parsing", "tree-sitter", "scss"]
+categories = ["parsing", "text-editors"]
+repository = "https://github.com/tree-sitter-grammars/tree-sitter-scss"
+edition = "2021"
+autoexamples = false
+publish = false
+
+build = "bindings/rust/build.rs"
+include = ["bindings/rust/*", "grammar.js", "queries/*", "src/*", "tree-sitter.json", "/LICENSE"]
+
+[lib]
+path = "bindings/rust/lib.rs"
+
+[dependencies]
+tree-sitter-language = "0.1"
+
+[build-dependencies]
+cc = "1.2"
+
+[dev-dependencies]
+tree-sitter = "0.27"

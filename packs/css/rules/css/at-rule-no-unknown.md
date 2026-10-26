@@ -47,3 +47,7 @@ native: css/at-rule-no-unknown
   }
 }
 ```
+
+## Differences from the source
+
+On `.scss` files `scss/at-rule-no-unknown` takes this rule's place: it knows Sass's own at-rules.

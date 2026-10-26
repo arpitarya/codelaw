@@ -1,7 +1,7 @@
 ---
 id: css/selector-pseudo-class-no-unknown
 title: "No unknown pseudo-classes"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended pseudo-class is the author's call"
 stability: preview
@@ -38,6 +38,23 @@ a:hovr {
 #### Do
 
 ```css
+a:hover {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a:hovr {
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 a:hover {
   color: red;
 }

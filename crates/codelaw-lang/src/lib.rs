@@ -28,7 +28,7 @@ pub type SyntaxNode<'r> = Node<'r, StrDoc<Grammar>>;
 /// Names every grammar and its pinned version; part of every cache key.
 /// The CSS fork's version carries `+codelaw.N`, bumped with every change to
 /// its `grammar.js`, so a grammar change invalidates cached results.
-pub const GRAMMARS_FINGERPRINT: &str = "ast-grep-language=0.51.0;tree-sitter=0.27.0;tree-sitter-toml-ng=0.7.0;tree-sitter-md=0.5.3;tree-sitter-css=0.25.0+codelaw.1";
+pub const GRAMMARS_FINGERPRINT: &str = "ast-grep-language=0.51.0;tree-sitter=0.27.0;tree-sitter-toml-ng=0.7.0;tree-sitter-md=0.5.3;tree-sitter-css=0.25.0+codelaw.1;tree-sitter-scss=1.0.0";
 
 /// Parse source text with the grammar for `language`.
 pub fn parse(language: Language, source: &str) -> Root {
@@ -103,6 +103,7 @@ mod tests {
             (Language::Toml, "[project]\nname = \"x\"\n"),
             (Language::Markdown, "# Title\n\ntext\n"),
             (Language::Css, "a { color: red; }\n"),
+            (Language::Scss, "$a: 1px;\n.b { &-c { margin: $a; } }\n"),
             (Language::Html, "<p class=\"a\">x</p>\n"),
         ];
         for (lang, src) in samples {

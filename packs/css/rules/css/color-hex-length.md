@@ -1,7 +1,7 @@
 ---
 id: css/color-hex-length
 title: "Short hex colours"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 ported_from: [stylelint/color-hex-length]
@@ -31,6 +31,24 @@ a {
 #### Do
 
 ```css
+a {
+  color: #fff;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: #ffffff;
+}
+```
+
+#### Do
+
+```scss
 a {
   color: #fff;
 }

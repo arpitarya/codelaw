@@ -1,7 +1,7 @@
 ---
 id: css/at-rule-prelude-no-invalid
 title: "At-rule preludes follow their grammar"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended prelude is the author's call"
 stability: preview
@@ -40,6 +40,28 @@ native: css/at-rule-prelude-no-invalid
 #### Do
 
 ```css
+@property --size {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+@property size {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+```
+
+#### Do
+
+```scss
 @property --size {
   syntax: "<length>";
   inherits: false;

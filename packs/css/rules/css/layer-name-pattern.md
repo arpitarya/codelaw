@@ -1,7 +1,7 @@
 ---
 id: css/layer-name-pattern
 title: "Layer names are kebab-case"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "renaming must update every use of the layer"
 stability: preview
@@ -37,5 +37,18 @@ native: css/layer-name-pattern
 #### Do
 
 ```css
+@layer base-styles;
+```
+### SCSS
+
+#### Don't
+
+```scss
+@layer baseStyles;
+```
+
+#### Do
+
+```scss
 @layer base-styles;
 ```

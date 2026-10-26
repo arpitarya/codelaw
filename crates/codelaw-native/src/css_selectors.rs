@@ -138,7 +138,7 @@ css_rule!(NoDescendingSpecificity, "css/no-descending-specificity", |sheet, src,
 css_rule!(NestingSelectorNoMissingScopingRoot, "css/nesting-selector-no-missing-scoping-root", |sheet, src, ctx, out| {
     for i in sheet.walk() {
         let n = &sheet.nodes[i];
-        let rooted = sheet.ancestors(i).any(|a| sheet.nodes[a].kind == Kind::Rule || (sheet.nodes[a].kind == Kind::AtRule && sheet.at_name(a, src) == "scope" && !text(src, sheet.nodes[a].params).is_empty()));
+        let rooted = sheet.ancestors(i).any(|a| sheet.nodes[a].kind == Kind::Rule || (sheet.scss && sheet.nodes[a].kind == Kind::Other) || (sheet.nodes[a].kind == Kind::AtRule && sheet.at_name(a, src) == "scope" && !text(src, sheet.nodes[a].params).is_empty()));
         if rooted {
             continue;
         }

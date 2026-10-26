@@ -1,7 +1,7 @@
 ---
 id: css/custom-property-pattern
 title: "Custom property names are kebab-case"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "renaming must update every use of the name, also in scripts"
 stability: preview
@@ -39,6 +39,23 @@ native: css/custom-property-pattern
 #### Do
 
 ```css
+:root {
+  --brand-color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+:root {
+  --brandColor: red;
+}
+```
+
+#### Do
+
+```scss
 :root {
   --brand-color: red;
 }

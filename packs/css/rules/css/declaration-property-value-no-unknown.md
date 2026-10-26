@@ -1,7 +1,7 @@
 ---
 id: css/declaration-property-value-no-unknown
 title: "Keyword-valued properties use a known keyword"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended value is the author's call"
 stability: preview
@@ -36,6 +36,24 @@ a {
 #### Do
 
 ```css
+a {
+  position: relative;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  position: centre;
+}
+```
+
+#### Do
+
+```scss
 a {
   position: relative;
 }

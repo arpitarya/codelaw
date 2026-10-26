@@ -1,7 +1,7 @@
 ---
 id: css/comment-no-empty
 title: "No empty comments"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 ported_from: [stylelint/comment-no-empty]
@@ -32,6 +32,24 @@ a {
 #### Do
 
 ```css
+a {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+/**/
+a {
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 a {
   color: red;
 }

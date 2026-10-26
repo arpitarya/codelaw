@@ -17,6 +17,7 @@ mod css_misc;
 mod css_selectors;
 mod css_syntax;
 mod css_values;
+mod scss_rules;
 mod data_json;
 mod data_md;
 mod data_toml;
@@ -203,6 +204,21 @@ static TS_NO_UNUSED_EXPRESSIONS: typescript::NoUnusedExpressions = typescript::N
 
 /// Every native rule; ids are unique, order doesn't matter.
 static REGISTRY: &[&dyn NativeRule] = &[
+    &scss_rules::AtExtendNoMissingPlaceholder,
+    &scss_rules::AtIfNoNull,
+    &scss_rules::AtMixinPattern,
+    &scss_rules::AtRuleNoUnknown,
+    &scss_rules::DollarVariablePattern,
+    &scss_rules::DoubleSlashCommentEmpty,
+    &scss_rules::FunctionNoUnknown,
+    &scss_rules::LoadNoPartialLeadingUnderscore,
+    &scss_rules::MaxNestingDepth,
+    &scss_rules::NoDuplicateDollarVariables,
+    &scss_rules::NoDuplicateMixins,
+    &scss_rules::NoGlobalFunctionNames,
+    &scss_rules::NoImport,
+    &scss_rules::NoSlashDivision,
+    &scss_rules::PercentPlaceholderPattern,
     &css_values::AlphaValueNotation,
     &css_declarations::AnnotationNoUnknown,
     &css_atrules::AtRuleDescriptorNoUnknown,

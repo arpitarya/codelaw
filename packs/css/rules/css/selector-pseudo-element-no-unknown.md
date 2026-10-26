@@ -1,7 +1,7 @@
 ---
 id: css/selector-pseudo-element-no-unknown
 title: "No unknown pseudo-elements"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended pseudo-element is the author's call"
 stability: preview
@@ -38,6 +38,23 @@ a::befor {
 #### Do
 
 ```css
+a::before {
+  content: "";
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a::befor {
+  content: "";
+}
+```
+
+#### Do
+
+```scss
 a::before {
   content: "";
 }

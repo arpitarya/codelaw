@@ -71,7 +71,7 @@ Teams run a linter and a formatter as two tools: ESLint plus Prettier, or Ruff c
    | YAML | `pretty_yaml` | configurable, close to Prettier's YAML style | MIT | crates.io |
    | TOML | `taplo` formatter | taplo style | MIT | crates.io |
    | Markdown | `dprint-plugin-markdown` | CommonMark/GFM, dprint style | MIT | crates.io |
-   | CSS | Biome formatter (`biome_css_formatter`) | Prettier-compatible; standard CSS only (no SCSS/Less) | MIT / Apache-2.0 | same Biome pin |
+   | CSS · SCSS | Biome formatter (`biome_css_formatter`; `.scss` through its SCSS source) | Prettier-compatible; no Less or indented Sass | MIT / Apache-2.0 | same Biome pin |
    | HTML | `markup_fmt` | Prettier-like; embedded `<script>` and `<style>` are handed to the JS and CSS engines through its callback | MIT | crates.io |
 
    Every engine must pass [L2](0004_LAW-2-foss-dependencies.md); `crates/codelaw-cli/tests/licences.rs` checks every crate in `Cargo.lock`, the git-pinned Biome ones included. One transitive crate failed L2: Biome reaches `option-ext` (MPL-2.0) through `directories`. The workspace's `[patch.crates-io]` replaces it with `crates/codelaw-format/shims/option-ext`, an MIT re-implementation of the one trait method `dirs-sys` uses; the licence check sees the shim, not the original. The engine versions are `codelaw_format::ENGINES_FINGERPRINT`, part of every cache key a format result enters (decision 7).
@@ -175,10 +175,13 @@ Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclu
   | TS · TSX | Prettier | 424 | 100.0 % | 100.0 % | 6 |
   | JSON | Prettier | 16 | 100.0 % | 100.0 % | 0 |
   | CSS | Prettier | 189 | 97.4 % | 99.4 % | 10 |
+  | SCSS | Prettier | 212 | 98.6 % | 99.6 % | 7 |
   | YAML | Prettier | 21 | 95.2 % | 99.2 % | 5 |
   | Markdown | Prettier | 88 | 42.0 % | 96.7 % | 0 |
   | HTML | Prettier | 182 | 62.1 % | 68.4 % | 13 |
   | Python | Black | 346 | 97.7 % | 99.6 % | 0 |
+
+  The SCSS row was measured separately on 2026-10-26 (`W-62`), with the same script and pins (Prettier 3.6.2, defaults) at commit `84b392f` plus the W-62 change: 2,288 files in all, 212 of them SCSS— every fenced `scss` example in `packs/` and the files of `fixtures/scss/corpus`; the other rows are the 2026-10-21 run's.
 
   `markup_fmt` (HTML) is the one engine far from Prettier. Markdown differs in a few lines of most files. TOML has no Prettier or Black formatter to compare against.
 - **The binary grows** by the size of six formatter engines. Accepted, because each package must be complete ([L6](0008_LAW-6-python-and-node-packages.md) decision 3).
@@ -188,7 +191,7 @@ Built 2026-10-21 (`W-07`): decisions 1, 2, 4 and 7; decision 5's keys and `exclu
 - **Shell out to Prettier and Black:** rejected. It needs Node and Python at runtime, which breaks [L3](0005_LAW-3-languages.md) independence and [L6](0008_LAW-6-python-and-node-packages.md) completeness, and it adds two more tools for users to install.
 - **`dprint-plugin-typescript` for JS/TS:** kept only as a fallback. It's MIT and on crates.io, but its output isn't Prettier-compatible, which is the style teams expect.
 - **Write codelaw's own formatters:** rejected. It's years of work, and mature permissive engines already exist.
-- **`malva` for CSS** (MIT; handles CSS, SCSS, Sass and Less): kept as the replacement if SCSS or Less ever enter [L3](0005_LAW-3-languages.md).
+- **`malva` for CSS** (MIT; handles CSS, SCSS, Sass and Less): kept as the replacement if Biome's SCSS formatter (new in the 2.5 pin, used for `.scss` since W-62, 2026-10-26) falls short, or Less enters [L3](0005_LAW-3-languages.md).
 - **dprint's WASM plugin host for every language:** deferred. It's one uniform plugin model, but it adds a WASM runtime and a plugin-download step that conflicts with "complete, offline" ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
 
 ### Reference (required)

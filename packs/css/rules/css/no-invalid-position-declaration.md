@@ -1,7 +1,7 @@
 ---
 id: css/no-invalid-position-declaration
 title: "Declarations sit inside rules"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the selector it was meant for is the author's call"
 stability: preview
@@ -34,6 +34,21 @@ color: red;
 #### Do
 
 ```css
+a {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+color: red;
+```
+
+#### Do
+
+```scss
 a {
   color: red;
 }

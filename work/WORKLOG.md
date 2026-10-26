@@ -24,6 +24,15 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-62: SCSS joins as a CSS dialect; the `scss` pack  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-62 (L3 amendment, B-047 ruled: own grammar / tree-sitter-scss), then W-63 as a separate change; Arpit has approved everything.
+- **Done:** `Language::Scss`; tree-sitter-scss vendored as D-33; Biome formats `.scss` (98.6 % identical files vs Prettier on 212 files); the CSS statement reader reads Sass (`//`, `#{}`, `@mixin`/`@include`/`@use`/`@if`, nested properties, `&-suffix`, `!default`) and 64 of 71 `css/*` rules declare `scss`; the `scss` pack with 15 rules, `scss/recommended` and `scss/strict`; L3, L6 (sixteen packs), L7, SR-RULE-PACKS, SR-PACKAGES, SR-LINTER, SR-FORMATTER, SR-ARCHITECTURE amended; `init`, the VS Code extension, the config schema, `format-parity.py`; **`CLAUDE.md` edited** (the L3 and L6 lines and the `packs/` count, SR-WORK-DOCS decision 7a).
+- **Decided / left open:** `scss/operator-no-unspaced` not shipped (layout: SR-FORMATTER decision 3 refuses it); `scss/at-if-no-null` fixes `!= null` only (tree-sitter-scss reads `@if not …` as an error, and the fix verifier refuses an edit that adds one). Left: the grammar patch and moving the CSS rules onto trees, a pinned SCSS corpus, the graph on `.scss` (the item's *Left* section).
+- **Mistakes:** the shared `target/` hashes workspace crates by their path inside the workspace, so parallel worktrees overwrite each other's `codelaw-core` and `target/debug/codelaw`: builds failed with a stale core and tests ran another lane's binary. `touch crates/*/src/lib.rs` before a build, and copy the `deps/codelaw-<hash>` that holds your change.
+- **Next:** W-63 (CSS Modules), then the *Left* list.
+
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*
