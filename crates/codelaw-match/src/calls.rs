@@ -42,8 +42,16 @@ fn callee_of<'t>(n: Node<'t>) -> Option<Node<'t>> {
     }
 }
 
+/// One path segment against an item's: a name, `*` or `*<suffix>`.
+fn segment_matches(item: &str, seg: &str) -> bool {
+    match item.strip_prefix('*') {
+        Some(suffix) => seg.ends_with(suffix),
+        None => item == seg,
+    }
+}
+
 fn names_match(item: &[&str], callee: &[&str]) -> bool {
-    item.len() == callee.len() && item.iter().zip(callee).all(|(i, c)| *i == "*" || i == c)
+    item.len() == callee.len() && item.iter().zip(callee).all(|(i, c)| segment_matches(i, c))
 }
 
 /// Whether `node` is a call to one of `items`.
@@ -53,7 +61,7 @@ pub fn is_call_to(node: Node<'_>, src: &str, model: &SemanticModel, items: &[Cal
     let Some(root) = model.reference_at(root_at) else { return false };
     items.iter().any(|item| {
         let name: Vec<&str> = item.name.split('.').collect();
-        if name[0] == "*" {
+        if name[0].starts_with('*') {
             return item.modules.is_empty() && names_match(&name, &segs);
         }
         if item.modules.is_empty() {
@@ -84,6 +92,45 @@ pub fn is_call_to(node: Node<'_>, src: &str, model: &SemanticModel, items: &[Cal
             Imported::Star | Imported::SideEffect => false,
         }
     })
+}
+
+const FUNCTIONS: &[&str] = &[
+    "function_declaration",
+    "function_expression",
+    "function",
+    "arrow_function",
+    "method_definition",
+    "generator_function_declaration",
+    "generator_function",
+    "function_definition",
+    "lambda",
+];
+
+const CALLS: &[&str] = &["call_expression", "call"];
+
+/// Whether `node` is a function, or sits in one, and that function or one
+/// enclosing it contains a call to one of `items` (`function_calls:`).
+/// The outermost enclosing function holds every inner one, so it alone is
+/// searched.
+pub fn function_calls(node: Node<'_>, src: &str, model: &SemanticModel, items: &[CallItem]) -> bool {
+    let mut outer = None;
+    let mut at = Some(node);
+    while let Some(n) = at {
+        if FUNCTIONS.contains(&n.kind()) {
+            outer = Some(n);
+        }
+        at = n.parent();
+    }
+    let Some(outer) = outer else { return false };
+    let mut cursor = outer.walk();
+    let mut stack = vec![outer];
+    while let Some(n) = stack.pop() {
+        if CALLS.contains(&n.kind()) && is_call_to(n, src, model, items) {
+            return true;
+        }
+        stack.extend(n.named_children(&mut cursor));
+    }
+    false
 }
 
 /// Whether the local `sym` is declared as `const x = f(…)` where `f` is an

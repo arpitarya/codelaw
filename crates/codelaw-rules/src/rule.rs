@@ -609,7 +609,11 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
         } else if let Some(d) = &spec.default
             && !spec.accepts(d)
         {
-            err(&mut errors, 2, format!("option `{name}`: the default is not a `{}`", spec.kind));
+            let why = match crate::calls::parse_call_items(d) {
+                Err(e) if spec.kind == "call[]" => format!(": {e}"),
+                _ => String::new(),
+            };
+            err(&mut errors, 2, format!("option `{name}`: the default is not a `{}`{why}", spec.kind));
         }
     }
     // A `call[]` option declares its `<opt>_mode` (decision 2, W-73).

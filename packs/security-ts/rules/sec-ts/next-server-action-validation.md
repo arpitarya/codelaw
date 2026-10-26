@@ -7,9 +7,41 @@ fix_reason: "the schema and the authorisation check are written by the author"
 stability: preview
 security: { cwe: [20, 862], owasp: ["A01:2025"], severity: high }
 since: 0.3.0
+options:
+  validators:
+    type: "call[]"
+    description: "calls that check input, any one of which in the function counts: a callee path or { name, module }; `validators_mode: replace` makes yours the only ones that count"
+    default:
+      - { name: "z.*", module: zod }
+      - { name: "z.*.*", module: zod }
+      - "*Schema.parse"
+      - "*schema.parse"
+      - "*.parseAsync"
+      - "*.safeParse"
+      - "*.safeParseAsync"
+      - { name: "v.*", module: valibot }
+      - { name: parse, module: valibot }
+      - { name: safeParse, module: valibot }
+      - { name: parseAsync, module: valibot }
+      - { name: "yup.*", module: yup }
+      - { name: "Joi.*", module: joi }
+      - { name: "joi.*", module: joi }
+      - "*.validate"
+      - "*.validateSync"
+      - "*.validateAsync"
+      - { name: validate, module: [class-validator, superstruct] }
+      - { name: validateOrReject, module: class-validator }
+      - { name: validateSync, module: class-validator }
+      - { name: plainToInstance, module: class-transformer }
+      - { name: assert, module: superstruct }
+      - { name: create, module: superstruct }
+      - "*.assert"
+      - { name: "typia.*", module: typia }
 ---
 
 An exported function in a `"use server"` file that takes arguments calls a validator (`schema.parse`, `safeParse`, `validate`) on them.
+
+**Your validator:** the function passes when it calls one of the `validators` anywhere in its body, or in a function around it: the built-in list (zod and valibot imports and a `*Schema.parse`, any `.safeParse`, `.parseAsync`, `.validate` or `.assert`, yup, joi, class-validator, class-transformer's `plainToInstance`, superstruct, typia) plus your own, each matched by name and by the module it is imported from, so a local `function validate(x) { return x }` does not count. `validators_mode = "replace"` makes yours the only ones that count. Add a project function with `validators = [{ name = "checkInput", module = "@acme/validation" }]`. A validator that a helper calls for you is not seen: name the helper.
 
 **Why:** A server action is a public HTTP endpoint: its arguments come from the client whatever the form looks like, so an unchecked one writes what an attacker sends (CWE-20, CWE-862). Whether the function also checks who is calling is not decided from the syntax.
 
@@ -29,11 +61,9 @@ match:
         has:
           kind: expression_statement
           regex: '^["'']use server["'']'
-    - not:
-        has:
-          field: body
-          regex: '(?i)[A-Za-z_$]*schema\.(safeParse|parse|parseAsync)\(|\.safeParse\(|\.parseAsync\(|\bz\.|valibot|\bv\.(parse|safeParse)|validate|class-validator|plainToInstance|\.assert\(|ajv|typia|\byup\b|\bjoi\b'
-message: "This server action uses its arguments without validating them"
+where:
+  $$MATCH: { not: { function_calls: validators } }
+message: "This server action uses its arguments without calling a validator (add yours to `validators`)"
 ```
 
 ## How to fix

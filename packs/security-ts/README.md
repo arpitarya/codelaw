@@ -71,8 +71,10 @@ Every rule carries `security: { cwe, owasp, severity }` ([SR-RULE-FORMAT](../../
 ## Syntax, not types
 
 codelaw reads one file's syntax; it has no type checker. So 'typed `any`' means the word `any` is written there (`sec-ts/no-any-request-handler`), and 'a validator in
-the function' means a call to `parse`, `safeParse`, `validate` or a schema's method appears in the same function (`sec-ts/no-unchecked-cast-of-input`,
-`sec-ts/next-server-action-validation`). An `any` that is inferred, a validator that runs in another function or another file, and a guard registered in a module are not
+the function' means a call to one of the rule's `validators` appears in the function or one around it (`sec-ts/no-unchecked-cast-of-input`,
+`sec-ts/next-server-action-validation`): zod, valibot, yup, joi, class-validator, superstruct and typia matched by the module they are imported from, and a schema's
+`parse`, `safeParse` or `validate`; add your own with `validators = [{ name = "checkInput", module = "@acme/validation" }]`, or make it the only one with
+`validators_mode = "replace"`. An `any` that is inferred, a validator that runs in another function or another file, and a guard registered in a module are not
 seen; the rules that depend on them are `strict`, and each page says what it cannot see. What type information would add (the real type of `req.body`, whether a
 value flows from a request through a call) waits on [B-049](../../work/BACKLOG.md), the type-aware rules.
 
