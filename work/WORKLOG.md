@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-65 closed: L11's dependency check built  ·  Claude Code, parallel lane (Sonnet 5.5)
+
+- **Asked:** *"W-65 — L11's CI check"* (brief: implement fully, land through lockmaster).
+- **Done:** `crates/codelaw-cli/tests/dependencies.rs` and the ledger block at the end of `DEPENDENCIES.md` (per unit: members and ratified tree as `name@major`; `own` for codelaw's own code). Fails on an unlisted Cargo/npm/Python/action dependency, a grown tree (a new package or major), a unit in use with no valid row status, a lockfile package outside every tree, a script or hook importing past the Python standard library. SR-LAW-11 decision 7 now says built and `owns:` the two files; the Ownership table and register updated; CI runs it in `cargo test --workspace`.
+- **Decided / left open:** `option-ext`'s MIT stand-in and the sibling tool `lockmaster` (imported in `now-ledger.py`) are `own`, not dependencies — if the decider disagrees, they need rows. `bit-set` is declared in the root `Cargo.toml` and used by no crate; the check ignores `[workspace.dependencies]` declarations. W-67 deletes its three units' rows and ledger lines when it removes the crates.
+- **Mistakes:** none.
+- **Next:** W-67 drops `strsim`, `anyhow`, `postcard` and their ledger lines.
+
 ## 2026-10-26 — W-45: demo PR opened for DoD 2; CHANGELOG names W-45 and W-47  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** open the PR that runs `codelaw check --format github`; fix the CHANGELOG gap.
