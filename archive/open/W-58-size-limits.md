@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-26: size limits for JS, TS and Python — max lines
 item: W-58
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-26
-updated_by: "Claude Code (Sonnet 5.5)"
+updated: 2026-10-27
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -85,7 +85,7 @@ All six are `fix: manual` — splitting a file or a function changes structure, 
 | 3 · | a wrong option type (e.g. `max = "300"`) is a load error, exit 2 | ✅ |
 | 4 · | `codelaw baseline add --rule js/max-lines` freezes today's long files; a new long file errors | ✅ |
 | 5 · | JSON and SARIF carry the measured value and the limit | ✅ |
-| 6 · | L8: `check_warm_10k` unchanged (counting reuses the parsed tree) | ⏳ CI's `perf` job on the merge: the six rules are in no preset the workload extends, so the budgeted operations do not run them; the opt-in cost is unmeasured |
+| 6 · | L8: `check_warm_10k` unchanged (counting reuses the parsed tree) | ✅ 2026-10-27 — CI run 40382552494, `perf` job on `a5c2a5b` (GitHub ubuntu-24.04 runner, the L8 reference machine; the six rules landed 2026-10-26): `check_warm_10k` p95 157.0 ms (median 154.1) against 331 ms; `check_cold_10k` p95 4969.6 ms (median 4677.1) against 13118 ms; every budgeted operation within. The six rules are in no preset the workload extends, so the opt-in cost stays unmeasured (a later item if the decider wants it) |
 
 ## Built, and what is left
 
@@ -94,7 +94,9 @@ Landed 2026-10-26 (Claude Code, Sonnet 5.5): `crates/codelaw-native/src/size.rs`
 Left, on a runner I do not have (the corpus counts landed on 2026-10-26, in the CI repair; confirmed present 2026-10-26):
 
 1. ~~**Corpus counts:** `scripts/corpus.py run --binary <codelaw> --update --pack js` and `--pack python`, then commit the six new `[findings]` rows in `packs/js/corpus.toml` and `packs/python/corpus.toml` (needs the pinned repositories cloned).~~ Done.
-2. **DoD 6:** CI's `perf` job on the merge, for `check_warm_10k` and `check_cold_10k` — and, if the decider wants it, the same workload with `js/size` on, to put a number on the opt-in cost.
+2. ~~**DoD 6:** CI's `perf` job on the merge, for `check_warm_10k` and `check_cold_10k`.~~ Done 2026-10-27 (run 40382552494; numbers in the DoD table). Not done, and not in this item's DoD: the same workload with `js/size` on, to put a number on the opt-in cost — only if the decider asks.
+
+**Closed 2026-10-27:** every DoD met.
 
 ## Blockers
 
