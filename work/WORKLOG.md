@@ -24,14 +24,6 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
-## 2026-10-26 — CI perf gate: `check_warm_10k` over budget, cache never hit for files with findings  ·  Claude Code (Sonnet 5.5)
-
-- **Asked:** *find which L8 budget broke in CI run 40315989524 and optimise the real cause; never loosen a budget.*
-- **Done:** only `check_warm_10k` was over (p95 1562 ms, budget 331 ms; the other budgeted rows were within). Reproduced locally (1106 cache misses on every warm run); instrumented the lookup: the entries were written but did not decode. Cause: W-61's `skip_serializing_if` on `Diagnostic.data` against W-67's positional codec. Fixed with a hand-written `Serialize` for `Diagnostic` and a codec round-trip test. No budget touched.
-- **Decided / left open:** the CI runner's p95 for `check_warm_10k` needs the next `perf` run; this machine was at load average 18, so its absolute numbers (356 ms median, 370 ms p95 here) are noise-bound and only the hit count (10001/0) is exact.
-- **Mistakes:** none.
-- **Next:** read the next CI `perf` summary; if `check_warm_10k` is still over, profile the all-hit path (read + key hashing).
-
 ## 2026-10-26 — Cross-lane cleanup after thirteen landings  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** fix what the thirteen parallel lanes left: a duplicate `D-33`, a red docs-sync, the MCP tool list, clippy, the build-tool declaration.
