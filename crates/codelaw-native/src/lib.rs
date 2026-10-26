@@ -48,6 +48,7 @@ mod react;
 mod react_hooks;
 mod tanstack_query;
 mod redux_toolkit;
+mod size_lines;
 mod regexp;
 mod stencil;
 mod typescript;
@@ -201,8 +202,13 @@ static JS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars 
 static TS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "ts/no-unused-vars", languages: TS_ONLY };
 static TS_NO_UNUSED_EXPRESSIONS: typescript::NoUnusedExpressions = typescript::NoUnusedExpressions { id: "ts/no-unused-expressions", languages: TS_ONLY };
 
+static CSS_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::css("css/max-lines");
+static HTML_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::html("html/max-lines");
+
 /// Every native rule; ids are unique, order doesn't matter.
 static REGISTRY: &[&dyn NativeRule] = &[
+    &CSS_MAX_LINES,
+    &HTML_MAX_LINES,
     &css_values::AlphaValueNotation,
     &css_declarations::AnnotationNoUnknown,
     &css_atrules::AtRuleDescriptorNoUnknown,
