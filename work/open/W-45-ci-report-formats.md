@@ -37,13 +37,13 @@ ball: agent
 | DoD | what | state |
 |---|---|---|
 | 1 · | each format validated against its published schema/XSD in a test | ✅ |
-| 2 · | GitHub: a real run on this repo shows annotations on a PR | ⏳ |
+| 2 · | GitHub: a real run on this repo shows annotations on a PR | ⏳ PR open: [#3](https://github.com/arpitarya/codelaw/pull/3), waiting for Arpit's look |
 | 3 · | the same input gives byte-identical output (L5) | ✅ |
 | 4 · | exit codes unchanged | ✅ |
 
 ## What is left
 
-- DoD 2: push, open a PR with `codelaw check --format github` in the workflow, and look at the annotations. Nothing else.
+- DoD 2: **PR [#3](https://github.com/arpitarya/codelaw/pull/3) is open** (draft; its run did put the 5 annotations on `a.js`/`a.py` per the check-runs API; branch `demo/W-45-annotations-v2`, workflow `w45-annotations-demo`). The one step left is Arpit's: open Files changed, confirm the 2 errors and 3 warnings show inline on `w45-demo/a.js` and `a.py`, say so here; then close the PR and delete the branch. (Was: push, open a PR with `codelaw check --format github` in the workflow, and look at the annotations.)
 - JUnit/Checkstyle schema checks need `xmllint` (libxml2); the test skips loudly without it. Checkstyle publishes no schema, so `checkstyle.xsd` is its format description written down.
 
 

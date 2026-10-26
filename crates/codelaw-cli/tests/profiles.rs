@@ -132,21 +132,21 @@ fn remap_never_errors_never_warns_or_only_errors() {
         r#"[rules]
 "fixture/py-no-print" = "warn"
 
-[[overrides]]
+[scope.scripts]
 files = ["scripts/**"]
 remap = { error = "warn" }
 
-[[overrides]]
+[scope.gen]
 files = ["gen/**"]
 remap = { error = "off", warn = "off", info = "off" }
 
-[[overrides]]
+[scope.payments]
 files = ["payments/**"]
 remap = { warn = "error" }
 
-[profiles.ci]
+[profile.ci]
 rules = { "fixture/py-no-print" = "error" }
-overrides = [{ files = ["legacy/**"], remap = { error = "info" } }]
+scope = { legacy = { files = ["legacy/**"], remap = { error = "info" } } }
 "#,
     )
     .unwrap();
@@ -181,7 +181,7 @@ overrides = [{ files = ["legacy/**"], remap = { error = "info" } }]
 
     // `config --print --for` shows the remap and where it came from.
     let (_, out, _) = codelaw_env(&d, &["config", "--print", "--for", "legacy/a.py"], &[("CI", "true")]);
-    assert!(out.lines().any(|l| l.starts_with("remap.error = \"info\"") && l.contains("profile ci override #1")), "{out}");
+    assert!(out.lines().any(|l| l.starts_with("remap.error = \"info\"") && l.contains("profile ci scope legacy")), "{out}");
 
     // A bad remap is a config error naming the nearest value.
     fs::write(d.join("codelaw.toml"), "[[overrides]]\nfiles = [\"a/**\"]\nremap = { error = \"wran\" }\n").unwrap();

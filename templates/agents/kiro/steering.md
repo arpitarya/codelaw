@@ -1,0 +1,6 @@
+---
+inclusion: always
+---
+{{note}}
+
+{{body}}

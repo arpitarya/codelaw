@@ -16,7 +16,11 @@ pub struct ConfigArgs {
     /// Print `codelaw.schema.json`, the JSON Schema of the config.
     #[arg(long, conflicts_with = "print")]
     schema: bool,
-    /// Resolve for this file: nested configs, `[[overrides]]` and `languages` apply.
+    /// List every scope with its files and where it is written, in the
+    /// order they apply.
+    #[arg(long, conflicts_with_all = ["print", "schema"])]
+    scopes: bool,
+    /// Resolve for this file: nested configs, `[scope.<name>]` and `languages` apply.
     #[arg(long = "for", requires = "print")]
     for_path: Option<PathBuf>,
     /// text or json.
@@ -35,8 +39,8 @@ pub fn run(args: ConfigArgs) -> ExitCode {
         print!("{}", codelaw_config::SCHEMA);
         return ExitCode::SUCCESS;
     }
-    if !args.print {
-        return fail("`codelaw config` takes --print [--for <file>] or --schema");
+    if !args.print && !args.scopes {
+        return fail("`codelaw config` takes --print [--for <file>], --scopes or --schema");
     }
     let json = match args.format.as_str() {
         "text" => false,
@@ -48,6 +52,25 @@ pub fn run(args: ConfigArgs) -> ExitCode {
         Ok(p) => p,
         Err(e) => return fail(e),
     };
+    if args.scopes {
+        let scopes = project.config.scope_list();
+        if json {
+            let v: Vec<serde_json::Value> = scopes
+                .iter()
+                .map(|s| serde_json::json!({ "name": s.name, "files": s.files, "exclude": s.exclude, "source": s.source, "profile": s.profile }))
+                .collect();
+            println!("{}", serde_json::to_string_pretty(&v).expect("json"));
+        } else if scopes.is_empty() {
+            println!("no scopes");
+        } else {
+            for s in &scopes {
+                let exclude = if s.exclude.is_empty() { String::new() } else { format!(" except {}", s.exclude.join(", ")) };
+                let profile = s.profile.as_ref().map(|p| format!(" (profile {p})")).unwrap_or_default();
+                println!("{}{profile}: {}{exclude}\n    {}", s.name, s.files.join(", "), s.source);
+            }
+        }
+        return ExitCode::SUCCESS;
+    }
     let env = TraceEnv { cache_dir: std::env::var("CODELAW_CACHE_DIR").ok(), no_cache: args.no_cache };
     let file = args.for_path.as_deref();
     let values = project.config_trace(file, &env);

@@ -24,6 +24,118 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-65 closed: L11's dependency check built  ·  Claude Code, parallel lane (Sonnet 5.5)
+
+- **Asked:** *"W-65 — L11's CI check"* (brief: implement fully, land through lockmaster).
+- **Done:** `crates/codelaw-cli/tests/dependencies.rs` and the ledger block at the end of `DEPENDENCIES.md` (per unit: members and ratified tree as `name@major`; `own` for codelaw's own code). Fails on an unlisted Cargo/npm/Python/action dependency, a grown tree (a new package or major), a unit in use with no valid row status, a lockfile package outside every tree, a script or hook importing past the Python standard library. SR-LAW-11 decision 7 now says built and `owns:` the two files; the Ownership table and register updated; CI runs it in `cargo test --workspace`.
+- **Decided / left open:** `option-ext`'s MIT stand-in and the sibling tool `lockmaster` (imported in `now-ledger.py`) are `own`, not dependencies — if the decider disagrees, they need rows. `bit-set` is declared in the root `Cargo.toml` and used by no crate; the check ignores `[workspace.dependencies]` declarations. W-67 deletes its three units' rows and ledger lines when it removes the crates.
+- **Mistakes:** none.
+- **Next:** W-67 drops `strsim`, `anyhow`, `postcard` and their ledger lines.
+
+## 2026-10-26 — W-45: demo PR opened for DoD 2; CHANGELOG names W-45 and W-47  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** open the PR that runs `codelaw check --format github`; fix the CHANGELOG gap.
+- **Done:** draft PR https://github.com/arpitarya/codelaw/pull/3 (branch `demo/W-45-annotations-v2`, never to merge) runs the formats on `w45-demo/` (2 errors, 3 warnings); `CHANGELOG.md` gains the W-45 and W-47 lines.
+- **Decided / left open:** DoD 2 stays open until Arpit looks at the annotations on PR 3 and says so; then close the PR and delete the branch.
+- **Mistakes:** none.
+- **Next:** Arpit looks at PR 3's Files changed tab.
+
+## 2026-10-26 — W-49: dev-server plugins for Vite, webpack, Rspack, Next.js  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-44's remaining agent work, then W-49 (lane brief).
+- **Done:** W-44: nothing an agent can still do — its Windows paths are already `cfg`-guarded (inode, Ctrl-C) and the rest is CI-only; no change. W-49: `packaging/npm/{dev-core,vite-plugin,webpack-plugin,next}`, `scripts/package.py` (stage, check, names, `sync-dev-core`), SR-PACKAGES decision 3a, `plugins.test.js` and `crates/codelaw-cli/tests/dev_plugins.rs`, USAGE, CHANGELOG.
+- **Decided / left open:** three packages, not four (Rspack runs the webpack plugin); no shared package because a package may have no dependency, so one source is copied and checked. Left: an example app on each real host and the first publish.
+- **Mistakes:** none that landed; `package.py check`'s wheel regex rejects `codelaw_rules_security_js` (an underscore) — found, not mine to change here.
+- **Next:** the decider ratifies the hosts for an examples job, or publishes the three packages.
+
+## 2026-10-26 — W-51: scheduled auto-fix PR (`init --ci … --autofix`)  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** implement W-51 in a parallel lane.
+- **Done:** `ci.rs` (a slot-only renderer, writer, install), four templates under `templates/ci/`, `--ci/--autofix/--unsafe` on `init`, `tests/ci_autofix.rs`, SR-CLI-MCP decision 12, CHANGELOG, queue row.
+- **Decided / left open:** the renderer is a stand-in until W-60 lands its own (same `{{slot}}` and `\{{` rules); DoD 1 and 3 need a real GitHub repo; the exceptions section is guarded until W-46; no deps-snapshot section (the job is offline, L5).
+- **Mistakes:** none.
+- **Next:** run the workflow once on a throwaway GitHub repo; W-60 registers these templates.
+
+## 2026-10-26 — W-34: the Fux index packages built (steps 2–4)  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** do W-34 steps 2–4 now that Fux's index-package item (fux item 299) is closed; leave step 5 (reserve names, publish) to Arpit.
+- **Done:** L6 decision 12 (and the law sentence, decision 10, the veto), SR-PACKAGES decision 14 and SR-RULE-PACKS decision 6; `scripts/fux-index.py` and a `suffix` on `package.py`'s pack builders; `ci.yml`'s `package` job; `init` prints the install and pin lines when `.fux/` exists and installs nothing (`tests/fux_index.rs`); RELEASING.md, DEPENDENCIES.md D-33, CHANGELOG.
+- **Decided / left open:** the two open questions answered in the item (print whenever `.fux/` exists; version left to Fux's pin plus our manifest check), for the decider to overrule. Sixteen packages, not twenty-two: the four empty security packs wait for a rule. Index packages stay out of `dist/npm` and `dist/pypi` so `publish.yml` cannot trip on an unreserved name. Left: Arpit reserves and publishes the 16 names, and ratifies `fux-engine` (L11).
+- **Mistakes:** none that landed; the first assemble run failed on the empty security packs and a temp-dir scope bug, both fixed before commit.
+- **Next:** Arpit's step 5.
+
+## 2026-10-26 — W-61: `html/max-lines` and `css/max-lines`, with `html/size` and `css/size`  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-61 — a max-lines rule for HTML and CSS (CSS, SCSS and CSS Modules), with W-58's options shape.
+- **Done:** `crates/codelaw-native/src/size_lines.rs` (a text scanner, no tree: comments, strings, unquoted `url(…)`, SCSS `//`, `@import`/`@use`/`@forward` statements, HTML `<!-- -->` and `<script>`/`<style>` bodies); the two rule pages with cases; the two opt-in `size` presets, added to both pack manifests; USAGE's `Size limits` section; SR-RULE-PACKS decision on the `size` presets; unit tests for every option. Both rules do nothing on a region (a `<style>` in a page, a fence in Markdown): the host file only.
+- **Decided / left open:** W-58's counter is tree-based and not landed, so this item has its own text scanner rather than waiting. Left: DoD 3 (a `[scope]` for `_*.scss` partials) needs W-59 and W-62; the measured `data` in JSON/SARIF needs W-58's `data_of` trait method (the message already ends ` (max N…`, the shape its parser reads).
+- **Mistakes:** a shared `CARGO_TARGET_DIR` made cargo reuse another lane's artifacts for same-named workspace crates (one build failed on another lane's `Language::Scss`); verified with a private `RUSTFLAGS` so the fingerprints differ.
+- **Next:** merge main after W-58 and W-59 land, add `data_of`, and close DoD 3.
+
+## 2026-10-26 — W-57 closed: the `security-python` pack, 61 rules  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *"W-57 (work/open/W-57-security-python-pack.md, 61 rules). Every rule needs a fix (L4), fixtures and tests."* by the lead agent, on Arpit's approval of the security-pack lane.
+- **Done:** 61 `match:` rules in `packs/security-python/rules/sec-py/` with examples, `.cases.md` sidecars (positions from marks in the source) and a fix class each (17 `suggest` with a verified `fix:`, 44 `manual`); `data/sources/` for `from_source:`; both presets; the README with the Bandit and Ruff `S` accounting; the corpus snapshot over Flask, Starlette, full-stack-fastapi-template and djangoproject.com; the false positives that run showed were fixed first (test files excluded from the noisy rules, cookie flags passed as variables, bare `except`, `Response`, `key=` in a non-crypto call). Closed and archived W-57.
+- **Decided / left open:** `no-xpath-injection`, `no-xmlrpc` and `no-cleartext-http` are `manual`, not `suggest`: no edit of the code alone is right. The ReDoS check for a literal pattern is not built (`from_source:` cannot sit beside a literal-pattern alternative in one rule). Every rule stays `preview`. The PyPI upload is the decider's.
+- **Mistakes:** the first `codelaw test` of a single rule file reported "does not fire" for every `match:` rule, which was the single-file load path, not the rule; running the pack folder is the check. A `where:` on a capture that only one alternative of an `any:` binds makes every other alternative fail, and an `any:` does not fall back to the next alternative when the first matched structurally but a predicate failed; the rules were written around both.
+- **Next:** review the `security-python` counts and promote the rules whose findings hold; W-54 to W-56 are the other three packs.
+
+## 2026-10-26 — W-50 closed: post-commit reminders  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-50 after W-46 landed (`2120458`).
+- **Done:** `post-commit.sh` prints the committer's exceptions expiring within 7 days and the 30-day burn-down total; test added; SR-CLI-MCP decision 11, USAGE, CHANGELOG updated; W-50 archived.
+- **Decided / left open:** the reminders live in the script, not as `post-commit.d` files, so an installed hook needs `init --git-hooks` re-run. The burn-down "delta" is `baseline history`'s total row (no new command).
+- **Mistakes:** first threshold counted lines (a one-row report is 2 lines, as is an empty one); the test caught it.
+- **Next:** none.
+
+## 2026-10-26 — W-46 built: `codelaw exceptions` and `list_exceptions`  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** build W-46 (CLI plus MCP twin), then W-50's post-commit reminder.
+- **Done:** engine `Project::exceptions()` collects baseline entries, deprecations (their symbol's baseline entries folded in) and inline ignores; `codelaw-report::exceptions` filters, groups and renders text, JSON, CSV and markdown; CLI `exceptions` and MCP `list_exceptions`; SR-BASELINE decision 11 and SR-CLI-MCP updated; tests `exceptions.rs` and the parity test.
+- **Decided / left open:** `[[overrides]]` are not listed (no `expires`; decision 9). `--fail-if-expiring` counts expired rows too.
+- **Mistakes:** the shared `CARGO_TARGET_DIR` lets lanes overwrite each other's `target/debug/codelaw` between build and test (an old binary answered "unrecognized subcommand"); rebuilt and reran until green.
+- **Next:** W-50's post-commit reminders.
+
+## 2026-10-26 — W-67 closed: strsim, anyhow and postcard replaced  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** replace the three dependencies the decider ruled "Remove" / "Replace" in W-66, and measure L8 before and after.
+- **Done:** `levenshtein` and `jaro_winkler` in `codelaw-core::similar` (with known-pair tests) replace `strsim` in config, schema and target; the unused `anyhow` line left `codelaw-format`; the cache body is now codelaw's own deterministic binary format (`codelaw-cache/src/codec.rs`, header version 2; tests: round trip, fixed layout, every truncation, bit flips, a huge length, an old-version entry, a truncated entry). `postcard` left the workspace; D-20, D-23, D-24 left `DEPENDENCIES.md`; SR-CACHE decision 4 and SR-LAW-11 context updated; W-67 archived.
+- **Decided / left open:** `strsim` (via clap) and `anyhow` (via markup_fmt) are still in `Cargo.lock` as parts of ratified trees — said so in `DEPENDENCIES.md`, not fought. L8 was measured on this (loaded) machine only: no slower; the CI-runner numbers are the `perf` job's.
+- **Mistakes:** concurrent lanes share one target dir and overwrite each other's `codelaw_core` artifacts (cargo then said `cannot find similar in codelaw_core`); worked around with a per-package profile setting so my builds had their own hash. `mcp_parity` reads another lane's clobbered `codelaw` binary (10 tools, not 9) — not this change.
+- **Next:** none for W-67.
+
+## 2026-10-26 — W-60: L10 built, every consumer-file text is a template  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *implement L10: one template per consumer file under `templates/`, a registry, a slot-only renderer and a test.*
+- **Done:** `templates/` (`init`, `git-hooks`, `agents`, `new-rule`) with the registry in `templates/README.md`; `codelaw_core::template` (slots, `\{{`, errors on unfilled or unknown slots, no dependency); `init.rs`, `git_hooks.rs`, `rules_cmd.rs`, `sync.rs`, `skills.rs` render from it; `agents/` is now `templates/agents/` and the hook scripts left `crates/codelaw-cli/src/hooks/`; CLAUDE.md §Layout names `templates/` (said out loud: a layout line only); ownership rows and the 0012, 0101, 0102, 0107, 0108, 0115 records updated. Output byte-identical: 95 files diffed before and after.
+- **Decided / left open:** W-51 landed first with its own renderer in `ci.rs` and `templates/ci/`; on merging I replaced its renderer with the core one and added its four templates to the registry. Any later writer (W-49) follows L10 from the start. SR-LAW-10 is `yes` in the register.
+- **Mistakes:** the shared target dir gave another lane's `codelaw-core` rlib to my build twice (same artefact hash across worktrees); fixed with a per-package profile override so the hash differs. `a_rule_panic_exits_2` failed in a full parallel run and passes alone; not looked into.
+- **Next:** none for W-60.
+
+## 2026-10-26 — W-59: `[scope.<name>]` and `[profile.<name>]`  ·  Claude Code, parallel lane (Opus 5.5)
+
+- **Asked:** *W-59: named, singular config tables — `[scope.utils]` for a group of files, `[profile.ci]` for an environment — with preset-shipped scopes a project extends by name; the old spellings stay one minor release.*
+- **Done:** SR-CONFIG decisions 3a, 4, 10, 11 and §1 amended; loader (`scope.rs`): ordered scope table, name check, preset scopes merged under the project's, profile scopes inheriting `files`, deprecation warnings for `[[overrides]]` and `[profiles.*]`; presets carry `[scope.*]` (SR-RULE-PACKS decision 3) and the rule set hands them to the config; `config --scopes`, scope names in `config --print`; schema, tests, USAGE, README, CHANGELOG, GLOSSARY, DESIGN, the suppress skill. Item closed.
+- **Decided / left open:** preset globs written `**/…` (the item's `*.config.*` would only match the root); a merged scope keeps the preset's place in the order; a `pyproject.toml` home reads its scopes in file order too (positions from the text). The alias goes in the next minor release (CHANGELOG says so). B-050 (`codelaw migrate`) and W-58 must use the new spelling when built.
+- **Mistakes:** the shared `target/debug/codelaw` is overwritten by every lane's build, so a CLI test can run another lane's binary; the tests were run from a private copy of the binary with the baked path patched, after every `cargo test` that skipped the relink gave a false red.
+- **Next:** none for W-59.
+
+## 2026-10-26 — W-54 built: `security-js`, 66 rules  ·  Claude Code, lockmaster (Sonnet 5.5)
+
+- **Asked:** *"W-54 (security-js pack, 66 rules), every rule with a fix (L4), fixtures and tests"* — a sub-agent of a parallel session, Arpit having approved everything.
+- **Done:** 66 rule files under `packs/security-js/rules/sec-js/` with `.cases.md` sidecars (generated from one table kept outside the repo, then read and tested rule by rule), five `data/sources/` tables, the two presets, the README with the not-ported table, NOTICE, `corpus.toml`. `codelaw test packs/security-js`: 66 rules · 1482 checks · 0 failed. The corpus run (744 files) showed false positives in `timing-safe-compare`, `no-hardcoded-secret` and `missing-rate-limit`; each was fixed and became a case. W-54 archived; SR-RULE-PACKS names what landed.
+- **Decided / left open:** the catalogue's `auto` for `no-bidi-characters` and `suggest` for `no-cleartext-http` are not reachable with the edit primitives (a native rule would do both: not built, because a build was past the disk ceiling at the time); the other differences are at the foot of the item. A release-build timing of the pack is the `perf` job's.
+- **Mistakes:** assumed an `any:` tries each branch with its own `constraints:` — it runs the first branch that matches the shape, and a constraint that fails then ends the match; found by a case, fixed by `all:` with `regex:` per branch.
+- **Next:** W-55 (`security-ts`), which extends this pack.
+
+## 2026-10-26 — W-56 closed: `security-html`, 19 rules  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** build W-56 in a parallel lane: every rule with a fix (L4), fixtures and tests.
+- **Done:** `crates/codelaw-native/src/html_security.rs` (19 native rules on the `html/*` document model, registered in `lib.rs`), `packs/security-html/rules/sec-html/` (a rule file and a cases sidecar each; `security:` on all), the two presets (14 + 5 rules, extending `html/security`), `corpus.toml` counts on `flask`, `html5-boilerplate` and `djangoproject.com`, the pack README, `NOTICE`, the SR-RULE-PACKS row, `README.md` counts, `crates/codelaw-cli/tests/security_html.rs`. `suggest` fixes (`https://`, `method="post"`, `sandbox`, `crossorigin`, `referrerpolicy`, `ng-href`) apply with `--unsafe`; `sec-html/no-sensitive-comments` is `auto`. W-56's file archived.
+- **Decided / left open:** the preset split is mine: `strict` holds `no-external-base`, `no-plugin-embed`, `no-sensitive-comments`, `form-csrf-token`, `iframe-allow-powerful`, the rules that cannot tell a legitimate use from a risky one; the rest are in `recommended`. Uploading the pack to npm and PyPI is the release's (W-38), not this item's.
+- **Mistakes:** `target/debug/codelaw` is one file shared by every lane building into the shared target dir, so a test that runs the binary can run another lane's build; a copy taken right after a forced rebuild gave the right one.
+- **Next:** none for W-56; W-54, W-55 and W-57 are the sibling packs.
+
 ## 2026-10-26 — W-58: size limits for JS, TS and Python  ·  Claude Code (Sonnet 5.5), in a lockmaster worktree
 
 - **Asked:** W-58 — max lines per file, max lines per function and max parameters, each configurable, for JS, TS and Python.

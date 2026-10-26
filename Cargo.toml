@@ -62,7 +62,6 @@ ignore = "0.4.33"
 # the protocol types. lsp-server is MIT OR Apache-2.0, lsp-types is MIT.
 lsp-server = "0.10.0"
 lsp-types = "0.97.0"
-postcard = { version = "1.1", features = ["use-std"] }
 pulldown-cmark = { version = "0.13", default-features = false }
 rayon = "1.12"
 regex = "1.10"
@@ -70,7 +69,6 @@ semver = "1.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 serde-saphyr = "2.0"
-strsim = "0.11"
 toml = "1.1"
 
 # L2: Biome reaches the MPL-2.0 `option-ext` through `directories`; this MIT

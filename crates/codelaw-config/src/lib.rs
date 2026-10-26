@@ -7,10 +7,12 @@
 
 mod raw;
 mod resolve;
+mod scope;
 mod trace;
 
-pub use raw::{RawConfig, RawOverride, RawProfile, RuleSetting};
-pub use resolve::{Config, ConfigFile, DEFAULT_EXCLUDES, Home, Layer, Profile, ProfileChoice, Remap, RuleConfig, find_config, load_file};
+pub use raw::{RawConfig, RawOverride, RawProfile, RawScope, RuleSetting, ScopeMap};
+pub use resolve::{Config, PresetScope, ScopeInfo, ConfigFile, DEFAULT_EXCLUDES, Home, Layer, Profile, ProfileChoice, Remap, RuleConfig, find_config, load_file};
+pub use scope::check_scope_name;
 pub use trace::{TraceEnv, Traced};
 
 /// `codelaw.schema.json`: every key a config may set, each naming the one
@@ -51,7 +53,7 @@ impl std::error::Error for ConfigError {}
 pub fn did_you_mean<'a>(unknown: &str, valid: impl IntoIterator<Item = &'a str>) -> Option<&'a str> {
     valid
         .into_iter()
-        .map(|v| (strsim::jaro_winkler(unknown, v), v))
+        .map(|v| (codelaw_core::similar::jaro_winkler(unknown, v), v))
         .filter(|(score, _)| *score > 0.8)
         .max_by(|a, b| a.0.total_cmp(&b.0).then_with(|| b.1.cmp(a.1)))
         .map(|(_, v)| v)

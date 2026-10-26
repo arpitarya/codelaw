@@ -1,0 +1,98 @@
+# Written by `codelaw init --ci github --autofix`; the template is templates/ci/github/codelaw-autofix.yml.
+#
+# Runs codelaw's safe fixes, the formatter and `baseline prune` on a schedule
+# and keeps ONE pull request open from the branch `codelaw/autofix` (it is
+# force-pushed each run; exclude it from branch protection's force-push rule).
+#
+# A pull request opened with the default GITHUB_TOKEN does not trigger other
+# workflows. For the PR's own CI to run, add a repository secret
+# CODELAW_AUTOFIX_TOKEN (a GitHub App token or a fine-grained PAT with
+# contents and pull requests write), or start CI by hand from the Actions tab.
+name: codelaw autofix
+
+on:
+  schedule:
+    - cron: "{{cron}}"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: codelaw-autofix
+  cancel-in-progress: false
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: $\{{ secrets.CODELAW_AUTOFIX_TOKEN || github.token }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the repository's dependencies
+        run: |
+          if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile
+          elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile
+          elif [ -f package-lock.json ]; then npm ci
+          fi
+      - name: Install codelaw
+        run: npm install --global codelaw@{{version}}
+      - name: Fix, format and prune the baseline
+        run: |
+          set -u
+          day="$(date +%F)"
+          rc=0
+          codelaw fix --as-of "$day" --format json > "$RUNNER_TEMP/fix.json" || rc=$?
+          # 1 means errors remain after the fixes: this job fixes, it does not gate.
+          if [ "$rc" -ge 2 ]; then cat "$RUNNER_TEMP/fix.json"; exit "$rc"; fi
+          codelaw format
+          codelaw baseline prune
+      - name: Write the pull request body
+        run: |
+          {
+            echo "Safe fixes from \`codelaw fix\` (auto class only), \`codelaw format\` and \`codelaw baseline prune\`, run on $(date +%F)."
+            echo
+            echo "## Fixes per rule and file"
+            jq -r '(.fixed // [])[] | "- `\(.file)`: " + ([.applied[] | "\(.[0]) x\(.[1])"] | join(", "))' "$RUNNER_TEMP/fix.json"
+            echo
+            echo "## Baseline lowered"
+            jq -r '(.pruned // [])[] | "- `\(.)`"' "$RUNNER_TEMP/fix.json"
+            echo
+            echo "## This week's burn-down"
+            codelaw baseline history --since 7d --by day --format markdown 2>/dev/null || echo "No baseline history in the last 7 days."
+            echo
+            if codelaw exceptions --help > /dev/null 2>&1; then
+              echo "## Exceptions expiring in 30 days"
+              codelaw exceptions --expiring 30d 2>/dev/null || true
+              echo
+            fi
+            echo "This pull request only lowers baseline counts; one that raises a count fails its own CI."
+          } > "$RUNNER_TEMP/body.md"
+      - name: Commit, push and open or update the pull request
+        env:
+          GH_TOKEN: $\{{ secrets.CODELAW_AUTOFIX_TOKEN || github.token }}
+          BASE: $\{{ github.event.repository.default_branch }}
+        run: |
+          set -eu
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing to fix: no pull request."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C codelaw/autofix
+          git add -A
+          git commit -m "codelaw: scheduled autofix"
+          git push --force origin codelaw/autofix
+          number="$(gh pr list --head codelaw/autofix --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$number" ]; then
+            gh pr edit "$number" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr create --base "$BASE" --head codelaw/autofix --title "codelaw: scheduled autofix" --body-file "$RUNNER_TEMP/body.md"
+          fi
+{{suggest_job}}

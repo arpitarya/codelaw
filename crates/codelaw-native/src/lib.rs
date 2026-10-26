@@ -31,6 +31,7 @@ mod html_content;
 mod html_document;
 mod html_dom;
 mod html_rules;
+mod html_security;
 mod js_ast;
 mod js_console;
 mod size;
@@ -49,6 +50,7 @@ mod react;
 mod react_hooks;
 mod tanstack_query;
 mod redux_toolkit;
+mod size_lines;
 mod regexp;
 mod stencil;
 mod typescript;
@@ -214,8 +216,13 @@ static JS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars 
 static TS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "ts/no-unused-vars", languages: TS_ONLY };
 static TS_NO_UNUSED_EXPRESSIONS: typescript::NoUnusedExpressions = typescript::NoUnusedExpressions { id: "ts/no-unused-expressions", languages: TS_ONLY };
 
+static CSS_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::css("css/max-lines");
+static HTML_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::html("html/max-lines");
+
 /// Every native rule; ids are unique, order doesn't matter.
 static REGISTRY: &[&dyn NativeRule] = &[
+    &CSS_MAX_LINES,
+    &HTML_MAX_LINES,
     &css_values::AlphaValueNotation,
     &css_declarations::AnnotationNoUnknown,
     &css_atrules::AtRuleDescriptorNoUnknown,
@@ -358,6 +365,25 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &html_rules::ValidFor,
     &html_rules::ValidId,
     &html_content::VoidContent,
+    &html_security::AngularjsUrlExpression,
+    &html_security::CspMetaUnsafe,
+    &html_security::FormCsrfToken,
+    &html_security::IframeAllowPowerful,
+    &html_security::IframeSandbox,
+    &html_security::NoCredentialsInUrl,
+    &html_security::NoExternalBase,
+    &html_security::NoInlineEventHandler,
+    &html_security::NoJavascriptUrl,
+    &html_security::NoMixedContent,
+    &html_security::NoPluginEmbed,
+    &html_security::NoSecretInHiddenInput,
+    &html_security::NoSensitiveComments,
+    &html_security::NoSrcdocScript,
+    &html_security::NoTemplateHtmlSink,
+    &html_security::NoUnsafeTemplateInterpolation,
+    &html_security::PasswordFormPost,
+    &html_security::ReferrerPolicy,
+    &html_security::SriCrossorigin,
     &classes::ConstructorSuper,
     &accessors::GetterReturn,
     &conventions::ImportGroups,

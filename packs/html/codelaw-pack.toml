@@ -2,5 +2,5 @@ name = "@codelaw/rules-html"
 version = "0.2.0"
 min_codelaw = "0.1.0"
 languages = ["html"]
-presets = ["html/recommended", "html/a11y", "html/document", "html/conventions", "html/security"]
+presets = ["html/recommended", "html/a11y", "html/document", "html/conventions", "html/security", "html/size"]
 description = "codelaw's rules for HTML (SR-RULE-PACKS)"

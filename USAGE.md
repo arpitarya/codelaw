@@ -87,26 +87,27 @@ preview = true                  # every rule is preview in 0.1.0
 [rules]
 "js/use-isnan" = "warn"         # change a severity, or "off"
 
-[[overrides]]
+[scope.legacy]                  # a named group of files with its own settings
 files = ["src/legacy/**"]
 rules = { "ts/no-unused-vars" = "off" }
 ```
 
 - **Validation is strict.** An unknown key stops the run and names the valid ones (`unknown key 'disable'; valid keys are 'files', 'exclude', 'rules', 'remap'`).
+- **Scopes:** `[scope.<name>]` gives a group of files its own rule settings, applied after `[rules]`, in the order written. The old `[[overrides]]` and `[profiles.<name>]` still load, with a warning, for one more minor release.
 - **Monorepos:** a nested `codelaw.toml` inherits from the root and overrides it.
 - **Team packs:** `extends` also takes `npm:<package>`, `pypi:<distribution>` and `path:<folder>`.
 - **Full reference:** [SR-CONFIG](records/0110_config.md).
 
 ### Warn on a laptop, fail in CI
 
-A **profile** is a named set of `rules` and `overrides` laid over the config. codelaw runs the `ci` profile when the `CI` environment variable is set (and not `false` or `0`), `local` otherwise; `--profile <name>` or `CODELAW_PROFILE` picks one by name. `codelaw hook` and the MCP server run `ci` — an agent gets CI's verdict — and the editor runs `local`.
+A **profile** is a named set of `rules` and `scope`s laid over the config. codelaw runs the `ci` profile when the `CI` environment variable is set (and not `false` or `0`), `local` otherwise; `--profile <name>` or `CODELAW_PROFILE` picks one by name. `codelaw hook` and the MCP server run `ci` — an agent gets CI's verdict — and the editor runs `local`.
 
 ```toml
-[profiles.local.rules]
+[profile.local.rules]
 "js/no-console"  = "warn"
 "js/no-debugger" = "warn"
 
-[profiles.ci.rules]
+[profile.ci.rules]
 "js/no-console"  = "error"
 "js/no-debugger" = "error"
 ```
@@ -121,21 +122,39 @@ When the config defines a profile, every report opens with the one in use (`prof
 
 ### Globs that never error, or never warn
 
-`remap` on an `[[overrides]]` entry maps each severity of a finding in those files to another, or to `off`. It applies last — after the baseline — and never to codelaw's own `codelaw/*` diagnostics.
+`remap` on a `[scope.<name>]` maps each severity of a finding in those files to another, or to `off`. It applies last — after the baseline — and never to codelaw's own `codelaw/*` diagnostics.
 
 ```toml
-[[overrides]]                      # never fails the run
+[scope.scripts]                    # never fails the run
 files = ["scripts/**"]
 remap = { error = "warn" }
 
-[[overrides]]                      # silent
+[scope.generated]                  # silent
 files = ["**/*.generated.ts"]
 remap = { error = "off", warn = "off", info = "off" }
 
-[[overrides]]                      # strict: no warnings, only errors
+[scope.payments]                   # strict: no warnings, only errors
 files = ["src/payments/**"]
 remap = { warn = "error" }
 ```
+
+### One limit for a kind of file
+
+A **scope** names a group of files. `js/recommended` already ships `tests` (`**/*.test.*`, `**/*.spec.*`), `stories` and `config`, and `py/recommended` ships `tests`; a scope of yours with the same name **extends** it — the files stay, your settings win. A scope of your own needs `files`:
+
+```toml
+[rules]
+"js/max-lines" = { severity = "error", options = { max = 100 } }
+
+[scope.utils]                      # every *.utils.* file: 50 lines
+files = ["**/*.utils.ts", "**/*.utils.tsx", "**/*.utils.js", "**/*.utils.jsx"]
+rules = { "js/max-lines" = { options = { max = 50 } } }
+
+[scope.tests]                      # the preset's test files: 400 lines
+rules = { "js/max-lines" = { options = { max = 400 } } }
+```
+
+`codelaw config --scopes` lists every scope with its files and where it is written, in the order they apply; `codelaw config --print --for <file>` names the scope each value came from. A scope name is lowercase letters, digits, `_` and `-`, and `default` is reserved.
 
 ### Size limits
 
@@ -160,6 +179,22 @@ extends = ["codelaw:js/size", "codelaw:py/size"]
 - **What they report:** the measured value and the limit, `renderOrders is 84 lines (max 50)`, and `--format json` and SARIF carry both as `data` (`{ "lines": 84, "max": 50 }`) for a dashboard or a burn-down.
 - **An existing codebase:** `codelaw baseline add --rule js/max-lines` keeps today's long files as exceptions, and a new long file fails.
 - **Every fix is yours:** splitting a file or a function changes its structure, so all six are `manual`. The rule's page, `codelaw explain js/max-lines`, lists the steps.
+
+**HTML and CSS.** The `html/size` and `css/size` presets are opt-in too: `codelaw:html/size` and `codelaw:css/size` turn on a line limit per file. HTML and CSS have no prior art in stylelint, html-validate or Biome, so the defaults are codelaw's own. The stylesheet limit covers `.css` and, as those languages arrive, SCSS and CSS Modules; a `<style>` or `<script>` inside a page is part of that page's count, never a file of its own.
+
+| rule | default | options |
+|---|---|---|
+| `html/max-lines` | 400 | `max`, `skip_blank_lines` (true), `skip_comments` (true, `<!-- -->`), `skip_embedded` (false: lines inside `<script>` and `<style>`) |
+| `css/max-lines` | 300 | `max`, `skip_blank_lines` (true), `skip_comments` (true, `/* */` and SCSS `//`), `skip_imports` (false: `@import`, `@use`, `@forward`) |
+
+```toml
+extends = ["codelaw:html/size", "codelaw:css/size"]
+
+[rules]
+"css/max-lines" = { severity = "warn", options = { max = 200, skip_imports = true } }
+```
+
+A line holding code and a comment counts as code. A finding names the first line over the limit and carries the count: `412 lines (max 300; blank lines and comments not counted)`. The fix is manual: split the file.
 
 ---
 
@@ -252,7 +287,7 @@ flowchart LR
 - **Editor:** `codelaw lsp` is a language server — diagnostics, quick fixes and formatting. The VS Code extension is built; its Marketplace listing comes later ([SR-EDITOR](records/0114_editor.md)).
 - **Pre-commit:** `codelaw init --git-hooks` installs a `pre-commit` and a `post-commit` hook in the folder git uses (`core.hooksPath` or `.git/hooks`). An existing hook is kept as `<name>.pre-codelaw` and runs first; nothing is overwritten, and deleting the file uninstalls it ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 11).
   - **`pre-commit` blocks:** it runs `codelaw fix --staged` on the files that are fully staged and re-stages them, then `codelaw check --staged` on every staged file. A partly staged file is checked but never fixed, so your unstaged hunks stay yours. Add flags to both with `CODELAW_HOOK_ARGS` (for example `--profile ci`); skip once with `git commit --no-verify`.
-  - **`post-commit` never blocks:** it prints what the scripts in `.codelaw/hooks/post-commit.d/` print and always exits 0.
+  - **`post-commit` never blocks:** it reminds you of your exceptions that expire within 7 days (`codelaw exceptions --mine --expiring 7d`) and the baseline's 30-day burn-down in one line, then prints what the scripts in `.codelaw/hooks/post-commit.d/` print, and always exits 0.
   - **By hand:** `codelaw check --staged`.
   - **The pre-commit framework** — `codelaw` must be on `PATH`:
 
@@ -279,6 +314,7 @@ flowchart LR
           run: codelaw check --staged -- {staged_files}
           stage_fixed: true
     ```
+- **In your dev server:** `@codelaw/vite-plugin` (`plugins: [codelaw()]`), `@codelaw/webpack-plugin` (`new CodelawPlugin()`, also in Rspack) and `@codelaw/next` (`export default withCodelaw(nextConfig)`) show codelaw's findings where you already look — errors in the overlay, warnings in the terminal — and make `vite build`, `webpack` and `next build` fail on an error. Each runs the `codelaw` binary your project already has; options `profile`, `buildProfile`, `failOnError`, `paths`, `binary` ([SR-PACKAGES](records/0107_packages.md) decision 3a).
 - **While you work:** `codelaw check --watch` checks once, then again every time a file is saved — the saved file, and through the project rules every file that depends on it — until Ctrl-C. Editing `codelaw.toml`, a rule or the baseline takes effect on the next run, with no restart. It runs the `local` profile unless `--profile` says otherwise. `--format json` prints one JSON object per run, one per line, for tools that read it; `codelaw fix --watch` fixes each file as you save it, which can fight an editor that also fixes or formats on save ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 2).
 - **CI:** `codelaw check --max-warnings 0` fails the job on any finding; `--changed-since origin/main` checks only what a branch touched; `--format sarif` feeds GitHub code scanning. A CI job runs the `ci` profile when `CI` is set, as GitHub Actions, GitLab CI and most runners do; where it is not, pass `--profile ci` ([Configure](#warn-on-a-laptop-fail-in-ci)). To show findings inline without one, pick the format your CI reads (every one keeps the exit code):
   - **GitHub Actions:** `codelaw check --format github` — annotations on the PR diff.
@@ -336,6 +372,7 @@ flowchart LR
 | `codelaw match <id> <file>` | Which clause of a rule matched or failed, and what it captured. `--explain` shows every candidate node |
 | `codelaw graph refs\|why-unused <symbol>` | Query the project graph: every use of a symbol, or why `graph/no-unused-exports` held |
 | `codelaw baseline add\|prune\|check` | Grandfather a rule's existing findings with a deadline, lower the counts, or fail when the baseline got looser ([SR-BASELINE](records/0104_baseline-and-deprecations.md)) |
+| `codelaw exceptions` | List every exception (baseline entry, deprecation, inline ignore) with its expiry, days left and owner: `--expiring 30d`, `--expired`, `--mine`, `--rule`, `--path`, `--group-by added_by\|rule\|file\|expires-month`, `--format text\|json\|csv\|markdown`, `--fail-if-expiring 7d` ([SR-BASELINE](records/0104_baseline-and-deprecations.md) decision 11) |
 | `codelaw deprecate <symbol>` | Deprecate a symbol: write the registry entry and baseline every current use, for `graph/no-deprecated-usage` |
 | `codelaw hook [paths]` | Check and fix the files an agent just edited; what is left goes back to it |
 | `codelaw sync-agents` | Write every agent's instruction files from the rules and skills; `--check` reports drift |
