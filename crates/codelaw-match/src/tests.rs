@@ -181,3 +181,75 @@ fn from_source_reads_its_tables_and_refuses_bad_sources() {
     let r = rule(Language::Javascript, "match:\n  pattern: res.redirect($URL)\nwhere:\n  $URL: from_source\nmessage: x");
     assert!(compile(&r, Grammar::JavaScript, &data).err().unwrap().contains("names its sources"));
 }
+
+fn call_rule(options: &str, language: Language, src: &str, opts: serde_json::Value) -> usize {
+    let text = format!(
+        "---\nid: t/r\ntitle: \"t\"\nlanguages: [{lang}]\nfix: manual\nfix_reason: \"x\"\noptions:\n  ok:\n    type: \"call[]\"\n    default: {options}\n---\n\nT.\n\n**Why:** W.\n\n```codelaw\nmatch:\n  pattern: $F($$$A)\nwhere:\n  $$MATCH: {{ calls: ok }}\nmessage: \"m $OPTION.ok\"\n```\n\n## How to fix\n\n1. x\n\n## Examples\n\n### {title}\n\n#### Don't\n\n```{lang}\nx\n```\n\n#### Do\n\n```{lang}\ny\n```\n",
+        lang = language.name(),
+        title = if language == Language::Python { "Python" } else { "JavaScript" }
+    );
+    let r = parse_rule_ok(&text);
+    let compiled = compile(&r, Grammar::for_language(language), &BTreeMap::new()).unwrap();
+    let options: BTreeMap<String, serde_json::Value> = serde_json::from_value(opts).unwrap();
+    let root = codelaw_lang::parse(language, src);
+    let model = codelaw_semantic::build(language, &root, src);
+    root.root().dfs().filter(|n| compiled.kinds().as_ref().is_none_or(|k| k.contains(&n.kind_id()))).filter(|n| compiled.try_match_with(n.clone(), model.as_ref(), &options).is_some()).count()
+}
+
+#[test]
+fn calls_matches_by_name_and_import_source() {
+    let d = r#"[{ name: sanitizeHtml, module: "@acme/s" }, "DOMPurify.sanitize"]"#;
+    let none = serde_json::json!({});
+    assert_eq!(call_rule(d, Language::Javascript, "import { sanitizeHtml } from \"@acme/s\";\nsanitizeHtml(x);\n", none.clone()), 1);
+    assert_eq!(call_rule(d, Language::Javascript, "import { sanitizeHtml as c } from \"@acme/s\";\nc(x);\n", none.clone()), 1);
+    assert_eq!(call_rule(d, Language::Javascript, "import { sanitizeHtml } from \"other\";\nsanitizeHtml(x);\n", none.clone()), 0);
+    assert_eq!(call_rule(d, Language::Javascript, "function sanitizeHtml(x) {}\nsanitizeHtml(x);\n", none.clone()), 0);
+    assert_eq!(call_rule(d, Language::Javascript, "DOMPurify.sanitize(x);\n", none.clone()), 1);
+    assert_eq!(call_rule(d, Language::Javascript, "const DOMPurify = {};\nDOMPurify.sanitize(x);\n", none.clone()), 0);
+    assert_eq!(call_rule(r#"[{ name: DOMPurify.sanitize, module: dompurify }]"#, Language::Javascript, "import DOMPurify from \"dompurify\";\nDOMPurify.sanitize(x);\n", none.clone()), 1);
+    let dp = r#"[{ name: DOMPurify.sanitize, module: dompurify }]"#;
+    assert_eq!(call_rule(dp, Language::Javascript, "import createDOMPurify from \"dompurify\";\nconst DOMPurify = createDOMPurify(window);\nDOMPurify.sanitize(x);\n", none.clone()), 1);
+    assert_eq!(call_rule(dp, Language::Javascript, "import createDOMPurify from \"other\";\nconst DOMPurify = createDOMPurify(window);\nDOMPurify.sanitize(x);\n", none.clone()), 0);
+    assert_eq!(call_rule(r#"["*.createHTML"]"#, Language::Javascript, "policy.createHTML(x);\n", none), 1);
+}
+
+#[test]
+fn calls_reads_the_project_list_in_extend_and_replace_mode() {
+    let d = r#"["DOMPurify.sanitize"]"#;
+    let mine = serde_json::json!([{ "name": "clean", "module": "m" }]);
+    let src = "import { clean } from \"m\";\nclean(x);\nDOMPurify.sanitize(x);\n";
+    assert_eq!(call_rule(d, Language::Javascript, src, serde_json::json!({ "ok": mine })), 2);
+    assert_eq!(call_rule(d, Language::Javascript, src, serde_json::json!({ "ok": mine, "ok_mode": "replace" })), 1);
+}
+
+#[test]
+fn calls_in_python_follow_from_and_plain_imports() {
+    let d = r#"[{ name: clean, module: app.security }, { name: bleach.clean, module: bleach }]"#;
+    let none = serde_json::json!({});
+    assert_eq!(call_rule(d, Language::Python, "from app.security import clean\nclean(x)\n", none.clone()), 1);
+    assert_eq!(call_rule(d, Language::Python, "from app.security import clean as c\nc(x)\n", none.clone()), 1);
+    assert_eq!(call_rule(d, Language::Python, "import bleach as b\nb.clean(x)\n", none.clone()), 1);
+    assert_eq!(call_rule(d, Language::Python, "def clean(x): ...\nclean(x)\n", none), 0);
+}
+
+#[test]
+fn calls_must_name_a_call_option() {
+    let text = "---\nid: t/r\ntitle: \"t\"\nlanguages: [javascript]\nfix: manual\nfix_reason: \"x\"\n---\n\nT.\n\n**Why:** W.\n\n```codelaw\nmatch:\n  pattern: $F($$$A)\nwhere:\n  $$MATCH: { calls: nope }\nmessage: \"m\"\n```\n\n## How to fix\n\n1. x\n\n## Examples\n\n### JavaScript\n\n#### Don't\n\n```js\nx\n```\n\n#### Do\n\n```js\ny\n```\n";
+    let r = parse_rule_ok(text);
+    let err = compile(&r, Grammar::JavaScript, &BTreeMap::new()).err().expect("an error");
+    assert!(err.contains("names no `call[]` option"), "{err}");
+}
+
+#[test]
+fn option_references_in_a_message_name_the_resolved_list() {
+    let mut specs = BTreeMap::new();
+    specs.insert(
+        "ok".to_owned(),
+        codelaw_rules::OptionSpec { kind: "call[]".into(), default: Some(serde_json::json!(["a.b"])), description: None },
+    );
+    let mut o = BTreeMap::new();
+    o.insert("ok".to_owned(), serde_json::json!([{ "name": "mine", "module": "m" }]));
+    assert_eq!(crate::expand_options("one of $OPTION.ok.", &specs, &o), "one of a.b, mine.");
+    o.insert("ok_mode".to_owned(), serde_json::json!("replace"));
+    assert_eq!(crate::expand_options("$OPTION.ok; $OPTION.zz", &specs, &o), "mine; $OPTION.zz");
+}

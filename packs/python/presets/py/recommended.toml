@@ -95,6 +95,7 @@ description = "Ruff 0.17.1's long-standing default (E4, E7, E9, F) plus flake8-b
 "py/useless-comparison" = "error"
 "py/useless-contextlib-suppress" = "error"
 "py/useless-expression" = "error"
+"py/use-instead" = "warn"
 "py/yield-outside-function" = "error"
 "py/zip-without-explicit-strict" = "error"
 

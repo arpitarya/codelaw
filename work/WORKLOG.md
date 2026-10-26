@@ -120,6 +120,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** none. Left uncommitted in the working tree; it lands through lockmaster.
 - **Next:** a Claude Code lane builds W-74 (Sonnet).
 
+## 2026-10-27 — W-73: configurable approved calls  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** build W-73 as a lockmaster change: `sanitizers` on the five HTML-sink rules, `js/use-instead` and `py/use-instead`.
+- **Done:** `call[]` option type, `calls:` predicate, `$OPTION.<name>`; the five rules moved onto `sanitizers`; the two `use-instead` natives with cases; corpus counts for `js`, `python`, `security-js`; USAGE, CHANGELOG, SR-RULE-FORMAT 3a note. The built-in default is stricter (a locally declared `sanitize` no longer passes); an instance of `createDOMPurify(window)` was added to the matcher after the corpus showed bulletproof-react using it.
+- **Decided / left open:** the validator-call lists in `sec-ts/next-server-action-validation` and `no-unchecked-cast-of-input` detect a validator anywhere in a function, not at a value, so `calls` does not fit; a follow-up. Release `perf` not run on this machine (disk).
+- **Mistakes:** started editing in the main checkout before `lockmaster start`; the coordinator caught it and the edits were moved into the worktree, the main tree restored.
+- **Next:** CI's corpus and `perf` runs on the landed change.
+
 ## 2026-10-26 — Cross-lane cleanup after thirteen landings  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** fix what the thirteen parallel lanes left: a duplicate `D-33`, a red docs-sync, the MCP tool list, clippy, the build-tool declaration.

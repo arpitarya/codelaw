@@ -725,7 +725,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
             match &rule.matcher {
                 Matcher::Match(_) => {
                     let cm = rule.compiled_match(grammar).expect("dispatched for this grammar");
-                    match catch_unwind(AssertUnwindSafe(|| cm.try_match(node.clone(), semantic.as_ref()))) {
+                    match catch_unwind(AssertUnwindSafe(|| cm.try_match_with(node.clone(), semantic.as_ref(), &cfg.options))) {
                         Ok(Some(m)) => {
                             if !matches[slot].iter().any(|x| x.start == m.start && x.end == m.end) {
                                 matches[slot].push(m);
@@ -759,7 +759,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
     // The data tree, built once for every `target:` rule of the unit; a
     // build that panics fails each of them (decision 25).
     let mut data_tree: Option<Result<Option<codelaw_match::data::DataTree>, String>> = None;
-    for (slot, (index, rule, _)) in unit.rules.iter().enumerate() {
+    for (slot, (index, rule, cfg)) in unit.rules.iter().enumerate() {
         if let Some(why) = &failed[slot] {
             out.push(internal_error(*index, 0, 0, rule.id(), why));
             continue;
@@ -783,6 +783,8 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     continue;
                 }
                 let message = rule.loaded.rule.block.message.as_deref().unwrap_or(rule.loaded.rule.title.as_str());
+                let message = codelaw_match::expand_options(message, &rule.loaded.rule.options, &cfg.options);
+                let message = message.as_str();
                 let mut per: Vec<(Option<Vec<TextEdit>>, Option<String>)> = vec![(None, None); ms.len()];
                 match (&rule.fix, wants_fix) {
                     (Some(spec @ FixSpec::Steps(_)), true) if spec.is_group() => {

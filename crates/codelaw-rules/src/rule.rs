@@ -168,7 +168,7 @@ pub struct OptionSpec {
     pub description: Option<String>,
 }
 
-const OPTION_TYPES: &[&str] = &["string", "string[]", "number", "number[]", "integer", "boolean", "object"];
+const OPTION_TYPES: &[&str] = &["string", "string[]", "number", "number[]", "integer", "boolean", "object", "call[]"];
 
 impl OptionSpec {
     /// Whether `value` has this option's type.
@@ -179,6 +179,8 @@ impl OptionSpec {
             ("integer", V::Number(n)) => n.is_i64() || n.is_u64(),
             ("string[]", V::Array(a)) => a.iter().all(|v| v.is_string()),
             ("number[]", V::Array(a)) => a.iter().all(|v| v.is_number()),
+            ("call[]", v) => crate::calls::parse_call_items(v).is_ok(),
+            (crate::calls::MODE_KIND, V::String(s)) => s == "extend" || s == "replace",
             _ => false,
         }
     }
@@ -610,6 +612,24 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
             err(&mut errors, 2, format!("option `{name}`: the default is not a `{}`", spec.kind));
         }
     }
+    // A `call[]` option declares its `<opt>_mode` (decision 2, W-73).
+    let mut fm_options = fm.options.clone();
+    for (name, spec) in &fm.options {
+        if spec.kind == "call[]" {
+            let mode = format!("{name}{}", crate::calls::MODE_SUFFIX);
+            if fm.options.contains_key(&mode) {
+                err(&mut errors, 2, format!("option `{mode}` is declared by the `call[]` option `{name}`; remove it"));
+            }
+            fm_options.insert(
+                mode,
+                OptionSpec {
+                    kind: crate::calls::MODE_KIND.into(),
+                    default: Some(serde_json::json!("extend")),
+                    description: Some(format!("`extend` adds `{name}` to the rule's default list; `replace` uses it instead")),
+                },
+            );
+        }
+    }
     for p in &fm.ported_from {
         if p.split('/').count() < 2 {
             err(&mut errors, 2, format!("`ported_from: {p}` must be `<tool>/<rule>`"));
@@ -831,7 +851,7 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
         stability,
         host,
         invariants,
-        options: fm.options,
+        options: fm_options,
         ported_from: fm.ported_from,
         tags: fm.tags,
         security,
@@ -915,6 +935,16 @@ pub fn parse_cases(path: &Path, text: &str) -> Result<Vec<Case>, Vec<LoadError>>
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_call_option_declares_its_mode_and_checks_its_items() {
+        let spec = OptionSpec { kind: "call[]".into(), default: None, description: None };
+        assert!(spec.accepts(&serde_json::json!(["a.b", { "name": "x", "module": ["m"] }])));
+        assert!(!spec.accepts(&serde_json::json!([{ "name": "x" }])));
+        assert!(!spec.accepts(&serde_json::json!("a.b")));
+        let mode = OptionSpec { kind: crate::calls::MODE_KIND.into(), default: None, description: None };
+        assert!(mode.accepts(&serde_json::json!("replace")) && !mode.accepts(&serde_json::json!("merge")));
+    }
 
     #[test]
     fn a_fence_takes_options_as_compact_json() {

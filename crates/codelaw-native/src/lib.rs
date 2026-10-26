@@ -59,6 +59,7 @@ mod typescript;
 mod unused_vars;
 mod useless_assignment;
 mod useless_escape;
+mod use_instead;
 mod util;
 
 use codelaw_core::{Language, Severity, TextEdit};
@@ -217,6 +218,9 @@ static PY_MAX_PARAMS: size::Size = size::Size::py("py/max-params", size::Measure
 static JS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "js/no-unused-vars", languages: JS_ONLY };
 static TS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "ts/no-unused-vars", languages: TS_ONLY };
 static TS_NO_UNUSED_EXPRESSIONS: typescript::NoUnusedExpressions = typescript::NoUnusedExpressions { id: "ts/no-unused-expressions", languages: TS_ONLY };
+
+static JS_USE_INSTEAD: use_instead::UseInstead = use_instead::UseInstead { id: "js/use-instead", python: false };
+static PY_USE_INSTEAD: use_instead::UseInstead = use_instead::UseInstead { id: "py/use-instead", python: true };
 
 static CSS_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::css("css/max-lines");
 static HTML_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::html("html/max-lines");
@@ -424,6 +428,8 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &literals::NoSparseArrays,
     &classes::NoThisBeforeSuper,
     &js_console::NoConsole,
+    &JS_USE_INSTEAD,
+    &PY_USE_INSTEAD,
     &JS_MAX_LINES,
     &JS_MAX_LINES_PER_FUNCTION,
     &JS_MAX_PARAMS,

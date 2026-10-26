@@ -165,7 +165,7 @@ impl Explainer {
                 let target = if var == MATCH_KEY { Some(m.get_inner_node()) } else { env.get_match(var.trim_start_matches('$')).map(|n| n.get_inner_node()) };
                 let start = target.map(|t| t.start_byte()).or((var == MATCH_KEY).then_some(this.start));
                 let holds = match (target, semantic) {
-                    (Some(t), Some(model)) => Some(p.holds(model, &crate::Subject { start: t.start_byte(), node: Some(t), source })),
+                    (Some(t), Some(model)) => Some(p.holds(model, &crate::Subject { start: t.start_byte(), node: Some(t), source, options: &BTreeMap::new() })),
                     _ => None,
                 };
                 let error = match (start, semantic) {
