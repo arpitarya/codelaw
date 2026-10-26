@@ -183,6 +183,7 @@ fn ci_report(report: &FormatReport, check: bool) -> codelaw_engine::CheckReport 
                 steps: vec![],
                 source: "engine".into(),
                 note: None,
+                data: None,
             });
         }
         r.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));

@@ -100,7 +100,7 @@ pub fn exit_code(report: &CheckReport, max_warnings: Option<usize>) -> i32 {
 
 /// One diagnostic as `--format json` writes it.
 pub fn diagnostic_json(d: &Diagnostic) -> Value {
-    json!({
+    let mut v = json!({
         "rule": d.rule,
         "severity": d.severity.name(),
         "file": d.file,
@@ -116,7 +116,12 @@ pub fn diagnostic_json(d: &Diagnostic) -> Value {
             "note": d.note,
         },
         "source": d.source,
-    })
+    });
+    // A size rule's measured value and its limit (`{ "lines": 412, "max": 300 }`).
+    if let Some(data) = &d.data {
+        v["data"] = data.clone();
+    }
+    v
 }
 
 fn summary_json(report: &CheckReport) -> Value {
@@ -378,6 +383,7 @@ mod tests {
             steps: if fix == FixClass::Manual { vec!["Do it.".into()] } else { vec![] },
             source: "local".into(),
             note: None,
+            data: None,
         }
     }
 
@@ -412,6 +418,14 @@ mod tests {
         assert_eq!(v["diagnostics"][0]["fix"]["edits"][0]["text"], "===");
         assert_eq!(v["diagnostics"][1]["fix"]["steps"][0], "Do it.");
         assert_eq!(v["skipped"][0]["reason"], "not valid UTF-8");
+    }
+
+    #[test]
+    fn json_carries_a_findings_data_only_when_it_has_some() {
+        let mut with = diag("js/max-lines", Severity::Warn, FixClass::Manual);
+        with.data = Some(json!({ "lines": 412, "max": 300 }));
+        assert_eq!(diagnostic_json(&with)["data"], json!({ "lines": 412, "max": 300 }));
+        assert!(diagnostic_json(&diag("a/m", Severity::Warn, FixClass::Manual)).get("data").is_none());
     }
 
     #[test]

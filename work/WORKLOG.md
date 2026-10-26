@@ -144,6 +144,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** `target/debug/codelaw` is one file shared by every lane building into the shared target dir, so a test that runs the binary can run another lane's build; a copy taken right after a forced rebuild gave the right one.
 - **Next:** none for W-56; W-54, W-55 and W-57 are the sibling packs.
 
+## 2026-10-26 — W-58: size limits for JS, TS and Python  ·  Claude Code (Sonnet 5.5), in a lockmaster worktree
+
+- **Asked:** W-58 — max lines per file, max lines per function and max parameters, each configurable, for JS, TS and Python.
+- **Done:** six native rules in one module (`size.rs`), their pages and cases (every option and form), presets `js/size` and `py/size`; `NativeRule::data_of` and `Diagnostic::data` carry the measured value and the limit into JSON and SARIF; `options=<json>` on an example or case fence (a Don't cannot be 300 lines long), with the test harness keying its compiled rule set on the options; USAGE "Size limits", the packs' README rows, CHANGELOG; SR-RULE-FORMAT 5, SR-ARCHITECTURE 15b, SR-CLI-MCP 4, SR-RULE-PACKS rows.
+- **Decided / left open:** the rule counts lines from the parsed tree's comment, docstring and import ranges; with `include_nested = false` an inner function's lines are removed from its first line to its last, as ESLint does; an invalid `ignore_names` expression is one finding at the file's start, and the rule still measures. Left: the six corpus counts and DoD 6 on CI's `perf` job.
+- **Mistakes:** the integration tests of `codelaw-cli` run `target/debug/codelaw`, which concurrent lanes sharing one target dir overwrite; five suites failed with another lane's binary until I re-ran each with a fresh build. A retry is the workaround, a per-lane target dir the fix.
+- **Next:** the two items under W-58's "what is left".
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*

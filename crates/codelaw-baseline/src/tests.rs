@@ -18,6 +18,7 @@ fn d(rule: &str, file: &str, line: usize) -> Diagnostic {
         steps: Vec::new(),
         source: "engine".into(),
         note: None,
+        data: None,
     }
 }
 

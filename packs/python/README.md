@@ -19,6 +19,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `py/recommended` | 96 | Ruff 0.17.1: its long-standing default `E4`, `E7`, `E9`, `F` (55 of 59 rules; the other four are below), all 39 stable flake8-bugbear `B` rules, isort's `I001` and `RUF022` |
 | `py/conventions` | 2 | opt-in house conventions from the starter catalogue: `py/no-print`, `py/no-tunable-literals` |
 | `py/project` | 1 | `graph/no-unused-exports`, the rule that reads the whole repo, from vulture's unused-function check — opt in |
+| `py/size` | 3 | size limits at `warn`: `py/max-lines` (1000 per module, Pylint's `too-many-lines`), `py/max-lines-per-function` (50) and `py/max-params` (5, Pylint's and Ruff's) — opt in |
 
 <!-- /docs-sync:presets -->
 
@@ -28,7 +29,7 @@ The starter catalogue's other Python rules match a Ruff rule, so they sit in
 
 Every rule is **reimplemented**, not vendored: the matchers, messages and docs
 are written fresh from Ruff's documented behaviour, and each rule's
-`ported_from:` names the source rule. 97 rules are `native:` (Rust, in
+`ported_from:` names the source rule. 100 rules are `native:` (Rust, in
 `crates/codelaw-native/src/python_*.rs`); `py/no-tunable-literals` is a
 `match:` rule.
 

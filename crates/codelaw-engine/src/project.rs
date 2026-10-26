@@ -194,6 +194,7 @@ impl Project {
                     steps,
                     source: rule.loaded.source.label(),
                     note,
+                    data: None,
                 });
             }
         }

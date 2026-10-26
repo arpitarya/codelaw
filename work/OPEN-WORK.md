@@ -44,7 +44,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-51** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); left: a real GitHub run (DoD 1, 3) and the exceptions section (W-46 landed). Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
 
-🟢 **W-58** `agent` Size limits for JS, TS and Python: `max-lines`, `max-lines-per-function`, `max-params` with configurable options; opt-in `size` presets. Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
+🟢 **W-58** `agent` Size limits for JS, TS and Python built (six rules, `js/size` and `py/size`, measured value in JSON and SARIF); left: the six corpus counts and CI's `perf` run (DoD 6). Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
 
 
 🟡 **W-61** waits on **W-62** `agent` `html/max-lines` and `css/max-lines` built with the `size` presets; left: DoD 3, a `[scope]` giving `_*.scss` partials their own limit, once W-62 (SCSS) lands (scope tables are in), and `data` in JSON/SARIF once W-58's `data_of` lands. Filed by Arpit (Cowork). [detail](open/W-61-max-lines-html-css.md)

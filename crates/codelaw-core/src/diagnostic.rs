@@ -110,6 +110,10 @@ pub struct Diagnostic {
     pub source: String,
     /// Why a fix was not offered, e.g. `fix-conflict` or `fix-verify-failed`.
     pub note: Option<String>,
+    /// Structured facts about the finding, for `--format json` and SARIF: a
+    /// size rule's measured value and its limit (`{ "lines": 412, "max": 300 }`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub data: Option<serde_json::Value>,
 }
 
 impl Diagnostic {

@@ -248,6 +248,7 @@ mod tests {
             steps: vec!["Do it.".into()],
             source: "local".into(),
             note: None,
+            data: None,
         }
     }
 

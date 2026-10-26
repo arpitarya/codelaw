@@ -28,7 +28,7 @@ entry.**
 
 **2026-10-26 docket:** the inbox holds only W-38 (PyPI by hand). Ruled: watch polls (no `notify`), hook passes no profile, pre-commit `language: system` now + W-64 mirror later, CSS/SCSS rules move to the tree-sitter-css fork + tree-sitter-scss (B-047 → W-62), W-45's PR is Claude Code's.
 
-**2026-10-26 (Cowork): L10 ratified** — every file codelaw writes into a consumer's repo comes from a template in `templates/` ([SR-LAW-10](../records/0012_LAW-10-consumer-templates.md)); not built yet (W-60). W-59 renames `[[overrides]]` → `[scope.<name>]` and `[profiles.*]` → `[profile.*]`. W-58 adds max-lines / max-lines-per-function / max-params.
+**2026-10-26 (Cowork): L10 ratified** — every file codelaw writes into a consumer's repo comes from a template in `templates/` ([SR-LAW-10](../records/0012_LAW-10-consumer-templates.md)); not built yet (W-60). W-59 renames `[[overrides]]` → `[scope.<name>]` and `[profiles.*]` → `[profile.*]`. W-58 adds max-lines / max-lines-per-function / max-params (built 2026-10-26: `js/size`, `py/size`, opt in; the corpus counts and CI's `perf` run are left).
 
 **2026-10-25 (Cowork): new feature work filed, not built.** CI-vs-local severity (profiles, agents on `ci`), a per-glob severity `remap`, dated exceptions (`expires`, `warn_days`, `require_expiry`, git-checked `added_by`) and `react/no-context` — W-39, W-40, W-41, rulings in [the compare doc](compare/ci-profiles-and-dated-exceptions.compare.md). Each build writes its record, schema and loader in one change: SR-CONFIG §1 is parsed by `crates/codelaw-config/tests/schema.rs`.
 
