@@ -24,6 +24,13 @@ pub struct RulesArgs {
     /// Why a rule is active, and from which source.
     #[arg(long)]
     why: Option<String>,
+    /// Only rules with this tag: `security`, `cwe:<n>`, `owasp:<category>`
+    /// (`owasp:A05`) or one of a rule's `tags:`; repeat to need all.
+    #[arg(long)]
+    tag: Vec<String>,
+    /// Each OWASP Top 10:2025 category and the security rules that map to it.
+    #[arg(long)]
+    security_coverage: bool,
     /// text or json (the shape of the npm `rulesFor` and Python `rules_for`).
     #[arg(long, default_value = "text")]
     format: String,
@@ -156,13 +163,21 @@ pub fn rules(args: RulesArgs) -> ExitCode {
             Err(e) => fail(e),
         };
     }
-    let rows = match &args.for_path {
+    let mut rows = match &args.for_path {
         Some(p) => match project.rules_for(p) {
             Ok(r) => r,
             Err(e) => return fail(e),
         },
         None => project.list_rules(),
     };
+    rows.retain(|r| args.tag.iter().all(|t| r.has_tag(t)));
+    if args.security_coverage {
+        if json {
+            return print_json(&codelaw_report::security_coverage_json(&rows));
+        }
+        print!("{}", codelaw_report::security_coverage_text(&rows));
+        return ExitCode::SUCCESS;
+    }
     if json {
         return print_json(&codelaw_report::rules_json(&rows, args.for_path.as_deref().map(codelaw_core::normalize_path).as_deref()));
     }

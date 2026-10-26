@@ -48,7 +48,7 @@ record to become wrong?*
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002` SR-LAW-0, `0003` SR-LAW-1, `0004` SR-LAW-2, `0005` SR-LAW-3, `0006` SR-LAW-4, `0007` SR-LAW-5, `0008` SR-LAW-6, `0009` SR-LAW-7, `0010` SR-LAW-8, `0011` SR-LAW-9 | the next free number after the highest law |
+| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002` SR-LAW-0, `0003` SR-LAW-1, `0004` SR-LAW-2, `0005` SR-LAW-3, `0006` SR-LAW-4, `0007` SR-LAW-5, `0008` SR-LAW-6, `0009` SR-LAW-7, `0010` SR-LAW-8, `0011` SR-LAW-9, `0012` SR-LAW-10, `0013` SR-LAW-11 | the next free number after the highest law |
 | `0051`–`0100` | the **WORK** records only — how work is done | the next free number after the highest |
 | `0101`– | every other record | the next free number after the highest |
 
@@ -110,10 +110,12 @@ Start from `TEMPLATE.md`.
 | [0005](0005_LAW-3-languages.md) | **SR-LAW-3** | **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, HTML — each alone or in any combination | accepted | partly |
 | [0006](0006_LAW-4-every-rule-has-a-fix.md) | **SR-LAW-4** | **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix | accepted | partly |
 | [0007](0007_LAW-5-no-model-in-the-engine.md) | **SR-LAW-5** | **L5** — no model in the engine; works the same with or without an agent | accepted | partly |
-| [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as eleven packs, ten on npm (`@codelaw/rules-*`) and six on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` | accepted | partly |
+| [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as fifteen packs, thirteen on npm (`@codelaw/rules-*`) and nine on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` | accepted | partly |
 | [0009](0009_LAW-7-linter-and-formatter.md) | **SR-LAW-7** | **L7** — always both a linter and a formatter, for every L3 language | accepted | yes |
 | [0010](0010_LAW-8-performance-budgets.md) | **SR-LAW-8** | **L8** — performance budgets — set from measurement, never exceeded, never loosened | accepted | partly |
 | [0011](0011_LAW-9-machine-budget.md) | **SR-LAW-9** | **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it approved first | accepted | yes |
+| [0012](0012_LAW-10-consumer-templates.md) | **SR-LAW-10** | **L10** — every file codelaw writes into a consumer's repo comes from a template in `templates/`; code only fills slots | accepted | no |
+| [0013](0013_LAW-11-no-dependencies.md) | **SR-LAW-11** | **L11** — no dependencies unless the decider ratifies each one by name in `DEPENDENCIES.md` | accepted | no |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — the queue discipline in eight groups | accepted | yes |
 | [0052](0052_WORK-backlog.md) | **SR-WORK-BACKLOG** | How `BACKLOG.md` works — the named-but-unclaimed in five classes | accepted | yes |
 | [0053](0053_WORK-lifecycle.md) | **SR-WORK-LIFECYCLE** | How a feature travels — compare, proposal, handoff in the item file, the model line, one record | accepted | yes |
@@ -132,7 +134,7 @@ Start from `TEMPLATE.md`.
 | [0104](0104_baseline-and-deprecations.md) | **SR-BASELINE** | Grandfather violations with a deadline and a touch policy; the deprecations registry | accepted | yes |
 | [0105](0105_formatter.md) | **SR-FORMATTER** | codelaw is a linter and a formatter — embedded engines, layout owned by the formatter | accepted | yes |
 | [0106](0106_linter.md) | **SR-LINTER** | The linter — nine languages, file/project/adapter rules, embedded code, one diagnostic stream | accepted | partly |
-| [0107](0107_packages.md) | **SR-PACKAGES** | What goes into which package — 20 internal crates; npm `codelaw` + 8 `@codelaw/cli-*`; PyPI `codelaw`; eleven rule packs, ten on npm and six on PyPI; the editor extension | accepted | partly |
+| [0107](0107_packages.md) | **SR-PACKAGES** | What goes into which package — 20 internal crates; npm `codelaw` + 8 `@codelaw/cli-*`; PyPI `codelaw`; fifteen rule packs, thirteen on npm and nine on PyPI; the editor extension | accepted | partly |
 | [0108](0108_architecture.md) | **SR-ARCHITECTURE** | The design of record — layers, pipelines, file I/O rules, contracts for fixers and adapters, warm processes, failure handling | accepted | partly |
 | [0109](0109_cache.md) | **SR-CACHE** | Content-addressed caches — safe to delete, never change output | accepted | partly |
 | [0110](0110_config.md) | **SR-CONFIG** | The configuration file — three homes, sections and owners, precedence, strict validation | accepted | partly |
@@ -168,6 +170,9 @@ yet is owned by an open `W-nn`.
 | `.claude/hooks/worktree-cleanup.py` | SR-WORK-CLEANUP | decisions 1–6 |
 | `.claude/hooks/require-progress.sh` | SR-WORK-SESSION | decision 5 |
 | `.claude/hooks/now-ledger.py` | SR-WORK-NOW | decisions 2–5 |
+| `.claude/hooks/block-main.py` | SR-WORK-SESSION | decision 15 — lockmaster's kit: only lockmaster writes to main |
+| `.claude/hooks/claim-guard.py` | SR-WORK-SESSION | decision 15 — lockmaster's kit: a write outside the claim is warned |
+| `lockmaster.toml` | SR-WORK-SESSION | decision 15 — this repo's landing checks and merge drivers |
 | `.claude/hooks/disk-budget.py` | SR-LAW-9 | decision 4 |
 | `Cargo.toml` | SR-PACKAGES | decision 1: the workspace and its one version |
 | `crates/codelaw-core` | SR-ARCHITECTURE | decision 13: offsets and positions; the shared types; `process`: the one process-group kill (decisions 18 and 19) |
@@ -185,7 +190,8 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-engine` | SR-ARCHITECTURE | decisions 4–28: the pipelines |
 | `crates/codelaw-report` | SR-CLI-MCP | decisions 3 and 4 |
 | `crates/codelaw-test` | SR-RULE-AUTHORING | decision 4 |
-| `crates/codelaw-cli` | SR-CLI-MCP | decisions 1–3 |
+| `crates/codelaw-cli` | SR-CLI-MCP | decisions 1–3 and 11 |
+| `.pre-commit-hooks.yaml` | SR-CLI-MCP | decision 11: the pre-commit framework's hook definitions |
 | `crates/codelaw-lsp` | SR-EDITOR | decisions 1–3: the language server |
 | `crates/codelaw-mcp` | SR-CLI-MCP | decisions 5–6: the MCP server and its parity with the CLI |
 | `crates/codelaw-graph` | SR-PROJECT-GRAPH | decisions 1–6: the symbol graph, its resolver and the `graph:` queries |
@@ -205,7 +211,7 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-cli/tests/react_no_context.rs` | SR-RULE-PACKS | decision 8: runs that recipe through the binary (a different decision from the CLI's) |
 | `fixtures/perf` | SR-LAW-8 | decision 2: the reference workload's description (the repo itself is generated by `codelaw bench`) |
 | `perf/budgets.toml` | SR-LAW-8 | decision 1: the budgets file the perf gate reads |
-| `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the eleven first-party packs' rules, presets and data |
+| `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the fifteen first-party packs' rules, presets and data |
 | `LICENSE` | SR-PACKAGES | decision 10: the licence every package carries |
 | `packaging` | SR-PACKAGES | decisions 3 and 5: the npm launcher and API, the PyPI module and its maturin build |
 | `packaging/vscode` | SR-EDITOR | decision 4: the thin VS Code extension (SR-PACKAGES decision 6 is how it ships) |
@@ -235,6 +241,9 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 |---|---|---|
 | `crates/codelaw-rules` | SR-RULE-PACKS | pack layout, resolution, presets and precedence (decisions 3–5, 10–14) are the loader's |
 | `crates/codelaw-cli/src/init.rs` | SR-RULE-PACKS | decision 6 is what `codelaw init` does |
+| `crates/codelaw-native/src/deps` | SR-RULE-PACKS | decision 15: the manifests, lockfiles, snapshot and version order the dependency rules read |
+| `crates/codelaw-cli/src/deps_cmd.rs` | SR-RULE-PACKS | decision 15: what `codelaw deps refresh` reads, sends and writes |
+| `crates/codelaw-cli/src/deps_cmd.rs` | SR-LAW-5 | decision 3: the one command that may use the network |
 | `crates/codelaw-engine/src/suppress.rs` | SR-LINTER | decision 6: the suppression syntax and what it covers |
 | `crates/codelaw-match/src/data.rs` | SR-RULE-FORMAT | decision 3e: the data tree a `target:` rule reads |
 | `crates/codelaw-match/src/target.rs` | SR-RULE-FORMAT | decision 3e: `target:` paths and `assert:` checks |

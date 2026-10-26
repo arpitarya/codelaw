@@ -1,4 +1,4 @@
-use crate::raw::{RawConfig, RawOverride, RawProfile, RuleSetting};
+use crate::raw::{RawConfig, RawDepsIgnore, RawOverride, RawProfile, RuleSetting};
 use crate::{ConfigError, did_you_mean, explain_serde_error};
 use codelaw_cache::{Key, KeyBuilder};
 use codelaw_core::Language;
@@ -243,6 +243,18 @@ impl ConfigFile {
                 validate_override(&path, &format!("profile `{name}` override #{}", i + 1), o)?;
             }
         }
+        for e in raw.deps.ignore.iter().flatten() {
+            let p = e.package();
+            let named = p.strip_prefix("npm:").or_else(|| p.strip_prefix("pypi:")).is_some_and(|n| !n.is_empty());
+            if !named {
+                return Err(ConfigError::new(Some(path), format!("`[deps] ignore`: `{p}` names no package; write `npm:<name>` or `pypi:<name>`")));
+            }
+            if let RawDepsIgnore::Dated(d) = e
+                && let Some(x) = d.expires.as_deref().filter(|x| !is_date(x))
+            {
+                return Err(ConfigError::new(Some(path), format!("`[deps] ignore`: `expires = \"{x}\"` is not a date; write it as YYYY-MM-DD")));
+            }
+        }
         let include = if raw.include.is_empty() { None } else { Some(glob_set(&raw.include, &path)?) };
         let exclude = glob_set(&raw.exclude, &path)?;
         let overrides = override_globs(&raw.overrides, &path)?;
@@ -346,8 +358,10 @@ pub struct Config {
 pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codelaw/cache"];
 
 /// Keys a nested config may not set yet; they belong to the root config.
-const ROOT_ONLY: &[&str] =
-    &["extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profiles]"];
+const ROOT_ONLY: &[&str] = &[
+    "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profiles]",
+    "[deps]",
+];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
     let set = [
@@ -363,6 +377,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.daemon != Default::default(),
         raw.lsp != Default::default(),
         !raw.profiles.is_empty(),
+        raw.deps != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -577,6 +592,19 @@ impl Config {
         self.root_raw().and_then(|r| r.markdown.lint_code_blocks).unwrap_or(false)
     }
 
+    /// The keys of a root config section as JSON options, for a native
+    /// rule that reads one (`[deps]`: SR-RULE-PACKS decision 15).
+    pub fn section_options(&self, name: &str) -> BTreeMap<String, serde_json::Value> {
+        let value = match (name, self.root_raw()) {
+            ("deps", Some(r)) => serde_json::to_value(&r.deps).ok(),
+            _ => None,
+        };
+        match value {
+            Some(serde_json::Value::Object(m)) => m.into_iter().collect(),
+            _ => BTreeMap::new(),
+        }
+    }
+
     pub fn tagged_templates(&self) -> bool {
         self.root_raw().and_then(|r| r.lint.tagged_templates).unwrap_or(false)
     }
@@ -703,6 +731,17 @@ impl Config {
         }
         k.key()
     }
+}
+
+/// `YYYY-MM-DD`, with a month and a day in range.
+fn is_date(s: &str) -> bool {
+    let b = s.as_bytes();
+    b.len() == 10
+        && b[4] == b'-'
+        && b[7] == b'-'
+        && [&s[..4], &s[5..7], &s[8..]].iter().all(|p| p.bytes().all(|c| c.is_ascii_digit()))
+        && (1..=12).contains(&s[5..7].parse::<u8>().unwrap_or(0))
+        && (1..=31).contains(&s[8..].parse::<u8>().unwrap_or(0))
 }
 
 #[cfg(test)]
@@ -842,3 +881,4 @@ mod tests {
         assert!(err.message.contains("can only be set in the root config"), "{}", err.message);
     }
 }
+

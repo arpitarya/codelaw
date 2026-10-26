@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Checkstyle's report format, as an XSD. Checkstyle publishes the report
+     only as a format description (https://checkstyle.org/cmdline.html, "XML
+     format"), not as a schema; this is that description, written down: the
+     elements and attributes its XmlLogger writes and Jenkins, SonarQube and
+     Azure DevOps read. Written for codelaw; nothing is copied. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="checkstyle">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="error" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="line" type="xs:positiveInteger" use="required"/>
+                  <xs:attribute name="column" type="xs:positiveInteger" use="optional"/>
+                  <xs:attribute name="severity" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="ignore"/>
+                        <xs:enumeration value="info"/>
+                        <xs:enumeration value="warning"/>
+                        <xs:enumeration value="error"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="message" type="xs:string" use="required"/>
+                  <xs:attribute name="source" type="xs:string" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

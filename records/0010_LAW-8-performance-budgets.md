@@ -136,6 +136,12 @@ The decider wants performance to be a key property and accepts that today's numb
 - On the runner `check_cold_10k` (8.7 s), `format_warm_10k` (1.6 s) and `mcp_rules_for_path` (43 ms) are past the loaded Mac's proposals; every one but `fix_one_file` still leaves 1.5 × headroom under its design target.
 - `fix_one_file` is 76.3 ms against a 100 ms target: 1.31 × headroom, not 1.5 ×. Its context twin `fix_one_file_cold` is 76.7 ms against < 300 ms.
 
+**Watch mode, first measurements, 2026-10-25 (W-44). Context rows, not L8 operations: no budget, never gated.** A loaded developer Mac (Apple M4, 10 cores; load average 12–28, five other agents compiling), release build, `codelaw bench --runs 11 --only watch_rerun,watch_save_to_print`, two sessions:
+- `watch_rerun` (the engine's re-check of one saved file over the 10k workload, primed cache): median 2.5 / 4.3 ms, p95 2.9 / 5.7 ms — inside `fix_one_file`'s 100 ms class.
+- `watch_save_to_print` (save to the printed JSON line): median 274 / 233 ms, p95 289 / 273 ms. Most of it is the watch's own waiting by design — up to one 100 ms poll, then the 100 ms settle ([SR-ARCHITECTURE](0108_architecture.md) decision 22a) — and the two looks at ~10,000 files.
+- With `js/project` and `py/project` added to the workload's config, so the graph is linked and its rules run on every save, the save-to-print median is about 15 ms more (268 against 253 ms, measured by hand the same day).
+- Polling 10,000 files every 100 ms costs about a fifth of one core while nothing changes.
+
 ### Consequences
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.

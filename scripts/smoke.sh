@@ -25,8 +25,16 @@ case "$key" in win32-*) win=1 ;; *) win=0 ;; esac
 UV_VERSION=0.11.3 # MIT OR Apache-2.0; declared in crates/codelaw-cli/tests/licences.rs (L2)
 work="$(mktemp -d)"
 index_pid=""
+watch_pid=""
+stop_watch() { # a running `check --watch`, and on Windows the native process tree under it
+  [ -n "$watch_pid" ] || return 0
+  if [ "$win" = 1 ] && [ -r "/proc/$watch_pid/winpid" ]; then taskkill //F //T //PID "$(cat "/proc/$watch_pid/winpid")" >/dev/null 2>&1 || true; fi
+  kill "$watch_pid" 2>/dev/null || true; wait "$watch_pid" 2>/dev/null || true
+  watch_pid=""
+}
 stop() { # the script's own status, whatever stopping the index returns
   local st=$?
+  stop_watch
   if [ -n "$index_pid" ]; then kill "$index_pid" 2>/dev/null || true; wait "$index_pid" 2>/dev/null || true; fi
   rm -rf "$work"
   exit "$st"
@@ -137,6 +145,19 @@ n="$(node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "
 cmp -s "$work/npm.json" "$work/pypi.json" || { echo "✗ npm and PyPI disagree:" >&2; diff "$work/npm.json" "$work/pypi.json" >&2 || true; exit 1; }
 node -e 'const [a, b, c] = process.argv.slice(1).map(f => JSON.parse(require("fs").readFileSync(f, "utf8"))); const s = JSON.stringify(a.summary); if (s !== JSON.stringify(b) || s !== JSON.stringify(c)) { console.error("✗ an API disagrees with the CLI", s, JSON.stringify(b), JSON.stringify(c)); process.exit(1) }' \
   "$(native "$work/npm.json")" "$(native "$work/api-npm.json")" "$(native "$work/api-pypi.json")"
+# ── watch mode (SR-ARCHITECTURE decision 22a, W-44): in-process on every
+# platform, Windows included — a save is re-checked, one JSON object per run ──
+(cd "$work/pypi" && VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" check --watch --format json --no-cache >"$work/watch.ndjson" 2>"$work/watch.err") &
+watch_pid=$!
+lines() { if [ -f "$work/watch.ndjson" ]; then wc -l <"$work/watch.ndjson" | tr -d ' '; else echo 0; fi; }
+for _ in $(seq 1 300); do [ "$(lines)" -ge 1 ] && break; sleep 0.1; done
+printf '\n# A third title\n' >>"$work/pypi/SMOKE.md"
+for _ in $(seq 1 300); do [ "$(lines)" -ge 2 ] && break; sleep 0.1; done
+stop_watch
+node -e 'const lines = require("fs").readFileSync(process.argv[1], "utf8").split("\n").filter(Boolean); const runs = lines.map(l => JSON.parse(l));
+  const [a, b] = runs; const md = r => r.diagnostics.filter(d => d.file === "SMOKE.md").length;
+  if (runs.length < 2 || b.watch.run !== 2 || !b.watch.changed.includes("SMOKE.md") || md(b) <= md(a)) { console.error("✗ check --watch did not re-check a save:", lines.length, "lines", lines.map(l => l.slice(0, 200))); process.exit(1) }' \
+  "$(native "$work/watch.ndjson")" || { cat "$work/watch.err" >&2; exit 1; }
 # ── Windows is one-shot (SR-ARCHITECTURE decision 21): no warm socket, so
 # `codelaw daemon` refuses with its stated message and exit 2, and
 # `--prefer-warm` runs in-process with byte-identical output ──
@@ -150,4 +171,4 @@ if [ "$win" = 1 ]; then
   cmp -s "$work/warm.json" "$work/pypi.json" || { echo "✗ win32: \`check --prefer-warm\` differs from \`check\`" >&2; exit 1; }
   oneshot="; one-shot: \`codelaw daemon\` refuses (exit 2) and \`--prefer-warm\` runs in-process, byte-identical"
 fi
-echo "✔ $key, installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree; codelaw --version is codelaw $version through uvx and through npx; the index served $served_npm tarballs and $served_pypi wheels$oneshot"
+echo "✔ $key, installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree; codelaw --version is codelaw $version through uvx and through npx; the index served $served_npm tarballs and $served_pypi wheels; check --watch re-checked a save$oneshot"

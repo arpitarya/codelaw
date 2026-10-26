@@ -13,6 +13,7 @@ codelaw-config.workspace = true
 codelaw-fix.workspace = true
 codelaw-match.workspace = true
 codelaw-rules.workspace = true
+blake3.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tree-sitter.workspace = true

@@ -6,8 +6,8 @@ item: W-47
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5), parallel merge"
+ball: done
 ---
 
 # W-47 — `codelaw baseline history` — the burn-down over commits
@@ -16,11 +16,11 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Define `baseline history` in SR-BASELINE | the record is the spec | ⏳ |
-| 2 | Walk the commits that touched `.codelaw/baseline/` (`git log`), read each version with `git show`, sum counts per rule | a series per rule, fast | ⏳ |
-| 3 | Options: `--since <ref|date>`, `--rule`, `--by day|week|commit` | the window you want | ⏳ |
-| 4 | Output: text table with a sparkline; `json` and `csv` for dashboards; `markdown` for PR comments | shareable | ⏳ |
-| 5 | Docs: a weekly CI job that posts it | the trend lands where people look | ⏳ |
+| 1 | Define `baseline history` in SR-BASELINE | the record is the spec | ✅ |
+| 2 | Walk the commits that touched `.codelaw/baseline/` (`git log`), read each version with `git show`, sum counts per rule | a series per rule, fast | ✅ |
+| 3 | Options: `--since <ref|date>`, `--rule`, `--by day|week|commit` | the window you want | ✅ |
+| 4 | Output: text table with a sparkline; `json` and `csv` for dashboards; `markdown` for PR comments | shareable | ✅ |
+| 5 | Docs: a weekly CI job that posts it | the trend lands where people look | ✅ |
 
 **Arpit, 2026-10-25:** *"Watch mode, let's build it. Then CI report formats, let's build it. Exception report, that is code law exceptions, expiring 30 days, group added by … build it. Baseline burn down over commits, build it. Code law migrate from ESLint, flat config, Ruff, style lint, as well as biome … Remove OXLint. Dev server plugin for RSpack, Vite, Webpack, Next.js. Pre-commit hook, post-commit hook, create work items for all these."*
 
@@ -42,14 +42,14 @@ total                        253  135   −118
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | history on a fixture repo with five baseline commits matches hand-counted totals | ⏳ |
-| 2 · | a renamed or deleted baseline file is handled | ⏳ |
-| 3 · | same commit range → byte-identical output | ⏳ |
-| 4 · | no `git` → usage error, exit 2 | ⏳ |
+| 1 · | history on a fixture repo with five baseline commits matches hand-counted totals | ✅ |
+| 2 · | a renamed or deleted baseline file is handled | ✅ |
+| 3 · | same commit range → byte-identical output | ✅ |
+| 4 · | no `git` → usage error, exit 2 | ✅ |
 
 ## Blockers
 
-None.
+None. Landed on the branch; the parent merge writes the queue rows.
 
 ## Record affected
 

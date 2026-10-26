@@ -1,0 +1,4 @@
+description = "sec-js/strict, sec-ts/recommended and the heuristic TypeScript-only security rules, at warn"
+extends = ["codelaw:sec-js/strict", "codelaw:sec-ts/recommended"]
+
+[rules]

@@ -9,6 +9,7 @@ use crate::project::{Source, suppressed, suppressions};
 use crate::{CheckReport, EngineError, Project, git};
 use crate::suppress::Suppression;
 use codelaw_baseline::exception::{Expiry, expiry, valid_email};
+use codelaw_baseline::history::{self, By, History, Snapshot};
 use codelaw_baseline::{
     AUTHOR_RULE, AddOptions, BaselineFile, Baselines, Context, DEPRECATED_RULE, Date, Deprecation, Exceptions, OnTouch, Occurrence, Policy, Registry,
     STALE_RULE, WITHOUT_EXPIRY_RULE,
@@ -589,6 +590,64 @@ impl Project {
             None => Some(format!("no CODEOWNERS file: add one with an entry for `{folder}/` so a raised count needs review (SR-BASELINE decision 5)")),
         };
         Ok(Ratchet { base, loosened, codeowners })
+    }
+
+    /// `codelaw baseline history`: the burn-down per rule, read from the
+    /// baseline files of the commits that touched them (SR-BASELINE
+    /// decision 10). `since` is a date, a duration (`90d`, `12w`, from the
+    /// `HEAD` commit date, never the wall clock) or a ref; the state just
+    /// before the window opens the series. Warnings are returned.
+    pub fn baseline_history(&self, since: Option<&str>, by: By, rule: Option<&str>) -> Result<(History, Vec<String>), EngineError> {
+        let root = self.root();
+        let usage = |e: String| EngineError::Usage(format!("baseline history needs git: {e}"));
+        git::toplevel(root).map_err(usage)?;
+        let folder = ".codelaw/baseline";
+        let mut warnings = Vec::new();
+        if git::is_shallow(root) {
+            warnings.push("shallow clone: the history stops at the clone's depth; fetch the full history (`fetch-depth: 0` in actions/checkout, or `git fetch --unshallow`)".to_owned());
+        }
+        // `(id, date)` of each commit in the window, and of the one that opens it.
+        let (commits, opening) = match since {
+            None => (git::commits_touching(root, None, folder).map_err(usage)?, None),
+            Some(s) => {
+                let days = s.strip_suffix(['d', 'w']).and_then(|n| n.parse::<i64>().ok()).map(|n| n * if s.ends_with('w') { 7 } else { 1 });
+                let start = match (Date::parse(s), days) {
+                    (Ok(d), _) => Some(d),
+                    (_, Some(n)) => Some(Date::parse(&git::head_date(root).map_err(usage)?).map_err(EngineError::Usage)?.add_days(-n)),
+                    _ => None,
+                };
+                if let Some(start) = start {
+                    let all = git::commits_touching(root, None, folder).map_err(usage)?;
+                    let (before, within): (Vec<_>, Vec<_>) = all.into_iter().partition(|c| Date::parse(&c.1).is_ok_and(|d| d < start));
+                    (within, before.into_iter().last())
+                } else {
+                    let base = git::resolve(root, s).map_err(EngineError::Usage)?;
+                    let range = git::commits_touching(root, Some(&format!("{base}..HEAD")), folder).map_err(usage)?;
+                    let date = git::commit_date(root, &base).map_err(usage)?;
+                    (range, Some((base, date)))
+                }
+            }
+        };
+        let mut read = |(id, date): &(String, String)| -> Result<Option<Snapshot>, EngineError> {
+            let Ok(date) = Date::parse(date) else { return Ok(None) };
+            let files = git::files_at(root, id, folder).map_err(usage)?;
+            Ok(match Baselines::from_texts(&files) {
+                Ok(b) => Some(Snapshot::new(id, date, &b)),
+                Err(e) => {
+                    warnings.push(format!("commit {} skipped: {e}", id.get(..7).unwrap_or(id)));
+                    None
+                }
+            })
+        };
+        let opening = match &opening {
+            Some(o) => read(o)?,
+            None => None,
+        };
+        let mut snaps = Vec::new();
+        for c in &commits {
+            snaps.extend(read(c)?);
+        }
+        Ok((history::build(opening, snaps, by, rule), warnings))
     }
 
     /// `codelaw deprecate`: add the registry entry, then baseline every

@@ -29,6 +29,7 @@ it, and do not read it top-down as a priority order.
 | B-046 | the tree-sitter-css upstream PR: `grammar.patch`, a ready commit with `src/` regenerated (`0001-tree-sitter-css-modern.patch`) and `PR.md` in `crates/codelaw-lang/grammars/tree-sitter-css/upstream/`; not filed — **Arpit, 2026-10-24:** *"Then let's keep using the patch copy and put the PR in backlog."* | [SR-ARCHITECTURE](../records/0108_architecture.md) decision 3 · [W-21](../archive/open/W-21-pack-engine-gaps.md) | the PR is opened on tree-sitter/tree-sitter-css; the fork is dropped when a release carries it |
 | B-048 | The *later* presets: `js/strict` (typescript-eslint `strict`, jsx-a11y, unicorn), `react/a11y`, `py/strict`, and an opt-in pydocstyle `D` preset | [SR-RULE-PACKS](../records/0101_rule-packs.md) §1; the research table of [W-03](../archive/open/W-03-rule-packs.md) | each preset ships in its pack, or the decider rules it out |
 | B-050 | `codelaw migrate --from eslint\|ruff\|stylelint\|biome` (no oxlint): "Maps existing ESLint, typescript-eslint, Ruff, stylelint … configs rule by rule through `ported_from:`" and writes "a mapping report"; was W-48, moved here by the decider, 2026-10-25 | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) §P2 `codelaw-migrate` row · `archive/open/W-48-codelaw-migrate.md` | the decider reopens it as a `W-nn` |
+| B-052 | `rules_for_path` on a source file names the major-version gaps of the packages it imports, from the deps snapshot; in W-52's Goal, not its DoD, and not built | `archive/open/W-52-dependency-latest-versions.md` §Goal, Agents · [SR-RULE-PACKS](../records/0101_rule-packs.md) decision 15 | built and tested in the MCP server |
 
 ---
 
@@ -50,8 +51,8 @@ it, and do not read it top-down as a priority order.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-047 | move the 70 CSS rules off `css_syntax.rs` onto a real tree: (a) extend the tree-sitter-css fork for the forms that still give `ERROR` or misparse (`--x: { … }`), then port; or (b) run the native rules on Biome's CSS tree, already in the binary for the formatter. Not decided; W-21's DoD 3 was restated without it (Arpit, 2026-10-24) | [SR-ARCHITECTURE](../records/0108_architecture.md) decision 15b · `archive/open/W-21-pack-engine-gaps.md` §DoD 3, settled | the decider picks (a), (b) or neither, and an item is filed |
 | B-049 | type-aware rules (typescript-eslint's `*-type-checked` set) and TypeScript's own errors with its fixes, answered by a typescript-go helper; needs L3 and L6 amended. Parked by the decider, 2026-10-25: *"For now, put type aware rules and details in backlog"* | [proposal](proposals/type-aware-rules.md) | the decider reopens it, or TypeScript 7.1 ships its programmatic API |
+| B-051 | `deps refresh` and `data/outdated-dependency` do not read `requirements*.txt`: it is not one of L3's nine languages, so no rule can report on its lines | [L3](../records/0005_LAW-3-languages.md) · `archive/open/W-52-dependency-latest-versions.md` §As built | the decider amends L3, or rules that refresh reads it with findings elsewhere |
 
 ---
 

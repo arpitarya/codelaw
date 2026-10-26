@@ -24,11 +24,11 @@ codelaw init --no-install
 # 3. Until the packs are published, link them from the clone:
 #    the npm packs into node_modules/, the PyPI-only ones where a Python install would put them
 mkdir -p node_modules/@codelaw .codelaw-packs
-for p in js ts react node stencil html css data tanstack-query redux-toolkit; do
+for p in js ts react node stencil html css data tanstack-query redux-toolkit security-js security-ts security-html; do
   ln -s "$OLDPWD/codelaw/packs/$p" "node_modules/@codelaw/rules-$p"
 done
-for p in python; do
-  ln -s "$OLDPWD/codelaw/packs/$p" ".codelaw-packs/codelaw_rules_$p"
+for p in python security-python; do
+  ln -s "$OLDPWD/codelaw/packs/$p" ".codelaw-packs/codelaw_rules_${p//-/_}"
 done
 export CODELAW_SITE_PACKAGES="$PWD/.codelaw-packs"
 
@@ -226,8 +226,42 @@ flowchart LR
 ## Without AI: editor, pre-commit, CI
 
 - **Editor:** `codelaw lsp` is a language server — diagnostics, quick fixes and formatting. The VS Code extension is built; its Marketplace listing comes later ([SR-EDITOR](records/0114_editor.md)).
-- **Pre-commit:** check only what is staged — `codelaw check --staged`.
-- **CI:** `codelaw check --max-warnings 0` fails the job on any finding; `--changed-since origin/main` checks only what a branch touched; `--format sarif` feeds GitHub code scanning. A CI job runs the `ci` profile when `CI` is set, as GitHub Actions, GitLab CI and most runners do; where it is not, pass `--profile ci` ([Configure](#warn-on-a-laptop-fail-in-ci)).
+- **Pre-commit:** `codelaw init --git-hooks` installs a `pre-commit` and a `post-commit` hook in the folder git uses (`core.hooksPath` or `.git/hooks`). An existing hook is kept as `<name>.pre-codelaw` and runs first; nothing is overwritten, and deleting the file uninstalls it ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 11).
+  - **`pre-commit` blocks:** it runs `codelaw fix --staged` on the files that are fully staged and re-stages them, then `codelaw check --staged` on every staged file. A partly staged file is checked but never fixed, so your unstaged hunks stay yours. Add flags to both with `CODELAW_HOOK_ARGS` (for example `--profile ci`); skip once with `git commit --no-verify`.
+  - **`post-commit` never blocks:** it prints what the scripts in `.codelaw/hooks/post-commit.d/` print and always exits 0.
+  - **By hand:** `codelaw check --staged`.
+  - **The pre-commit framework** — `codelaw` must be on `PATH`:
+
+    ```yaml
+    repos:
+      - repo: https://github.com/arpitarya/codelaw
+        rev: v0.2.0
+        hooks:
+          - id: codelaw-fix
+          - id: codelaw-check
+    ```
+
+  - **husky** (`.husky/pre-commit`) and **lefthook** (`lefthook.yml`):
+
+    ```sh
+    npx codelaw check --staged -- $(git diff --cached --name-only --diff-filter=ACMR)
+    ```
+
+    ```yaml
+    pre-commit:
+      commands:
+        codelaw:
+          glob: "*.{js,jsx,ts,tsx,py,json,yaml,yml,toml,md,css,html}"
+          run: codelaw check --staged -- {staged_files}
+          stage_fixed: true
+    ```
+- **While you work:** `codelaw check --watch` checks once, then again every time a file is saved — the saved file, and through the project rules every file that depends on it — until Ctrl-C. Editing `codelaw.toml`, a rule or the baseline takes effect on the next run, with no restart. It runs the `local` profile unless `--profile` says otherwise. `--format json` prints one JSON object per run, one per line, for tools that read it; `codelaw fix --watch` fixes each file as you save it, which can fight an editor that also fixes or formats on save ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 2).
+- **CI:** `codelaw check --max-warnings 0` fails the job on any finding; `--changed-since origin/main` checks only what a branch touched; `--format sarif` feeds GitHub code scanning. A CI job runs the `ci` profile when `CI` is set, as GitHub Actions, GitLab CI and most runners do; where it is not, pass `--profile ci` ([Configure](#warn-on-a-laptop-fail-in-ci)). To show findings inline without one, pick the format your CI reads (every one keeps the exit code):
+  - **GitHub Actions:** `codelaw check --format github` — annotations on the PR diff.
+  - **GitLab:** `codelaw check --format gitlab > gl-code-quality-report.json`, then `artifacts: reports: codequality: gl-code-quality-report.json` — the MR widget.
+  - **Jenkins, Azure DevOps, Bitbucket:** `codelaw check --format junit > codelaw-junit.xml` and publish it as test results.
+  - **Jenkins (Warnings Next Generation), SonarQube generic import, Azure DevOps:** `codelaw check --format checkstyle > checkstyle.xml`.
+  - `codelaw format --check --format github` (or any of the four) reports the files that would change.
 - **Adopting it in an old repo:** grandfather a rule's existing findings with a deadline — `codelaw baseline add --rule <id> --expires <date> --reason "<why>"` ([SR-BASELINE](records/0104_baseline-and-deprecations.md)).
 - **Exceptions with an expiry date:** a baseline entry, a deprecation or an inline ignore can carry `expires` — the first day it no longer holds. From `warn_days` before it (3 by default) it is a warning, `codelaw/expiring-exception`; on the day it is an error, `codelaw/expired-exception`, and the findings it covered come back. Set `[exceptions] require_expiry = true` in `codelaw.toml` to make the date mandatory. An optional `added_by` email (`by=` inline) is checked against git under `--staged` (your `git config user.email`) and `--changed-since` (the line's blame author):
 
@@ -245,6 +279,17 @@ flowchart LR
     --warn-from 2026-10-25 --on-touch keep --reason "legacy context, grandfathered"
   ```
 
+- **Dependencies on their latest version:** `codelaw deps refresh` reads npm and the Python index for every dependency your `package.json` and `pyproject.toml` files name, and writes `.codelaw/deps-snapshot.json` — commit it. It is the only command that uses the network ([L5](records/0007_LAW-5-no-model-in-the-engine.md) decision 3). Then `check` reports each dependency behind its latest version from the snapshot, offline: a major version behind is a warning, a minor or patch one is info, a deprecated or yanked version in use is an error, and a lockfile behind a range that already allows the latest is info. `codelaw fix --unsafe` moves the range to the latest and keeps its `^`, `~`, `>=` or `==`. Turn the rules on with the `data/package-json` and `data/pyproject` presets (and `preview = true`), and tune them in `[deps]`:
+
+  ```toml
+  [deps]
+  severity        = { major = "warn", minor = "info", patch = "off" }
+  min_release_age = "7d"                  # ignore releases younger than a week
+  ignore          = ["npm:typescript"]    # or { package = "npm:react", expires = "2027-01-01" }
+  ```
+
+  A private npm registry comes from `.npmrc` (`@acme:registry=…` and `//host/:_authToken=${NPM_TOKEN}`, the token read from the environment, never written); a private Python index from `PIP_INDEX_URL` or `[[tool.uv.index]]`. `data/stale-deps-snapshot` says when the snapshot is older than `[deps] max_snapshot_age` (14 days) on the as-of date ([SR-RULE-PACKS](records/0101_rule-packs.md) decision 15).
+
 ---
 
 ## Commands
@@ -253,13 +298,13 @@ flowchart LR
 
 | command | what it does |
 |---|---|
-| `codelaw check [paths]` | Report every finding with its fix. `--format text\|json\|sarif\|agent`, `--max-warnings N`, `--lang`, `--rule`, `--timings`; `--no-adapters` skips the installed oxlint, Ruff, stylelint and html-validate |
-| `codelaw fix [paths]` | Apply `auto` fixes, format, then report what's left. `--unsafe` adds `suggest` fixes; `--dry-run` writes nothing; `--trace` shows each pass |
+| `codelaw check [paths]` | Report every finding with its fix. `--format text\|json\|sarif\|agent\|github\|gitlab\|junit\|checkstyle`, `--max-warnings N`, `--lang`, `--rule`, `--timings`; `--no-adapters` skips the installed oxlint, Ruff, stylelint and html-validate; `--watch` checks again on every save until Ctrl-C |
+| `codelaw fix [paths]` | Apply `auto` fixes, format, then report what's left. `--unsafe` adds `suggest` fixes; `--dry-run` writes nothing; `--trace` shows each pass; `--watch` fixes each file again when you save it |
 | `codelaw format [paths]` | Format every file: Prettier-style JS/TS/JSON/CSS/HTML/YAML/Markdown, Black-style Python, taplo-style TOML. `--check` and `--diff` change nothing |
 | `codelaw mcp` · `codelaw lsp` | The MCP server for agents and the language server for editors, from the same binary |
-| `codelaw init` | Detect languages and write `codelaw.toml`, `.codelaw/rules/` and the `.gitignore` line. `--no-install` prints the pack install commands instead of running them; `--registry npm\|pypi`; `--agents` writes the agent hooks and files |
+| `codelaw init` | Detect languages and write `codelaw.toml`, `.codelaw/rules/` and the `.gitignore` line. `--no-install` prints the pack install commands instead of running them; `--registry npm\|pypi`; `--agents` writes the agent hooks and files; `--git-hooks [pre-commit,post-commit]` installs the git hooks |
 | `codelaw config` | `--print` every resolved value and where it came from; `--schema` prints the config's JSON Schema; `--for <file>` resolves for one file |
-| `codelaw rules` | List active rules. `--for <file>` shows the ones that apply to that file. `rules lint` checks rule files |
+| `codelaw rules` | List active rules. `--for <file>` shows the ones that apply to that file. `--tag cwe:79` / `--tag owasp:A05` / `--tag security` keep the rules with that security mapping; `--security-coverage` prints the OWASP Top 10:2025 × rule matrix. `rules lint` checks rule files |
 | `codelaw explain <id>` | What a rule requires, why, and how to fix it |
 | `codelaw test [rule\|folder] [--corpus <dir>]` | Run rules against their own examples; `--corpus` also runs them over real code |
 | `codelaw new-rule <ns/name>` | Write a rule file from the template |
@@ -271,6 +316,7 @@ flowchart LR
 | `codelaw hook [paths]` | Check and fix the files an agent just edited; what is left goes back to it |
 | `codelaw sync-agents` | Write every agent's instruction files from the rules and skills; `--check` reports drift |
 | `codelaw daemon start\|stop\|status` | An opt-in warm process that `--prefer-warm` runs use; the output is the same |
+| `codelaw deps refresh` | Read npm and the Python index for every dependency the manifests name and write `.codelaw/deps-snapshot.json`, which `data/outdated-dependency` reads offline; the only command that uses the network. `--as-of` sets the `fetched` day |
 | `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
 | `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set ([L8](records/0010_LAW-8-performance-budgets.md)) |
 

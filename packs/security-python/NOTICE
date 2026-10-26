@@ -1,0 +1,11 @@
+codelaw-rules-security-python
+
+This pack holds no rule yet; every rule it will hold is written for
+codelaw.
+Rules ported from Bandit (Apache-2.0) and Ruff's `S` rules (MIT) name their source rule in `ported_from:` and
+are listed here with that tool's version and licence when they land
+(SR-RULE-PACKS decision 7).
+
+Rule sets under a copyleft or source-available licence — eslint-plugin-no-unsanitized
+(MPL-2.0), njsscan (LGPL-3.0), Semgrep's rules (the Semgrep Rules License) — are
+read for ideas only; no text, pattern or code is taken from them (L2).

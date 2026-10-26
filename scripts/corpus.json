@@ -7,7 +7,7 @@
       "commit": "d086db856be187255b8ec61ef409357393020f32",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE.txt",
-      "packs": ["python", "html", "data"]
+      "packs": ["python", "html", "data", "security-python", "security-html"]
     },
     {
       "name": "httpx",
@@ -23,7 +23,7 @@
       "commit": "1a3a401c0d33920b7c8b1541fb89784976a41a96",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE.md",
-      "packs": ["python", "css"]
+      "packs": ["python", "css", "security-python"]
     },
     {
       "name": "rich",
@@ -55,7 +55,7 @@
       "commit": "b1125d8839482cb7bbae603ddc6d0081bf87532e",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "python", "data", "ts", "react", "node", "tanstack-query"]
+      "packs": ["js", "python", "data", "ts", "react", "node", "tanstack-query", "security-python", "security-js", "security-ts"]
     },
     {
       "name": "html5-boilerplate",
@@ -63,7 +63,7 @@
       "commit": "b6597338e695dc4a8165c5abcb2bfffa586c3ee5",
       "licence": "MIT",
       "licence_file": "LICENSE.txt",
-      "packs": ["html", "css", "js", "data"]
+      "packs": ["html", "css", "js", "data", "security-js", "security-html"]
     },
     {
       "name": "normalize.css",
@@ -79,7 +79,7 @@
       "commit": "c78c1306b3135809a109b207ac40a5916ef9f1c0",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE",
-      "packs": ["python", "html", "css"]
+      "packs": ["python", "html", "css", "security-python", "security-html"]
     },
     {
       "name": "ionic-framework",
@@ -87,7 +87,7 @@
       "commit": "25a114f4077cae0aa2d633e32d26638096eeb9f1",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["stencil", "ts"]
+      "packs": ["stencil", "ts", "security-ts"]
     },
     {
       "name": "bulletproof-react",
@@ -95,7 +95,7 @@
       "commit": "9506629ed003a561c6627735480cce4994244bb4",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["tanstack-query"]
+      "packs": ["tanstack-query", "security-js", "security-ts"]
     },
     {
       "name": "tanstack-query",

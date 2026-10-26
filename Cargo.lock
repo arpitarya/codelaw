@@ -1020,6 +1020,7 @@ dependencies = [
  "codelaw-test",
  "ignore",
  "libc",
+ "semver",
  "serde_json",
  "similar 2.7.0",
  "toml",
@@ -1195,7 +1196,11 @@ dependencies = [
  "codelaw-lang",
  "codelaw-semantic",
  "regex",
+ "semver",
+ "serde",
+ "serde-saphyr",
  "serde_json",
+ "toml",
  "tree-sitter",
 ]
 
@@ -1203,6 +1208,7 @@ dependencies = [
 name = "codelaw-report"
 version = "0.2.0"
 dependencies = [
+ "blake3",
  "codelaw-config",
  "codelaw-core",
  "codelaw-engine",

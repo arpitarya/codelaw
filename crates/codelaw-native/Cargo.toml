@@ -10,6 +10,12 @@ codelaw-core.workspace = true
 codelaw-lang.workspace = true
 codelaw-semantic.workspace = true
 regex.workspace = true
+# `data/outdated-dependency` (SR-RULE-PACKS decision 15): npm versions, the
+# snapshot, and the lockfiles. All MIT OR Apache-2.0, already in the tree.
+semver.workspace = true
+serde.workspace = true
+serde-saphyr.workspace = true
+toml.workspace = true
 serde_json.workspace = true
 tree-sitter.workspace = true
 

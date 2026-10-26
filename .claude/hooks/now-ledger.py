@@ -89,14 +89,38 @@ def read_now():
     return head.rstrip() + "\n", flight, res
 
 
-def write_now(head, flight, res):
-    def table(header, rows, n):
-        out = [header, "|" + "---|" * n]
-        out += ["| " + " | ".join((r + [""] * n)[:n]) + " |" for r in rows]
-        return "\n".join(out)
+def renderer():
+    """lockmaster's NOW.md renderer (`lockmaster.now`) when it is importable —
+    installed, or this repository's own src/ — so NOW.md always equals
+    `lockmaster status --now` (SR-ARCHITECTURE decision 14, W-07)."""
+    for extra in (None, ROOT / "src"):
+        if extra is not None:
+            if not (extra / "lockmaster" / "now.py").is_file():
+                continue
+            sys.path.insert(0, str(extra))
+        try:
+            from lockmaster import now
+            return now
+        except ImportError:
+            continue
+    return None
 
-    text = (f"{head}\n## In flight\n\n{table(FLIGHT_HEAD, flight, 4)}\n\n"
-            f"## Resources this session created\n\n{table(RES_HEAD, res, 5)}\n")
+
+def write_now(head, flight, res):
+    mod = renderer()
+    if mod is not None:
+        text = mod.format_now(head, flight, mod.normalise(res, ROOT))
+    else:
+        # The same shape lockmaster.now writes, for a repo without lockmaster.
+        def table(header, rows, n):
+            out = [header, "|" + "---|" * n]
+            out += ["| " + " | ".join((r + [""] * n)[:n]) + " |" for r in rows]
+            return "\n".join(out)
+
+        res = [r for r in res if not (r[0] in PATH_KINDS and (p := where_path(r[1])) is not None
+                                      and not p.exists())]
+        text = (f"{head}\n## In flight\n\n{table(FLIGHT_HEAD, flight, 4)}\n\n"
+                f"## Resources this session created\n\n{table(RES_HEAD, res, 5)}\n")
     TMP.write_text(text, encoding="utf-8")
     os.replace(TMP, NOW_MD)
 
@@ -179,28 +203,38 @@ def next_id():
 
 
 def file_item(ball, lane, title, body, sid):
-    """One item file + one OPEN-WORK row (and, for red, an inbox row)."""
+    """One item file + one OPEN-WORK row (and, for red, an inbox row), in the
+    queue's own row style; the `### build (N)` count moves with the row."""
     n = next_id()
     wid, slug = f"W-{n:02d}", "session-cleanup"
     today = date.today().isoformat()
+    by = "now-ledger.py (Claude Code)"
     path = ROOT / "work" / "open" / f"{wid}-{slug}.md"
     path.write_text(
         f"---\ntype: Handoff\nname: {wid}\ndescription: \"{title}\"\nitem: {wid}\n"
-        f"filed: {today}\nfiled_by: \"now-ledger.py (Claude Code), session {sid}\"\n"
-        f"updated: {today}\nupdated_by: \"now-ledger.py\"\nball: {lane}\n---\n\n"
-        f"# {wid} — {title}\n\n{body}\n\n## Record affected\n\n"
-        f"No SR affected — the rule is [SR-WORK-CLEANUP](../../records/0062_WORK-cleanup.md).\n",
+        f"filed: {today}\nfiled_by: \"{by}\"\n"
+        f"updated: {today}\nupdated_by: \"{by}\"\nball: {'arpit' if ball == '🔴' else lane}\n---\n\n"
+        f"# {wid} — {title}\n\n## At a glance\n\n| what | state |\n|---|---|\n"
+        f"| {title} | ⏳ |\n\nFiled at the end of session `{sid}`.\n\n{body}\n\n## Record affected\n\n"
+        f"No SR affected — the rule is SR-WORK-CLEANUP.\n",
         encoding="utf-8")
-    row = (f"{ball} **{wid}** `{lane}` {title}. Filed by now-ledger.py (Claude Code)."
-           f" [detail](open/{wid}-{slug}.md)")
     text = OPEN_WORK.read_text(encoding="utf-8")
-    text = re.sub(r"(### build\n\n)", lambda m: m.group(1) + row + "\n\n", text, count=1)
+    bullets = re.search(r"^- (🔴|🟣|🟡|🟢)", text, re.M) is not None
+    row = (f"- {ball} **{wid}** · `{lane}` — {title}." if bullets else f"{ball} **{wid}** `{lane}` {title}.") + \
+          f" Filed by {by}. [detail](open/{wid}-{slug}.md)"
+
+    def bump(m):
+        return f"{m.group(1)} ({int(m.group(2) or 0) + 1})\n\n{row}\n\n"
+    text = re.sub(r"^(### (?:\S+ )?build)(?: \((\d+)\))?\n\n", bump, text, count=1, flags=re.M)
     if ball == "🔴":
-        inbox = (f"| 🔴 Keep or drop each worktree in [{wid}](open/{wid}-{slug}.md):"
-                 f" removing it would lose data (SR-WORK-CLEANUP decision 3) | {today} |\n"
-                 f"| ↳ **blocks:** nothing else in the queue | |\n")
-        text = re.sub(r"(## Blocked on the decider\n\n\| what[^\n]*\n\|---[^\n]*\n)",
-                      lambda m: m.group(1) + inbox, text, count=1)
+        head = re.search(r"^## Blocked on [^\n]*\n\n(\| what[^\n]*)\n", text, re.M)
+        aged = head is not None and "| age |" in head.group(1)
+        inbox = (f"| 🔴 **{wid}** — keep or drop each worktree in [the item](open/{wid}-{slug}.md):"
+                 f" removing it would lose data (SR-WORK-CLEANUP decision 3) | {today} |"
+                 + (" 0 d |" if aged else "") + "\n"
+                 f"| ↳ **blocks:** nothing else in the queue | |" + (" |" if aged else "") + "\n")
+        text = re.sub(r"(^## Blocked on [^\n]*\n\n\| what[^\n]*\n\|---[^\n]*\n)",
+                      lambda m: m.group(1) + inbox, text, count=1, flags=re.M)
         text = re.sub(r"\n\*Empty since[^\n]*\n", "\n", text, count=1)
     OPEN_WORK.write_text(text, encoding="utf-8")
     return wid
@@ -310,6 +344,8 @@ def end(sid, _hook):
 
 
 def main(argv):
+    if not NOW_MD.is_file():
+        return 0  # a repository without the work system has no NOW to keep (W-09)
     mode = argv[0] if argv else "show"
     fn = {"start": start, "show": show, "sync": sync, "stop": stop, "end": end}.get(mode)
     if fn is None:

@@ -93,27 +93,28 @@ into a scan anyone can do at task end.
 
 | Document | Update trigger | Last verified | Notes |
 |---|---|---|---|
-| `CLAUDE.md` | any rule or pointer changes | 2026-10-25 | 2026-10-25 — the L6 line and the `packs/` layout line: eleven packs, ten on npm and six on PyPI (W-32, the decider's ruling) |
+| `CLAUDE.md` | any rule or pointer changes | 2026-10-25 | 2026-10-25 — the L5 line (no network in the engine) and the L6 and `packs/` lines: fifteen packs, thirteen on npm and nine on PyPI (W-52, W-53, the decider's ruling) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-39, W-40 closed (CI perf within budget); W-46 unblocked |
-| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-25 | 2026-10-25 — B-048, the later presets from W-03 |
+| `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-47, W-52, W-53 closed; W-44, W-45, W-50 to the inbox; W-54–W-57 unblocked |
+| `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-25 | 2026-10-25 — B-050 (`migrate`), B-051 (`requirements*.txt`), B-052 (the deps agent hint) |
 | `work/open/README.md` | the item-file contract changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §2: release state (W-37, W-38); README/USAGE; the Fux layer |
-| `work/IMPLEMENTATION.md` | something lands | 2026-10-25 | 2026-10-25 — W-35 step 2a: the README rewrite and `USAGE.md` |
-| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-25 | 2026-10-25 — release split into W-37/W-38; the README rewrite; W-05 research |
+| `work/INTERVIEW.md` | direction, a decision or the live state changes — during the session | 2026-10-25 | 2026-10-25 — §1: the six parallel builds |
+| `work/IMPLEMENTATION.md` | something lands | 2026-10-25 | 2026-10-25 — W-44, W-45, W-47, W-50, W-52, W-53 merged |
+| `work/WORKLOG.md` | every session, before it ends — chat-only ones too | 2026-10-25 | 2026-10-25 — six items built in parallel and merged |
 | `work/NOW.md` | kept by hooks: a row per live session; empty when nothing runs | 2026-10-24 | 2026-10-24 — after W-31: unpublish `@codelaw/rules-python`, push, 0.2.0 |
 | `work/LESSONS.md` | a failure teaches something durable | 2026-10-24 | 2026-10-24 — the cfg-split lesson and the two-sessions-one-checkout lesson |
 | `work/MACHINE.md` | a surface breaks in a way the code did not cause | 2026-10-20 | 2026-10-20 — Windows runner cp1252; the cloud session's blocked Actions logs |
 | `work/compare/README.md` | a fork opens, closes, or its trigger fires | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/proposals/README.md` | an idea is filed, graduates, or is rejected | 2026-10-18 | 2026-10-18 — created at setup |
-| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-25 | 2026-10-25 — first-party pack: eleven packs (W-32) |
-| `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-25 | 2026-10-25 — the L6 and SR-RULE-PACKS rows: eleven packs (W-32) |
-| `records/README.md` | a record's state, ownership or number changes | 2026-10-25 | 2026-10-25 — the L6 and SR-PACKAGES rows and the `packs` row: eleven packs (W-32) |
-| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-25 | 2026-10-25 — npm first by a run by hand on the tag, PyPI with the Release (L6 decision 9; W-37, W-38) |
+| `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-25 | 2026-10-25 — first-party pack: fifteen packs; preset (extends), security metadata, request source (W-53) |
+| `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-25 | 2026-10-25 — the L6 and SR-RULE-PACKS rows: fifteen packs (W-53) |
+| `records/README.md` | a record's state, ownership or number changes | 2026-10-25 | 2026-10-25 — the L6 and SR-PACKAGES rows and the `packs` row: fifteen packs (W-53) |
+| `DEPENDENCIES.md` | a dependency is added, upgraded, ratified or removed (L11) | 2026-10-26 | 2026-10-26 — created: 32 units, all pending (W-66) |
+| `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-25 | 2026-10-25 — the thirteen npm and nine PyPI pack names; the six new security-pack names published by hand once (W-53) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
-| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — version 0.2.0: badge, preview note, roadmap (W-37) |
-| `USAGE.md` | a command, flag, install step, config key or agent wiring changes | 2026-10-25 | 2026-10-25 — created from the README's how-to sections (W-35) |
-| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-25 | 2026-10-25 — Unreleased: the README rewrite, `USAGE.md`, the npm-only publish run (W-37) |
+| `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — the four security packs' rows, fifteen packs (W-53) |
+| `USAGE.md` | a command, flag, install step, config key or agent wiring changes | 2026-10-25 | 2026-10-25 — the from-source link loops: the security packs, `codelaw_rules_${p//-/_}` (W-53) |
+| `CHANGELOG.md` | a user-visible change lands; a release is cut | 2026-10-25 | 2026-10-25 — Unreleased: the security packs' groundwork (W-53) |
 | `CONTRIBUTING.md` | the build, test or contribution steps change | 2026-10-20 | 2026-10-20 — contributions are MIT |
 | `SECURITY.md` | the reporting channel or the supported versions change | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |
 | `CODE_OF_CONDUCT.md` | the code or its contact changes | 2026-10-20 | 2026-10-20 — created (W-06, filed as W-04) |

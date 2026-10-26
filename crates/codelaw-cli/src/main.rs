@@ -5,13 +5,16 @@
 mod baseline_cmd;
 mod bench;
 mod format_cmd;
+mod git_hooks;
 mod graph_cmd;
 mod config_cmd;
+mod deps_cmd;
 mod init;
 mod match_cmd;
 mod rules_cmd;
 mod tree;
 mod warm;
+mod watch_cmd;
 
 use clap::{Args, Parser, Subcommand};
 use codelaw_core::Language;
@@ -85,6 +88,9 @@ enum Command {
     },
     /// Deprecate a symbol: write the registry entry and baseline every current use (SR-BASELINE decision 6).
     Deprecate(baseline_cmd::DeprecateArgs),
+    /// Read npm and the Python index and write the dependency snapshot the
+    /// offline rules read: the one command that uses the network (L5 decision 3).
+    Deps(deps_cmd::DepsArgs),
     /// Time every L8 operation on the reference workload and compare each
     /// with `perf/budgets.toml` (SR-LAW-8).
     Bench(bench::BenchArgs),
@@ -145,7 +151,7 @@ struct CheckArgs {
     paths: Vec<PathBuf>,
     #[command(flatten)]
     common: Common,
-    /// text, json, sarif or agent.
+    /// text, json, sarif, agent, github, gitlab, junit or checkstyle.
     #[arg(long, default_value = "text")]
     format: String,
     /// Fail when there are more warnings than this.
@@ -155,6 +161,9 @@ struct CheckArgs {
     /// html-validate) this command runs otherwise.
     #[arg(long)]
     no_adapters: bool,
+    /// Keep running: check again each time a file is saved, until Ctrl-C.
+    #[arg(long)]
+    watch: bool,
 }
 
 #[derive(Args)]
@@ -171,7 +180,7 @@ struct FixArgs {
     /// Show each pass of the fix loop: what was offered, applied or refused, and why.
     #[arg(long)]
     trace: bool,
-    /// text, json, sarif or agent.
+    /// text, json, sarif, agent, github, gitlab, junit or checkstyle.
     #[arg(long, default_value = "text")]
     format: String,
     #[arg(long)]
@@ -180,6 +189,9 @@ struct FixArgs {
     /// html-validate) this command runs otherwise.
     #[arg(long)]
     no_adapters: bool,
+    /// Keep running: fix each file again when it is saved, until Ctrl-C.
+    #[arg(long, conflicts_with = "trace")]
+    watch: bool,
 }
 
 #[derive(Args)]
@@ -267,6 +279,9 @@ fn run(prefer_warm: bool, paths: &[PathBuf], local: impl FnOnce(&Ctx) -> Output)
 pub fn serve_command(argv: &[String], ctx: &Ctx) -> Option<Output> {
     let cli = Cli::try_parse_from(argv).ok()?;
     match cli.command {
+        // A watch runs for as long as its own process does.
+        Command::Check(a) if a.watch => None,
+        Command::Fix(a) if a.watch => None,
         Command::Check(a) => Some(check(a, ctx)),
         Command::Fix(a) => fix(a, ctx),
         Command::Format(a) => Some(format_cmd::format(a, ctx)),
@@ -321,7 +336,7 @@ pub fn load(paths: &[PathBuf], options: EngineOptions) -> Result<Project, Engine
 }
 
 pub fn format(s: &str) -> Result<Format, String> {
-    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif or agent)"))
+    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif, agent, github, gitlab, junit or checkstyle)"))
 }
 
 fn check(args: CheckArgs, ctx: &Ctx) -> Output {
@@ -345,14 +360,27 @@ fn check(args: CheckArgs, ctx: &Ctx) -> Output {
     };
     let mut out = Output::default();
     match fmt {
-        Format::Text => out.stdout.push_str(&codelaw_report::check_text(&report, ctx.color)),
+        Format::Text => out.stdout.push_str(&codelaw_report::check_text_with(&report, ctx.color, &codelaw_report::security_labels(&project))),
         Format::Json => out.stdout = json_line(&with_timings(codelaw_report::check_json(&report), &project)),
         Format::Sarif => out.stdout = json_line(&codelaw_report::check_sarif(&report, &project)),
-        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent(&report)),
+        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent_with(&report, &codelaw_report::security_labels(&project))),
+        ci => out.stdout = ci_output(ci, &report),
     }
     timings(&project, fmt, &mut out);
     out.code = codelaw_report::exit_code(&report, args.max_warnings) as u8;
     out
+}
+
+/// What a CI platform reads (SR-CLI-MCP decision 4). Only the four CI
+/// formats come here.
+pub fn ci_output(fmt: Format, report: &codelaw_engine::CheckReport) -> String {
+    match fmt {
+        Format::Github => codelaw_report::check_github(report),
+        Format::Gitlab => json_line(&codelaw_report::check_gitlab(report)),
+        Format::Junit => codelaw_report::check_junit(report),
+        Format::Checkstyle => codelaw_report::check_checkstyle(report),
+        other => unreachable!("{other:?} is not a CI format"),
+    }
 }
 
 /// A JSON value as `println!` of its pretty form prints it.
@@ -407,7 +435,7 @@ fn fix(args: FixArgs, ctx: &Ctx) -> Option<Output> {
             for b in &report.pruned {
                 out.stdout.push_str(&format!("pruned {b}\n"));
             }
-            out.stdout.push_str(&codelaw_report::fix_text(&report, ctx.color));
+            out.stdout.push_str(&codelaw_report::fix_text_with(&report, ctx.color, &codelaw_report::security_labels(&project)));
         }
         Format::Json => {
             let mut v = with_timings(codelaw_report::fix_json(&report), &project);
@@ -417,12 +445,13 @@ fn fix(args: FixArgs, ctx: &Ctx) -> Option<Output> {
             out.stdout = json_line(&v);
         }
         Format::Sarif => out.stdout = json_line(&codelaw_report::check_sarif(&report.check, &project)),
-        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent(&report.check)),
+        Format::Agent => out.stdout.push_str(&codelaw_report::check_agent_with(&report.check, &codelaw_report::security_labels(&project))),
+        ci => out.stdout = ci_output(ci, &report.check),
     }
     // Text: on stdout after the report; SARIF and agent: on stderr.
     match (trace, fmt) {
         (Some(t), Format::Text) => out.stdout.push_str(&codelaw_report::trace_text(t)),
-        (Some(t), Format::Sarif | Format::Agent) => out.stderr.push_str(&codelaw_report::trace_text(t)),
+        (Some(t), _) => out.stderr.push_str(&codelaw_report::trace_text(t)),
         _ => {}
     }
     timings(&project, fmt, &mut out);
@@ -450,7 +479,11 @@ fn test(args: TestArgs) -> ExitCode {
         Ok(r) => r,
         Err(e) => return fail(e),
     };
-    if rules.is_empty() {
+    // A pack folder with no rules yet (a scaffold, like the security packs
+    // before their catalogues land) passes with nothing to check; a project
+    // or rule id with none is a usage error.
+    let empty_pack = args.target.as_deref().is_some_and(|t| std::path::Path::new(t).join("codelaw-pack.toml").is_file());
+    if rules.is_empty() && !empty_pack {
         return fail("no rules to test");
     }
     let mut reports = codelaw_test::test_rules(rules.iter(), args.case.as_deref());
@@ -527,6 +560,8 @@ fn cache(action: CacheAction) -> ExitCode {
 fn main() -> ExitCode {
     let cli = Cli::parse();
     match cli.command {
+        Command::Check(a) if a.watch => watch_cmd::check(a),
+        Command::Fix(a) if a.watch => watch_cmd::fix(a),
         Command::Check(a) => run(a.common.prefer_warm, &a.paths.clone(), |ctx| check(a, ctx)),
         // Only a warm process declines a fix; here it always runs.
         Command::Fix(a) => run(a.common.prefer_warm, &a.paths.clone(), |ctx| fix(a, ctx).unwrap_or_default()),
@@ -558,6 +593,7 @@ fn main() -> ExitCode {
         Command::Deprecate(a) => baseline_cmd::deprecate(a),
         Command::Daemon { action } => warm::daemon(action),
         Command::Bench(a) => bench::bench(a),
+        Command::Deps(a) => deps_cmd::deps(a),
         Command::Hook(a) => codelaw_agents::hook(a),
         Command::SyncAgents(a) => codelaw_agents::sync_agents(a),
     }

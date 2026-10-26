@@ -8,7 +8,7 @@ build jobs in `.github/workflows/ci.yml`.
     package.py prepare-wheel                 copy LICENSE and README into packaging/python for maturin
     package.py extract WHEEL OUTDIR          take the binary out of a maturin wheel (the npm copy)
     package.py assemble --bins B --wheels W --out dist
-                                             build the 19 npm tarballs and the 6 pack wheels; copy the 8 engine wheels
+                                             build the 22 npm tarballs and the 9 pack wheels; copy the 8 engine wheels
     package.py check dist                    the release checks, against what was assembled
     package.py names                         every name codelaw publishes (SR-PACKAGES §1)
 
@@ -200,9 +200,16 @@ def pack_tarball(name: str, v: str, src: pathlib.Path, dest: pathlib.Path) -> pa
     return out
 
 
+def pack_module(name: str) -> str:
+    """The Python package a pack's wheel installs, and its wheel's file-name
+    distribution: `security-js` is `codelaw_rules_security_js` (the engine's
+    FirstPartyPack::module; PEP 427 escapes `-` in a wheel name)."""
+    return "codelaw_rules_" + name.replace("-", "_")
+
+
 def wheel_for_pack(name: str, v: str, src: pathlib.Path, dest: pathlib.Path) -> pathlib.Path:
     """One pure py3-none-any wheel: package `codelaw_rules_<name>` holds the pack folder."""
-    dist = f"codelaw_rules_{name}"
+    dist = pack_module(name)
     pv = pep440(v)
     info = f"{dist}-{pv}.dist-info"
     readme = (src / "README.md").read_text(encoding="utf-8")
@@ -400,7 +407,7 @@ def check(out: pathlib.Path) -> None:
             else:
                 if (py, abi, plat) != ("py3", "none", "any"):
                     bad.append(f"{w.name}: a pack wheel is py3-none-any")
-                short = dist[len("codelaw_rules_"):]
+                short = next((p for p in PYPI_PACKS if pack_module(p) == dist), dist[len("codelaw_rules_"):])
                 prefix = f"{dist}/"
                 pypi_packs[short] = {n[len(prefix):]: z.read(n) for n in names if n.startswith(prefix) and not n.endswith("/")}
     if sorted(seen_tags) != sorted(TARGETS):

@@ -79,6 +79,8 @@ struct Finding {
     message: String,
     edits: Option<Vec<TextEdit>>,
     note: Option<String>,
+    /// A graded finding's own severity (a native rule's `severity_of`).
+    severity: Option<Severity>,
 }
 
 const FALLBACK_STEP: &str = "Make the change by hand; `codelaw explain <rule>` shows what the rule requires.";
@@ -175,8 +177,14 @@ impl Project {
         Some(format!("marked generated (`{marker}`); set `[files] lint_generated = true` to check it"))
     }
 
-    /// An editor's text of a file, through the same skips `check_file`
+    /// An editor's text of a file, through the same skips `check_file_asked`
     /// makes on the file on disk (SR-EDITOR decision 3).
+    /// The as-of date as `YYYY-MM-DD`, for a native rule that asks
+    /// (SR-ARCHITECTURE decision 15b).
+    pub(crate) fn as_of_text(&self) -> Option<String> {
+        self.as_of().date.map(|d| d.to_string())
+    }
+
     pub(crate) fn check_unsaved(&self, entry: &FileEntry, text: &str, host: Option<&Root>) -> FileResult {
         let layers = self.config.layers_for(&entry.abs);
         let skip = |id: &str, reason: String| FileResult {
@@ -195,10 +203,12 @@ impl Project {
         FileResult { diagnostics, skipped: None }
     }
 
-    pub(crate) fn check_file(&self, entry: &FileEntry) -> FileResult {
+    /// One file of a run, with the questions its rules asked about other
+    /// files: a watch re-checks a file whose answers no longer hold (W-44).
+    pub(crate) fn check_file_asked(&self, entry: &FileEntry) -> (FileResult, Vec<Asked>) {
         let file = match self.read_entry(entry) {
             Ok(f) => f,
-            Err(skipped) => return skipped,
+            Err(skipped) => return (skipped, Vec::new()),
         };
         let key = KeyBuilder::new("file+asked")
             .part(&entry.rel)
@@ -217,25 +227,25 @@ impl Project {
             .part(self.exception_key(&file.text))
             .key();
         // A result that read other files holds only while their answers do.
-        let cached = self.cache.get::<CachedFile>(&key).filter(|c| crate::files::still_holds(self.root(), &c.asked));
+        let cached = self.cache.get::<CachedFile>(&key).filter(|c| crate::files::still_holds(self.root(), &c.asked, &|| self.as_of_text()));
         if let Some(t) = &self.timings {
             t.cache(cached.is_some());
         }
-        let mut diagnostics = match cached {
-            Some(c) => c.diagnostics,
+        let (mut diagnostics, asked) = match cached {
+            Some(c) => (c.diagnostics, c.asked),
             None => {
                 let mut out = lint_text(self, entry, &file.text, &RunMode::check().with_bom(file.bom));
                 out.diagnostics.extend(crate::format::check_diagnostic(self, entry, &file.text));
                 if !out.diagnostics.iter().any(|d| d.rule == "codelaw/internal-error") {
-                    self.cache.put(&key, &CachedFile { diagnostics: out.diagnostics.clone(), asked: out.asked });
+                    self.cache.put(&key, &CachedFile { diagnostics: out.diagnostics.clone(), asked: out.asked.clone() });
                 }
-                out.diagnostics
+                (out.diagnostics, out.asked)
             }
         };
         if file.bom {
             shift_for_bom(&mut diagnostics);
         }
-        FileResult { diagnostics, skipped: None }
+        (FileResult { diagnostics, skipped: None }, asked)
     }
 }
 
@@ -398,7 +408,8 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
 
     let crlf = dominant_crlf(text);
     // Every unit, regions included, sees the host file (decision 15b).
-    let file = ProjectFile::new(&entry.rel, text, mode.bom, project.root(), mode.tree);
+    let as_of = || project.as_of_text();
+    let file = ProjectFile::new(&entry.rel, text, mode.bom, project.root(), mode.tree).with_as_of(&as_of);
     let mut findings: Vec<Finding> = Vec::new();
     let mut comments: Vec<(usize, usize)> = Vec::new();
     for unit in &units {
@@ -490,7 +501,7 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
         };
         diagnostics.push(Diagnostic {
             rule: rule.id().to_owned(),
-            severity: cfg.severity.expect("active"),
+            severity: f.severity.or(cfg.severity).expect("active"),
             file: entry.rel.clone(),
             start_byte: f.start,
             end_byte: f.end,
@@ -623,7 +634,7 @@ fn apply_suppressions(
 const INTERNAL_ERROR: &str = "internal-error";
 
 fn internal_error(rule: usize, start: usize, end: usize, id: &str, what: &str) -> Finding {
-    Finding { rule, start, end, message: format!("rule `{id}` failed on this file: {what}"), edits: None, note: Some(INTERNAL_ERROR.into()) }
+    Finding { rule, start, end, message: format!("rule `{id}` failed on this file: {what}"), edits: None, note: Some(INTERNAL_ERROR.into()), severity: None }
 }
 
 fn panic_message(p: &(dyn std::any::Any + Send)) -> String {
@@ -680,6 +691,20 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
     let mut matches: Vec<Vec<Match>> = vec![Vec::new(); n];
     let mut native: Vec<Vec<NativeFinding>> = vec![Vec::new(); n];
     let empty = std::collections::BTreeMap::new();
+    // A native rule that names a config section reads its keys as options,
+    // under the rule's own (SR-RULE-PACKS decision 15).
+    let sectioned: Vec<Option<std::collections::BTreeMap<String, serde_json::Value>>> = unit
+        .rules
+        .iter()
+        .map(|(_, rule, cfg)| match &rule.matcher {
+            Matcher::Native(nr) => nr.config_section().map(|name| {
+                let mut o = project.config.section_options(name);
+                o.extend(cfg.options.clone());
+                o
+            }),
+            _ => None,
+        })
+        .collect();
     for node in unit.root.root().dfs() {
         let k = node.kind_id() as usize;
         let mut slots: Vec<usize> = by_kind.get(k).cloned().unwrap_or_default();
@@ -707,7 +732,11 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     }
                 }
                 Matcher::Native(nr) => {
-                    let options = if cfg.options.is_empty() { &empty } else { &cfg.options };
+                    let options = match &sectioned[slot] {
+                        Some(o) => o,
+                        None if cfg.options.is_empty() => &empty,
+                        None => &cfg.options,
+                    };
                     let ctx = NativeContext { source: &unit.text, language: unit.language, semantic: semantic.as_ref(), options, data: &rule.loaded.data, file };
                     let out = &mut native[slot];
                     if let Err(p) = catch_unwind(AssertUnwindSafe(|| nr.check(node.clone(), &ctx, out))) {
@@ -735,10 +764,12 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
         let ctx = FixContext { source: &unit.text, root: &unit.root, language: unit.language, semantic: semantic.as_ref() };
         let wants_fix = rule.loaded.rule.fix != FixClass::Manual;
         match &rule.matcher {
-            Matcher::Native(_) => {
+            Matcher::Native(nr) => {
+                let options = sectioned[slot].as_ref().unwrap_or(&unit.rules[slot].2.options);
                 for f in std::mem::take(&mut native[slot]) {
+                    let severity = nr.severity_of(&f, options);
                     let edits = (wants_fix && !f.edits.is_empty()).then_some(f.edits);
-                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: f.message, edits, note: None });
+                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: f.message, edits, note: None, severity });
                 }
             }
             Matcher::Match(_) => {
@@ -794,7 +825,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     _ => {}
                 }
                 for (m, (edits, note)) in ms.iter().zip(per) {
-                    out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note });
+                    out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note, severity: None });
                 }
             }
             Matcher::Graph(_) => {}
@@ -832,7 +863,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                         _ => (None, None),
                     };
                     let text = codelaw_match::target::interpolate(message, tree, &f.slot, &unit.text, f.error.as_deref());
-                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: text, edits, note });
+                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: text, edits, note, severity: None });
                 }
             }
             Matcher::Unsupported(_) => {}

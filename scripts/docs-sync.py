@@ -63,7 +63,8 @@ NPM_API = ROOT / "packaging" / "npm" / "codelaw" / "index.d.ts"
 PY_API = ROOT / "packaging" / "python" / "python" / "codelaw" / "__init__.py"
 FIX_CLASSES = ("auto", "suggest", "manual")
 WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
-         "nine", "ten", "eleven", "twelve")
+         "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+         "sixteen", "seventeen", "eighteen", "nineteen", "twenty")
 
 
 def word(n, capital=False):
@@ -79,8 +80,13 @@ def frontmatter(text):
 
 
 def read_packs():
-    """{pack: {"rules": [(id, fix, native)], "presets": [(name, count, description)]}}"""
+    """{pack: {"rules": [(id, fix, native)], "presets": [(name, count, description)]}}
+
+    A preset's count is every rule it turns on: its own `[rules]` and those
+    of the first-party presets its `extends` names (SR-RULE-PACKS decision 3).
+    """
     packs = {}
+    own, extends = {}, {}
     for name in package.PACKS:
         pdir = ROOT / "packs" / name
         rules = []
@@ -104,10 +110,23 @@ def read_packs():
         for preset in re.findall(r'"([^"]+)"', listed.group(1) if listed else ""):
             ptext = (pdir / "presets" / (preset + ".toml")).read_text(encoding="utf-8")
             desc = re.search(r'^description\s*=\s*"(.*)"', ptext, re.M)
-            body = ptext.split("[rules]", 1)[1] if "[rules]" in ptext else ""
-            count = len(re.findall(r'^\s*"[^"]+"\s*=', body, re.M))
-            presets.append((preset, count, desc.group(1) if desc else ""))
+            head, body = ptext.split("[rules]", 1) if "[rules]" in ptext else (ptext, "")
+            own[preset] = set(re.findall(r'^\s*"([^"]+)"\s*=', body, re.M))
+            ext = re.search(r"^extends\s*=\s*\[(.*?)\]", head, re.M | re.S)
+            extends[preset] = re.findall(r'"codelaw:([^"]+)"', ext.group(1)) if ext else []
+            presets.append((preset, 0, desc.group(1) if desc else ""))
         packs[name] = {"rules": rules, "presets": presets}
+
+    def turned_on(preset, seen=()):
+        if preset in seen or preset not in own:
+            sys.exit("docs-sync: preset `{}` extends a preset no pack has, or a cycle".format(preset))
+        out = set(own[preset])
+        for e in extends[preset]:
+            out |= turned_on(e, seen + (preset,))
+        return out
+
+    for pack in packs.values():
+        pack["presets"] = [(p, len(turned_on(p)), d) for p, _, d in pack["presets"]]
     return packs
 
 

@@ -33,7 +33,7 @@ for _s in (sys.stdout, sys.stderr):
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "scripts" / "corpus.json"
-PACKS = ("css", "data", "html", "js", "node", "python", "react", "stencil", "tanstack-query", "ts")  # FIRST_PARTY_PACKS since W-31; tanstack-query since W-42
+PACKS = ("css", "data", "html", "js", "node", "python", "react", "security-html", "security-js", "security-python", "security-ts", "stencil", "tanstack-query", "ts")  # FIRST_PARTY_PACKS since W-31; tanstack-query since W-42; the security packs since W-53
 
 # Each allowed licence (a subset of SR-LAW-2 decision 2's list) and phrases its
 # licence text must carry, all of them, whitespace-normalised.

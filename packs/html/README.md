@@ -20,11 +20,15 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `html/a11y` | 26 | html-validate 11.16.4 `html-validate:a11y`: every rule it turns on |
 | `html/document` | 5 | html-validate 11.16.4 `html-validate:document`: checks that only make sense for a complete page |
 | `html/conventions` | 3 | opt-in: the starter rule `html/target-blank-rel`, and HTMLHint's `inline-style-disabled` and `inline-script-disabled` |
+| `html/security` | 5 | the html pack's security rules: subresource integrity, reverse tabnabbing, inline scripts, password autocomplete, meta refresh; codelaw:sec-html/recommended extends it |
 
 <!-- /docs-sync:presets -->
 
 `html/a11y` is a subset of `html/recommended`, as upstream; turn it on alone
 for an accessibility-only check. `html/document` adds to `html/recommended`.
+`html/security` gathers the pack's five security rules so that
+`codelaw:sec-html/recommended` (the `security-html` pack) can extend it
+instead of copying them.
 
 Every rule is **reimplemented**, not vendored: the checks, messages and docs are
 written fresh, and each rule's `ported_from:` names the source rule. Every rule
@@ -44,7 +48,7 @@ Fix classes: 10 `auto`, 11 `suggest`, 51 `manual`.
 | `html/aria-label-misuse` | manual | html-validate/aria-label-misuse | recommended, a11y |
 | `html/attribute-allowed-values` | manual | html-validate/attribute-allowed-values, htmlhint/src-not-empty | recommended |
 | `html/attribute-misuse` | manual | html-validate/attribute-misuse | recommended |
-| `html/autocomplete-password` | manual | html-validate/autocomplete-password | recommended |
+| `html/autocomplete-password` | manual | html-validate/autocomplete-password | recommended, security |
 | `html/button-type` | suggest | html-validate/no-implicit-button-type, htmlhint/button-type-require | recommended, a11y |
 | `html/close-attr` | auto | html-validate/close-attr | recommended |
 | `html/close-order` | manual | html-validate/close-order, htmlhint/tag-pair | recommended |
@@ -72,7 +76,7 @@ Fix classes: 10 `auto`, 11 `suggest`, 51 `manual`.
 | `html/long-title` | manual | html-validate/long-title | recommended |
 | `html/map-dup-name` | manual | html-validate/map-dup-name | recommended |
 | `html/map-id-name` | manual | html-validate/map-id-name | recommended |
-| `html/meta-refresh` | manual | html-validate/meta-refresh | recommended, a11y |
+| `html/meta-refresh` | manual | html-validate/meta-refresh | recommended, a11y, security |
 | `html/multiple-labeled-controls` | manual | html-validate/multiple-labeled-controls | recommended, a11y |
 | `html/no-abstract-role` | manual | html-validate/no-abstract-role | recommended, a11y |
 | `html/no-autoplay` | suggest | html-validate/no-autoplay | recommended, a11y |
@@ -107,10 +111,10 @@ Fix classes: 10 `auto`, 11 `suggest`, 51 `manual`.
 | `html/input-missing-label` | manual | html-validate/input-missing-label, htmlhint/input-requires-label | document |
 | `html/missing-doctype` | suggest | html-validate/missing-doctype | document |
 | `html/no-missing-references` | manual | html-validate/no-missing-references | document |
-| `html/require-sri` | manual | html-validate/require-sri | document |
-| `html/target-blank-rel` | auto | — (starter rule) | conventions |
+| `html/require-sri` | manual | html-validate/require-sri | document, security |
+| `html/target-blank-rel` | auto | — (starter rule) | conventions, security |
 | `html/no-inline-style` | manual | html-validate/no-inline-style, htmlhint/inline-style-disabled | conventions |
-| `html/no-inline-script` | manual | htmlhint/inline-script-disabled | conventions |
+| `html/no-inline-script` | manual | htmlhint/inline-script-disabled | conventions, security |
 
 The four starter-catalogue rules ([SR-RULE-PACKS](../../records/0101_rule-packs.md)
 decision 8): `html/img-alt` (↔ `wcag/h37`), `html/no-duplicate-id` (↔ `no-dup-id`)

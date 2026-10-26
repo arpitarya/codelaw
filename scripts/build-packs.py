@@ -100,7 +100,7 @@ def read_pack(name, version, release):
         "npm": npm_name,
         "pypi": pypi_name,
         "label": want,
-        "module": "codelaw_rules_" + name,
+        "module": package.pack_module(name),
         "description": manifest_field(manifest, "description") or "",
         "files": files,
         "licensed": licensed,

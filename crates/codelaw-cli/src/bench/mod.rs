@@ -51,6 +51,8 @@ pub const CONTEXT: &[Op] = &[
     Op { name: "fix_one_file_cold", unit: "ms", budgeted: false, what: "`codelaw hook <file>`, empty cache" },
     Op { name: "check_cold_repo", unit: "ms", budgeted: false, what: "`check` on each `--repo`, empty cache" },
     Op { name: "check_warm_repo", unit: "ms", budgeted: false, what: "`check` on each `--repo` in its own process, primed cache" },
+    Op { name: "watch_rerun", unit: "ms", budgeted: false, what: "`check --watch`'s re-check after one file is saved (the engine's `Watch::rerun`), primed cache" },
+    Op { name: "watch_save_to_print", unit: "ms", budgeted: false, what: "`check --watch --format json`: one file saved to its run printed, polling and settling included" },
 ];
 
 #[derive(Args)]
@@ -263,6 +265,20 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
     }
     if wanted("mcp_rules_for_path") {
         results.push(b.mcp(op("mcp_rules_for_path"), &target, &warm)?);
+    }
+    if wanted("watch_rerun") || wanted("watch_save_to_print") {
+        b.cli(&["check", "--no-adapters"], Some(&warm))?;
+        let measured = (|| -> Result<(), String> {
+            if wanted("watch_rerun") {
+                results.push(b.watch_rerun(op("watch_rerun"), &target, &warm)?);
+            }
+            if wanted("watch_save_to_print") {
+                results.push(b.watch_print(op("watch_save_to_print"), &target, &warm)?);
+            }
+            Ok(())
+        })();
+        std::fs::write(dir.join(&target.path), &target.text).map_err(|e| e.to_string())?;
+        measured?;
     }
     let mut repos = Vec::new();
     if wanted("check_cold_repo") || wanted("check_warm_repo") {
@@ -519,6 +535,65 @@ impl Bench {
         let _ = send(&mut stdin, json!({"jsonrpc": "2.0", "method": "exit"}));
         drop(stdin);
         finish(&mut child);
+        result
+    }
+
+    /// The target saved with a comment line added, then without it, and
+    /// each time `Watch::rerun` timed from the poll that saw the save to
+    /// its report: the engine's part of a watch, in this process.
+    fn watch_rerun(&self, op: &'static Op, target: &workload::File, cache: &Path) -> Result<Measured, String> {
+        let options = codelaw_engine::EngineOptions {
+            cache_dir_env: Some(cache.to_string_lossy().into_owned()),
+            path_env: std::env::var_os("PATH"),
+            profile_surface: Some(("local", "--watch")),
+            ..Default::default()
+        };
+        let (mut watch, _) = codelaw_engine::Watch::start(&self.dir, Vec::new(), options).map_err(|e| e.to_string())?;
+        let path = self.dir.join(&target.path);
+        self.repeat(op, |i| {
+            // Text no run has seen: the save is checked, not found in the cache.
+            let text = format!("// edited {i}\n{}", target.text);
+            std::fs::write(&path, text).map_err(|e| e.to_string())?;
+            let changes = loop {
+                let c = watch.poll();
+                if !c.is_empty() {
+                    break c;
+                }
+            };
+            let started = Instant::now();
+            watch.rerun(&changes).map_err(|e| e.to_string())?.ok_or("the save was not re-checked")?;
+            Ok(started.elapsed().as_secs_f64() * 1000.0)
+        })
+    }
+
+    /// A running `codelaw check --watch --format json`: the target saved,
+    /// then the line of the run that re-checked it.
+    fn watch_print(&self, op: &'static Op, target: &workload::File, cache: &Path) -> Result<Measured, String> {
+        let mut child = self
+            .command(Some(cache))
+            .args(["check", "--watch", "--no-adapters", "--format", "json"])
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        let rx = read_lines(child.stdout.take().ok_or("no stdout")?);
+        let path = self.dir.join(&target.path);
+        let result = (|| {
+            wait_for(&rx, |m| m["watch"]["run"] == 1)?;
+            self.repeat(op, |i| {
+                let text = format!("// edited {i}\n{}", target.text);
+                let started = Instant::now();
+                std::fs::write(&path, text).map_err(|e| e.to_string())?;
+                let run = wait_for(&rx, |m| m["watch"]["run"] == i + 2)?;
+                if run.get("error").is_some() {
+                    return Err(format!("the watch failed: {}", run["error"]));
+                }
+                Ok(started.elapsed().as_secs_f64() * 1000.0)
+            })
+        })();
+        let _ = child.kill();
+        let _ = child.wait();
         result
     }
 

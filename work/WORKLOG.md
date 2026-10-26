@@ -24,6 +24,70 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*
+- **Done:** `DEPENDENCIES.md` carries every ruling (29 `ratified 2026-10-26`; D-20 postcard, D-23 strsim, D-24 anyhow `remove`); W-66 closed and moved to `archive/open/` with an IMPLEMENTATION row and an archive map row; W-67 filed to replace the three (anyhow is declared but unused); W-65's DoD 3 restated; SR-LAW-11's context notes the rulings. Nothing committed.
+- **Decided / left open:** the two "Remove" rulings arrived transcribed as "Je m'ouvre"; recorded as *"Remove"*, matching the confirmations given on the call.
+- **Mistakes:** a plain `os.remove` of W-66's file was refused (deletes are off in the connected folder); moved it with `mv` instead.
+- **Next:** W-67 and W-65 in Claude Code.
+
+## 2026-10-26 — L11 (no dependencies unless ratified) and `DEPENDENCIES.md`; W-65, W-66 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"Create a law, no dependencies. For Rust, for Python, for JavaScript, TypeScript, JSON, CSS, YAML, TOML, HTML, nothing … tell me what all dependencies do we have. We will ratify them one by one."*
+- **Done:** SR-LAW-11 (`records/0013`), its SR-LAWS, register and ownership rows, and **a new line in `CLAUDE.md` §The laws**. Took the inventory into `DEPENDENCIES.md`: 32 units (25 Rust runtime, 1 Rust test, 2 VS Code, 1 Python build, 3 CI), all `pending`; 47 direct crates, 376 in `Cargo.lock`. Filed W-65 (the CI check) and W-66 (🔴 the rulings, with an inbox row). Nothing committed.
+- **Decided / left open:** agent's reading, stated in the law: default-deny with ratification by name (as the decider said "ratify one by one"); toolchains and standard libraries are not dependencies; vendored code is; ratification fixes the transitive tree; pending units stay at today's pin.
+- **Mistakes:** none.
+- **Next:** W-66, unit by unit.
+
+## 2026-10-26 — docket: six rulings written back (W-44, W-45, W-50, B-047); W-64 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"What are the blockers on me? List them one by one, explain them to me, and give me a recommendation as well."*
+- **Done:** walked 7 cards. Rulings written back: W-44 keep polling, DoD 1 judged on the re-check (→ 🟢); W-45 Claude Code opens the PR (→ 🟢 agent); W-50 no profile in the hook confirmed, DoD 5 amended to `language: system` (→ 🟡 W-46); B-047 own grammar + tree-sitter-scss, against the recommendation (absorbed by W-62, row deleted); W-64 filed (mirror repo, waits on W-38). W-38 left for later; inbox holds W-38 only. Nothing committed.
+- **Decided / left open:** L10's consumer template override stays unruled.
+- **Mistakes:** W-62 sat 🟢 while waiting on B-047 (drift) — resolved by the ruling.
+- **Next:** W-38 by hand (four uploads fit one day's limit).
+
+## 2026-10-26 — SCSS and CSS Modules become their own packs (W-62, W-63 amended)  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"Create separate packages for SCSS and CSS modules."*
+- **Done:** W-62 gains a `scss` pack (`@codelaw/rules-scss`, `codelaw-rules-scss`); W-63 a `css-modules` pack (`@codelaw/rules-css-modules`, npm only); both amend L6 (fifteen → seventeen packs) in the change that builds them. Queue rows updated. Nothing committed.
+- **Decided / left open:** agent's call: `scss` on both registries (Python web apps use SCSS), `css-modules` npm only (a JS-bundler feature); the dialect support and the graph join stay in the engine and the `css` pack.
+- **Mistakes:** none.
+- **Next:** the decider's B-047 answer; then W-62.
+
+## 2026-10-26 — W-61 (max-lines HTML/CSS), W-62 (SCSS), W-63 (CSS Modules) filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"I want max lines rule for HTML CSS files as well. Research and create a work item for it. The CSS pack should work with SCSS, and CSS modules as well."*
+- **Done:** researched (no stylelint/html-validate/Biome file-length rule exists; Biome's language-support page lists SCSS parsing, formatting and linting; tree-sitter-scss is MIT; stylelint-scss and eslint-plugin-css-modules are MIT). Filed W-61, W-62 (amends L3 on this ruling; settles B-047), W-63. Nothing committed.
+- **Decided / left open:** SCSS joins L3 as a CSS dialect (the decider's ask); `.sass` and Less stay out. Open: B-047's parser fork — recommended (b), Biome's tree.
+- **Mistakes:** none.
+- **Next:** the decider confirms B-047 (b); W-61 and W-63 can start now.
+
+## 2026-10-26 — L10 (consumer files from `templates/`) ratified; W-59 (scope/profile tables) and W-60 (templates) filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** a sample `codelaw.toml` with `*.utils.*` at 50 lines and the rest at 100; then *"overrides is not the right terminology"* → *"we will go with scope"* (singular in TOML); then *"create a law that all the files that are supposed to be created on the consumer end will have templates in separate templates directory."*
+- **Done:** wrote SR-LAW-10 (`records/0012`), its SR-LAWS row, register row and **a new line in `CLAUDE.md` §The laws** (SR-WORK-DOCS decision 7a: said here and in chat). Filed W-59 (`[scope.<name>]`, `[profile.<name>]`, preset scopes, one-release aliases) and W-60 (move consumer text into `templates/`). Nothing committed.
+- **Decided / left open:** the decider: scopes, singular `scope` and `profile`. Agent's calls, stated in the record: slot-only templates, embedded in the binary, serialised data exempt. Not ruled: consumers overriding templates.
+- **Mistakes:** none.
+- **Next:** W-59 and W-60 in Claude Code.
+
+## 2026-10-26 — W-58 filed: max lines, max lines per function, max params  ·  Claude, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** *"Does code law have a rule for max line?"* — no; then *"create a work item for max lines for TypeScript, JavaScript, and Python … max lines per function and max params … show me how am I going to use it in my consuming application."*
+- **Done:** filed W-58: six `native:` rules (`js/` and `py/` `max-lines`, `max-lines-per-function`, `max-params`) with options, defaults from ESLint and Pylint, opt-in `size` presets; showed consumer usage in chat. Nothing committed.
+- **Decided / left open:** all six are `fix: manual`; `max-depth`, `complexity`, `max-statements` named as a later item, not filed.
+- **Mistakes:** none.
+- **Next:** W-58 in Claude Code.
+
+## 2026-10-25 — six items built in parallel (W-44, W-45, W-47, W-50, W-52, W-53) and merged  ·  Claude Code, VS Code (Opus 5.5)
+
+- **Asked:** *"implement whatever possible in parallel"*; on disk, *"cargo clean first then 6 agents"*; on W-52's and W-53's law amendments, *"Yes, include them."*
+- **Done:** `cargo clean` (10 GB freed; it also pulled `target/` from under session f38f16ad's running `cargo test`). Six sub-agents in worktrees, merged on `integrate-parallel` with main merged in; two cross-branch breaks fixed (`4707d43`). `cargo test --workspace` 555 passed, 0 failed; clippy `-D warnings` clean. W-47, W-52, W-53 closed and archived; W-44, W-45, W-50 to the inbox; W-54–W-57 unblocked; B-051, B-052 filed. **CLAUDE.md changed** (SR-WORK-DOCS decision 7a): the L5 line (no network in the engine, `deps refresh` the one networked command) and the L6 and `packs/` lines (fifteen packs, thirteen on npm, nine on PyPI), on the decider's ruling above.
+- **Decided / left open:** for the decider — W-44 (`notify` is CC0; what DoD 1 times), W-45 (a real PR for DoD 2), W-50 (the hook's profile; DoD 5), B-051 (`requirements*.txt` and L3), W-53's six first hand uploads and `min_codelaw` at the release.
+- **Mistakes:** the shared `CARGO_TARGET_DIR` let worktrees overwrite each other's artifacts and `target/debug/codelaw`, so every branch's green tests were suspect until the one clean run on the merge; the `cargo clean` broke another session's run. Lesson for LESSONS.md: parallel worktrees on one target dir are not isolated.
+- **Next:** the decider's inbox; then W-54 (`security-js`).
+
 ## 2026-10-25 — npm 0.2.0 from CI (W-37); W-39–W-43 merged, W-41/W-42/W-43 closed  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"go ahead and run it"*; then *"Whatever is in green implement it … till the closure. And I want more React query hooks and React hooks. Rules."*

@@ -11,6 +11,18 @@ named here only as the failure that produced it. A lesson whose remedy is
 
 ---
 
+## 2026-10-25 — a shared `CARGO_TARGET_DIR` does not make parallel worktrees safe either
+
+Six agents built six worktrees into the one shared `target/`. Disk held, but
+cargo names a workspace crate's artifacts the same in every worktree and judges
+freshness by mtime, so a build reused another branch's compiled crates, and
+`target/debug/codelaw` was swapped mid-test. Agents saw "method not found",
+unknown rules and tests failing on another branch's binary; one `cargo clean`
+pulled the folder from under a third session's test run. Every branch's green
+tests were suspect until one clean run on the merge (555 passed). The lesson
+of 2026-10-24 stands, for a second reason: **only one may build** — let the
+others edit, then build each branch in turn, or test only on the merge.
+
 ## 2026-10-24 — seven parallel cargo builds fill this disk; one at a time
 
 Seven agents, each in its own worktree with its own `target/`, built the

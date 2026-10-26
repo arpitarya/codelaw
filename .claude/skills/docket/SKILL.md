@@ -7,7 +7,7 @@ description: Walk Arpit through work/OPEN-WORK.md one item at a time — the dec
 
 **Takes** `work/OPEN-WORK.md`. **Gives** one card per item, a recommendation, and Arpit's ruling written back.
 
-**Docket holds no rules.** Every rule it follows lives in the record named in OPEN-WORK's frontmatter (`governed_by_path`) and the records it points to — in codelaw, SR-WORK-OPEN-QUEUE, with SR-WORK-DOCS, SR-WORK-SESSION and SR-WORK-BLOCKERS. Where this skill and a record disagree, the record wins (SR-LAW-0): say so, and fix the skill.
+**Docket holds no rules.** Every rule it follows lives in the record named in OPEN-WORK's frontmatter (`governed_by_path`) and the records it points to — here, SR-WORK-OPEN-QUEUE, with SR-WORK-DOCS, SR-WORK-SESSION and SR-WORK-BLOCKERS. Where this skill and a record disagree, the record wins (SR-LAW-0): say so, and fix the skill.
 
 ## 1 · Prepare — silently, before the first card
 
@@ -20,7 +20,7 @@ description: Walk Arpit through work/OPEN-WORK.md one item at a time — the dec
 
 - Line 1: `Docket: N rulings owed · M open items · D drift`.
 - An open blocker in `BLOCKED.json` is named first.
-- Every inbox row older than 5 days is named with its age (rule 41); 🔺 first (rule 33).
+- The inbox rows rule 41 says to name, each with its age; 🔺 first (rule 33).
 - Drift: one line each.
 
 ## 3 · Order
@@ -84,6 +84,6 @@ A 🟡 card carries its blocker in the header, as its row does: `**[k/N] 🟡 W-
 - Copy a record's rule into a file — point to it.
 - Cite an `archive/` document as evidence (SR-WORK-ARCHIVE).
 
-## Outside codelaw
+## Outside a repo with these records
 
 A repo with `work/OPEN-WORK.md` but no governing record: run steps 1–4 as written, write back only to OPEN-WORK and the item file, and skip the checks that do not exist.
