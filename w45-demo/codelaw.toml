@@ -1,0 +1,2 @@
+[rules]
+"fixture/py-no-print" = "warn"
