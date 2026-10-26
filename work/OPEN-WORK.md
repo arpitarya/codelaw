@@ -24,7 +24,7 @@ here. Read that record before changing anything below it.
 |---|---|
 | 🔴 **PyPI 0.2.0 by hand, over 2–3 days** (four new projects a day): upload `codelaw-rules-{html,js,python,react}`, add six trusted publishers, then `gh release create v0.2.0` on W-37's tag — [W-38](open/W-38-pypi-0-2-0-by-hand.md) | 2026-10-20 |
 | ↳ **blocks:** W-38 itself; W-64 waits on it | |
-| 🔴 **Reserve and publish the 16 Fux index package names** (npm `@codelaw/rules-<name>-fux-index` ×10 by hand, then `npm-trust.sh`; PyPI `codelaw-rules-<name>-fux-index` ×6 by `twine`, then a trusted publisher each) — built by CI as the `fux-index` artifact; RELEASING.md §"The optional Fux index packages"; also ratify `fux-engine` as D-33 in `DEPENDENCIES.md` — [W-34](open/W-34-fux-index-packages.md) | 2026-10-26 |
+| 🔴 **Reserve and publish the 16 Fux index package names** (npm `@codelaw/rules-<name>-fux-index` ×10 by hand, then `npm-trust.sh`; PyPI `codelaw-rules-<name>-fux-index` ×6 by `twine`, then a trusted publisher each) — built by CI as the `fux-index` artifact; RELEASING.md §"The optional Fux index packages"; also ratify `fux-engine` as D-34 in `DEPENDENCIES.md` — [W-34](open/W-34-fux-index-packages.md) | 2026-10-26 |
 | ↳ **blocks:** W-34 itself | |
 
 ---
