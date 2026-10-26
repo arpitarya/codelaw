@@ -4,6 +4,7 @@
 set -uo pipefail
 cd "$(dirname "$0")/../.." || exit 0
 git rev-parse --git-dir >/dev/null 2>&1 || exit 0
+[ -f work/NOW.md ] || exit 0   # a repository without the work system has no NOW to keep (W-09)
 [ -n "$(git status --porcelain -- ':!work/NOW.md' 2>/dev/null)" ] || exit 0
 [ -z "$(git status --porcelain -- work/NOW.md 2>/dev/null)" ] || exit 0
 F=.claude/.progress-nudged

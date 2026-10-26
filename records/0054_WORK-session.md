@@ -9,6 +9,9 @@ date: 2026-10-18
 feature: session continuity
 owns:
   - .claude/hooks/require-progress.sh
+  - .claude/hooks/block-main.py
+  - .claude/hooks/claim-guard.py
+  - lockmaster.toml
 laws: [L0]
 timestamp: 2026-10-18T12:52:51Z
 content_sha: ""
@@ -91,6 +94,17 @@ not after.
     becomes a check — a hook, a script, or (once tests exist) a test — **in the
     same change that records the second occurrence.**
 14. The worklog is cut at each major release into `archive/worklog/`.
+15. 🔴 **Changes land on `main` through lockmaster** (Arpit, 2026-10-26 —
+    lockmaster W-09). An agent session never commits to `main`:
+    `.claude/hooks/block-main.py` refuses it, and `claim-guard.py` warns on a
+    write outside the change's claim. The way round is
+    `lockmaster start W-nn --paths …` → edit in its worktree →
+    `lockmaster submit -m "…"`, which lands only the claimed paths, one change
+    at a time, after the checks in [`lockmaster.toml`](../lockmaster.toml).
+    **The hooks pinned in `.claude/lockmaster.lock` are lockmaster's kit** —
+    changed in the lockmaster repository's `kit/` and re-installed with
+    `lockmaster install .`, never edited here (`lockmaster doctor` reports a
+    hand edit). The decider's own terminal can still commit by hand.
 
 ### Consequences
 

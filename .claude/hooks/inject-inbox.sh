@@ -33,7 +33,7 @@ with_age() {
 
 if [ -f work/OPEN-WORK.md ]; then
   DECIDER=$(git config user.name 2>/dev/null); DECIDER=${DECIDER:-the decider}
-  INBOX=$(sed -n '/## Blocked on the decider/,/^---$/p' work/OPEN-WORK.md | sed '1d;$d' | with_age)
+  INBOX=$(sed -n '/^## Blocked on /,/^---$/p' work/OPEN-WORK.md | sed '1d;$d' | with_age)
   case "$INBOX" in
     *"*Empty since"*|"") ;;
     *) echo "<inbox>"; echo "$INBOX"; echo "</inbox>"
@@ -42,7 +42,7 @@ if [ -f work/OPEN-WORK.md ]; then
 fi
 
 if [ -s work/NOW.md ]; then
-  N=$(grep -v '^---' work/NOW.md | grep -v '^type:' | grep -v '^description:' | grep -v '^$' | head -1)
+  N=$(grep -v '^---' work/NOW.md | grep -v '^type:' | grep -v '^description:' | grep -v '^<!--' | grep -v '^-->' | grep -v '^ ' | grep -v '^$' | head -1)
   case "$N" in
     idle*|"") ;;
     *) echo "<in-flight>$N</in-flight>"

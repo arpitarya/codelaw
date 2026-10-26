@@ -16,6 +16,24 @@ decisions 3 and 6. Install its `commit-msg` hook once:
 ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg
 ```
 
+## Landing on main — lockmaster
+
+**An agent session never commits to `main`** — the kit's `block-main.py`
+refuses it (SR-WORK-SESSION decision 15). Work goes through
+[lockmaster](https://github.com/arpitarya/lockmaster), which lands claimed
+paths one change at a time after the checks in [`lockmaster.toml`](lockmaster.toml):
+
+```bash
+# `lockmaster` = PYTHONPATH=~/my_programs/lockmaster/src python3 -m lockmaster  (until it is on PyPI)
+lockmaster start W-nn --paths <path> …   # branch + worktree + claim
+lockmaster submit -m "W-nn: …"           # commit the claimed paths and land them
+lockmaster queue · status · doctor
+```
+
+The hooks pinned in `.claude/lockmaster.lock` are lockmaster's kit: change them
+in `~/my_programs/lockmaster/kit/`, then `lockmaster install .` — an edit made
+here is reported by `lockmaster doctor` and overwritten by the next install.
+
 ## Triage first — a human-blocked queue stops the session
 
 **Before any work, read [`work/OPEN-WORK.md`](work/OPEN-WORK.md)** and ask: *is
