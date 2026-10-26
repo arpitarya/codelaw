@@ -31,7 +31,7 @@ use codelaw_core::{Diagnostic, FixClass, Severity};
 use codelaw_engine::{DocumentTree, EngineOptions, FileEntry, Project, TreeCache};
 use lsp_server::{Connection, ErrorCode, Message, Notification, Request, Response};
 use lsp_types::notification::{
-    DidChangeTextDocument, DidChangeWatchedFiles, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument, LogMessage, Notification as _,
+    DidChangeConfiguration, DidChangeTextDocument, DidChangeWatchedFiles, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument, LogMessage, Notification as _,
     PublishDiagnostics, ShowMessage,
 };
 use lsp_types::request::{CodeActionRequest, Formatting, HoverRequest, RangeFormatting, Request as _};
@@ -43,11 +43,45 @@ use lsp_types::{
     TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions, TextEdit, Uri, WorkspaceEdit,
 };
 use position::Utf16Index;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
+use std::time::Instant;
 
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
+
+/// How much the server says through `window/logMessage` (SR-EDITOR
+/// decision 7). The extension passes it as `initializationOptions.logLevel`
+/// and changes it with `workspace/didChangeConfiguration`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum LogLevel {
+    Error,
+    Warn,
+    Info,
+    Debug,
+}
+
+impl LogLevel {
+    /// `error`, `warn`, `info` or `debug`; anything else is `None`.
+    pub fn parse(s: &str) -> Option<LogLevel> {
+        match s {
+            "error" => Some(LogLevel::Error),
+            "warn" => Some(LogLevel::Warn),
+            "info" => Some(LogLevel::Info),
+            "debug" => Some(LogLevel::Debug),
+            _ => None,
+        }
+    }
+
+    fn of(typ: MessageType) -> LogLevel {
+        match typ {
+            MessageType::ERROR => LogLevel::Error,
+            MessageType::WARNING => LogLevel::Warn,
+            MessageType::INFO => LogLevel::Info,
+            _ => LogLevel::Debug,
+        }
+    }
+}
 
 /// The code-action kind of "fix everything safe in this file".
 pub const FIX_ALL: &str = "source.fixAll.codelaw";
@@ -87,6 +121,7 @@ pub fn capabilities() -> ServerCapabilities {
 pub fn serve(connection: &Connection) -> Result<(), Error> {
     let (id, params) = connection.initialize_start()?;
     let params: lsp_types::InitializeParams = serde_json::from_value(params)?;
+    let initial_level = params.initialization_options.as_ref().and_then(level_of);
     #[allow(deprecated)] // `rootUri`, for clients without workspace folders
     let mut roots: Vec<PathBuf> = params
         .workspace_folders
@@ -105,6 +140,13 @@ pub fn serve(connection: &Connection) -> Result<(), Error> {
     };
     connection.initialize_finish(id, serde_json::to_value(result)?)?;
     let mut server = Server::new(connection, roots);
+    if let Some(level) = initial_level {
+        server.level = level;
+    }
+    server.log_at(
+        LogLevel::Info,
+        format!("codelaw lsp {} started: {} workspace folder(s): {}", env!("CARGO_PKG_VERSION"), server.roots.len(), server.paths(&server.roots)),
+    )?;
     for msg in &connection.receiver {
         match msg {
             Message::Request(req) => {
@@ -180,11 +222,16 @@ struct Server<'c> {
     /// The trees of closed documents, by project key, each bounded by its
     /// project's `[lsp] tree_cache` (SR-ARCHITECTURE decision 24).
     closed: HashMap<PathBuf, TreeCache>,
+    /// What `window/logMessage` carries (decision 7).
+    level: LogLevel,
+    /// Log lines already said since the last reload, so a keystroke never
+    /// repeats one: `(file or project, line)`.
+    said: HashSet<(String, String)>,
 }
 
 impl<'c> Server<'c> {
     fn new(connection: &'c Connection, roots: Vec<PathBuf>) -> Self {
-        Server { connection, roots, docs: HashMap::new(), projects: HashMap::new(), closed: HashMap::new() }
+        Server { connection, roots, docs: HashMap::new(), projects: HashMap::new(), closed: HashMap::new(), level: LogLevel::Info, said: HashSet::new() }
     }
 
     fn send(&self, msg: impl Into<Message>) -> Result<(), Error> {
@@ -196,7 +243,36 @@ impl<'c> Server<'c> {
     }
 
     fn log(&self, typ: MessageType, message: String) -> Result<(), Error> {
+        if LogLevel::of(typ) > self.level {
+            return Ok(());
+        }
         self.notify::<LogMessage>(LogMessageParams { typ, message })
+    }
+
+    /// Log at `level`. Debug lines go as `LOG`, which the extension shows
+    /// at its debug level; they hold paths, rule ids, counts and timings,
+    /// never source text (decision 7). Nothing is printed: stdout is the
+    /// transport.
+    fn log_at(&self, level: LogLevel, message: String) -> Result<(), Error> {
+        let typ = match level {
+            LogLevel::Error => MessageType::ERROR,
+            LogLevel::Warn => MessageType::WARNING,
+            LogLevel::Info => MessageType::INFO,
+            LogLevel::Debug => MessageType::LOG,
+        };
+        self.log(typ, message)
+    }
+
+    /// `log_at`, but once per `subject` and line until the next reload.
+    fn log_once(&mut self, level: LogLevel, subject: &str, message: String) -> Result<(), Error> {
+        if self.said.insert((subject.to_owned(), message.clone())) {
+            self.log_at(level, message)?;
+        }
+        Ok(())
+    }
+
+    fn paths(&self, paths: &[PathBuf]) -> String {
+        paths.iter().map(|p| p.display().to_string()).collect::<Vec<_>>().join(", ")
     }
 
     // ---- notifications -------------------------------------------------
@@ -227,7 +303,8 @@ impl<'c> Server<'c> {
                 let p: DidSaveTextDocumentParams = serde_json::from_value(n.params)?;
                 let path = uri::to_path(p.text_document.uri.as_str());
                 if path.as_deref().is_some_and(reloads) {
-                    self.reload()?;
+                    let name = path.as_deref().map(|p| p.display().to_string()).unwrap_or_default();
+                    self.reload(&format!("saved {name}"))?;
                 } else {
                     self.check(p.text_document.uri.as_str())?;
                 }
@@ -245,15 +322,29 @@ impl<'c> Server<'c> {
             }
             // Config, rules or baseline changed on disk: reload live
             // (SR-EDITOR decision 1).
-            DidChangeWatchedFiles::METHOD => self.reload()?,
+            DidChangeWatchedFiles::METHOD => {
+                let p: lsp_types::DidChangeWatchedFilesParams = serde_json::from_value(n.params)?;
+                let files: Vec<String> = p.changes.iter().filter_map(|c| uri::to_path(c.uri.as_str())).map(|f| f.display().to_string()).collect();
+                self.reload(&format!("watched file changed: {}", files.join(", ")))?
+            }
+            // `{ "settings": { "codelaw": { "logLevel": "debug" } } }`
+            DidChangeConfiguration::METHOD => {
+                let p: lsp_types::DidChangeConfigurationParams = serde_json::from_value(n.params)?;
+                if let Some(level) = p.settings.get("codelaw").and_then(level_of).filter(|l| *l != self.level) {
+                    self.level = level;
+                    self.log_at(LogLevel::Info, format!("log level is now {level:?}").to_lowercase())?;
+                }
+            }
             _ => {}
         }
         Ok(())
     }
 
     /// Drop every loaded project and re-check every open document.
-    fn reload(&mut self) -> Result<(), Error> {
+    fn reload(&mut self, why: &str) -> Result<(), Error> {
+        self.log_at(LogLevel::Info, format!("reloading projects: {why}"))?;
         self.projects.clear();
+        self.said.clear();
         let mut keys: Vec<String> = self.docs.keys().cloned().collect();
         keys.sort();
         for k in keys {
@@ -275,7 +366,11 @@ impl<'c> Server<'c> {
         let config = match found {
             Ok(c) => c,
             Err(e) => {
-                self.log(MessageType::ERROR, format!("codelaw: {e}"))?;
+                let subject = path.display().to_string();
+                if self.said.insert((subject.clone(), format!("show {e}"))) {
+                    self.notify::<ShowMessage>(ShowMessageParams { typ: MessageType::ERROR, message: format!("codelaw: {e}") })?;
+                }
+                self.log_once(LogLevel::Error, &subject, format!("codelaw: no project for {subject}: {e}"))?;
                 return Ok(None);
             }
         };
@@ -300,6 +395,13 @@ impl<'c> Server<'c> {
                     self.notify::<ShowMessage>(ShowMessageParams { typ: MessageType::ERROR, message: format!("codelaw: {e}") })?;
                 }
             }
+            match &loaded {
+                Ok(p) => self.log_at(
+                    LogLevel::Info,
+                    format!("project {} loaded: config {}, {} rule(s) compiled", key.display(), p.config.config_dir().display(), p.compiled.len()),
+                )?,
+                Err(e) => self.log_at(LogLevel::Error, format!("project {} failed to load: {e}", key.display()))?,
+            }
             self.projects.insert(key.clone(), loaded);
         }
         Ok(matches!(self.projects.get(&key), Some(Ok(_))).then_some(key))
@@ -307,20 +409,51 @@ impl<'c> Server<'c> {
 
     /// Re-check one open document and publish what it finds.
     fn check(&mut self, key: &str) -> Result<(), Error> {
+        let started = Instant::now();
         let Some(doc) = self.docs.get(key) else { return Ok(()) };
+        // Why a file gets nothing, when it does: said once per file per
+        // reload, never per keystroke (decision 7).
+        let mut why_not: Option<String> = None;
         let target = match uri::to_path(doc.uri.as_str()) {
             Some(path) => {
                 let path = canonical(&path);
                 match self.project_for(&path)? {
                     Some(pk) => match &self.projects[&pk] {
-                        Ok(project) => project.entry_for(&path).map(|e| (pk, e)),
-                        Err(_) => None,
+                        Ok(project) => {
+                            let entry = project.entry_for(&path);
+                            if entry.is_none() {
+                                why_not = Some(if codelaw_core::Language::from_path(&path).is_none() {
+                                    "its language is not one codelaw covers".to_owned()
+                                } else if !project.config.is_included(&path) {
+                                    "it is outside the project's `include` or matched by `exclude`".to_owned()
+                                } else {
+                                    "its language is not enabled for it in `languages`".to_owned()
+                                });
+                            } else {
+                                self.log_once(LogLevel::Info, &pk.display().to_string(), format!("{} is checked by project {}", path.display(), pk.display()))?;
+                            }
+                            entry.map(|e| (pk, e))
+                        }
+                        Err(e) => {
+                            why_not = Some(format!("its project {} failed to load: {e}", pk.display()));
+                            None
+                        }
                     },
-                    None => None,
+                    None => {
+                        why_not = Some("its config does not load (see the error above)".to_owned());
+                        None
+                    }
                 }
             }
-            None => None,
+            None => {
+                why_not = Some("it is not a file: URI".to_owned());
+                None
+            }
         };
+        if let Some(reason) = why_not {
+            let name = uri::to_path(key).map_or_else(|| key.to_owned(), |p| p.display().to_string());
+            self.log_once(LogLevel::Info, &name, format!("no diagnostics for {name}: {reason}"))?;
+        }
         let doc = self.docs.get_mut(key).expect("an open document");
         let project = target.as_ref().and_then(|(pk, _)| self.projects[pk].as_ref().ok());
         let diagnostics = match (&target, project) {
@@ -346,25 +479,47 @@ impl<'c> Server<'c> {
         };
         let lsp = to_lsp(doc, target.as_ref().map(|t| &t.1), project.map(Project::root), &diagnostics);
         let params = PublishDiagnosticsParams { uri: doc.uri.clone(), diagnostics: lsp, version: Some(doc.version) };
+        let summary = format!(
+            "check {}: {} rule(s), {} diagnostic(s), {} ms",
+            uri::to_path(key).map_or_else(|| key.to_owned(), |p| p.display().to_string()),
+            project.map_or(0, |p| p.compiled.len()),
+            diagnostics.len(),
+            started.elapsed().as_millis()
+        );
+        let lang = target.as_ref().map_or("-".to_owned(), |t| format!("{:?}", t.1.language));
         doc.target = target;
         doc.diagnostics = diagnostics;
-        self.notify::<PublishDiagnostics>(params)
+        self.notify::<PublishDiagnostics>(params)?;
+        self.log_at(LogLevel::Debug, format!("{summary} ({lang})"))
     }
 
     // ---- requests ------------------------------------------------------
 
     fn request(&mut self, req: Request) -> Result<(), Error> {
         let id = req.id.clone();
+        let method = req.method.clone();
+        let file = req.params.pointer("/textDocument/uri").and_then(|u| u.as_str()).and_then(uri::to_path).map(|p| p.display().to_string());
         let result = match req.method.as_str() {
             CodeActionRequest::METHOD => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.code_actions(p))),
             HoverRequest::METHOD => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.hover(p))),
             Formatting::METHOD if format::AVAILABLE => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.formatting(p))),
             RangeFormatting::METHOD if format::AVAILABLE => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.range_formatting(p))),
-            m => return self.send(Response::new_err(id, ErrorCode::MethodNotFound as i32, format!("codelaw lsp does not handle `{m}`"))),
+            m => {
+                self.log_at(LogLevel::Warn, format!("request `{m}` is not handled by codelaw lsp"))?;
+                return self.send(Response::new_err(id, ErrorCode::MethodNotFound as i32, format!("codelaw lsp does not handle `{m}`")));
+            }
         };
         match result {
-            Ok(Ok(v)) => self.send(Response::new_ok(id, v)),
-            Ok(Err(e)) | Err(e) => self.send(Response::new_err(id, ErrorCode::InvalidParams as i32, e.to_string())),
+            Ok(Ok(v)) => {
+                if v.is_null() || v.as_array().is_some_and(Vec::is_empty) {
+                    self.log_at(LogLevel::Debug, format!("{method} {}: nothing to return", file.as_deref().unwrap_or("-")))?;
+                }
+                self.send(Response::new_ok(id, v))
+            }
+            Ok(Err(e)) | Err(e) => {
+                self.log_at(LogLevel::Error, format!("request `{method}` for {} failed: {e}", file.as_deref().unwrap_or("-")))?;
+                self.send(Response::new_err(id, ErrorCode::InvalidParams as i32, e.to_string()))
+            }
         }
     }
 
@@ -500,6 +655,11 @@ fn to_lsp(doc: &Doc, entry: Option<&FileEntry>, root: Option<&Path>, diagnostics
         .collect()
 }
 
+/// `logLevel` in an options object, when it is one of the four.
+fn level_of(v: &serde_json::Value) -> Option<LogLevel> {
+    v.get("logLevel").and_then(|l| l.as_str()).and_then(LogLevel::parse)
+}
+
 /// Saving these changes what every file's verdict may be.
 fn reloads(path: &Path) -> bool {
     let name = path.file_name().and_then(|n| n.to_str()).unwrap_or_default();
@@ -567,3 +727,7 @@ fn explain(project: Option<&Project>, d: &Diagnostic) -> String {
 #[cfg(test)]
 #[path = "../tests/unit/tree_cache.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "../tests/unit/logging.rs"]
+mod log_tests;
