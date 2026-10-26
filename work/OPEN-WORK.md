@@ -39,7 +39,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, CI, `init` prints not installs); left: reserve the 16 names and publish them by hand (npm ten, PyPI six), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
-🔴 **W-71** `arpit` A unit test for every new or edited function (JS, TS, Python): `graph/untested-function` and `graph/function-coverage` (≥ 60% per function from an lcov report, `min` configurable), untouched functions exempt, `.codelawignore` for the rest; left: Arpit confirms diff-scoped, then an agent builds it. Filed by Arpit (Cowork). [detail](open/W-71-tests-for-new-code.md)
+🔴 **W-71** `arpit` A unit test for every new or edited function (JS, TS, Python): `graph/untested-function` and `graph/function-coverage` (≥ 60% per function, lcov); left: Arpit confirms diff-scoped, then an agent builds it. Filed by Arpit (Cowork). [detail](open/W-71-tests-for-new-code.md)
 
 🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); left: DoD 5 on CI's Windows legs and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
