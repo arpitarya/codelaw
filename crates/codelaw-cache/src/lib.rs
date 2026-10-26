@@ -209,7 +209,7 @@ mod tests {
     }
 
     /// A `Diagnostic` must survive the cache whether or not it has `data`
-    /// (W-73: a skipped field broke the positional codec, so every file with
+    /// (a skipped field broke the positional codec, so every file with
     /// a finding missed on every run).
     #[test]
     fn a_diagnostic_round_trips_with_and_without_data() {
