@@ -72,6 +72,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** a shared `CARGO_TARGET_DIR` made cargo reuse another lane's artifacts for same-named workspace crates (one build failed on another lane's `Language::Scss`); verified with a private `RUSTFLAGS` so the fingerprints differ.
 - **Next:** merge main after W-58 and W-59 land, add `data_of`, and close DoD 3.
 
+## 2026-10-26 — W-57 closed: the `security-python` pack, 61 rules  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *"W-57 (work/open/W-57-security-python-pack.md, 61 rules). Every rule needs a fix (L4), fixtures and tests."* by the lead agent, on Arpit's approval of the security-pack lane.
+- **Done:** 61 `match:` rules in `packs/security-python/rules/sec-py/` with examples, `.cases.md` sidecars (positions from marks in the source) and a fix class each (17 `suggest` with a verified `fix:`, 44 `manual`); `data/sources/` for `from_source:`; both presets; the README with the Bandit and Ruff `S` accounting; the corpus snapshot over Flask, Starlette, full-stack-fastapi-template and djangoproject.com; the false positives that run showed were fixed first (test files excluded from the noisy rules, cookie flags passed as variables, bare `except`, `Response`, `key=` in a non-crypto call). Closed and archived W-57.
+- **Decided / left open:** `no-xpath-injection`, `no-xmlrpc` and `no-cleartext-http` are `manual`, not `suggest`: no edit of the code alone is right. The ReDoS check for a literal pattern is not built (`from_source:` cannot sit beside a literal-pattern alternative in one rule). Every rule stays `preview`. The PyPI upload is the decider's.
+- **Mistakes:** the first `codelaw test` of a single rule file reported "does not fire" for every `match:` rule, which was the single-file load path, not the rule; running the pack folder is the check. A `where:` on a capture that only one alternative of an `any:` binds makes every other alternative fail, and an `any:` does not fall back to the next alternative when the first matched structurally but a predicate failed; the rules were written around both.
+- **Next:** review the `security-python` counts and promote the rules whose findings hold; W-54 to W-56 are the other three packs.
+
 ## 2026-10-26 — W-50 closed: post-commit reminders  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** W-50 after W-46 landed (`2120458`).

@@ -2,3 +2,7 @@ description = "sec-py/recommended and the heuristic security rules, at warn"
 extends = ["codelaw:sec-py/recommended"]
 
 [rules]
+"sec-py/no-bind-all-interfaces" = "warn"
+"sec-py/no-llm-output-to-sink" = "warn"
+"sec-py/no-log-injection" = "warn"
+"sec-py/no-partial-path" = "warn"

@@ -1,0 +1,17 @@
+[
+  "request.GET",
+  "request.POST",
+  "request.COOKIES",
+  "request.body",
+  "request.FILES",
+  "request.META",
+  "request.headers",
+  "request.data",
+  "request.query_params",
+  "self.request.GET",
+  "self.request.POST",
+  "self.request.COOKIES",
+  "self.request.body",
+  "self.request.data",
+  "self.request.query_params"
+]
