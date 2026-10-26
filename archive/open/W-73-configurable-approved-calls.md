@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-26: rules that require a certain function (a saniti
 item: W-73
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-26
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-27
+updated_by: "Claude Code (Opus 5.5), the W-73 closing lane"
 ball: agent
 ---
 
@@ -18,7 +18,7 @@ ball: agent
 |---|---|---|---|
 | 1 | Option type `call[]` with an `<opt>_mode` of `extend` or `replace`; the `calls:` predicate in `where:`; `$OPTION.<name>` in messages | a declarative rule can read a project's function list | ✅ |
 | 2 | The five HTML-sink rules move their hard-coded sanitizer regex onto a `sanitizers` option | `sanitizers = [{ name = "sanitizeHtml", module = "@acme/security" }]` works | ✅ |
-| 3 | Audit every first-party rule for another hard-coded approved-call list; move each | "wherever we have these kind of rules" | 🟡 |
+| 3 | Audit every first-party rule for another hard-coded approved-call list; move each | "wherever we have these kind of rules" | ✅ |
 | 4 | `js/use-instead` and `py/use-instead`: "use `apiFetch` instead of `fetch`", auto-fix when the wrapper is a drop-in | custom functions and variables everywhere, not only at sinks | ✅ |
 
 **Arpit, 2026-10-26:** *"I want that function to be configurable … rather than passing DOMPurify.sanitize throughout the repo, you need to use this function. I want these kind of rules."*
@@ -66,16 +66,16 @@ sanitizers_mode = "replace"      # only our wrapper counts; "extend" (default) a
 |---|---|---|
 | 1 · | `call[]` type, `_mode`, `calls:` predicate, `$OPTION.<name>`; load errors for a bad item, an undeclared option, `calls:` on a non-`call[]` option; unit tests in `codelaw-match` and `codelaw-rules` | ✅ |
 | 2 · | the five rules below read `sanitizers`; each `.cases.md` covers: extend passes a project fn and DOMPurify · replace passes only the project fn and reports DOMPurify · aliased import passes · same-named local fn is reported · wrong module is reported · global `DOMPurify` passes | ✅ |
-| 3 · | audit of every first-party pack for other hard-coded approved-call lists (JS, TS, Python), each listed here and moved, or listed with why not | 🟡 audited; two lists left |
+| 3 · | audit of every first-party pack for other hard-coded approved-call lists (JS, TS, Python), each listed here and moved, or listed with why not | ✅ audited; the two validator lists moved onto `validators` (2026-10-27) |
 | 4 · | `js/use-instead`, `py/use-instead` with examples, cases (prefix match, `allow_in`, local shadow ignored, import added once, import already present, non-drop-in is manual) | ✅ |
-| 5 · | `codelaw test` green on every pack; corpus counts in each `corpus.toml` updated with the change explained; L8 `perf` within budget | 🟡 perf in release not run |
+| 5 · | `codelaw test` green on every pack; corpus counts in each `corpus.toml` updated with the change explained; L8 `perf` within budget | ✅ CI `perf` passed on the landing ([run 40382552494](https://github.com/arpitarya/codelaw/actions/runs/40382552494), `a5c2a5b`, 2026-10-27); the validator move leaves `security-ts`' corpus counts unchanged (`no-unchecked-cast-of-input` 21, `next-server-action-validation` 0) |
 | 6 · | docs: each pack README row, the config example in `docs/`, `IMPLEMENTATION.md`, CHANGELOG (the tightened default is a behaviour change) | ✅ |
 
 The five rules: `sec-js/no-dangerously-set-inner-html`, `sec-js/no-unsanitized-html`, `sec-js/no-jquery-html-sink`, `sec-js/angularjs-sce-disabled`, `sec-ts/angular-native-element-html`.
 
 ## Audit (DoD 3, 2026-10-27)
 
-No other first-party rule holds a list of approved functions that a `calls` predicate fits. Looked at and left: `sec-py/yaml-safe-load` (`SafeLoader` is a closed set of PyYAML classes, not a project wrapper); `sec-py/no-mark-safe` (bans calls, approves none); `sec-py/upload-secure-filename` (a fix suggestion, no approved list); the path rules (`realpath` etc. are sink patterns). **Left, a follow-up:** `sec-ts/next-server-action-validation` and `sec-ts/no-unchecked-cast-of-input` accept a validator named by a regex (`schema.parse`, `z.`, `class-validator` …) anywhere in the function; moving them needs a predicate for "a call to one of these exists in the enclosing function", which `calls:` (about one captured value) is not.
+No other first-party rule holds a list of approved functions that a `calls` predicate fits. Looked at and left: `sec-py/yaml-safe-load` (`SafeLoader` is a closed set of PyYAML classes, not a project wrapper); `sec-py/no-mark-safe` (bans calls, approves none); `sec-py/upload-secure-filename` (a fix suggestion, no approved list); the path rules (`realpath` etc. are sink patterns). **Moved, 2026-10-27:** `sec-ts/next-server-action-validation` and `sec-ts/no-unchecked-cast-of-input` accepted a validator named by a regex (`schema.parse`, `z.`, `class-validator` …) anywhere in the function. They now read a `validators` option (`call[]`, `validators_mode` extend/replace) through a new predicate, **`function_calls: <option>`** — the node is a function or in one, and that function or one around it calls an entry anywhere in its body (SR-RULE-FORMAT decision 3a, amended in the same change). The default re-expresses the regex: `{z.*, z.*.*, zod}`, `{v.*, parse, safeParse, parseAsync, valibot}`, `{yup.*, yup}`, `{Joi.*, joi.*, joi}`, `{validate, class-validator|superstruct}`, `{validateOrReject, validateSync, class-validator}`, `{plainToInstance, class-transformer}`, `{assert, create, superstruct}`, `{typia.*, typia}`, and, for schema values that are not imports, `*Schema.parse`, `*schema.parse`, `*.parseAsync`, `*.safeParse`, `*.safeParseAsync`, `*.validate`, `*.validateSync`, `*.validateAsync`, `*.assert`. For the `*Schema` receivers a `call[]` path segment may now be `*<suffix>` (decision 2, same amendment), so `postSchema.parse` counts and `JSON.parse` does not. **Tightened, as the sanitizers were:** a bare `validate(x)` or a name merely containing "validate" no longer counts, nor does a local `const validate = ajv.compile(s)` (call `ajv.validate(s, x)`, or add the wrapper to `validators`). No bare global is in the default: none of the old list was a script-loaded global.
 
 ## Blockers
 

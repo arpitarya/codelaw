@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (13)
+### build (12)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
@@ -50,8 +50,6 @@ here. Read that record before changing anything below it.
 🔴 **W-62** `arpit` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: Arpit ratifies `tree-sitter-cli` 0.25.10 (L11), then grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-70** `agent` Example apps for the dev-server plugins on real Vite, webpack, Rspack, Next.js, via a CI job that installs the hosts (L11). Built; left: the first CI run on the real hosts, fix, close. Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
-
-🟢 **W-73** `agent` Approved calls built: `call[]` options, `calls:`, `sanitizers` on the 5 HTML-sink rules, `js/use-instead`, `py/use-instead`; left: release `perf` run, two validator lists. Filed by Arpit (Cowork). [detail](open/W-73-configurable-approved-calls.md)
 
 
 🟢 **W-77** `agent` A separate package for everything agent-facing: `@codelaw/skills` (npm) and `codelaw-skills` (PyPI), pinned to the same codelaw version; codelaw itself keeps no agent files (ruled 2026-10-27). Filed by Arpit (Cowork). [detail](open/W-77-skills-package.md)

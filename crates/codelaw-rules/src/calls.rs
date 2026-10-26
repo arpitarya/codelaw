@@ -9,11 +9,12 @@ use std::collections::BTreeMap;
 /// One approved function.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CallItem {
-    /// A callee path: `DOMPurify.sanitize`, or `*.createHTML` for any
-    /// receiver.
+    /// A callee path: `DOMPurify.sanitize`, `*.createHTML` for any
+    /// receiver, or `*Schema.parse` for a receiver ending in `Schema`.
     pub name: String,
     /// The modules the root binding must be imported from; empty means the
-    /// root is a global (undeclared in the file) - or, for a `*` root, any.
+    /// root is a global (undeclared in the file) - or, for a `*` or
+    /// `*<suffix>` root, any.
     pub modules: Vec<String>,
 }
 
@@ -31,7 +32,10 @@ pub fn parse_call_items(v: &Value) -> Result<Vec<CallItem>, String> {
 
 fn valid_path(s: &str) -> bool {
     let parts: Vec<&str> = s.split('.').collect();
-    !parts.is_empty() && parts.iter().all(|p| !p.is_empty() && (*p == "*" || p.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '$')))
+    // A segment is a name, `*` (any one segment) or `*<suffix>` (one ending
+    // in the suffix).
+    let name = |p: &str| !p.is_empty() && p.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '$');
+    !parts.is_empty() && parts.iter().all(|p| *p == "*" || name(p.strip_prefix('*').unwrap_or(p)))
 }
 
 fn parse_item(v: &Value) -> Result<CallItem, String> {
@@ -43,7 +47,8 @@ fn parse_item(v: &Value) -> Result<CallItem, String> {
                 return Err(format!("a call takes `name` and `module`, not `{k}`"));
             }
             let name = match o.get("name") {
-                Some(Value::String(s)) if valid_path(s) => s.clone(),
+                Some(Value::String(s)) if valid_path(s) && !s.starts_with('*') => s.clone(),
+                Some(Value::String(s)) if valid_path(s) => return Err(format!("`{s}` matches any root, so it takes no `module`; write it as a bare path")),
                 Some(_) => return Err("a call's `name` is a callee path like `DOMPurify.sanitize`".into()),
                 None => return Err("a call needs a `name`".into()),
             };
@@ -94,14 +99,14 @@ mod tests {
 
     #[test]
     fn items_are_paths_or_name_and_module() {
-        let items = parse_call_items(&json!(["DOMPurify.sanitize", "*.createHTML", { "name": "clean", "module": ["a", "b"] }])).unwrap();
+        let items = parse_call_items(&json!(["DOMPurify.sanitize", "*.createHTML", { "name": "clean", "module": ["a", "b"] }, "*Schema.parse"])).unwrap();
         assert_eq!(items[2], CallItem { name: "clean".into(), modules: vec!["a".into(), "b".into()] });
         assert!(items[0].modules.is_empty());
     }
 
     #[test]
     fn a_bad_item_is_refused() {
-        for bad in [json!("not a path()"), json!({ "name": "x" }), json!({ "name": "x", "module": 3 }), json!({ "name": "x", "module": "m", "extra": 1 }), json!(7), json!("")] {
+        for bad in [json!("not a path()"), json!({ "name": "x" }), json!({ "name": "x", "module": 3 }), json!({ "name": "x", "module": "m", "extra": 1 }), json!(7), json!(""), json!("a.**"), json!("*-x.parse"), json!({ "name": "*.parse", "module": "m" })] {
             assert!(parse_call_items(&json!([bad])).is_err());
         }
         assert!(parse_call_items(&json!("x")).is_err());
