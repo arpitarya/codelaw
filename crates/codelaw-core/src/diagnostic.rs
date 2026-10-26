@@ -93,7 +93,7 @@ impl TextEdit {
 
 /// One finding. Every diagnostic carries its fix (L4 decision 4): the class,
 /// the edits for `auto` and `suggest`, the steps for `manual`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 pub struct Diagnostic {
     pub rule: String,
     pub severity: Severity,
@@ -112,8 +112,50 @@ pub struct Diagnostic {
     pub note: Option<String>,
     /// Structured facts about the finding, for `--format json` and SARIF: a
     /// size rule's measured value and its limit (`{ "lines": 412, "max": 300 }`).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(default, deserialize_with = "de_data")]
     pub data: Option<serde_json::Value>,
+}
+
+/// `data` is omitted from JSON when absent, but the cache's codec is
+/// positional (a skipped field shifts every later one) and cannot carry a
+/// `serde_json::Value` (it is self-describing): so a non-human-readable
+/// serializer always gets the field, as the value's JSON text.
+impl Serialize for Diagnostic {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+        let readable = s.is_human_readable();
+        let n = 13 + usize::from(!readable || self.data.is_some());
+        let mut st = s.serialize_struct("Diagnostic", n)?;
+        st.serialize_field("rule", &self.rule)?;
+        st.serialize_field("severity", &self.severity)?;
+        st.serialize_field("file", &self.file)?;
+        st.serialize_field("start_byte", &self.start_byte)?;
+        st.serialize_field("end_byte", &self.end_byte)?;
+        st.serialize_field("start", &self.start)?;
+        st.serialize_field("end", &self.end)?;
+        st.serialize_field("message", &self.message)?;
+        st.serialize_field("fix", &self.fix)?;
+        st.serialize_field("edits", &self.edits)?;
+        st.serialize_field("steps", &self.steps)?;
+        st.serialize_field("source", &self.source)?;
+        st.serialize_field("note", &self.note)?;
+        if readable {
+            if self.data.is_some() {
+                st.serialize_field("data", &self.data)?;
+            }
+        } else {
+            st.serialize_field("data", &self.data.as_ref().map(|v| v.to_string()))?;
+        }
+        st.end()
+    }
+}
+
+fn de_data<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<serde_json::Value>, D::Error> {
+    if d.is_human_readable() {
+        Option::<serde_json::Value>::deserialize(d)
+    } else {
+        Option::<String>::deserialize(d)?.map(|t| serde_json::from_str(&t).map_err(serde::de::Error::custom)).transpose()
+    }
 }
 
 impl Diagnostic {
