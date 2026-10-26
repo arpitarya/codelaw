@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-26T18:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -79,7 +79,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
    1. Load config ([SR-CONFIG](0110_config.md)), resolve the rule packs ([SR-RULE-PACKS](0101_rule-packs.md) decision 4) and load the compiled rule set (cached).
    2. Discover files (decision 7).
    3. In parallel, per file: read once, hash, and on a cache hit reuse the results; otherwise parse once, split embedded regions, build the semantic model if an active rule needs it (decision 15a), run file rules (`native:` ones included, decision 15b) and the format check, and extract graph facts.
-   4. Link the graph and run project rules ([SR-PROJECT-GRAPH](0103_project-graph.md)). The graph reads every file of the project root, including those `[files]` or `languages` leave out, so their uses count; project-rule findings are reported only in files step 3 would check.
+   4. Link the graph and run project rules ([SR-PROJECT-GRAPH](0103_project-graph.md)). The graph reads every file of the project root, including those `[files]` or `languages` leave out, so their uses count; project-rule findings are reported only in files step 3 would check. The engine's own graph rules run here on the same linked graph: `graph/no-deprecated-usage` and, when the project turns them on, the test rules of new code (`crates/codelaw-engine/src/new_code.rs`, which reads the change set's base copies, `.codelawignore` and an lcov report through `lcov.rs`; [SR-PROJECT-GRAPH](0103_project-graph.md) decision 9). Off, step 4 builds no graph for them.
    5. Run adapters (decision 19).
    6. Apply suppressions ([SR-LINTER](0106_linter.md) decision 6) and the baseline ([SR-BASELINE](0104_baseline-and-deprecations.md)), then each file's `remap` ([SR-CONFIG](0110_config.md) decision 11) — once, last, never to `codelaw/*`. `fix`, MCP's `check_snippet` and the editor's checks end with the same `remap`. The profile ([SR-CONFIG](0110_config.md) decision 10) is chosen in step 1, before anything keys on the config, so it is part of every cache key.
    7. Merge, dedupe (same file, range, rule) and sort by path, line, column, rule.
@@ -141,7 +141,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
   - **The React Compiler and @eslint-react hooks rules** (`react_hooks.rs`) decide from one file's tree and semantic model: a component is a PascalCase function that renders JSX, calls a hook or is wrapped in `memo` / `forwardRef`; a hook is a `use…` function; a state setter is the second element of a `useState` pattern and a ref a `useRef` result, each recognised at its declaration in the same function; a global is a name no declaration binds, or one declared at the module's top level. Only the component's or hook's own body counts as render — a nested function (an effect, a handler, an initializer) does not — and nothing is followed through calls or aliases. *(W-43, 2026-10-25.)*
   - **Only first-party packs** and ejected copies of their rules may use `native:` ([SR-RULE-PACKS](0101_rule-packs.md) decision 10).
 
-15c. **Rule packs and data tables.** Rules come from the packs resolved by [SR-RULE-PACKS](0101_rule-packs.md) decision 4, plus local rules. The engine embeds only its own (`codelaw/*` diagnostics and `graph/no-deprecated-usage`).
+15c. **Rule packs and data tables.** Rules come from the packs resolved by [SR-RULE-PACKS](0101_rule-packs.md) decision 4, plus local rules. The engine embeds only its own (`codelaw/*` diagnostics, `graph/no-deprecated-usage`, and the opt-in `graph/untested-function` and `graph/function-coverage`).
   - **Data tables:** a pack's `data/` tables (CSS properties, HTML elements and attributes, JSON Schemas) are read at load, parsed once, and shared read-only by every rule that names them.
   - **Caching:** their hashes join the compiled rule set's cache key (decision 15).
   - **Nothing is fetched** (decision 27).
