@@ -48,7 +48,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 - every rule in them carries `security:` metadata — CWE, OWASP Top 10:2025 category, severity ([SR-RULE-FORMAT](0112_rule-format.md) decision 2a);
 - each has a `recommended` preset (high-confidence rules, `error`) and a `strict` one (adds the heuristic rules, `warn`);
 - `security-ts` **extends** `security-js` (the `sec-js` rules already run on TypeScript), and `security-html` turns on the html pack's own security rules through `html/security` instead of copying them (decision 3);
-- **npm** carries thirteen packs and **PyPI** nine. The packs ship as scaffolds with no rules yet; their catalogues are [W-54](../work/open/W-54-security-js-pack.md) to [W-57](../work/open/W-57-security-python-pack.md).
+- **npm** carries thirteen packs and **PyPI** nine. `security-js` carries its 66 rules since W-54 (2026-10-26: `sec-js/recommended` 55 at `error`, `sec-js/strict` adds 11 at `warn`; a `data/sources/` table per request-source family for `from_source:`; counts in `packs/security-js/corpus.toml` from the three pinned repositories); the other three packs are scaffolds until [W-55](../work/open/W-55-security-ts-pack.md), [W-56](../work/open/W-56-security-html-pack.md) and [W-57](../work/open/W-57-security-python-pack.md).
 
 | Pack | npm | PyPI | Languages | Presets |
 |---|---|---|---|---|

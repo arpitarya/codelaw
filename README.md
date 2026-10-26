@@ -10,7 +10,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 
 ![status: preview](https://img.shields.io/badge/status-preview-orange)
 ![version 0.2.0](https://img.shields.io/badge/version-0.2.0-blue)
-![rules: 460](https://img.shields.io/badge/rules-460-informational)
+![rules: 526](https://img.shields.io/badge/rules-526-informational)
 ![languages: 9](https://img.shields.io/badge/languages-9-informational)
 ![licence: MIT](https://img.shields.io/badge/licence-MIT-green)
 ![engine: Rust](https://img.shields.io/badge/engine-Rust-b7410e)
@@ -202,7 +202,7 @@ def greet(names=None):
 | 🧱 **Fixes can restructure code** | Fix primitives move and regroup code, for example gathering every `export` into one block at the end of the file. A plain node-for-node replace can't do that. |
 | 🔁 **Deterministic** | Same files and config in, same output out, with or without an AI agent. Every fix is re-parsed and checked before it's written, and a fix that would break the file is rolled back. |
 | 🤖 **Built for AI coding agents** | `--format agent` gives one line per finding with its fix, ready to feed back to an agent after every edit. |
-| 📦 **Standard rules included** | 460 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
+| 📦 **Standard rules included** | 526 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
 
 **For the person who owns the codebase:** the review comment you keep writing becomes a rule file, once. From then on a person, a CI job and every AI agent get the same answer — and the answer can be audited, because it is a file in your repo and not a model's opinion.
 
@@ -227,7 +227,7 @@ Fifteen first-party packs: thirteen on npm as `@codelaw/rules-<pack>`, nine on P
 | [`data`](packs/data/README.md) | ✅ | ✅ | 39 | `data/recommended` · `md/recommended` · `data/package-json` · `data/tsconfig` · `data/pyproject` · `data/github-actions` · `data/conventions` | markdownlint 0.42, plus JSON/YAML/TOML correctness checks |
 | [`tanstack-query`](packs/tanstack-query/README.md) | ✅ | — | 13 | `tanstack-query/recommended` | @tanstack/eslint-plugin-query 5 recommended (all 7), and 6 rules from TanStack Query v5's guides |
 | [`redux-toolkit`](packs/redux-toolkit/README.md) | ✅ | — | 12 | `redux-toolkit/recommended` | codelaw's own, from the Redux Style Guide's Priority A and B rules |
-| [`security-js`](packs/security-js/README.md) | ✅ | ✅ | 0 | `sec-js/recommended` · `sec-js/strict` | a scaffold: the rules are W-54 (eslint-plugin-security, CodeQL and OWASP ideas), mapped to CWE and OWASP 2025 |
+| [`security-js`](packs/security-js/README.md) | ✅ | ✅ | 66 | `sec-js/recommended` · `sec-js/strict` | eslint-plugin-security, Bandit and Ruff `S` ports and codelaw's own, mapped to CWE and OWASP 2025: injection, XSS, traversal, SSRF, crypto, secrets, cookies, TLS, Electron, prompt injection |
 | [`security-ts`](packs/security-ts/README.md) | ✅ | — | 0 | `sec-ts/recommended` · `sec-ts/strict` | a scaffold: extends `security-js`; its TypeScript-only rules are W-55 |
 | [`security-html`](packs/security-html/README.md) | ✅ | ✅ | 0 | `sec-html/recommended` · `sec-html/strict` | a scaffold: extends `html/security`; its rules are W-56 |
 | [`security-python`](packs/security-python/README.md) | — | ✅ | 0 | `sec-py/recommended` · `sec-py/strict` | a scaffold: the rules are W-57 (Bandit, Ruff `S`, Django, Flask, FastAPI) |
@@ -242,15 +242,15 @@ Fifteen first-party packs: thirteen on npm as `@codelaw/rules-<pack>`, nine on P
 - **`*/project` presets are opt-in too**: the rules that read the whole repo, `graph/no-unused-exports` (`js/project`, `py/project`) and `graph/no-unused-css-classes` (`css/project`). `codelaw graph why-unused <symbol>` says why a finding held.
 - **The counts on this page are checked.** `python3 scripts/docs-sync.py --check` fails CI when a pack's rules, presets or fix classes and this page disagree.
 
-### Fix classes across all 460 rules
+### Fix classes across all 526 rules
 
 <!-- docs-sync:fix-classes -->
 
 | class | rules | what happens |
 |---|---|---|
 | `auto` | 70 | `codelaw fix` applies it. It's safe and meaning-preserving. |
-| `suggest` | 77 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
-| `manual` | 313 | The finding lists numbered steps, for a person or an agent to follow. |
+| `suggest` | 94 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
+| `manual` | 362 | The finding lists numbered steps, for a person or an agent to follow. |
 
 <!-- /docs-sync:fix-classes -->
 
@@ -354,7 +354,7 @@ $ codelaw test acme/no-console-log
 |---|---|---|---|
 | ✅ | Engine: nine languages, one binary, parse once, cache | [SR-ARCHITECTURE](records/0108_architecture.md) | built |
 | ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `match`, `config`, `new-rule`, `init`, `cache` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
-| ✅ | Fifteen rule packs: 460 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
+| ✅ | Fifteen rule packs: 526 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
 | ✅ | `--format agent`, `--format json` and `--format sarif`; `--timings` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | Watch mode: `check --watch` and `fix --watch` re-check on every save | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | npm package (`npx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0 published from CI with provenance, ten packs |

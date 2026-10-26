@@ -2,3 +2,14 @@ description = "sec-js/recommended and the heuristic security rules, at warn"
 extends = ["codelaw:sec-js/recommended"]
 
 [rules]
+"sec-js/angularjs-sce-disabled" = "warn"
+"sec-js/express-hardening" = "warn"
+"sec-js/graphql-hardening" = "warn"
+"sec-js/missing-rate-limit" = "warn"
+"sec-js/no-format-string" = "warn"
+"sec-js/no-log-injection" = "warn"
+"sec-js/no-non-literal-fs-filename" = "warn"
+"sec-js/no-secret-in-log" = "warn"
+"sec-js/no-unsafe-regex" = "warn"
+"sec-js/no-user-controlled-auth-bypass" = "warn"
+"sec-js/timing-safe-compare" = "warn"
