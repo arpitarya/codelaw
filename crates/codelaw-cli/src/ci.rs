@@ -1,0 +1,147 @@
+//! `codelaw init --ci github|gitlab --autofix daily|weekly [--unsafe]`
+//! (SR-CLI-MCP decision 12, W-51): write the scheduled auto-fix workflow into
+//! the consumer's repo. The text is a template under `templates/ci/` (L10);
+//! this code fills the slots (`cron`, `version`, `suggest_job`) and writes.
+
+use std::path::{Path, PathBuf};
+
+const GITHUB: &str = include_str!("../../../templates/ci/github/codelaw-autofix.yml");
+const GITHUB_SUGGEST: &str = include_str!("../../../templates/ci/github/autofix-suggest-job.yml");
+const GITLAB: &str = include_str!("../../../templates/ci/gitlab/codelaw-autofix.yml");
+const GITLAB_SUGGEST: &str = include_str!("../../../templates/ci/gitlab/autofix-suggest-job.yml");
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Provider {
+    Github,
+    Gitlab,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Schedule {
+    Daily,
+    Weekly,
+}
+
+pub fn parse_provider(s: &str) -> Result<Provider, String> {
+    match s {
+        "github" => Ok(Provider::Github),
+        "gitlab" => Ok(Provider::Gitlab),
+        other => Err(format!("--ci is `github` or `gitlab`, not `{other}`")),
+    }
+}
+
+pub fn parse_schedule(s: &str) -> Result<Schedule, String> {
+    match s {
+        "daily" => Ok(Schedule::Daily),
+        "weekly" => Ok(Schedule::Weekly),
+        other => Err(format!("--autofix is `daily` or `weekly`, not `{other}`")),
+    }
+}
+
+impl Schedule {
+    fn cron(self) -> &'static str {
+        match self {
+            Schedule::Daily => "17 4 * * *",
+            Schedule::Weekly => "17 4 * * 1",
+        }
+    }
+}
+
+/// Fill `{{name}}` slots; `\{{` writes a literal `{{`. A slot with no value,
+/// or a value for a slot the template lacks, is an error (L10 decision 4).
+pub fn render(template: &str, slots: &[(&str, &str)]) -> Result<String, String> {
+    let mut out = String::with_capacity(template.len());
+    let mut used = vec![false; slots.len()];
+    let mut rest = template;
+    while let Some(i) = rest.find("{{") {
+        if rest[..i].ends_with('\\') {
+            out.push_str(&rest[..i - 1]);
+            out.push_str("{{");
+            rest = &rest[i + 2..];
+            continue;
+        }
+        out.push_str(&rest[..i]);
+        let after = &rest[i + 2..];
+        let end = after.find("}}").ok_or("a template has an unclosed `{{`")?;
+        let name = &after[..end];
+        let k = slots.iter().position(|(n, _)| *n == name).ok_or_else(|| format!("a template slot `{{{{{name}}}}}` has no value"))?;
+        used[k] = true;
+        out.push_str(slots[k].1);
+        rest = &after[end + 2..];
+    }
+    out.push_str(rest);
+    if let Some(k) = used.iter().position(|u| !u) {
+        return Err(format!("a value was given for slot `{}`, which the template lacks", slots[k].0));
+    }
+    Ok(out)
+}
+
+/// The workflow text and the path it lands at, relative to the repo root.
+pub fn workflow(provider: Provider, schedule: Schedule, suggest: bool, version: &str) -> Result<(PathBuf, String), String> {
+    let (main, extra, path) = match provider {
+        Provider::Github => (GITHUB, GITHUB_SUGGEST, ".github/workflows/codelaw-autofix.yml"),
+        Provider::Gitlab => (GITLAB, GITLAB_SUGGEST, ".gitlab/codelaw-autofix.yml"),
+    };
+    let suggest_job = if suggest { render(extra, &[("version", version)])? } else { String::new() };
+    let text = render(main, &[("cron", schedule.cron()), ("version", version), ("suggest_job", &suggest_job)])?;
+    Ok((PathBuf::from(path), text))
+}
+
+/// Write the workflow; never overwrites a different file already there.
+pub fn install(root: &Path, provider: Provider, schedule: Schedule, suggest: bool) -> Result<Vec<String>, String> {
+    let (rel, text) = workflow(provider, schedule, suggest, codelaw_core::VERSION)?;
+    let path = root.join(&rel);
+    let shown = rel.display().to_string();
+    let mut lines = Vec::new();
+    match std::fs::read_to_string(&path) {
+        Ok(current) if current == text => return Ok(vec![format!("{shown} already up to date")]),
+        Ok(current) if !current.contains("codelaw-autofix.yml") => {
+            return Err(format!("{shown} exists and is not codelaw's; move it aside first"));
+        }
+        _ => {}
+    }
+    if let Some(dir) = path.parent() {
+        std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    }
+    std::fs::write(&path, &text).map_err(|e| e.to_string())?;
+    lines.push(format!("wrote {shown}"));
+    match provider {
+        Provider::Github => {
+            lines.push("the pull request's own CI needs a token that can trigger workflows: add the secret CODELAW_AUTOFIX_TOKEN (a GitHub App token or a fine-grained PAT), or start CI by hand".into());
+            lines.push("exclude the branch `codelaw/autofix` from branch protection's force-push rule".into());
+        }
+        Provider::Gitlab => {
+            lines.push(format!("add `include: \".gitlab/codelaw-autofix.yml\"` to .gitlab-ci.yml, create a pipeline schedule with the cron `{}`, and set the masked variable CODELAW_AUTOFIX_TOKEN (api and write_repository scopes)", schedule.cron()));
+        }
+    }
+    if suggest {
+        lines.push("--unsafe: the `suggest` fixes go to the branch `codelaw/autofix-suggest`, in their own PR".into());
+    }
+    Ok(lines)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn renders_slots_and_escapes() {
+        assert_eq!(render("a {{x}} \\{{y}}", &[("x", "1")]).unwrap(), "a 1 {{y}}");
+        assert!(render("{{x}}", &[]).is_err());
+        assert!(render("a", &[("x", "1")]).is_err());
+    }
+
+    #[test]
+    fn every_workflow_leaves_no_unfilled_slot() {
+        for p in [Provider::Github, Provider::Gitlab] {
+            for s in [Schedule::Daily, Schedule::Weekly] {
+                for u in [false, true] {
+                    let (_, t) = workflow(p, s, u, "1.2.3").unwrap();
+                    assert!(!t.contains("{{") || t.contains("${{"), "{p:?}");
+                    assert!(t.contains("codelaw@1.2.3"));
+                    assert_eq!(t.contains("autofix-suggest"), u);
+                }
+            }
+        }
+    }
+}

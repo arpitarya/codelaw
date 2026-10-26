@@ -115,7 +115,7 @@ Start from `TEMPLATE.md`.
 | [0010](0010_LAW-8-performance-budgets.md) | **SR-LAW-8** | **L8** — performance budgets — set from measurement, never exceeded, never loosened | accepted | partly |
 | [0011](0011_LAW-9-machine-budget.md) | **SR-LAW-9** | **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it approved first | accepted | yes |
 | [0012](0012_LAW-10-consumer-templates.md) | **SR-LAW-10** | **L10** — every file codelaw writes into a consumer's repo comes from a template in `templates/`; code only fills slots | accepted | no |
-| [0013](0013_LAW-11-no-dependencies.md) | **SR-LAW-11** | **L11** — no dependencies unless the decider ratifies each one by name in `DEPENDENCIES.md` | accepted | no |
+| [0013](0013_LAW-11-no-dependencies.md) | **SR-LAW-11** | **L11** — no dependencies unless the decider ratifies each one by name in `DEPENDENCIES.md` | accepted | yes |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — the queue discipline in eight groups | accepted | yes |
 | [0052](0052_WORK-backlog.md) | **SR-WORK-BACKLOG** | How `BACKLOG.md` works — the named-but-unclaimed in five classes | accepted | yes |
 | [0053](0053_WORK-lifecycle.md) | **SR-WORK-LIFECYCLE** | How a feature travels — compare, proposal, handoff in the item file, the model line, one record | accepted | yes |
@@ -200,6 +200,8 @@ yet is owned by an open `W-nn`.
 | `agents` | SR-AGENT-SURFACES | decisions 1, 4 and 5: the skill sources, the custom agent and the trigger evals |
 | `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced: the Cargo packages, the npm lockfiles and the build tools |
+| `crates/codelaw-cli/tests/dependencies.rs` | SR-LAW-11 | how L11 is enforced: every manifest and lockfile against the ledger in `DEPENDENCIES.md` |
+| `DEPENDENCIES.md` | SR-LAW-11 | decision 3: the list of ratified dependencies and the ledger the check reads |
 | `crates/codelaw-cli/tests/network_fence.rs` | SR-LAW-5 | how L5 is enforced: the network fence (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/consumer_layout.rs` | SR-CONSUMER-LAYOUT | the veto's `init` check against §1's tree (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/promotion.rs` | SR-RULE-AUTHORING | decisions 4 and 6: level 4 and the `stable` gate (a different decision from the CLI's) |
