@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-49: dev-server plugins for Vite, webpack, Rspack, Next.js  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-44's remaining agent work, then W-49 (lane brief).
+- **Done:** W-44: nothing an agent can still do — its Windows paths are already `cfg`-guarded (inode, Ctrl-C) and the rest is CI-only; no change. W-49: `packaging/npm/{dev-core,vite-plugin,webpack-plugin,next}`, `scripts/package.py` (stage, check, names, `sync-dev-core`), SR-PACKAGES decision 3a, `plugins.test.js` and `crates/codelaw-cli/tests/dev_plugins.rs`, USAGE, CHANGELOG.
+- **Decided / left open:** three packages, not four (Rspack runs the webpack plugin); no shared package because a package may have no dependency, so one source is copied and checked. Left: an example app on each real host and the first publish.
+- **Mistakes:** none that landed; `package.py check`'s wheel regex rejects `codelaw_rules_security_js` (an underscore) — found, not mine to change here.
+- **Next:** the decider ratifies the hosts for an examples job, or publishes the three packages.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*
