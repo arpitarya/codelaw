@@ -82,6 +82,16 @@ pub(crate) fn files_at(dir: &Path, rev: &str, folder: &str) -> Result<Vec<(Strin
     Ok(out)
 }
 
+/// `path` (relative to `dir`) as it is at `rev`; `None` when `rev` has no
+/// such file (a new file).
+pub(crate) fn file_at(dir: &Path, rev: &str, path: &str) -> Result<Option<String>, String> {
+    match git(dir, &["show", &format!("{rev}:./{path}")]) {
+        Ok(body) => Ok(Some(String::from_utf8_lossy(&body).into_owned())),
+        Err(e) if e.contains("does not exist") || e.contains("exists on disk, but not in") => Ok(None),
+        Err(e) => Err(e),
+    }
+}
+
 /// Whether the clone is shallow: its history stops at the clone's depth.
 pub(crate) fn is_shallow(dir: &Path) -> bool {
     git(dir, &["rev-parse", "--is-shallow-repository"]).map(|b| text(b) == "true").unwrap_or(false)

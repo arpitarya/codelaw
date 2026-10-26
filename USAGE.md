@@ -396,6 +396,7 @@ flowchart LR
 | `codelaw deps refresh` | Read npm and the Python index for every dependency the manifests name and write `.codelaw/deps-snapshot.json`, which `data/outdated-dependency` reads offline; the only command that uses the network. `--as-of` sets the `fetched` day |
 | `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
 | `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set ([L8](records/0010_LAW-8-performance-budgets.md)) |
+| `codelaw debug` | Inspect what the engine sees: `changed-functions` |
 
 <!-- /docs-sync:commands -->
 

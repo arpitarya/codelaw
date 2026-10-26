@@ -26,8 +26,6 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-38 itself; W-64 waits on it | |
 | 🔴 **Reserve and publish the 16 Fux index package names** (npm `@codelaw/rules-<name>-fux-index` ×10 by hand, then `npm-trust.sh`; PyPI `codelaw-rules-<name>-fux-index` ×6 by `twine`, then a trusted publisher each) — built by CI as the `fux-index` artifact; RELEASING.md §"The optional Fux index packages"; also ratify `fux-engine` as D-34 in `DEPENDENCIES.md` — [W-34](open/W-34-fux-index-packages.md) | 2026-10-26 |
 | ↳ **blocks:** W-34 itself | |
-| 🔴 **Diff-scoped or baseline** for the new-code test rules: judge only functions the change set adds or edits (recommended), or fire everywhere and freeze legacy in a baseline — [W-71](open/W-71-tests-for-new-code.md) | 2026-10-26 |
-| ↳ **blocks:** W-71 itself | |
 
 ---
 
@@ -39,7 +37,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, CI, `init` prints not installs); left: reserve the 16 names and publish them by hand (npm ten, PyPI six), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
-🔴 **W-71** `arpit` A unit test for every new or edited function (JS, TS, Python): `graph/untested-function`, `graph/function-coverage` (lcov); left: Arpit confirms diff-scoped, then an agent builds it. Filed by Arpit (Cowork). [detail](open/W-71-tests-for-new-code.md)
+🟢 **W-71** `agent` Tests for new or edited functions (JS, TS, Python), diff-scoped; step 1 built (`debug changed-functions`); left: the hook's file, `graph/untested-function`, lcov `graph/function-coverage`, `.codelawignore`. Filed by Arpit (Cowork). [detail](open/W-71-tests-for-new-code.md)
 
 🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); left: DoD 5 on CI's Windows legs and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
