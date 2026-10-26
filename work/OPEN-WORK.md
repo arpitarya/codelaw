@@ -47,7 +47,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-51** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); left: a real GitHub run (DoD 1, 3) and the exceptions section (W-46 landed). Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
 
-🟢 **W-58** `agent` Size limits for JS, TS and Python built (six rules, `js/size` and `py/size`, measured value in JSON and SARIF); left: the six corpus counts and CI's `perf` run (DoD 6). Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
+🟢 **W-58** `agent` Size limits for JS, TS and Python built (six rules, `js/size` and `py/size`, measured value in JSON and SARIF); left: CI's `perf` run (DoD 6); the six corpus counts are in. Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
 
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: patch tree-sitter-scss (`@if not` is an `ERROR`), CSS rules onto trees, a pinned corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 

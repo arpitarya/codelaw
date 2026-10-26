@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-58: corpus counts confirmed, left list trimmed  ·  Claude Code (Sonnet 5.5), in a lockmaster worktree
+
+- **Asked:** finish W-58 except CI's `perf` run (DoD 6).
+- **Done:** checked `packs/js/corpus.toml` (23/177/7) and `packs/python/corpus.toml` (13/91/134) hold the six `[findings]` rows (landed in the CI repair); removed the stale "six corpus counts" from OPEN-WORK and IMPLEMENTATION. No re-run of `corpus.py` (pinned repos not cloned here).
+- **Decided / left open:** left: DoD 6, CI's `perf` job on the merge (and, if the decider wants, a `js/size`-on workload).
+- **Mistakes:** none.
+- **Next:** read `perf` on the merge, then close W-58.
+
 ## 2026-10-26 — W-74 filed (editor logs you can debug from)  ·  Cowork (Opus 5.5)
 
 - **Asked:** Arpit: *"The VS Code extension doesn't have very good output or logging. Create a work item for better logs so that at least it can be debugged if there is any issue."*
