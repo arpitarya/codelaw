@@ -31,6 +31,7 @@ mod html_content;
 mod html_document;
 mod html_dom;
 mod html_rules;
+mod html_security;
 mod js_ast;
 mod js_console;
 mod literals;
@@ -351,6 +352,25 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &html_rules::ValidFor,
     &html_rules::ValidId,
     &html_content::VoidContent,
+    &html_security::AngularjsUrlExpression,
+    &html_security::CspMetaUnsafe,
+    &html_security::FormCsrfToken,
+    &html_security::IframeAllowPowerful,
+    &html_security::IframeSandbox,
+    &html_security::NoCredentialsInUrl,
+    &html_security::NoExternalBase,
+    &html_security::NoInlineEventHandler,
+    &html_security::NoJavascriptUrl,
+    &html_security::NoMixedContent,
+    &html_security::NoPluginEmbed,
+    &html_security::NoSecretInHiddenInput,
+    &html_security::NoSensitiveComments,
+    &html_security::NoSrcdocScript,
+    &html_security::NoTemplateHtmlSink,
+    &html_security::NoUnsafeTemplateInterpolation,
+    &html_security::PasswordFormPost,
+    &html_security::ReferrerPolicy,
+    &html_security::SriCrossorigin,
     &classes::ConstructorSuper,
     &accessors::GetterReturn,
     &conventions::ImportGroups,

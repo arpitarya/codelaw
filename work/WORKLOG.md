@@ -136,6 +136,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** assumed an `any:` tries each branch with its own `constraints:` — it runs the first branch that matches the shape, and a constraint that fails then ends the match; found by a case, fixed by `all:` with `regex:` per branch.
 - **Next:** W-55 (`security-ts`), which extends this pack.
 
+## 2026-10-26 — W-56 closed: `security-html`, 19 rules  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** build W-56 in a parallel lane: every rule with a fix (L4), fixtures and tests.
+- **Done:** `crates/codelaw-native/src/html_security.rs` (19 native rules on the `html/*` document model, registered in `lib.rs`), `packs/security-html/rules/sec-html/` (a rule file and a cases sidecar each; `security:` on all), the two presets (14 + 5 rules, extending `html/security`), `corpus.toml` counts on `flask`, `html5-boilerplate` and `djangoproject.com`, the pack README, `NOTICE`, the SR-RULE-PACKS row, `README.md` counts, `crates/codelaw-cli/tests/security_html.rs`. `suggest` fixes (`https://`, `method="post"`, `sandbox`, `crossorigin`, `referrerpolicy`, `ng-href`) apply with `--unsafe`; `sec-html/no-sensitive-comments` is `auto`. W-56's file archived.
+- **Decided / left open:** the preset split is mine: `strict` holds `no-external-base`, `no-plugin-embed`, `no-sensitive-comments`, `form-csrf-token`, `iframe-allow-powerful`, the rules that cannot tell a legitimate use from a risky one; the rest are in `recommended`. Uploading the pack to npm and PyPI is the release's (W-38), not this item's.
+- **Mistakes:** `target/debug/codelaw` is one file shared by every lane building into the shared target dir, so a test that runs the binary can run another lane's build; a copy taken right after a forced rebuild gave the right one.
+- **Next:** none for W-56; W-54, W-55 and W-57 are the sibling packs.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*
