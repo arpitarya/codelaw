@@ -1,0 +1,17 @@
+# W-45 DoD 2 demo — NOT for main. Runs `codelaw check --format github` on a
+# fixture with known findings so the annotations can be looked at on the PR.
+name: w45-annotations-demo
+on:
+  pull_request:
+    paths: ['w45-demo/**', '.github/workflows/w45-annotations-demo.yml']
+permissions:
+  contents: read
+jobs:
+  annotate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo build --release -p codelaw-cli
+      - name: codelaw check --format github
+        working-directory: w45-demo
+        run: ../target/release/codelaw check --no-adapters --format github
