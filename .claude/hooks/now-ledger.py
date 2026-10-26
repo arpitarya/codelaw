@@ -203,28 +203,38 @@ def next_id():
 
 
 def file_item(ball, lane, title, body, sid):
-    """One item file + one OPEN-WORK row (and, for red, an inbox row)."""
+    """One item file + one OPEN-WORK row (and, for red, an inbox row), in the
+    queue's own row style; the `### build (N)` count moves with the row."""
     n = next_id()
     wid, slug = f"W-{n:02d}", "session-cleanup"
     today = date.today().isoformat()
+    by = "now-ledger.py (Claude Code)"
     path = ROOT / "work" / "open" / f"{wid}-{slug}.md"
     path.write_text(
         f"---\ntype: Handoff\nname: {wid}\ndescription: \"{title}\"\nitem: {wid}\n"
-        f"filed: {today}\nfiled_by: \"now-ledger.py (Claude Code), session {sid}\"\n"
-        f"updated: {today}\nupdated_by: \"now-ledger.py\"\nball: {lane}\n---\n\n"
-        f"# {wid} — {title}\n\n{body}\n\n## Record affected\n\n"
-        f"No SR affected — the rule is [SR-WORK-CLEANUP](../../records/0062_WORK-cleanup.md).\n",
+        f"filed: {today}\nfiled_by: \"{by}\"\n"
+        f"updated: {today}\nupdated_by: \"{by}\"\nball: {'arpit' if ball == '🔴' else lane}\n---\n\n"
+        f"# {wid} — {title}\n\n## At a glance\n\n| what | state |\n|---|---|\n"
+        f"| {title} | ⏳ |\n\nFiled at the end of session `{sid}`.\n\n{body}\n\n## Record affected\n\n"
+        f"No SR affected — the rule is SR-WORK-CLEANUP.\n",
         encoding="utf-8")
-    row = (f"{ball} **{wid}** `{lane}` {title}. Filed by now-ledger.py (Claude Code)."
-           f" [detail](open/{wid}-{slug}.md)")
     text = OPEN_WORK.read_text(encoding="utf-8")
-    text = re.sub(r"(### build\n\n)", lambda m: m.group(1) + row + "\n\n", text, count=1)
+    bullets = re.search(r"^- (🔴|🟣|🟡|🟢)", text, re.M) is not None
+    row = (f"- {ball} **{wid}** · `{lane}` — {title}." if bullets else f"{ball} **{wid}** `{lane}` {title}.") + \
+          f" Filed by {by}. [detail](open/{wid}-{slug}.md)"
+
+    def bump(m):
+        return f"{m.group(1)} ({int(m.group(2) or 0) + 1})\n\n{row}\n\n"
+    text = re.sub(r"^(### (?:\S+ )?build)(?: \((\d+)\))?\n\n", bump, text, count=1, flags=re.M)
     if ball == "🔴":
-        inbox = (f"| 🔴 Keep or drop each worktree in [{wid}](open/{wid}-{slug}.md):"
-                 f" removing it would lose data (SR-WORK-CLEANUP decision 3) | {today} |\n"
-                 f"| ↳ **blocks:** nothing else in the queue | |\n")
-        text = re.sub(r"(## Blocked on the decider\n\n\| what[^\n]*\n\|---[^\n]*\n)",
-                      lambda m: m.group(1) + inbox, text, count=1)
+        head = re.search(r"^## Blocked on [^\n]*\n\n(\| what[^\n]*)\n", text, re.M)
+        aged = head is not None and "| age |" in head.group(1)
+        inbox = (f"| 🔴 **{wid}** — keep or drop each worktree in [the item](open/{wid}-{slug}.md):"
+                 f" removing it would lose data (SR-WORK-CLEANUP decision 3) | {today} |"
+                 + (" 0 d |" if aged else "") + "\n"
+                 f"| ↳ **blocks:** nothing else in the queue | |" + (" |" if aged else "") + "\n")
+        text = re.sub(r"(^## Blocked on [^\n]*\n\n\| what[^\n]*\n\|---[^\n]*\n)",
+                      lambda m: m.group(1) + inbox, text, count=1, flags=re.M)
         text = re.sub(r"\n\*Empty since[^\n]*\n", "\n", text, count=1)
     OPEN_WORK.write_text(text, encoding="utf-8")
     return wid

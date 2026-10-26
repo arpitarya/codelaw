@@ -33,7 +33,9 @@ with_age() {
 
 if [ -f work/OPEN-WORK.md ]; then
   DECIDER=$(git config user.name 2>/dev/null); DECIDER=${DECIDER:-the decider}
-  INBOX=$(sed -n '/^## Blocked on /,/^---$/p' work/OPEN-WORK.md | sed '1d;$d' | with_age)
+  INBOX=$(sed -n '/^## Blocked on /,/^---$/p' work/OPEN-WORK.md | sed '1d;$d')
+  # A queue that stores its own age column (fux's) keeps it; any other gets one computed.
+  case "$INBOX" in *'| age |'*) ;; *) INBOX=$(printf '%s\n' "$INBOX" | with_age) ;; esac
   case "$INBOX" in
     *"*Empty since"*|"") ;;
     *) echo "<inbox>"; echo "$INBOX"; echo "</inbox>"

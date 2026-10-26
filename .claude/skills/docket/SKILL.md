@@ -20,7 +20,7 @@ description: Walk Arpit through work/OPEN-WORK.md one item at a time — the dec
 
 - Line 1: `Docket: N rulings owed · M open items · D drift`.
 - An open blocker in `BLOCKED.json` is named first.
-- Every inbox row older than 5 days is named with its age (rule 41); 🔺 first (rule 33).
+- The inbox rows rule 41 says to name, each with its age; 🔺 first (rule 33).
 - Drift: one line each.
 
 ## 3 · Order

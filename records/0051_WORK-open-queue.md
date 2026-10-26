@@ -172,6 +172,11 @@ the top.
     picking a shape).
 37a. **The `research` section runs in a chat/Cowork session, never in Claude
     Code.** Its rows' lane is `cowork`; its files say `**Model:** Cowork`.
+37b. **Every group heading carries its count of open items** (Arpit,
+    2026-10-26: *"in front of every title in open items put a count of open
+    items"*) — `### build (10)`, `### testing (0)`; an empty group says `(0)`.
+    The count is of rows, and changes in the same edit as the row it counts.
+    Checked on every write by `scripts/check-open-work-inbox.py`.
 38. Each item's file names the record its change will update, or says
     **"no SR affected"** out loud.
 
