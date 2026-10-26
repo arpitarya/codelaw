@@ -56,6 +56,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** none.
 - **Next:** Arpit looks at PR 3's Files changed tab.
 
+## 2026-10-26 — W-73 filed (configurable approved calls)  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit: *"rules which say that we need to call certain functions … DOM purify dot sanitize … I want that function to be configurable … custom function … custom variables … I want these kind of rules"*.
+- **Done:** found the same hard-coded sanitizer regex in five rules, matched by spelling only (a local `sanitize()` passes); amended SR-RULE-FORMAT decisions 2, 3a, 3b (`call[]` option type with `_mode`, the `calls:` predicate, `$OPTION.<name>`); filed W-73 and its build row.
+- **Decided / left open:** Arpit ruled extend *or* replace (configurable), per-rule options, name + import source, and a `use-instead` rule for JS/TS and Python. Not built here: no Rust toolchain on the Cowork VM, lockmaster unreachable, `target/` 37 GB against L9's 5 GB.
+- **Mistakes:** none.
+- **Next:** a Claude Code lane builds W-73 (`cargo clean` first, L9).
+
+## 2026-10-26 — W-71 filed (tests for new and edited functions)  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit: *"a rule where if a new function is added or if a file is being written, it should have a unit test … coverage of around 60%, configurable … JS, TS, Python … older functions no need … if somebody is editing that function, this rule again gets applied … research and write a work item"*.
+- **Done:** filed W-71 (`work/open/W-71-tests-for-new-code.md`), its build row and an inbox row; researched SonarQube new-code gate, Codecov patch, diff-cover, lcov / Istanbul / coverage.py report formats; found SR-BASELINE decision 3's `on_touch_scope = "function"` specified but unbuilt (`git.rs` diffs names only).
+- **Decided / left open:** Arpit ruled `scope = "all"` with a `.codelawignore` file for exemptions, and per-function coverage. Open to him: diff-scoped (recommended) vs baseline + touch — the inbox row.
+- **Mistakes:** none.
+- **Next:** Arpit's yes on diff-scoped flips W-71 to 🟢 `agent`.
+
 ## 2026-10-26 — W-49 closed, W-70 filed (queue housekeeping)  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** Arpit: *"create a separate work item for example app"* for W-49; he publishes the new npm packages himself.

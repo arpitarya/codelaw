@@ -26,16 +26,20 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-38 itself; W-64 waits on it | |
 | 🔴 **Reserve and publish the 16 Fux index package names** (npm `@codelaw/rules-<name>-fux-index` ×10 by hand, then `npm-trust.sh`; PyPI `codelaw-rules-<name>-fux-index` ×6 by `twine`, then a trusted publisher each) — built by CI as the `fux-index` artifact; RELEASING.md §"The optional Fux index packages"; also ratify `fux-engine` as D-34 in `DEPENDENCIES.md` — [W-34](open/W-34-fux-index-packages.md) | 2026-10-26 |
 | ↳ **blocks:** W-34 itself | |
+| 🔴 **Diff-scoped or baseline** for the new-code test rules: judge only functions the change set adds or edits (recommended), or fire everywhere and freeze legacy in a baseline — [W-71](open/W-71-tests-for-new-code.md) | 2026-10-26 |
+| ↳ **blocks:** W-71 itself | |
 
 ---
 
 ## Open items
 
-### build (10)
+### build (12)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
 🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, CI, `init` prints not installs); left: reserve the 16 names and publish them by hand (npm ten, PyPI six), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
+
+🔴 **W-71** `arpit` A unit test for every new or edited function (JS, TS, Python): `graph/untested-function`, `graph/function-coverage` (lcov); left: Arpit confirms diff-scoped, then an agent builds it. Filed by Arpit (Cowork). [detail](open/W-71-tests-for-new-code.md)
 
 🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); left: DoD 5 on CI's Windows legs and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
@@ -48,6 +52,8 @@ here. Read that record before changing anything below it.
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: patch tree-sitter-scss (`@if not` is an `ERROR`), CSS rules onto trees, a pinned corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-70** `agent` Example apps for the dev-server plugins: one each for real Vite, webpack, Rspack, Next.js (a `debugger` in the overlay within a second; Rspack runs the webpack plugin unchanged), via a CI job that installs the hosts (L11). Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
+
+🟢 **W-73** `agent` Configurable approved calls: 5 HTML-sink rules take a `sanitizers` list (extend or replace the built-in; name + import source); `js/use-instead`, `py/use-instead` for wrappers. Filed by Arpit (Cowork). [detail](open/W-73-configurable-approved-calls.md)
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
