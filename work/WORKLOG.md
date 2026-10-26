@@ -72,6 +72,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** a shared `CARGO_TARGET_DIR` made cargo reuse another lane's artifacts for same-named workspace crates (one build failed on another lane's `Language::Scss`); verified with a private `RUSTFLAGS` so the fingerprints differ.
 - **Next:** merge main after W-58 and W-59 land, add `data_of`, and close DoD 3.
 
+## 2026-10-26 — W-50 closed: post-commit reminders  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-50 after W-46 landed (`2120458`).
+- **Done:** `post-commit.sh` prints the committer's exceptions expiring within 7 days and the 30-day burn-down total; test added; SR-CLI-MCP decision 11, USAGE, CHANGELOG updated; W-50 archived.
+- **Decided / left open:** the reminders live in the script, not as `post-commit.d` files, so an installed hook needs `init --git-hooks` re-run. The burn-down "delta" is `baseline history`'s total row (no new command).
+- **Mistakes:** first threshold counted lines (a one-row report is 2 lines, as is an empty one); the test caught it.
+- **Next:** none.
+
 ## 2026-10-26 — W-46 built: `codelaw exceptions` and `list_exceptions`  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** build W-46 (CLI plus MCP twin), then W-50's post-commit reminder.

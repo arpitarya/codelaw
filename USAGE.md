@@ -246,7 +246,7 @@ flowchart LR
 - **Editor:** `codelaw lsp` is a language server — diagnostics, quick fixes and formatting. The VS Code extension is built; its Marketplace listing comes later ([SR-EDITOR](records/0114_editor.md)).
 - **Pre-commit:** `codelaw init --git-hooks` installs a `pre-commit` and a `post-commit` hook in the folder git uses (`core.hooksPath` or `.git/hooks`). An existing hook is kept as `<name>.pre-codelaw` and runs first; nothing is overwritten, and deleting the file uninstalls it ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 11).
   - **`pre-commit` blocks:** it runs `codelaw fix --staged` on the files that are fully staged and re-stages them, then `codelaw check --staged` on every staged file. A partly staged file is checked but never fixed, so your unstaged hunks stay yours. Add flags to both with `CODELAW_HOOK_ARGS` (for example `--profile ci`); skip once with `git commit --no-verify`.
-  - **`post-commit` never blocks:** it prints what the scripts in `.codelaw/hooks/post-commit.d/` print and always exits 0.
+  - **`post-commit` never blocks:** it reminds you of your exceptions that expire within 7 days (`codelaw exceptions --mine --expiring 7d`) and the baseline's 30-day burn-down in one line, then prints what the scripts in `.codelaw/hooks/post-commit.d/` print, and always exits 0.
   - **By hand:** `codelaw check --staged`.
   - **The pre-commit framework** — `codelaw` must be on `PATH`:
 
