@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-26: a separate item for the example apps of the dev
 item: W-70
 filed: 2026-10-26
 filed_by: "Arpit (chat), written by Claude Code (Sonnet 5.5)"
-updated: 2026-10-26
-updated_by: "Claude Code (Sonnet 5.5)"
+updated: 2026-10-27
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -46,6 +46,18 @@ No decider ruling is recorded; the item proceeds on route 1 (no blocker, so no `
 ## Built 2026-10-26 (what is left)
 
 `examples/dev-servers/{vite,webpack,rspack,next}` (config + a one-file source each, no manifest) and `run.mjs`, the driver the `dev-servers` CI job runs per host (`vite`, `webpack`, `rspack`, `next`, `next-turbopack`) on `ubuntu-latest`, Node 22, after `package`: it installs the host plus the plugin and `@codelaw/rules-js` from the `dist` tarballs into a temp dir, takes the binary out of the linux-x64-gnu CLI tarball, starts the dev server, saves `debugger;`, and times the save to the first finding against a 1000 ms budget. **Nothing has run on a real host yet** (this machine is over the disk budget, L9, so no host was installed); host version ranges (`vite ^7`, `webpack ^5`, `webpack-dev-server ^5`, `@rspack/core ^1`, `next ^15`) are guesses to be corrected by the first CI run. Left: push, read the five jobs, fix what the real hosts disagree on, then close.
+
+## First CI run on the real hosts — run 40388001095 (2026-10-27, ubuntu-latest, Node 22)
+
+| host | installed | result |
+|---|---|---|
+| vite | `vite ^7` | ✅ terminal 111 ms, overlay websocket 106 ms |
+| next-turbopack | `next ^15` → 15.5.28 | ✅ terminal 163 ms |
+| webpack | `webpack ^5` → 5.112.2, `webpack-cli ^6`, `webpack-dev-server ^5` | ✗ the finding reached the terminal (`ERROR in src/main.js … js/no-debugger`), but no websocket message matched in 15 s |
+| rspack | `@rspack/core ^1`, `@rspack/cli ^1` | ✗ same as webpack: terminal yes (`Rspack compiled with 1 error`), websocket no — so `@codelaw/webpack-plugin` does run unchanged on Rspack (DoD 2's substance) |
+| next | `next ^15` → 15.5.28 | ✗ the watch checked Next's own output, `.next/server/app/page.js` (`js/no-unused-vars` on webpack's wrapper), and that error was all Next printed |
+
+The version ranges held: every host installed and started. Fixes (2026-10-27): the driver sends an `Origin` header on its websocket, as a browser does (webpack-dev-server 5 checks it), and on a timeout prints every websocket message type it saw; the Next.js example gets the `.gitignore` create-next-app writes (`/.next/`, `/node_modules/`), which codelaw honours without a git repository.
 
 ## Record affected
 

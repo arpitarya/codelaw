@@ -162,7 +162,10 @@ cmp -s "$work/npm.json" "$work/pypi.json" || { echo "✗ npm and PyPI disagree:"
 node -e 'const [a, b, c] = process.argv.slice(1).map(f => JSON.parse(require("fs").readFileSync(f, "utf8"))); const s = JSON.stringify(a.summary); if (s !== JSON.stringify(b) || s !== JSON.stringify(c)) { console.error("✗ an API disagrees with the CLI", s, JSON.stringify(b), JSON.stringify(c)); process.exit(1) }' \
   "$(native "$work/npm.json")" "$(native "$work/api-npm.json")" "$(native "$work/api-pypi.json")"
 # ── watch mode (SR-ARCHITECTURE decision 22a, W-44): in-process on every
-# platform, Windows included — a save is re-checked, one JSON object per run ──
+# platform, Windows included — a save is re-checked, one JSON object per run.
+# The save is undone afterwards: the win32 one-shot check below compares with
+# pypi.json, taken before it (W-44: run 40388001095 failed that compare) ──
+cp "$work/pypi/SMOKE.md" "$work/SMOKE.md.before-watch"
 (cd "$work/pypi" && VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" check --watch --format json --no-cache >"$work/watch.ndjson" 2>"$work/watch.err") &
 watch_pid=$!
 lines() { if [ -f "$work/watch.ndjson" ]; then wc -l <"$work/watch.ndjson" | tr -d ' '; else echo 0; fi; }
@@ -174,6 +177,7 @@ node -e 'const lines = require("fs").readFileSync(process.argv[1], "utf8").split
   const [a, b] = runs; const md = r => r.diagnostics.filter(d => d.file === "SMOKE.md").length;
   if (runs.length < 2 || b.watch.run !== 2 || !b.watch.changed.includes("SMOKE.md") || md(b) <= md(a)) { console.error("✗ check --watch did not re-check a save:", lines.length, "lines", lines.map(l => l.slice(0, 200))); process.exit(1) }' \
   "$(native "$work/watch.ndjson")" || { cat "$work/watch.err" >&2; exit 1; }
+cp "$work/SMOKE.md.before-watch" "$work/pypi/SMOKE.md"
 # ── Windows is one-shot (SR-ARCHITECTURE decision 21): no warm socket, so
 # `codelaw daemon` refuses with its stated message and exit 2, and
 # `--prefer-warm` runs in-process with byte-identical output ──

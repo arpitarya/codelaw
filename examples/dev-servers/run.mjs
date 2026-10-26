@@ -68,7 +68,7 @@ try {
   const waitFor = async (pred, ms, what) => {
     const t0 = Date.now();
     while (!pred()) {
-      if (Date.now() - t0 > ms) throw new Error(`timed out (${ms} ms) waiting for ${what}\n--- host output ---\n${out}`);
+      if (Date.now() - t0 > ms) throw new Error(`timed out (${ms} ms) waiting for ${what}${host.ws ? `\nwebsocket messages: ${seen.join(", ") || "none"}` : ""}\n--- host output ---\n${out}`);
       await sleep(25);
     }
   };
@@ -84,15 +84,22 @@ try {
 
   // overlay channel: the dev server's own websocket, where it has one
   let overlay = null;
+  const seen = []; // every websocket message's type, for the timeout's report
   if (host.ws) {
     const u = `ws://127.0.0.1:${host.ws.port}${host.ws.path ?? "/"}`;
-    const ws = host.ws.protocol ? new WebSocket(u, host.ws.protocol) : new WebSocket(u);
-    ws.onmessage = (e) => {
+    // A browser sends Origin; webpack-dev-server 5 refuses a socket without a
+    // valid one (Node's WebSocket sends none). Undici takes `headers` here.
+    const init = { protocols: host.ws.protocol ? [host.ws.protocol] : [], headers: { Origin: new URL(host.url).origin } };
+    const ws = new WebSocket(u, init);
+    ws.onmessage = async (e) => {
+      const text = typeof e.data === "string" ? e.data : await new Response(e.data).text();
       try {
-        const m = JSON.parse(e.data);
-        if (host.ws.match(m) && /debugger/i.test(e.data) && overlay === null) overlay = performance.now();
-      } catch { /* not JSON */ }
+        const m = JSON.parse(text);
+        seen.push(m.type);
+        if (host.ws.match(m) && /debugger/i.test(text) && overlay === null) overlay = performance.now();
+      } catch { seen.push("(not JSON)"); }
     };
+    ws.onclose = (e) => seen.push(`(closed ${e.code} ${e.reason})`);
     await new Promise((res, rej) => ((ws.onopen = res), (ws.onerror = () => rej(new Error(`websocket ${u} failed`)))));
   }
 

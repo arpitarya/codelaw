@@ -1,0 +1,3 @@
+# as create-next-app writes it: the build output and the installs are not source
+/.next/
+/node_modules/
