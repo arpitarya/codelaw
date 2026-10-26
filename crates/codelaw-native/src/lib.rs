@@ -14,6 +14,7 @@ mod css_atrules;
 mod css_declarations;
 mod css_media;
 mod css_misc;
+mod css_modules;
 mod css_selectors;
 mod css_syntax;
 mod css_values;
@@ -222,6 +223,9 @@ static HTML_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::html("html/m
 
 /// Every native rule; ids are unique, order doesn't matter.
 static REGISTRY: &[&dyn NativeRule] = &[
+    &css_modules::ClassNaming,
+    &css_modules::ComposesValid,
+    &css_modules::NoGlobal,
     &scss_rules::AtExtendNoMissingPlaceholder,
     &scss_rules::AtIfNoNull,
     &scss_rules::AtMixinPattern,

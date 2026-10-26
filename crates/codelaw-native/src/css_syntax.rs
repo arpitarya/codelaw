@@ -54,6 +54,9 @@ pub struct Sheet {
     pub top: Vec<usize>,
     /// Read as SCSS (`//` comments blanked, Sass statements kept apart).
     pub scss: bool,
+    /// Read as a CSS Module: `@value`, `composes:`, `:export {}` and
+    /// `:import() {}` are kept apart, `:global` and `:local` are known.
+    pub module: bool,
 }
 
 impl Sheet {
@@ -262,6 +265,14 @@ struct Parser<'s> {
     src: &'s str,
     nodes: Vec<Node>,
     scss: bool,
+    module: bool,
+}
+
+/// Whether a rule prelude opens an ICSS block (`:export`, `:import("x")`),
+/// whose declarations are not CSS properties.
+fn icss_block(prelude: &str) -> bool {
+    let t = prelude.trim();
+    t == ":export" || t.starts_with(":import(") || t.starts_with(":import (")
 }
 
 /// The at-rules only Sass has. In an SCSS sheet they become `Other`
@@ -325,7 +336,8 @@ impl Parser<'_> {
             if b[i] == b'@' {
                 let name_end = ident_end(src, i + 1);
                 let (stop_at, stop) = scan(src, name_end, b.len(), b"{;}", false);
-                let sass = self.scss && SASS_AT_RULES.contains(&src[i + 1..name_end].to_ascii_lowercase().as_str());
+                let lower_name = src[i + 1..name_end].to_ascii_lowercase();
+                let sass = (self.scss && SASS_AT_RULES.contains(&lower_name.as_str())) || (self.module && lower_name == "value");
                 let mut n = Self::node(if sass { Kind::Other } else { Kind::AtRule }, start, stop_at, parent);
                 n.name = (i + 1, name_end);
                 n.params = trim(src, name_end, stop_at);
@@ -341,7 +353,7 @@ impl Parser<'_> {
             };
             let (stop_at, stop) = scan(src, i, b.len(), b";{}", custom);
             if stop == b'{' {
-                let nested = self.scss && nested_property(&src[start..stop_at]);
+                let nested = (self.scss && nested_property(&src[start..stop_at])) || (self.module && icss_block(&src[start..stop_at]));
                 let mut n = Self::node(if nested { Kind::Other } else { Kind::Rule }, start, stop_at, parent);
                 n.name = trim(src, start, stop_at);
                 let id = self.push(n);
@@ -353,6 +365,9 @@ impl Parser<'_> {
             let mut n = Self::node(if found == b':' { Kind::Decl } else { Kind::Other }, start, stop_at, parent);
             if found == b':' {
                 n.name = trim(src, start, colon);
+                if self.module && src[n.name.0..n.name.1].eq_ignore_ascii_case("composes") {
+                    n.kind = Kind::Other;
+                }
                 let (vs, ve) = trim(src, colon + 1, stop_at);
                 n.params = (vs, ve);
                 if !src[start..].starts_with("--") {
@@ -397,7 +412,7 @@ impl Parser<'_> {
                 let (kids, close) = self.block(at + 1, Some(id));
                 // A Sass nested property block (`font: { family: x }`) holds
                 // property suffixes, not declarations: its statements are not kept.
-                let nested = self.scss && self.nodes[id].kind == Kind::Other && !self.src[self.nodes[id].start..].starts_with('@');
+                let nested = (self.scss || self.module) && self.nodes[id].kind == Kind::Other && !self.src[self.nodes[id].start..].starts_with('@');
                 let kids = if nested {
                     self.nodes.truncate(id + 1);
                     Vec::new()
@@ -425,19 +440,25 @@ impl Parser<'_> {
     }
 }
 
+#[cfg(test)]
 pub fn parse(src: &str) -> Sheet {
-    let mut p = Parser { src, nodes: Vec::new(), scss: false };
+    parse_with(src, false, false)
+}
+
+/// Parse a stylesheet in a mode: SCSS (`//` comments, Sass statements) and/or
+/// CSS Module (`composes`, `@value`, ICSS blocks).
+pub fn parse_with(src: &str, scss: bool, module: bool) -> Sheet {
+    let view = if scss { scss_view(src) } else { src.to_owned() };
+    let mut p = Parser { src: &view, nodes: Vec::new(), scss, module };
     let (top, _) = p.block(0, None);
-    Sheet { nodes: p.nodes, top, scss: false }
+    Sheet { nodes: p.nodes, top, scss, module }
 }
 
 /// Parse SCSS: `//` comments are blanked first (same byte length, so every
 /// range is a range of `src`), Sass statements are kept as `Other`.
+#[cfg(test)]
 pub fn parse_scss(src: &str) -> Sheet {
-    let view = scss_view(src);
-    let mut p = Parser { src: &view, nodes: Vec::new(), scss: true };
-    let (top, _) = p.block(0, None);
-    Sheet { nodes: p.nodes, top, scss: true }
+    parse_with(src, true, false)
 }
 
 /// The byte ranges of the `//` comments of an SCSS source, each from its
@@ -484,24 +505,47 @@ pub fn scss_view(src: &str) -> String {
 }
 
 thread_local! {
-    static CACHE: RefCell<Option<(String, bool, Rc<Sheet>)>> = const { RefCell::new(None) };
+    static CACHE: RefCell<Option<(String, (bool, bool), Rc<Sheet>)>> = const { RefCell::new(None) };
 }
 
 /// The parsed sheet of a source (`scss`: read as SCSS); each file is parsed
 /// once, however many CSS rules run on it.
-pub fn sheet_for(src: &str, scss: bool) -> Rc<Sheet> {
+pub fn sheet_for(src: &str, scss: bool, module: bool) -> Rc<Sheet> {
     CACHE.with(|c| {
         let mut c = c.borrow_mut();
         if let Some((s, k, sheet)) = c.as_ref()
-            && *k == scss
+            && *k == (scss, module)
             && s == src
         {
             return sheet.clone();
         }
-        let sheet = Rc::new(if scss { parse_scss(src) } else { parse(src) });
-        *c = Some((src.to_owned(), scss, sheet.clone()));
+        let sheet = Rc::new(parse_with(src, scss, module));
+        *c = Some((src.to_owned(), (scss, module), sheet.clone()));
         sheet
     })
+}
+
+/// Whether the file a native rule checks is a CSS Module: named
+/// `*.module.css` or `*.module.scss`, or matching a glob of `[css] modules`
+/// (the `modules` option, read from `[css]`).
+pub fn is_module(ctx: &crate::NativeContext<'_>) -> bool {
+    module_path(ctx.file.path(), ctx.options.get("modules"))
+}
+
+/// [`is_module`] for a path and the `modules` option.
+pub fn module_path(path: &str, modules: Option<&serde_json::Value>) -> bool {
+    let lower = path.to_ascii_lowercase();
+    if lower.ends_with(".module.css") || lower.ends_with(".module.scss") {
+        return true;
+    }
+    let Some(globs) = modules.and_then(|v| v.as_array()) else { return false };
+    let mut b = globset::GlobSetBuilder::new();
+    for g in globs.iter().filter_map(|g| g.as_str()) {
+        if let Ok(g) = globset::GlobBuilder::new(g.trim_start_matches("./")).literal_separator(false).build() {
+            b.add(g);
+        }
+    }
+    b.build().is_ok_and(|set| set.is_match(path))
 }
 
 // ---------------------------------------------------------------------
@@ -1047,13 +1091,17 @@ macro_rules! css_rule {
                 // rules read the text, so they still run, once, on the root.
                 &["stylesheet", "ERROR"]
             }
+            /// `[css]`'s `modules` globs name the CSS Modules (W-63).
+            fn config_section(&self) -> Option<&'static str> {
+                Some("css")
+            }
             #[allow(unused_variables)]
             fn check(&self, node: codelaw_lang::SyntaxNode<'_>, $ctx: &$crate::NativeContext<'_>, $out: &mut Vec<$crate::NativeFinding>) {
                 if node.parent().is_some() {
                     return;
                 }
                 let $src: &str = $ctx.source;
-                let sheet_rc = $crate::css_syntax::sheet_for($src, $ctx.language == codelaw_core::Language::Scss);
+                let sheet_rc = $crate::css_syntax::sheet_for($src, $ctx.language == codelaw_core::Language::Scss, $crate::css_syntax::is_module($ctx));
                 let $sheet: &$crate::css_syntax::Sheet = &sheet_rc;
                 $body
             }

@@ -1,0 +1,62 @@
+@value primary: #3b82f6;
+@value gap, radius from "./tokens.module.css";
+
+.button {
+  composes: base from "./base.module.css";
+  color: primary;
+  border-radius: radius;
+}
+
+.primary {
+  composes: button;
+  background: primary;
+}
+
+.icon {
+  composes: glyph from global;
+}
+
+.unused {
+  color: red;
+}
+
+.disabled:not(.active) {
+  opacity: 0.5;
+}
+
+:global(.legacy) .wrapper {
+  margin: 0;
+}
+
+:local(.scoped) {
+  display: block;
+}
+
+.broken {
+  composes: gone from "./base.module.css";
+}
+
+:export {
+  gutter: 8px;
+  accent: primary;
+}
+
+:import("./tokens.module.css") {
+  imported-gap: gap;
+}
+
+@media (min-width: 600px) {
+  .button {
+    padding: 1rem;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

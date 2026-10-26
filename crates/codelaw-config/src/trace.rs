@@ -289,6 +289,11 @@ impl Config {
         push("deps.ignore", v, s);
         let (v, s) = root_key(&["deps", "max_snapshot_age"], |r| r.deps.max_snapshot_age.map(|d| json!(d.0)), json!(14));
         push("deps.max_snapshot_age", v, s);
+        // `[css]` (SR-PROJECT-GRAPH decision 8).
+        let (v, s) = root_key(&["css", "modules"], |r| r.css.modules.as_ref().and_then(|x| serde_json::to_value(x).ok()), json!([]));
+        push("css.modules", v, s);
+        let (v, s) = root_key(&["css", "modules_convention"], |r| r.css.modules_convention.as_ref().map(|x| json!(x)), json!("asIs"));
+        push("css.modules_convention", v, s);
         // The sections not validated yet: shown as written.
         for (name, get) in [
             ("format", (|r: &RawConfig| r.format.clone()) as fn(&RawConfig) -> Option<toml::Table>),

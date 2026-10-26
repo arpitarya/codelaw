@@ -1169,6 +1169,7 @@ dependencies = [
  "codelaw-core",
  "codelaw-lang",
  "codelaw-semantic",
+ "globset",
  "regex",
  "semver",
  "serde",

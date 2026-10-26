@@ -277,6 +277,25 @@
         }
       }
     },
+    "css": {
+      "x-codelaw-record": "SR-PROJECT-GRAPH",
+      "description": "CSS Modules: which stylesheets are modules, and how the bundler turns a class name into `styles.x`. Read by the `css-modules/*` rules and the project graph. Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "modules": {
+          "description": "Globs of CSS Module stylesheets besides `*.module.css` and `*.module.scss`, from the project root.",
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "modules_convention": {
+          "description": "css-loader's `localsConvention`: how a class such as `.btn-primary` is reached from JavaScript. `asIs`: `styles[\"btn-primary\"]`; `camelCase`: that and `styles.btnPrimary`; `camelCaseOnly`: only `styles.btnPrimary`; `dashes` and `dashesOnly`: dashes become camel case, other characters stay.",
+          "enum": ["asIs", "camelCase", "camelCaseOnly", "dashes", "dashesOnly"],
+          "default": "asIs"
+        }
+      }
+    },
     "deps": {
       "x-codelaw-record": "SR-RULE-PACKS",
       "description": "The dependency rules, `data/outdated-dependency` and `data/stale-deps-snapshot`, read against `.codelaw/deps-snapshot.json`, which `codelaw deps refresh` writes (SR-RULE-PACKS decision 15). Root config only.",

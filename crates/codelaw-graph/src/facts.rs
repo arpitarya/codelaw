@@ -195,6 +195,10 @@ pub struct FileFacts {
     /// Python: `if __name__ == "__main__":`.
     pub is_main: bool,
     pub css_classes: Vec<CssClass>,
+    /// A stylesheet's CSS Modules facts: local classes, `composes`, exports
+    /// (W-63). Read for every `.css` and `.scss` file; whether the file is a
+    /// module is the graph's question, by name and `[css] modules`.
+    pub module: Option<crate::modules::ModuleFacts>,
     /// Words that may name a CSS class (strings, attribute values).
     pub class_tokens: Vec<String>,
     /// Static prefixes of built class names (`btn-${x}`).
@@ -212,7 +216,7 @@ pub fn extract(language: Language, text: &str) -> Option<FileFacts> {
     } else {
         match language {
             Language::Python => FactLang::Python,
-            Language::Css => FactLang::Css,
+            Language::Css | Language::Scss => FactLang::Css,
             Language::Html => FactLang::Html,
             _ => return None,
         }
@@ -225,7 +229,10 @@ pub fn extract(language: Language, text: &str) -> Option<FileFacts> {
             let model = codelaw_semantic::build(language, &root, text)?;
             Extractor { text, root: node, m: &model, f: &mut f, python: lang == FactLang::Python }.run();
         }
-        FactLang::Css => css(node, text, &mut f),
+        FactLang::Css => {
+            css(node, text, &mut f);
+            f.module = Some(crate::modules::scan(text, language == Language::Scss));
+        }
         FactLang::Html => html(text, &mut f),
     }
     f.class_tokens.sort();
@@ -269,6 +276,15 @@ fn push_tokens(f: &mut FileFacts, s: &str) {
         }
         f.class_tokens.push(t.to_owned());
     }
+}
+
+/// How a read of a binding names a member other than by `.name`.
+enum Computed {
+    No,
+    Named(String, Span),
+    Names(Vec<(String, Span)>),
+    /// A computed name, a rest pattern: the binding may be read in full.
+    Escapes,
 }
 
 struct Extractor<'a> {
@@ -583,6 +599,20 @@ impl<'a> Extractor<'a> {
         let mut out = Vec::new();
         for &(s, e) in uses {
             let node = self.root.descendant_for_byte_range(s, e)?;
+            if expected.is_empty() && !self.python {
+                match self.computed_member(node) {
+                    Computed::No => {}
+                    Computed::Named(name, span) => {
+                        out.push(Member { name, span });
+                        continue;
+                    }
+                    Computed::Names(names) => {
+                        out.extend(names.into_iter().map(|(name, span)| Member { name, span }));
+                        continue;
+                    }
+                    Computed::Escapes => return None,
+                }
+            }
             let mut chain: Vec<(String, Span)> = Vec::new();
             let mut cur = node;
             while let Some(p) = cur.parent() {
@@ -620,6 +650,49 @@ impl<'a> Extractor<'a> {
         }
         out.sort_by_key(|a| a.span);
         Some(out)
+    }
+
+    /// `styles["a"]`, `styles[x]` and `const { a, b } = styles`: reads of a
+    /// binding that `.name` access does not cover (JS and TS only).
+    fn computed_member(&self, node: Node<'_>) -> Computed {
+        let Some(p) = node.parent() else { return Computed::No };
+        match p.kind() {
+            "subscript_expression" if p.child_by_field_name("object").is_some_and(|o| o.id() == node.id()) => {
+                let Some(index) = p.child_by_field_name("index") else { return Computed::Escapes };
+                match self.string_literal(index) {
+                    Some(name) => Computed::Named(name, (index.start_byte(), index.end_byte())),
+                    None => Computed::Escapes,
+                }
+            }
+            "variable_declarator" if p.child_by_field_name("value").is_some_and(|v| v.id() == node.id()) => {
+                let Some(pattern) = p.child_by_field_name("name").filter(|n| n.kind() == "object_pattern") else { return Computed::No };
+                let mut names = Vec::new();
+                for c in named_children(pattern) {
+                    match c.kind() {
+                        "shorthand_property_identifier_pattern" => names.push((self.t(c).to_owned(), (c.start_byte(), c.end_byte()))),
+                        "pair_pattern" => {
+                            let Some(key) = c.child_by_field_name("key") else { return Computed::Escapes };
+                            let name = match key.kind() {
+                                "property_identifier" => self.t(key).to_owned(),
+                                _ => match self.string_literal(key) {
+                                    Some(n) => n,
+                                    None => return Computed::Escapes,
+                                },
+                            };
+                            names.push((name, (key.start_byte(), key.end_byte())));
+                        }
+                        "object_assignment_pattern" => {
+                            let Some(left) = c.child_by_field_name("left") else { return Computed::Escapes };
+                            names.push((self.t(left).to_owned(), (left.start_byte(), left.end_byte())));
+                        }
+                        // `...rest` takes every other name: the binding escapes.
+                        _ => return Computed::Escapes,
+                    }
+                }
+                Computed::Names(names)
+            }
+            _ => Computed::No,
+        }
     }
 
     fn string_literal(&self, n: Node<'_>) -> Option<String> {

@@ -104,6 +104,19 @@ fn detect_languages(root: &Path) -> BTreeSet<Language> {
     out
 }
 
+/// Whether the repo holds a CSS Module: a `*.module.css` or `*.module.scss` file.
+fn has_css_modules(root: &Path) -> bool {
+    let walk = ignore::WalkBuilder::new(root)
+        .hidden(false)
+        .git_global(false)
+        .require_git(false)
+        .filter_entry(|e| !codelaw_config::DEFAULT_EXCLUDES.iter().any(|x| e.file_name() == *x))
+        .build();
+    walk.flatten().any(|e| {
+        e.file_type().is_some_and(|t| t.is_file()) && e.file_name().to_str().is_some_and(|n| n.to_ascii_lowercase().ends_with(".module.css") || n.to_ascii_lowercase().ends_with(".module.scss"))
+    })
+}
+
 fn depends_on(package_json: &str, name: &str) -> bool {
     let Ok(v) = serde_json::from_str::<serde_json::Value>(package_json) else { return false };
     ["dependencies", "devDependencies", "peerDependencies"].iter().any(|k| v.get(k).and_then(|d| d.get(name)).is_some())
@@ -128,6 +141,7 @@ fn presets(packs: &BTreeSet<&str>, languages: &BTreeSet<Language>) -> Vec<String
             "html" => out.push("codelaw:html/recommended".into()),
             "css" => out.push("codelaw:css/recommended".into()),
             "scss" => out.push("codelaw:scss/recommended".into()),
+            "css-modules" => out.push("codelaw:css-modules/recommended".into()),
             "python" => out.push("codelaw:py/recommended".into()),
             "data" => {
                 out.push("codelaw:data/recommended".into());
@@ -245,7 +259,11 @@ pub fn init(args: InitArgs) -> ExitCode {
 
     let languages = detect_languages(&root);
     let package_json = std::fs::read_to_string(root.join("package.json")).ok();
-    let wanted = packs_for(&languages, package_json.as_deref());
+    let mut wanted = packs_for(&languages, package_json.as_deref());
+    // CSS Modules are a bundler feature: `*.module.*` files add the npm-only pack.
+    if has_css_modules(&root) {
+        wanted.insert("css-modules");
+    }
     let has_npm = package_json.is_some();
     let has_pypi = root.join("pyproject.toml").is_file();
 
@@ -454,6 +472,20 @@ mod tests {
         assert_eq!(from_dep.iter().copied().collect::<Vec<_>>(), ["css", "js", "scss"]);
         let langs: BTreeSet<Language> = [Language::Scss].into();
         assert_eq!(presets(&from_files, &langs), ["codelaw:css/recommended", "codelaw:scss/recommended"]);
+    }
+
+    #[test]
+    fn module_stylesheets_add_the_css_modules_pack() {
+        let dir = std::env::temp_dir().join(format!("codelaw-init-modules-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("src")).unwrap();
+        std::fs::write(dir.join("src/a.css"), "a { color: red }\n").unwrap();
+        assert!(!has_css_modules(&dir));
+        std::fs::write(dir.join("src/Button.module.SCSS"), ".a { color: red }\n").unwrap();
+        assert!(has_css_modules(&dir));
+        let packs: BTreeSet<&str> = ["css", "css-modules"].into();
+        assert_eq!(presets(&packs, &[Language::Css].into()), ["codelaw:css/recommended", "codelaw:css-modules/recommended"]);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

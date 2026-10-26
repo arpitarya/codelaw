@@ -1,0 +1,5 @@
+extends = ["codelaw:css/recommended", "codelaw:css-modules/recommended"]
+preview = true
+
+[format]
+check = false

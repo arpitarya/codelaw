@@ -24,7 +24,7 @@ codelaw init --no-install
 # 3. Until the packs are published, link them from the clone:
 #    the npm packs into node_modules/, the PyPI-only ones where a Python install would put them
 mkdir -p node_modules/@codelaw .codelaw-packs
-for p in js ts react node stencil html css scss data tanstack-query redux-toolkit security-js security-ts security-html; do
+for p in js ts react node stencil html css scss css-modules data tanstack-query redux-toolkit security-js security-ts security-html; do
   ln -s "$OLDPWD/codelaw/packs/$p" "node_modules/@codelaw/rules-$p"
 done
 for p in python security-python; do
@@ -180,7 +180,7 @@ extends = ["codelaw:js/size", "codelaw:py/size"]
 - **An existing codebase:** `codelaw baseline add --rule js/max-lines` keeps today's long files as exceptions, and a new long file fails.
 - **Every fix is yours:** splitting a file or a function changes its structure, so all six are `manual`. The rule's page, `codelaw explain js/max-lines`, lists the steps.
 
-**HTML and CSS.** The `html/size` and `css/size` presets are opt-in too: `codelaw:html/size` and `codelaw:css/size` turn on a line limit per file. HTML and CSS have no prior art in stylelint, html-validate or Biome, so the defaults are codelaw's own. The stylesheet limit covers `.css` and, as those languages arrive, SCSS and CSS Modules; a `<style>` or `<script>` inside a page is part of that page's count, never a file of its own.
+**HTML and CSS.** The `html/size` and `css/size` presets are opt-in too: `codelaw:html/size` and `codelaw:css/size` turn on a line limit per file. HTML and CSS have no prior art in stylelint, html-validate or Biome, so the defaults are codelaw's own. The stylesheet limit covers `.css`, `.scss` and CSS Module files; a `<style>` or `<script>` inside a page is part of that page's count, never a file of its own.
 
 | rule | default | options |
 |---|---|---|
@@ -195,6 +195,22 @@ extends = ["codelaw:html/size", "codelaw:css/size"]
 ```
 
 A line holding code and a comment counts as code. A finding names the first line over the limit and carries the count: `412 lines (max 300; blank lines and comments not counted)`. The fix is manual: split the file.
+
+### SCSS and CSS Modules
+
+`.scss` is a CSS dialect: `codelaw check` and `codelaw format` read it, and the `css/*` rules run on it. Install `@codelaw/rules-css` and `@codelaw/rules-scss` (`codelaw init` does, for `.scss` files or `sass` in `package.json`) and extend `codelaw:css/recommended` and `codelaw:scss/recommended`; `codelaw:scss/strict` adds Dart Sass's module migrations (`@import` to `@use`, `map-get()` to `map.get()`, `/` to `math.div()`), naming patterns and a nesting limit. The indented `.sass` syntax and Less are not read.
+
+A stylesheet named `*.module.css` or `*.module.scss` is a CSS Module, and so is one matching `[css] modules`. `@codelaw/rules-css-modules` (npm only) joins its classes with the JavaScript and TypeScript that read them:
+
+```toml
+extends = ["codelaw:css/recommended", "codelaw:css-modules/recommended"]
+
+[css]
+modules = ["src/**/*.styles.css"]    # besides *.module.css and *.module.scss
+modules_convention = "camelCase"     # css-loader's localsConvention: .btn-primary is also styles.btnPrimary
+```
+
+`css-modules/no-unused-class` reports a class no file reads (in the stylesheet; `codelaw fix --unsafe` deletes the rule), and `css-modules/no-undefined-class` reports `styles.x` where the module has no `.x` (in the JS or TS file). A module read by a computed name (`styles[name]`), spread, or passed to a function is never reported, and neither is one no file imports ([SR-PROJECT-GRAPH](records/0103_project-graph.md) decision 8).
 
 ---
 

@@ -1,12 +1,12 @@
 //! `graph:` queries (SR-PROJECT-GRAPH decision 6), their findings and fixes,
 //! and the two debug commands: `graph refs` and `graph why-unused`.
 
-use crate::facts::{Decl, DeclKind, FactLang, Span, SpecForm};
+use crate::facts::{Decl, DeclKind, FactLang, ImportKind, Span, SpecForm};
 use crate::link::{Graph, Module, Use};
 use crate::resolve::{Target, is_node_builtin, package_name};
 use codelaw_core::{Language, TextEdit};
 use serde_json::Value;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// A query a `graph:` block names.
 #[derive(Clone, Debug, PartialEq)]
@@ -17,6 +17,10 @@ pub enum Query {
     UnusedCssClasses,
     /// `deprecated: registry` (SR-BASELINE decision 6).
     DeprecatedUsage,
+    /// `module: { classes: unused }`: a class of a CSS Module no importer reads.
+    UnusedModuleClasses,
+    /// `module: { classes: undefined }`: `styles.x` where the module has no `.x`.
+    UndefinedModuleClasses,
     /// `import: { form: [...], resolves | declared | published: false }`:
     /// the `node/` import rules.
     Imports { forms: Vec<SpecForm>, check: ImportCheck },
@@ -87,7 +91,7 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         Some(other) => return Err(format!("`certainty_from: {other}` must be `module.dynamic`")),
     };
     for k in g.keys() {
-        if !["symbol", "unless", "when", "class", "deprecated", "import", "certainty_from"].contains(&k.as_str()) {
+        if !["symbol", "unless", "when", "class", "deprecated", "import", "module", "certainty_from"].contains(&k.as_str()) {
             return Err(format!("unknown `graph:` key `{k}`"));
         }
     }
@@ -128,6 +132,12 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
             return Err("`graph: class:` queries need `defined_in: css`".into());
         }
         Query::UnusedCssClasses
+    } else if let Some(module) = g.get("module") {
+        match module.get("classes").and_then(Value::as_str) {
+            Some("unused") => Query::UnusedModuleClasses,
+            Some("undefined") => Query::UndefinedModuleClasses,
+            _ => return Err("`graph: module:` takes `classes: unused` or `classes: undefined`".into()),
+        }
     } else if g.get("deprecated").is_some() {
         Query::DeprecatedUsage
     } else if let Some(imp) = g.get("import") {
@@ -158,7 +168,7 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         };
         Query::Imports { forms, check }
     } else {
-        return Err("`graph:` names no query (`symbol:`, `class:`, `import:` or `deprecated:`)".into());
+        return Err("`graph:` names no query (`symbol:`, `class:`, `module:`, `import:` or `deprecated:`)".into());
     };
     let mut gf = GraphFix::default();
     match fix {
@@ -357,6 +367,8 @@ pub fn run(rule: &GraphRule, graph: &Graph, languages: &[Language]) -> Vec<Graph
         // registry and the baseline (SR-BASELINE; the `deprecated` module).
         Query::DeprecatedUsage => Vec::new(),
         Query::Imports { forms, check } => imports(graph, languages, forms, *check),
+        Query::UnusedModuleClasses => unused_module_classes(rule, graph, languages),
+        Query::UndefinedModuleClasses => undefined_module_classes(graph, languages),
     }
 }
 
@@ -498,6 +510,144 @@ fn unused_css(rule: &GraphRule, graph: &Graph, languages: &[Language]) -> Vec<Gr
                 uncertain: None,
                 message: None,
             });
+        }
+    }
+    out
+}
+
+/// The stylesheets of the project that are CSS Modules, with their facts.
+fn css_modules(graph: &Graph) -> impl Iterator<Item = (&Module, &crate::modules::ModuleFacts)> {
+    graph.modules.values().filter(|m| m.facts.lang == Some(FactLang::Css) && graph.config.is_css_module(&m.path)).filter_map(|m| m.facts.module.as_ref().map(|f| (m, f)))
+}
+
+/// What the JavaScript and TypeScript files of the project read from each
+/// CSS Module: `Some(names)`, or `None` when some importer may read any name
+/// (`styles[name]`, `{ ...rest } = styles`, `fn(styles)`). A module no file
+/// imports is absent: nothing is known of how it is used.
+fn module_readers(graph: &Graph) -> BTreeMap<String, Option<BTreeSet<String>>> {
+    let mut out: BTreeMap<String, Option<BTreeSet<String>>> = BTreeMap::new();
+    for m in graph.modules.values() {
+        if m.facts.lang != Some(FactLang::Js) {
+            continue;
+        }
+        for imp in &m.facts.imports {
+            for t in resolve_from(graph, &m.path, &imp.source) {
+                let Target::File(file) = t else { continue };
+                if !graph.modules.get(&file).is_some_and(|c| c.facts.lang == Some(FactLang::Css) && graph.config.is_css_module(&file)) {
+                    continue;
+                }
+                let entry = out.entry(file).or_insert_with(|| Some(BTreeSet::new()));
+                match (&imp.kind, entry.as_mut()) {
+                    // `import "./a.module.css"` reads no class.
+                    (ImportKind::SideEffect, _) => {}
+                    (ImportKind::Named(n), Some(set)) => {
+                        set.insert(n.clone());
+                    }
+                    (_, Some(set)) => match &imp.members {
+                        Some(members) => set.extend(members.iter().map(|x| x.name.clone())),
+                        None => *entry = None,
+                    },
+                    (_, None) => {}
+                }
+            }
+        }
+    }
+    out
+}
+
+/// Every class name of a module a `composes: x from "./m.module.css"` in any
+/// stylesheet names.
+fn composed_from(graph: &Graph) -> BTreeMap<String, BTreeSet<String>> {
+    let mut out: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    for m in graph.modules.values() {
+        let Some(f) = &m.facts.module else { continue };
+        for c in &f.composes {
+            let target = match &c.from {
+                crate::modules::ComposeFrom::Local => Some(m.path.clone()),
+                crate::modules::ComposeFrom::Global => None,
+                crate::modules::ComposeFrom::File(spec) => graph.resolver.resolve_js(&m.path, spec).into_iter().find_map(|t| if let Target::File(p) = t { Some(p) } else { None }),
+            };
+            if let Some(t) = target {
+                out.entry(t).or_default().extend(c.names.iter().map(|n| n.0.clone()));
+            }
+        }
+    }
+    out
+}
+
+fn unused_module_classes(rule: &GraphRule, graph: &Graph, languages: &[Language]) -> Vec<GraphFinding> {
+    let readers = module_readers(graph);
+    let composed = composed_from(graph);
+    let convention = graph.config.css_modules_convention.as_str();
+    let removes = rule.fix.otherwise.contains(&Primitive::RemoveRule);
+    let mut out = Vec::new();
+    for (m, f) in css_modules(graph) {
+        if f.incomplete || !languages_match(&m.path, languages) || graph.is_kept_path(&m.path) {
+            continue;
+        }
+        // No reader is known, or one may read any name: stay silent.
+        let Some(Some(read)) = readers.get(&m.path) else { continue };
+        let composed_here = composed.get(&m.path);
+        for c in &f.classes {
+            let used = crate::modules::js_names(&c.name, convention).iter().any(|n| read.contains(n))
+                || read.contains(&c.name)
+                || composed_here.is_some_and(|s| s.contains(&c.name));
+            if used {
+                continue;
+            }
+            let edits = match (removes, c.rule) {
+                (true, Some((a, b))) => vec![TextEdit::delete(a, b)],
+                _ => Vec::new(),
+            };
+            out.push(GraphFinding {
+                file: m.path.clone(),
+                span: c.span,
+                captures: vec![("CLASS".into(), c.name.clone()), ("FILE".into(), file_name(&m.path).into())],
+                edits,
+                uncertain: None,
+                message: None,
+            });
+        }
+    }
+    out
+}
+
+fn undefined_module_classes(graph: &Graph, languages: &[Language]) -> Vec<GraphFinding> {
+    let convention = graph.config.css_modules_convention.as_str();
+    let mut out = Vec::new();
+    for m in graph.modules.values() {
+        if m.facts.lang != Some(FactLang::Js) || !languages_match(&m.path, languages) {
+            continue;
+        }
+        for imp in &m.facts.imports {
+            let reads: Vec<(String, Span)> = match (&imp.kind, &imp.members) {
+                (ImportKind::Named(n), _) => vec![(n.clone(), imp.span)],
+                (ImportKind::SideEffect, _) | (_, None) => continue,
+                (_, Some(members)) => members.iter().map(|x| (x.name.clone(), x.span)).collect(),
+            };
+            for t in resolve_from(graph, &m.path, &imp.source) {
+                let Target::File(file) = t else { continue };
+                let Some(c) = graph.modules.get(&file).filter(|c| c.facts.lang == Some(FactLang::Css) && graph.config.is_css_module(&file)) else { continue };
+                let Some(f) = c.facts.module.as_ref().filter(|f| !f.incomplete) else { continue };
+                let mut defined: BTreeSet<String> = f.exports.iter().cloned().collect();
+                for class in &f.classes {
+                    defined.extend(crate::modules::js_names(&class.name, convention));
+                }
+                for (name, span) in &reads {
+                    // `default`, and the members every object has, are not classes.
+                    if defined.contains(name) || matches!(name.as_str(), "default" | "__esModule" | "toString" | "constructor" | "hasOwnProperty") {
+                        continue;
+                    }
+                    out.push(GraphFinding {
+                        file: m.path.clone(),
+                        span: *span,
+                        captures: vec![("CLASS".into(), name.clone()), ("FILE".into(), file_name(&file).into())],
+                        edits: Vec::new(),
+                        uncertain: None,
+                        message: None,
+                    });
+                }
+            }
         }
     }
     out

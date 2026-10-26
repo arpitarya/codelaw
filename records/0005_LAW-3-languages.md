@@ -73,7 +73,7 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
    | YAML | multi-document files | `.yml` `.yaml` |
    | TOML | | `.toml` |
    | Markdown | YAML frontmatter | `.md` `.mdx` (MDX: Markdown parts only) |
-   | CSS | SCSS (a dialect: `$variables`, nesting, `@mixin`/`@include`, `@use`, `//` comments; the `.sass` indented syntax and Less are not) | `.css`, `.scss` |
+   | CSS | CSS Modules syntax (`composes`, `:global`, `:local`, `:export`, `@value`) in `*.module.css` and `*.module.scss`, read as a mode of the same grammar; SCSS (a dialect: `$variables`, nesting, `@mixin`/`@include`, `@use`, `//` comments; the `.sass` indented syntax and Less are not) | `.css`, `.scss` |
    | HTML | inline `<script>`, `<style>` and `style=""` are linted and formatted as JS/TS and CSS ([SR-LINTER](0106_linter.md) decision 3) | `.html` `.htm` |
 
 2. **Independently.** A repo containing only one language needs no configuration about the other eight. It also needs no runtime for them: `pip install codelaw` in a Python-only repo pulls no Node, and `npm i -D codelaw` in a JS-only repo pulls no Python. The same holds for rules: a Python-only repo gets its rule packs from PyPI (`codelaw-rules-python`, `codelaw-rules-data`) and a JS-only repo gets them from npm ([L6](0008_LAW-6-python-and-node-packages.md) decision 11).

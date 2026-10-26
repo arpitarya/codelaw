@@ -1,0 +1,18 @@
+$gap: 1rem;
+
+.panel {
+  padding: $gap;
+
+  &-title {
+    font-weight: bold;
+  }
+
+  // Sass line comment
+  &:hover {
+    color: red;
+  }
+}
+
+.old {
+  color: gray;
+}

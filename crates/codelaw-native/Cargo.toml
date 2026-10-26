@@ -10,6 +10,8 @@ codelaw-core.workspace = true
 codelaw-lang.workspace = true
 codelaw-semantic.workspace = true
 regex.workspace = true
+# `[css] modules` globs (W-63): the same glob crate the walker uses (D-17).
+globset.workspace = true
 # `data/outdated-dependency` (SR-RULE-PACKS decision 15): npm versions, the
 # snapshot, and the lockfiles. All MIT OR Apache-2.0, already in the tree.
 semver.workspace = true

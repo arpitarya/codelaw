@@ -9,8 +9,10 @@ date: 2026-10-18
 feature: "cross-file analysis"
 owns:
   - crates/codelaw-graph
+  - fixtures/css-modules
+  - crates/codelaw-cli/tests/css_modules.rs
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-24T12:00:00Z
+timestamp: 2026-10-26T18:00:00Z
 content_sha: ""
 ---
 
@@ -85,7 +87,7 @@ Every rule so far reads one file at a time. Unused exports, unused dependencies,
 | Node | From |
 |---|---|
 | **Workspace / package** | `package.json` `workspaces`, `pnpm-workspace.yaml`; `[tool.uv.workspace]`; any folder with its own `package.json` or `pyproject.toml` under the configured roots |
-| **Module** | Each JS/TS/Python file; Markdown files as link targets |
+| **Module** | Each JS/TS/Python file; Markdown files as link targets; a CSS Module stylesheet with its local classes (decision 8) |
 | **Symbol** | Each top-level declaration: function, class, const/let, type, interface, enum, and Python module-level def/class/assignment |
 
 | Edge | Meaning |
@@ -96,6 +98,7 @@ Every rule so far reads one file at a time. Unused exports, unused dependencies,
 | `declares-dependency` | package → external package (from the manifests) |
 | `links` | Markdown → file (relative links); HTML → file (`<script src>`, `<link href>`, `<img src>`) |
 | `uses-class` | HTML / JSX / TSX → CSS class selector |
+| `reads-class` | JS / TS → a class of the CSS Module it imports: `styles.x`, `styles["x"]`, `{ x } = styles`, `import { x }` (decision 8) |
 
 #### 2. Resolution, without a type checker
 
@@ -224,6 +227,19 @@ packages/legacy/src/plugins.py:14:1  info  graph/no-unused-exports  `register` l
 
 1 error, 1 info · 2 suggestions (`codelaw fix --unsafe` or review with `--dry-run`)
 ```
+
+#### 8. Stylesheet modules (CSS Modules)
+
+*Ruled by Arpit, 2026-10-26 (W-63): "The CSS pack should work with SCSS, and CSS modules as well", and "Create separate packages for SCSS and CSS modules".*
+
+- **A CSS Module** is a `.css` or `.scss` file named `*.module.css` or `*.module.scss`, or matching `[css] modules` (globs from the project root; root config only). Facts are read for every stylesheet from its text — not from a tree, because tree-sitter-scss cannot read all modern Sass and a class it missed would be reported as undefined — and the graph decides by name and config whether the file is a module.
+- **What a module holds:** its local classes (`:global(.x)` and a bare `:global` switch leave scope, `:local` returns; `&-suffix` is named from a parent that is one plain class; classes inside `@keyframes`, comments, strings and `url()` are not classes), each `composes: a b [from "./f.module.css" | global]`, and what it exports to JavaScript, the `:export` keys and the `@value` names.
+- **What reads it:** an import of a module stylesheet binds its classes as members: `styles.x`, `styles["x"]`, `const { x, y: z } = styles` and `import { x } from "./a.module.css"`. A `composes: a from "./b.module.css"` is a read of `b`'s `.a`, and `composes: a` one of this file's.
+- **Two queries,** `graph: { module: { classes: unused } }` (reported in the stylesheet, at the class; fix `remove-rule` when the class is its rule's only selector) and `graph: { module: { classes: undefined } }` (reported in the JS or TS file, at the name). They back `css-modules/no-unused-class` and `css-modules/no-undefined-class`.
+- **Never a guess.** A module read by a computed name (`styles[name]`, a template), spread, rest-destructured or passed to a function is *dynamic*: `no-unused-class` reports nothing for it. A module no file imports is unjudged. A module whose class names could not be worked out (interpolated selector, `&-suffix` on a selector list) is *incomplete*: neither query judges it.
+- **The bundler's names.** `[css] modules_convention` is css-loader's `localsConvention` (`asIs`, `camelCase`, `camelCaseOnly`, `dashes`, `dashesOnly`): `.btn-primary` is `styles["btn-primary"]` under `asIs` and also `styles.btnPrimary` under `camelCase`; both queries compare through it.
+- **Per-file rules** (`css-modules/composes-valid`, `class-naming`, `no-global`) are `native:` rules of the `css-modules` pack; `composes-valid` reads the file a `composes` points at through the project view ([SR-ARCHITECTURE](0108_architecture.md) decision 15b). The `css/*` rules read a module stylesheet in a *module mode* and report none of its syntax (`@value`, `composes`, `:export`, `:import()`, `:global`, `:local`).
+- **Not built:** the graph does not follow `composes` through an `@import`, a `@value … from` is read as an export only, and a module imported only from HTML or a template is unjudged.
 
 ### Consequences
 
