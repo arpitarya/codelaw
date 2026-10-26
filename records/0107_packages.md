@@ -15,6 +15,7 @@ owns:
   - scripts/version.py
   - scripts/package.py
   - scripts/build-packs.py
+  - scripts/fux-index.py
   - scripts/smoke.sh
   - scripts/staging-index.py
   - scripts/law-gate.py
@@ -42,6 +43,8 @@ content_sha: ""
 | npm | `@codelaw/vite-plugin`, `@codelaw/webpack-plugin`, `@codelaw/next` | the dev-server plugins: codelaw's findings in Vite's, webpack's, Rspack's and Next.js's overlay and terminal; each spawns the `codelaw` binary and lints nothing itself |
 | npm | `@codelaw/rules-<name>` × 13 | a rule pack (`js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `data`, `tanstack-query`, `redux-toolkit`, `security-js`, `security-ts`, `security-html`): rules, presets, data tables; no code, no dependencies |
 | PyPI | `codelaw-rules-<name>` × 9 | a rule pack (`js`, `react`, `html`, `css`, `python`, `data`, `security-js`, `security-html`, `security-python`) as one pure `py3-none-any` wheel; a pack on npm too holds the same files as there |
+| npm | `@codelaw/rules-<name>-fux-index` × 10 | an optional Fux index of one pack's rules (decision 14): data only, never installed by default; the four security packs get theirs with their first rule |
+| PyPI | `codelaw-rules-<name>-fux-index` × 6 | the same, as one pure `py3-none-any` wheel |
 | VS Code Marketplace + Open VSX | `codelaw.codelaw` | LSP client ([SR-EDITOR](0114_editor.md)) |
 
 ```mermaid
@@ -172,12 +175,19 @@ The decider asked for a record of what goes into which package, under the naming
     - It is bumped in a commit of its own. The MSRV stays `Cargo.toml`'s `rust-version`.
     - **The MSRV is the dependencies' floor, and informational:** `rust-version = "1.97"` because the pinned `ruff_*` 0.0.18 crates declare 1.97 (the highest `rust-version` in `Cargo.lock`; `cargo` refuses an older compiler). It promises `cargo install` users a compiler that builds codelaw; no release input reads it. `ci.yml`'s `msrv` job runs `cargo +<rust-version> check --workspace --all-targets --locked`, so the number stays true. Raise it whenever a dependency raises its own (W-27, 2026-10-24; it said 1.85 before, which no build could pass).
 
+14. **The optional Fux index packages** ([L6](0008_LAW-6-python-and-node-packages.md) decision 12; W-34). One per pack that holds rules, on the registries the pack is on: ten npm tarballs and six wheels today. **Built by `scripts/fux-index.py`, in CI only,** after `package.py assemble`:
+    - **Fux is pinned** (`FUX_VERSION`, `fux-engine`, MIT; [DEPENDENCIES.md](../DEPENDENCIES.md)) and the script refuses any other `fux`; CI installs exactly that version in a throwaway venv. Nothing in codelaw's engine, its packages or its tests imports or runs Fux.
+    - **A segment is built from `packs/<name>/rules/`** in a scratch repository whose root is the pack's (`fux setup`, `fux ingest --no-fetch`, `fux pack`), so a rule's id is `file:rules/<path>`, a path inside the installed pack and the one Fux reads in place. It is **built twice, in two fresh folders, and the build fails if the two differ.**
+    - **Packed with `package.py`'s own builders** (`pack_tarball`, `wheel_for_pack`, which take the `-fux-index` suffix): an npm package holds the segment at its root, a wheel holds it as the import package `codelaw_rules_<name>_fux_index` (no `__init__.py`), each with `LICENSE` and a `README.md`. The manifest's `content` names the pack on the registries it is on.
+    - **Output is `dist/fux-index/{npm,pypi,SHA256SUMS}`, never `dist/npm` or `dist/pypi`:** `publish.yml` uploads those two folders whole and its npm preflight demands a trusted publisher for every tarball, so an index package that is not reserved yet would stop the release. `package.py check` does not know them; `scripts/fux-index.py check dist` refuses a wrong name, version or dependency, a manifest that disagrees with its shards or with the pack it indexes, differing npm and PyPI copies, and one in the release set. `ci.yml`'s `package` job runs both and uploads `fux-index/` as its own artifact; `publish.yml` does not touch it until the decider reserves the names (`RELEASING.md`).
+
 ### Consequences
 
 - **One binary is larger than a modular install,** but there's nothing to mismatch and nothing to download later.
 - **Twenty crates add some build-graph overhead,** but they make the layering checkable and keep compile times incremental.
 - **Twenty-two pack packages publish with every release** (thirteen on npm, nine on PyPI), built by one job from `packs/`.
 - **A release costs one CI run, not a rebuild** (decision 11): `publish.yml` only uploads, so a release takes as long as its slowest upload. The price is that a release can only be cut from a commit whose `ci.yml` run still holds its `dist` artifact (30 days).
+- **Sixteen index packages ride along unpublished** (decision 14) until the decider reserves their names; the release does not wait on them and does not upload them.
 - **Withdrawal is manual** (decision 12), so L6 decision 9's *"everything already published is yanked or deprecated"* depends on one person acting — not ungated, but not automatic.
 - **CI's `test` job sets `CODELAW_REQUIRE_NETWORK_FENCE=1`,** so on its Linux runner the L5 network fence ([SR-LAW-5](0007_LAW-5-no-model-in-the-engine.md)) fails instead of skipping when no fence can be raised. Its `lint` job runs the work-system checks (`scripts/check-open-work-inbox.py`, `scripts/check-work-system.py`), so a malformed queue row or a lost `W-nn` fails CI ([SR-WORK-OPEN-QUEUE](0051_WORK-open-queue.md)).
 - **The first npm publish of each package is by hand,** because npm binds a trusted publisher only to a package that exists ([`RELEASING.md`](../RELEASING.md)). The split of 2026-10-24 adds four such names (`@codelaw/rules-ts`, `-react`, `-node`, `-stencil`) and one PyPI project (`codelaw-rules-react`), and removes `@codelaw/rules-python` from npm ([W-31](../archive/open/W-31-registry-pack-split.md)); W-32 adds two more npm names, `@codelaw/rules-tanstack-query` and `@codelaw/rules-redux-toolkit`, each published by hand once and then bound to trusted publishing (`scripts/npm-trust.sh`); W-53 adds three, `@codelaw/rules-security-js`, `-security-ts` and `-security-html`, the same way.

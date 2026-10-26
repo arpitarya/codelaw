@@ -158,10 +158,11 @@ def base_manifest(name: str, v: str, description: str) -> dict:
     }
 
 
-def pack_manifest(name: str, v: str) -> dict:
-    """A rule pack's package.json (decision 9)."""
-    m = base_manifest(f"@codelaw/rules-{name}", v, pack_meta(name)["description"])
-    m["keywords"] = ["codelaw", "codelaw-pack", "lint-rules"]
+def pack_manifest(name: str, v: str, suffix: str = "", description: str = "") -> dict:
+    """A rule pack's package.json (decision 9). `suffix` is `-fux-index` for the
+    optional index package beside a pack (L6 decision 12, `scripts/fux-index.py`)."""
+    m = base_manifest(f"@codelaw/rules-{name}{suffix}", v, description or pack_meta(name)["description"])
+    m["keywords"] = ["codelaw", "codelaw-pack", "lint-rules"] + (["fux", "fux-index"] if suffix else [])
     return m
 
 
@@ -210,12 +211,12 @@ def stage_pack(name: str, stage: pathlib.Path) -> pathlib.Path:
     return d
 
 
-def pack_tarball(name: str, v: str, src: pathlib.Path, dest: pathlib.Path) -> pathlib.Path:
+def pack_tarball(name: str, v: str, src: pathlib.Path, dest: pathlib.Path, suffix: str = "", description: str = "") -> pathlib.Path:
     """`@codelaw/rules-<name>` as an npm tarball: `package/` is the staged folder plus
     its package.json. Written here, not by `npm pack`, so it is byte-for-byte the
     same wherever it is built: fixed mtimes and modes, sorted entries, gzip mtime 0."""
     entries = [(f.relative_to(src).as_posix(), f.read_bytes()) for f in src.rglob("*") if f.is_file()]
-    entries.append(("package.json", (json.dumps(pack_manifest(name, v), indent=2) + "\n").encode("utf-8")))
+    entries.append(("package.json", (json.dumps(pack_manifest(name, v, suffix, description), indent=2) + "\n").encode("utf-8")))
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w", format=tarfile.PAX_FORMAT) as tar:
         for rel, data in sorted(entries):
@@ -225,7 +226,7 @@ def pack_tarball(name: str, v: str, src: pathlib.Path, dest: pathlib.Path) -> pa
             info.mode = 0o644
             tar.addfile(info, io.BytesIO(data))
     # npm names a scoped package's tarball without the `@` and with `-` for `/`.
-    out = dest / f"codelaw-rules-{name}-{v}.tgz"
+    out = dest / f"codelaw-rules-{name}{suffix}-{v}.tgz"
     with open(out, "wb") as raw, gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as gz:
         gz.write(buf.getvalue())
     return out
@@ -238,17 +239,19 @@ def pack_module(name: str) -> str:
     return "codelaw_rules_" + name.replace("-", "_")
 
 
-def wheel_for_pack(name: str, v: str, src: pathlib.Path, dest: pathlib.Path) -> pathlib.Path:
-    """One pure py3-none-any wheel: package `codelaw_rules_<name>` holds the pack folder."""
-    dist = pack_module(name)
+def wheel_for_pack(name: str, v: str, src: pathlib.Path, dest: pathlib.Path, suffix: str = "", description: str = "") -> pathlib.Path:
+    """One pure py3-none-any wheel: package `codelaw_rules_<name>` holds the pack folder.
+    With `suffix="-fux-index"` it is `codelaw_rules_<name>_fux_index` holding a Fux
+    index segment (L6 decision 12)."""
+    dist = pack_module(name) + suffix.replace("-", "_")
     pv = pep440(v)
     info = f"{dist}-{pv}.dist-info"
     readme = (src / "README.md").read_text(encoding="utf-8")
     metadata = "\n".join([
         "Metadata-Version: 2.4",
-        f"Name: codelaw-rules-{name}",
+        f"Name: codelaw-rules-{name}{suffix}",
         f"Version: {pv}",
-        f"Summary: {pack_meta(name)['description']}",
+        f"Summary: {description or pack_meta(name)['description']}",
         f"License-Expression: {LICENCE}",
         *[f"License-File: {f}" for f in LICENCE_FILES],
         f"Project-URL: Repository, {REPO}",

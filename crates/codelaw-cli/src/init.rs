@@ -170,6 +170,26 @@ fn install_command(root: &Path, registry: Registry, packages: &[&str]) -> Vec<St
     cmd
 }
 
+/// What `init` prints when the repo uses Fux (a `.fux/` folder): the optional
+/// index package beside each pack it chose, and how to add it. It is only ever
+/// printed, never run, and nothing is printed for a repo without `.fux/`
+/// (SR-RULE-PACKS decision 6a; L6 decision 12: never installed by default).
+fn fux_index_note(root: &Path, by_registry: &std::collections::BTreeMap<Registry, Vec<&str>>) -> Vec<String> {
+    if !root.join(".fux").is_dir() || by_registry.is_empty() {
+        return Vec::new();
+    }
+    let mut lines = vec![
+        "note: this repo uses Fux, and each rule pack has an optional index package that lets `fux_search` find its rules from plain words. `init` does not install them; to add them:".to_string(),
+    ];
+    for (registry, packs) in by_registry {
+        let names: Vec<String> = packs.iter().map(|p| format!("{p}-fux-index")).collect();
+        let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+        lines.push(format!("  {}", install_command(root, *registry, &refs).join(" ")));
+    }
+    lines.push("  then pin each: fux setup --index <its PyPI name> --index-npm <its npm name> (an npm-only pack: add its `kind = \"index\"` row to .fux/config/plugins.toml)".to_string());
+    lines
+}
+
 pub fn init(args: InitArgs) -> ExitCode {
     let targets = match codelaw_agents::parse_targets(&args.agents) {
         Ok(t) => t,
@@ -330,6 +350,9 @@ pub fn init(args: InitArgs) -> ExitCode {
             }
         }
     }
+    for line in fux_index_note(&root, &by_registry) {
+        println!("{line}");
+    }
     // After the packs, so the per-language instructions list their rules.
     if !targets.is_empty() {
         match codelaw_agents::write_for_init(&root, &targets, None) {
@@ -369,6 +392,23 @@ fn install_hooks(root: &Path, hooks: &[&str]) -> ExitCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_fux_index_note_needs_fux_and_names_each_chosen_pack() {
+        let root = std::env::temp_dir().join(format!("codelaw-init-fux-note-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        let mut by_registry: std::collections::BTreeMap<Registry, Vec<&str>> = Default::default();
+        by_registry.entry(Registry::Npm).or_default().extend(["@codelaw/rules-js", "@codelaw/rules-ts"]);
+        by_registry.entry(Registry::Pypi).or_default().push("codelaw-rules-python");
+        assert!(fux_index_note(&root, &by_registry).is_empty(), "no .fux/, no note");
+        std::fs::create_dir_all(root.join(".fux")).unwrap();
+        let lines = fux_index_note(&root, &by_registry);
+        assert!(lines.contains(&"  npm install -D @codelaw/rules-js-fux-index @codelaw/rules-ts-fux-index".to_string()), "{lines:?}");
+        assert!(lines.contains(&"  pip install codelaw-rules-python-fux-index".to_string()), "{lines:?}");
+        assert!(fux_index_note(&root, &Default::default()).is_empty(), "no pack chosen, no note");
+        let _ = std::fs::remove_dir_all(&root);
+    }
 
     #[test]
     fn presets_follow_the_repo() {
