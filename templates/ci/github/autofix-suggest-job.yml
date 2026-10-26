@@ -1,0 +1,56 @@
+
+  # --unsafe: the `suggest` fixes, kept apart on their own branch and PR.
+  autofix-suggest:
+    runs-on: ubuntu-latest
+    needs: autofix
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: $\{{ secrets.CODELAW_AUTOFIX_TOKEN || github.token }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the repository's dependencies
+        run: |
+          if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile
+          elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile
+          elif [ -f package-lock.json ]; then npm ci
+          fi
+      - name: Install codelaw
+        run: npm install --global codelaw@{{version}}
+      - name: Apply the suggest fixes
+        run: |
+          set -u
+          rc=0
+          codelaw fix --unsafe --as-of "$(date +%F)" --format json > "$RUNNER_TEMP/fix.json" || rc=$?
+          if [ "$rc" -ge 2 ]; then cat "$RUNNER_TEMP/fix.json"; exit "$rc"; fi
+          codelaw format
+          {
+            echo "Fixes of the \`suggest\` class from \`codelaw fix --unsafe\`: review each one; they can change behaviour."
+            echo
+            echo "## Fixes per rule and file"
+            jq -r '(.fixed // [])[] | "- `\(.file)`: " + ([.applied[] | "\(.[0]) x\(.[1])"] | join(", "))' "$RUNNER_TEMP/fix.json"
+          } > "$RUNNER_TEMP/body.md"
+      - name: Commit, push and open or update the pull request
+        env:
+          GH_TOKEN: $\{{ secrets.CODELAW_AUTOFIX_TOKEN || github.token }}
+          BASE: $\{{ github.event.repository.default_branch }}
+        run: |
+          set -eu
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing to suggest: no pull request."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C codelaw/autofix-suggest
+          git add -A
+          git commit -m "codelaw: scheduled autofix (suggest)"
+          git push --force origin codelaw/autofix-suggest
+          number="$(gh pr list --head codelaw/autofix-suggest --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$number" ]; then
+            gh pr edit "$number" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr create --base "$BASE" --head codelaw/autofix-suggest --title "codelaw: scheduled autofix (suggest, review each)" --body-file "$RUNNER_TEMP/body.md"
+          fi
