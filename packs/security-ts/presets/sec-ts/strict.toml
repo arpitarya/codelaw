@@ -2,3 +2,9 @@ description = "sec-js/strict, sec-ts/recommended and the heuristic TypeScript-on
 extends = ["codelaw:sec-js/strict", "codelaw:sec-ts/recommended"]
 
 [rules]
+"sec-ts/nest-missing-guard" = "warn"
+"sec-ts/nest-throttler" = "warn"
+"sec-ts/no-any-request-handler" = "warn"
+"sec-ts/no-ts-ignore-on-sink" = "warn"
+"sec-ts/no-unchecked-cast-of-input" = "warn"
+"sec-ts/trpc-public-mutation" = "warn"
