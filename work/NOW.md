@@ -19,4 +19,3 @@ Rule: [SR-WORK-NOW](../records/0061_WORK-now.md).
 
 | kind | where | host | session | created |
 |---|---|---|---|---|
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/W-00` | Arpits-MacBook | f8e9b642-9ea2-49be-8a74-3165730481fb | 2026-10-26 |
