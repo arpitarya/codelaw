@@ -8,8 +8,9 @@ build jobs in `.github/workflows/ci.yml`.
     package.py prepare-wheel                 copy LICENSE and README into packaging/python for maturin
     package.py extract WHEEL OUTDIR          take the binary out of a maturin wheel (the npm copy)
     package.py assemble --bins B --wheels W --out dist
-                                             build the 22 npm tarballs and the 9 pack wheels; copy the 8 engine wheels
+                                             build the 25 npm tarballs and the 9 pack wheels; copy the 8 engine wheels
     package.py check dist                    the release checks, against what was assembled
+    package.py sync-dev-core                 copy the dev-server plugins' shared source into each package (W-49)
     package.py names                         every name codelaw publishes (SR-PACKAGES §1)
 
 `--bins` holds one folder per platform key (`linux-x64-gnu/codelaw`, ...),
@@ -41,6 +42,36 @@ LICENCE_FILES = ("LICENSE",)
 SCHEMA = ROOT / "crates" / "codelaw-config" / "codelaw.schema.json"  # shipped in npm codelaw (SR-PACKAGES decision 3)
 REPO = "https://github.com/arpitarya/codelaw"
 PACK_TABLE = ROOT / "crates" / "codelaw-rules" / "src" / "pack.rs"
+
+# The npm-only dev-server plugins (W-49, SR-PACKAGES decision 3a). Each is one folder
+# under packaging/npm/ holding index.js, index.d.ts and README.md; the shared
+# `dev-core/core.js` (and, for Next, the webpack plugin) is copied in by
+# `sync-dev-core`, so each package has no dependency (L6 decision 4).
+DEV_PLUGINS = {
+    "vite-plugin": ("@codelaw/vite-plugin", "codelaw's findings in Vite's overlay and terminal; fails vite build on an error"),
+    "webpack-plugin": ("@codelaw/webpack-plugin", "codelaw's findings as webpack and Rspack errors and warnings; fails the build on an error"),
+    "next": ("@codelaw/next", "withCodelaw(nextConfig): codelaw's findings in next dev, and next build fails on an error"),
+}
+DEV_SHARED = {  # destination (relative to packaging/npm) -> source
+    "vite-plugin/core.js": "dev-core/core.js",
+    "webpack-plugin/core.js": "dev-core/core.js",
+    "next/core.js": "dev-core/core.js",
+    "next/plugin.js": "webpack-plugin/index.js",
+}
+NPM_DIR = ROOT / "packaging" / "npm"
+
+
+def sync_dev_core(check: bool = False) -> list[str]:
+    """Copy the shared dev-plugin sources into place; with `check`, only report the copies that differ."""
+    stale = []
+    for dst, src in DEV_SHARED.items():
+        want = (NPM_DIR / src).read_bytes()
+        d = NPM_DIR / dst
+        if not d.is_file() or d.read_bytes() != want:
+            stale.append(f"packaging/npm/{dst} differs from packaging/npm/{src}")
+            if not check:
+                d.write_bytes(want)
+    return stale
 
 
 def read_packs() -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -302,6 +333,27 @@ def assemble(bins: pathlib.Path, wheels: pathlib.Path, out: pathlib.Path) -> Non
     write_json(d / "package.json", m)
     to_pack.append(d)
 
+    # the dev-server plugins, npm only, no dependencies (decision 3a)
+    stale = sync_dev_core(check=True)
+    if stale:
+        fail("run `python3 scripts/package.py sync-dev-core`:\n  " + "\n  ".join(stale))
+    for folder, (pname, desc) in DEV_PLUGINS.items():
+        d = stage / folder
+        shutil.copytree(NPM_DIR / folder, d)
+        copy_licences(d)
+        m = base_manifest(pname, v, desc)
+        m.update({
+            "type": "module",
+            "main": "index.js",
+            "types": "index.d.ts",
+            "exports": {".": {"types": "./index.d.ts", "default": "./index.js"}, "./package.json": "./package.json"},
+            "files": [f.name for f in sorted(d.iterdir()) if f.suffix in (".js", ".ts", ".md")] + list(LICENCE_FILES),
+            "engines": {"node": ">=22"},
+            "keywords": ["codelaw", "linter", "dev-server"],
+        })
+        write_json(d / "package.json", m)
+        to_pack.append(d)
+
     # the rule packs, each on the registries pack.rs names, the same files
     # on both where it is on both (decision 9, L6 decision 11)
     for name in PACKS:
@@ -358,7 +410,8 @@ def check(out: pathlib.Path) -> None:
             bad.append(f"{t.name}: only codelaw may have optionalDependencies")
         if "scripts" in man:
             bad.append(f"{t.name}: has lifecycle scripts")
-    want_npm = {"codelaw"} | {f"@codelaw/cli-{k}" for k in TARGETS} | {f"@codelaw/rules-{n}" for n in NPM_PACKS}
+    want_npm = {"codelaw"} | {f"@codelaw/cli-{k}" for k in TARGETS} | {f"@codelaw/rules-{n}" for n in NPM_PACKS} | {n for n, _ in DEV_PLUGINS.values()}
+    bad.extend(sync_dev_core(check=True))
     if set(npm) != want_npm:
         bad.append(f"npm names: missing {sorted(want_npm - set(npm))}, not allowed {sorted(set(npm) - want_npm)}")
     if "codelaw" in npm and npm["codelaw"].get("codelaw.schema.json") != SCHEMA.read_bytes():
@@ -473,6 +526,7 @@ def main() -> None:
     a.add_argument("--out", type=pathlib.Path, required=True)
     c = sub.add_parser("check")
     c.add_argument("out", type=pathlib.Path)
+    sub.add_parser("sync-dev-core")
     sub.add_parser("names", help="every name codelaw publishes, one `registry name` per line")
     args = ap.parse_args()
     if args.cmd == "prepare-wheel":
@@ -483,8 +537,10 @@ def main() -> None:
         assemble(args.bins, args.wheels, args.out)
     elif args.cmd == "check":
         check(args.out)
+    elif args.cmd == "sync-dev-core":
+        sync_dev_core()
     else:
-        for n in ["codelaw", *[f"@codelaw/cli-{k}" for k in TARGETS], *[f"@codelaw/rules-{x}" for x in NPM_PACKS]]:
+        for n in ["codelaw", *[f"@codelaw/cli-{k}" for k in TARGETS], *[f"@codelaw/rules-{x}" for x in NPM_PACKS], *[n for n, _ in DEV_PLUGINS.values()]]:
             print(f"npm {n}")
         for n in ["codelaw", *[f"codelaw-rules-{x}" for x in PYPI_PACKS]]:
             print(f"pypi {n}")
