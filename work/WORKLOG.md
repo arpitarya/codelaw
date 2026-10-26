@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-58: corpus counts confirmed, left list trimmed  ·  Claude Code (Sonnet 5.5), in a lockmaster worktree
+
+- **Asked:** finish W-58 except CI's `perf` run (DoD 6).
+- **Done:** checked `packs/js/corpus.toml` (23/177/7) and `packs/python/corpus.toml` (13/91/134) hold the six `[findings]` rows (landed in W-72); removed the stale "six corpus counts" from OPEN-WORK and IMPLEMENTATION. No re-run of `corpus.py` (pinned repos not cloned here).
+- **Decided / left open:** left: DoD 6, CI's `perf` job on the merge (and, if the decider wants, a `js/size`-on workload).
+- **Mistakes:** none.
+- **Next:** read `perf` on the merge, then close W-58.
+
 ## 2026-10-26 — Cross-lane cleanup after thirteen landings  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** fix what the thirteen parallel lanes left: a duplicate `D-33`, a red docs-sync, the MCP tool list, clippy, the build-tool declaration.
