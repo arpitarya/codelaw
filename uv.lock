@@ -1,0 +1,73 @@
+version = 1
+revision = 3
+requires-python = ">=3.14"
+
+[[package]]
+name = "codelaw"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "fux-decoder-json" },
+    { name = "fux-engine" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fux-decoder-json", specifier = ">=5.1.1" },
+    { name = "fux-engine", specifier = ">=5.1.1" },
+]
+
+[[package]]
+name = "fux-core"
+version = "5.1.1"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4d/ee/78606c1d634be3504fa99fa4b3a344a0711250d81e29eb1867051fa173e3/fux_core-5.1.1-py3-none-any.whl", hash = "sha256:8ef120d1d06f5175e4a7a18127b8637c243bd742db27bcdf1d5ab9ef9b5d7483", size = 610365, upload-time = "2026-10-26T08:17:07.354Z" },
+]
+
+[[package]]
+name = "fux-decoder-json"
+version = "5.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fux-core" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/f3/5acbf0121f6ee2b48bb3e135baabd8f1d4e6443e483b44ed819c266af3f0/fux_decoder_json-5.1.1-py3-none-any.whl", hash = "sha256:11d5cc2ffb450e61554872597c5d1fcf91959cb0ca56cf52fcc1a64efad29627", size = 9761, upload-time = "2026-10-26T08:17:49.894Z" },
+]
+
+[[package]]
+name = "fux-engine"
+version = "5.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fux-core" },
+    { name = "fux-reader" },
+    { name = "fux-writer" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/04/6a/5aace236e63ee3c53f22eca6c2bc041ad8d38fe8159cfcc82e7e25eab470/fux_engine-5.1.1.tar.gz", hash = "sha256:07cf946073de12c9a480042ec776cf5e5a8c48e55b2bbdab759273f5672b9daa", size = 51720069, upload-time = "2026-10-26T08:17:39.554Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/74/a957dcb45bab36e03294aa39688b5b40b16a79f3ecce2b1656ac10c5a7d0/fux_engine-5.1.1-py3-none-any.whl", hash = "sha256:20fdd7b0fdc9307d967a08ea420aed4d4f6fb1204af6faaf56432888cb46d7ec", size = 111025, upload-time = "2026-10-26T08:17:37.582Z" },
+]
+
+[[package]]
+name = "fux-reader"
+version = "5.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fux-core" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/79/c1/adbf85c1ac233edf1a0cefd20038f7b323d03bcebb225dbfb8553cd70a5e/fux_reader-5.1.1-py3-none-any.whl", hash = "sha256:085037d10d2f6294de842929e5afe91defd61e4b30ce2e93d809f06afac7d5df", size = 228515, upload-time = "2026-10-26T08:17:08.993Z" },
+]
+
+[[package]]
+name = "fux-writer"
+version = "5.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fux-core" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/11/4e/915eeacd7f510e64f7e44085c0a00ed50725d030c978b9d8bfde05ca539d/fux_writer-5.1.1-py3-none-any.whl", hash = "sha256:bc9c8360d5b86dcad19bf67d829b6afed07c2edf1d1c6f298b6c2215f8529bcb", size = 181004, upload-time = "2026-10-26T08:17:10.66Z" },
+]

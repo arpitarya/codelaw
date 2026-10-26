@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-74 filed (editor logs you can debug from)  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit: *"The VS Code extension doesn't have very good output or logging. Create a work item for better logs so that at least it can be debugged if there is any issue."*
+- **Done:** read `packaging/vscode/src/extension.ts` and `crates/codelaw-lsp/src/lib.rs`: the extension logs one line (the binary), never the server version it receives; the server logs only config errors and project warnings — a project that fails to load is a popup only, a failed request and a file with no project are silent. Filed W-74 (`work/open/W-74-editor-logs.md`, six steps, nine DoD) and its 🟢 `build` row; build count 12 → 13.
+- **Decided / left open:** nothing ruled. The design pointers in the file (`LogOutputChannel`, `codelaw.logLevel`, *Copy debug info*, never log source text) are proposals, not rulings. SR-EDITOR is amended by the building session.
+- **Mistakes:** none. Left uncommitted in the working tree; it lands through lockmaster.
+- **Next:** a Claude Code lane builds W-74 (Sonnet).
+
 ## 2026-10-26 — Cross-lane cleanup after thirteen landings  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** fix what the thirteen parallel lanes left: a duplicate `D-33`, a red docs-sync, the MCP tool list, clippy, the build-tool declaration.
