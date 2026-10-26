@@ -96,6 +96,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** concurrent lanes share one target dir and overwrite each other's `codelaw_core` artifacts (cargo then said `cannot find similar in codelaw_core`); worked around with a per-package profile setting so my builds had their own hash. `mcp_parity` reads another lane's clobbered `codelaw` binary (10 tools, not 9) — not this change.
 - **Next:** none for W-67.
 
+## 2026-10-26 — W-60: L10 built, every consumer-file text is a template  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *implement L10: one template per consumer file under `templates/`, a registry, a slot-only renderer and a test.*
+- **Done:** `templates/` (`init`, `git-hooks`, `agents`, `new-rule`) with the registry in `templates/README.md`; `codelaw_core::template` (slots, `\{{`, errors on unfilled or unknown slots, no dependency); `init.rs`, `git_hooks.rs`, `rules_cmd.rs`, `sync.rs`, `skills.rs` render from it; `agents/` is now `templates/agents/` and the hook scripts left `crates/codelaw-cli/src/hooks/`; CLAUDE.md §Layout names `templates/` (said out loud: a layout line only); ownership rows and the 0012, 0101, 0102, 0107, 0108, 0115 records updated. Output byte-identical: 95 files diffed before and after.
+- **Decided / left open:** W-51 landed first with its own renderer in `ci.rs` and `templates/ci/`; on merging I replaced its renderer with the core one and added its four templates to the registry. Any later writer (W-49) follows L10 from the start. SR-LAW-10 is `yes` in the register.
+- **Mistakes:** the shared target dir gave another lane's `codelaw-core` rlib to my build twice (same artefact hash across worktrees); fixed with a per-package profile override so the hash differs. `a_rule_panic_exits_2` failed in a full parallel run and passes alone; not looked into.
+- **Next:** none for W-60.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*

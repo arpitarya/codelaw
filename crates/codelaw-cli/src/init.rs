@@ -6,7 +6,7 @@
 
 use crate::fail;
 use clap::Args;
-use codelaw_core::Language;
+use codelaw_core::{Language, template};
 use codelaw_rules::first_party;
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -298,31 +298,36 @@ pub fn init(args: InitArgs) -> ExitCode {
     }
     let extends = presets(&packs, &languages);
 
-    // codelaw.toml: `extends` and nothing else (SR-CONFIG decision 8).
-    let mut config = String::from("# codelaw configuration — see `codelaw config --print` and SR-CONFIG.\n");
+    // codelaw.toml: `extends` and nothing else (SR-CONFIG decision 8); its
+    // text is templates/init/ (SR-LAW-10).
     let quoted: Vec<String> = extends.iter().map(|e| format!("\"{e}\"")).collect();
-    config.push_str(&format!("extends = [{}]\n", quoted.join(", ")));
-    if !targets.is_empty() {
+    let agents_section = if targets.is_empty() {
+        String::new()
+    } else {
         let names: Vec<String> = targets.iter().map(|t| format!("\"{}\"", t.name())).collect();
-        config.push_str(&format!("\n[agents]\ntargets = [{}]\n", names.join(", ")));
-    }
+        match template::render("init/codelaw-agents.toml", &[("targets", &names.join(", "))]) {
+            Ok(s) => s,
+            Err(e) => return fail(e),
+        }
+    };
+    let config = match template::render("init/codelaw.toml", &[("extends", &quoted.join(", ")), ("agents", &agents_section)]) {
+        Ok(c) => c,
+        Err(e) => return fail(e),
+    };
     let rules_dir = root.join(".codelaw").join("rules");
     let written = std::fs::write(root.join("codelaw.toml"), &config)
         .and_then(|_| std::fs::create_dir_all(&rules_dir))
-        .and_then(|_| {
-            std::fs::write(
-                rules_dir.join("README.md"),
-                "# Project rules\n\nOne Markdown file per rule, at `<namespace>/<name>.md`. Start one with\n`codelaw new-rule <namespace>/<name> --lang <languages>`, then run `codelaw test`.\n",
-            )
-        })
+        .and_then(|_| std::fs::write(rules_dir.join("README.md"), template::text("init/.codelaw/rules/README.md")))
         .and_then(|_| {
             let gi = root.join(".gitignore");
             let current = std::fs::read_to_string(&gi).unwrap_or_default();
-            if current.lines().any(|l| l.trim() == ".codelaw/cache/" || l.trim() == ".codelaw/cache") {
+            let line = template::text("init/gitignore");
+            let have = |l: &str| l.trim() == line.trim() || l.trim() == line.trim().trim_end_matches('/');
+            if current.lines().any(have) {
                 return Ok(());
             }
             let sep = if current.is_empty() || current.ends_with('\n') { "" } else { "\n" };
-            std::fs::write(&gi, format!("{current}{sep}.codelaw/cache/\n"))
+            std::fs::write(&gi, format!("{current}{sep}{line}"))
         });
     if let Err(e) = written {
         return fail(e);

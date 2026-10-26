@@ -103,7 +103,7 @@ The decider asked for a record of what goes into which package, under the naming
    | surfaces | `codelaw-cli` | the `codelaw` binary's entry point and commands ([SR-CLI-MCP](0115_cli-and-mcp.md)) |
    | surfaces | `codelaw-mcp` | the MCP server: a hand-written JSON-RPC loop over stdio ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 5) |
    | surfaces | `codelaw-lsp` | the language server ([SR-EDITOR](0114_editor.md)) |
-   | surfaces | `codelaw-agents` | hook mode, `sync-agents`, and the skill sources from `agents/skills/` ([SR-AGENT-SURFACES](0102_agent-surfaces.md)) |
+   | surfaces | `codelaw-agents` | hook mode, `sync-agents`, and the skill sources from `templates/agents/skills/` ([SR-AGENT-SURFACES](0102_agent-surfaces.md)) |
 
    The workspace's `Cargo.toml` may carry a `[patch.crates-io]` for two reasons only: to replace a transitive crate that fails [L2](0004_LAW-2-foss-dependencies.md) with a permissive stand-in kept under `crates/`, or to put a grammar fork the decider ruled for, kept under `crates/codelaw-lang/grammars/`, in place of the pinned grammar. The record that takes in the dependency that pulls it names it. Today there are two: `option-ext`, for Biome ([SR-FORMATTER](0105_formatter.md) decision 2), and `tree-sitter-css`, codelaw's CSS grammar fork ([SR-ARCHITECTURE](0108_architecture.md) decision 3). Neither is a workspace member, so neither is one of the crates above.
 

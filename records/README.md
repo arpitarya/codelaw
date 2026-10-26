@@ -114,7 +114,7 @@ Start from `TEMPLATE.md`.
 | [0009](0009_LAW-7-linter-and-formatter.md) | **SR-LAW-7** | **L7** — always both a linter and a formatter, for every L3 language | accepted | yes |
 | [0010](0010_LAW-8-performance-budgets.md) | **SR-LAW-8** | **L8** — performance budgets — set from measurement, never exceeded, never loosened | accepted | partly |
 | [0011](0011_LAW-9-machine-budget.md) | **SR-LAW-9** | **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it approved first | accepted | yes |
-| [0012](0012_LAW-10-consumer-templates.md) | **SR-LAW-10** | **L10** — every file codelaw writes into a consumer's repo comes from a template in `templates/`; code only fills slots | accepted | no |
+| [0012](0012_LAW-10-consumer-templates.md) | **SR-LAW-10** | **L10** — every file codelaw writes into a consumer's repo comes from a template in `templates/`; code only fills slots | accepted | yes |
 | [0013](0013_LAW-11-no-dependencies.md) | **SR-LAW-11** | **L11** — no dependencies unless the decider ratifies each one by name in `DEPENDENCIES.md` | accepted | yes |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — the queue discipline in eight groups | accepted | yes |
 | [0052](0052_WORK-backlog.md) | **SR-WORK-BACKLOG** | How `BACKLOG.md` works — the named-but-unclaimed in five classes | accepted | yes |
@@ -197,7 +197,9 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-mcp` | SR-CLI-MCP | decisions 5–6: the MCP server and its parity with the CLI |
 | `crates/codelaw-graph` | SR-PROJECT-GRAPH | decisions 1–6: the symbol graph, its resolver and the `graph:` queries |
 | `crates/codelaw-agents` | SR-AGENT-SURFACES | decisions 1, 2 and 6: hook mode, `sync-agents` and the compiled-in skills |
-| `agents` | SR-AGENT-SURFACES | decisions 1, 4 and 5: the skill sources, the custom agent and the trigger evals |
+| `templates/agents` | SR-AGENT-SURFACES | decisions 1, 4 and 5: the skill sources, the custom agent and the trigger evals |
+| `templates` | SR-LAW-10 | every file codelaw writes into a consumer's repo, its registry and its slot-only renderer; `templates/agents` is carved out to SR-AGENT-SURFACES |
+| `crates/codelaw-core/src/template.rs` | SR-LAW-10 | decisions 4–7: the renderer and the registry test |
 | `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced: the Cargo packages, the npm lockfiles and the build tools |
 | `crates/codelaw-cli/tests/dependencies.rs` | SR-LAW-11 | how L11 is enforced: every manifest and lockfile against the ledger in `DEPENDENCIES.md` |

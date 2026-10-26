@@ -27,6 +27,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-60-consumer-templates.md`](open/W-60-consumer-templates.md) | 2026-10-26 | [`templates/`](../templates/README.md), [`template.rs`](../crates/codelaw-core/src/template.rs) and [SR-LAW-10](../records/0012_LAW-10-consumer-templates.md) |
 | [`W-67-replace-three-dependencies.md`](open/W-67-replace-three-dependencies.md) | 2026-10-26 | [`DEPENDENCIES.md`](../DEPENDENCIES.md), `crates/codelaw-core/src/similar.rs` and `crates/codelaw-cache/src/codec.rs` ([SR-CACHE](../records/0109_cache.md) decision 4) |
 | [`W-65-dependency-check.md`](open/W-65-dependency-check.md) | 2026-10-26 | [`crates/codelaw-cli/tests/dependencies.rs`](../crates/codelaw-cli/tests/dependencies.rs), the ledger in [`DEPENDENCIES.md`](../DEPENDENCIES.md) and [SR-LAW-11](../records/0013_LAW-11-no-dependencies.md) decision 7 |
 | [`W-66-ratify-dependencies.md`](open/W-66-ratify-dependencies.md) | 2026-10-26 | [`DEPENDENCIES.md`](../DEPENDENCIES.md) and [SR-LAW-11](../records/0013_LAW-11-no-dependencies.md); the three removals are [W-67](../work/open/W-67-replace-three-dependencies.md) |

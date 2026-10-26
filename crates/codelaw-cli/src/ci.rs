@@ -5,10 +5,7 @@
 
 use std::path::{Path, PathBuf};
 
-const GITHUB: &str = include_str!("../../../templates/ci/github/codelaw-autofix.yml");
-const GITHUB_SUGGEST: &str = include_str!("../../../templates/ci/github/autofix-suggest-job.yml");
-const GITLAB: &str = include_str!("../../../templates/ci/gitlab/codelaw-autofix.yml");
-const GITLAB_SUGGEST: &str = include_str!("../../../templates/ci/gitlab/autofix-suggest-job.yml");
+use codelaw_core::template::render;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Provider {
@@ -47,40 +44,11 @@ impl Schedule {
     }
 }
 
-/// Fill `{{name}}` slots; `\{{` writes a literal `{{`. A slot with no value,
-/// or a value for a slot the template lacks, is an error (L10 decision 4).
-pub fn render(template: &str, slots: &[(&str, &str)]) -> Result<String, String> {
-    let mut out = String::with_capacity(template.len());
-    let mut used = vec![false; slots.len()];
-    let mut rest = template;
-    while let Some(i) = rest.find("{{") {
-        if rest[..i].ends_with('\\') {
-            out.push_str(&rest[..i - 1]);
-            out.push_str("{{");
-            rest = &rest[i + 2..];
-            continue;
-        }
-        out.push_str(&rest[..i]);
-        let after = &rest[i + 2..];
-        let end = after.find("}}").ok_or("a template has an unclosed `{{`")?;
-        let name = &after[..end];
-        let k = slots.iter().position(|(n, _)| *n == name).ok_or_else(|| format!("a template slot `{{{{{name}}}}}` has no value"))?;
-        used[k] = true;
-        out.push_str(slots[k].1);
-        rest = &after[end + 2..];
-    }
-    out.push_str(rest);
-    if let Some(k) = used.iter().position(|u| !u) {
-        return Err(format!("a value was given for slot `{}`, which the template lacks", slots[k].0));
-    }
-    Ok(out)
-}
-
 /// The workflow text and the path it lands at, relative to the repo root.
 pub fn workflow(provider: Provider, schedule: Schedule, suggest: bool, version: &str) -> Result<(PathBuf, String), String> {
     let (main, extra, path) = match provider {
-        Provider::Github => (GITHUB, GITHUB_SUGGEST, ".github/workflows/codelaw-autofix.yml"),
-        Provider::Gitlab => (GITLAB, GITLAB_SUGGEST, ".gitlab/codelaw-autofix.yml"),
+        Provider::Github => ("ci/github/codelaw-autofix.yml", "ci/github/autofix-suggest-job.yml", ".github/workflows/codelaw-autofix.yml"),
+        Provider::Gitlab => ("ci/gitlab/codelaw-autofix.yml", "ci/gitlab/autofix-suggest-job.yml", ".gitlab/codelaw-autofix.yml"),
     };
     let suggest_job = if suggest { render(extra, &[("version", version)])? } else { String::new() };
     let text = render(main, &[("cron", schedule.cron()), ("version", version), ("suggest_job", &suggest_job)])?;
@@ -123,13 +91,6 @@ pub fn install(root: &Path, provider: Provider, schedule: Schedule, suggest: boo
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn renders_slots_and_escapes() {
-        assert_eq!(render("a {{x}} \\{{y}}", &[("x", "1")]).unwrap(), "a 1 {{y}}");
-        assert!(render("{{x}}", &[]).is_err());
-        assert!(render("a", &[("x", "1")]).is_err());
-    }
 
     #[test]
     fn every_workflow_leaves_no_unfilled_slot() {

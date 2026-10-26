@@ -79,7 +79,7 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
-          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**', 'agents/**', 'perf/**', 'records/[0-9]*.md', 'scripts/**', 'packaging/**', '.github/workflows/**') }}
+          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**', 'templates/**', 'perf/**', 'records/[0-9]*.md', 'scripts/**', 'packaging/**', '.github/workflows/**') }}
           lookup-only: true
       - if: steps.verdict.outputs.cache-hit == 'true'
         run: echo "::notice title=test::skipped — cargo test already passed on these exact sources with rustc ${{ steps.rustc.outputs.v }}"
@@ -100,7 +100,7 @@ jobs:
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
-          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**', 'agents/**', 'perf/**', 'records/[0-9]*.md', 'scripts/**', 'packaging/**', '.github/workflows/**') }}
+          key: test-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'fixtures/**', 'packs/**', 'templates/**', 'perf/**', 'records/[0-9]*.md', 'scripts/**', 'packaging/**', '.github/workflows/**') }}
 
   lint:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
@@ -140,7 +140,7 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
-          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'agents/**', 'perf/**', 'packs/**') }}
+          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'templates/**', 'perf/**', 'packs/**') }}
           lookup-only: true
       - if: steps.verdict.outputs.cache-hit == 'true'
         run: echo "::notice title=clippy::skipped — clippy already passed on these exact sources with rustc ${{ steps.rustc.outputs.v }}"
@@ -163,7 +163,7 @@ jobs:
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .verdict
-          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'agents/**', 'perf/**', 'packs/**') }}
+          key: clippy-${{ steps.rustc.outputs.v }}-${{ hashFiles('Cargo.toml', 'Cargo.lock', 'crates/**', 'templates/**', 'perf/**', 'packs/**') }}
 
   perf:
     # L8's perf gate (SR-LAW-8 decision 7; W-19). `codelaw bench` times every
@@ -328,7 +328,7 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: out/wheel
-          key: wheel-${{ matrix.key }}-${{ steps.rustc.outputs.v }}-${{ env.MATURIN_VERSION }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.toml', 'Cargo.lock', 'crates/**', 'agents/**', 'packaging/python/**', 'packaging/README.md', 'LICENSE', 'scripts/package.py', '.github/workflows/ci.yml') }}
+          key: wheel-${{ matrix.key }}-${{ steps.rustc.outputs.v }}-${{ env.MATURIN_VERSION }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.toml', 'Cargo.lock', 'crates/**', 'templates/**', 'packaging/python/**', 'packaging/README.md', 'LICENSE', 'scripts/package.py', '.github/workflows/ci.yml') }}
       - if: steps.wheel.outputs.cache-hit == 'true'
         run: echo "::notice title=build ${{ matrix.key }}::reused the wheel built from these exact sources with rustc ${{ steps.rustc.outputs.v }}"
       - if: steps.wheel.outputs.cache-hit != 'true'

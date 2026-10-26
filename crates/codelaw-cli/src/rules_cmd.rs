@@ -6,6 +6,7 @@ use crate::{fail, load};
 use clap::{Args, Subcommand};
 use codelaw_cache::Key;
 use codelaw_config::Config;
+use codelaw_core::template as tpl;
 use codelaw_core::{FixClass, Language};
 use codelaw_report::Format;
 use codelaw_engine::{EngineOptions, Project};
@@ -280,35 +281,31 @@ pub fn explain(id: &str, format: &str) -> ExitCode {
 /// The rule template with every required field filled
 /// (SR-RULE-FORMAT decision 8).
 pub fn template(id: &str, languages: &[Language], scope: &str, fix: FixClass) -> String {
+    // The scaffold's text is templates/new-rule/ (SR-LAW-10); this only picks
+    // which optional parts go in.
+    let project = scope == "project";
+    let part = |path: &str, on: bool| if on { tpl::text(path) } else { "" };
     let names: Vec<&str> = languages.iter().map(|l| l.name()).collect();
-    let mut s = format!("---\nid: {id}\ntitle: TODO one line on what the rule requires\nlanguages: [{}]\n", names.join(", "));
-    if scope == "project" {
-        s.push_str("scope: project\n");
-    }
-    s.push_str(&format!("fix: {fix}\n"));
-    if fix != FixClass::Auto {
-        s.push_str("fix_reason: \"TODO: one line on why the fix can't be automatic\"\n");
-    }
-    s.push_str(&format!("stability: preview\nsince: {}\n---\n\n", codelaw_core::VERSION));
-    s.push_str("TODO: one paragraph on what the rule requires.\n\n**Why:** TODO: the reason, in one or two sentences.\n\n```codelaw\n");
-    if scope == "project" {
-        s.push_str("graph:\n  query: TODO\n");
-    } else {
-        s.push_str("match:\n  regex: \"^TODO$\"\n");
-    }
-    s.push_str("message: \"TODO: what is wrong\"\n");
-    if fix != FixClass::Manual {
-        s.push_str("fix: \"TODO\"\n");
-    }
-    s.push_str("```\n\n");
-    if fix == FixClass::Manual {
-        s.push_str("## How to fix\n\n1. TODO: the first step.\n\n");
-    }
-    s.push_str("## Examples\n");
-    for l in languages {
-        s.push_str(&format!("\n### {}\n\n#### Don't\n\n```{ext}\nTODO\n```\n\n#### Do\n\n```{ext}\n```\n", l.display(), ext = l.extension()));
-    }
-    s
+    let examples: String = languages
+        .iter()
+        .map(|l| tpl::render("new-rule/example.md", &[("language", l.display()), ("ext", l.extension())]).expect("example template"))
+        .collect();
+    tpl::render(
+        "new-rule/rule.md",
+        &[
+            ("id", id),
+            ("languages", &names.join(", ")),
+            ("scope", part("new-rule/scope-project.md", project)),
+            ("fix", &fix.to_string()),
+            ("fix_reason", part("new-rule/fix-reason.md", fix != FixClass::Auto)),
+            ("since", codelaw_core::VERSION),
+            ("matcher", tpl::text(if project { "new-rule/matcher-project.md" } else { "new-rule/matcher-file.md" })),
+            ("fix_line", part("new-rule/fix-line.md", fix != FixClass::Manual)),
+            ("how_to_fix", part("new-rule/how-to-fix.md", fix == FixClass::Manual)),
+            ("examples", &examples),
+        ],
+    )
+    .expect("new-rule template")
 }
 
 /// A namespace or name that is one plain path segment: letters, digits,
