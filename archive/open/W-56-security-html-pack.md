@@ -16,9 +16,9 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Write the catalogue below with cases | the rules | ⏳ |
-| 2 | `recommended` also enables `html/require-sri`, `html/target-blank-rel`, `html/no-inline-script`, `html/autocomplete-password`, `html/meta-refresh` | no duplicates | ⏳ |
-| 3 | README and corpus | adoption | ⏳ |
+| 1 | Write the catalogue below with cases | the rules | ✅ |
+| 2 | `recommended` also enables `html/require-sri`, `html/target-blank-rel`, `html/no-inline-script`, `html/autocomplete-password`, `html/meta-refresh` | no duplicates | ✅ |
+| 3 | README and corpus | adoption | ✅ |
 
 **Arpit, 2026-10-25:** *"I want to create a pack for security issues. Security issues like Veracode, Black Duck, X-Ray, OWASP. They would have some suggestions on how to write, what to write, what not to write in JavaScript and Python. So create … one for JavaScript, one for TypeScript, one for HTML, one for Python. Research and create work items for individual languages."*
 
@@ -61,12 +61,12 @@ Also widen `sec-html/no-javascript-url`'s attributes: `formaction`, `xlink:href`
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | `codelaw test packs/security-html` green | ⏳ |
-| 2 · | the preset enables the five existing `html/*` rules, shown by `codelaw rules --for x.html` | ⏳ |
+| 1 · | `codelaw test packs/security-html` green | ✅ |
+| 2 · | the preset enables the five existing `html/*` rules, shown by `codelaw rules --for x.html` | ✅ |
 
 ## Blockers
 
-waits on **W-53**.
+W-53 landed 2026-10-25. Closed 2026-10-26: see `work/IMPLEMENTATION.md`.
 
 ## Record affected
 

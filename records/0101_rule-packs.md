@@ -66,7 +66,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 | `redux-toolkit` | `@codelaw/rules-redux-toolkit` | — | JS, JSX, TS, TSX using Redux | `redux-toolkit/recommended` |
 | `security-js` | `@codelaw/rules-security-js` | `codelaw-rules-security-js` | JS, JSX, and the TS and TSX that run them | `sec-js/recommended`, `sec-js/strict` |
 | `security-ts` | `@codelaw/rules-security-ts` | — | TS, TSX (TypeScript-only security rules) | `sec-ts/recommended`, `sec-ts/strict` (extend `sec-js/*`) |
-| `security-html` | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | HTML | `sec-html/recommended`, `sec-html/strict` (extend `html/security`) |
+| `security-html` | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | HTML | `sec-html/recommended` (14 rules at `error`), `sec-html/strict` (5 more at `warn`); both extend `html/security`; 19 native rules, each with `security:` (W-56, 2026-10-26) |
 | `security-python` | — | `codelaw-rules-security-python` | Python | `sec-py/recommended`, `sec-py/strict` |
 
 `FIRST_PARTY_PACKS` in `crates/codelaw-rules/src/pack.rs` is this table in code, and `scripts/package.py` reads it, so the engine and the release name the same packs on the same registries.

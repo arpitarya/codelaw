@@ -70,6 +70,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 | [`W-47-baseline-burn-down.md`](open/W-47-baseline-burn-down.md) | 2026-10-25 | `codelaw baseline history` (`crates/codelaw-baseline/src/history.rs`, `tests/baseline_history.rs`); [SR-BASELINE](../records/0104_baseline-and-deprecations.md) decision 10 |
 | [`W-52-dependency-latest-versions.md`](open/W-52-dependency-latest-versions.md) | 2026-10-25 | `codelaw deps refresh`, `data/outdated-dependency`, `data/stale-deps-snapshot`; [L5](../records/0007_LAW-5-no-model-in-the-engine.md) decision 3, [SR-RULE-PACKS](../records/0101_rule-packs.md) decision 15; refresh in the auto-fix PR is W-51's; the agent hint is B-052, `requirements*.txt` B-051 |
 | [`W-53-security-packs-groundwork.md`](open/W-53-security-packs-groundwork.md) | 2026-10-25 | the four security-pack scaffolds, `security:` metadata, `from_source:`, preset `extends`; [L6](../records/0008_LAW-6-python-and-node-packages.md), [SR-RULE-FORMAT](../records/0112_rule-format.md) decisions 2a and 3a; the catalogues are W-54–W-57 |
+| [`W-56-security-html-pack.md`](open/W-56-security-html-pack.md) | 2026-10-26 | the 19 `sec-html/*` rules and two presets: [`packs/security-html/`](../packs/security-html/README.md), `crates/codelaw-native/src/html_security.rs`; [SR-RULE-PACKS](../records/0101_rule-packs.md) |
 
 ## `backlog/`
 

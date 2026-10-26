@@ -29,7 +29,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (22)
+### build (21)
 
 🟢 **W-67** `agent` Replace `strsim`, `anyhow` (unused) and `postcard` with codelaw's own code, then drop them (L11; ruled in W-66). Filed by Arpit (Cowork). [detail](open/W-67-replace-three-dependencies.md)
 
@@ -65,7 +65,6 @@ here. Read that record before changing anything below it.
 
 🟢 **W-55** `agent` `security-ts`: 16 rules on top of security-js — unchecked casts of input, permissive schemas, Angular sinks, NestJS guards/CORS/whitelist, Next.js server actions, tRPC, raw ORM queries. Filed by Arpit (Cowork). [detail](open/W-55-security-ts-pack.md)
 
-🟢 **W-56** `agent` `security-html`: 19 rules plus five existing `html/*` — inline handlers, `javascript:` URLs, mixed content, iframes, CSP, SRI, CSRF fields, secrets in markup, template sinks. Filed by Arpit (Cowork). [detail](open/W-56-security-html-pack.md)
 
 🟢 **W-57** `agent` `security-python`: 61 rules — Bandit's set ported, injection (SQL, NoSQL, LDAP, XPath, SSTI), Django/Flask/FastAPI settings, mass assignment, crypto, uploads, ML loaders, `trust_remote_code`, prompt injection. Filed by Arpit (Cowork). [detail](open/W-57-security-python-pack.md)
 
