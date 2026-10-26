@@ -33,6 +33,7 @@ here. Read that record before changing anything below it.
 
 ### build (14)
 
+
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
 🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, CI, `init` prints not installs); left: reserve the 16 names and publish them by hand (npm ten, PyPI six), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
@@ -54,7 +55,6 @@ here. Read that record before changing anything below it.
 
 🟢 **W-49** `agent` Dev-server plugins (`@codelaw/vite-plugin`, `webpack-plugin` also for Rspack, `next`) built and tested against the binary; left: an example app per real host (needs Vite, webpack, Rspack, Next.js installed, L11) and the first npm publish. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
 
-🟢 **W-54** `agent` `security-js`: 66 rules — injection (SQL, shell, SSTI …), XSS and DOM sinks, traversal, SSRF, crypto, secrets, cookies, TLS, Electron, mass assignment, prototype pollution, prompt injection. Filed by Arpit (Cowork). [detail](open/W-54-security-js-pack.md)
 
 🟢 **W-55** `agent` `security-ts`: 16 rules on top of security-js — unchecked casts of input, permissive schemas, Angular sinks, NestJS guards/CORS/whitelist, Next.js server actions, tRPC, raw ORM queries. Filed by Arpit (Cowork). [detail](open/W-55-security-ts-pack.md)
 

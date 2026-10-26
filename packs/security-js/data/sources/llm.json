@@ -1,0 +1,14 @@
+[
+  "completion.choices",
+  "chatCompletion.choices",
+  "response.choices",
+  "completion.content",
+  "response.content",
+  "message.content",
+  "msg.content",
+  "completion.text",
+  "response.output_text",
+  "result.output_text",
+  "result.text",
+  "result.content"
+]

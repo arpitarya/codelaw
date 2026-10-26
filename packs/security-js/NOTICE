@@ -1,11 +1,22 @@
 @codelaw/rules-security-js · codelaw-rules-security-js
 
-This pack holds no rule yet; every rule it will hold is written for
-codelaw.
-Rules ported from eslint-plugin-security (Apache-2.0) name their source rule in `ported_from:` and
-are listed here with that tool's version and licence when they land
-(SR-RULE-PACKS decision 7).
+Every rule in this pack is written for codelaw. Rules whose `ported_from:` names a
+source reimplement the documented behaviour of that rule; no source code, pattern or
+documentation text is copied:
+
+- eslint-plugin-security (Apache-2.0): detect-buffer-noassert, detect-child-process,
+  detect-eval-with-expression, detect-new-buffer, detect-non-literal-fs-filename,
+  detect-non-literal-regexp, detect-non-literal-require, detect-object-injection,
+  detect-possible-timing-attacks, detect-pseudoRandomBytes, detect-unsafe-regex,
+  detect-bidi-characters.
+- Bandit (Apache-2.0): B105, B202, B304, B307, B310, B311, B324, B501, B505, B506, B602, B608.
+- Ruff's `S` rules (MIT): S105, S202, S304, S307, S310, S311, S324, S501, S505, S506, S602, S608.
+- ESLint (MIT): no-script-url.
+
+data/sources/*.json are request-source lists (`req.query`, `location.hash`, …) written for this
+pack from the frameworks' public documentation (Express, Koa, Next.js, the DOM).
 
 Rule sets under a copyleft or source-available licence — eslint-plugin-no-unsanitized
 (MPL-2.0), njsscan (LGPL-3.0), Semgrep's rules (the Semgrep Rules License) — are
-read for ideas only; no text, pattern or code is taken from them (L2).
+read for ideas only; no text, pattern or code is taken from them (L2). CodeQL's JavaScript
+queries (MIT) and the OWASP cheat sheets were read for ideas; nothing is copied.

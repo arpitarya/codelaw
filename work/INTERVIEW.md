@@ -32,6 +32,8 @@ entry.**
 
 **2026-10-25 (Cowork): new feature work filed, not built.** CI-vs-local severity (profiles, agents on `ci`), a per-glob severity `remap`, dated exceptions (`expires`, `warn_days`, `require_expiry`, git-checked `added_by`) and `react/no-context` — W-39, W-40, W-41, rulings in [the compare doc](compare/ci-profiles-and-dated-exceptions.compare.md). Each build writes its record, schema and loader in one change: SR-CONFIG §1 is parsed by `crates/codelaw-config/tests/schema.rs`.
 
+**Built 2026-10-26 (Claude Code, lockmaster): W-54 `security-js`** — 66 rules, 55 in `sec-js/recommended`, 11 more in `strict`; archived. Two catalogue fix classes could not be met with the edit primitives (`no-bidi-characters`, `no-cleartext-http`); W-55 builds on it.
+
 **Built 2026-10-25 (Claude Code, six parallel worktrees, merged):** W-47 baseline history, W-52 `deps refresh` (L5 amended: the one networked command), W-53 security-pack groundwork (L6: fifteen packs) — closed; W-44 watch, W-45 CI formats, W-50 git hooks — built, each waiting on a ruling or a PR from the decider. W-54–W-57 are now open to an agent.
 
 **Built 2026-10-26 (Claude Code):** W-57, the `security-python` catalogue — 61 `match:` rules (Bandit and Ruff `S` ported; Django, Flask, FastAPI, ML loaders and LLM rules), `sec-py/recommended` (57) and `strict` (+4), the README's Bandit accounting. Still `preview`: no rule is `stable` until its corpus count is reviewed, and the PyPI upload of `codelaw-rules-security-python` is the decider's, by hand (W-38's pattern). Three rules the catalogue called `suggest` are `manual`: `no-xpath-injection`, `no-xmlrpc`, `no-cleartext-http`.
