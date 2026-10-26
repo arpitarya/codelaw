@@ -48,7 +48,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 - every rule in them carries `security:` metadata — CWE, OWASP Top 10:2025 category, severity ([SR-RULE-FORMAT](0112_rule-format.md) decision 2a);
 - each has a `recommended` preset (high-confidence rules, `error`) and a `strict` one (adds the heuristic rules, `warn`);
 - `security-ts` **extends** `security-js` (the `sec-js` rules already run on TypeScript), and `security-html` turns on the html pack's own security rules through `html/security` instead of copying them (decision 3);
-- **npm** carries thirteen packs and **PyPI** nine. The packs ship as scaffolds with no rules yet; their catalogues are [W-54](../work/open/W-54-security-js-pack.md) to [W-57](../work/open/W-57-security-python-pack.md).
+- **npm** carries thirteen packs and **PyPI** nine. The packs shipped as scaffolds; their catalogues are [W-54](../work/open/W-54-security-js-pack.md) to W-57. `security-python` has its 61 rules since W-57 (2026-10-26, [archived](../archive/open/W-57-security-python-pack.md)): `match:` rules only, from Bandit and Ruff `S`, Django, Flask, FastAPI, ML loaders and LLM sinks, in `packs/security-python/README.md`.
 
 | Pack | npm | PyPI | Languages | Presets |
 |---|---|---|---|---|
@@ -67,7 +67,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 | `security-js` | `@codelaw/rules-security-js` | `codelaw-rules-security-js` | JS, JSX, and the TS and TSX that run them | `sec-js/recommended`, `sec-js/strict` |
 | `security-ts` | `@codelaw/rules-security-ts` | — | TS, TSX (TypeScript-only security rules) | `sec-ts/recommended`, `sec-ts/strict` (extend `sec-js/*`) |
 | `security-html` | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | HTML | `sec-html/recommended`, `sec-html/strict` (extend `html/security`) |
-| `security-python` | — | `codelaw-rules-security-python` | Python | `sec-py/recommended`, `sec-py/strict` |
+| `security-python` | — | `codelaw-rules-security-python` | Python (61 rules, W-57) | `sec-py/recommended`, `sec-py/strict` |
 
 `FIRST_PARTY_PACKS` in `crates/codelaw-rules/src/pack.rs` is this table in code, and `scripts/package.py` reads it, so the engine and the release name the same packs on the same registries.
 

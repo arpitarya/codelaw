@@ -34,6 +34,8 @@ entry.**
 
 **Built 2026-10-25 (Claude Code, six parallel worktrees, merged):** W-47 baseline history, W-52 `deps refresh` (L5 amended: the one networked command), W-53 security-pack groundwork (L6: fifteen packs) — closed; W-44 watch, W-45 CI formats, W-50 git hooks — built, each waiting on a ruling or a PR from the decider. W-54–W-57 are now open to an agent.
 
+**Built 2026-10-26 (Claude Code):** W-57, the `security-python` catalogue — 61 `match:` rules (Bandit and Ruff `S` ported; Django, Flask, FastAPI, ML loaders and LLM rules), `sec-py/recommended` (57) and `strict` (+4), the README's Bandit accounting. Still `preview`: no rule is `stable` until its corpus count is reviewed, and the PyPI upload of `codelaw-rules-security-python` is the decider's, by hand (W-38's pattern). Three rules the catalogue called `suggest` are `manual`: `no-xpath-injection`, `no-xmlrpc`, `no-cleartext-http`.
+
 **Also filed 2026-10-25 (Cowork):** W-44 watch mode · W-45 CI formats · W-46 exceptions report (waits on W-40) · W-47 baseline history · W-48 `migrate` (ESLint, Ruff, stylelint, Biome; no oxlint — moved to the backlog as B-050 the same day) · W-49 dev-server plugins (waits on W-44) · W-50 git hooks. Then W-51 (scheduled auto-fix PR) and W-52 (dependency latest versions; the decider ruled `deps refresh` the one network command). Type-aware via typescript-go: parked as B-049 with [a proposal](proposals/type-aware-rules.md). Security: W-53 (groundwork, amends L6 to fifteen packs) then W-54–W-57 (`security-js`, `-ts`, `-html`, `-python`).
 
 *Updated 2026-10-24 (the parallel session: W-20, W-21, W-24–W-28 merged to `main` `82df231`, unpushed).*

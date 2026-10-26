@@ -1,0 +1,10 @@
+[
+  "request.query_params",
+  "request.path_params",
+  "request.headers",
+  "request.cookies",
+  "request.form",
+  "request.json",
+  "request.body",
+  "request.stream"
+]
