@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-34: Fux pinned at 5.1.1; what is unpublished  ·  Claude Code (Opus 5.5)
+
+- **Asked:** which packages are not on PyPI and npm (the decider publishes by hand); then *"Implement Fux for the latest version that we have."*
+- **Done:** listed the unpublished set (PyPI: `codelaw` and eight rule packs; npm: `scss`, `css-modules`, three security packs; all 25 Fux index packages). `FUX_VERSION` 5.1.0 → 5.1.1 with D-34, `licences.rs`, RELEASING.md, W-34 and OPEN-WORK; the count corrected from 16 to 25. Built all 25 with a scratch fux 5.1.1 venv; `check` passed.
+- **Decided / left open:** the pin moved on the decider's word; D-34 is still `pending`. No CI run has ever uploaded a `fux-index` artifact (the last green `main` run predates it; the two newest are red), so the decider builds locally with `--fux`.
+- **Mistakes:** gave the decider commands with `<run-id>`/`<tarball>` placeholders, which zsh ran literally, and told them to downgrade their venv to 5.1.0 before the pin moved; corrected in chat.
+- **Next:** the decider publishes the 25 from a local `assemble` and rules D-34.
+
 ## 2026-10-26 — W-62 finish attempt: blocked on the tree-sitter CLI  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** finish W-62 (patch tree-sitter-scss, CSS rules onto trees, pinned corpus), blocking under L11 where a dependency is unratified.

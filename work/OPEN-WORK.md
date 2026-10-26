@@ -24,7 +24,7 @@ here. Read that record before changing anything below it.
 |---|---|
 | 🔴 **PyPI 0.2.0 by hand, over 2–3 days** (four new projects a day): upload `codelaw-rules-{html,js,python,react}`, add six trusted publishers, then `gh release create v0.2.0` on W-37's tag — [W-38](open/W-38-pypi-0-2-0-by-hand.md) | 2026-10-20 |
 | ↳ **blocks:** W-38 itself; W-64 waits on it | |
-| 🔴 **Reserve and publish the 16 Fux index package names** (npm `@codelaw/rules-<name>-fux-index` ×10 by hand, then `npm-trust.sh`; PyPI `codelaw-rules-<name>-fux-index` ×6 by `twine`, then a trusted publisher each) — built by CI as the `fux-index` artifact; RELEASING.md §"The optional Fux index packages"; also ratify `fux-engine` as D-34 in `DEPENDENCIES.md` — [W-34](open/W-34-fux-index-packages.md) | 2026-10-26 |
+| 🔴 **Reserve and publish the 25 Fux index package names** (npm `@codelaw/rules-<name>-fux-index` ×15 by hand, then `npm-trust.sh`; PyPI `codelaw-rules-<name>-fux-index` ×10 by `twine`, then a trusted publisher each; built with fux 5.1.1) — built by CI as the `fux-index` artifact; RELEASING.md §"The optional Fux index packages"; also ratify `fux-engine` as D-34 in `DEPENDENCIES.md` — [W-34](open/W-34-fux-index-packages.md) | 2026-10-26 |
 | ↳ **blocks:** W-34 itself | |
 
 ---
@@ -35,7 +35,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
-🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, CI, `init` prints not installs); left: reserve the 16 names and publish them by hand (npm ten, PyPI six), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
+🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, fux 5.1.1, CI, `init` prints not installs); left: reserve the 25 names and publish them by hand (npm fifteen, PyPI ten), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
 🟢 **W-71** `agent` Tests for new or edited functions (JS, TS, Python), diff-scoped; step 1 built (`debug changed-functions`); left: the hook's file, `graph/untested-function`, lcov `graph/function-coverage`, `.codelawignore`. Filed by Arpit (Cowork). [detail](open/W-71-tests-for-new-code.md)
 
