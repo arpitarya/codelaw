@@ -120,6 +120,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the shared `target/debug/codelaw` is overwritten by every lane's build, so a CLI test can run another lane's binary; the tests were run from a private copy of the binary with the baked path patched, after every `cargo test` that skipped the relink gave a false red.
 - **Next:** none for W-59.
 
+## 2026-10-26 — W-55 built: `security-ts`, 16 rules  ·  Claude Code, lockmaster (Sonnet 5.5)
+
+- **Asked:** *"W-55 (security-ts, 16 rules on top)"*, the second landing of the same sub-agent after W-54.
+- **Done:** 16 rule files under `packs/security-ts/rules/sec-ts/` with `.cases.md` sidecars, the two presets (extending `security-js`'s), the README, NOTICE, `corpus.toml`. `codelaw test packs/security-ts`: 16 rules · 198 checks · 0 failed. W-55 archived; SR-RULE-PACKS names what landed.
+- **Decided / left open:** no cargo integration test (disk); the pack's own examples, cases and corpus counts are the tests. `nest-missing-guard`, `nest-throttler`, `no-ts-ignore-on-sink` (21 hits in test code at first) are `strict` because a guard or a throttler registered in another file is not seen.
+- **Mistakes:** matched `class_declaration` for a decorated controller, but tree-sitter-typescript puts the decorators of an exported class on the `export_statement`; found by the Do example firing, fixed by matching the export (or an unexported class).
+- **Next:** the decider's inbox; W-56 and the rest of the queue.
+
 ## 2026-10-26 — W-54 built: `security-js`, 66 rules  ·  Claude Code, lockmaster (Sonnet 5.5)
 
 - **Asked:** *"W-54 (security-js pack, 66 rules), every rule with a fix (L4), fixtures and tests"* — a sub-agent of a parallel session, Arpit having approved everything.

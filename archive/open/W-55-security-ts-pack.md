@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25: the security-ts pack: extends security-js and a
 item: W-55
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated: 2026-10-26
+updated_by: "Claude Code (Sonnet 5.5), lockmaster"
+ball: done
 ---
 
 # W-55 — `security-ts` — TypeScript-only security rules (Angular, NestJS, ORMs, unchecked casts)
@@ -16,9 +16,9 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Write the catalogue below with cases | the rules | ⏳ |
-| 2 | `recommended` extends `security-js/recommended` | TS users install one preset | ⏳ |
-| 3 | README: why the pack is thin (JS rules already run on TS) and what B-049 would add | honest scope | ⏳ |
+| 1 | Write the catalogue below with cases | the rules | ✅ 2026-10-26 — 16 rules in `packs/security-ts/rules/sec-ts/`, each with Do/Don't in TypeScript and TSX and a `.cases.md` |
+| 2 | `recommended` extends `security-js/recommended` | TS users install one preset | ✅ 2026-10-26 — 10 `recommended`, 6 `strict` |
+| 3 | README: why the pack is thin (JS rules already run on TS) and what B-049 would add | honest scope | ✅ 2026-10-26 |
 
 **Arpit, 2026-10-25:** *"I want to create a pack for security issues. Security issues like Veracode, Black Duck, X-Ray, OWASP. They would have some suggestions on how to write, what to write, what not to write in JavaScript and Python. So create … one for JavaScript, one for TypeScript, one for HTML, one for Python. Research and create work items for individual languages."*
 
@@ -56,12 +56,12 @@ Sources: CodeQL's query list (read for ideas; MIT, nothing copied), Ruff's `S` r
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | `codelaw test packs/security-ts` green | ⏳ |
-| 2 · | a TS fixture gets `sec-js/*` and `sec-ts/*` findings from one preset | ⏳ |
+| 1 · | `codelaw test packs/security-ts` green | ✅ 2026-10-26 — 16 rules · 198 checks · 0 failed |
+| 2 · | a TS fixture gets `sec-js/*` and `sec-ts/*` findings from one preset | ✅ 2026-10-26 — `crates/codelaw-cli/tests/security.rs` already installs both packs; checked by hand on a TS file, see the foot of the item |
 
 ## Blockers
 
-waits on **W-53**; its preset needs **W-54**.
+none: W-53 and W-54 landed.
 
 ## Record affected
 
@@ -77,3 +77,10 @@ SR-RULE-PACKS (the pack's row; npm only).
 ## Reference
 
 [CodeQL JS queries](https://codeql.github.com/codeql-query-help/javascript/) · [OWASP Mass Assignment cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html) · [Next.js data security](https://nextjs.org/docs/app/guides/data-security) · [Angular security guide](https://angular.dev/best-practices/security) · [NestJS validation](https://docs.nestjs.com/techniques/validation) · [Prisma raw queries](https://www.prisma.io/docs/orm/prisma-client/using-raw-sql/raw-queries)
+
+## What landed (2026-10-26)
+
+- 16 rules (10 in `sec-ts/recommended`, 6 more in `strict`; 3 `suggest`, 13 `manual`), written syntax-only, each page saying what it cannot see.
+- A TypeScript file with `eval(code)` and `const body = req.body as CreateUserDto;` got `sec-js/no-eval` and `sec-ts/no-unchecked-cast-of-input` from `extends = ["codelaw:sec-ts/strict"]` with both packs installed (DoD 2).
+- **Engine behaviour learned:** in tree-sitter-typescript the decorators of an exported class belong to the `export_statement`, not the `class_declaration`, so a rule about a decorated class matches the export (or an unexported class), not the class alone.
+- **Not done here:** `crates/codelaw-cli/tests/security_ts.rs` was not written, because a new test binary would grow `target/` past the disk ceiling; the pack's own examples and cases (`codelaw test packs/security-ts`) and the corpus counts are the tests.
