@@ -75,6 +75,14 @@ impl NativeRule for MaxLines {
             out.push(f);
         }
     }
+    /// The measured value and the limit, parsed back from the message the
+    /// rule wrote, for `--format json` and SARIF.
+    fn data_of(&self, finding: &NativeFinding, _options: &BTreeMap<String, Value>) -> Option<Value> {
+        let (head, tail) = finding.message.split_once(" lines (max ")?;
+        let lines: u64 = head.parse().ok()?;
+        let max: u64 = tail.chars().take_while(char::is_ascii_digit).collect::<String>().parse().ok()?;
+        Some(serde_json::json!({ "lines": lines, "max": max }))
+    }
 }
 
 fn file_ext(path: &str) -> String {
@@ -481,5 +489,17 @@ mod tests {
         let page = "<p>x</p>\n".repeat(401);
         assert_eq!(html(&page, json!({})).len(), 1);
         assert!(html(&"<p>x</p>\n".repeat(400), json!({})).is_empty());
+    }
+
+    #[test]
+    fn data_carries_the_count_and_the_limit() {
+        let src = "a {\n  top: 0;\n  left: 0;\n}\n";
+        for rule in [MaxLines::css("css/max-lines"), MaxLines::html("html/max-lines")] {
+            let path = if rule.lang == Lang::Css { "a.css" } else { "a.html" };
+            let f = run(&rule, path, src, json!({ "max": 2 }));
+            assert_eq!(rule.data_of(&f[0], &BTreeMap::new()), Some(json!({ "lines": 4, "max": 2 })));
+        }
+        let other = NativeFinding { start: 0, end: 0, message: "x".into(), edits: Vec::new() };
+        assert_eq!(MaxLines::css("css/max-lines").data_of(&other, &BTreeMap::new()), None);
     }
 }

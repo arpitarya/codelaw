@@ -7,7 +7,7 @@ filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-26
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+ball: done
 ---
 
 # W-61 — `html/max-lines` and `css/max-lines` (CSS, SCSS, CSS Modules)
@@ -57,7 +57,8 @@ ball: agent
 |---|---|---|
 | 1 · | cases: blank, comment, SCSS `//`, embedded `<script>`/`<style>`, every option | ✅ unit tests in `size_lines.rs` (cases cannot set options) |
 | 2 · | `codelaw test packs/html packs/css` green | ✅ |
-| 3 · | a scope gives `_*.scss` partials their own limit | ⏳ needs W-59 (scope tables) and W-62 (`.scss` is not a language yet; the rule already reads `//` comments when the path ends `.scss`) |
+| 3 · | a scope gives `_*.scss` partials their own limit | ✅ `[scope.partials] files = ["**/_*.scss"]` with `css/max-lines` at a higher `max`; test `css_and_html_size_data_and_a_partials_scope` in `crates/codelaw-cli/tests/size_limits.rs` |
+| 4 · | the measured value and the limit in JSON and SARIF (`data`: `{lines, max}`) | ✅ `NativeRule::data_of` on `MaxLines`; the same test, plus a unit test in `size_lines.rs` |
 
 ## Blockers
 

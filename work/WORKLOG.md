@@ -80,6 +80,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** none that landed; the first assemble run failed on the empty security packs and a temp-dir scope bug, both fixed before commit.
 - **Next:** Arpit's step 5.
 
+## 2026-10-26 — W-61 closed: `data` and the partials scope  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** finish W-61 now that W-59, W-58 (`data_of`) and W-62 have landed; collapse the blank runs in OPEN-WORK's build section.
+- **Done:** `MaxLines::data_of` (`{lines, max}`, parsed from the finding's message as `js/max-lines` does); a unit test and the binary test `css_and_html_size_data_and_a_partials_scope` (JSON and SARIF `data`; `[scope.partials]` with `files = ["**/_*.scss"]` raises `css/max-lines` for partials only). DoD 3 met, item archived, row removed.
+- **Decided / left open:** nothing left on W-61.
+- **Mistakes:** none.
+- **Next:** none.
+
 ## 2026-10-26 — W-61: `html/max-lines` and `css/max-lines`, with `html/size` and `css/size`  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** W-61 — a max-lines rule for HTML and CSS (CSS, SCSS and CSS Modules), with W-58's options shape.

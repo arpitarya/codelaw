@@ -109,3 +109,41 @@ fn a_baseline_freezes_the_long_files_and_a_new_one_fails() {
     assert!(out.contains("info  4 lines (max 3") && out.contains("grandfathered"), "the old one is frozen: {out}");
     let _ = fs::remove_dir_all(&d);
 }
+
+/// W-61: a project with the css and html packs, the two `size` presets and
+/// a scope that gives `_*.scss` partials their own limit.
+#[test]
+fn css_and_html_size_data_and_a_partials_scope() {
+    let d = temp("cssdata");
+    copy_dir(&repo().join("packs/css"), &d.join("node_modules/@codelaw/rules-css"));
+    copy_dir(&repo().join("packs/html"), &d.join("node_modules/@codelaw/rules-html"));
+    fs::write(
+        d.join("codelaw.toml"),
+        "extends = [\"codelaw:css/size\", \"codelaw:html/size\"]\npreview = true\n[rules]\n\"css/max-lines\" = { severity = \"warn\", options = { max = 3 } }\n\"html/max-lines\" = { severity = \"warn\", options = { max = 3 } }\n\n[scope.partials]\nfiles = [\"**/_*.scss\"]\nrules = { \"css/max-lines\" = { options = { max = 6 } } }\n",
+    )
+    .unwrap();
+    let five = "a {\n  top: 0;\n  left: 0;\n  right: 0;\n}\n";
+    fs::write(d.join("site.scss"), five).unwrap();
+    fs::write(d.join("_part.scss"), five).unwrap();
+    fs::write(d.join("long.css"), five).unwrap();
+    fs::write(d.join("page.html"), "<p>\n<b>\n<i>\n<u>\n</p>\n").unwrap();
+    let (_, out, err) = codelaw(&d, &["check", "--format", "json"]);
+    let v: Value = serde_json::from_str(&out).unwrap_or_else(|e| panic!("{e}: {out}{err}"));
+    let hits: Vec<(&str, &str, &Value)> = v["diagnostics"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|x| x["rule"].as_str().is_some_and(|r| r.ends_with("/max-lines")))
+        .map(|x| (x["file"].as_str().unwrap(), x["rule"].as_str().unwrap(), &x["data"]))
+        .collect();
+    let five_over_three = serde_json::json!({ "lines": 5, "max": 3 });
+    assert!(hits.contains(&("site.scss", "css/max-lines", &five_over_three)), "{hits:?}");
+    assert!(hits.contains(&("long.css", "css/max-lines", &five_over_three)), "{hits:?}");
+    assert!(hits.contains(&("page.html", "html/max-lines", &five_over_three)), "{hits:?}");
+    assert!(!hits.iter().any(|h| h.0 == "_part.scss"), "the partials scope raises the limit to 6: {hits:?}");
+    let (_, out, _) = codelaw(&d, &["check", "--format", "sarif"]);
+    let log: Value = serde_json::from_str(&out).unwrap();
+    let r = log["runs"][0]["results"].as_array().unwrap().iter().find(|r| r["ruleId"] == "html/max-lines").unwrap();
+    assert_eq!(r["properties"]["data"], five_over_three, "{r}");
+    let _ = fs::remove_dir_all(&d);
+}
