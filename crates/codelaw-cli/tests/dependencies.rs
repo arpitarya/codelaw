@@ -405,8 +405,7 @@ fn workflow_direct(root: &Path) -> BTreeMap<(String, String), String> {
                         "python" => py_name(tok),
                         // `npm@$NPM_VERSION` is npm itself: a toolchain (L11 decision 2).
                         _ => {
-                            let base = tok.strip_prefix('@').map(|t| format!("@{}", t.split('@').next().unwrap())).unwrap_or_else(|| tok.split('@').next().unwrap().to_owned());
-                            base
+                            tok.strip_prefix('@').map(|t| format!("@{}", t.split('@').next().unwrap())).unwrap_or_else(|| tok.split('@').next().unwrap().to_owned())
                         }
                     };
                     if name.is_empty() || name == "npm" || name == "pip" {

@@ -483,7 +483,7 @@ mod tests {
         let names: Vec<&str> = r["result"]["tools"].as_array().unwrap().iter().map(|t| t["name"].as_str().unwrap()).collect();
         assert_eq!(
             names,
-            ["rules_for_path", "explain_rule", "list_rules", "check_snippet", "check_paths", "fix_paths", "format_snippet", "dump_tree", "trace_rule"]
+            ["rules_for_path", "explain_rule", "list_rules", "check_snippet", "check_paths", "fix_paths", "format_snippet", "dump_tree", "list_exceptions", "trace_rule"]
         );
         for t in r["result"]["tools"].as_array().unwrap() {
             assert_eq!(t["inputSchema"]["type"], "object", "{t}");

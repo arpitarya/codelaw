@@ -209,6 +209,19 @@ const BUILD_TOOLS: &[BuildTool] = &[
         extras: &[],
         source: "https://pypi.org/pypi/uv/0.11.3/json (license_expression; no requires_dist)",
     },
+    // The optional Fux index packages (scripts/fux-index.py, W-34). A licence declaration
+    // only: whether Fux may be depended on is DEPENDENCIES.md D-34, `pending` the decider's ruling.
+    BuildTool {
+        registry: "pypi",
+        name: "fux-engine",
+        licence: "MIT",
+        requires: &["fux-core", "fux-reader", "fux-writer"],
+        extras: &[],
+        source: "DEPENDENCIES.md D-34 (MIT, 5.1.0; pending)",
+    },
+    BuildTool { registry: "pypi", name: "fux-core", licence: "MIT", requires: &[], extras: &[], source: "DEPENDENCIES.md D-34 (fux-engine's pinned dependency)" },
+    BuildTool { registry: "pypi", name: "fux-reader", licence: "MIT", requires: &[], extras: &[], source: "DEPENDENCIES.md D-34 (fux-engine's pinned dependency)" },
+    BuildTool { registry: "pypi", name: "fux-writer", licence: "MIT", requires: &[], extras: &[], source: "DEPENDENCIES.md D-34 (fux-engine's pinned dependency)" },
     BuildTool {
         registry: "npm",
         name: "npm",

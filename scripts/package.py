@@ -428,7 +428,7 @@ def check(out: pathlib.Path) -> None:
     seen_tags: dict[str, str] = {}
     pypi_packs: dict[str, dict[str, bytes]] = {}
     for w in sorted((out / "pypi").iterdir()):
-        m = re.match(r"^(codelaw(?:_rules_[a-z]+)?)-([^-]+)-([^-]+)-([^-]+)-([^-]+)\.whl$", w.name)
+        m = re.match(r"^(codelaw(?:_rules_[a-z_]+)?)-([^-]+)-([^-]+)-([^-]+)-([^-]+)\.whl$", w.name)
         if not m:
             bad.append(f"pypi: {w.name} is not a wheel codelaw publishes")
             continue
