@@ -62,10 +62,23 @@ fn team_pack(dir: &Path, name: &str, id: &str, lang: (&str, &str, &str), block: 
     .unwrap();
 }
 
+/// The project of the tests that read what the first-party security packs
+/// do; `teams_only` has just the two team packs, so a count of the rules a
+/// CWE or an OWASP category holds is not moved by a first-party pack's rules.
 fn project(name: &str) -> PathBuf {
+    project_with(name, true)
+}
+
+fn teams_only(name: &str) -> PathBuf {
+    project_with(name, false)
+}
+
+fn project_with(name: &str, first_party: bool) -> PathBuf {
     let d = temp(name);
-    for p in ["html", "security-html", "security-js", "security-ts"] {
-        install(&d, p);
+    if first_party {
+        for p in ["html", "security-html", "security-js", "security-ts"] {
+            install(&d, p);
+        }
     }
     team_pack(
         &d.join("team-js"),
@@ -87,7 +100,11 @@ fn project(name: &str) -> PathBuf {
     );
     fs::write(
         d.join("codelaw.toml"),
-        "extends = [\"codelaw:sec-html/recommended\", \"codelaw:sec-ts/strict\", \"path:team-js\", \"path:team-py\"]\npreview = true\n",
+        if first_party {
+            "extends = [\"codelaw:sec-html/recommended\", \"codelaw:sec-ts/strict\", \"path:team-js\", \"path:team-py\"]\npreview = true\n"
+        } else {
+            "extends = [\"path:team-js\", \"path:team-py\"]\npreview = true\n"
+        },
     )
     .unwrap();
     fs::write(d.join("a.js"), "function show() {\n  const h = location.hash;\n  document.body.innerHTML = h;\n}\nfunction safe(h) {\n  document.body.innerHTML = h;\n}\n").unwrap();
@@ -100,7 +117,7 @@ fn project(name: &str) -> PathBuf {
 /// it; `owasp:` matches a category; a tag nothing has lists nothing.
 #[test]
 fn rules_by_tag_across_packs() {
-    let d = project("tag");
+    let d = teams_only("tag");
     let (code, out, err) = codelaw(&d, &["rules", "--tag", "cwe:79"]);
     assert_eq!(code, 0, "{out}{err}");
     let ids: Vec<&str> = out.lines().map(|l| l.split_whitespace().next().unwrap()).collect();
@@ -120,7 +137,7 @@ fn rules_by_tag_across_packs() {
 /// `rules --security-coverage`: the OWASP Top 10:2025 × rule matrix.
 #[test]
 fn security_coverage_matrix() {
-    let d = project("coverage");
+    let d = teams_only("coverage");
     let (code, out, err) = codelaw(&d, &["rules", "--security-coverage"]);
     assert_eq!(code, 0, "{out}{err}");
     let injection = out.lines().find(|l| l.starts_with("A05:2025")).unwrap();

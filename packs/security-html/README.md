@@ -22,8 +22,8 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 | preset | rules | ported from |
 |---|---|---|
-| `sec-html/recommended` | 5 | extends `html/security` (the html pack's five security rules); high-confidence rules, at `error` |
-| `sec-html/strict` | 5 | `sec-html/recommended` and the heuristic rules, at `warn` |
+| `sec-html/recommended` | 19 | extends `html/security` (the html pack's five security rules); high-confidence rules, at `error` |
+| `sec-html/strict` | 24 | `sec-html/recommended` and the heuristic rules, at `warn` |
 
 <!-- /docs-sync:presets -->
 
@@ -32,8 +32,45 @@ heuristic ones, at `warn`, so a team can start without noise.
 
 ## Rules
 
-None yet: this is the pack's scaffold (W-53). The catalogue, each rule with
-its CWE, OWASP 2025 category and fix class, is [W-56](../../work/open/W-56-security-html-pack.md).
+| rule | flags | CWE | OWASP 2025 | fix | preset |
+|---|---|---|---|---|---|
+| `sec-html/no-inline-event-handler` | `onclick=`, `onerror=` … attributes (they block a strict CSP) | 79 | A05 | manual | `recommended` |
+| `sec-html/no-javascript-url` | `javascript:` in `href`, `src`, `action`, `formaction`, `xlink:href`, `<object data>` | 79 | A05 | manual | `recommended` |
+| `sec-html/no-mixed-content` | `http://` in `src`, `action`, a stylesheet/script `href`, a download link | 319 | A04 | suggest | `recommended` |
+| `sec-html/password-form-post` | a password form with `method=get`, no `method`, or an `http:` action | 598 | A04 | suggest | `recommended` |
+| `sec-html/iframe-sandbox` | `<iframe>` without `sandbox`, or `allow-scripts` with `allow-same-origin` | 1021 | A02 | suggest | `recommended` |
+| `sec-html/csp-meta-unsafe` | a meta CSP with `'unsafe-inline'`, `'unsafe-eval'`, `*` or `data:` in script sources | 693 | A02 | manual | `recommended` |
+| `sec-html/no-credentials-in-url` | `user:pass@host` in a URL attribute | 522 | A07 | manual | `recommended` |
+| `sec-html/no-template-html-sink` | Angular `[innerHTML]`, Vue `v-html`, Alpine `x-html` | 79 | A05 | manual | `recommended` |
+| `sec-html/referrer-policy` | `referrerpolicy` or `<meta name=referrer>` set to `unsafe-url` or `no-referrer-when-downgrade` | 200 | A02 | suggest | `recommended` |
+| `sec-html/no-srcdoc-script` | `<iframe srcdoc>` holding a script, handler or `javascript:` | 79 | A05 | manual | `recommended` |
+| `sec-html/sri-crossorigin` | `integrity` on a cross-origin file without `crossorigin` | 353 | A08 | suggest | `recommended` |
+| `sec-html/no-secret-in-hidden-input` | a hidden `password`/`token`/`secret`/`api-key` input with a literal value (CSRF tokens excluded) | 798, 200 | A07 | manual | `recommended` |
+| `sec-html/angularjs-url-expression` | `href="{{…}}"` / `src="{{…}}"` in an AngularJS page | 79 | A05 | suggest | `recommended` |
+| `sec-html/no-unsafe-template-interpolation` | Handlebars `{{{ }}}`, `|safe`, `{% autoescape off %}`, EJS `<%-` | 79 | A05 | manual | `recommended` |
+| `sec-html/no-external-base` | `<base href>` on another origin | — | A05 | manual | `strict` |
+| `sec-html/no-plugin-embed` | `<object>`, `<embed>`, `<applet>` | — | A02 | manual | `strict` |
+| `sec-html/no-sensitive-comments` | an HTML comment with a password, key, internal host or a note to remove | 615 | A02 | auto | `strict` |
+| `sec-html/form-csrf-token` | a `method=post` form with no CSRF field (extra names: `names` option) | 352 | A01 | manual | `strict` |
+| `sec-html/iframe-allow-powerful` | a cross-origin `<iframe allow="camera; microphone; …">` | 250 | A02 | manual | `strict` |
+
+Each rule is native (a Rust implementation in the engine, read with the same
+document model as the `html/*` rules) and is pattern-level: one start tag,
+one attribute, one comment or one run of template syntax. A value that is
+template code (`{{ }}`, `<% %>`) is judged by its literal prefix only, and
+the AngularJS rule runs only on a page that shows AngularJS. The catalogue
+and its sources are [W-56](../../archive/open/W-56-security-html-pack.md) and the
+OWASP HTML5, CSP and Cross-Site Request Forgery cheat sheets.
+
+`sec-html/no-inline-event-handler` and `sec-html/no-javascript-url` overlap
+`html/no-inline-script`, which the preset also turns on: a handler is
+reported twice, once with its CWE. Turn either off in `[rules]` if one report
+is enough.
+
+`suggest` fixes (`https://`, `method="post"`, `sandbox`, `crossorigin`,
+`referrerpolicy`) apply with `codelaw fix --unsafe`. A fix is not applied when
+it would add a finding the file did not have: under `strict`, turning a form
+to POST is refused while `sec-html/form-csrf-token` has nothing to see.
 
 Every rule here carries `security: { cwe, owasp, severity }`
 ([SR-RULE-FORMAT](../../records/0112_rule-format.md) decision 2a), so
