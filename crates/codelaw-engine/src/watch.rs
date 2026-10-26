@@ -65,7 +65,7 @@ impl Project {
         let checked: Vec<(FileResult, Vec<Asked>)> = self.pool.install(|| files.par_iter().map(|f| this.check_file_asked(f)).collect());
         let (results, asked): (Vec<FileResult>, Vec<Vec<Asked>>) = checked.into_iter().unzip();
         // Project rules see the whole root, and report inside `paths`.
-        let graph = if !self.graph_rules().is_empty() || self.deprecations_on() {
+        let graph = if !self.graph_rules().is_empty() || self.deprecations_on() || self.tests_on() {
             let config = self.graph_config()?;
             let sources = self.graph_sources()?;
             let this = &*self;
@@ -106,6 +106,11 @@ impl Project {
             report.diagnostics.extend(self.run_graph_rules_on(&graph, &g.sources).into_iter().filter(|d| project::within(&d.file, &scopes)));
             if self.deprecations_on() {
                 deprecated = self.deprecated_occurrences(&graph, &g.sources).into_iter().filter(|o| project::within(&o.diag.file, &scopes)).collect();
+            }
+            if self.tests_on() {
+                let (found, header) = self.new_code_findings(&graph, &g.sources, &scopes, &mut report.warnings);
+                report.diagnostics.extend(found);
+                report.new_code = header;
             }
         }
         // The adapters (SR-ARCHITECTURE decision 4, step 5): a finding a
@@ -179,7 +184,7 @@ fn names(dir: &Path) -> BTreeSet<OsString> {
 
 /// Files whose change reloads the project wherever they are, as the
 /// language server's watched files do (SR-EDITOR decision 2).
-const INPUT_NAMES: &[&str] = &["codelaw.toml", "pyproject.toml", "package.json", ".editorconfig", ".gitignore", ".ignore"];
+const INPUT_NAMES: &[&str] = &["codelaw.toml", "pyproject.toml", "package.json", ".editorconfig", ".gitignore", ".ignore", ".codelawignore"];
 
 /// Whether a change to `path` reloads the project: the config, a rule, the
 /// baseline or the deprecations registry, the format options or an ignore

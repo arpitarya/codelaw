@@ -150,7 +150,59 @@ pub const ENGINE_RULES: &[EngineRule] = &[
         fix: FixClass::Manual,
         steps: &["Correct the rule id, or remove the comment."],
     },
+    EngineRule {
+        id: "graph/untested-function",
+        title: "A new or edited function is reached by no test file",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &[
+            "Write a unit test that imports the function (or its module, for a function the module does not export) and calls it: a test needs judgment, so codelaw does not write one.",
+            "If the function should never need its own test (a thin wrapper, generated code), exempt it in `.codelawignore` with `forever: <reason>`; to defer the test, give the line `expires=YYYY-MM-DD` and `on_touch=…` and a reason.",
+        ],
+    },
+    EngineRule {
+        id: "graph/function-coverage",
+        title: "A new or edited function's line coverage is under `[coverage] min`",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &[
+            "Add test cases that run the lines the coverage report shows as missed, regenerate the lcov report in the same job, and run `codelaw check --coverage <report>` again: a test needs judgment, so codelaw does not write one.",
+            "If the function cannot reasonably be covered, exempt it in `.codelawignore` with a reason, `expires=` or `forever`, and `on_touch=`.",
+        ],
+    },
+    EngineRule {
+        id: "codelaw/stale-coverage",
+        title: "The coverage report does not match this file, so its coverage is not judged",
+        severity: Severity::Warn,
+        fix: FixClass::Manual,
+        steps: &["Regenerate the lcov report from the code being checked — in the same CI job, after the tests and before `codelaw check` — and pass it with `--coverage` or `[coverage] report`."],
+    },
+    EngineRule {
+        id: "codelaw/stale-ignore",
+        title: "A `.codelawignore` line matches no file or function",
+        severity: Severity::Warn,
+        fix: FixClass::Auto,
+        steps: &[],
+    },
+    EngineRule {
+        id: "codelaw/incomplete-ignore",
+        title: "A `.codelawignore` line is missing a field or contradicts itself, so it exempts nothing",
+        severity: Severity::Error,
+        fix: FixClass::Manual,
+        steps: &[
+            "Give the line what the message names: a reason after a colon (always, with `expires=` or `forever`), `expires=YYYY-MM-DD` or `forever` (`[coverage.ignore] require_expiry`), and `on_touch=error|warn|keep` unless it is `forever` (`[coverage.ignore] require_on_touch`).",
+            "`forever` takes no `expires=`, `warn_days=` or `on_touch=`; a glob takes no `on_touch_scope=function`.",
+        ],
+    },
 ];
+
+/// The opt-in preset that turns on the test rules of new code (W-71):
+/// `extends = ["codelaw:tests"]`. It is the engine's, not a pack's, so it
+/// has no namespace and no rule pack resolves it.
+pub const TESTS_PRESET: &str = "codelaw:tests";
+
+/// The engine rules `codelaw:tests` turns on.
+pub const TEST_RULES: &[&str] = &["graph/untested-function", "graph/function-coverage"];
 
 pub fn engine_rule(id: &str) -> Option<&'static EngineRule> {
     ENGINE_RULES.iter().find(|r| r.id == id)

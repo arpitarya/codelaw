@@ -84,6 +84,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
 2. **Common flags:**
    - `--lang <list>`, `--rule <id>`;
    - `--changed-since <ref>`, `--staged`, `--as-of <date>`;
+   - `--coverage <path>`: the lcov report `graph/function-coverage` reads; it wins over `[coverage] report` ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9). When the test rules of new code run, `text` and `agent` output opens with `new code: …` (`new code: 3 new, 1 edited functions since <base>`, or `new code: no change set; test rules not evaluated`) and, when the coverage rule runs, `coverage: <report> (N files)` or `coverage: none; not evaluated`; `json` carries them as `new_code: { change_set, coverage }`, and each finding of the two rules carries `data` (`function`, `change`; the coverage rule also `covered`, `lines`, `pct`, `min`);
    - `--profile <name>`: the `[profile.<name>]` to run with; without it, `CODELAW_PROFILE`, then `ci` when `CI` is set, else `local` ([SR-CONFIG](0110_config.md) decision 10). `codelaw hook` and `config --print` take it too;
    - `--format text|json|sarif|agent|github|gitlab|junit|checkstyle`;
    - `--unsafe` (apply `suggest` fixes), `--dry-run`;
@@ -136,8 +137,8 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
      | `explain_rule {id}` | `explain <id> --format json` |
      | `list_rules {}` | `rules --format json` |
      | `check_snippet {path, code}` | `check <path> --format json` on a file holding `code` |
-     | `check_paths {paths, rule, lang, as_of, changed_since, staged}` | `check [paths] [--rule] [--lang] [--as-of] [--changed-since] [--staged] --no-adapters --format json` |
-     | `fix_paths {paths, unsafe, dry_run, rule, lang, as_of, changed_since, staged}` | `fix … --no-adapters --format json` |
+     | `check_paths {paths, rule, lang, as_of, changed_since, staged, coverage}` | `check [paths] [--rule] [--lang] [--as-of] [--changed-since] [--staged] [--coverage] --no-adapters --format json` |
+     | `fix_paths {paths, unsafe, dry_run, rule, lang, as_of, changed_since, staged, coverage}` | `fix … --no-adapters --format json` |
      | `format_snippet {path, code}` | the bytes `fix <path>` writes, format step included, without writing them ([SR-FORMATTER](0105_formatter.md) decision 4) |
      | `dump_tree {path \| code+lang, line}` | `tree … --format json` |
      | `list_exceptions {expiring, expired, mine, rule, path, group_by, as_of}` | `exceptions … --format json` ([SR-BASELINE](0104_baseline-and-deprecations.md) decision 11) |

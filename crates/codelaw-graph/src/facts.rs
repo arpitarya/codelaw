@@ -521,15 +521,19 @@ impl<'a> Extractor<'a> {
 
     /// The source-side name of `export { x as name } from`.
     fn reexported_name(&self, tops: &[Node<'_>], start: usize, name: &str) -> String {
-        let Some(stmt) = tops.iter().find(|n| n.start_byte() == start) else { return name.to_owned() };
+        // `start` is the statement's or, for one specifier, inside it.
+        let Some(stmt) = tops.iter().find(|n| n.start_byte() <= start && start < n.end_byte()) else { return name.to_owned() };
         for c in named_children(*stmt) {
             match c.kind() {
                 "export_clause" => {
                     for spec in named_children(c) {
                         let Some(n) = spec.child_by_field_name("name") else { continue };
                         let alias = spec.child_by_field_name("alias").unwrap_or(n);
-                        if unquote(self.t(alias)) == name {
-                            return unquote(self.t(n));
+                        // `unquote` is for a string name (`export { "a b" as x }`):
+                        // on an identifier it would strip the letters.
+                        let text = |x: Node<'_>| if x.kind() == "string" { unquote(self.t(x)) } else { self.t(x).to_owned() };
+                        if text(alias) == name {
+                            return text(n);
                         }
                     }
                 }

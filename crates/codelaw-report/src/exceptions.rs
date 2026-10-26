@@ -191,7 +191,16 @@ fn subject(e: &Exception) -> String {
             }
         }
         Inline => format!("{}:{}", e.files[0], e.line),
+        Ignore => match &e.symbol {
+            Some(s) => format!("{}#{s}", e.files[0]),
+            None => e.files[0].clone(),
+        },
     }
+}
+
+/// `expires`, or `forever` for a `.codelawignore` line that never expires.
+fn expires_cell(e: &Exception) -> String {
+    if e.forever { "forever".to_owned() } else { e.expires.map(|d| d.to_string()).unwrap_or_default() }
 }
 
 fn plural(n: usize, one: &str, many: &str) -> String {
@@ -207,10 +216,10 @@ impl Report<'_> {
         }
         let cells = |r: &Row<'_>| {
             let e = r.e;
-            let uses = if e.kind == codelaw_engine::ExceptionKind::Inline { String::new() } else { format!(" ({})", e.uses) };
+            let uses = if matches!(e.kind, codelaw_engine::ExceptionKind::Inline | codelaw_engine::ExceptionKind::Ignore) { String::new() } else { format!(" ({})", e.uses) };
             [
-                e.expires.map(|d| d.to_string()).unwrap_or_default(),
-                when(r.days_left, e.expires.is_some()),
+                expires_cell(e),
+                if e.forever { "never".to_owned() } else { when(r.days_left, e.expires.is_some()) },
                 e.rule.clone(),
                 format!("{}{uses}", subject(e)),
                 e.reason.clone().unwrap_or_default(),
@@ -246,7 +255,7 @@ impl Report<'_> {
             e.rule.clone(),
             e.files.join(" "),
             e.symbol.clone().unwrap_or_default(),
-            e.expires.map(|d| d.to_string()).unwrap_or_default(),
+            expires_cell(e),
             r.days_left.map(|d| d.to_string()).unwrap_or_default(),
             e.added_by.clone().unwrap_or_default(),
             e.reason.clone().unwrap_or_default(),
@@ -296,8 +305,8 @@ impl Report<'_> {
                 let e = r.e;
                 out.push_str(&format!(
                     "| {} | {} | `{}` | `{}` | {} | {} | {} |\n",
-                    e.expires.map(|d| d.to_string()).unwrap_or_default(),
-                    when(r.days_left, e.expires.is_some()),
+                    expires_cell(e),
+                    if e.forever { "never".to_owned() } else { when(r.days_left, e.expires.is_some()) },
                     esc(&e.rule),
                     esc(&subject(e)),
                     e.uses,
@@ -327,6 +336,7 @@ impl Report<'_> {
                 "files": e.files,
                 "symbol": e.symbol,
                 "expires": e.expires.map(|d| d.to_string()),
+                "forever": e.forever,
                 "days_left": r.days_left,
                 "added_by": e.added_by,
                 "reason": e.reason,

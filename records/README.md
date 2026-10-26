@@ -216,6 +216,7 @@ yet is owned by an open `W-nn`.
 | `fixtures/l3` | SR-LAW-3 | the fixture matrix |
 | `fixtures/css-modules` | SR-PROJECT-GRAPH | decision 8: the React app the `css-modules` rules run on |
 | `crates/codelaw-cli/tests/css_modules.rs` | SR-PROJECT-GRAPH | decision 8: runs that app, `[css]` and `init` through the binary |
+| `crates/codelaw-cli/tests/tests_for_new_code.rs` | SR-PROJECT-GRAPH | decision 9: the test rules of new code and `.codelawignore` on real git repos |
 | `fixtures/scss` | SR-LAW-3 | SCSS as a CSS dialect (amended 2026-10-26): the corpus the `css` and `scss` packs hold finding counts on |
 | `crates/codelaw-cli/tests/scss.rs` | SR-LAW-3 | runs that corpus, the `css/*`-quiet-on-Sass check and `format` idempotence through the binary |
 | `fixtures/react-no-context` | SR-RULE-PACKS | decision 8: `react/no-context`'s adoption recipe as a repo (W-41) |

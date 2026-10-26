@@ -10,7 +10,7 @@ feature: "caching"
 owns:
   - crates/codelaw-cache
 laws: [L0, L2, L5, L8]
-timestamp: 2026-10-19T14:19:21Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -57,7 +57,7 @@ The decider made performance a law (L8) and asked for a caching record. Caches w
 
 ### Decision
 
-1. **The five caches and their keys** are the §1 table. A key covers **every** input that can change the value. If an input is missing from a key, that's a correctness bug, and the cold/warm test (decision 7) exists to catch it.
+1. **The five caches and their keys** are the §1 table. A key covers **every** input that can change the value. If an input is missing from a key, that's a correctness bug, and the cold/warm test (decision 7) exists to catch it. **Not cached: the test rules of new code** ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9). Their verdict depends on the change set's base copies (read from git each run), the lcov report and `.codelawignore`, so it is computed every run from the linked graph — whose facts are cached as above — and no key needs those inputs; `[coverage]` is config text, already in every key ([SR-CONFIG](0110_config.md) decision 9). Caching it later means a key with the report's hash and each base copy's.
 2. **Hashing:** `blake3` over the raw bytes (CC0-1.0 / Apache-2.0; [L2](0004_LAW-2-foss-dependencies.md)). Versions are part of every key, so upgrading codelaw invalidates the cache without any extra step.
 3. **Location:** `.codelaw/cache/` in the repo root, gitignored ([SR-CONSUMER-LAYOUT](0111_consumer-layout.md)). It can be overridden with `CODELAW_CACHE_DIR` or `[cache] dir`. In CI the folder can be restored between runs (for example with `actions/cache`), keyed by the codelaw version.
 4. **Format on disk:**

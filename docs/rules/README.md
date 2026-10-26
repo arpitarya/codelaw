@@ -2,7 +2,7 @@
 
 # Rule reference
 
-**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 651 rules in 17 packs, plus the engine's 18 own rules.
+**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 651 rules in 17 packs, plus the engine's 23 own rules.
 
 ## Configuring any rule — the forms
 
@@ -52,7 +52,7 @@ remap = { error = "warn" }
 | [security-html](#security-html) | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | 19 | 1 |
 | [python](#python) | — | `codelaw-rules-python` | 103 | 10 |
 | [security-python](#security-python) | — | `codelaw-rules-security-python` | 61 | 0 |
-| [engine](engine.md) | in `codelaw` | in `codelaw` | 18 | 0 |
+| [engine](engine.md) | in `codelaw` | in `codelaw` | 23 | 0 |
 
 ## js
 

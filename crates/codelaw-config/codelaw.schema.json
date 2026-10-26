@@ -277,6 +277,77 @@
         }
       }
     },
+    "coverage": {
+      "x-codelaw-record": "SR-PROJECT-GRAPH",
+      "description": "The test rules of new code, `graph/untested-function` and `graph/function-coverage` (SR-PROJECT-GRAPH decision 9). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "report": {
+          "description": "The lcov report `graph/function-coverage` reads, relative to the config file; `--coverage` wins.",
+          "type": "string"
+        },
+        "scope": {
+          "description": "`all`: every new or edited function; `public`: only exported ones (JS/TS), or ones with no leading `_` or in `__all__` (Python).",
+          "enum": ["all", "public"],
+          "default": "all"
+        },
+        "min": {
+          "description": "The least line coverage, in percent, of each new or edited function.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 60
+        },
+        "mode": {
+          "description": "`function`: one finding per function under `min`; `patch`: one finding when all new and edited functions' lines together are under `min`.",
+          "enum": ["function", "patch"],
+          "default": "function"
+        },
+        "require_report": {
+          "description": "No coverage report is an error, not a skip.",
+          "type": "boolean",
+          "default": false
+        },
+        "on_no_change_set": {
+          "description": "`skip`: with no change set nothing is judged; `all`: every function is judged (a baseline roll-out).",
+          "enum": ["skip", "all"],
+          "default": "skip"
+        },
+        "ignore_names": {
+          "description": "A regular expression: functions whose name matches it are never judged.",
+          "type": "string"
+        },
+        "ignore": {
+          "x-codelaw-record": "SR-BASELINE",
+          "description": "What every `.codelawignore` line must carry, and the defaults of a line (SR-BASELINE decision 12).",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "require_expiry": {
+              "description": "Every line says `expires=…` or `forever`; one without is `codelaw/incomplete-ignore`.",
+              "type": "boolean",
+              "default": true
+            },
+            "require_on_touch": {
+              "description": "Every line that is not `forever` says `on_touch=…`; one without is `codelaw/incomplete-ignore`.",
+              "type": "boolean",
+              "default": true
+            },
+            "on_touch": {
+              "description": "What an edit does to a line that does not say: `error` revokes it, `warn` revokes it as warnings, `keep` keeps it.",
+              "enum": ["error", "warn", "keep"],
+              "default": "error"
+            },
+            "on_touch_scope": {
+              "description": "What counts as an edit for a line that does not say: `file`, any change to the file; `function`, the function's tokens changed.",
+              "enum": ["file", "function"],
+              "default": "file"
+            }
+          }
+        }
+      }
+    },
     "css": {
       "x-codelaw-record": "SR-PROJECT-GRAPH",
       "description": "CSS Modules: which stylesheets are modules, and how the bundler turns a class name into `styles.x`. Read by the `css-modules/*` rules and the project graph. Root config only.",

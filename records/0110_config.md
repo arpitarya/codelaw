@@ -10,7 +10,7 @@ feature: "configuration"
 owns:
   - crates/codelaw-config
 laws: [L0, L3, L5, L7]
-timestamp: 2026-10-26T18:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -60,6 +60,7 @@ remap = { error = "warn" }
 [exceptions]  # SR-BASELINE (dated exceptions: require_expiry, warn_days)
 [deps]        # SR-RULE-PACKS (the dependency rules and their snapshot)
 [css]         # SR-PROJECT-GRAPH (CSS Modules: which stylesheets, and the bundler's class-name mapping)
+[coverage]    # SR-PROJECT-GRAPH (the test rules of new code; [coverage.ignore] is SR-BASELINE's)
 ```
 
 ```mermaid
@@ -121,9 +122,9 @@ Configuration keys were scattered across six records. The decider asked for one 
 
    Sizes are bytes or a string such as `"1 MiB"` or `"512MB"`; durations are seconds or a string such as `"5s"` or `"500ms"`; a number of days (`[deps]`'s ages) is an integer or a string such as `"7d"` or `"2w"`.
 
-   `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11).
+   `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11). One preset has no namespace: `codelaw:tests` is the engine's own and turns on the test rules of new code ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9); no pack resolves it.
 
-   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]`, `[deprecation]`, `[exceptions]`, `[deps]` and `[css]` are validated by the loader like `[fix]` and `[lint]`; `[format]`, `[graph]` and `[baseline]` are still read as tables.
+   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]`, `[deprecation]`, `[exceptions]`, `[deps]`, `[css]` and `[coverage]` are validated by the loader like `[fix]` and `[lint]`; `[format]`, `[graph]` and `[baseline]` are still read as tables.
 4. **Precedence, last wins:**
    1. Built-in defaults.
    2. `.editorconfig` (formatter keys only).

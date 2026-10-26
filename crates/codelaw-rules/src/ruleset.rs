@@ -126,6 +126,10 @@ impl RuleSet {
                 Some(v) => format!("{spec_text} (extended by {v})"),
                 None => spec_text.clone(),
             };
+            // The engine's own preset: the engine reads it, no pack does.
+            if spec_text == crate::TESTS_PRESET && via.is_empty() {
+                continue;
+            }
             let spec = match ExtendsSpec::parse(spec_text) {
                 Ok(s) => s,
                 Err(e) => {

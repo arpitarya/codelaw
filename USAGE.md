@@ -234,6 +234,33 @@ modules_convention = "camelCase"     # css-loader's localsConvention: .btn-prima
 
 `css-modules/no-unused-class` reports a class no file reads (in the stylesheet; `codelaw fix --unsafe` deletes the rule), and `css-modules/no-undefined-class` reports `styles.x` where the module has no `.x` (in the JS or TS file). A module read by a computed name (`styles[name]`), spread, or passed to a function is never reported, and neither is one no file imports ([SR-PROJECT-GRAPH](records/0103_project-graph.md) decision 8).
 
+### Tests for new code
+
+Every new or edited function in JavaScript, TypeScript or Python must have a unit test, and — given a coverage report — at least 60% line coverage. Functions nobody touched are never judged, so a legacy codebase needs no baseline to start. Opt in:
+
+```toml
+extends = ["codelaw:tests"]
+
+[coverage]
+report = "coverage/lcov.info"   # or --coverage <path>; codelaw reads lcov itself and never runs your tests
+min = 60                        # per function; mode = "patch" judges all new lines together
+scope = "all"                   # "public": only exported functions (JS/TS), no leading _ (Python)
+```
+
+- **The change set is an input:** `--changed-since origin/main` in CI, `--staged` in the pre-commit hook, and the file an agent just edited in `codelaw hook`. A function is *new* when the base has none of that name and *edited* when its tokens changed — a reformat, a move or a comment outside it is not an edit. Plain `codelaw check` judges nothing and says `new code: no change set; test rules not evaluated`. See what it sees with `codelaw debug changed-functions --changed-since origin/main`.
+- **`graph/untested-function`:** no test file reaches the function — a test reaches it by importing it (any alias, through a barrel or `from pkg.mod import f`), or, for a function its module does not export, by importing the module. A string such as `mock.patch("pkg.mod.f")` does not count. It needs no report, so it runs in hooks too.
+- **`graph/function-coverage`:** the function's lines in an lcov report (Jest `coverageReporters: ["lcov"]`, Vitest `coverage.reporter: ["lcov"]`, c8, `coverage lcov`, pytest-cov `--cov-report=lcov`) are under `min`. **Generate the report in the same job, before `codelaw check`:** lcov has no content hash, so an old report is only mostly caught — a file it does not name, a line past the end, or a line that is now blank or a comment gives `codelaw/stale-coverage` and no verdict for that file. TypeScript compiled with plain `tsc` and measured by c8 without source maps is not supported; Jest and Vitest write lcov against the `.ts` source.
+- **Exemptions live in `.codelawignore`** at the project root, one line each, every line with a reason:
+
+  ```text
+  src/utils/http.ts#get                 forever: thin wrapper over fetch, nothing to test
+  scripts/*.py                          on_touch=error expires=2027-01-31: one-off migration scripts
+  app/billing.py#Invoice.legacy_total   on_touch=error on_touch_scope=function expires=2027-03-01 by=lead@example.com: replaced in ORD-1500
+  app/legacy/report.py#build_report     on_touch=warn expires=2027-06-30: migration in progress
+  ```
+
+  `on_touch=error` (the default) revokes an exemption when its file is edited — every function it covers in that file is judged again; `warn` brings the findings back as warnings; `keep` keeps it. `on_touch_scope=function` narrows "edited" to that function's own tokens. `forever` never expires and is never revoked. `[coverage.ignore]` sets `require_expiry` and `require_on_touch` (both `true`) and the defaults of a line; a line missing a field is `codelaw/incomplete-ignore` and exempts nothing, and a line that matches nothing is `codelaw/stale-ignore`, which `codelaw fix` removes. `codelaw exceptions` lists every line. A `// codelaw-ignore graph/untested-function: <why>` above one function works too ([SR-PROJECT-GRAPH](records/0103_project-graph.md) decision 9, [SR-BASELINE](records/0104_baseline-and-deprecations.md) decision 12).
+
 ---
 
 ## Write your own rules

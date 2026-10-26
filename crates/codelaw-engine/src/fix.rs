@@ -356,9 +356,10 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
     if !project.graph_rules().is_empty() {
         sources = Some(fix_project_rules(project, paths, options, &mut report)?);
     }
-    // `graph/no-deprecated-usage` on the fixed texts; its fix is manual.
+    // `graph/no-deprecated-usage` and the test rules of new code on the
+    // fixed texts; their fixes are manual.
     let mut deprecated = Vec::new();
-    if project.deprecations_on() {
+    if project.deprecations_on() || project.tests_on() {
         let sources = match sources {
             Some(s) => s,
             None => {
@@ -372,7 +373,19 @@ pub(crate) fn fix_paths(project: &mut Project, paths: &[PathBuf], options: &FixO
             }
         };
         let graph = project.build_graph(&sources, project.graph_config()?);
-        deprecated = project.deprecated_occurrences(&graph, &sources).into_iter().filter(|o| crate::project::within(&o.diag.file, &scopes)).collect();
+        if project.deprecations_on() {
+            deprecated = project.deprecated_occurrences(&graph, &sources).into_iter().filter(|o| crate::project::within(&o.diag.file, &scopes)).collect();
+        }
+        if project.tests_on() {
+            let (mut found, header) = project.new_code_findings(&graph, &sources, &scopes, &mut report.check.warnings);
+            // `codelaw/stale-ignore` is `auto`: the line goes, and so does
+            // the finding.
+            if !options.dry_run && project.prune_ignore_file(&found) > 0 {
+                found.retain(|d| d.rule != codelaw_baseline::STALE_IGNORE_RULE);
+            }
+            report.check.diagnostics.extend(found);
+            report.check.new_code = header;
+        }
     }
     let ran = crate::baseline::Ran {
         files: files.iter().filter(|e| !skipped.iter().any(|s| s.file == e.rel)).map(|e| e.rel.clone()).collect(),

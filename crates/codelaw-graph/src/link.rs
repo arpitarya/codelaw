@@ -450,6 +450,43 @@ impl Graph {
     }
 }
 
+/// Whether a file is a test file by the graph's test presets (decision 3):
+/// Jest / Vitest `*.test.*` and `*.spec.*`, a file under `__tests__/`, and
+/// pytest / unittest `test*.py`, `*_test.py` and `conftest.py`. The test
+/// rules of W-71 use it twice: a test file reaches a function, and a test
+/// file's own functions are never judged.
+pub fn is_test_file(path: &str) -> bool {
+    let name = path.rsplit('/').next().unwrap_or(path);
+    if let Some(stem) = name.strip_suffix(".py") {
+        return name == "conftest.py" || stem.starts_with("test") || stem.ends_with("_test");
+    }
+    let parts: Vec<&str> = name.split('.').collect();
+    let js = parts.len() >= 2 && matches!(parts[parts.len() - 1], "js" | "jsx" | "mjs" | "cjs" | "ts" | "tsx" | "mts" | "cts");
+    if !js {
+        return false;
+    }
+    (parts.len() >= 3 && matches!(parts[parts.len() - 2], "test" | "spec")) || path.split('/').rev().skip(1).any(|d| d == "__tests__")
+}
+
+impl Graph {
+    /// Whether a test file reaches the top-level declaration `name` of
+    /// `module` (W-71, `graph/untested-function`): by graph identity — an
+    /// import under any alias, through a barrel or a re-export, a namespace
+    /// or module member — or, when `importable` is false (a JS function the
+    /// module does not export), by importing the module at all. A test file
+    /// that takes the whole module (`import *` passed around, `from m import
+    /// *`) reaches every name in it. Strings (`mock.patch("m.f")`) are not
+    /// identity and never count.
+    pub fn test_reaches(&self, module: &str, name: &str, importable: bool) -> bool {
+        if self.uses_of(module, name).iter().any(|u| u.file != module && is_test_file(&u.file)) {
+            return true;
+        }
+        let Some(m) = self.modules.get(module) else { return false };
+        let tested_import = m.importers.iter().any(|f| is_test_file(f));
+        tested_import && (!importable || m.all_used.as_deref().is_some_and(|why| why.split_whitespace().any(is_test_file)))
+    }
+}
+
 /// Framework presets (decision 3): files used from outside the repo.
 fn preset_entry(path: &str, lang: Option<FactLang>) -> Option<String> {
     let name = path.rsplit('/').next().unwrap_or(path);

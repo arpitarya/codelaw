@@ -237,6 +237,8 @@ impl Project {
         let only = self.options.rules.as_ref();
         let ran_rule = if rule == DEPRECATED_RULE {
             ran.project && self.deprecations_on()
+        } else if codelaw_rules::TEST_RULES.contains(&rule) {
+            ran.project && self.test_rules_on().contains(&rule)
         } else {
             match self.compiled.iter().find(|c| c.id() == rule) {
                 Some(c) if matches!(c.matcher, crate::Matcher::Graph(_)) => ran.project && self.graph_rules().iter().any(|(_, r)| r.id() == rule),
@@ -315,7 +317,7 @@ impl Project {
 
     /// An engine diagnostic on one line of a project file (a baseline file,
     /// the registry): the line's text is its range.
-    fn at_line(&self, rel: &str, line: u32, rule: &str, message: String) -> Option<Diagnostic> {
+    pub(crate) fn at_line(&self, rel: &str, line: u32, rule: &str, message: String) -> Option<Diagnostic> {
         let abs = self.root().join(rel);
         let layers = self.config.layers_for(&abs);
         let mut d = meta_diagnostic(rel, &layers, rule, message)?;

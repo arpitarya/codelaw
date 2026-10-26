@@ -14,7 +14,9 @@ mod fix;
 mod format;
 mod git;
 mod incremental;
+mod lcov;
 mod lint;
+mod new_code;
 mod query;
 mod project;
 mod suppress;
@@ -31,6 +33,8 @@ pub use fix::{FileFix, FileTrace, FixOptions, FixReport};
 pub use incremental::{DocumentTree, TreeCache};
 pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
 pub use lint::FileResult;
+pub use new_code::NewCodeHeader;
+pub use lcov::Lcov;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
 pub use debug::MatchReport;
 pub use timings::{PhaseTiming, RuleTiming, TimingReport};
@@ -80,6 +84,9 @@ pub struct EngineOptions {
     pub changed_since: Option<String>,
     /// `--staged`: the files in the index count as touched.
     pub staged: bool,
+    /// `--coverage <path>`: the lcov report `graph/function-coverage`
+    /// reads; it wins over `[coverage] report` (W-71).
+    pub coverage: Option<PathBuf>,
     /// Files that count as touched whatever the change set says: the
     /// files an agent hook was given.
     pub touched_paths: Vec<PathBuf>,
@@ -164,6 +171,9 @@ pub struct CheckReport {
     /// The profile line (`profile ci (CI=true)`), when the config defines
     /// a profile (SR-CONFIG decision 10).
     pub profile: Option<codelaw_config::Profile>,
+    /// The `new code:` and `coverage:` lines, when the test rules of new
+    /// code ran (W-71; SR-CLI-MCP).
+    pub new_code: Option<NewCodeHeader>,
 }
 
 impl CheckReport {
@@ -202,6 +212,9 @@ pub struct Project {
     deprecations: Option<baseline::Deprecations>,
     /// `[exceptions]` (SR-BASELINE decision 9).
     pub(crate) exceptions: codelaw_baseline::Exceptions,
+    /// The test rules of new code, `[coverage]` and `.codelawignore`
+    /// (W-71), when the project turns them on.
+    pub(crate) tests: Option<new_code::TestRules>,
     /// The as-of date and the change set, read on first use.
     as_of: std::sync::OnceLock<AsOf>,
     touched: std::sync::OnceLock<(BTreeSet<String>, Vec<String>)>,
@@ -271,6 +284,7 @@ impl Project {
             return Err(EngineError::Config(codelaw_config::ConfigError::new(config.files.first().map(|f| f.path.clone()), e)));
         }
         let (baselines, deprecations, exceptions) = baseline::load(&config)?;
+        let tests = new_code::load(&config)?;
         let pool = pool(options.threads);
         let adapters = std::sync::OnceLock::new();
         Ok(Project {
@@ -287,6 +301,7 @@ impl Project {
             baselines,
             deprecations,
             exceptions,
+            tests,
             as_of: std::sync::OnceLock::new(),
             touched: std::sync::OnceLock::new(),
         })

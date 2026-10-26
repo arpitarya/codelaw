@@ -457,7 +457,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
     "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
-    "[deps]", "[css]",
+    "[deps]", "[css]", "[coverage]",
 ];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
@@ -476,6 +476,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         !raw.profile.is_empty() || !raw.profiles.is_empty(),
         raw.deps != Default::default(),
         raw.css != Default::default(),
+        raw.coverage.is_some(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
