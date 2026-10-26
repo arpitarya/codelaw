@@ -1,7 +1,7 @@
 # fux.register.v2	rules=5
 # loc	sha	decoder	[k=v ...]
 README.md	ca9475622406ba7c517b46e66f527f2c703f8495	prose
-archive/README.md	9a34d3112a6383b9aa299bc527078407ce5bd7d7	prose	archived=true
+archive/README.md	1606f0b0a0d723ebc387771905d1cf990b831ae7	prose	archived=true
 archive/bootstrap/WORK-SYSTEM.md	596ed34d20a3476fd702bfd021200e94eb35b91e	prose	archived=true
 archive/open/W-01-rule-pack-records.md	78910b43392f62d75923d781051e226450ef67a2	prose	archived=true
 archive/open/W-02-engine-p0.md	d973a1d8002070f691a826554ca3ee503ea8e0b3	prose	archived=true
@@ -59,6 +59,7 @@ archive/open/W-63-css-modules.md	ee92b7b92461ce18677477db38bb55cfebfefeb1	prose	
 archive/open/W-65-dependency-check.md	fecbdc138f66645136c7bc6988a8b3ae53786ba9	prose	archived=true
 archive/open/W-66-ratify-dependencies.md	211e8ee9821c68b7bd2fc9c0433b4c2b00c29a8a	prose	archived=true
 archive/open/W-67-replace-three-dependencies.md	a1c65ee713de6df5b46c65319a56a3014b01ba02	prose	archived=true
+archive/open/W-75-commit-main-checkout.md	d332f6aab3bf02a92041832c7736a387050baa1d	prose	archived=true
 docs/DESIGN.md	164f518611f272a308438fe9f0980c3eebc1864e	prose
 docs/GLOSSARY.md	d7968e0a92f7cc6e1554188ab45beb48ce17382b	prose
 records/0001_LAWS.md	fc68bd6308f459513969528a37b33c5cf9b1cfa8	prose
@@ -78,12 +79,12 @@ records/0051_WORK-open-queue.md	81ea1e1928ef21f93a2542b54d2e0684e07809f7	prose
 records/0052_WORK-backlog.md	f31b16cf6433a7949fc3cc15da418430dc9b87eb	prose
 records/0053_WORK-lifecycle.md	6beee72d6c2cb0df11cfc54d8ee8d42a4a13e97f	prose
 records/0054_WORK-session.md	b0dda9768a116a448a31b03ff8c0b4d9aab03113	prose
-records/0055_WORK-docs.md	73466086aaa00192b21d62e86c6d89fed0015225	prose
+records/0055_WORK-docs.md	4a85e496462bdb018cf4296a8a9d23ac42c1197e	prose
 records/0056_WORK-blockers.md	11353a9b6eb9e86d1172a31e47809457a9f3366b	prose
 records/0057_WORK-archive.md	1360d7d398540cdab891dab3fcb22615306a1b2e	prose
 records/0058_WORK-ownership.md	4c538d16315273de183a141282f380bc26b20799	prose
 records/0059_WORK-governance.md	ed8c50e3a722b4c4c13ec2d1e1943619255ef2f7	prose
-records/0060_WORK-registry.md	04206a3339be660565ce171db01cd2143aee580c	prose
+records/0060_WORK-registry.md	83df81b67054348d351b2eca1aa4b817c75142bc	prose
 records/0061_WORK-now.md	6a5d4bd9d653c55d232d7abf7d13d968e30ba889	prose
 records/0062_WORK-cleanup.md	d01e97992d4efc37731cc7cdb1d6c0fab81456fb	prose
 records/0101_rule-packs.md	a5dc10d7d803a1334cbef6a2f92f04280f88c1e6	prose
@@ -101,7 +102,7 @@ records/0112_rule-format.md	916d5207e1f4e11f888ad44d22f2331fb71c3aaa	prose
 records/0113_rule-authoring.md	30808f09370925f4f4e6661c87dcb82790e7cf0c	prose
 records/0114_editor.md	f914b744391b835624528abc5e72df65d6752f7c	prose
 records/0115_cli-and-mcp.md	14166fa3a26035bc56503c8e8ffee0aa6558a446	prose
-records/README.md	7f76786dcd2106a47d2b131e00c4386069435fcb	prose
+records/README.md	525a62e8923039783d13552f02997a13e651f7a7	prose
 records/TEMPLATE.md	227d3572bfbb7da4327396f8d073d8269a2859ed	prose
 work/BACKLOG.md	6ababe5d93b7a939febaf9c45186a754190a0ce8	prose
 work/BLOCKED.json	d1cf19366dcd3b1a8431d8d1786011e0bff997d9	pkg:fux-decoder-json@5.1.1/json@1+limits@1
@@ -109,10 +110,10 @@ work/IMPLEMENTATION.md	c679d9ec1756f16b5821930fd55914386ca69c55	prose
 work/INTERVIEW.md	7e632e9663916eb36f97bd17ca83b6c0663923dd	prose
 work/LESSONS.md	4a9885fe867f95f2fd1bcc046fa21922b9311198	prose
 work/MACHINE.md	a5b8840949acb76c0492068466e044d7a1950ad2	prose
-work/NOW.md	afdf20fae32109faba3df8b8781afd33f25853f3	prose
-work/OPEN-WORK.md	7b568728531817af30d64f981924047c82b376b3	prose
+work/NOW.md	b0ff05e8900ab1a94f920e45ce6783a3fcc651af	prose
+work/OPEN-WORK.md	944a3facfc320718bfc97d2c0597ef7b65105c17	prose
 work/README.md	6b31915cf9322827f31f6b28dc4fbfe6cb29e3c4	prose
-work/WORKLOG.md	9763f5c81a314751e4e7fde4018412ba8e2635f3	prose
+work/WORKLOG.md	5fd559af0509ca3a32daa8997bdba55aa207014e	prose
 work/compare/README.md	18d791face63144aa25a2dd8b40d1aefa79a7d69	prose
 work/compare/ci-profiles-and-dated-exceptions.compare.md	8e0070ca1930c2bf2151d538dd7c6dc7c53e58bf	prose
 work/open/README.md	671c84a0497eb6fb302929fab4af30df8697a6f4	prose
@@ -128,7 +129,8 @@ work/open/W-58-size-limits.md	33fe5240663d301f68ec9a242b315dea6677664d	prose
 work/open/W-62-scss-support.md	d843cb95e408f7fca0269c8b72325d17a631d529	prose
 work/open/W-64-codelaw-pre-commit-mirror.md	c03d59c1cc6804029b86b4d9df043ecef1e245f9	prose
 work/open/W-70-dev-server-example-apps.md	cfbc8783b70191277e8d3219b33b10ae7d67ebe4	prose
-work/open/W-71-tests-for-new-code.md	5d87bfa86b2ee8b373e9fedece1cb7764031b864	prose
+work/open/W-71-tests-for-new-code.md	ca17c33c1652a963e96aa8d7ffd2f4fa136cc257	prose
 work/open/W-73-configurable-approved-calls.md	9178326085fa864a060553548e104b5349a3bade	prose
+work/open/W-74-editor-logs.md	cde8c9bb0d70199d155c29b284cffcd2002f80f3	prose
 work/proposals/README.md	fb4ea0b14c6582432ea279de4845401f78d15662	prose
 work/proposals/type-aware-rules.md	3bb35867a8d47b047f37893fc3a0ec5aaa21d8ca	prose
