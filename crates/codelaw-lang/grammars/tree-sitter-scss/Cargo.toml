@@ -3,11 +3,13 @@
 # Vendored unchanged (SR-LAW-11: a copy is a dependency, ratified as D-33;
 # B-047 ruled 2026-10-26: "Own grammar / tree-sitter-scss"). The generated
 # src/ is upstream's, not regenerated; bindings/rust is codelaw's, on
-# tree-sitter-language like the CSS fork's.
+# tree-sitter-language like the CSS fork's. +codelaw.1: its build.rs
+# force-includes c_locale_wctype.h, so the scanner's character classes are
+# the "C" locale's on every platform (W-44); bumped with every such change.
 [package]
 name = "tree-sitter-scss"
 description = "SCSS grammar for tree-sitter (codelaw's in-tree copy of 1.0.0)"
-version = "1.0.0"
+version = "1.0.0+codelaw.1"
 authors = ["Amaan Qureshi <amaanq12@gmail.com>"]
 license = "MIT"
 keywords = ["incremental", "parsing", "tree-sitter", "scss"]

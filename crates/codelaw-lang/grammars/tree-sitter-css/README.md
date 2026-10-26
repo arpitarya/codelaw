@@ -24,6 +24,15 @@ fork when upstream releases.* SR-ARCHITECTURE decision 3 records it.
 - **Only `grammar.js` was edited by hand,** plus the new `<`, `<=` and `>=`
   operators in `queries/highlights.scm`. `src/parser.c`, `src/grammar.json`
   and `src/node-types.json` are generated from `grammar.js`.
+- **The scanner's character classes are the "C" locale's everywhere**
+  (`+codelaw.2`, W-44, 2026-10-27). `src/scanner.c` asks `<wctype.h>`
+  whether a character is a space or a letter, and C libraries disagree:
+  MSVC's `iswspace` says yes to U+00A0, musl's to U+2028 and U+3000.
+  `bindings/rust/build.rs` force-includes `bindings/rust/c_locale_wctype.h`
+  (`/FI` on MSVC, `-include` elsewhere), which pins `iswspace`, `iswalpha`,
+  `iswdigit` and `iswalnum` to ASCII, as macOS and glibc answer in the "C"
+  locale; `src/scanner.c` is upstream's, unchanged. A unit test in
+  `codelaw-lang` fails if the scanner calls a class the shim does not pin.
 - **`test/corpus/modern.txt`** is new: one tree-sitter corpus test per construct.
 - **Nothing else changed.** Every tree upstream 0.25.0 parses without an error
   is unchanged: checked on 564 files (bootstrap, bulma, normalize.css,
@@ -48,7 +57,7 @@ tree-sitter test          # runs test/corpus/*.txt
   ABI 15 output loads in the workspace's `tree-sitter` 0.27 runtime.
   Regenerating the unmodified upstream `grammar.js` with it reproduces
   upstream's `src/parser.c` byte for byte.
-- **After any change to `grammar.js`:** bump the `+codelaw.N` in `Cargo.toml`,
+- **After any change to `grammar.js` or to `bindings/rust/` that changes how `src/` compiles:** bump the `+codelaw.N` in `Cargo.toml`,
   run `cargo update -p tree-sitter-css`, and bump the same version in
   `codelaw_lang::GRAMMARS_FINGERPRINT`, so cached results are invalidated
   (a unit test checks the two agree).

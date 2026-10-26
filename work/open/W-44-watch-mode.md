@@ -42,7 +42,7 @@ ball: agent
 | 2 · | deleting the last use of an export in file A reports `graph/no-unused-exports` in file B | ✅ `crates/codelaw-cli/tests/watch.rs` `a_save_rechecks_the_files_that_depend_on_it` (also: a save by rename, a file added, a file removed, each run equal to `check --format json`) |
 | 3 · | editing `codelaw.toml` changes the next run's verdict | ✅ `watch.rs` `a_config_edit_changes_the_next_verdict` (and a broken config: an `error` line, then recovery) |
 | 4 · | `--format json` gives one valid JSON object per run | ✅ every `watch.rs` JSON test parses each line alone and compares it with `check`'s object |
-| 5 · | works on the `win32-*` CI legs | ⏳ for CI — `scripts/smoke.sh` now runs `check --watch` on all eight `smoke` legs (a save to `SMOKE.md` must be re-checked); not run here (no Windows target on this Mac). In-process by construction, no Unix-only call outside `cfg(unix)`; Ctrl-C uses the C runtime's `signal`, which `libc` declares for Windows |
+| 5 · | works on the `win32-*` CI legs | ⏳ for CI — `scripts/smoke.sh` now runs `check --watch` on all eight `smoke` legs (a save to `SMOKE.md` must be re-checked); not run here (no Windows target on this Mac). In-process by construction, no Unix-only call outside `cfg(unix)`; Ctrl-C uses the C runtime's `signal`, which `libc` declares for Windows. 2026-10-27: CI's `build win32-*` legs had been red since 2026-10-26 (a grammar scanner's `iswspace`, not the watch), so `smoke` never ran; fixed in the grammars' `build.rs` (IMPLEMENTATION 2026-10-27, W-44 CI fix) |
 
 
 ## Rulings

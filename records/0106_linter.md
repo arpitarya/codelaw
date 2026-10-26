@@ -77,7 +77,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | JSON · JSONC | `tree-sitter-json` | yes |
    | Python | `tree-sitter-python` | yes |
    | CSS | `tree-sitter-css`: codelaw's in-tree fork of 0.25.0, which adds range media features, `layer()` in `@import` and fractional keyframe percentages ([SR-ARCHITECTURE](0108_architecture.md) decision 3); the `css/*` rules still read the text themselves (decision 15b there) | yes, patched in place of ast-grep's |
-   | SCSS | `tree-sitter-scss` 1.0.0: codelaw's in-tree copy, unchanged ([SR-ARCHITECTURE](0108_architecture.md) decision 3; B-047, ruled 2026-10-26). The `css/*` rules run on `.scss` through the same text reader in its SCSS mode; the `scss/*` rules read the Sass statements | no: a path crate, like the CSS fork |
+   | SCSS | `tree-sitter-scss` 1.0.0: codelaw's in-tree copy, `src/` unchanged, its scanner's character classes pinned to the "C" locale's ([SR-ARCHITECTURE](0108_architecture.md) decision 3; B-047, ruled 2026-10-26). The `css/*` rules run on `.scss` through the same text reader in its SCSS mode; the `scss/*` rules read the Sass statements | no: a path crate, like the CSS fork |
    | HTML | `tree-sitter-html` | yes |
    | YAML | `tree-sitter-yaml` | yes |
    | TOML | `tree-sitter-toml` | **no**: registered by codelaw as a custom language |

@@ -10,6 +10,16 @@ fn main() {
     #[cfg(target_env = "msvc")]
     c_config.flag("-utf-8");
 
+    // codelaw: the scanner's <wctype.h> classes are the "C" locale's on
+    // every platform (MSVC and musl say more); src/ stays upstream's.
+    let shim = std::path::Path::new(&std::env::var("CARGO_MANIFEST_DIR").unwrap()).join("bindings/rust/c_locale_wctype.h");
+    if c_config.get_compiler().is_like_msvc() {
+        c_config.flag(format!("/FI{}", shim.display()));
+    } else {
+        c_config.flag("-include").flag(shim.to_str().unwrap());
+    }
+    println!("cargo:rerun-if-changed={}", shim.display());
+
     if std::env::var("TARGET").unwrap() == "wasm32-unknown-unknown" {
         let Ok(wasm_headers) = std::env::var("DEP_TREE_SITTER_LANGUAGE_WASM_HEADERS") else {
             panic!("Environment variable DEP_TREE_SITTER_LANGUAGE_WASM_HEADERS must be set by the language crate");

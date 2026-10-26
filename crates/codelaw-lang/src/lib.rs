@@ -28,9 +28,10 @@ pub type Root = AstGrep<StrDoc<Grammar>>;
 pub type SyntaxNode<'r> = Node<'r, StrDoc<Grammar>>;
 
 /// Names every grammar and its pinned version; part of every cache key.
-/// The CSS fork's version carries `+codelaw.N`, bumped with every change to
-/// its `grammar.js`, so a grammar change invalidates cached results.
-pub const GRAMMARS_FINGERPRINT: &str = "ast-grep-language=0.51.0;tree-sitter=0.27.0;tree-sitter-toml-ng=0.7.0;tree-sitter-md=0.5.3;tree-sitter-css=0.25.0+codelaw.1;tree-sitter-scss=1.0.0";
+/// The CSS fork's and the SCSS copy's versions carry `+codelaw.N`, bumped
+/// with every change to a `grammar.js` or to how `src/` is compiled, so a
+/// grammar change invalidates cached results.
+pub const GRAMMARS_FINGERPRINT: &str = "ast-grep-language=0.51.0;tree-sitter=0.27.0;tree-sitter-toml-ng=0.7.0;tree-sitter-md=0.5.3;tree-sitter-css=0.25.0+codelaw.2;tree-sitter-scss=1.0.0+codelaw.1";
 
 /// Parse source text with the grammar for `language`.
 pub fn parse(language: Language, source: &str) -> Root {
@@ -144,6 +145,53 @@ mod tests {
         assert!(version.contains("+codelaw."), "Cargo.lock resolves tree-sitter-css {version}, not the in-tree fork");
         assert!(!entry.contains("source ="), "the fork is a path crate, not a registry one");
         assert!(GRAMMARS_FINGERPRINT.contains(&format!("tree-sitter-css={version}")), "GRAMMARS_FINGERPRINT lacks tree-sitter-css={version}");
+    }
+
+    /// The same for the SCSS copy, whose `+codelaw.N` marks codelaw's
+    /// build of upstream's unchanged `src/`.
+    #[test]
+    fn fingerprint_names_the_scss_copy() {
+        let lock = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../Cargo.lock")).unwrap();
+        let entry = lock.split("[[package]]").find(|p| p.contains("name = \"tree-sitter-scss\"")).expect("tree-sitter-scss in Cargo.lock");
+        let version = entry.lines().find_map(|l| l.strip_prefix("version = \"")).and_then(|v| v.strip_suffix('"')).unwrap();
+        assert!(!entry.contains("source ="), "the copy is a path crate, not a registry one");
+        assert!(GRAMMARS_FINGERPRINT.contains(&format!("tree-sitter-scss={version}")), "GRAMMARS_FINGERPRINT lacks tree-sitter-scss={version}");
+    }
+
+    /// A grammar's external scanner asks `<wctype.h>` what a space and a
+    /// letter are, and the C libraries disagree: MSVC's `iswspace` says yes
+    /// to U+00A0, musl's to U+2028 and U+3000, macOS's and glibc's "C"
+    /// locale to neither. So every grammar's `build.rs` force-includes
+    /// `c_locale_wctype.h`, which answers with the "C" locale's classes on
+    /// every platform. This test runs anywhere: it fails when a scanner
+    /// calls a class the shim does not pin (an upstream update) or a build
+    /// stops including the shim (W-44: the SCSS example of
+    /// `css/no-irregular-whitespace` failed only on Windows).
+    #[test]
+    fn every_scanner_character_class_is_the_c_locales() {
+        let grammars = concat!(env!("CARGO_MANIFEST_DIR"), "/grammars");
+        for grammar in ["tree-sitter-css", "tree-sitter-scss"] {
+            let dir = format!("{grammars}/{grammar}");
+            let scanner = std::fs::read_to_string(format!("{dir}/src/scanner.c")).unwrap();
+            let shim = std::fs::read_to_string(format!("{dir}/bindings/rust/c_locale_wctype.h")).unwrap();
+            let build = std::fs::read_to_string(format!("{dir}/bindings/rust/build.rs")).unwrap();
+            assert!(build.contains("c_locale_wctype.h") && build.contains("/FI") && build.contains("-include"), "{grammar}: build.rs does not force-include the shim on every compiler");
+            let mut called: Vec<&str> = scanner
+                .match_indices("isw")
+                .map(|(i, _)| {
+                    let rest = &scanner[i..];
+                    &rest[..rest.find(|c: char| !c.is_ascii_alphanumeric() && c != '_').unwrap_or(rest.len())]
+                })
+                .collect();
+            called.sort_unstable();
+            called.dedup();
+            for class in called {
+                assert!(shim.contains(&format!("#define {class} codelaw_{class}")), "{grammar}: scanner.c calls {class}, which the shim does not pin");
+            }
+            for narrow in ["isspace(", "isalnum(", "isalpha(", "isdigit("] {
+                assert!(!scanner.contains(narrow), "{grammar}: scanner.c calls <ctype.h>'s {narrow}…), which the shim does not pin");
+            }
+        }
     }
 
     #[test]
