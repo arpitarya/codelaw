@@ -967,6 +967,7 @@ dependencies = [
  "blake3",
  "codelaw-core",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

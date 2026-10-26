@@ -207,4 +207,37 @@ mod tests {
         cache.clean().unwrap();
         let _ = fs::remove_dir_all(&dir);
     }
+
+    /// A `Diagnostic` must survive the cache whether or not it has `data`
+    /// (a skipped field broke the positional codec, so every file with
+    /// a finding missed on every run).
+    #[test]
+    fn a_diagnostic_round_trips_with_and_without_data() {
+        use codelaw_core::{Diagnostic, FixClass, Position, Severity};
+        let mk = |data| Diagnostic {
+            rule: "css/max-lines".into(),
+            severity: Severity::Warn,
+            file: "a.css".into(),
+            start_byte: 1,
+            end_byte: 2,
+            start: Position { line: 1, column: 1 },
+            end: Position { line: 1, column: 2 },
+            message: "m".into(),
+            fix: FixClass::Manual,
+            edits: vec![],
+            steps: vec!["s".into()],
+            source: "engine".into(),
+            note: None,
+            data,
+        };
+        let cache = DiskCache::new(Some(temp_dir("diag")));
+        for (i, d) in [mk(None), mk(Some(serde_json::json!({ "lines": 412, "max": 300 })))].into_iter().enumerate() {
+            let key = KeyBuilder::new("d").part([i as u8]).key();
+            cache.put(&key, &vec![d.clone()]);
+            assert_eq!(cache.get::<Vec<Diagnostic>>(&key), Some(vec![d.clone()]));
+            let json = serde_json::to_value(&d).unwrap();
+            assert_eq!(json.get("data").is_some(), d.data.is_some(), "JSON still omits an absent `data`");
+            assert_eq!(serde_json::from_value::<Diagnostic>(json).unwrap(), d);
+        }
+    }
 }

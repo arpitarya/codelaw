@@ -11,6 +11,10 @@ named here only as the failure that produced it. A lesson whose remedy is
 
 ---
 
+## 2026-10-26 — a `skip_serializing_if` on a cached type silently turns every entry into a miss
+
+`Diagnostic.data` (W-61) was `skip_serializing_if = "Option::is_none"`; the cache's codec (W-67) is positional, so a skipped field shifts every later one and the entry never decodes. A corrupt entry reads as a miss by design, so nothing failed: warm runs re-linted every file with a finding and `check_warm_10k` went from 220 ms to 1.4 s. A cached type must serialize the same fields every time; the cache's test now round-trips a `Diagnostic` with and without `data`. Look at the cache hit/miss line of `--timings` first when a warm run slows.
+
 ## 2026-10-25 — a shared `CARGO_TARGET_DIR` does not make parallel worktrees safe either
 
 Six agents built six worktrees into the one shared `target/`. Disk held, but
