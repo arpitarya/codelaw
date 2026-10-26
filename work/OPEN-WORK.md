@@ -51,7 +51,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: patch tree-sitter-scss (`@if not` is an `ERROR`), CSS rules onto trees, a pinned corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
-🟢 **W-70** `agent` Example apps for the dev-server plugins: one each for real Vite, webpack, Rspack, Next.js (a `debugger` in the overlay within a second; Rspack runs the webpack plugin unchanged), via a CI job that installs the hosts (L11). Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
+🟢 **W-70** `agent` Example apps for the dev-server plugins on real Vite, webpack, Rspack, Next.js, via a CI job that installs the hosts (L11). Built; left: the first CI run on the real hosts, fix, close. Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
 
 🟢 **W-73** `agent` Configurable approved calls: 5 HTML-sink rules take a `sanitizers` list (extend or replace the built-in; name + import source); `js/use-instead`, `py/use-instead` for wrappers. Filed by Arpit (Cowork). [detail](open/W-73-configurable-approved-calls.md)
 
