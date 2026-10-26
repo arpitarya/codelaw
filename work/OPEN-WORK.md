@@ -26,6 +26,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-38 itself; W-64 waits on it | |
 | 🔴 **Reserve and publish the 25 Fux index package names** (npm `@codelaw/rules-<name>-fux-index` ×15 by hand, then `npm-trust.sh`; PyPI `codelaw-rules-<name>-fux-index` ×10 by `twine`, then a trusted publisher each; built with fux 5.1.1) — built by CI as the `fux-index` artifact; RELEASING.md §"The optional Fux index packages"; also ratify `fux-engine` as D-34 in `DEPENDENCIES.md` — [W-34](open/W-34-fux-index-packages.md) | 2026-10-26 |
 | ↳ **blocks:** W-34 itself | |
+| 🔴 **Reserve and first-publish the skills package** — npm `@codelaw/skills` by hand (`npm publish codelaw-skills-<v>.tgz --access public` from a green `dist`, after `codelaw` at that version), then `scripts/npm-trust.sh`; PyPI `codelaw-skills` by `twine upload codelaw_skills-<v>-py3-none-any.whl`, then a trusted publisher. Until npm trusts `publish.yml` for it, the release's preflight stops before uploading anything — RELEASING.md §"One time, by hand" — [W-77](open/W-77-skills-package.md) | 2026-10-27 |
+| ↳ **blocks:** W-77 itself; every release from this commit on (the npm trust preflight) | |
 
 ---
 
@@ -50,7 +52,7 @@ here. Read that record before changing anything below it.
 🟢 **W-70** `agent` Example apps for the dev-server plugins on real Vite, webpack, Rspack, Next.js, via a CI job that installs the hosts (L11). Built; left: the first CI run on the real hosts, fix, close. Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
 
 
-🟢 **W-77** `agent` A separate package for everything agent-facing: `@codelaw/skills` (npm) and `codelaw-skills` (PyPI), pinned to the same codelaw version; codelaw itself keeps no agent files (ruled 2026-10-27). Filed by Arpit (Cowork). [detail](open/W-77-skills-package.md)
+🔴 **W-77** `arpit` Skills package built: `@codelaw/skills` / `codelaw-skills` hold every agent file at codelaw's exact version; the binary has none; missing or mismatched → exit 2. Left: Arpit's first publish + trusted publishers (DoD 6). Filed by Arpit (Cowork). [detail](open/W-77-skills-package.md)
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 

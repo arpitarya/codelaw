@@ -14,15 +14,16 @@
 #   build ×8  one maturin wheel per platform; the npm binary is taken OUT of it, so
 #             both registries ship the same bytes (L6 decision 2); each runs its
 #             binary's --version and every pack's tests on its own platform
-#   package   the 17 npm tarballs + 14 wheels, the release checks (SHA256SUMS
-#             included); on main, a build attestation of every file publish.yml uploads
+#   package   every npm tarball and wheel — the skills package (W-77) among them —
+#             and the release checks (SHA256SUMS included); on main, a build attestation of every file publish.yml uploads
 #             and, beside it and never in it, the optional Fux index packages (dist/fux-index/,
 #             W-34): built by a pinned fux, twice, and checked; nothing publishes them yet
 #   dev-servers ×5  W-70: vite, webpack, rspack (the webpack plugin unchanged), next, next on
 #             Turbopack — the hosts installed on the runner only; a saved `debugger` shows within a second
 #   smoke ×8  the L6 install matrix and runtime fence on every platform: `dist` is
 #             published to a throwaway staging index on localhost and installed
-#             from it; npm and PyPI give byte-equal output on the L3 fixtures + a pack
+#             from it; npm and PyPI give byte-equal output on the L3 fixtures + a pack,
+#             and @codelaw/skills and codelaw-skills write the same agent files (W-77)
 #
 # Every `run:` is `bash -eo pipefail` (the defaults below), so a failure inside
 # a pipe — `cargo clippy … | tee` — fails its step (W-18). Every action is
@@ -401,7 +402,7 @@ jobs:
           merge-multiple: true
       - name: assemble every package (SR-PACKAGES decisions 3-9)
         run: python3 scripts/package.py assemble --bins out/bin --wheels out/wheel --out dist
-      - name: the release checks — names (B-020), one version, zero deps, licence, one binary, pack parity, SHA256SUMS
+      - name: the release checks — names (B-020), one version, zero deps but the skills package's exact codelaw, licence, one binary, pack and skills parity, SHA256SUMS
         run: python3 scripts/package.py check dist
       - name: the engine is complete enough to release — format, mcp and lsp present (L6 decision 3, L7)
         run: python3 scripts/law-gate.py dist

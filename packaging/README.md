@@ -16,6 +16,11 @@ as `codelaw` on npm and on PyPI; neither needs the other.
 `codelaw` installed alone lints nothing until a rule pack is installed — it
 says so (`codelaw/no-rules`).
 
+**Agent files** — skills, steering, instructions, hooks and MCP registration for
+Claude Code, Cowork, Copilot, Codex and Kiro — are a package of their own, at
+codelaw's exact version: `npm i -D @codelaw/skills` or `pip install codelaw-skills`.
+`codelaw init --agents` installs it; `codelaw sync-agents` needs it.
+
 **Rule packs** — each registry carries the packs its users install:
 
 <!-- docs-sync:registries -->

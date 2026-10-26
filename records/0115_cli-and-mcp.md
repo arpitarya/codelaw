@@ -13,7 +13,7 @@ owns:
   - crates/codelaw-mcp
   - .pre-commit-hooks.yaml
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-26T18:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -76,6 +76,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | dependencies | `deps refresh [--as-of <date>] [--jobs N]` — the one command that uses the network ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3) |
 
    - **`deps refresh`** reads every `package.json` and `pyproject.toml` the project's discovery finds and their lockfiles, asks npm and the Python index about each dependency (through `curl`, `--jobs` requests at a time, 8 by default), and writes `.codelaw/deps-snapshot.json` with `fetched` set to `--as-of` or today in UTC; what it reads, sends and writes is [SR-RULE-PACKS](0101_rule-packs.md) decision 15. It prints `wrote .codelaw/deps-snapshot.json: <n> npm and <m> PyPI package(s), fetched <date>` and a `warning:` per package its registry does not have, and exits `0`; a request that fails, a registry that refuses the token, or a bad `--as-of` exits `2` and writes nothing (`crates/codelaw-cli/src/deps_cmd.rs`; W-52, 2026-10-25). It has no MCP twin: the MCP server stays offline (decision 5).
+   - **`init --agents` and `sync-agents` need the skills package** (W-77, 2026-10-27): the agent files come from `@codelaw/skills` / `codelaw-skills` at this binary's version; with none, or another version, both exit 2 with the install lines and write nothing ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 8). `init --agents` adds the skills package to what it installs.
    - **`init` picks the packs** from the repo's languages and `package.json`, by [SR-RULE-PACKS](0101_rule-packs.md) decision 6: `react`, `stencil`, `tanstack-query` (`@tanstack/react-query` or `react-query`) and `redux-toolkit` (`@reduxjs/toolkit` or `redux`) join when the repo depends on that library (`crates/codelaw-cli/src/init.rs`; W-32, 2026-10-25). `scss` (with `css`) joins for `.scss` files or a `sass`, `sass-embedded` or `node-sass` dependency (W-62), and `css-modules` for a `*.module.css` or `*.module.scss` file (W-63, 2026-10-26).
 
    - **`rules --tag <tag>`** (repeatable; a rule must have every one) keeps the rules with that tag: `security`, `cwe:<n>`, `owasp:<category>` (`owasp:A05` matches `A05:2025`) from the rule's `security:` metadata ([SR-RULE-FORMAT](0112_rule-format.md) decision 2a), or one of its `tags:`. It lists rules across every pack the project loads. **`rules --security-coverage`** prints each OWASP Top 10:2025 category with the security rules mapped to it (id and CWE ids), how many of the ten are covered, and the security rules mapped to no 2025 category; `--format json` gives `owasp[]` (`id`, `name`, `rules[]`) and `unmapped[]`. Both apply after `--for` (W-53, 2026-10-25).

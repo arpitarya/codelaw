@@ -9,8 +9,12 @@ what consumers receive, edit the template here — the diff is the change.
   and there is nothing else: no conditions, no loops (an optional section is its own
   template, rendered into a slot). A file whose last line ends in a slot has no final newline.
 - **Embedded at build time** (`crates/codelaw-core/src/template.rs`), so both packages are
-  complete and identical and nothing is read from disk at run time.
-- **Adding a template** is three edits: the file, one `t!("<path>")` line in `TEMPLATES`, one
+  complete and identical and nothing is read from disk at run time — **except `agents/`**,
+  which is never embedded: it ships byte for byte as the skills package, `@codelaw/skills`
+  and `codelaw-skills`, and `init --agents` and `sync-agents` read it from the installed
+  package (W-77; SR-LAW-10 decision 6, SR-AGENT-SURFACES decision 8). An `agents/` template
+  is two edits: the file and its row; the test refuses one in `TEMPLATES`.
+- **Adding any other template** is three edits: the file, one `t!("<path>")` line in `TEMPLATES`, one
   row below. `cargo test -p codelaw-core` fails until all three agree, and until its fixture
   fills exactly the slots it has.
 - **Not here:** data codelaw serialises from state (baseline, deprecations, the deps snapshot,

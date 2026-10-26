@@ -11,6 +11,8 @@
 #     as its only index, run with no Node on PATH; codelaw --version through uvx
 #   - the same project checked by both: the JSON reports must be byte-equal,
 #     and must contain diagnostics, so two empty runs can't pass
+#   - the skills package (W-77), installed by name on both: `sync-agents` in
+#     fixtures/skills-consumer writes the same agent files from either, byte for byte
 # ci.yml's `smoke` job runs it on each of the eight platforms (W-18).
 # Usage: scripts/smoke.sh DIST [KEY]    KEY defaults to this machine's, e.g. linux-x64-gnu
 # Needs node, npm and python3 (>= 3.11, the wheel's floor); installs uv (UV_VERSION) into a
@@ -105,7 +107,7 @@ UV_NO_CONFIG=1 "$tbin/uv" publish -q --publish-url "$url/legacy/" --username sta
 # ── npm ──
 project "$work/npm"
 (cd "$work/npm" && cp package.json package.json.orig &&
-  npm i --no-audit --no-fund --no-package-lock --no-save --loglevel=error codelaw @codelaw/rules-data &&
+  npm i --no-audit --no-fund --no-package-lock --no-save --loglevel=error codelaw @codelaw/rules-data @codelaw/skills &&
   mv package.json.orig package.json)
 [ -d "$work/npm/node_modules/@codelaw/cli-$key" ] || { echo "✗ npm did not pick @codelaw/cli-$key from the staging index" >&2; ls "$work/npm/node_modules/@codelaw" >&2; exit 1; }
 np="$(bare_path npm)"
@@ -120,7 +122,7 @@ fi
 # ── PyPI ──
 project "$work/pypi"
 "$py" -m venv "$work/venv"
-"$vbin/python" -m pip install -q --isolated --no-cache-dir --disable-pip-version-check --index-url "$url/simple/" ${pre:+--pre} codelaw codelaw-rules-data
+"$vbin/python" -m pip install -q --isolated --no-cache-dir --disable-pip-version-check --index-url "$url/simple/" ${pre:+--pre} codelaw codelaw-rules-data codelaw-skills
 (cd "$work/pypi" && fenced "$(bare_path pypi)" VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" check --format json --no-cache >"$work/pypi.json") || [ $? = 1 ]
 # the Python API, through the same binary
 (cd "$work/pypi" && "$vbin/python" -c 'import codelaw, json, sys; sys.stdout.write(json.dumps(codelaw.check(no_cache=True)["summary"], separators=(",", ":")))' >"$work/api-pypi.json")
@@ -133,11 +135,25 @@ v_uvx="$(cd "$work/once" && UV_NO_CONFIG=1 UV_PYTHON_DOWNLOADS=never "$tbin/uvx"
   --python "$(native "$tbin/python")" --default-index "$url/simple/" ${pre:+--prerelease=allow} codelaw --version)"
 [ "$v_npm" = "codelaw $version" ] && [ "$v_npx" = "$v_npm" ] && [ "$v_uvx" = "$v_npm" ] ||
   { echo "✗ --version: npm '$v_npm', npx '$v_npx', uvx '$v_uvx'; expected 'codelaw $version'" >&2; exit 1; }
-# every install downloaded from the index: 3 tarballs for npm, 2 for npx; 2 wheels for pip, 1 for uvx
+# every install downloaded from the index: 4 tarballs for npm, 2 for npx; 3 wheels for pip, 1 for uvx
 served_npm="$(grep -c '"GET /[^ ]*/-/[^ ]*\.tgz HTTP/1.1" 200' "$work/index.log" || true)"
 served_pypi="$(grep -c '"GET /files/[^ ]*\.whl HTTP/1.1" 200' "$work/index.log" || true)"
-[ "$served_npm" -ge 5 ] && [ "$served_pypi" -ge 3 ] ||
-  { echo "✗ the staging index served $served_npm npm tarballs (5 expected) and $served_pypi wheels (3): something installed from elsewhere" >&2; cat "$work/index.log" >&2; exit 1; }
+[ "$served_npm" -ge 6 ] && [ "$served_pypi" -ge 4 ] ||
+  { echo "✗ the staging index served $served_npm npm tarballs (6 expected) and $served_pypi wheels (4): something installed from elsewhere" >&2; cat "$work/index.log" >&2; exit 1; }
+
+# ── the skills package (W-77): the agent files, from the npm install and from the PyPI install ──
+for reg in npm pypi; do
+  a="$work/$reg/agents"; mkdir -p "$a"; cp -R "$root/fixtures/skills-consumer/." "$a/"; git -C "$a" init -q
+done
+(cd "$work/npm/agents" && node "$(native "$work/npm/node_modules/codelaw/bin/codelaw.js")" sync-agents >/dev/null &&
+  node "$(native "$work/npm/node_modules/codelaw/bin/codelaw.js")" sync-agents --check >/dev/null) ||
+  { echo "✗ npm: sync-agents did not write the agent files from @codelaw/skills" >&2; exit 1; }
+(cd "$work/pypi/agents" && VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" sync-agents >/dev/null &&
+  VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" sync-agents --check >/dev/null) ||
+  { echo "✗ PyPI: sync-agents did not write the agent files from codelaw-skills" >&2; exit 1; }
+[ -f "$work/npm/agents/.claude/skills/codelaw-fix/SKILL.md" ] || { echo "✗ the skills package wrote no skill" >&2; exit 1; }
+diff -r -x .git "$work/npm/agents" "$work/pypi/agents" >&2 || { echo "✗ @codelaw/skills and codelaw-skills wrote different agent files" >&2; exit 1; }
+agent_files="$(cd "$work/npm/agents" && find . -type f -not -path './.git/*' | wc -l | tr -d ' ')"
 
 # ── compare ──
 n="$(node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); console.log(r.diagnostics.filter(d => d.rule !== "codelaw/no-rules").length)' "$(native "$work/npm.json")")"
@@ -171,4 +187,4 @@ if [ "$win" = 1 ]; then
   cmp -s "$work/warm.json" "$work/pypi.json" || { echo "✗ win32: \`check --prefer-warm\` differs from \`check\`" >&2; exit 1; }
   oneshot="; one-shot: \`codelaw daemon\` refuses (exit 2) and \`--prefer-warm\` runs in-process, byte-identical"
 fi
-echo "✔ $key, installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree; codelaw --version is codelaw $version through uvx and through npx; the index served $served_npm tarballs and $served_pypi wheels; check --watch re-checked a save$oneshot"
+echo "✔ $key, installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree; codelaw --version is codelaw $version through uvx and through npx; the index served $served_npm tarballs and $served_pypi wheels; check --watch re-checked a save; @codelaw/skills and codelaw-skills wrote the same $agent_files files$oneshot"

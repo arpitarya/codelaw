@@ -1,6 +1,6 @@
 [package]
 name = "codelaw-agents"
-description = "Hook mode, `sync-agents` and the skill sources from agents/ (SR-AGENT-SURFACES)"
+description = "Hook mode, `sync-agents` and the lookup of the skills package that holds every agent file (SR-AGENT-SURFACES)"
 version.workspace = true
 edition.workspace = true
 publish.workspace = true

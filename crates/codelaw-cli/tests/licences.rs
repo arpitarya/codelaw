@@ -283,7 +283,7 @@ fn expand_expressions(line: &str) -> String {
 }
 
 fn ours(name: &str) -> bool {
-    name == "codelaw" || name.starts_with("@codelaw/") || name.starts_with("codelaw-rules-") || name.starts_with("codelaw_rules_")
+    name == "codelaw" || name == "codelaw-skills" || name.starts_with("@codelaw/") || name.starts_with("codelaw-rules-") || name.starts_with("codelaw_rules_")
 }
 
 type Install = (String, String, Vec<String>);

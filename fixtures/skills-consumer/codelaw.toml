@@ -1,0 +1,5 @@
+extends = ["codelaw:data/recommended"]
+
+[agents]
+targets = ["claude", "copilot", "codex", "kiro", "cowork"]
+command = "codelaw"

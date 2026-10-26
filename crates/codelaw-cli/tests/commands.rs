@@ -12,7 +12,7 @@ fn temp(name: &str) -> PathBuf {
 }
 
 fn codelaw(cwd: &Path, args: &[&str]) -> (i32, String, String) {
-    let out = Command::new(env!("CARGO_BIN_EXE_codelaw")).args(args).current_dir(cwd).env_remove("VIRTUAL_ENV").env_remove("CODELAW_SITE_PACKAGES").output().unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codelaw")).args(args).current_dir(cwd).env_remove("VIRTUAL_ENV").env_remove("CODELAW_SITE_PACKAGES").env_remove("CODELAW_SKILLS").output().unwrap();
     (out.status.code().unwrap_or(-1), String::from_utf8(out.stdout).unwrap(), String::from_utf8(out.stderr).unwrap())
 }
 
@@ -147,6 +147,102 @@ fn copy_dir(from: &Path, to: &Path) {
     }
 }
 
+/// The skills package as a registry installs it (W-77): `templates/agents/`
+/// byte for byte, its manifest at `version`, and the package's own files,
+/// which are never read as agent files.
+fn skills_package(at: &Path, version: &str) {
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().to_path_buf();
+    copy_dir(&repo.join("templates/agents"), at);
+    fs::write(at.join("codelaw-skills.json"), format!("{{\"name\": \"codelaw-skills\", \"version\": \"{version}\"}}\n")).unwrap();
+    fs::copy(repo.join("LICENSE"), at.join("LICENSE")).unwrap();
+    fs::write(at.join("README.md"), "# codelaw-skills\n").unwrap();
+}
+
+/// A JS project whose `[agents]` names every target, with the packs installed.
+fn agents_project(name: &str) -> PathBuf {
+    let d = temp(name);
+    fs::write(d.join("package.json"), r#"{"name":"x"}"#).unwrap();
+    fs::create_dir_all(d.join("src")).unwrap();
+    fs::write(d.join("src/a.ts"), "export const a = 1;\n").unwrap();
+    fs::write(d.join("codelaw.toml"), "extends = [\"codelaw:js/recommended\"]\n\n[agents]\ntargets = [\"claude\", \"copilot\", \"codex\", \"kiro\", \"cowork\"]\ncommand = \"codelaw\"\n").unwrap();
+    let packs = Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().join("packs");
+    copy_dir(&packs.join("js"), &d.join("node_modules/@codelaw/rules-js"));
+    d
+}
+
+/// W-77 DoD 3 and 4: the agent files come only from the skills package at
+/// this binary's version — none installed or another version, exit 2 with
+/// the install lines and nothing written; the npm and the PyPI install of
+/// the same package write the same files, byte for byte (L6).
+#[test]
+fn the_skills_package_is_found_or_refused() {
+    let v = env!("CARGO_PKG_VERSION");
+    let generated = |d: &Path| -> Vec<(String, Vec<u8>)> {
+        tree(d)
+            .into_iter()
+            .filter(|f| !f.starts_with("node_modules/") && !f.starts_with(".venv/") && !matches!(f.as_str(), "package.json" | "src/a.ts" | "codelaw.toml"))
+            .map(|f| {
+                let b = fs::read(d.join(&f)).unwrap();
+                (f, b)
+            })
+            .collect()
+    };
+
+    // None installed: both commands refuse, name both registries' install lines, write nothing.
+    let d = agents_project("skills-none");
+    let before = tree(&d);
+    let (code, _, err) = codelaw(&d, &["sync-agents"]);
+    assert_eq!(code, 2, "{err}");
+    assert!(err.contains(&format!("npm i -D @codelaw/skills@{v}")) && err.contains("pip install codelaw-skills=="), "{err}");
+    assert!(err.contains("node_modules/@codelaw/skills") && err.contains("codelaw_skills/ in the site-packages"), "it says where it looked: {err}");
+    assert_eq!(codelaw(&d, &["sync-agents", "--check"]).0, 2);
+    assert_eq!(tree(&d), before, "a refusal writes nothing");
+    fs::remove_file(d.join("codelaw.toml")).unwrap();
+    let (code, out, err) = codelaw(&d, &["init", "--no-install", "--agents", "claude"]);
+    assert_eq!(code, 2, "{out}{err}");
+    assert!(err.contains(&format!("npm i -D @codelaw/skills@{v}")) && err.contains("nothing was written"), "{err}");
+    assert_eq!(tree(&d).len() + 1, before.len(), "init --agents refused before writing a file");
+    let _ = fs::remove_dir_all(&d);
+
+    // Another version, on either registry: refused, naming both versions.
+    for at in ["node_modules/@codelaw/skills", ".venv/lib/python3.12/site-packages/codelaw_skills"] {
+        let d = agents_project("skills-old");
+        skills_package(&d.join(at), "0.0.1");
+        let before = tree(&d);
+        let (code, _, err) = codelaw(&d, &["sync-agents"]);
+        assert_eq!(code, 2, "{at}: {err}");
+        assert!(err.contains(&format!("is version 0.0.1, and this codelaw is {v}")) && err.contains(&format!("npm i -D @codelaw/skills@{v}")), "{at}: {err}");
+        assert_eq!(tree(&d), before, "{at}: a refusal writes nothing");
+        let _ = fs::remove_dir_all(&d);
+    }
+
+    // The npm install and the PyPI install write the same files.
+    let mut outputs = Vec::new();
+    for at in ["node_modules/@codelaw/skills", ".venv/lib/python3.12/site-packages/codelaw_skills"] {
+        let d = agents_project("skills-ok");
+        skills_package(&d.join(at), v);
+        let (code, out, err) = codelaw(&d, &["sync-agents"]);
+        assert_eq!(code, 0, "{at}: {out}{err}");
+        assert_eq!(codelaw(&d, &["sync-agents", "--check"]).0, 0, "{at}");
+        let files = generated(&d);
+        assert!(files.iter().all(|(f, _)| f != "LICENSE" && f != "codelaw-skills.json" && !f.ends_with("/codelaw-skills.json")), "{at}: the package's own files are not agent files");
+        assert!(files.iter().any(|(f, _)| f == ".claude/skills/codelaw-fix/SKILL.md"), "{at}");
+        outputs.push(files);
+        let _ = fs::remove_dir_all(&d);
+    }
+    assert_eq!(outputs[0], outputs[1], "npm and PyPI give the same agent files (L6)");
+
+    // CODELAW_SKILLS names a folder ahead of both.
+    let d = agents_project("skills-env");
+    let own = temp("skills-env-pkg");
+    skills_package(&own, v);
+    let out = Command::new(env!("CARGO_BIN_EXE_codelaw")).arg("sync-agents").current_dir(&d).env_remove("VIRTUAL_ENV").env("CODELAW_SKILLS", &own).output().unwrap();
+    assert_eq!(out.status.code(), Some(0), "{}", String::from_utf8_lossy(&out.stderr));
+    assert_eq!(generated(&d), outputs[0]);
+    let _ = fs::remove_dir_all(&d);
+    let _ = fs::remove_dir_all(&own);
+}
+
 /// W-17 row 3: with no `target_version`, `strict=` may not exist on the
 /// code's Python, so `codelaw fix` must not add it; `--unsafe` may.
 #[test]
@@ -260,6 +356,8 @@ fn init_agents_writes_the_layout_and_sync_keeps_it() {
     copy_dir(&packs.join("js"), &d.join("node_modules/@codelaw/rules-js"));
     copy_dir(&packs.join("ts"), &d.join("node_modules/@codelaw/rules-ts"));
     copy_dir(&packs.join("data"), &d.join("node_modules/@codelaw/rules-data"));
+    // And the skills package beside them (W-77): the agent files are in it.
+    skills_package(&d.join("node_modules/@codelaw/skills"), env!("CARGO_PKG_VERSION"));
     let before = tree(&d);
     let (code, out, err) = codelaw(&d, &["init", "--no-install", "--agents", "kiro,claude,cowork,copilot,codex"]);
     assert_eq!(code, 0, "{out}{err}");

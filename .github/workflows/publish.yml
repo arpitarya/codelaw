@@ -163,9 +163,11 @@ jobs:
           echo "$SUMS  dist/SHA256SUMS" | sha256sum --strict --quiet -c
           (cd dist && sha256sum --strict --quiet -c SHA256SUMS)
           [ "$(find dist/npm dist/pypi -type f | wc -l)" = "$(wc -l < dist/SHA256SUMS)" ] || { echo "::error::dist holds a file SHA256SUMS does not list"; exit 1; }
-      - name: publish — the eight binaries, the eight npm packs, then codelaw last
-        # codelaw names the binaries as optionalDependencies, so it goes last: a
+      - name: publish — the eight binaries, the npm packs, codelaw, then @codelaw/skills
+        # codelaw names the binaries as optionalDependencies, so it goes after them: a
         # failure before it leaves the previous codelaw as `latest`, intact.
+        # @codelaw/skills depends on codelaw at its exact version (W-77), so it
+        # goes after codelaw, never before the engine it needs.
         # The dist-tag, one for the whole release:
         #   a pre-release (a version with "-")          → `next`, never `latest`
         #   older than codelaw's current `latest` (a backport, 0.1.5 after 0.2.0)
@@ -182,7 +184,7 @@ jobs:
                else tag=latest; fi ;;
           esac
           echo "dist-tag: $tag (codelaw's latest is ${cur:-none})"
-          for t in ./dist/npm/codelaw-cli-*.tgz ./dist/npm/codelaw-rules-*.tgz ./dist/npm/codelaw-[0-9]*.tgz; do
+          for t in ./dist/npm/codelaw-cli-*.tgz ./dist/npm/codelaw-rules-*.tgz ./dist/npm/codelaw-[0-9]*.tgz ./dist/npm/codelaw-skills-*.tgz; do
             id="$(tar -xzOf "$t" package/package.json | node -p 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); p.name + "@" + p.version')"
             [ "${id##*@}" = "$v" ] || { echo "::error::$id is not the release version $v"; exit 1; }  # the version after the LAST @
             if npm view "$id" version >/dev/null 2>&1; then echo "✓ $id is already on npm"; continue; fi
