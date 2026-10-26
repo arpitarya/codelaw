@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25: the security-js pack: injection, XSS, path trav
 item: W-54
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated: 2026-10-26
+updated_by: "Claude Code (Sonnet 5.5), lockmaster"
+ball: done
 ---
 
 # W-54 — `security-js` — JavaScript (Node, browser, Express) security rules
@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Port the eslint-plugin-security set (Apache-2.0) and write the rest below, each with cases | the catalogue | ⏳ |
-| 2 | Framework sources for `from_source:`: Express, Koa, Fastify, Next.js route handlers, browser `location`/`postMessage` | precise rules | ⏳ |
-| 3 | `recommended` and `strict` presets; README with the 'not ported, and why' table | adoption | ⏳ |
-| 4 | Corpus run on three real repos; every `recommended` rule under 5% false positives on them | trustworthy defaults | ⏳ |
+| 1 | Port the eslint-plugin-security set (Apache-2.0) and write the rest below, each with cases | the catalogue | ✅ 2026-10-26 — 66 rules in `packs/security-js/rules/sec-js/`, each with Do/Don't in four languages and a `.cases.md` |
+| 2 | Framework sources for `from_source:`: Express, Koa, Fastify, Next.js route handlers, browser `location`/`postMessage` | precise rules | ✅ 2026-10-26 — `data/sources/{express,koa,nextjs,browser,llm}.json` (Fastify's `request.*` is in `express`) |
+| 3 | `recommended` and `strict` presets; README with the 'not ported, and why' table | adoption | ✅ 2026-10-26 — 55 `recommended`, 11 `strict` |
+| 4 | Corpus run on three real repos; every `recommended` rule under 5% false positives on them | trustworthy defaults | ✅ 2026-10-26 — 744 files, 31 findings; the false positives it showed (client-side `confirm password` compares, an `api.post` client call, a cookie-name constant) were fixed and became cases |
 
 **Arpit, 2026-10-25:** *"I want to create a pack for security issues. Security issues like Veracode, Black Duck, X-Ray, OWASP. They would have some suggestions on how to write, what to write, what not to write in JavaScript and Python. So create … one for JavaScript, one for TypeScript, one for HTML, one for Python. Research and create work items for individual languages."*
 
@@ -109,14 +109,14 @@ Also widen `sec-js/no-unsanitized-html`'s sinks: `Range.createContextualFragment
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | every rule has Do/Don't examples and cases, `security:` metadata and a fix | ⏳ |
-| 2 · | `codelaw test packs/security-js` green | ⏳ |
-| 3 · | `recommended` false-positive rate under 5% on the corpus | ⏳ |
-| 4 · | README's not-ported table covers every eslint-plugin-security rule | ⏳ |
+| 1 · | every rule has Do/Don't examples and cases, `security:` metadata and a fix | ✅ 2026-10-26 |
+| 2 · | `codelaw test packs/security-js` green | ✅ 2026-10-26 — 66 rules · 1482 checks · 0 failed |
+| 3 · | `recommended` false-positive rate under 5% on the corpus | ✅ 2026-10-26 — see step 4 |
+| 4 · | README's not-ported table covers every eslint-plugin-security rule | ✅ 2026-10-26 — all 14 |
 
 ## Blockers
 
-waits on **W-53** (pack, metadata, `from_source:`).
+none: W-53 landed 2026-10-25.
 
 ## Record affected
 
@@ -132,3 +132,10 @@ SR-RULE-PACKS (the pack's row and presets); rule pages are the rules' spec (SR-R
 ## Reference
 
 [CodeQL JS queries](https://codeql.github.com/codeql-query-help/javascript/) · [OWASP Node.js cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_Sheet.html) · [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) · [Electron security checklist](https://www.electronjs.org/docs/latest/tutorial/security) · [eslint-plugin-security](https://github.com/eslint-community/eslint-plugin-security) · [OWASP Node.js cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_Sheet.html) · [JFrog SAST rule list](https://docs.jfrog.com/security/docs/list-of-sast-rules)
+
+## What landed, and where it differs from the catalogue (2026-10-26)
+
+- 66 rules, 55 in `sec-js/recommended`, 11 more in `sec-js/strict`. Fix classes: 17 `suggest`, 49 `manual`, none `auto`.
+- **Differences, each said on the pack README:** `sec-js/no-bidi-characters` is `suggest`, not `auto` (a comment is removed whole; a hidden character in a string or a regular expression has no mechanical fix — a new edit primitive or a native rule would make it `auto`); `sec-js/no-cleartext-http` is `manual`, not `suggest` (an edit primitive cannot rewrite the text inside a URL); `sec-js/no-prototype-pollution` does not flag a literal `__proto__` write, only a request value used as a key or merged; `sec-js/no-javascript-url` reads the address by its text, not through a local name; `sec-js/no-electron-insecure` fixes the flags set to `false` only; `sec-js/no-unsafe-deserialize` flags a bare js-yaml `load`, safe in js-yaml 4, with a harmless fix.
+- **Engine behaviour learned, for the next pack:** `from_source:` is one `where:` for the whole rule, so every branch of the rule must capture the same name, and an `any:` runs the first branch that matches the shape, so two branches of one shape with different `constraints:` do not both run (use `all:` with `regex:` per branch); `has:` looks at direct children unless `stopBy: end`; `$$$REST` after a comma does not match a call with one argument.
+- **Not done here:** a release-build timing of the pack (the debug binary took 15 s over the 744 files; the `perf` job decides L8); promotion of any rule to `stable` (needs a corpus run with no false positives the decider has read).

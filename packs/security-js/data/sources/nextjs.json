@@ -1,0 +1,13 @@
+[
+  "searchParams",
+  "req.nextUrl.searchParams",
+  "request.nextUrl.searchParams",
+  "request.nextUrl.pathname",
+  "req.nextUrl.pathname",
+  "request.formData",
+  "request.json",
+  "req.json",
+  "req.formData",
+  "req.query",
+  "req.body"
+]

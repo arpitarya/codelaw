@@ -120,6 +120,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the shared `target/debug/codelaw` is overwritten by every lane's build, so a CLI test can run another lane's binary; the tests were run from a private copy of the binary with the baked path patched, after every `cargo test` that skipped the relink gave a false red.
 - **Next:** none for W-59.
 
+## 2026-10-26 — W-54 built: `security-js`, 66 rules  ·  Claude Code, lockmaster (Sonnet 5.5)
+
+- **Asked:** *"W-54 (security-js pack, 66 rules), every rule with a fix (L4), fixtures and tests"* — a sub-agent of a parallel session, Arpit having approved everything.
+- **Done:** 66 rule files under `packs/security-js/rules/sec-js/` with `.cases.md` sidecars (generated from one table kept outside the repo, then read and tested rule by rule), five `data/sources/` tables, the two presets, the README with the not-ported table, NOTICE, `corpus.toml`. `codelaw test packs/security-js`: 66 rules · 1482 checks · 0 failed. The corpus run (744 files) showed false positives in `timing-safe-compare`, `no-hardcoded-secret` and `missing-rate-limit`; each was fixed and became a case. W-54 archived; SR-RULE-PACKS names what landed.
+- **Decided / left open:** the catalogue's `auto` for `no-bidi-characters` and `suggest` for `no-cleartext-http` are not reachable with the edit primitives (a native rule would do both: not built, because a build was past the disk ceiling at the time); the other differences are at the foot of the item. A release-build timing of the pack is the `perf` job's.
+- **Mistakes:** assumed an `any:` tries each branch with its own `constraints:` — it runs the first branch that matches the shape, and a constraint that fails then ends the match; found by a case, fixed by `all:` with `regex:` per branch.
+- **Next:** W-55 (`security-ts`), which extends this pack.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*
