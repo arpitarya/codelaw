@@ -27,6 +27,8 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-80-session-cleanup.md`](open/W-80-session-cleanup.md) | 2026-10-27 | the W-77 worktree is W-77's live change ([`work/open/`](../work/open/W-77-skills-package.md)) |
+| [`W-79-session-cleanup.md`](open/W-79-session-cleanup.md) | 2026-10-27 | branch `lm/W-73` (`e5af708`), the regenerated index kept |
 | [`W-74-editor-logs.md`](open/W-74-editor-logs.md) | 2026-10-27 | [SR-EDITOR](../records/0114_editor.md) decision 7; `packaging/vscode/README.md` *Troubleshooting* |
 | [`W-78-commit-main-checkout.md`](open/W-78-commit-main-checkout.md) | 2026-10-27 | the commit itself; W-77 lives in [`work/open/`](../work/open/W-77-skills-package.md) |
 | [`W-76-commit-main-and-clean-worktrees.md`](open/W-76-commit-main-and-clean-worktrees.md) | 2026-10-27 | the commit itself and the worklog entry |
