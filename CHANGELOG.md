@@ -28,6 +28,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Changed
 
+- **Three fewer dependencies:** "did you mean …?" suggestions use codelaw's own `levenshtein` and `jaro_winkler` (same results), the cache writes its own binary format instead of `postcard` (old cache files are ignored and rebuilt; a truncated or corrupt one is a miss), and the unused `anyhow` line is gone from `codelaw-format` (L11, W-67).
 - **`publish.yml` can publish npm on its own:** a run by hand on a `v*` tag publishes npm only, and the GitHub Release on the same tag later adds PyPI and skips what npm already has (L6 decision 9, W-37). The rest of the release work of W-03, W-04, W-29, W-30 and W-31 is W-37 (npm) and W-38 (PyPI).
 - **The README tells codelaw's story** — the four moments (before, while and after an AI writes, and with no AI), and how it compares with ESLint + Prettier and Biome — and **the how-to moved to a new [`USAGE.md`](USAGE.md)**: install, configure, write rules, agents, editor, pre-commit, CI and every command (W-35).
 

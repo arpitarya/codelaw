@@ -51,7 +51,7 @@ impl std::error::Error for ConfigError {}
 pub fn did_you_mean<'a>(unknown: &str, valid: impl IntoIterator<Item = &'a str>) -> Option<&'a str> {
     valid
         .into_iter()
-        .map(|v| (strsim::jaro_winkler(unknown, v), v))
+        .map(|v| (codelaw_core::similar::jaro_winkler(unknown, v), v))
         .filter(|(score, _)| *score > 0.8)
         .max_by(|a, b| a.0.total_cmp(&b.0).then_with(|| b.1.cmp(a.1)))
         .map(|(_, v)| v)

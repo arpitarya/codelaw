@@ -13,7 +13,6 @@ codelaw-core.workspace = true
 serde_json.workspace = true
 serde-saphyr.workspace = true
 toml.workspace = true
-anyhow = "1"
 # `.editorconfig` section globs (decision 5).
 globset.workspace = true
 # Biome 2.5.15 (tag `@biomejs/biome@2.5.15`): the crates.io copies are stale.

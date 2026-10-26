@@ -337,8 +337,8 @@ impl Schema {
                         let near = props
                             .into_iter()
                             .flat_map(|p| p.keys())
-                            .filter(|k| strsim::levenshtein(k, &m.key) <= 2.max(m.key.len() / 4))
-                            .min_by_key(|k| strsim::levenshtein(k, &m.key));
+                            .filter(|k| codelaw_core::similar::levenshtein(k, &m.key) <= 2.max(m.key.len() / 4))
+                            .min_by_key(|k| codelaw_core::similar::levenshtein(k, &m.key));
                         let hint = near.map(|k| format!("; did you mean `{k}`?")).unwrap_or_default();
                         let (start, end) = m.key_span.unwrap_or(ctx.tree.node(m.value).span);
                         let message = if here == "$" { format!("Unknown key `{}`{hint}", m.key) } else { format!("`{here}` has an unknown key `{}`{hint}", m.key) };

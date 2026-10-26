@@ -6,6 +6,7 @@
 mod diagnostic;
 mod language;
 pub mod process;
+pub mod similar;
 mod text;
 
 pub use diagnostic::{Diagnostic, FixClass, Severity, Skipped, TextEdit};

@@ -27,6 +27,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-67-replace-three-dependencies.md`](open/W-67-replace-three-dependencies.md) | 2026-10-26 | [`DEPENDENCIES.md`](../DEPENDENCIES.md), `crates/codelaw-core/src/similar.rs` and `crates/codelaw-cache/src/codec.rs` ([SR-CACHE](../records/0109_cache.md) decision 4) |
 | [`W-65-dependency-check.md`](open/W-65-dependency-check.md) | 2026-10-26 | [`crates/codelaw-cli/tests/dependencies.rs`](../crates/codelaw-cli/tests/dependencies.rs), the ledger in [`DEPENDENCIES.md`](../DEPENDENCIES.md) and [SR-LAW-11](../records/0013_LAW-11-no-dependencies.md) decision 7 |
 | [`W-66-ratify-dependencies.md`](open/W-66-ratify-dependencies.md) | 2026-10-26 | [`DEPENDENCIES.md`](../DEPENDENCIES.md) and [SR-LAW-11](../records/0013_LAW-11-no-dependencies.md); the three removals are [W-67](../work/open/W-67-replace-three-dependencies.md) |
 | [`W-03-rule-packs.md`](open/W-03-rule-packs.md) | 2026-10-25 | the packs in `packs/` and [SR-RULE-PACKS](../records/0101_rule-packs.md); publishing is [W-37](../work/open/W-37-npm-0-2-0-through-the-pipeline.md) and [W-38](../work/open/W-38-pypi-0-2-0-by-hand.md); the *later* presets are B-048 in [`work/BACKLOG.md`](../work/BACKLOG.md) |

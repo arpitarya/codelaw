@@ -88,6 +88,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the shared `CARGO_TARGET_DIR` lets lanes overwrite each other's `target/debug/codelaw` between build and test (an old binary answered "unrecognized subcommand"); rebuilt and reran until green.
 - **Next:** W-50's post-commit reminders.
 
+## 2026-10-26 — W-67 closed: strsim, anyhow and postcard replaced  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** replace the three dependencies the decider ruled "Remove" / "Replace" in W-66, and measure L8 before and after.
+- **Done:** `levenshtein` and `jaro_winkler` in `codelaw-core::similar` (with known-pair tests) replace `strsim` in config, schema and target; the unused `anyhow` line left `codelaw-format`; the cache body is now codelaw's own deterministic binary format (`codelaw-cache/src/codec.rs`, header version 2; tests: round trip, fixed layout, every truncation, bit flips, a huge length, an old-version entry, a truncated entry). `postcard` left the workspace; D-20, D-23, D-24 left `DEPENDENCIES.md`; SR-CACHE decision 4 and SR-LAW-11 context updated; W-67 archived.
+- **Decided / left open:** `strsim` (via clap) and `anyhow` (via markup_fmt) are still in `Cargo.lock` as parts of ratified trees — said so in `DEPENDENCIES.md`, not fought. L8 was measured on this (loaded) machine only: no slower; the CI-runner numbers are the `perf` job's.
+- **Mistakes:** concurrent lanes share one target dir and overwrite each other's `codelaw_core` artifacts (cargo then said `cannot find similar in codelaw_core`); worked around with a per-package profile setting so my builds had their own hash. `mcp_parity` reads another lane's clobbered `codelaw` binary (10 tools, not 9) — not this change.
+- **Next:** none for W-67.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*
