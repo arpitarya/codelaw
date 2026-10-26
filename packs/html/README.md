@@ -21,6 +21,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `html/document` | 5 | html-validate 11.16.4 `html-validate:document`: checks that only make sense for a complete page |
 | `html/conventions` | 3 | opt-in: the starter rule `html/target-blank-rel`, and HTMLHint's `inline-style-disabled` and `inline-script-disabled` |
 | `html/security` | 5 | the html pack's security rules: subresource integrity, reverse tabnabbing, inline scripts, password autocomplete, meta refresh; codelaw:sec-html/recommended extends it |
+| `html/size` | 1 | Size limits for pages and templates, opt-in: a line limit per file |
 
 <!-- /docs-sync:presets -->
 

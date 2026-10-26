@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25 (voice): each rule pack gets an optional compani
 item: W-34
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated: 2026-10-26
+updated_by: "Claude Code (Sonnet 5.5)"
+ball: arpit
 ---
 
 # W-34 — An optional Fux index package beside each rule pack
@@ -16,11 +16,11 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Wait for Fux's spike (20 plain-words questions over the JS rules; bar 16 of 20 in the top 5) and Fux's design of a shipped index | proof that free-text search over the rules is worth a package | ⏳ waiting on Fux item 298 |
-| 2 | Amend the records: L6 names a third kind of package on both registries; SR-RULE-PACKS and SR-PACKAGES say what it holds and how it is built | the packages are legal | ⏳ |
-| 3 | Build: CI runs Fux over each pack's `rules/` and packs the index as `@codelaw/rules-<name>-fux-index` and `codelaw-rules-<name>-fux-index`, same version as the pack | 10 npm + 6 PyPI optional packages | ⏳ |
-| 4 | `codelaw init` leaves them out; it only prints how to add them when the repo uses Fux | nobody downloads an index they did not ask for | ⏳ |
-| 5 | Reserve the 16 names and publish with the next release | teams can install them | 🔴 Arpit's hand |
+| 1 | Wait for Fux's spike (20 plain-words questions over the JS rules; bar 16 of 20 in the top 5) and Fux's design of a shipped index | proof that free-text search over the rules is worth a package | ✅ done — fux item 299 closed (fux 5.1.0; SR-PKG-INDEX, `fux pack`) |
+| 2 | Amend the records: L6 names a third kind of package on both registries; SR-RULE-PACKS and SR-PACKAGES say what it holds and how it is built | the packages are legal | ✅ L6 decision 12, SR-PACKAGES decision 14, SR-RULE-PACKS decision 6 |
+| 3 | Build: CI runs Fux over each pack's `rules/` and packs the index as `@codelaw/rules-<name>-fux-index` and `codelaw-rules-<name>-fux-index`, same version as the pack | 10 npm + 6 PyPI optional packages | ✅ `scripts/fux-index.py`; `ci.yml`'s `package` job; `dist/fux-index/`, not in the release set |
+| 4 | `codelaw init` leaves them out; it only prints how to add them when the repo uses Fux | nobody downloads an index they did not ask for | ✅ `crates/codelaw-cli/tests/fux_index.rs` |
+| 5 | Reserve the 16 names and publish with the next release | teams can install them | 🔴 Arpit's hand — open; RELEASING.md §"The optional Fux index packages" |
 
 **Arpit, 2026-10-25 (voice):** *"I want codelaw to have a separate package for
 Fux index. It shouldn't be added as a default one."* → *"I would like to go with
@@ -62,19 +62,25 @@ the consumer's repo.
   `codelaw-rules-<name>`, and *"no other codelaw distribution is published"*;
   decision 11's table lists only rule packs. Both change on this ruling.
 
-## Open questions (step 2)
+## Questions (step 2), answered 2026-10-26 by the agent that built it
 
-- Does `codelaw init` print the index-package lines whenever `.fux/` exists, or
-  only with a flag?
-- Is the index package's version checked against the pack's (a drift error like
-  `min_codelaw`), or left to Fux's own pin?
+- **Does `codelaw init` print the index-package lines whenever `.fux/` exists, or only with a flag?** Whenever `.fux/` exists, under every flag, never when it does not. No new flag, so SR-CLI-MCP is unchanged. *The decider may overrule.*
+- **Is the index package's version checked against the pack's?** By Fux's own pin: the pin row holds the index package's version and digest, and Fux's `pkg:` passage check (its item 301) refuses a docs package at another version than the manifest's `content.version`. `scripts/fux-index.py check` also refuses a manifest whose `content` is not the pack at the release version.
+
+## What was built, and what is not the plan's
+
+- **16, not 22.** The four security packs hold no rule file yet, Fux refuses an empty index, so they get theirs with their first rule: ten npm and six PyPI, the number this item always said.
+- **Out of the release set.** `publish.yml` uploads `dist/npm` and `dist/pypi` whole and its preflight demands a trusted publisher per tarball, so an unreserved index name would stop a release. They build into `dist/fux-index/` and are a CI artifact (`fux-index`); step 5 ends with a change to `publish.yml`.
+- **A manifest per registry.** `fux pack` writes both registry names; a pack on one registry has the other removed from the manifest's `content` (the manifest is outside the digest), so Fux never looks for a package that does not exist.
+- **`fux-engine` is a dependency under L11** (D-33, `pending` in `DEPENDENCIES.md`): named by this item's own ruling as a build tool of CI only, but ratified by name only on the decider's say.
+- **Proven end to end:** the js wheel and `codelaw-rules-js` installed beside fux 5.1.0: `fux setup --index` pinned it, `fux doctor` reported it verified with 74 documents, `fux ask "stop using debugger statements" --scope packages` ranked `rules/js/no-debugger.md` first.
 
 ## Definition of done
 
-- The amended records name the 16 packages and cite this ruling.
-- CI builds each index from a pinned fux and checks its digest is reproducible.
-- `codelaw init` with no flag installs none of them (a test).
-- The packages are on both registries at the release version.
+- ✅ The amended records name the 16 packages and cite this ruling.
+- ✅ CI builds each index from a pinned fux and checks its digest is reproducible.
+- ✅ `codelaw init` with no flag installs none of them (a test).
+- 🔴 The packages are on both registries at the release version — Arpit's hand.
 
 ## Hazards
 

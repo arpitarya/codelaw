@@ -1,0 +1,4 @@
+description = "Size limits for stylesheets, opt-in: a line limit per file (CSS, SCSS and CSS Modules)"
+
+[rules]
+"css/max-lines" = "error"

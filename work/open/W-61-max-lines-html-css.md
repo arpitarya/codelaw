@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Write `html/max-lines` and `css/max-lines` pages with options and cases | the spec | ⏳ |
-| 2 | Implement as `native:` rules on the counter W-58 builds (one shared line counter, per-language comment syntax) | one implementation for six languages | ⏳ |
-| 3 | Add both to the `size` presets: `codelaw:html/size`, `codelaw:css/size` | one line to turn them on | ⏳ |
-| 4 | Docs: USAGE's size-limits section gains HTML and CSS rows | users find it | ⏳ |
+| 1 | Write `html/max-lines` and `css/max-lines` pages with options and cases | the spec | ✅ |
+| 2 | Implement as `native:` rules (`crates/codelaw-native/src/size_lines.rs`: one text scanner for CSS/SCSS and HTML; W-58's counter is tree-based and did not exist yet) | one implementation for both | ✅ |
+| 3 | Add both to the `size` presets: `codelaw:html/size`, `codelaw:css/size` | one line to turn them on | ✅ |
+| 4 | Docs: USAGE's size-limits section gains HTML and CSS rows | users find it | ✅ (USAGE has a `Size limits` section with the two rows; W-58 adds its three) |
 
 **Arpit, 2026-10-26:** *"I want max lines rule for HTML CSS files as well. Research and create a work item for it. The CSS pack should work with SCSS, and CSS modules as well."*
 
@@ -55,9 +55,9 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | cases: blank, comment, SCSS `//`, embedded `<script>`/`<style>`, every option | ⏳ |
-| 2 · | `codelaw test packs/html packs/css` green | ⏳ |
-| 3 · | a scope gives `_*.scss` partials their own limit | ⏳ |
+| 1 · | cases: blank, comment, SCSS `//`, embedded `<script>`/`<style>`, every option | ✅ unit tests in `size_lines.rs` (cases cannot set options) |
+| 2 · | `codelaw test packs/html packs/css` green | ✅ |
+| 3 · | a scope gives `_*.scss` partials their own limit | ⏳ needs W-59 (scope tables) and W-62 (`.scss` is not a language yet; the rule already reads `//` comments when the path ends `.scss`) |
 
 ## Blockers
 

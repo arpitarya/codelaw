@@ -98,6 +98,12 @@ harmless); `publish.yml` then skips the versions already on npm.
 
 After this, no release needs a token, a code or your machine.
 
+## The optional Fux index packages (W-34) — built, not yet published
+
+L6 decision 12: each pack that holds rules has a companion `@codelaw/rules-<name>-fux-index` (npm, ten today) and `codelaw-rules-<name>-fux-index` (PyPI, six), which `codelaw init` never installs. `ci.yml`'s `package` job builds them with a pinned fux (`python3 scripts/fux-index.py assemble --out dist`, then `check dist`; `names` prints the sixteen) into **`dist/fux-index/`** and uploads that folder as the artifact `fux-index`. **They are not in `dist/npm` or `dist/pypi`, so `publish.yml` neither uploads nor trust-checks them.**
+
+**Step 5 of W-34, the decider's hand, is open.** Per name, as the pack names were done: npm first publish by hand from the `fux-index` artifact (`gh run download <run-id> -n fux-index`; `npm publish dist/fux-index/npm/<tarball> --access public`), then `scripts/npm-trust.sh` for the new names; PyPI by `twine upload` of the six wheels with your token, then a trusted publisher on each project. Only after that does `publish.yml` learn to upload `dist/fux-index/` (a follow-up change to its `npm` and `pypi` jobs), so a release never waits on a name nobody reserved. The four security packs add their index packages when they hold their first rule.
+
 ## Every release
 
 1. **Bump:** `python3 scripts/version.py --set 0.2.0` — Cargo.toml, Cargo.lock
