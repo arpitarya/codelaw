@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 /// (SR-RULE-FORMAT decision 1).
 pub const RESERVED_NAMESPACES: &[&str] = &[
     "js", "ts", "react", "node", "stencil", "py", "json", "yaml", "toml", "md", "data", "css", "html", "graph", "format",
-    "codelaw", "tanstack-query", "redux-toolkit", "sec-js", "sec-ts", "sec-html", "sec-py", "scss",
+    "codelaw", "tanstack-query", "redux-toolkit", "sec-js", "sec-ts", "sec-html", "sec-py", "scss", "css-modules",
 ];
 
 /// The namespaces of the four security packs: a rule in one must carry

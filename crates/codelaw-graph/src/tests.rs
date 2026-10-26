@@ -326,3 +326,130 @@ fn deprecated_python_alias() {
     assert_eq!(uses.len(), 1);
     assert_eq!(uses[0].file, "app/billing.py");
 }
+
+fn module_rule(classes: &str) -> GraphRule {
+    compile(&serde_json::json!({"module": {"classes": classes}}), Some(&serde_json::json!({"do": ["remove-rule"]}))).unwrap()
+}
+
+fn module_findings(classes: &str, files: &[(&str, &str)], config: GraphConfig) -> Vec<String> {
+    let g = graph(files, config);
+    let langs: &[Language] = if classes == "unused" { &[Language::Css, Language::Scss] } else { ALL };
+    run(&module_rule(classes), &g, langs).into_iter().map(|f| format!("{}:{}", f.file, f.captures[0].1)).collect()
+}
+
+#[test]
+fn css_modules_unused_and_undefined_classes() {
+    let files = [
+        ("src/a.module.css", ".used {}
+.unused {}
+:global(.g) {}
+.btn-primary {}
+"),
+        ("src/a.tsx", "import s from './a.module.css';
+export const x = [s.used, s['btn-primary'], s.nope];
+"),
+        ("src/plain.css", ".whatever {}
+"),
+        ("src/plain.tsx", "import p from './plain.css';
+export const y = p.zzz;
+"),
+    ];
+    assert_eq!(module_findings("unused", &files, GraphConfig::default()), vec!["src/a.module.css:unused"]);
+    assert_eq!(module_findings("undefined", &files, GraphConfig::default()), vec!["src/a.tsx:nope"]);
+}
+
+#[test]
+fn css_modules_destructuring_and_named_imports_are_reads() {
+    let files = [
+        ("a.module.css", ".one {}
+.two {}
+.three {}
+"),
+        ("a.js", "import s from './a.module.css';
+const { one, two: renamed } = s;
+"),
+        ("b.js", "import { three, four } from './a.module.css';
+"),
+    ];
+    assert!(module_findings("unused", &files, GraphConfig::default()).is_empty());
+    assert_eq!(module_findings("undefined", &files, GraphConfig::default()), vec!["b.js:four"]);
+}
+
+#[test]
+fn css_modules_computed_access_and_unimported_modules_are_silent() {
+    let files = [
+        ("a.module.css", ".one {}
+.two {}
+"),
+        ("a.js", "import s from './a.module.css';
+export const f = (n) => s[n];
+"),
+        ("b.module.css", ".lonely {}
+"),
+        ("c.module.css", ".x {}
+.y {}
+"),
+        ("c.js", "import s from './c.module.css';
+export const all = { ...s };
+export const g = s.x;
+"),
+        ("d.module.css", ".x {}
+.y {}
+"),
+        ("d.js", "import s from './d.module.css';
+register(s);
+"),
+    ];
+    assert!(module_findings("unused", &files, GraphConfig::default()).is_empty());
+}
+
+#[test]
+fn css_modules_composes_counts_as_a_use_and_incomplete_modules_are_skipped() {
+    let files = [
+        ("a.module.css", ".base {}
+.top { composes: base; }
+.other { composes: remote from './b.module.css'; }
+"),
+        ("b.module.css", ".remote {}
+.stray {}
+"),
+        ("use.js", "import a from './a.module.css';
+import b from './b.module.css';
+export const t = [a.top, a.other, b.stray];
+"),
+        ("c.module.scss", ".card { &-title {} }
+.list, .row { &-x {} }
+"),
+        ("c.js", "import c from './c.module.scss';
+export const k = c.card;
+"),
+    ];
+    // `.card-title` is unused, but `&-x` on a selector list could not be named, so c.module.scss is skipped.
+    assert!(module_findings("unused", &files, GraphConfig::default()).is_empty());
+    let sass = [("c.module.scss", ".card { &-title {} }
+"), ("c.js", "import c from './c.module.scss';
+export const k = c.card;
+")];
+    assert_eq!(module_findings("unused", &sass, GraphConfig::default()), vec!["c.module.scss:card-title"]);
+}
+
+#[test]
+fn css_modules_convention_and_globs() {
+    let files = [("a.module.css", ".btn-primary {}
+:export { gutter: 1px }
+"), ("a.js", "import s from './a.module.css';
+export const k = [s.btnPrimary, s.gutter];
+")];
+    assert_eq!(module_findings("undefined", &files, GraphConfig::default()), vec!["a.js:btnPrimary"]);
+    let camel = GraphConfig { css_modules_convention: "camelCase".into(), ..Default::default() };
+    assert!(module_findings("undefined", &files, camel.clone()).is_empty());
+    assert!(module_findings("unused", &files, camel).is_empty());
+    let named = [("src/a.styles.css", ".x {}
+.y {}
+"), ("src/a.js", "import s from './a.styles.css';
+export const k = s.x;
+")];
+    assert!(module_findings("unused", &named, GraphConfig::default()).is_empty(), "not a module without [css] modules");
+    let globbed = GraphConfig { css_modules: vec!["src/**/*.styles.css".into()], ..Default::default() };
+    assert_eq!(module_findings("unused", &named, globbed), vec!["src/a.styles.css:y"]);
+}

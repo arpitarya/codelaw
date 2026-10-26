@@ -312,6 +312,15 @@ impl ConfigFile {
                 return Err(ConfigError::new(Some(path), format!("`[deps] ignore`: `expires = \"{x}\"` is not a date; write it as YYYY-MM-DD")));
             }
         }
+        if let Some(c) = raw.css.modules_convention.as_deref().filter(|c| !crate::raw::CSS_MODULES_CONVENTIONS.contains(c)) {
+            return Err(ConfigError::new(
+                Some(path),
+                format!("`[css] modules_convention`: `{c}` is not one of {}", crate::raw::CSS_MODULES_CONVENTIONS.iter().map(|c| format!("`{c}`")).collect::<Vec<_>>().join(", ")),
+            ));
+        }
+        if let Some(globs) = &raw.css.modules {
+            glob_set(globs, &path).map_err(|e| ConfigError::new(Some(path.clone()), format!("`[css] modules`: {}", e.message)))?;
+        }
         let include = if raw.include.is_empty() { None } else { Some(glob_set(&raw.include, &path)?) };
         let exclude = glob_set(&raw.exclude, &path)?;
         let built = scope::build(&path, &raw, &profiles, &alias_profiles, &[], raw.extends.is_empty())?;
@@ -448,7 +457,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
     "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
-    "[deps]",
+    "[deps]", "[css]",
 ];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
@@ -466,6 +475,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.lsp != Default::default(),
         !raw.profile.is_empty() || !raw.profiles.is_empty(),
         raw.deps != Default::default(),
+        raw.css != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -697,12 +707,24 @@ impl Config {
     pub fn section_options(&self, name: &str) -> BTreeMap<String, serde_json::Value> {
         let value = match (name, self.root_raw()) {
             ("deps", Some(r)) => serde_json::to_value(&r.deps).ok(),
+            ("css", Some(r)) => serde_json::to_value(&r.css).ok(),
             _ => None,
         };
         match value {
             Some(serde_json::Value::Object(m)) => m.into_iter().collect(),
             _ => BTreeMap::new(),
         }
+    }
+
+    /// `[css] modules`: globs naming CSS Module stylesheets besides
+    /// `*.module.css` and `*.module.scss`.
+    pub fn css_module_globs(&self) -> Vec<String> {
+        self.root_raw().and_then(|r| r.css.modules.clone()).unwrap_or_default()
+    }
+
+    /// `[css] modules_convention`: css-loader's `localsConvention`, `asIs` by default.
+    pub fn css_modules_convention(&self) -> String {
+        self.root_raw().and_then(|r| r.css.modules_convention.clone()).unwrap_or_else(|| "asIs".into())
     }
 
     pub fn tagged_templates(&self) -> bool {

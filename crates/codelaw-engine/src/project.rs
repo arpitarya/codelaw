@@ -40,7 +40,11 @@ impl Project {
 
     pub(crate) fn graph_config(&self) -> Result<GraphConfig, EngineError> {
         let table = self.config.files.first().and_then(|f| f.raw.graph.as_ref());
-        GraphConfig::from_table(table).map_err(|e| EngineError::Config(codelaw_config::ConfigError::new(self.config.root_file().map(Path::to_path_buf), e)))
+        let mut config =
+            GraphConfig::from_table(table).map_err(|e| EngineError::Config(codelaw_config::ConfigError::new(self.config.root_file().map(Path::to_path_buf), e)))?;
+        config.css_modules = self.config.css_module_globs();
+        config.css_modules_convention = self.config.css_modules_convention();
+        Ok(config)
     }
 
     /// Every file of the project root the graph reads, from disk.

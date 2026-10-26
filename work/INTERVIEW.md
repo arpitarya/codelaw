@@ -24,6 +24,8 @@ entry.**
 
 ## 1 · State of play
 
+**Built 2026-10-26 (Claude Code): W-63, CSS Modules.** A stylesheet named `*.module.css` / `*.module.scss` (or matching `[css] modules`) is a module: the `css/*` rules read its syntax, the project graph joins its classes with the `styles.x` that JS and TS read, and the npm-only `css-modules` pack (5 rules) reports unused classes (in the stylesheet), undefined ones (in the JS or TS file), bad `composes`, naming and `:global`. Seventeen packs now, fifteen on npm and ten on PyPI. Closed; the pinned corpora for SCSS and CSS Modules are on W-62's *Left* list.
+
 **Built 2026-10-26 (Claude Code): W-62, SCSS as a CSS dialect.** `.scss` is linted and formatted (L3 amended); tree-sitter-scss 1.0.0 is vendored (`DEPENDENCIES.md` D-33); 64 of the 71 `css/*` rules run on it; a new `scss` pack (15 rules, `scss/recommended`, `scss/strict`) makes sixteen packs, fourteen on npm and ten on PyPI. Not done: the grammar still reads some modern Sass as `ERROR` (`@if not …`), so the CSS and SCSS rules still read the text and `scss/at-if-no-null` fixes `!= null` only; no pinned SCSS corpus yet; the graph does not read `.scss`. W-63 (CSS Modules) is next and adds a seventeenth pack.
 
 **2026-10-26: L11 ratified** — no dependencies unless the decider ratifies each by name in `DEPENDENCIES.md` (ruled 2026-10-26: 29 ratified, `strsim`/`anyhow`/`postcard` replaced by W-67; W-65 built the CI check: `crates/codelaw-cli/tests/dependencies.rs`).

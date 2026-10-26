@@ -96,6 +96,13 @@ pub struct GraphConfig {
     /// More registrar decorators, added to the defaults.
     #[serde(default)]
     pub registrars: Vec<String>,
+    /// `[css] modules`: globs of CSS Module stylesheets besides
+    /// `*.module.css` and `*.module.scss`. Set by the engine from `[css]`.
+    #[serde(skip)]
+    pub css_modules: Vec<String>,
+    /// `[css] modules_convention`: css-loader's `localsConvention`; empty is `asIs`.
+    #[serde(skip)]
+    pub css_modules_convention: String,
 }
 
 fn globs(patterns: &[String]) -> GlobSet {
@@ -117,6 +124,12 @@ impl GraphConfig {
             GlobBuilder::new(p).build().map_err(|e| format!("`[graph]`: invalid glob `{p}`: {e}"))?;
         }
         Ok(c)
+    }
+
+    /// Whether a stylesheet is a CSS Module: named `*.module.css` or
+    /// `*.module.scss`, or matching `[css] modules`.
+    pub fn is_css_module(&self, path: &str) -> bool {
+        crate::modules::named_module(path) || (!self.css_modules.is_empty() && globs(&self.css_modules).is_match(path))
     }
 
     pub fn entry_set(&self) -> GlobSet {

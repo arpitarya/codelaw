@@ -30,6 +30,10 @@ macro_rules! scss_rule {
                 // rules read the text, so they run once, on the root.
                 &["stylesheet", "ERROR"]
             }
+            /// `[css] modules` names the CSS Modules, which the SCSS rules read as modules.
+            fn config_section(&self) -> Option<&'static str> {
+                Some("css")
+            }
             #[allow(unused_variables)]
             fn check(&self, node: SyntaxNode<'_>, $ctx: &NativeContext<'_>, $out: &mut Vec<NativeFinding>) {
                 if node.parent().is_some() {
@@ -37,7 +41,7 @@ macro_rules! scss_rule {
                 }
                 let view = css_syntax::scss_view($ctx.source);
                 let $src: &str = &view;
-                let sheet_rc = css_syntax::sheet_for($ctx.source, true);
+                let sheet_rc = css_syntax::sheet_for($ctx.source, true, css_syntax::is_module($ctx));
                 let $sheet: &Sheet = &sheet_rc;
                 $body
             }

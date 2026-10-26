@@ -1,0 +1,6 @@
+extends = ["codelaw:css-modules/recommended"]
+description = "css-modules/recommended plus names JavaScript reads without brackets and no :global"
+
+[rules]
+"css-modules/class-naming" = "error"
+"css-modules/no-global" = "error"

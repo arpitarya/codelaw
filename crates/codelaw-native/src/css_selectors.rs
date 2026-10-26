@@ -243,6 +243,10 @@ css_rule!(SelectorPseudoClassNoUnknown, "css/selector-pseudo-class-no-unknown", 
             if name.is_empty() || name.starts_with("--") || LEGACY_ELEMENTS.contains(&name.as_str()) || matches_any(&ignore, raw) {
                 return;
             }
+            // CSS Modules' `:global` and `:local`.
+            if sheet.module && matches!(name.as_str(), "global" | "local") {
+                return;
+            }
             if is_page {
                 if !page.contains(&name) {
                     out.push(finding(x.start, x.name.1, format!("Unknown page pseudo-class `:{raw}`")));

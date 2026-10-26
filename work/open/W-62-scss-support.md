@@ -74,7 +74,7 @@ ball: agent
 
 1. **Step 2's second half:** extend the tree-sitter-css fork and move the CSS rules from `css_syntax.rs` onto trees. Not done: tree-sitter-scss 1.0.0 gives `ERROR` on much modern Sass (`@if not …`, and in a spot check on 2026-10-26 the first 40 files listed of Bootstrap's `scss/` all had `ERROR` nodes), so the `css/*` and `scss/*` rules still read the text, as SR-ARCHITECTURE decision 15b records for CSS. To do: patch `tree-sitter-scss`'s `grammar.js` (CLI 0.25.10 + tree-sitter-css 0.20 as upstream builds it), bump to `1.0.0+codelaw.1`, regenerate `src/`, add tests.
 2. **`scss/at-if-no-null` fixes `!= null` only:** `== null` → `not $x` is refused by the fix verifier because the grammar reads `@if not …` as an error. Lands with item 1.
-3. **A pinned SCSS corpus** (`scripts/corpus.json`: e.g. Bootstrap, Foundation) and a `corpus.toml` count for each `scss/*` rule, then `stable` for those with no false positive. Needs CI network.
+3. **Pinned corpora** (`scripts/corpus.json`): an SCSS one (e.g. Bootstrap, Foundation) and a CSS Modules one (a React repo that uses them, W-63's step), and a `corpus.toml` count for each `scss/*` and `css-modules/*` rule, then `stable` for those with no false positive. Needs CI network.
 4. **The graph does not read `.scss`:** `graph/no-unused-css-classes` and `css/project` stay CSS-only (W-63 extends the graph for modules).
 5. **Not shipped on purpose:** `scss/operator-no-unspaced` (layout; the formatter's) — the item's table listed it.
 

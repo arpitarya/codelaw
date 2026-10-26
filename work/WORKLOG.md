@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-63: CSS Modules; the `css-modules` pack  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-63 as a separate lockmaster change after W-62 landed (`494a128`).
+- **Done:** a stylesheet is a CSS Module by name (`*.module.css`, `*.module.scss`) or `[css] modules`; `[css] modules_convention` (a new root-only, schema-validated `[css]` section); the `css/*` rules read module syntax without findings; the graph reads each stylesheet's module facts from its text and the JS facts read `styles["x"]` and `const { x } = styles`; two graph queries and five rules in the new npm-only `css-modules` pack (L6: seventeen packs, fifteen on npm, ten on PyPI); `init` adds it. SR-PROJECT-GRAPH gains decision 8; **`CLAUDE.md` edited** (the L6 and `packs/` lines; SR-WORK-DOCS decision 7a). W-63 closed and archived.
+- **Decided / left open:** a module nobody imports and a module read by a computed name are never judged (no false positive); a module whose class names could not be worked out (Sass interpolation, `&-suffix` on a selector list) is skipped by both queries. The pinned CSS Modules and SCSS corpora moved to W-62's *Left* list (CI network).
+- **Mistakes:** none new; the shared-`target/` collision of the W-62 entry bit again (stale `codelaw-core`, another lane's binary under `CARGO_BIN_EXE_codelaw`) and was handled the same way.
+- **Next:** W-62's *Left* list.
+
 ## 2026-10-26 — W-65 closed: L11's dependency check built  ·  Claude Code, parallel lane (Sonnet 5.5)
 
 - **Asked:** *"W-65 — L11's CI check"* (brief: implement fully, land through lockmaster).

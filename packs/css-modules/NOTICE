@@ -1,0 +1,9 @@
+@codelaw/rules-css-modules
+
+The rules are reimplementations written for codelaw. Their `ported_from:` fields
+name the eslint-plugin-css-modules rules (https://github.com/atfzl/eslint-plugin-css-modules,
+MIT License) whose documented behaviour they reproduce; no eslint-plugin-css-modules
+code or documentation text is included. `css-modules/composes-valid`, `class-naming` and
+`no-global` have no source rule: they follow the CSS Modules specification
+(https://github.com/css-modules/css-modules, MIT License) and the behaviour of css-loader's
+`localsConvention` (https://github.com/webpack-contrib/css-loader, MIT License).

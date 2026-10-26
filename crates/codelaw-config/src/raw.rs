@@ -63,6 +63,9 @@ pub struct RawConfig {
     /// SR-RULE-PACKS decision 15: the dependency rules. Root config only.
     #[serde(default)]
     pub deps: RawDeps,
+    /// SR-PROJECT-GRAPH decision 8 (W-63): CSS Modules. Root config only.
+    #[serde(default)]
+    pub css: RawCss,
     #[serde(default)]
     pub adapters: RawAdapters,
     #[serde(default)]
@@ -222,6 +225,24 @@ pub struct RawExceptions {
     pub require_expiry: Option<bool>,
     pub warn_days: Option<i64>,
 }
+
+/// `[css]`: which stylesheets are CSS Modules, and how the bundler maps class
+/// names to `styles.x`. The `css-modules/*` rules and the graph read it; it
+/// serialises to the JSON the native rules read as options.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawCss {
+    /// Globs of module stylesheets, besides `*.module.css` and `*.module.scss`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modules: Option<Vec<String>>,
+    /// css-loader's `localsConvention`: `asIs` (default), `camelCase`,
+    /// `camelCaseOnly`, `dashes` or `dashesOnly`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modules_convention: Option<String>,
+}
+
+/// The values of `[css] modules_convention`.
+pub const CSS_MODULES_CONVENTIONS: &[&str] = &["asIs", "camelCase", "camelCaseOnly", "dashes", "dashesOnly"];
 
 /// `[deps]`: SR-RULE-PACKS decision 15. The dependency rules read it as
 /// their options, so it serialises to the JSON they read.

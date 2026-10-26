@@ -1,0 +1,6 @@
+name = "@codelaw/rules-css-modules"
+version = "0.2.0"
+min_codelaw = "0.1.0"
+languages = ["css", "scss", "javascript", "jsx", "typescript", "tsx"]
+presets = ["css-modules/recommended", "css-modules/strict"]
+description = "codelaw's rules for CSS Modules: the join between *.module.css and the JavaScript that reads styles.x; npm only (SR-RULE-PACKS)"

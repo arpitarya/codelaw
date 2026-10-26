@@ -1,0 +1,6 @@
+description = "CSS Modules correctness: a class read by JavaScript exists, a class defined is read, composes resolves"
+
+[rules]
+"css-modules/composes-valid" = "error"
+"css-modules/no-undefined-class" = "error"
+"css-modules/no-unused-class" = "warn"
