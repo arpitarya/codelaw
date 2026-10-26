@@ -4,6 +4,7 @@
 
 mod baseline_cmd;
 mod bench;
+mod ci;
 mod format_cmd;
 mod git_hooks;
 mod graph_cmd;

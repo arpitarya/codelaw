@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-51: scheduled auto-fix PR (`init --ci … --autofix`)  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** implement W-51 in a parallel lane.
+- **Done:** `ci.rs` (a slot-only renderer, writer, install), four templates under `templates/ci/`, `--ci/--autofix/--unsafe` on `init`, `tests/ci_autofix.rs`, SR-CLI-MCP decision 12, CHANGELOG, queue row.
+- **Decided / left open:** the renderer is a stand-in until W-60 lands its own (same `{{slot}}` and `\{{` rules); DoD 1 and 3 need a real GitHub repo; the exceptions section is guarded until W-46; no deps-snapshot section (the job is offline, L5).
+- **Mistakes:** none.
+- **Next:** run the workflow once on a throwaway GitHub repo; W-60 registers these templates.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*

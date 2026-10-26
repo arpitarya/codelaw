@@ -1,0 +1,62 @@
+# Written by `codelaw init --ci gitlab --autofix`; the template is templates/ci/gitlab/codelaw-autofix.yml.
+#
+# Add to .gitlab-ci.yml:   include: ".gitlab/codelaw-autofix.yml"
+# Then create a pipeline schedule (CI/CD > Schedules) with the cron `{{cron}}`.
+# Set a masked variable CODELAW_AUTOFIX_TOKEN: a project access token with
+# the api and write_repository scopes (the job pushes and opens the merge
+# request with it). One merge request stays open from `codelaw/autofix`; the
+# branch is force-pushed each run, so leave it unprotected.
+codelaw-autofix:
+  image: node:22
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq jq curl git > /dev/null
+    - if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile; elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile; elif [ -f package-lock.json ]; then npm ci; fi
+    - npm install --global codelaw@{{version}}
+  script:
+    - |
+      set -u
+      rc=0
+      codelaw fix --as-of "$(date +%F)" --format json > fix.json || rc=$?
+      if [ "$rc" -ge 2 ]; then cat fix.json; exit "$rc"; fi
+      codelaw format
+      codelaw baseline prune
+      if [ -z "$(git status --porcelain)" ]; then echo "Nothing to fix: no merge request."; exit 0; fi
+      {
+        echo "Safe fixes from codelaw fix (auto class only), codelaw format and codelaw baseline prune, run on $(date +%F)."
+        echo
+        echo "## Fixes per rule and file"
+        jq -r '(.fixed // [])[] | "- `\(.file)`: " + ([.applied[] | "\(.[0]) x\(.[1])"] | join(", "))' fix.json
+        echo
+        echo "## Baseline lowered"
+        jq -r '(.pruned // [])[] | "- `\(.)`"' fix.json
+        echo
+        echo "## This week's burn-down"
+        codelaw baseline history --since 7d --by day --format markdown 2>/dev/null || echo "No baseline history in the last 7 days."
+        echo
+        if codelaw exceptions --help > /dev/null 2>&1; then
+          echo "## Exceptions expiring in 30 days"
+          codelaw exceptions --expiring 30d 2>/dev/null || true
+          echo
+        fi
+        echo "This merge request only lowers baseline counts; one that raises a count fails its own pipeline."
+      } > body.md
+      rm fix.json
+      git config user.name "codelaw autofix"
+      git config user.email "codelaw-autofix@users.noreply.gitlab.com"
+      git switch -C codelaw/autofix
+      git add -A
+      git reset -q body.md
+      git commit -m "codelaw: scheduled autofix"
+      git push --force "https://oauth2:$CODELAW_AUTOFIX_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git" codelaw/autofix
+      api="$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests"
+      iid="$(curl -sf --header "PRIVATE-TOKEN: $CODELAW_AUTOFIX_TOKEN" "$api?state=opened&source_branch=codelaw/autofix" | jq -r '.[0].iid // empty')"
+      jq -n --rawfile d body.md '{description: $d}' > mr.json
+      if [ -n "$iid" ]; then
+        curl -sf --request PUT --header "PRIVATE-TOKEN: $CODELAW_AUTOFIX_TOKEN" --header "Content-Type: application/json" --data @mr.json "$api/$iid" > /dev/null
+      else
+        jq -n --rawfile d body.md --arg t "codelaw: scheduled autofix" --arg b "$CI_DEFAULT_BRANCH" '{source_branch: "codelaw/autofix", target_branch: $b, title: $t, description: $d, remove_source_branch: true}' > mr.json
+        curl -sf --request POST --header "PRIVATE-TOKEN: $CODELAW_AUTOFIX_TOKEN" --header "Content-Type: application/json" --data @mr.json "$api" > /dev/null
+      fi
+{{suggest_job}}
