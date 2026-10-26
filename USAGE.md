@@ -97,6 +97,7 @@ rules = { "ts/no-unused-vars" = "off" }
 - **Monorepos:** a nested `codelaw.toml` inherits from the root and overrides it.
 - **Team packs:** `extends` also takes `npm:<package>`, `pypi:<distribution>` and `path:<folder>`.
 - **Full reference:** [SR-CONFIG](records/0110_config.md).
+- **Every rule, one page each:** its options with types, defaults and examples, scopes, profiles, suppression and fix steps — [`docs/rules/`](docs/rules/README.md).
 
 ### Warn on a laptop, fail in CI
 

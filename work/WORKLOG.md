@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — A page per rule, generated: `docs/rules/` and `scripts/rule-docs.py`  ·  Claude (Opus 5.5)
+
+- **Asked:** *a detailed document with examples on how each and every rule can be configured with its options — one doc per rule is fine*; then *do it right now here itself*.
+- **Done:** `scripts/rule-docs.py` (stdlib; `--write` / `--check`) renders `docs/rules/<namespace>/<rule>.md` for all 651 rules, plus `engine.md` (the 18 engine rules) and the index `README.md`, from the rule files, their `.cases.md`, the presets, `FIRST_PARTY_PACKS` and `codelaw.schema.json`. Each page: facts (pack, presets, default severity, fix, stability, security), what it checks, turning it on, severity, every option (type, default, description, an example), every option at its default, the `call[]` mode, the cases that run with `options=`, scopes, profiles, `pyproject.toml` / `package.json`, `[deps]` / `[css]` where read, suppression, baseline, then How to fix, Examples and the rest. Its front-matter parser equals PyYAML on all 652 files; every TOML and JSON config snippet it writes (4,555 settings) parses and matches the rule's declared option names and types. Ownership row, `owns:`, the `docs/rules/` registry row, a USAGE pointer and a CI step (`rule-docs.py --check`). Not committed: written into the main checkout, uncommitted.
+- **Decided / left open:** an option with no `.cases.md` example gets a value from its description's `e.g.`, its type and its default — illustrative, not run. Options with no description in the rule file say so (`ts/no-unused-vars`, `js/no-unused-vars`, `stencil/ban-prefix`). Landing through lockmaster is the decider's.
+- **Mistakes:** none landed; two found and fixed before writing (case fences kept their closing line; link rebasing touched inline code).
+- **Next:** land it through lockmaster (`scripts/rule-docs.py`, `docs/rules/`, `USAGE.md`, `.github/workflows/ci.yml`, `records/README.md`, `records/0060_WORK-registry.md`, `work/WORKLOG.md`).
+
 ## 2026-10-27 — W-74 built and closed (editor logs you can debug from)  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** build W-74 end to end and close it, through lockmaster.

@@ -209,6 +209,7 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-cli/tests/consumer_layout.rs` | SR-CONSUMER-LAYOUT | the veto's `init` check against §1's tree (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/promotion.rs` | SR-RULE-AUTHORING | decisions 4 and 6: level 4 and the `stable` gate (a different decision from the CLI's) |
 | `scripts/docs-sync.py` | SR-WORK-REGISTRY | its Consequences: `README.md`'s, `USAGE.md`'s and `CHANGELOG.md`'s triggers, checked in CI (W-26) |
+| `scripts/rule-docs.py` | SR-WORK-REGISTRY | `docs/rules/`, one page per rule generated from the rule files, presets and cases; `--check` in CI |
 | `scripts/corpus.py` | SR-RULE-AUTHORING | decision 4: fetches the pinned corpus and runs level 4 per pack (W-20) |
 | `scripts/corpus.json` | SR-RULE-AUTHORING | decision 4: the pinned corpus — repositories, commits, licences, packs |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
