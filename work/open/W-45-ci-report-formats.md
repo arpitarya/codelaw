@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25: findings inline on PRs without a SARIF upload: 
 item: W-45
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), parallel merge"
-ball: arpit
+updated: 2026-10-26
+updated_by: "Arpit (Cowork, Opus 5.5) — docket"
+ball: agent
 ---
 
 # W-45 — CI report formats — GitHub, GitLab, JUnit, Checkstyle
@@ -45,6 +45,13 @@ ball: arpit
 
 - DoD 2: push, open a PR with `codelaw check --format github` in the workflow, and look at the annotations. Nothing else.
 - JUnit/Checkstyle schema checks need `xmllint` (libxml2); the test skips loudly without it. Checkstyle publishes no schema, so `checkstyle.xsd` is its format description written down.
+
+
+## Rulings
+
+**Arpit, 2026-10-26 (docket):** *"Claude Code opens the PR"*. Claude Code, on the Mac with `gh`, pushes a branch whose workflow runs `codelaw check --format github` on a file with known findings, opens the PR, and links it in this file; Arpit looks at the annotations and says so — then DoD 2 is met.
+
+**Model:** Claude Code, Sonnet — it needs `git push` and `gh`, which this Cowork bridge lacks.
 
 ## Blockers
 

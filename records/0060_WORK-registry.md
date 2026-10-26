@@ -109,6 +109,7 @@ into a scan anyone can do at task end.
 | `docs/GLOSSARY.md` | a term is coined or redefined | 2026-10-25 | 2026-10-25 — first-party pack: fifteen packs; preset (extends), security metadata, request source (W-53) |
 | `docs/DESIGN.md` | the design changes — after the owning record | 2026-10-25 | 2026-10-25 — the L6 and SR-RULE-PACKS rows: fifteen packs (W-53) |
 | `records/README.md` | a record's state, ownership or number changes | 2026-10-25 | 2026-10-25 — the L6 and SR-PACKAGES rows and the `packs` row: fifteen packs (W-53) |
+| `DEPENDENCIES.md` | a dependency is added, upgraded, ratified or removed (L11) | 2026-10-26 | 2026-10-26 — created: 32 units, all pending (W-66) |
 | `RELEASING.md` | the release process, the one-time setup or a workflow's name changes | 2026-10-25 | 2026-10-25 — the thirteen npm and nine PyPI pack names; the six new security-pack names published by hand once (W-53) |
 | `records/TEMPLATE.md` | the convention changes | 2026-10-18 | 2026-10-18 — created at setup |
 | `README.md` | a command, flag, preset or pack's rule count changes; something on the roadmap lands; the licence is ruled | 2026-10-25 | 2026-10-25 — the four security packs' rows, fifteen packs (W-53) |

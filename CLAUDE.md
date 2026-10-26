@@ -87,6 +87,8 @@ Each law is stated in exactly one record and is **not restated here**:
 - **L7** — always both a linter and a formatter, for every L3 language — [SR-LAW-7](records/0009_LAW-7-linter-and-formatter.md)
 - **L8** — performance budgets — set from measurement, never exceeded, never loosened — [SR-LAW-8](records/0010_LAW-8-performance-budgets.md)
 - **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it needs the decider's approval — [SR-LAW-9](records/0011_LAW-9-machine-budget.md)
+- **L10** — every file codelaw writes into a consumer's repo comes from a template in `templates/`; code only fills slots — [SR-LAW-10](records/0012_LAW-10-consumer-templates.md)
+- **L11** — no dependencies, in any ecosystem or scope, unless the decider ratifies each one by name in `DEPENDENCIES.md` — [SR-LAW-11](records/0013_LAW-11-no-dependencies.md)
 
 [SR-LAWS](records/0001_LAWS.md) assigns the handles and routes each to its
 record; that is all it does. Add a law by adding a record in the law range and

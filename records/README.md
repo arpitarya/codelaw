@@ -48,7 +48,7 @@ record to become wrong?*
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002` SR-LAW-0, `0003` SR-LAW-1, `0004` SR-LAW-2, `0005` SR-LAW-3, `0006` SR-LAW-4, `0007` SR-LAW-5, `0008` SR-LAW-6, `0009` SR-LAW-7, `0010` SR-LAW-8, `0011` SR-LAW-9 | the next free number after the highest law |
+| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002` SR-LAW-0, `0003` SR-LAW-1, `0004` SR-LAW-2, `0005` SR-LAW-3, `0006` SR-LAW-4, `0007` SR-LAW-5, `0008` SR-LAW-6, `0009` SR-LAW-7, `0010` SR-LAW-8, `0011` SR-LAW-9, `0012` SR-LAW-10, `0013` SR-LAW-11 | the next free number after the highest law |
 | `0051`–`0100` | the **WORK** records only — how work is done | the next free number after the highest |
 | `0101`– | every other record | the next free number after the highest |
 
@@ -114,6 +114,8 @@ Start from `TEMPLATE.md`.
 | [0009](0009_LAW-7-linter-and-formatter.md) | **SR-LAW-7** | **L7** — always both a linter and a formatter, for every L3 language | accepted | yes |
 | [0010](0010_LAW-8-performance-budgets.md) | **SR-LAW-8** | **L8** — performance budgets — set from measurement, never exceeded, never loosened | accepted | partly |
 | [0011](0011_LAW-9-machine-budget.md) | **SR-LAW-9** | **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it approved first | accepted | yes |
+| [0012](0012_LAW-10-consumer-templates.md) | **SR-LAW-10** | **L10** — every file codelaw writes into a consumer's repo comes from a template in `templates/`; code only fills slots | accepted | no |
+| [0013](0013_LAW-11-no-dependencies.md) | **SR-LAW-11** | **L11** — no dependencies unless the decider ratifies each one by name in `DEPENDENCIES.md` | accepted | no |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — the queue discipline in eight groups | accepted | yes |
 | [0052](0052_WORK-backlog.md) | **SR-WORK-BACKLOG** | How `BACKLOG.md` works — the named-but-unclaimed in five classes | accepted | yes |
 | [0053](0053_WORK-lifecycle.md) | **SR-WORK-LIFECYCLE** | How a feature travels — compare, proposal, handoff in the item file, the model line, one record | accepted | yes |

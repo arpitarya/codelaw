@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25: codelaw init --git-hooks installs a blocking pr
 item: W-50
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), parallel merge"
-ball: arpit
+updated: 2026-10-26
+updated_by: "Arpit (Cowork, Opus 5.5) — docket"
+ball: agent
 ---
 
 # W-50 — Git hooks — pre-commit and post-commit, installed in one command
@@ -39,7 +39,12 @@ ball: arpit
 | 2 · | a partly staged file is checked but never auto-fixed (no clobbering unstaged hunks) | ✅ |
 | 3 · | an existing hook is chained, not replaced | ✅ |
 | 4 · | post-commit prints and always exits 0 | ✅ |
-| 5 · | pre-commit framework installs codelaw from the repo's tag | ❌ not met: the hooks are `language: system` (`codelaw` on `PATH`). The repo root has no `pyproject.toml`, `package.json` or buildable root crate for the framework to install from; the decider rules whether to add one |
+| 5 · | pre-commit framework runs codelaw from `PATH` (`language: system`) — amended by the decider, 2026-10-26; installing from a tag is W-64 | ✅ |
+
+
+## Rulings
+
+**Arpit, 2026-10-26 (docket):** hook profile — *"Confirm"* (no profile passed; `local` on a laptop by W-39's detection; `CODELAW_HOOK_ARGS="--profile ci"` flips it). Pre-commit framework — *"PATH now, mirror repo later"*: DoD 5 is amended to `language: system` (codelaw on `PATH`); a `codelaw-pre-commit` mirror repo that installs the PyPI wheel is W-64. Left here: post-commit's two reminders once W-46 lands.
 
 ## Blockers
 

@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25: a watch mode that re-checks changed files, and 
 item: W-44
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), parallel merge"
-ball: arpit
+updated: 2026-10-26
+updated_by: "Arpit (Cowork, Opus 5.5) — docket"
+ball: agent
 ---
 
 # W-44 — `codelaw check --watch` — re-check on every save
@@ -38,11 +38,16 @@ ball: arpit
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | saving a file reprints within L8's `fix_one_file`-class budget on the 10k fixture | ⚠ the re-check yes, the reprint no — new `codelaw bench` context rows on a loaded Mac (load 12–28): `watch_rerun` p95 2.9 / 5.7 ms (the engine, save seen → report); `watch_save_to_print` p95 289 / 273 ms (save → JSON line), most of it the poll (≤ 100 ms) and the 100 ms settle the spec asks for, so no build meets < 100 ms save-to-print with a 100 ms debounce. Graph rules on (js/project + py/project) add ~15 ms. Question 2 below |
+| 1 · | the re-check (`watch_rerun`) within L8's `fix_one_file`-class budget on the 10k fixture — save-to-print is context only (the decider, 2026-10-26) | ✅ re-check;  the re-check yes, the reprint no — new `codelaw bench` context rows on a loaded Mac (load 12–28): `watch_rerun` p95 2.9 / 5.7 ms (the engine, save seen → report); `watch_save_to_print` p95 289 / 273 ms (save → JSON line), most of it the poll (≤ 100 ms) and the 100 ms settle the spec asks for, so no build meets < 100 ms save-to-print with a 100 ms debounce. Graph rules on (js/project + py/project) add ~15 ms. Question 2 below |
 | 2 · | deleting the last use of an export in file A reports `graph/no-unused-exports` in file B | ✅ `crates/codelaw-cli/tests/watch.rs` `a_save_rechecks_the_files_that_depend_on_it` (also: a save by rename, a file added, a file removed, each run equal to `check --format json`) |
 | 3 · | editing `codelaw.toml` changes the next run's verdict | ✅ `watch.rs` `a_config_edit_changes_the_next_verdict` (and a broken config: an `error` line, then recovery) |
 | 4 · | `--format json` gives one valid JSON object per run | ✅ every `watch.rs` JSON test parses each line alone and compares it with `check`'s object |
 | 5 · | works on the `win32-*` CI legs | ⏳ for CI — `scripts/smoke.sh` now runs `check --watch` on all eight `smoke` legs (a save to `SMOKE.md` must be re-checked); not run here (no Windows target on this Mac). In-process by construction, no Unix-only call outside `cfg(unix)`; Ctrl-C uses the C runtime's `signal`, which `libc` declares for Windows |
+
+
+## Rulings
+
+**Arpit, 2026-10-26 (docket):** watch events — *"Keep polling"*; what must be under 100 ms — *"The re-check"*. So: no `notify`, L2 unchanged; DoD 1 is judged on `watch_rerun`, and save-to-print stays a context measurement. OS backends over `libc`/`windows-sys` would be a later item if latency ever matters.
 
 ## Blockers
 
