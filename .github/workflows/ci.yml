@@ -3,7 +3,7 @@
 # artifact this run assembled: nothing is compiled at release time
 # (SR-PACKAGES decision 11; W-04).
 #
-#   test      cargo test --workspace (the law checks: L2 licences, L11 dependencies, L3 fixtures, L5 network fence, layers)
+#   test      cargo test --workspace (the law checks: L2 licences, L3 fixtures, L5 network fence, layers)
 #   lint      the version copies agree (W-18) · the SR guard replayed from RULE-SINCE ·
 #             the work-system checks (W-20) · clippy
 #   perf      L8's gate (W-19): `codelaw bench` on the reference workload against
