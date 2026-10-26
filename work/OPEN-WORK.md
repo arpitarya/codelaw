@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (16)
+### build (15)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
@@ -45,10 +45,8 @@ here. Read that record before changing anything below it.
 
 🟢 **W-58** `agent` Size limits for JS, TS and Python: `max-lines`, `max-lines-per-function`, `max-params` with configurable options; opt-in `size` presets. Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
 
-🟢 **W-59** `agent` `[scope.<name>]` replaces `[[overrides]]` and `[profile.<name>]` replaces `[profiles.*]` (aliases for one release); presets ship `tests`, `stories`, `config` scopes. Filed by Arpit (Cowork). [detail](open/W-59-scope-and-profile-tables.md)
 
-
-🟡 **W-61** waits on **W-59** `agent` `html/max-lines` and `css/max-lines` built with the `size` presets; left: DoD 3, a `[scope]` giving `_*.scss` partials their own limit, once W-59 (scope tables) and W-62 (SCSS) land, and `data` in JSON/SARIF once W-58's `data_of` lands. Filed by Arpit (Cowork). [detail](open/W-61-max-lines-html-css.md)
+🟡 **W-61** waits on **W-62** `agent` `html/max-lines` and `css/max-lines` built with the `size` presets; left: DoD 3, a `[scope]` giving `_*.scss` partials their own limit, once W-62 (SCSS) lands (scope tables are in), and `data` in JSON/SARIF once W-58's `data_of` lands. Filed by Arpit (Cowork). [detail](open/W-61-max-lines-html-css.md)
 
 🟢 **W-62** `agent` SCSS: L3 amended, Biome formats SCSS, CSS rules moved onto the tree-sitter-css fork + tree-sitter-scss (B-047 ruled), 15 rules in a new `scss` pack (npm + PyPI). Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 

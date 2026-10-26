@@ -83,7 +83,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
 2. **Common flags:**
    - `--lang <list>`, `--rule <id>`;
    - `--changed-since <ref>`, `--staged`, `--as-of <date>`;
-   - `--profile <name>`: the `[profiles.<name>]` to run with; without it, `CODELAW_PROFILE`, then `ci` when `CI` is set, else `local` ([SR-CONFIG](0110_config.md) decision 10). `codelaw hook` and `config --print` take it too;
+   - `--profile <name>`: the `[profile.<name>]` to run with; without it, `CODELAW_PROFILE`, then `ci` when `CI` is set, else `local` ([SR-CONFIG](0110_config.md) decision 10). `codelaw hook` and `config --print` take it too;
    - `--format text|json|sarif|agent|github|gitlab|junit|checkstyle`;
    - `--unsafe` (apply `suggest` fixes), `--dry-run`;
    - `--no-adapters` on `check` and `fix`: don't run the installed external linters those two commands run otherwise ([SR-LINTER](0106_linter.md) decision 2);

@@ -237,6 +237,7 @@ impl Project {
     pub fn from_parts(mut config: Config, rules: RuleSet, options: EngineOptions) -> Result<Project, EngineError> {
         baseline::check_dates(&options)?;
         // Before anything keys on the config: the profile is part of it.
+        config.set_preset_scopes(&rules.preset_scopes).map_err(EngineError::Config)?;
         config.select_profile(&options.profile_choice()).map_err(|e| EngineError::Usage(e.to_string()))?;
         if let Some(only) = &options.rules {
             for id in only {

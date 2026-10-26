@@ -6,7 +6,7 @@ use crate::engine_rules::engine_rule;
 use crate::pack::{ExtendsSpec, PackSearch, RulePack, first_party_npm, first_party_pypi, load_pack_from, load_rules_dir};
 use crate::rule::{RESERVED_NAMESPACES, RuleFile, Stability};
 use codelaw_cache::{Key, KeyBuilder};
-use codelaw_config::{Config, Layer, RuleConfig, RuleSetting};
+use codelaw_config::{Config, Layer, PresetScope, RuleConfig, RuleSetting};
 use codelaw_core::Severity;
 use std::collections::{BTreeMap, VecDeque};
 use std::path::PathBuf;
@@ -62,6 +62,9 @@ pub struct RuleSet {
     pub rules: Vec<LoadedRule>,
     pub packs: Vec<(String, PathBuf)>,
     pub warnings: Vec<String>,
+    /// The scopes the presets ship, in `extends` order; the project's
+    /// config puts them in front of its own (SR-CONFIG decision 4).
+    pub preset_scopes: Vec<PresetScope>,
     pub fingerprint: Key,
 }
 
@@ -105,6 +108,7 @@ impl RuleSet {
         let mut merged: BTreeMap<String, LoadedRule> = BTreeMap::new();
         let mut loaded_packs: Vec<(PathBuf, Arc<RulePack>)> = Vec::new();
         let mut key = KeyBuilder::new("ruleset");
+        let mut preset_scopes: Vec<PresetScope> = Vec::new();
 
         // Each entry, with the presets that extended it (outermost first):
         // a preset's own `extends` are resolved before its `[rules]`, so
@@ -241,7 +245,12 @@ impl RuleSet {
             }
             let enabled: Vec<(String, Option<RuleSetting>)> = match &spec {
                 ExtendsSpec::FirstParty { preset, .. } => match pack.presets.get(preset) {
-                    Some(p) => p.rules.iter().map(|(k, v)| (k.clone(), Some(v.clone()))).collect(),
+                    Some(p) => {
+                        for (name, scope) in &p.scope {
+                            preset_scopes.push(PresetScope { preset: spec_text.clone(), name: name.clone(), scope: scope.clone() });
+                        }
+                        p.rules.iter().map(|(k, v)| (k.clone(), Some(v.clone()))).collect()
+                    }
                     None => {
                         let near = codelaw_config::did_you_mean(preset, pack.presets.keys().map(String::as_str))
                             .map(|n| format!("; did you mean `codelaw:{n}`?"))
@@ -362,15 +371,10 @@ impl RuleSet {
             for (id, s) in &f.raw.rules {
                 check(id, s);
             }
-            for o in &f.raw.overrides {
-                for (id, s) in &o.rules {
-                    check(id, s);
-                }
-            }
-            // Every profile's, not only the one in use: a typo fails on a
-            // laptop as it would in CI (SR-CONFIG decision 10).
-            for p in f.raw.profiles.values() {
-                for (id, s) in p.rules.iter().chain(p.overrides.iter().flat_map(|o| &o.rules)) {
+            // Every scope's and every profile's, not only the one in use: a
+            // typo fails on a laptop as it would in CI (SR-CONFIG decision 10).
+            for t in f.scope_rule_tables() {
+                for (id, s) in t {
                     check(id, s);
                 }
             }
@@ -385,8 +389,12 @@ impl RuleSet {
             key.push(r.source.label());
             key.push(format!("{:?}{}", r.default, r.preview_blocked));
         }
+        for p in &preset_scopes {
+            key.push(format!("scope {} {} {:?}", p.preset, p.name, p.scope));
+        }
         Ok(RuleSet {
             rules: merged.into_values().collect(),
+            preset_scopes,
             packs: loaded_packs.iter().map(|(d, p)| (p.label(), d.clone())).collect(),
             warnings,
             fingerprint: key.key(),

@@ -112,6 +112,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the shared target dir gave another lane's `codelaw-core` rlib to my build twice (same artefact hash across worktrees); fixed with a per-package profile override so the hash differs. `a_rule_panic_exits_2` failed in a full parallel run and passes alone; not looked into.
 - **Next:** none for W-60.
 
+## 2026-10-26 — W-59: `[scope.<name>]` and `[profile.<name>]`  ·  Claude Code, parallel lane (Opus 5.5)
+
+- **Asked:** *W-59: named, singular config tables — `[scope.utils]` for a group of files, `[profile.ci]` for an environment — with preset-shipped scopes a project extends by name; the old spellings stay one minor release.*
+- **Done:** SR-CONFIG decisions 3a, 4, 10, 11 and §1 amended; loader (`scope.rs`): ordered scope table, name check, preset scopes merged under the project's, profile scopes inheriting `files`, deprecation warnings for `[[overrides]]` and `[profiles.*]`; presets carry `[scope.*]` (SR-RULE-PACKS decision 3) and the rule set hands them to the config; `config --scopes`, scope names in `config --print`; schema, tests, USAGE, README, CHANGELOG, GLOSSARY, DESIGN, the suppress skill. Item closed.
+- **Decided / left open:** preset globs written `**/…` (the item's `*.config.*` would only match the root); a merged scope keeps the preset's place in the order; a `pyproject.toml` home reads its scopes in file order too (positions from the text). The alias goes in the next minor release (CHANGELOG says so). B-050 (`codelaw migrate`) and W-58 must use the new spelling when built.
+- **Mistakes:** the shared `target/debug/codelaw` is overwritten by every lane's build, so a CLI test can run another lane's binary; the tests were run from a private copy of the binary with the baked path patched, after every `cargo test` that skipped the relink gave a false red.
+- **Next:** none for W-59.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*

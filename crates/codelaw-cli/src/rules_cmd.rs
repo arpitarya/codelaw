@@ -112,7 +112,7 @@ fn rules_at(path: &Path) -> Result<Vec<LoadedRule>, String> {
 fn compile_check(rules: &[LoadedRule]) -> Result<(), String> {
     let mut rs: Vec<LoadedRule> = rules.to_vec();
     rs.sort_by(|a, b| a.rule.id.cmp(&b.rule.id));
-    let set = RuleSet { rules: rs, packs: Vec::new(), warnings: Vec::new(), fingerprint: Key([0; 32]) };
+    let set = RuleSet { rules: rs, packs: Vec::new(), warnings: Vec::new(), preset_scopes: Vec::new(), fingerprint: Key([0; 32]) };
     Project::from_parts(Config::defaults(PathBuf::from(".")), set, EngineOptions { threads: Some(1), no_cache: true, ..Default::default() })
         .map(|_| ())
         .map_err(|e| e.to_string())

@@ -227,7 +227,7 @@ pub(crate) fn discover_with(project: &mut Project, paths: &[PathBuf], filtered: 
         let Some(file) = load_file(&dir, &mut w)? else { continue };
         warnings.extend(w);
         let path = file.path.clone();
-        let names: Vec<String> = file.raw.rules.keys().chain(file.raw.overrides.iter().flat_map(|o| o.rules.keys())).cloned().collect();
+        let names: Vec<String> = file.raw.rules.keys().chain(file.scope_rule_tables().into_iter().flat_map(|t| t.keys())).cloned().collect();
         if !project.config.add_nested(file)? {
             separate.push(dir);
             continue;

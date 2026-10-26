@@ -99,15 +99,15 @@ You keep the rules you know: **441 rules are reimplemented from ESLint, typescri
 **A warning on your laptop, an error in CI** — one config, no second file for the pipeline. codelaw runs the `ci` profile when `CI` is set, `local` otherwise, and an AI agent's hook runs `ci`, so an agent never leaves behind what CI would fail. A glob can be told never to fail the run, or never to warn ([usage guide](USAGE.md#warn-on-a-laptop-fail-in-ci)):
 
 ```toml
-[profiles.local.rules]
+[profile.local.rules]
 "js/no-console"  = "warn"
 "js/no-debugger" = "warn"
 
-[profiles.ci.rules]
+[profile.ci.rules]
 "js/no-console"  = "error"
 "js/no-debugger" = "error"
 
-[[overrides]]                      # never fails the run
+[scope.scripts]                    # never fails the run
 files = ["scripts/**"]
 remap = { error = "warn" }
 ```

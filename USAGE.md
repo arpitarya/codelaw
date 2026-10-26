@@ -87,26 +87,27 @@ preview = true                  # every rule is preview in 0.1.0
 [rules]
 "js/use-isnan" = "warn"         # change a severity, or "off"
 
-[[overrides]]
+[scope.legacy]                  # a named group of files with its own settings
 files = ["src/legacy/**"]
 rules = { "ts/no-unused-vars" = "off" }
 ```
 
 - **Validation is strict.** An unknown key stops the run and names the valid ones (`unknown key 'disable'; valid keys are 'files', 'exclude', 'rules', 'remap'`).
+- **Scopes:** `[scope.<name>]` gives a group of files its own rule settings, applied after `[rules]`, in the order written. The old `[[overrides]]` and `[profiles.<name>]` still load, with a warning, for one more minor release.
 - **Monorepos:** a nested `codelaw.toml` inherits from the root and overrides it.
 - **Team packs:** `extends` also takes `npm:<package>`, `pypi:<distribution>` and `path:<folder>`.
 - **Full reference:** [SR-CONFIG](records/0110_config.md).
 
 ### Warn on a laptop, fail in CI
 
-A **profile** is a named set of `rules` and `overrides` laid over the config. codelaw runs the `ci` profile when the `CI` environment variable is set (and not `false` or `0`), `local` otherwise; `--profile <name>` or `CODELAW_PROFILE` picks one by name. `codelaw hook` and the MCP server run `ci` — an agent gets CI's verdict — and the editor runs `local`.
+A **profile** is a named set of `rules` and `scope`s laid over the config. codelaw runs the `ci` profile when the `CI` environment variable is set (and not `false` or `0`), `local` otherwise; `--profile <name>` or `CODELAW_PROFILE` picks one by name. `codelaw hook` and the MCP server run `ci` — an agent gets CI's verdict — and the editor runs `local`.
 
 ```toml
-[profiles.local.rules]
+[profile.local.rules]
 "js/no-console"  = "warn"
 "js/no-debugger" = "warn"
 
-[profiles.ci.rules]
+[profile.ci.rules]
 "js/no-console"  = "error"
 "js/no-debugger" = "error"
 ```
@@ -121,21 +122,39 @@ When the config defines a profile, every report opens with the one in use (`prof
 
 ### Globs that never error, or never warn
 
-`remap` on an `[[overrides]]` entry maps each severity of a finding in those files to another, or to `off`. It applies last — after the baseline — and never to codelaw's own `codelaw/*` diagnostics.
+`remap` on a `[scope.<name>]` maps each severity of a finding in those files to another, or to `off`. It applies last — after the baseline — and never to codelaw's own `codelaw/*` diagnostics.
 
 ```toml
-[[overrides]]                      # never fails the run
+[scope.scripts]                    # never fails the run
 files = ["scripts/**"]
 remap = { error = "warn" }
 
-[[overrides]]                      # silent
+[scope.generated]                  # silent
 files = ["**/*.generated.ts"]
 remap = { error = "off", warn = "off", info = "off" }
 
-[[overrides]]                      # strict: no warnings, only errors
+[scope.payments]                   # strict: no warnings, only errors
 files = ["src/payments/**"]
 remap = { warn = "error" }
 ```
+
+### One limit for a kind of file
+
+A **scope** names a group of files. `js/recommended` already ships `tests` (`**/*.test.*`, `**/*.spec.*`), `stories` and `config`, and `py/recommended` ships `tests`; a scope of yours with the same name **extends** it — the files stay, your settings win. A scope of your own needs `files`:
+
+```toml
+[rules]
+"js/max-lines" = { severity = "error", options = { max = 100 } }
+
+[scope.utils]                      # every *.utils.* file: 50 lines
+files = ["**/*.utils.ts", "**/*.utils.tsx", "**/*.utils.js", "**/*.utils.jsx"]
+rules = { "js/max-lines" = { options = { max = 50 } } }
+
+[scope.tests]                      # the preset's test files: 400 lines
+rules = { "js/max-lines" = { options = { max = 400 } } }
+```
+
+`codelaw config --scopes` lists every scope with its files and where it is written, in the order they apply; `codelaw config --print --for <file>` names the scope each value came from. A scope name is lowercase letters, digits, `_` and `-`, and `default` is reserved.
 
 ### Size limits
 

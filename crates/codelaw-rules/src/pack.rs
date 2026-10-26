@@ -4,7 +4,7 @@
 use crate::LoadError;
 use crate::rule::{RESERVED_NAMESPACES, RuleFile, parse_cases, parse_rule};
 use codelaw_cache::{Key, KeyBuilder};
-use codelaw_config::RuleSetting;
+use codelaw_config::{RawScope, RuleSetting, ScopeMap};
 use codelaw_core::Language;
 use serde::Deserialize;
 use std::collections::BTreeMap;
@@ -185,6 +185,10 @@ struct PresetFile {
     extends: Vec<String>,
     #[serde(default)]
     rules: BTreeMap<String, RuleSetting>,
+    /// `[scope.<name>]`: groups of files the preset gives their own
+    /// settings (SR-CONFIG decision 3).
+    #[serde(default)]
+    scope: ScopeMap,
 }
 
 #[derive(Clone, Debug)]
@@ -195,6 +199,8 @@ pub struct Preset {
     /// entries before this preset's own `[rules]`.
     pub extends: Vec<String>,
     pub rules: BTreeMap<String, RuleSetting>,
+    /// The scopes it ships, in order; each has `files`.
+    pub scope: Vec<(String, RawScope)>,
 }
 
 /// A loaded pack.
@@ -479,6 +485,19 @@ pub fn load_pack_from(dir: &Path, first_party_origin: bool) -> Result<RulePack, 
                             errors.push(LoadError::new(Some(path.clone()), format!("preset `{name}` names `{id}`, which is not in this pack")));
                         }
                     }
+                    for (sname, sc) in &p.scope.0 {
+                        if let Err(e) = codelaw_config::check_scope_name(sname) {
+                            errors.push(LoadError::new(Some(path.clone()), format!("preset `{name}`: {e}")));
+                        }
+                        if sc.files.as_ref().is_none_or(Vec::is_empty) {
+                            errors.push(LoadError::new(Some(path.clone()), format!("preset `{name}`: scope `{sname}` needs `files`")));
+                        }
+                        for id in sc.rules.keys() {
+                            if !rules.iter().any(|r| &r.id == id) {
+                                errors.push(LoadError::new(Some(path.clone()), format!("preset `{name}`: scope `{sname}` names `{id}`, which is not in this pack")));
+                            }
+                        }
+                    }
                     for spec in &p.extends {
                         match ExtendsSpec::parse(spec) {
                             Ok(ExtendsSpec::FirstParty { preset, .. }) if preset == *name => {
@@ -492,7 +511,7 @@ pub fn load_pack_from(dir: &Path, first_party_origin: bool) -> Result<RulePack, 
                             Err(e) => errors.push(LoadError::new(Some(path.clone()), format!("preset `{name}`: {e}"))),
                         }
                     }
-                    presets.insert(name.clone(), Preset { name: name.clone(), description: p.description, extends: p.extends, rules: p.rules });
+                    presets.insert(name.clone(), Preset { name: name.clone(), description: p.description, extends: p.extends, rules: p.rules, scope: p.scope.0 });
                 }
                 Err(e) => errors.push(LoadError::new(Some(path.clone()), format!("invalid preset: {}", e.message()))),
             },

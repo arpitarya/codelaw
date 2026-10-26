@@ -143,7 +143,7 @@ pub struct Common {
     /// Files in the index count as touched (needs git).
     #[arg(long)]
     staged: bool,
-    /// The `[profiles.<name>]` to run with; by default `ci` when `CI` is
+    /// The `[profile.<name>]` to run with; by default `ci` when `CI` is
     /// set, else `local` (or `CODELAW_PROFILE`).
     #[arg(long, value_name = "NAME")]
     profile: Option<String>,
