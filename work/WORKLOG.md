@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-45: demo PR opened for DoD 2; CHANGELOG names W-45 and W-47  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** open the PR that runs `codelaw check --format github`; fix the CHANGELOG gap.
+- **Done:** draft PR https://github.com/arpitarya/codelaw/pull/3 (branch `demo/W-45-annotations-v2`, never to merge) runs the formats on `w45-demo/` (2 errors, 3 warnings); `CHANGELOG.md` gains the W-45 and W-47 lines.
+- **Decided / left open:** DoD 2 stays open until Arpit looks at the annotations on PR 3 and says so; then close the PR and delete the branch.
+- **Mistakes:** none.
+- **Next:** Arpit looks at PR 3's Files changed tab.
+
+## 2026-10-26 — W-49: dev-server plugins for Vite, webpack, Rspack, Next.js  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-44's remaining agent work, then W-49 (lane brief).
+- **Done:** W-44: nothing an agent can still do — its Windows paths are already `cfg`-guarded (inode, Ctrl-C) and the rest is CI-only; no change. W-49: `packaging/npm/{dev-core,vite-plugin,webpack-plugin,next}`, `scripts/package.py` (stage, check, names, `sync-dev-core`), SR-PACKAGES decision 3a, `plugins.test.js` and `crates/codelaw-cli/tests/dev_plugins.rs`, USAGE, CHANGELOG.
+- **Decided / left open:** three packages, not four (Rspack runs the webpack plugin); no shared package because a package may have no dependency, so one source is copied and checked. Left: an example app on each real host and the first publish.
+- **Mistakes:** none that landed; `package.py check`'s wheel regex rejects `codelaw_rules_security_js` (an underscore) — found, not mine to change here.
+- **Next:** the decider ratifies the hosts for an examples job, or publishes the three packages.
+
 ## 2026-10-26 — W-51: scheduled auto-fix PR (`init --ci … --autofix`)  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** implement W-51 in a parallel lane.

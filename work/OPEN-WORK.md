@@ -37,7 +37,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); left: DoD 5 on CI's Windows legs and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
-🟢 **W-45** `agent` CI formats built; left: Claude Code opens a PR running `--format github`, Arpit looks at the annotations (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
+🟢 **W-45** `agent` CI formats built; PR [#3](https://github.com/arpitarya/codelaw/pull/3) is open; left: Arpit looks at its annotations and says so (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
 
 🟢 **W-65** `agent` L11's check: CI fails on any dependency missing from `DEPENDENCIES.md`, or a ratified unit whose tree grew. Filed by Arpit (Cowork). [detail](open/W-65-dependency-check.md)
 
@@ -59,7 +59,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-63** `agent` CSS Modules: `:global`/`composes`/`:export` accepted; unused/undefined-class and `composes` rules in a new `css-modules` pack (npm). Filed by Arpit (Cowork). [detail](open/W-63-css-modules.md)
 
-🟡 **W-49** waits on **W-44** `agent` Dev-server plugins for Vite, Webpack, Rspack, Next.js: overlay and terminal on `local`, builds fail on `ci`. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
+🟢 **W-49** `agent` Dev-server plugins (`@codelaw/vite-plugin`, `webpack-plugin` also for Rspack, `next`) built and tested against the binary; left: an example app per real host (needs Vite, webpack, Rspack, Next.js installed, L11) and the first npm publish. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
 
 🟢 **W-54** `agent` `security-js`: 66 rules — injection (SQL, shell, SSTI …), XSS and DOM sinks, traversal, SSRF, crypto, secrets, cookies, TLS, Electron, mass assignment, prototype pollution, prompt injection. Filed by Arpit (Cowork). [detail](open/W-54-security-js-pack.md)
 
