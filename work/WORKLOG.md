@@ -24,6 +24,30 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-71 step 1: the per-function change set  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** implement W-71, step 1 first.
+- **Done:** `codelaw-lang` gains `functions` / `classify` (new, edited by token stream, untouched; qualified names, `f#1` numbering, public flag); the engine gains `git::file_at` and `Project::changed_functions`; the CLI gains `codelaw debug changed-functions` (text and JSON). 13 unit tests and 3 end-to-end tests on real git repos (reformat-only judges nothing, rename is new, new file all new, no change set prints the header line). Also carried Cowork's staged ruling edits (W-71 file, OPEN-WORK row, two worklog entries) into this change, because they were staged in the main checkout and blocked other lanes.
+- **Decided / left open:** left: the agent hook's file as a change-set source; W-58's `size.rs`/`js_ast.rs` still have their own function finders (W-58 was in flight); steps 2-5. Restoring the staged copies in the main checkout was refused by the permission classifier and is left to the decider or coordinator once this lands.
+- **Mistakes:** edited two files in the main checkout before starting the lockmaster worktree; moved them into the worktree and restored the main copies.
+- **Next:** step 2 (`graph/untested-function`) and steps 3, 4 as parallel lanes.
+
+## 2026-10-26 — W-71 ruled diff-scoped; now agent-ready  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit: *"yes"* — to diff-scoped for W-71.
+- **Done:** W-71 DoD 1 and step 1 marked ruled; ball `agent`; queue row 🔴 → 🟢; its inbox row and `↳ blocks:` sub-row removed.
+- **Decided / left open:** diff-scoped is ruled. Still unasked-for: the class-wide `.codelawignore` target `File#Class.*` (out of scope until he says).
+- **Mistakes:** none.
+- **Next:** an agent starts W-71 step 1 on Opus.
+
+## 2026-10-26 — W-71 updated: `.codelawignore` design and build order  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit, after a voice walk-through: *"file the work item for what we talked about"*.
+- **Done:** W-71 gains the `.codelawignore` design — `on_touch` (`error` default, `warn`, `keep`) and `on_touch_scope` (`file` default, `function`); `forever`; reason mandatory with a date or `forever`; `[coverage.ignore]` `require_expiry` and `require_on_touch`, both on by default; one rule `codelaw/incomplete-ignore` — plus a five-step build order (step 1, the per-function change set, first; 2–4 parallel). Queue row unchanged (kept short).
+- **Decided / left open:** all `.codelawignore` choices are Arpit's voice rulings, quoted in the file. Still open to him: diff-scoped (inbox row) and a class-wide target `File#Class.*`.
+- **Mistakes:** none.
+- **Next:** Arpit's yes on diff-scoped flips W-71 to 🟢 `agent`; step 1 starts on Opus.
+
 ## 2026-10-26 — W-70 example apps for the dev-server plugins  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** implement W-70: example apps for Vite, webpack, Rspack, Next.js plus a CI job that installs the hosts.
