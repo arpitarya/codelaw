@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-70 example apps for the dev-server plugins  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** implement W-70: example apps for Vite, webpack, Rspack, Next.js plus a CI job that installs the hosts.
+- **Done:** `examples/dev-servers/` (four apps, `run.mjs` driver) and the `dev-servers` job in `ci.yml`. Route 1 of the item (hosts installed on the runner), so L11 needs no ratification and no `BLOCKED.json`. Syntax-checked the driver and the workflow YAML only.
+- **Decided / left open:** no host was installed locally (disk over budget, L9), so nothing ran on a real host; host version ranges and the Next.js/websocket assertions are unverified. W-70 stays open until the first CI run.
+- **Mistakes:** none.
+- **Next:** push, read the five `dev-servers` jobs, fix what the real hosts disagree on.
+
 ## 2026-10-26 — W-44 tidied after the rulings  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** finish W-44's locally doable remainder.
