@@ -16,11 +16,11 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Define the command in SR-CLI-MCP and the exception list in SR-BASELINE | the record is the spec | ⏳ |
-| 2 | Collect every exception: baseline entries, deprecations, inline `codelaw-ignore`, `[[overrides]]` with `expires` | one list | ⏳ |
-| 3 | Filters: `--expiring 30d`, `--expired`, `--mine` (git `user.email`), `--rule`, `--path` | the slice you care about | ⏳ |
-| 4 | `--group-by added_by|rule|file|expires-month`; `--format text|json|csv|markdown` | a table for a stand-up or a PR comment | ⏳ |
-| 5 | MCP twin `list_exceptions` | agents see what's about to expire | ⏳ |
+| 1 | Define the command in SR-CLI-MCP and the exception list in SR-BASELINE | the record is the spec | ✅ |
+| 2 | Collect every exception: baseline entries, deprecations, inline `codelaw-ignore`, `[[overrides]]` with `expires` | one list | ✅ |
+| 3 | Filters: `--expiring 30d`, `--expired`, `--mine` (git `user.email`), `--rule`, `--path` | the slice you care about | ✅ |
+| 4 | `--group-by added_by|rule|file|expires-month`; `--format text|json|csv|markdown` | a table for a stand-up or a PR comment | ✅ |
+| 5 | MCP twin `list_exceptions` | agents see what's about to expire | ✅ |
 
 **Arpit, 2026-10-25:** *"Watch mode, let's build it. Then CI report formats, let's build it. Exception report, that is code law exceptions, expiring 30 days, group added by … build it. Baseline burn down over commits, build it. Code law migrate from ESLint, flat config, Ruff, style lint, as well as biome … Remove OXLint. Dev server plugin for RSpack, Vite, Webpack, Next.js. Pre-commit hook, post-commit hook, create work items for all these."*
 
@@ -43,14 +43,14 @@ arpit@example.com  3 exceptions, 7 uses
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | every exception form appears once, with expires, days left, added_by, reason, count | ⏳ |
-| 2 · | `--group-by` and `--expiring` combine | ⏳ |
-| 3 · | csv and markdown render in a GitHub comment | ⏳ |
-| 4 · | `--as-of` changes the days-left column and nothing else | ⏳ |
+| 1 · | every exception form appears once, with expires, days left, added_by, reason, count | ✅ |
+| 2 · | `--group-by` and `--expiring` combine | ✅ |
+| 3 · | csv and markdown render in a GitHub comment | ✅ |
+| 4 · | `--as-of` changes the days-left column and nothing else | ✅ |
 
 ## Blockers
 
-waits on **W-40** for `expires` and `added_by`; the listing of today's `until` entries can be built first.
+none: W-40 landed. Built 2026-10-26; the listing is SR-BASELINE decision 11. `[[overrides]]` carry no `expires` (decision 9 calls them configuration), so they are not listed.
 
 ## Record affected
 

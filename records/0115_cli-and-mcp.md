@@ -70,7 +70,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    | rules | `rules [--for <path>] [--why <id>] [--tag <tag>…] [--security-coverage]` · `new-rule` · `rules eject` · `rules lint` · `test [--case <title>] [--corpus <dir> [--snapshot <file> [--update-snapshot]]]` (SR-RULE-AUTHORING decision 4) |
    | debug | `tree` · `match <id> <file> [--explain] [--line N]` · `fix --trace` · `graph refs` · `graph why-unused` |
    | project | `init [--agents …] [--git-hooks [pre-commit,post-commit]] [--ci github\|gitlab --autofix daily\|weekly [--unsafe]] [--no-install] [--registry npm|pypi]` · `sync-agents [--check]` · `config --print [--for <file>]` · `config --schema` |
-   | baseline | `baseline add --rule <id> [--file …] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` · `baseline prune [paths]` · `baseline check --since <ref>` · `baseline history [--since <date\|90d\|ref>] [--by commit\|day\|week] [--rule <id>] [--format text\|json\|csv\|markdown]` · `deprecate <symbol> [--replacement] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 5, 6, 9 and 10; `--added-by` defaults to `git config user.email`; the MCP twins are unchanged) |
+   | baseline | `baseline add --rule <id> [--file …] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` · `baseline prune [paths]` · `baseline check --since <ref>` · `baseline history [--since <date\|90d\|ref>] [--by commit\|day\|week] [--rule <id>] [--format text\|json\|csv\|markdown]` · `exceptions [--expiring <N>d] [--expired] [--mine] [--rule] [--path] [--group-by added_by\|rule\|file\|expires-month] [--format text\|json\|csv\|markdown] [--fail-if-expiring <N>d] [--as-of]` · `deprecate <symbol> [--replacement] [--expires \| --until] [--warn-from] [--warn-days] [--on-touch] [--reason] [--added-by]` ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 5, 6, 9, 10 and 11; `--added-by` defaults to `git config user.email`; the MCP twins are unchanged) |
    | servers | `lsp [--stdio]` ([SR-EDITOR](0114_editor.md)) · `mcp` · `daemon start/stop/status` ([SR-ARCHITECTURE](0108_architecture.md) decision 22) · `hook` |
    | maintenance | `cache stats` · `cache clean` · `bench` |
    | dependencies | `deps refresh [--as-of <date>] [--jobs N]` — the one command that uses the network ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3) |
@@ -122,7 +122,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - `--timings` on `check`, `fix` and `format`: wall time, threads, each phase's summed time and count (`parse` counts one per file checked), cache hits and misses, and the slowest rules. JSON: a `timings` field; any other format: on stderr, so stdout stays parseable.
 5. **The MCP server.**
    - `codelaw mcp` speaks MCP over **stdio only**: offline, local, nothing listening on a port ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
-   - **Tools:** `rules_for_path`, `explain_rule`, `list_rules`, `check_snippet`, `check_paths`, `fix_paths` (applies `auto`; returns `suggest` fixes as diffs to accept), `format_snippet`, `dump_tree`, `trace_rule`.
+   - **Tools:** `rules_for_path`, `explain_rule`, `list_rules`, `check_snippet`, `check_paths`, `fix_paths` (applies `auto`; returns `suggest` fixes as diffs to accept), `format_snippet`, `dump_tree`, `trace_rule`, `list_exceptions`.
    - Results use the same JSON shapes as `--format json`.
    - **The `ci` profile:** every tool runs with `ci` unless `CODELAW_PROFILE` names another ([SR-CONFIG](0110_config.md) decision 10), so an agent gets CI's verdict; a tool's CLI twin below is the command with `--profile ci`.
    - **No adapters:** MCP never runs the external linters ([SR-ARCHITECTURE](0108_architecture.md) decision 19), so an agent sees their findings in CI only; the twins below carry `--no-adapters`.
@@ -139,6 +139,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
      | `fix_paths {paths, unsafe, dry_run, rule, lang, as_of, changed_since, staged}` | `fix … --no-adapters --format json` |
      | `format_snippet {path, code}` | the bytes `fix <path>` writes, format step included, without writing them ([SR-FORMATTER](0105_formatter.md) decision 4) |
      | `dump_tree {path \| code+lang, line}` | `tree … --format json` |
+     | `list_exceptions {expiring, expired, mine, rule, path, group_by, as_of}` | `exceptions … --format json` ([SR-BASELINE](0104_baseline-and-deprecations.md) decision 11) |
      | `trace_rule {id, path}` | `rules --why <id> --for <path> --format json`; for a `match:` rule its `for.match` is `match --explain`'s matcher-level trace |
 
    - The server loads the project per call, so an edited config or rule is seen on the next call; the compiled rule set is reused from memory while it is unchanged ([SR-ARCHITECTURE](0108_architecture.md) decision 21). `mcp` and `lsp` register as warm processes for their folder; the socket thread never writes to stdout.
