@@ -29,7 +29,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (22)
+### build (21)
 
 🟢 **W-67** `agent` Replace `strsim`, `anyhow` (unused) and `postcard` with codelaw's own code, then drop them (L11; ruled in W-66). Filed by Arpit (Cowork). [detail](open/W-67-replace-three-dependencies.md)
 
@@ -51,7 +51,6 @@ here. Read that record before changing anything below it.
 
 🟢 **W-59** `agent` `[scope.<name>]` replaces `[[overrides]]` and `[profile.<name>]` replaces `[profiles.*]` (aliases for one release); presets ship `tests`, `stories`, `config` scopes. Filed by Arpit (Cowork). [detail](open/W-59-scope-and-profile-tables.md)
 
-🟢 **W-60** `agent` L10: move every consumer-file text into `templates/` with a registry, a slot-only renderer and a test; output byte-identical. Filed by Arpit (Cowork). [detail](open/W-60-consumer-templates.md)
 
 🟢 **W-61** `agent` `html/max-lines` and `css/max-lines` (CSS, SCSS, CSS Modules) with skip options; `size` presets. Filed by Arpit (Cowork). [detail](open/W-61-max-lines-html-css.md)
 

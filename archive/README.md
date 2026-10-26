@@ -27,6 +27,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-60-consumer-templates.md`](open/W-60-consumer-templates.md) | 2026-10-26 | [`templates/`](../templates/README.md), [`template.rs`](../crates/codelaw-core/src/template.rs) and [SR-LAW-10](../records/0012_LAW-10-consumer-templates.md); CI workflow templates wait on [W-51](../work/open/W-51-scheduled-autofix-pr.md) |
 | [`W-66-ratify-dependencies.md`](open/W-66-ratify-dependencies.md) | 2026-10-26 | [`DEPENDENCIES.md`](../DEPENDENCIES.md) and [SR-LAW-11](../records/0013_LAW-11-no-dependencies.md); the three removals are [W-67](../work/open/W-67-replace-three-dependencies.md) |
 | [`W-03-rule-packs.md`](open/W-03-rule-packs.md) | 2026-10-25 | the packs in `packs/` and [SR-RULE-PACKS](../records/0101_rule-packs.md); publishing is [W-37](../work/open/W-37-npm-0-2-0-through-the-pipeline.md) and [W-38](../work/open/W-38-pypi-0-2-0-by-hand.md); the *later* presets are B-048 in [`work/BACKLOG.md`](../work/BACKLOG.md) |
 | [`W-04-release-pipeline.md`](open/W-04-release-pipeline.md) | 2026-10-25 | `.github/workflows/`, [`RELEASING.md`](../RELEASING.md) and [SR-PACKAGES](../records/0107_packages.md) decision 11; the first release is W-37 (npm) and W-38 (PyPI) |

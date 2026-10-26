@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-60: L10 built, every consumer-file text is a template  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *implement L10: one template per consumer file under `templates/`, a registry, a slot-only renderer and a test.*
+- **Done:** `templates/` (`init`, `git-hooks`, `agents`, `new-rule`) with the registry in `templates/README.md`; `codelaw_core::template` (slots, `\{{`, errors on unfilled or unknown slots, no dependency); `init.rs`, `git_hooks.rs`, `rules_cmd.rs`, `sync.rs`, `skills.rs` render from it; `agents/` is now `templates/agents/` and the hook scripts left `crates/codelaw-cli/src/hooks/`; CLAUDE.md §Layout names `templates/` (said out loud: a layout line only); ownership rows and the 0012, 0101, 0102, 0107, 0108, 0115 records updated. Output byte-identical: 95 files diffed before and after.
+- **Decided / left open:** `templates/ci/` waits on W-51 (and any W-49 output): a new writer follows L10 from the start. SR-LAW-10 stays `partly` in the register until then.
+- **Mistakes:** the shared target dir gave another lane's `codelaw-core` rlib to my build twice (same artefact hash across worktrees); fixed with a per-package profile override so the hash differs. `a_rule_panic_exits_2` failed in a full parallel run and passes alone; not looked into.
+- **Next:** W-51 adds its workflow files under `templates/ci/github/` with registry rows.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*

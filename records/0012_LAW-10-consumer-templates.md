@@ -7,7 +7,9 @@ description: "Every file codelaw creates or writes text into on the consumer's s
 status: accepted
 date: 2026-10-26
 feature: "consumer-facing files as templates"
-owns: []
+owns:
+  - templates
+  - crates/codelaw-core/src/template.rs
 laws: [L0, L5, L6, L10]
 timestamp: 2026-10-26T06:10:00Z
 content_sha: ""
@@ -66,7 +68,7 @@ codelaw writes a dozen kinds of files into a consumer's repo. Their text is the 
 
 - One more step to change user-facing text: edit the template, not the code — which is the point.
 - A slot-only renderer pushes formatting of lists into code; the template stays readable.
-- Moving `agents/` under `templates/agents/` changes paths other records cite; that move is W-60's.
+- Moving `agents/` under `templates/agents/` changes paths other records cite; that move is W-60's, done 2026-10-26.
 
 ### Alternatives considered
 
@@ -83,7 +85,7 @@ codelaw writes a dozen kinds of files into a consumer's repo. Their text is the 
 
 **Reopen this decision if:** a consumer file's text is found inline in code.
 
-**How to check it:** the registry test (decision 7, built by W-60), plus review of every new write to a consumer path (L0 obligation iii).
+**How to check it:** the registry test (decision 7, built by W-60 in `crates/codelaw-core/src/template.rs`), plus review of every new write to a consumer path (L0 obligation iii).
 
 ---
 

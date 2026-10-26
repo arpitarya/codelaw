@@ -5,8 +5,14 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-pub const PRE_COMMIT: &str = include_str!("hooks/pre-commit.sh");
-pub const POST_COMMIT: &str = include_str!("hooks/post-commit.sh");
+/// The hook scripts are templates/git-hooks/ (SR-LAW-10).
+pub fn pre_commit() -> &'static str {
+    codelaw_core::template::text("git-hooks/pre-commit")
+}
+
+pub fn post_commit() -> &'static str {
+    codelaw_core::template::text("git-hooks/post-commit")
+}
 
 /// The line that marks a hook as ours.
 const MARKER: &str = "# codelaw-hook:";
@@ -32,7 +38,7 @@ pub fn parse(names: &[String]) -> Result<Vec<&'static str>, String> {
 }
 
 fn script(hook: &str) -> &'static str {
-    if hook == "pre-commit" { PRE_COMMIT } else { POST_COMMIT }
+    if hook == "pre-commit" { pre_commit() } else { post_commit() }
 }
 
 /// Where git looks for hooks: `core.hooksPath` or `.git/hooks`, as git itself
@@ -114,7 +120,7 @@ mod tests {
 
     #[test]
     fn scripts_carry_the_marker_and_are_posix_sh() {
-        for s in [PRE_COMMIT, POST_COMMIT] {
+        for s in [pre_commit(), post_commit()] {
             assert!(s.starts_with("#!/bin/sh\n"));
             assert!(s.contains(MARKER));
             assert!(!s.contains("[["), "bashisms break dash");

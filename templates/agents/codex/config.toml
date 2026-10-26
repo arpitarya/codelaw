@@ -1,0 +1,9 @@
+[mcp_servers.codelaw]
+command = "{{command}}"
+args = [{{args}}]
+
+[[hooks.PostToolUse]]
+matcher = "apply_patch|Edit|Write"
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = "{{cmd}} hook"

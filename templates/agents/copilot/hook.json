@@ -1,0 +1,1 @@
+{"version": 1, "hooks": {"postToolUse": [{"type": "command", "bash": "{{cmd}} hook", "powershell": "{{cmd}} hook", "cwd": ".", "timeoutSec": 30}]}}
