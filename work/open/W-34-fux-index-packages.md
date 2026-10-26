@@ -20,7 +20,7 @@ ball: arpit
 | 2 | Amend the records: L6 names a third kind of package on both registries; SR-RULE-PACKS and SR-PACKAGES say what it holds and how it is built | the packages are legal | ✅ L6 decision 12, SR-PACKAGES decision 14, SR-RULE-PACKS decision 6 |
 | 3 | Build: CI runs Fux over each pack's `rules/` and packs the index as `@codelaw/rules-<name>-fux-index` and `codelaw-rules-<name>-fux-index`, same version as the pack | 15 npm + 10 PyPI optional packages | ✅ `scripts/fux-index.py` (pinned fux 5.1.1 since 2026-10-26); `ci.yml`'s `package` job; `dist/fux-index/`, not in the release set |
 | 4 | `codelaw init` leaves them out; it only prints how to add them when the repo uses Fux | nobody downloads an index they did not ask for | ✅ `crates/codelaw-cli/tests/fux_index.rs` |
-| 5 | Reserve the 25 names and publish with the next release | teams can install them | 🔴 Arpit's hand — open; RELEASING.md §"The optional Fux index packages" |
+| 5 | Reserve the 25 names and publish with the next release | teams can install them | 🔴 Arpit's hand — PyPI 4 of 10 live (`css`, `data`, `html`, `js`; trusted publishers not yet added); npm all 15 `npm publish`ed 2026-10-26, not yet visible on the registry, `npm-trust.sh` to re-run once they are; RELEASING.md §"The optional Fux index packages" |
 
 **Arpit, 2026-10-25 (voice):** *"I want codelaw to have a separate package for
 Fux index. It shouldn't be added as a default one."* → *"I would like to go with
