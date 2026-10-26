@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-46 built: `codelaw exceptions` and `list_exceptions`  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** build W-46 (CLI plus MCP twin), then W-50's post-commit reminder.
+- **Done:** engine `Project::exceptions()` collects baseline entries, deprecations (their symbol's baseline entries folded in) and inline ignores; `codelaw-report::exceptions` filters, groups and renders text, JSON, CSV and markdown; CLI `exceptions` and MCP `list_exceptions`; SR-BASELINE decision 11 and SR-CLI-MCP updated; tests `exceptions.rs` and the parity test.
+- **Decided / left open:** `[[overrides]]` are not listed (no `expires`; decision 9). `--fail-if-expiring` counts expired rows too.
+- **Mistakes:** the shared `CARGO_TARGET_DIR` lets lanes overwrite each other's `target/debug/codelaw` between build and test (an old binary answered "unrecognized subcommand"); rebuilt and reran until green.
+- **Next:** W-50's post-commit reminders.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*

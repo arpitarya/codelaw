@@ -9,6 +9,7 @@ mod git_hooks;
 mod graph_cmd;
 mod config_cmd;
 mod deps_cmd;
+mod exceptions_cmd;
 mod init;
 mod match_cmd;
 mod rules_cmd;
@@ -86,6 +87,8 @@ enum Command {
         #[command(subcommand)]
         action: baseline_cmd::BaselineAction,
     },
+    /// List every exception (baseline entry, deprecation, inline ignore) with its deadline and owner (SR-BASELINE decision 11).
+    Exceptions(exceptions_cmd::ExceptionsArgs),
     /// Deprecate a symbol: write the registry entry and baseline every current use (SR-BASELINE decision 6).
     Deprecate(baseline_cmd::DeprecateArgs),
     /// Read npm and the Python index and write the dependency snapshot the
@@ -591,6 +594,7 @@ fn main() -> ExitCode {
         }
         Command::Baseline { action } => baseline_cmd::baseline(action),
         Command::Deprecate(a) => baseline_cmd::deprecate(a),
+        Command::Exceptions(a) => exceptions_cmd::exceptions(a),
         Command::Daemon { action } => warm::daemon(action),
         Command::Bench(a) => bench::bench(a),
         Command::Deps(a) => deps_cmd::deps(a),

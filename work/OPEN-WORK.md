@@ -29,7 +29,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (22)
+### build (21)
 
 🟢 **W-67** `agent` Replace `strsim`, `anyhow` (unused) and `postcard` with codelaw's own code, then drop them (L11; ruled in W-66). Filed by Arpit (Cowork). [detail](open/W-67-replace-three-dependencies.md)
 
@@ -41,11 +41,9 @@ here. Read that record before changing anything below it.
 
 🟢 **W-65** `agent` L11's check: CI fails on any dependency missing from `DEPENDENCIES.md`, or a ratified unit whose tree grew. Filed by Arpit (Cowork). [detail](open/W-65-dependency-check.md)
 
-🟡 **W-50** waits on **W-46** `agent` Git hooks built; rulings in (no profile in the hook; `language: system`); left: post-commit's two reminders. Filed by Arpit (Cowork). [detail](open/W-50-git-hooks.md)
+🟢 **W-50** `agent` Git hooks built; rulings in (no profile in the hook; `language: system`); left: post-commit's two reminders. Filed by Arpit (Cowork). [detail](open/W-50-git-hooks.md)
 
 🟢 **W-51** `agent` A scheduled auto-fix PR: `init --ci github --autofix weekly`, one open PR with every safe fix, expiries and burn-down in its body. Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
-
-🟢 **W-46** `agent` `codelaw exceptions --expiring 30d --group-by added_by`: every exception, days left, owner; MCP twin. Filed by Arpit (Cowork). [detail](open/W-46-exceptions-report.md)
 
 🟢 **W-58** `agent` Size limits for JS, TS and Python: `max-lines`, `max-lines-per-function`, `max-params` with configurable options; opt-in `size` presets. Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
 
