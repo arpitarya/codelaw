@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-26: the VS Code extension and `codelaw lsp` log too
 item: W-74
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-26
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-27
+updated_by: "Claude Code (Sonnet 5.5)"
 ball: agent
 ---
 
@@ -16,12 +16,12 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | The extension's first lines say what is running: extension, VS Code and OS versions, every binary it tried and why it picked one, the server's version | "which codelaw is this?" answered without asking | ⏳ |
-| 2 | The server says which config and project each file got, and when and why it reloads | "why these rules here?" answered from the log | ⏳ |
-| 3 | Every "nothing happened" says why: no project, file excluded, language not covered, project failed to load, no fix, no formatter | silent files stop being a mystery | ⏳ |
-| 4 | Every failure is logged with its context: failed requests, server crash and exit code, Explain rule failing, a project that won't load | an error is in the log, not only in a popup | ⏳ |
-| 5 | Timestamps and log levels on one channel, a `codelaw.logLevel` setting; `debug` adds timings and counts per check | quiet by default, detailed when asked | ⏳ |
-| 6 | A *Copy debug info* command: versions, binary, config path and the last log lines, ready to paste into an issue | one click from a problem to a bug report | ⏳ |
+| 1 | The extension's first lines say what is running: extension, VS Code and OS versions, every binary it tried and why it picked one, the server's version | "which codelaw is this?" answered without asking | ✅ |
+| 2 | The server says which config and project each file got, and when and why it reloads | "why these rules here?" answered from the log | ✅ |
+| 3 | Every "nothing happened" says why: no project, file excluded, language not covered, project failed to load, no fix, no formatter | silent files stop being a mystery | ✅ |
+| 4 | Every failure is logged with its context: failed requests, server crash and exit code, Explain rule failing, a project that won't load | an error is in the log, not only in a popup | ✅ |
+| 5 | Timestamps and log levels on one channel, a `codelaw.logLevel` setting; `debug` adds timings and counts per check | quiet by default, detailed when asked | ✅ |
+| 6 | A *Copy debug info* command: versions, binary, config path and the last log lines, ready to paste into an issue | one click from a problem to a bug report | ✅ |
 
 **Arpit, 2026-10-26:** *"The VS Code extension doesn't have very good output or logging. Create a work item for better logs so that at least it can be debugged if there is any issue."*
 
@@ -54,15 +54,15 @@ Someone whose editor shows the wrong thing — or nothing — can open *codelaw:
 
 | DoD | what | state |
 |---|---|---|
-| 1 · startup | first lines of the channel: extension version, VS Code version, OS/arch, each binary candidate with its verdict, the chosen one, `serverInfo.version`, workspace folders | ⏳ |
-| 2 · per file | at `info`: the config path and project root a file resolved to, once per project; at `debug`: per check — file, language, rule count, diagnostic count, milliseconds | ⏳ |
-| 3 · why nothing | each of: no config above the file · file outside every project's `files` · excluded · language not covered · project failed to load — logs one line naming the file and the reason (once per file per reload, not per keystroke) | ⏳ |
-| 4 · failures | failed requests (method, file, error); `client.start()` rejecting; server exit (code, last stderr lines) and restarts; *Explain rule* with no binary; *Fix all* / *Format* returning nothing at `debug` | ⏳ |
-| 5 · levels | `codelaw.logLevel`: `error` · `warn` · `info` (default) · `debug`; changing it applies without a restart; `codelaw.trace.server` unchanged | ⏳ |
-| 6 · debug info | *codelaw: Copy debug info* puts versions, binary path and source, config path(s), settings and the last 200 log lines on the clipboard | ⏳ |
-| 7 · tests | `codelaw-lsp` unit tests: a file outside any project logs its reason; a bad config logs and shows; a failed request logs. Extension: `binary.test.ts` covers the candidate trace | ⏳ |
-| 8 · perf | `info` adds no per-keystroke lines; `debug` off by default; L8 budgets for the LSP still met | ⏳ |
-| 9 · docs | SR-EDITOR updated; `packaging/vscode/README.md` gains *Troubleshooting* (where the log is, how to raise the level, what to paste in an issue); `IMPLEMENTATION.md`; CHANGELOG | ⏳ |
+| 1 · startup | first lines of the channel: extension version, VS Code version, OS/arch, each binary candidate with its verdict, the chosen one, `serverInfo.version`, workspace folders | ✅ |
+| 2 · per file | at `info`: the config path and project root a file resolved to, once per project; at `debug`: per check — file, language, rule count, diagnostic count, milliseconds | ✅ |
+| 3 · why nothing | each of: no config above the file · file outside every project's `files` · excluded · language not covered · project failed to load — logs one line naming the file and the reason (once per file per reload, not per keystroke) | ✅ |
+| 4 · failures | failed requests (method, file, error); `client.start()` rejecting; server exit (code, last stderr lines) and restarts; *Explain rule* with no binary; *Fix all* / *Format* returning nothing at `debug` | ✅ |
+| 5 · levels | `codelaw.logLevel`: `error` · `warn` · `info` (default) · `debug`; changing it applies without a restart; `codelaw.trace.server` unchanged | ✅ |
+| 6 · debug info | *codelaw: Copy debug info* puts versions, binary path and source, config path(s), settings and the last 200 log lines on the clipboard | ✅ |
+| 7 · tests | `codelaw-lsp` unit tests: a file outside any project logs its reason; a bad config logs and shows; a failed request logs. Extension: `binary.test.ts` covers the candidate trace | ✅ |
+| 8 · perf | `info` adds no per-keystroke lines; `debug` off by default; L8 budgets for the LSP still met | ✅ |
+| 9 · docs | SR-EDITOR updated; `packaging/vscode/README.md` gains *Troubleshooting* (where the log is, how to raise the level, what to paste in an issue); `IMPLEMENTATION.md`; CHANGELOG | ✅ |
 
 ## Blockers
 

@@ -43,3 +43,28 @@ test("Windows names: .cmd shim, Scripts, .exe", () => {
   assert.equal(findBinary(win(["C:\\repo\\.venv\\Scripts\\codelaw.exe"]))?.path, "C:\\repo\\.venv\\Scripts\\codelaw.exe");
   assert.equal(findBinary(win(["C:\\ext\\bin\\codelaw.exe"]))?.source, "bundled");
 });
+
+import { traceBinary } from "../src/binary";
+
+test("the trace names each candidate and why it was or was not used", () => {
+  const t = traceBinary(lookup(["/repo/.venv/bin/codelaw", "/ext/bin/codelaw"], { python: "/py/bin/python" }));
+  assert.deepEqual(t.found, { path: "/repo/.venv/bin/codelaw", source: "venv" });
+  assert.deepEqual(
+    t.tried.map((x) => [x.source, x.verdict]),
+    [
+      ["node_modules", "missing"],
+      ["venv", "used"],
+      ["python", "skipped: an earlier one was used"],
+      ["bundled", "skipped: an earlier one was used"],
+    ],
+  );
+});
+
+test("the trace of nothing found lists every miss; codelaw.path is used even when absent", () => {
+  const none = traceBinary(lookup([]));
+  assert.equal(none.found, undefined);
+  assert.deepEqual(none.tried.map((x) => x.verdict), ["missing", "missing", "missing"]);
+  const set = traceBinary(lookup([], { configured: "/opt/codelaw" }));
+  assert.equal(set.found?.source, "codelaw.path");
+  assert.equal(set.tried[0].verdict, "used (not found on disk)");
+});

@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — W-74 built and closed (editor logs you can debug from)  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** build W-74 end to end and close it, through lockmaster.
+- **Done:** `codelaw-lsp` gains `LogLevel`, per-project and per-file lines, once-per-file-per-reload "why nothing" reasons, reload causes, failed-request errors and per-check debug timings; the extension logs through a `LogOutputChannel`, traces binary candidates, spawns the server itself to log its exit code and stderr, adds `codelaw.logLevel` and *Copy debug info*; SR-EDITOR decision 7, README *Troubleshooting*, IMPLEMENTATION, CHANGELOG; the handoff archived. `cargo test -p codelaw-lsp` and `npm test` pass.
+- **Decided / left open:** a debug line is shown at the channel's info level behind `[debug]` so `codelaw.logLevel = debug` works without raising VS Code's own level; the extension was not run inside a real VS Code (only type-checked and unit-tested).
+- **Mistakes:** none.
+- **Next:** none for W-74.
+
 ## 2026-10-27 — W-77 filed (a separate package for everything agent-facing)  ·  Cowork (Opus 5.5)
 
 - **Asked:** Arpit: *"I want a separate package to be created just for skills, and it will have a hard dependency on code law. Skills being agent facing scripts or files."* Then: *"write it again. I believe it got cleared out."*

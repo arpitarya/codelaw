@@ -86,7 +86,7 @@ fn closed_trees_are_an_lru_bounded_by_tree_cache() {
 
     // A bound of 0, after a reload, keeps no closed tree.
     fs::write(root.join("codelaw.toml"), "[lsp]\ntree_cache = 0\n").unwrap();
-    server.reload().unwrap();
+    server.reload("test").unwrap();
     close(&mut server, &uris[0]);
     assert_eq!(server.closed[&root].capacity(), 0);
     assert!(server.closed[&root].is_empty());
