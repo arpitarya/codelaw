@@ -6,6 +6,35 @@
   "type": "object",
   "additionalProperties": false,
   "definitions": {
+    "remap": {
+      "description": "Each severity of a finding in these files mapped to another, or to off; applied last, after the baseline. Never remaps codelaw/* diagnostics.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "error": { "$ref": "#/definitions/severity" },
+        "warn": { "$ref": "#/definitions/severity" },
+        "info": { "$ref": "#/definitions/severity" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "files": { "$ref": "#/definitions/globs" },
+        "exclude": { "$ref": "#/definitions/globs" },
+        "rules": { "$ref": "#/definitions/rules" },
+        "remap": { "$ref": "#/definitions/remap" }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rules": { "$ref": "#/definitions/rules" },
+        "scope": { "$ref": "#/properties/scope" },
+        "overrides": { "$ref": "#/properties/overrides" }
+      }
+    },
     "globs": {
       "type": "array",
       "items": { "type": "string" },
@@ -73,9 +102,16 @@
       "type": "string"
     },
     "rules": { "x-codelaw-record": "SR-CONFIG", "$ref": "#/definitions/rules" },
+    "scope": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Named groups of files with their own rule settings, applied in file order after [rules]; a preset may ship one (`tests`), and the project's of the same name extends it. A name is lowercase letters, digits, `_` and `-`; `default` is reserved.",
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z0-9_-]+$", "not": { "const": "default" } },
+      "additionalProperties": { "$ref": "#/definitions/scope" }
+    },
     "overrides": {
       "x-codelaw-record": "SR-CONFIG",
-      "description": "Per-glob rule settings, applied in file order after [rules].",
+      "description": "Deprecated: write [scope.<name>]. Each entry loads as scope `override-<n>` with a warning; goes in the next minor release.",
       "type": "array",
       "items": {
         "type": "object",
@@ -85,31 +121,21 @@
           "files": { "$ref": "#/definitions/globs" },
           "exclude": { "$ref": "#/definitions/globs" },
           "rules": { "$ref": "#/definitions/rules" },
-          "remap": {
-            "description": "Each severity of a finding in these files mapped to another, or to off; applied last, after the baseline. Never remaps codelaw/* diagnostics.",
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "error": { "$ref": "#/definitions/severity" },
-              "warn": { "$ref": "#/definitions/severity" },
-              "info": { "$ref": "#/definitions/severity" }
-            }
-          }
+          "remap": { "$ref": "#/definitions/remap" }
         }
       }
     },
+    "profile": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Named sets of rules and scopes, applied after the configs' own: `ci` when CI is set, `local` otherwise, or --profile / CODELAW_PROFILE. Root config only.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/profile" }
+    },
     "profiles": {
       "x-codelaw-record": "SR-CONFIG",
-      "description": "Named sets of rules and overrides, applied after the configs' own: `ci` when CI is set, `local` otherwise, or --profile / CODELAW_PROFILE. Root config only.",
+      "description": "Deprecated: write [profile.<name>]. Loads with a warning; goes in the next minor release.",
       "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "rules": { "$ref": "#/definitions/rules" },
-          "overrides": { "$ref": "#/properties/overrides" }
-        }
-      }
+      "additionalProperties": { "$ref": "#/definitions/profile" }
     },
     "root": {
       "x-codelaw-record": "SR-CONFIG",

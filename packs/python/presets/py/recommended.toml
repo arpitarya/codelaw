@@ -97,3 +97,6 @@ description = "Ruff 0.17.1's long-standing default (E4, E7, E9, F) plus flake8-b
 "py/useless-expression" = "error"
 "py/yield-outside-function" = "error"
 "py/zip-without-explicit-strict" = "error"
+
+[scope.tests]
+files = ["**/tests/**", "**/test_*.py", "**/*_test.py"]

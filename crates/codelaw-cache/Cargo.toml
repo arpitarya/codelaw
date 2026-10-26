@@ -8,5 +8,4 @@ publish.workspace = true
 [dependencies]
 codelaw-core.workspace = true
 blake3.workspace = true
-postcard.workspace = true
 serde.workspace = true

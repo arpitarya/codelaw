@@ -2,5 +2,5 @@ name = "@codelaw/rules-css"
 version = "0.2.0"
 min_codelaw = "0.1.0"
 languages = ["css", "scss"]
-presets = ["css/recommended", "css/standard", "css/conventions", "css/project"]
+presets = ["css/recommended", "css/standard", "css/conventions", "css/project", "css/size"]
 description = "codelaw's rules for CSS, also run on HTML <style> elements and style attributes (SR-RULE-PACKS)"

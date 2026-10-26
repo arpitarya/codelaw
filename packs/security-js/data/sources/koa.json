@@ -1,0 +1,18 @@
+[
+  "ctx.request.body",
+  "ctx.request.query",
+  "ctx.request.querystring",
+  "ctx.request.headers",
+  "ctx.request.url",
+  "ctx.request.href",
+  "ctx.query",
+  "ctx.querystring",
+  "ctx.params",
+  "ctx.headers",
+  "ctx.url",
+  "ctx.originalUrl",
+  "ctx.path",
+  "ctx.hostname",
+  "ctx.cookies.get",
+  "ctx.get"
+]

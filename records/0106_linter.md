@@ -132,7 +132,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    The fix pipeline is [SR-FORMATTER](0105_formatter.md) decision 4.
 
 5. **Severity and options.**
-   - **Severity:** `error`, `warn`, `info` or `off`, set per rule in `[rules]` and per glob in `[[overrides]]`, and per environment in `[profiles.<name>]` — `ci` when `CI` is set, `local` otherwise ([SR-CONFIG](0110_config.md) decision 10). An override's `remap` then maps whole severities in its files, last, after the baseline ([SR-CONFIG](0110_config.md) decision 11).
+   - **Severity:** `error`, `warn`, `info` or `off`, set per rule in `[rules]` and per group of files in `[scope.<name>]`, and per environment in `[profile.<name>]` — `ci` when `CI` is set, `local` otherwise ([SR-CONFIG](0110_config.md) decision 10). A scope's `remap` then maps whole severities in its files, last, after the baseline ([SR-CONFIG](0110_config.md) decision 11).
    - **Options:** a rule declares its options and their types in frontmatter (`options:`), and a value of the wrong type is a load error (exit 2).
    - **Exit codes:** `0` no errors · `1` errors · `2` config, rule or usage error. Warnings fail only with `--max-warnings N`.
 

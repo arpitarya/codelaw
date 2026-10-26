@@ -2,3 +2,8 @@ description = "sec-html/recommended and the heuristic HTML security rules, at wa
 extends = ["codelaw:sec-html/recommended"]
 
 [rules]
+"sec-html/form-csrf-token" = "warn"
+"sec-html/iframe-allow-powerful" = "warn"
+"sec-html/no-external-base" = "warn"
+"sec-html/no-plugin-embed" = "warn"
+"sec-html/no-sensitive-comments" = "warn"

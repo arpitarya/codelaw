@@ -3,7 +3,7 @@
 //! (SR-CONFIG decision 7).
 
 use crate::raw::{RawConfig, RuleSetting};
-use crate::resolve::{Config, ConfigFile, Home};
+use crate::resolve::{Config, ConfigFile, Home, ScopeInfo};
 use codelaw_core::{Language, LineIndex};
 use serde_json::{Value, json};
 use std::path::Path;
@@ -33,16 +33,22 @@ impl ConfigFile {
     /// below this home's codelaw table (`["rules", "py/no-print"]`,
     /// `["overrides", "0", "rules", "a/b"]`).
     pub fn line_of(&self, path: &[&str]) -> Option<u32> {
-        let offset = match self.home {
-            Home::CodelawToml => toml_offset(&self.text, path),
-            Home::Pyproject => {
-                let mut full = vec!["tool", "codelaw"];
-                full.extend_from_slice(path);
-                toml_offset(&self.text, &full)
-            }
-            Home::PackageJson => json_offset(&self.text, path),
-        }?;
+        let offset = key_offset(self.home, &self.text, path)?;
         Some(LineIndex::new(&self.text).position(offset).line)
+    }
+}
+
+/// The byte offset of a key, as a path of table keys and array indexes
+/// below the home's codelaw table.
+pub(crate) fn key_offset(home: Home, text: &str, path: &[&str]) -> Option<usize> {
+    match home {
+        Home::CodelawToml => toml_offset(text, path),
+        Home::Pyproject => {
+            let mut full = vec!["tool", "codelaw"];
+            full.extend_from_slice(path);
+            toml_offset(text, &full)
+        }
+        Home::PackageJson => json_offset(text, path),
     }
 }
 
@@ -243,18 +249,20 @@ impl Config {
         push("exceptions.require_expiry", v, s);
         let (v, s) = root_key(&["exceptions", "warn_days"], |r| r.exceptions.as_ref().and_then(|e| e.warn_days).map(|x| json!(x)), json!(3));
         push("exceptions.warn_days", v, s);
-        // `remap` (decision 11): what the matching overrides make of each
-        // severity in this file, each from the override that set it.
-        for (f, in_profile, i, o) in self.overrides_for(&target) {
-            let Some(t) = &o.remap else { continue };
-            let n = i.to_string();
-            let path: Vec<&str> = if in_profile {
-                vec!["profiles", &self.profile.name, "overrides", &n, "remap"]
-            } else {
-                vec!["overrides", &n, "remap"]
+        // `remap` (decision 11): what the matching scopes make of each
+        // severity in this file, each from the scope that set it.
+        for (f, sc) in self.scopes_for(&target) {
+            let Some(t) = &sc.remap else { continue };
+            let at = match &sc.toml_path {
+                Some(p) => {
+                    let mut path: Vec<&str> = p.iter().map(String::as_str).collect();
+                    path.push("remap");
+                    self.source(f, &path)
+                }
+                None => sc.presets.join(", "),
             };
-            let at = self.source(f, &path);
-            let at = if in_profile { format!("{at} profile {} override #{}", self.profile.name, i + 1) } else { format!("{at} override #{}", i + 1) };
+            let prof = sc.profile.as_ref().map(|p| format!(" profile {p}")).unwrap_or_default();
+            let at = format!("{at}{prof} scope {}", sc.name);
             for (from, to) in t {
                 push(&format!("remap.{from}"), json!(to), at.clone());
             }
@@ -311,17 +319,50 @@ impl Config {
         if let Some((f, p, _)) = self.active_profile().filter(|(f, _, _)| target.starts_with(&f.dir))
             && let Some(s) = p.rules.get(id)
         {
-            out.push((format!("{} profile {name}", self.source(f, &["profiles", name, "rules", id])), s));
+            let key = if f.alias_profiles.contains(name) { "profiles" } else { "profile" };
+            out.push((format!("{} profile {name}", self.source(f, &[key, name, "rules", id])), s));
         }
-        for (f, in_profile, i, o) in self.overrides_for(&target) {
-            let Some(s) = o.rules.get(id) else { continue };
-            let n = i.to_string();
-            let source = if in_profile {
-                format!("{} profile {name} override #{}", self.source(f, &["profiles", name, "overrides", &n, "rules", id]), i + 1)
+        for (f, sc) in self.scopes_for(&target) {
+            let Some(s) = sc.rules.get(id) else { continue };
+            let source = if let Some(preset) = sc.rule_from_preset.get(id) {
+                format!("{preset} scope {}", sc.name)
+            } else if let Some(p) = &sc.toml_path {
+                let mut path: Vec<&str> = p.iter().map(String::as_str).collect();
+                path.extend(["rules", id]);
+                let prof = sc.profile.as_ref().map(|p| format!(" profile {p}")).unwrap_or_default();
+                format!("{}{prof} scope {}", self.source(f, &path), sc.name)
             } else {
-                format!("{} override #{}", self.source(f, &["overrides", &n, "rules", id]), i + 1)
+                continue;
             };
             out.push((source, s));
+        }
+        out
+    }
+
+    /// Every scope, preset and project, in precedence order: each config's
+    /// outermost first, then the profile in use (`codelaw config --scopes`).
+    pub fn scope_list(&self) -> Vec<ScopeInfo> {
+        let mut out = Vec::new();
+        let mut add = |f: &ConfigFile, s: &crate::scope::Scope| {
+            let source = match &s.toml_path {
+                Some(p) => {
+                    let path: Vec<&str> = p.iter().map(String::as_str).collect();
+                    let at = self.source(f, &path);
+                    if s.presets.is_empty() { at } else { format!("{at}, extends {}", s.presets.join(", ")) }
+                }
+                None => s.presets.join(", "),
+            };
+            out.push(ScopeInfo { name: s.name.clone(), files: s.files.clone(), exclude: s.exclude.clone(), source, profile: s.profile.clone() });
+        };
+        for f in &self.files {
+            for s in &f.scopes {
+                add(f, s);
+            }
+        }
+        if let Some((f, _, scopes)) = self.active_profile() {
+            for s in scopes {
+                add(f, s);
+            }
         }
         out
     }
@@ -356,7 +397,7 @@ mod tests {
         let d = temp("sources");
         fs::write(
             d.join("codelaw.toml"),
-            "extends = [\"codelaw:js/recommended\"]\n\n[cache]\nmax_size = \"1 MiB\"\n\n[rules]\n\"a/x\" = \"warn\"\n\n[[overrides]]\nfiles = [\"pkg/**\"]\nrules = { \"a/x\" = \"off\" }\n",
+            "extends = [\"codelaw:js/recommended\"]\n\n[cache]\nmax_size = \"1 MiB\"\n\n[rules]\n\"a/x\" = \"warn\"\n\n[scope.pkg]\nfiles = [\"pkg/**\"]\nrules = { \"a/x\" = \"off\" }\n",
         )
         .unwrap();
         fs::create_dir_all(d.join("pkg")).unwrap();
@@ -374,7 +415,7 @@ mod tests {
         assert_eq!(get(&t, "languages").source, "pkg/codelaw.toml:1");
         assert_eq!(get(&t, "cache.enabled").source, "flag --no-cache");
         let s: Vec<String> = c.rule_setting_sources(Some(&file), "a/x").into_iter().map(|(s, _)| s).collect();
-        assert_eq!(s, ["codelaw.toml:7", "codelaw.toml:11 override #1"]);
+        assert_eq!(s, ["codelaw.toml:7", "codelaw.toml:11 scope pkg"]);
         assert_eq!(c.rule_setting_sources(None, "a/x").len(), 1);
     }
 

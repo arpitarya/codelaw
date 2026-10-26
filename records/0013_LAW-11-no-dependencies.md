@@ -7,7 +7,9 @@ description: "codelaw takes no third-party dependency — in Rust, Python, JavaS
 status: accepted
 date: 2026-10-26
 feature: "dependencies by ratification only"
-owns: []
+owns:
+  - DEPENDENCIES.md
+  - crates/codelaw-cli/tests/dependencies.rs
 laws: [L0, L2, L11]
 timestamp: 2026-10-26T06:50:00Z
 content_sha: ""
@@ -53,7 +55,7 @@ flowchart LR
 
 ### Context
 
-On 2026-10-26 codelaw had 47 direct Rust crates (376 in `Cargo.lock` with their own dependencies), one runtime npm package and three dev ones in the VS Code extension, a Python build backend, and ten CI actions. None had been chosen by the decider one by one. **Ruled 2026-10-26 (W-66):** 29 units ratified; `strsim`, `anyhow`, `postcard` to be replaced (W-67).
+On 2026-10-26 codelaw had 47 direct Rust crates (376 in `Cargo.lock` with their own dependencies), one runtime npm package and three dev ones in the VS Code extension, a Python build backend, and ten CI actions. None had been chosen by the decider one by one. **Ruled 2026-10-26 (W-66):** 29 units ratified; `strsim`, `anyhow`, `postcard` replaced by codelaw's own code and dropped (W-67); `strsim` and `anyhow` remain only inside the ratified trees of `clap` and `markup_fmt`.
 
 ### Decision
 
@@ -63,7 +65,7 @@ On 2026-10-26 codelaw had 47 direct Rust crates (376 in `Cargo.lock` with their 
 4. **Ratifying a unit accepts its transitive tree as pinned at that moment.** An upgrade that adds a new transitive package, or a new major version, needs the unit ratified again.
 5. **Today's dependencies are `pending`:** they stay at their current pin until the decider rules each one. A `pending` unit may not be upgraded to a version that adds transitive packages. `remove` opens a work item that replaces it with codelaw's own code; the row goes when the code no longer uses it.
 6. **What ships to users already holds:** the npm and PyPI `codelaw` packages have zero runtime dependencies ([SR-PACKAGES](0107_packages.md)); this law keeps it so.
-7. **Checked mechanically** (built by W-65): CI compares every manifest and lockfile — `Cargo.toml`/`Cargo.lock`, `packaging/**/package.json` and `package-lock.json`, `pyproject.toml` build requirements, `.github/workflows/*.yml` `uses:` — with `DEPENDENCIES.md`, and fails on any unit not listed, or on a transitive tree that grew past what was ratified.
+7. **Checked mechanically** (built, W-65): `crates/codelaw-cli/tests/dependencies.rs`, run by CI's `cargo test --workspace`, compares every manifest and lockfile — `Cargo.toml`/`Cargo.lock`, `packaging/**/package.json` and `package-lock.json`, `pyproject.toml` build requirements, `.github/workflows/*.yml` (`uses:` and `pip`/`npm`/`cargo install`) — with the ledger at the end of `DEPENDENCIES.md`. It fails on any dependency that is a member of no unit, on a transitive package its unit's ledger line does not hold (a patch or minor bump passes; a new package or a new major fails), on a unit in use whose row has no valid status, and on a script in `scripts/` or `.claude/hooks/` that imports past the Python standard library. Code codelaw wrote itself (`option-ext`'s stand-in, the sibling tool `lockmaster`) is listed as `own` in the ledger, not as a dependency.
 
 ### Consequences
 
@@ -85,7 +87,7 @@ On 2026-10-26 codelaw had 47 direct Rust crates (376 in `Cargo.lock` with their 
 
 **Reopen this decision if:** a dependency is in use with no row in `DEPENDENCIES.md`.
 
-**How to check it:** W-65's check in CI; until it lands, the inventory in `DEPENDENCIES.md` §How it was taken, re-run by hand.
+**How to check it:** `cargo test -p codelaw-cli --test dependencies` (CI runs it).
 
 ---
 

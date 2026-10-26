@@ -2,3 +2,22 @@
 # Rewrite with --update-snapshot, and review the change.
 
 [findings]
+"sec-html/angularjs-url-expression" = 0
+"sec-html/csp-meta-unsafe" = 0
+"sec-html/form-csrf-token" = 9
+"sec-html/iframe-allow-powerful" = 0
+"sec-html/iframe-sandbox" = 3
+"sec-html/no-credentials-in-url" = 0
+"sec-html/no-external-base" = 0
+"sec-html/no-inline-event-handler" = 1
+"sec-html/no-javascript-url" = 0
+"sec-html/no-mixed-content" = 0
+"sec-html/no-plugin-embed" = 0
+"sec-html/no-secret-in-hidden-input" = 0
+"sec-html/no-sensitive-comments" = 0
+"sec-html/no-srcdoc-script" = 0
+"sec-html/no-template-html-sink" = 0
+"sec-html/no-unsafe-template-interpolation" = 27
+"sec-html/password-form-post" = 0
+"sec-html/referrer-policy" = 0
+"sec-html/sri-crossorigin" = 0

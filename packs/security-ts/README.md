@@ -20,8 +20,8 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 | preset | rules | ported from |
 |---|---|---|
-| `sec-ts/recommended` | 0 | extends `sec-js/recommended`; high-confidence TypeScript-only rules, at `error` |
-| `sec-ts/strict` | 0 | extends `sec-js/strict` and `sec-ts/recommended`; the heuristic rules, at `warn` |
+| `sec-ts/recommended` | 55 | extends `sec-js/recommended`; high-confidence TypeScript-only rules, at `error` |
+| `sec-ts/strict` | 66 | extends `sec-js/strict` and `sec-ts/recommended`; the heuristic rules, at `warn` |
 
 <!-- /docs-sync:presets -->
 

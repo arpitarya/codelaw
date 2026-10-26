@@ -261,9 +261,9 @@ extends = ["codelaw:js/recommended", "npm:@acme/codelaw-rules"]   # first-party 
 adapters = ["oxlint", "ruff", "markdownlint"]
 # formatting is built in — see [format] in SR-FORMATTER; no external tools
 
-[[overrides]]
+[scope.components]
 files = ["src/components/**/*.tsx"]       # Stencil components
-disable = ["ts/exports-at-end"]
+rules = { "ts/exports-at-end" = "off" }
 ```
 
 ---

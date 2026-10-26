@@ -30,17 +30,24 @@ exclude   = ["dist/**", "**/*.generated.*"]
 [rules]                       # severity and options per rule
 "py/no-print" = "off"
 
-[[overrides]]                 # per-glob exceptions
+[scope.components]            # a named group of files
 files = ["src/components/**/*.tsx"]
 rules = { "js/exports-at-end" = "off" }
 
-[[overrides]]                 # a glob that never fails the run
+[scope.utils]                 # one limit for every *.utils.* file
+files = ["**/*.utils.ts", "**/*.utils.tsx", "**/*.utils.js", "**/*.utils.jsx"]
+rules = { "js/max-lines" = { options = { max = 50 } } }
+
+[scope.tests]                 # extends the preset's `tests` scope: its files stay
+rules = { "js/max-lines" = { options = { max = 400 } } }
+
+[scope.scripts]               # a group that never fails the run
 files = ["scripts/**"]
 remap = { error = "warn" }
 
-[profiles.local.rules]        # warn on a laptop …
+[profile.local.rules]         # warn on a laptop …
 "js/no-console" = "warn"
-[profiles.ci.rules]           # … fail in CI (CI=true)
+[profile.ci.rules]            # … fail in CI (CI=true)
 "js/no-console" = "error"
 
 [format]   # SR-FORMATTER      [lint]     # SR-LINTER
@@ -60,8 +67,8 @@ flowchart LR
     E --> R["root config"]
     R --> N["nested package config"]
     N --> PR["profile rules"]
-    PR --> O["[[overrides]] by glob"]
-    O --> PO["profile overrides"]
+    PR --> O["[scope.name] by files"]
+    O --> PO["profile scopes"]
     PO --> FL["CLI flags / env"]
     FL --> V["resolved config"]
 ```
@@ -71,7 +78,7 @@ flowchart LR
 
 ```text
    defaults --> .editorconfig --> root config --> nested package config --> profile rules
-            --> [[overrides]] --> profile overrides --> flags/env --> resolved
+            --> [scope.name] --> profile scopes --> flags/env --> resolved
 ```
 
 </details>
@@ -93,13 +100,20 @@ Configuration keys were scattered across six records. The decider asked for one 
    - A `pyproject.toml` or `package.json` is a home only if it configures codelaw. One that doesn't parse is a config error only if its text mentions `codelaw`; otherwise it is not a home, so a broken fixture file never stops a run.
 2. **Finding it:** walk up from each file to the nearest folder with a home.
    - **Monorepos:** the topmost config is the root. A nested config (for example in `packages/web/`) **inherits** the root and overrides it, unless it sets `root = true`, which makes that folder a separate project with its own graph and baseline ([SR-ARCHITECTURE](0108_architecture.md) decision 17).
-   - **Globs** in `include`, `exclude` and `[[overrides]]` are relative to the directory of the config file that declares them ([SR-ARCHITECTURE](0108_architecture.md) decision 11).
-   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]`, `[markdown]`, `[daemon]`, `[lsp]`, `[profiles]` and `[deps]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
+   - **Globs** in `include`, `exclude` and every `[scope.<name>]` are relative to the directory of the config file that declares them ([SR-ARCHITECTURE](0108_architecture.md) decision 11).
+   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]`, `[markdown]`, `[daemon]`, `[lsp]`, `[profile]` and `[deps]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
    - **A nested `root = true` project** is checked by running codelaw in its folder; a run from the parent skips its files and says so.
 3. **Sections and owners.** The top-level keys belong to this record:
    - `extends`, `languages`, `include`, `exclude`, `rules_dir`;
-   - `[rules]` and `[[overrides]]`, with an override's `remap` (decision 11);
-   - `[profiles]`, the named profiles of decision 10;
+   - `[rules]` and `scope`, the named scopes of decision 3a, with a scope's `remap` (decision 11);
+   - `profile`, the named profiles of decision 10;
+   - the deprecated spellings `[[overrides]]` and `[profiles]`, below.
+
+   **3a. Scopes: `[scope.<name>]`, a named group of files.** (W-59, the decider, 2026-10-26: "overrides is not the right terminology … then we will go with scope".)
+   - A scope holds `files` (globs), `exclude`, `rules` (the shape of `[rules]`) and `remap` (decision 11). Its name is `[a-z0-9_-]+`; `default` is reserved; both are load errors (exit 2). The table is singular — `[scope.utils]`, `[profile.ci]` — as in Cargo's `[profile.*]`.
+   - **A preset may ship scopes** ([SR-RULE-PACKS](0101_rule-packs.md) decision 3): `js/recommended` ships `tests`, `stories` and `config`, `py/recommended` ships `tests`. A scope of the project with the same name **extends** it: the project's `files` and `exclude` replace the preset's when it writes them and are inherited when it does not, and `rules` and `remap` merge per rule and per key, the project's value winning. The merged scope keeps the preset's place in the order.
+   - A scope with no `files` and no preset scope of its name is a load error. Scopes apply in the order of decision 4: the presets' in `extends` order, then each config's in file order (a `pyproject.toml` or `package.json` home is read sorted by name).
+   - **Deprecated, for one minor release:** each `[[overrides]]` entry loads as `scope.override-<n>` and `[profiles.<name>]` loads as `[profile.<name>]`, each with one warning naming the new spelling; the aliases go in the next minor release ([CHANGELOG](../docs/CHANGELOG.md)).
    - `root`, `requires`;
    - `preview` and `allow_pack_fixers`, whose meaning is [SR-RULE-PACKS](0101_rule-packs.md) decisions 9 and 12;
    - `[markdown]`, whose one key `lint_code_blocks` is [L3](0005_LAW-3-languages.md) decision 8's.
@@ -115,8 +129,8 @@ Configuration keys were scattered across six records. The decider asked for one 
    3. Root config.
    4. Nested config.
    5. The profile's `rules` (decision 10).
-   6. `[[overrides]]`, in file order.
-   7. The profile's `overrides`, in file order.
+   6. `[scope.<name>]`: the presets' scopes first, then the project's, in file order (decision 3a).
+   7. The profile's `scope`, in file order.
    8. Environment (`CODELAW_AS_OF`, `CODELAW_CACHE_DIR`, `CODELAW_LOG`, `CODELAW_PROFILE`, `CI`).
    9. Command-line flags.
 
@@ -125,23 +139,23 @@ Configuration keys were scattered across six records. The decider asked for one 
    - An unknown key, a wrong type or an unknown rule id stops the run with exit 2, naming the file, the key and the nearest valid key ("did you mean `line_width`?").
    - `requires = ">=0.4"` refuses to run with an older codelaw.
 6. **The schema ships with codelaw.** `codelaw.schema.json` is in the npm package and available as `codelaw config --schema`, so TOML and JSON editors offer completion and validation.
-7. **Traceable.** `codelaw config --print [--for <file>]` prints the resolved configuration for a file, with the source of each value (default, `.editorconfig`, file:line, override #n, env or flag).
+7. **Traceable.** `codelaw config --print [--for <file>]` prints the resolved configuration for a file, with the source of each value (default, `.editorconfig`, file:line, scope name, env or flag); `codelaw config --scopes` lists every scope with its files and source, in precedence order.
 8. **Creating it.**
    - `codelaw init` writes a minimal `codelaw.toml`: `extends` with the `recommended` presets of the rule packs it installs for the languages it detects ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and nothing else; with `--agents`, also the `[agents]` section naming them ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 6).
    - `codelaw format --import-config` converts Prettier, Ruff or Black configs ([SR-FORMATTER](0105_formatter.md) decision 5).
 9. **Deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)):** the resolved config is a pure function of the files, environment and flags. Its hash is part of every cache key ([SR-CACHE](0109_cache.md)).
 10. **Profiles: warn on a laptop, fail in CI.**
-    - `[profiles.<name>]` holds `rules` and `overrides`, the same shapes as the top-level `[rules]` and `[[overrides]]`. Root config only.
+    - `[profile.<name>]` holds `rules` and `scope`, the same shapes as the top-level `[rules]` and `[scope.<name>]`; a `[profile.<name>.scope.<scope>]` without `files` takes the files of the scope of that name. Root config only.
     - **Which profile:** `--profile <name>`, else `CODELAW_PROFILE`, else `ci` when `CI` is set and is not `""`, `false` (any case) or `0`, else `local`. A name the config does not define is a usage error (exit 2), except `ci` and `local`, which may be absent and then change nothing.
     - **Per surface:** the CLI as above. `codelaw hook` and the MCP server default to `ci` in place of the `CI` check, so an agent gets CI's verdict; the language server and `check --watch` / `fix --watch` (the person at the keyboard, [SR-CLI-MCP](0115_cli-and-mcp.md) decision 2) default to `local`, the latter shown as `profile local (--watch default)`. Each still honours `--profile` (where it has flags) and `CODELAW_PROFILE`.
     - **Visible:** when the config defines any profile, `text` and `agent` output open with `profile ci (CI=true)` — the name and its source — and `json` carries `profile: { name, source }`. `config --print` lists `profile` with its source.
     - **L5:** `CI` and `CODELAW_PROFILE` are inputs like every other variable of decision 4; the profile is part of the resolved config, so of every cache key (decision 9) — a warm `hook` (`ci`) and an editor (`local`) never share a verdict.
     - A pipeline that does not set `CI` runs `local`; it passes `--profile ci`.
 11. **`remap`: a glob that never errors, or never warns.**
-    - Any `[[overrides]]` entry, top level or a profile's, may carry `remap`: keys `error`, `warn`, `info`; values `error`, `warn`, `info` or `off`. `remap = { error = "warn" }` never fails the run; `{ error = "off", warn = "off", info = "off" }` is silent; `{ warn = "error" }` admits no warnings.
+    - Any `[scope.<name>]`, top level or a profile's, may carry `remap`: keys `error`, `warn`, `info`; values `error`, `warn`, `info` or `off`. `remap = { error = "warn" }` never fails the run; `{ error = "off", warn = "off", info = "off" }` is silent; `{ warn = "error" }` admits no warnings.
     - It applies **last**: after the rule's severity and after the baseline's outcome ([SR-BASELINE](0104_baseline-and-deprecations.md) decision 2), so an expired baseline entry in a `{ error = "warn" }` glob is a warning.
     - It **never remaps `codelaw/*`** diagnostics — config errors, a stale baseline, an unknown suppression, a rule failure — which cannot be hidden.
-    - Two matching overrides: the later wins per key, in decision 4's order, as for `rules`.
+    - Two matching scopes: the later wins per key, in decision 4's order, as for `rules`.
 
 ### Consequences
 

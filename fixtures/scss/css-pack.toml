@@ -37,6 +37,7 @@
 "css/layer-name-pattern" = 0
 "css/length-zero-no-unit" = 1
 "css/lightness-notation" = 0
+"css/max-lines" = 0
 "css/media-feature-name-no-unknown" = 0
 "css/media-feature-name-no-vendor-prefix" = 0
 "css/media-feature-name-value-no-unknown" = 0

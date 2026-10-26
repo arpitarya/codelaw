@@ -142,7 +142,7 @@ fn parity(name: &str, languages: &[&str]) {
     let sources = tree_of(&root);
     let mut mcp = Mcp::start(&root);
     let tools = mcp.request("tools/list", json!({}));
-    assert_eq!(tools["result"]["tools"].as_array().unwrap().len(), 9);
+    assert_eq!(tools["result"]["tools"].as_array().unwrap().len(), 10);
 
     let checked = mcp.call("check_paths", json!({}));
     assert_eq!(checked, cli(&root, &["check", "--format", "json"]), "{name}: check_paths");
@@ -259,6 +259,22 @@ fn baselines_and_time_inputs_agree() {
         assert_eq!(checked, cli(&root, &["check", "--as-of", date, "--format", "json"]), "check_paths as_of {date}");
         assert!(checked.contains(&format!("\"date\": \"{date}\"")), "{checked}");
     }
+    // `list_exceptions` is `exceptions --format json` (SR-BASELINE decision 11).
+    for date in ["2026-10-18", "2027-03-19", "2027-04-01"] {
+        let listed = mcp.call("list_exceptions", json!({ "as_of": date }));
+        assert_eq!(listed, cli(&root, &["exceptions", "--as-of", date, "--format", "json"]), "list_exceptions as_of {date}");
+        assert!(listed.contains("\"days_left\""), "{listed}");
+    }
+    assert_eq!(
+        mcp.call("list_exceptions", json!({ "as_of": "2027-03-19", "expiring": "30d", "group_by": "rule" })),
+        cli(&root, &["exceptions", "--as-of", "2027-03-19", "--expiring", "30d", "--group-by", "rule", "--format", "json"]),
+        "list_exceptions with filters"
+    );
+    assert_eq!(
+        mcp.call("list_exceptions", json!({ "expiring": "soon" })),
+        cli(&root, &["exceptions", "--expiring", "soon"]),
+        "list_exceptions error"
+    );
     // Not a git repository: the change set says so, in both.
     assert_eq!(
         mcp.call("check_paths", json!({ "as_of": "2026-10-18", "changed_since": "main", "staged": true })),

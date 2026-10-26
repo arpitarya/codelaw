@@ -2,3 +2,17 @@ description = "html/security and the high-confidence HTML security rules, at err
 extends = ["codelaw:html/security"]
 
 [rules]
+"sec-html/angularjs-url-expression" = "error"
+"sec-html/csp-meta-unsafe" = "error"
+"sec-html/iframe-sandbox" = "error"
+"sec-html/no-credentials-in-url" = "error"
+"sec-html/no-inline-event-handler" = "error"
+"sec-html/no-javascript-url" = "error"
+"sec-html/no-mixed-content" = "error"
+"sec-html/no-secret-in-hidden-input" = "error"
+"sec-html/no-srcdoc-script" = "error"
+"sec-html/no-template-html-sink" = "error"
+"sec-html/no-unsafe-template-interpolation" = "error"
+"sec-html/password-form-post" = "error"
+"sec-html/referrer-policy" = "error"
+"sec-html/sri-crossorigin" = "error"
