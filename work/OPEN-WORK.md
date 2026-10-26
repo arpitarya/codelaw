@@ -24,6 +24,8 @@ here. Read that record before changing anything below it.
 |---|---|
 | 🔴 **PyPI 0.2.0 by hand, over 2–3 days** (four new projects a day): upload `codelaw-rules-{html,js,python,react}`, add six trusted publishers, then `gh release create v0.2.0` on W-37's tag — [W-38](open/W-38-pypi-0-2-0-by-hand.md) | 2026-10-20 |
 | ↳ **blocks:** W-38 itself; W-64 waits on it | |
+| 🔴 **Reserve and publish the 16 Fux index package names** (npm `@codelaw/rules-<name>-fux-index` ×10 by hand, then `npm-trust.sh`; PyPI `codelaw-rules-<name>-fux-index` ×6 by `twine`, then a trusted publisher each) — built by CI as the `fux-index` artifact; RELEASING.md §"The optional Fux index packages"; also ratify `fux-engine` as D-33 in `DEPENDENCIES.md` — [W-34](open/W-34-fux-index-packages.md) | 2026-10-26 |
+| ↳ **blocks:** W-34 itself | |
 
 ---
 
@@ -35,15 +37,15 @@ here. Read that record before changing anything below it.
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
+🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, CI, `init` prints not installs); left: reserve the 16 names and publish them by hand (npm ten, PyPI six), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
+
 🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); left: DoD 5 on CI's Windows legs and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
-🟢 **W-45** `agent` CI formats built; left: Claude Code opens a PR running `--format github`, Arpit looks at the annotations (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
-
-🟢 **W-65** `agent` L11's check: CI fails on any dependency missing from `DEPENDENCIES.md`, or a ratified unit whose tree grew. Filed by Arpit (Cowork). [detail](open/W-65-dependency-check.md)
+🟢 **W-45** `agent` CI formats built; PR [#3](https://github.com/arpitarya/codelaw/pull/3) is open; left: Arpit looks at its annotations and says so (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
 
 🟡 **W-50** waits on **W-46** `agent` Git hooks built; rulings in (no profile in the hook; `language: system`); left: post-commit's two reminders. Filed by Arpit (Cowork). [detail](open/W-50-git-hooks.md)
 
-🟢 **W-51** `agent` A scheduled auto-fix PR: `init --ci github --autofix weekly`, one open PR with every safe fix, expiries and burn-down in its body. Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
+🟡 **W-51** waits on **W-46** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); left: a real GitHub run (DoD 1, 3) and the exceptions section once W-46 lands. Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
 
 🟢 **W-46** `agent` `codelaw exceptions --expiring 30d --group-by added_by`: every exception, days left, owner; MCP twin. Filed by Arpit (Cowork). [detail](open/W-46-exceptions-report.md)
 
@@ -58,7 +60,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-63** `agent` CSS Modules: `:global`/`composes`/`:export` accepted; unused/undefined-class and `composes` rules in a new `css-modules` pack (npm). Filed by Arpit (Cowork). [detail](open/W-63-css-modules.md)
 
-🟡 **W-49** waits on **W-44** `agent` Dev-server plugins for Vite, Webpack, Rspack, Next.js: overlay and terminal on `local`, builds fail on `ci`. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
+🟢 **W-49** `agent` Dev-server plugins (`@codelaw/vite-plugin`, `webpack-plugin` also for Rspack, `next`) built and tested against the binary; left: an example app per real host (needs Vite, webpack, Rspack, Next.js installed, L11) and the first npm publish. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
 
 🟢 **W-54** `agent` `security-js`: 66 rules — injection (SQL, shell, SSTI …), XSS and DOM sinks, traversal, SSRF, crypto, secrets, cookies, TLS, Electron, mass assignment, prototype pollution, prompt injection. Filed by Arpit (Cowork). [detail](open/W-54-security-js-pack.md)
 
@@ -69,8 +71,6 @@ here. Read that record before changing anything below it.
 🟢 **W-57** `agent` `security-python`: 61 rules — Bandit's set ported, injection (SQL, NoSQL, LDAP, XPath, SSTI), Django/Flask/FastAPI settings, mass assignment, crypto, uploads, ML loaders, `trust_remote_code`, prompt injection. Filed by Arpit (Cowork). [detail](open/W-57-security-python-pack.md)
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
-
-🟡 **W-34** waits on **fux W-299** `agent` An optional Fux index package beside each pack (`@codelaw/rules-<name>-fux-index`, `codelaw-rules-<name>-fux-index`), never a default; then L6's amendment. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
 
 🟡 **W-35** waits on **W-05** `agent` README leads with "your rules, before, while and after the AI writes"; then it drops While's "in design" and restores Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
 

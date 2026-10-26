@@ -26,6 +26,15 @@ pub struct InitArgs {
     /// Install git hooks: `pre-commit` (blocks) and `post-commit` (reminds, never blocks); both when none is named. In a repo codelaw already configures, it installs only the hooks (SR-CLI-MCP decision 7).
     #[arg(long, value_delimiter = ',', num_args = 0.., value_name = "HOOKS")]
     git_hooks: Option<Vec<String>>,
+    /// Write a scheduled CI workflow: `github` or `gitlab`; needs `--autofix`. In a repo codelaw already configures, it writes only the workflow (SR-CLI-MCP decision 12).
+    #[arg(long, value_name = "PROVIDER", requires = "autofix")]
+    ci: Option<String>,
+    /// How often the CI workflow runs the safe fixes, the formatter and `baseline prune`, and keeps one PR open: `daily` or `weekly`.
+    #[arg(long, value_name = "WHEN", requires = "ci")]
+    autofix: Option<String>,
+    /// With `--ci`: also apply `suggest` fixes, on a second branch and PR.
+    #[arg(long = "unsafe", requires = "ci")]
+    unsafe_fixes: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -161,6 +170,26 @@ fn install_command(root: &Path, registry: Registry, packages: &[&str]) -> Vec<St
     cmd
 }
 
+/// What `init` prints when the repo uses Fux (a `.fux/` folder): the optional
+/// index package beside each pack it chose, and how to add it. It is only ever
+/// printed, never run, and nothing is printed for a repo without `.fux/`
+/// (SR-RULE-PACKS decision 6a; L6 decision 12: never installed by default).
+fn fux_index_note(root: &Path, by_registry: &std::collections::BTreeMap<Registry, Vec<&str>>) -> Vec<String> {
+    if !root.join(".fux").is_dir() || by_registry.is_empty() {
+        return Vec::new();
+    }
+    let mut lines = vec![
+        "note: this repo uses Fux, and each rule pack has an optional index package that lets `fux_search` find its rules from plain words. `init` does not install them; to add them:".to_string(),
+    ];
+    for (registry, packs) in by_registry {
+        let names: Vec<String> = packs.iter().map(|p| format!("{p}-fux-index")).collect();
+        let refs: Vec<&str> = names.iter().map(String::as_str).collect();
+        lines.push(format!("  {}", install_command(root, *registry, &refs).join(" ")));
+    }
+    lines.push("  then pin each: fux setup --index <its PyPI name> --index-npm <its npm name> (an npm-only pack: add its `kind = \"index\"` row to .fux/config/plugins.toml)".to_string());
+    lines
+}
+
 pub fn init(args: InitArgs) -> ExitCode {
     let targets = match codelaw_agents::parse_targets(&args.agents) {
         Ok(t) => t,
@@ -169,6 +198,13 @@ pub fn init(args: InitArgs) -> ExitCode {
     let hooks = match args.git_hooks.as_deref().map(crate::git_hooks::parse).transpose() {
         Ok(h) => h,
         Err(e) => return fail(e),
+    };
+    let ci = match (args.ci.as_deref(), args.autofix.as_deref()) {
+        (Some(p), Some(w)) => match (crate::ci::parse_provider(p), crate::ci::parse_schedule(w)) {
+            (Ok(p), Ok(w)) => Some((p, w)),
+            (Err(e), _) | (_, Err(e)) => return fail(e),
+        },
+        _ => None,
     };
     let forced = match args.registry.as_deref() {
         None => None,
@@ -182,8 +218,17 @@ pub fn init(args: InitArgs) -> ExitCode {
     };
     let mut warnings = Vec::new();
     if let Ok(Some(existing)) = codelaw_config::load_file(&root, &mut warnings) {
-        if let Some(hooks) = &hooks {
-            return install_hooks(&root, hooks);
+        if hooks.is_some() || ci.is_some() {
+            if let Some((p, w)) = ci {
+                match crate::ci::install(&root, p, w, args.unsafe_fixes) {
+                    Ok(lines) => lines.iter().for_each(|l| println!("{l}")),
+                    Err(e) => return fail(e),
+                }
+            }
+            return match &hooks {
+                Some(hooks) => install_hooks(&root, hooks),
+                None => ExitCode::SUCCESS,
+            };
         }
         return fail(format!("{} already configures codelaw here", codelaw_core::normalize_path(&existing.path)));
     }
@@ -310,6 +355,9 @@ pub fn init(args: InitArgs) -> ExitCode {
             }
         }
     }
+    for line in fux_index_note(&root, &by_registry) {
+        println!("{line}");
+    }
     // After the packs, so the per-language instructions list their rules.
     if !targets.is_empty() {
         match codelaw_agents::write_for_init(&root, &targets, None) {
@@ -319,6 +367,12 @@ pub fn init(args: InitArgs) -> ExitCode {
                     println!("\n{n}");
                 }
             }
+            Err(e) => return fail(e),
+        }
+    }
+    if let Some((p, w)) = ci {
+        match crate::ci::install(&root, p, w, args.unsafe_fixes) {
+            Ok(lines) => lines.iter().for_each(|l| println!("{l}")),
             Err(e) => return fail(e),
         }
     }
@@ -343,6 +397,23 @@ fn install_hooks(root: &Path, hooks: &[&str]) -> ExitCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_fux_index_note_needs_fux_and_names_each_chosen_pack() {
+        let root = std::env::temp_dir().join(format!("codelaw-init-fux-note-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        let mut by_registry: std::collections::BTreeMap<Registry, Vec<&str>> = Default::default();
+        by_registry.entry(Registry::Npm).or_default().extend(["@codelaw/rules-js", "@codelaw/rules-ts"]);
+        by_registry.entry(Registry::Pypi).or_default().push("codelaw-rules-python");
+        assert!(fux_index_note(&root, &by_registry).is_empty(), "no .fux/, no note");
+        std::fs::create_dir_all(root.join(".fux")).unwrap();
+        let lines = fux_index_note(&root, &by_registry);
+        assert!(lines.contains(&"  npm install -D @codelaw/rules-js-fux-index @codelaw/rules-ts-fux-index".to_string()), "{lines:?}");
+        assert!(lines.contains(&"  pip install codelaw-rules-python-fux-index".to_string()), "{lines:?}");
+        assert!(fux_index_note(&root, &Default::default()).is_empty(), "no pack chosen, no note");
+        let _ = std::fs::remove_dir_all(&root);
+    }
 
     #[test]
     fn presets_follow_the_repo() {
