@@ -24,7 +24,7 @@ entry.**
 
 ## 1 · State of play
 
-**2026-10-26: L11 ratified** — no dependencies unless the decider ratifies each by name in `DEPENDENCIES.md` (ruled 2026-10-26: 29 ratified, `strsim`/`anyhow`/`postcard` replaced by W-67; W-65 builds the CI check).
+**2026-10-26: L11 ratified** — no dependencies unless the decider ratifies each by name in `DEPENDENCIES.md` (ruled 2026-10-26: 29 ratified, `strsim`/`anyhow`/`postcard` replaced by W-67; W-65 built the CI check: `crates/codelaw-cli/tests/dependencies.rs`).
 
 **2026-10-26 docket:** the inbox holds only W-38 (PyPI by hand). Ruled: watch polls (no `notify`), hook passes no profile, pre-commit `language: system` now + W-64 mirror later, CSS/SCSS rules move to the tree-sitter-css fork + tree-sitter-scss (B-047 → W-62), W-45's PR is Claude Code's.
 
@@ -33,6 +33,8 @@ entry.**
 **2026-10-25 (Cowork): new feature work filed, not built.** CI-vs-local severity (profiles, agents on `ci`), a per-glob severity `remap`, dated exceptions (`expires`, `warn_days`, `require_expiry`, git-checked `added_by`) and `react/no-context` — W-39, W-40, W-41, rulings in [the compare doc](compare/ci-profiles-and-dated-exceptions.compare.md). Each build writes its record, schema and loader in one change: SR-CONFIG §1 is parsed by `crates/codelaw-config/tests/schema.rs`.
 
 **Built 2026-10-25 (Claude Code, six parallel worktrees, merged):** W-47 baseline history, W-52 `deps refresh` (L5 amended: the one networked command), W-53 security-pack groundwork (L6: fifteen packs) — closed; W-44 watch, W-45 CI formats, W-50 git hooks — built, each waiting on a ruling or a PR from the decider. W-54–W-57 are now open to an agent.
+
+**Built 2026-10-26 (Claude Code):** W-57, the `security-python` catalogue — 61 `match:` rules (Bandit and Ruff `S` ported; Django, Flask, FastAPI, ML loaders and LLM rules), `sec-py/recommended` (57) and `strict` (+4), the README's Bandit accounting. Still `preview`: no rule is `stable` until its corpus count is reviewed, and the PyPI upload of `codelaw-rules-security-python` is the decider's, by hand (W-38's pattern). Three rules the catalogue called `suggest` are `manual`: `no-xpath-injection`, `no-xmlrpc`, `no-cleartext-http`.
 
 **Also filed 2026-10-25 (Cowork):** W-44 watch mode · W-45 CI formats · W-46 exceptions report (waits on W-40) · W-47 baseline history · W-48 `migrate` (ESLint, Ruff, stylelint, Biome; no oxlint — moved to the backlog as B-050 the same day) · W-49 dev-server plugins (waits on W-44) · W-50 git hooks. Then W-51 (scheduled auto-fix PR) and W-52 (dependency latest versions; the decider ruled `deps refresh` the one network command). Type-aware via typescript-go: parked as B-049 with [a proposal](proposals/type-aware-rules.md). Security: W-53 (groundwork, amends L6 to fifteen packs) then W-54–W-57 (`security-js`, `-ts`, `-html`, `-python`).
 
@@ -119,7 +121,7 @@ proposals (`check_cold_10k` 8701 ms, `format_warm_10k` 1353 ms, `mcp_rules_for_p
 
 **Docket 2026-10-25:** `main` pushed; L8's budgets ruled by method (min(target, 1.5 × worst CI p95), a capped one back to the decider; W-19 applies it with `gh` on the Mac); PyPI step 4 — Arpit logs in, Claude adds the seven; 0.2.0 bumped in the tree (uncommitted), command list in W-31; W-29's 8-platform check moved to 0.2.0; W-33 filed (two Stencil rules).
 
-**2026-10-25 (Cowork, W-05):** the Fux layer is ruled — each pack's Fux index is its own optional package, built in codelaw's CI, on npm and PyPI (W-34, waiting on Fux item 298's spike and design; then L6's amendment). W-35 puts "before, while and after the AI writes" on the README, the while beat labelled until W-05's `hook --pre` ships. W-05's next step is its step 1 payload capture (Codex, Copilot CLI, Kiro).
+**2026-10-25 (Cowork, W-05):** the Fux layer is ruled — each pack's Fux index is its own optional package, built in codelaw's CI, on npm and PyPI (W-34: built 2026-10-26 — L6 decision 12, `scripts/fux-index.py`, `init` only prints the install lines when `.fux/` exists; left: Arpit reserves and publishes the 16 names, and ratifies `fux-engine` as D-33). W-35 puts "before, while and after the AI writes" on the README, the while beat labelled until W-05's `hook --pre` ships. W-05's next step is its step 1 payload capture (Codex, Copilot CLI, Kiro).
 
 **2026-10-25 (Cowork, README):** the README is the pitch (story, four moments, the ESLint/Prettier/Biome comparison) and `USAGE.md` the how-to; `docs-sync.py` checks both. W-36 (research) checks the claims against the incumbents and finds the adoption gaps.
 

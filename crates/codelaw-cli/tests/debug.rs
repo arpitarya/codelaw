@@ -43,7 +43,7 @@ fn project(name: &str) -> PathBuf {
     for r in ["js-eqeqeq.md", "py-no-print.md"] {
         fs::copy(repo().join("fixtures/l3/rules/fixture").join(r), d.join(".codelaw/rules/fixture").join(r)).unwrap();
     }
-    fs::write(d.join("codelaw.toml"), "[rules]\n\"fixture/py-no-print\" = \"warn\"\n\n[[overrides]]\nfiles = [\"scripts/**\"]\nrules = { \"fixture/py-no-print\" = \"off\" }\n").unwrap();
+    fs::write(d.join("codelaw.toml"), "[rules]\n\"fixture/py-no-print\" = \"warn\"\n\n[scope.scripts]\nfiles = [\"scripts/**\"]\nrules = { \"fixture/py-no-print\" = \"off\" }\n").unwrap();
     fs::create_dir_all(d.join("scripts")).unwrap();
     fs::write(d.join("a.py"), "print(1)\n").unwrap();
     fs::write(d.join("scripts/b.py"), "print(2)\n").unwrap();
@@ -62,7 +62,7 @@ fn config_print_names_every_source_and_schema_is_the_shipped_one() {
     let v = json(&d, &["config", "--print", "--for", "scripts/b.py", "--format", "json"]);
     let rule = v["values"].as_array().unwrap().iter().find(|x| x["key"] == "rules.\"fixture/py-no-print\"").unwrap();
     assert_eq!(rule["value"], "off");
-    assert_eq!(rule["source"], "codelaw.toml:6 override #1");
+    assert_eq!(rule["source"], "codelaw.toml:6 scope scripts");
     let js = v["values"].as_array().unwrap().iter().find(|x| x["key"] == "rules.\"fixture/js-eqeqeq\"").unwrap();
     assert_eq!(js["source"], "preset .codelaw/rules", "{js}");
     let (code, out, _) = codelaw(&d, &["config", "--schema"]);

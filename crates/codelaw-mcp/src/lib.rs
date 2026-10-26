@@ -143,6 +143,26 @@ optionally only the nodes on one line. Same JSON as `codelaw tree --format json`
         },
     },
     Tool {
+        name: "list_exceptions",
+        description: "Call to see what is excepted from the rules and what is about to expire: every baseline entry, deprecation and inline `codelaw-ignore`, \
+with its `expires`, days left, `added_by`, reason and uses. Use `expiring` to see what expires soon before you extend or add one. \
+Same JSON as `codelaw exceptions --format json`.",
+        schema: || {
+            object(
+                json!({
+                    "expiring": string("Only exceptions expiring within this long after the as-of date: `30d`, `4w` or a number of days (as `--expiring`)."),
+                    "expired": boolean("Only exceptions already expired (as `--expired`)."),
+                    "mine": boolean("Only those added by `git config user.email` (as `--mine`)."),
+                    "rule": strings(RULE),
+                    "path": string("Only exceptions covering a file at or under this project-relative path (as `--path`)."),
+                    "group_by": string("`added_by`, `rule`, `file` or `expires-month` (as `--group-by`)."),
+                    "as_of": string(AS_OF),
+                }),
+                &[],
+            )
+        },
+    },
+    Tool {
         name: "trace_rule",
         description: "Call when a rule fired and you don't see why, or didn't fire when you expected: where the rule comes from, what enabled it, \
 which config layer sets it for `path`, whether it applies there, and what it reports in that file. Same JSON as \
@@ -281,6 +301,22 @@ pub fn call_tool(name: &str, args: &Map<String, Value>) -> Result<Value, String>
                 (None, None) => return Err("give `path`, or `lang` and `code`".into()),
             };
             Ok(codelaw_report::tree_json(language, &text, a.line()?))
+        }
+        "list_exceptions" => {
+            use codelaw_report::exceptions::{Filter, GroupBy, build, parse_days};
+            let filter = Filter {
+                expiring: a.str("expiring")?.map(|s| parse_days("expiring", &s)).transpose()?,
+                expired: a.flag("expired")?,
+                mine: a.flag("mine")?,
+                rules: a.list("rule")?,
+                path: a.str("path")?,
+            };
+            let group_by = a.str("group_by")?.map(|g| GroupBy::parse(&g)).transpose()?;
+            let mut options = EngineOptions::from_env();
+            options.as_of = a.str("as_of")?.or(options.as_of);
+            let mut p = project(&[], options)?;
+            let all = p.exceptions().map_err(err)?;
+            Ok(build(&all, &filter, group_by)?.json())
         }
         "trace_rule" => {
             let id = a.required("id")?;

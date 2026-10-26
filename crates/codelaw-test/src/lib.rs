@@ -85,7 +85,7 @@ fn project_for(loaded: &LoadedRule, keep_globs: bool) -> Project {
         external_allowed: true,
         ..loaded.clone()
     };
-    let rules = RuleSet { rules: vec![lr], packs: Vec::new(), warnings: Vec::new(), fingerprint: Key([0; 32]) };
+    let rules = RuleSet { rules: vec![lr], packs: Vec::new(), warnings: Vec::new(), preset_scopes: Vec::new(), fingerprint: Key([0; 32]) };
     let config = Config::defaults(PathBuf::from("/codelaw-test"));
     Project::from_parts(config, rules, EngineOptions { no_cache: true, threads: Some(1), ..Default::default() })
         .expect("a single loaded rule compiles: it already passed load")

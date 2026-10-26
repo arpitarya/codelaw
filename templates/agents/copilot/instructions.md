@@ -1,0 +1,6 @@
+---
+applyTo: "{{glob}}"
+---
+{{note}}
+
+{{body}}

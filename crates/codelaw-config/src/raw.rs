@@ -20,9 +20,17 @@ pub struct RawConfig {
     pub rules_dir: Option<String>,
     #[serde(default)]
     pub rules: BTreeMap<String, RuleSetting>,
+    /// SR-CONFIG decision 3: `[scope.<name>]`, a named group of files.
+    #[serde(default)]
+    pub scope: ScopeMap,
+    /// Deprecated spelling of `scope` (one minor release): each entry
+    /// loads as `scope.override-<n>`.
     #[serde(default)]
     pub overrides: Vec<RawOverride>,
-    /// SR-CONFIG decision 10: `[profiles.<name>]`, root-only.
+    /// SR-CONFIG decision 10: `[profile.<name>]`, root-only.
+    #[serde(default)]
+    pub profile: BTreeMap<String, RawProfile>,
+    /// Deprecated spelling of `profile` (one minor release).
     #[serde(default)]
     pub profiles: BTreeMap<String, RawProfile>,
     #[serde(default)]
@@ -93,6 +101,48 @@ impl RuleSetting {
     }
 }
 
+/// `[scope.<name>]`: SR-CONFIG decision 3. A preset may ship one, and a
+/// project's of the same name extends it, so `files` may be omitted there.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawScope {
+    pub files: Option<Vec<String>>,
+    pub exclude: Option<Vec<String>>,
+    #[serde(default)]
+    pub rules: BTreeMap<String, RuleSetting>,
+    /// SR-CONFIG decision 11.
+    pub remap: Option<BTreeMap<String, String>>,
+}
+
+/// The `scope` table in the order the file wrote it: a later scope wins
+/// (SR-CONFIG decision 4). A TOML file keeps its order; a `pyproject.toml`
+/// is read sorted by name.
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct ScopeMap(pub Vec<(String, RawScope)>);
+
+impl<'de> Deserialize<'de> for ScopeMap {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        struct V;
+        impl<'de> serde::de::Visitor<'de> for V {
+            type Value = ScopeMap;
+            fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                f.write_str("a table of named scopes")
+            }
+            fn visit_map<A: serde::de::MapAccess<'de>>(self, mut m: A) -> Result<ScopeMap, A::Error> {
+                let mut out: Vec<(String, RawScope)> = Vec::new();
+                while let Some((k, v)) = m.next_entry::<String, RawScope>()? {
+                    if out.iter().any(|(n, _)| *n == k) {
+                        return Err(serde::de::Error::custom(format!("duplicate scope `{k}`")));
+                    }
+                    out.push((k, v));
+                }
+                Ok(ScopeMap(out))
+            }
+        }
+        d.deserialize_map(V)
+    }
+}
+
 #[derive(Debug, Default, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RawOverride {
@@ -106,13 +156,16 @@ pub struct RawOverride {
     pub remap: Option<BTreeMap<String, String>>,
 }
 
-/// `[profiles.<name>]`: SR-CONFIG decision 10. The same shapes as the top
-/// level's `[rules]` and `[[overrides]]`.
+/// `[profile.<name>]`: SR-CONFIG decision 10. The same shapes as the top
+/// level's `[rules]` and `[scope.<name>]`.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RawProfile {
     #[serde(default)]
     pub rules: BTreeMap<String, RuleSetting>,
+    #[serde(default)]
+    pub scope: ScopeMap,
+    /// Deprecated spelling of `scope`.
     #[serde(default)]
     pub overrides: Vec<RawOverride>,
 }
