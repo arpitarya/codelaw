@@ -27,6 +27,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-61-max-lines-html-css.md`](open/W-61-max-lines-html-css.md) | 2026-10-26 | [`size_lines.rs`](../crates/codelaw-native/src/size_lines.rs), [SR-RULE-PACKS](../records/0101_rule-packs.md) (`size` presets) and [`tests/size_limits.rs`](../crates/codelaw-cli/tests/size_limits.rs) |
 | [`W-63-css-modules.md`](open/W-63-css-modules.md) | 2026-10-26 | [`packs/css-modules/`](../packs/css-modules/README.md), [SR-PROJECT-GRAPH](../records/0103_project-graph.md) decision 8 and [`tests/css_modules.rs`](../crates/codelaw-cli/tests/css_modules.rs) |
 | [`W-60-consumer-templates.md`](open/W-60-consumer-templates.md) | 2026-10-26 | [`templates/`](../templates/README.md), [`template.rs`](../crates/codelaw-core/src/template.rs) and [SR-LAW-10](../records/0012_LAW-10-consumer-templates.md) |
 | [`W-67-replace-three-dependencies.md`](open/W-67-replace-three-dependencies.md) | 2026-10-26 | [`DEPENDENCIES.md`](../DEPENDENCIES.md), `crates/codelaw-core/src/similar.rs` and `crates/codelaw-cache/src/codec.rs` ([SR-CACHE](../records/0109_cache.md) decision 4) |
