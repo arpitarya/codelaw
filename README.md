@@ -228,7 +228,7 @@ Fifteen first-party packs: thirteen on npm as `@codelaw/rules-<pack>`, nine on P
 | [`tanstack-query`](packs/tanstack-query/README.md) | ✅ | — | 13 | `tanstack-query/recommended` | @tanstack/eslint-plugin-query 5 recommended (all 7), and 6 rules from TanStack Query v5's guides |
 | [`redux-toolkit`](packs/redux-toolkit/README.md) | ✅ | — | 12 | `redux-toolkit/recommended` | codelaw's own, from the Redux Style Guide's Priority A and B rules |
 | [`security-js`](packs/security-js/README.md) | ✅ | ✅ | 66 | `sec-js/recommended` · `sec-js/strict` | eslint-plugin-security, Bandit and Ruff `S` ports and codelaw's own, mapped to CWE and OWASP 2025: injection, XSS, traversal, SSRF, crypto, secrets, cookies, TLS, Electron, prompt injection |
-| [`security-ts`](packs/security-ts/README.md) | ✅ | — | 16 | `sec-ts/recommended` · `sec-ts/strict` | a scaffold: extends `security-js`; its TypeScript-only rules are W-55 |
+| [`security-ts`](packs/security-ts/README.md) | ✅ | — | 16 | `sec-ts/recommended` · `sec-ts/strict` | extends `security-js`; Angular, NestJS, Next.js server actions, tRPC, Prisma/TypeORM/Drizzle raw queries and unchecked type assertions, read from syntax |
 | [`security-html`](packs/security-html/README.md) | ✅ | ✅ | 19 | `sec-html/recommended` · `sec-html/strict` | 19 rules (inline handlers, `javascript:` URLs, mixed content, iframes, CSP, forms, template sinks); extends `html/security` |
 | [`security-python`](packs/security-python/README.md) | — | ✅ | 61 | `sec-py/recommended` · `sec-py/strict` | Bandit and Ruff `S` ported, plus Django, Flask, FastAPI, ML-loader and LLM rules, each mapped to CWE and OWASP 2025 (W-57) |
 
