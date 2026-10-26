@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (18)
+### build (17)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
