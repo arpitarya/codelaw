@@ -292,7 +292,7 @@ fn nested_property(prelude: &str) -> bool {
     }
     let Some(c) = t.find(':') else { return false };
     let (name, rest) = t.split_at(c);
-    !name.is_empty() && name.bytes().all(|b| is_ident_byte(b)) && (rest.len() == 1 || rest.as_bytes().get(1).is_some_and(u8::is_ascii_whitespace))
+    !name.is_empty() && name.bytes().all(is_ident_byte) && (rest.len() == 1 || rest.as_bytes().get(1).is_some_and(u8::is_ascii_whitespace))
 }
 
 impl Parser<'_> {
@@ -504,8 +504,11 @@ pub fn scss_view(src: &str) -> String {
     String::from_utf8(out).expect("blanking whole comments keeps UTF-8")
 }
 
+/// The last parse: source, (module, scss) flags, sheet.
+type CachedSheet = (String, (bool, bool), Rc<Sheet>);
+
 thread_local! {
-    static CACHE: RefCell<Option<(String, (bool, bool), Rc<Sheet>)>> = const { RefCell::new(None) };
+    static CACHE: RefCell<Option<CachedSheet>> = const { RefCell::new(None) };
 }
 
 /// The parsed sheet of a source (`scss`: read as SCSS); each file is parsed

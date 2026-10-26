@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — Cross-lane cleanup after thirteen landings  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** fix what the thirteen parallel lanes left: a duplicate `D-33`, a red docs-sync, the MCP tool list, clippy, the build-tool declaration.
+- **Done:** `fux-engine` renumbered D-33 to D-34 in `DEPENDENCIES.md` and `work/open/W-34-fux-index-packages.md` (status still `pending`; no other file cited its id); `CHANGELOG.md` names W-60, W-65, W-66, so `docs-sync --check` is green and is now a lockmaster check; the MCP tool-list test expects `list_exceptions`; `fux-engine` and its three pinned dependencies are declared in `licences.rs` `BUILD_TOOLS` (a licence declaration, MIT, not a ratification); `scripts/package.py check`'s wheel regex takes `codelaw_rules_security_js`; four clippy errors (css_syntax.rs, scss_rules.rs, dependencies.rs).
+- **Decided / left open:** ratifying D-34 stays the decider's. `scripts/package.py check dist` needs CI's built wheels and was not run end to end.
+- **Mistakes:** none.
+- **Next:** the decider rules D-34.
+
 ## 2026-10-26 — W-63: CSS Modules; the `css-modules` pack  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** W-63 as a separate lockmaster change after W-62 landed (`494a128`).

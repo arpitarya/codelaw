@@ -72,7 +72,7 @@ the consumer's repo.
 - **16, not 22.** The four security packs hold no rule file yet, Fux refuses an empty index, so they get theirs with their first rule: ten npm and six PyPI, the number this item always said.
 - **Out of the release set.** `publish.yml` uploads `dist/npm` and `dist/pypi` whole and its preflight demands a trusted publisher per tarball, so an unreserved index name would stop a release. They build into `dist/fux-index/` and are a CI artifact (`fux-index`); step 5 ends with a change to `publish.yml`.
 - **A manifest per registry.** `fux pack` writes both registry names; a pack on one registry has the other removed from the manifest's `content` (the manifest is outside the digest), so Fux never looks for a package that does not exist.
-- **`fux-engine` is a dependency under L11** (D-33, `pending` in `DEPENDENCIES.md`): named by this item's own ruling as a build tool of CI only, but ratified by name only on the decider's say.
+- **`fux-engine` is a dependency under L11** (D-34, `pending` in `DEPENDENCIES.md`): named by this item's own ruling as a build tool of CI only, but ratified by name only on the decider's say.
 - **Proven end to end:** the js wheel and `codelaw-rules-js` installed beside fux 5.1.0: `fux setup --index` pinned it, `fux doctor` reported it verified with 74 documents, `fux ask "stop using debugger statements" --scope packages` ranked `rules/js/no-debugger.md` first.
 
 ## Definition of done

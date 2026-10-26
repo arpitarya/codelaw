@@ -173,7 +173,7 @@ fn use_edit(sheet: &Sheet, src: &str, module: &str) -> Option<TextEdit> {
     Some(TextEdit::insert(at, s))
 }
 
-fn pattern_option<'a>(ctx: &'a NativeContext<'_>) -> regex::Regex {
+fn pattern_option(ctx: &NativeContext<'_>) -> regex::Regex {
     let p = opt_str(ctx, "pattern", KEBAB);
     regex::Regex::new(p).unwrap_or_else(|_| regex::Regex::new(KEBAB).expect("the default pattern is valid"))
 }

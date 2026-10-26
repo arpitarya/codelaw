@@ -2,9 +2,6 @@
 # Read by `lockmaster` from the main checkout. Every landing runs [checks] in a fresh
 # worktree with nothing built, so only the stdlib-Python checks of CI's `lint` job are
 # here; cargo, the packs and the packaging stay in CI (.github/workflows/ci.yml).
-# `scripts/docs-sync.py --check` belongs here too once main is green on it — on
-# 2026-10-26 it is red (CHANGELOG.md does not name W-45 and W-47), and a red check
-# would stop every landing.
 
 [main]
 branch = "main"
@@ -13,6 +10,7 @@ branch = "main"
 versions = "python3 -B scripts/version.py --check"
 work-system = "python3 -B scripts/check-work-system.py"
 inbox = "python3 -B scripts/check-open-work-inbox.py"
+docs-sync = "python3 -B scripts/docs-sync.py --check"
 
 [merge]
 "work/WORKLOG.md" = "append-newest-first"
