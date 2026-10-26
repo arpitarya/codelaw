@@ -4,6 +4,7 @@
 
 mod ci;
 mod debug;
+pub mod exceptions;
 mod sarif;
 
 pub use ci::{check_checkstyle, check_github, check_gitlab, check_junit, fingerprints};

@@ -66,3 +66,12 @@ description = "The correctness core of ESLint's recommended preset (@eslint/js 1
 "js/require-yield" = "error"
 "js/use-isnan" = "error"
 "js/valid-typeof" = "error"
+
+[scope.tests]
+files = ["**/*.test.*", "**/*.spec.*"]
+
+[scope.stories]
+files = ["**/*.stories.*"]
+
+[scope.config]
+files = ["**/*.config.*"]

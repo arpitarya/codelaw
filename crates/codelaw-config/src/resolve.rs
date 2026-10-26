@@ -1,8 +1,10 @@
-use crate::raw::{RawConfig, RawDepsIgnore, RawOverride, RawProfile, RuleSetting};
+use crate::raw::{RawConfig, RawDepsIgnore, RawProfile, RuleSetting};
+use crate::scope::{self, Scope, glob_set};
+pub use crate::scope::PresetScope;
 use crate::{ConfigError, did_you_mean, explain_serde_error};
 use codelaw_cache::{Key, KeyBuilder};
 use codelaw_core::Language;
-use globset::{GlobBuilder, GlobSet, GlobSetBuilder};
+use globset::GlobSet;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -26,9 +28,6 @@ impl Home {
     }
 }
 
-/// An override's `files` and `exclude` globs.
-pub(crate) type OverrideGlobs = (GlobSet, GlobSet);
-
 /// One config file, parsed and validated.
 #[derive(Clone, Debug)]
 pub struct ConfigFile {
@@ -40,9 +39,28 @@ pub struct ConfigFile {
     pub text: String,
     include: Option<GlobSet>,
     exclude: GlobSet,
-    pub(crate) overrides: Vec<(GlobSet, GlobSet)>,
-    /// Each profile's `[[overrides]]` globs, by profile name.
-    pub(crate) profile_overrides: BTreeMap<String, Vec<(GlobSet, GlobSet)>>,
+    /// The preset scopes (root config only), then this config's, in
+    /// precedence order (SR-CONFIG decision 4).
+    pub(crate) scopes: Vec<Scope>,
+    /// Each profile's scopes, by profile name.
+    pub(crate) profile_scopes: BTreeMap<String, Vec<Scope>>,
+    /// `[profile.*]` and the deprecated `[profiles.*]`, by name.
+    pub profiles: BTreeMap<String, RawProfile>,
+    pub(crate) alias_profiles: BTreeSet<String>,
+    /// Deprecated spellings this file uses: one warning each.
+    pub deprecations: Vec<String>,
+}
+
+/// Where a scope's settings are listed by `codelaw config --scopes`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ScopeInfo {
+    pub name: String,
+    pub files: Vec<String>,
+    pub exclude: Vec<String>,
+    /// `codelaw.toml:7`, or the preset that ships it.
+    pub source: String,
+    /// The profile it belongs to, if any.
+    pub profile: Option<String>,
 }
 
 /// One layer of rule settings that applies to a file.
@@ -152,18 +170,6 @@ pub struct RuleConfig {
     pub options: BTreeMap<String, serde_json::Value>,
 }
 
-fn glob_set(patterns: &[String], file: &Path) -> Result<GlobSet, ConfigError> {
-    let mut b = GlobSetBuilder::new();
-    for p in patterns {
-        let glob = GlobBuilder::new(p.trim_start_matches("./"))
-            .literal_separator(true)
-            .build()
-            .map_err(|e| ConfigError::new(Some(file.to_owned()), format!("invalid glob `{p}`: {e}")))?;
-        b.add(glob);
-    }
-    b.build().map_err(|e| ConfigError::new(Some(file.to_owned()), e.to_string()))
-}
-
 fn validate_severity(file: &Path, id: &str, setting: &RuleSetting) -> Result<(), ConfigError> {
     if let Some(s) = setting.severity()
         && !matches!(s, "error" | "warn" | "info" | "off")
@@ -180,12 +186,12 @@ fn validate_severity(file: &Path, id: &str, setting: &RuleSetting) -> Result<(),
 const REMAP_KEYS: [&str; 3] = ["error", "warn", "info"];
 const REMAP_VALUES: [&str; 4] = ["error", "warn", "info", "off"];
 
-/// An `[[overrides]]` entry's severities and `remap` (SR-CONFIG decision 11).
-fn validate_override(file: &Path, what: &str, o: &RawOverride) -> Result<(), ConfigError> {
-    for (id, s) in &o.rules {
+/// A scope's severities and `remap` (SR-CONFIG decision 11).
+fn validate_scope(file: &Path, what: &str, rules: &BTreeMap<String, RuleSetting>, remap: Option<&BTreeMap<String, String>>) -> Result<(), ConfigError> {
+    for (id, s) in rules {
         validate_severity(file, id, s)?;
     }
-    for (from, to) in o.remap.iter().flatten() {
+    for (from, to) in remap.into_iter().flatten() {
         if !REMAP_KEYS.contains(&from.as_str()) {
             let near = did_you_mean(from, REMAP_KEYS).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
             return Err(ConfigError::new(Some(file.to_owned()), format!("{what}: `remap` key `{from}`{near} (one of error, warn, info)")));
@@ -201,13 +207,36 @@ fn validate_override(file: &Path, what: &str, o: &RawOverride) -> Result<(), Con
     Ok(())
 }
 
-fn override_globs(overrides: &[RawOverride], path: &Path) -> Result<Vec<(GlobSet, GlobSet)>, ConfigError> {
-    overrides.iter().map(|o| Ok((glob_set(&o.files, path)?, glob_set(&o.exclude, path)?))).collect()
+/// A TOML table reads back sorted by name; the scopes apply in the order
+/// the file wrote them (SR-CONFIG decision 4), so put them back by the
+/// position of each one's key. A JSON home is already in order.
+fn order_scopes(raw: &mut RawConfig, home: Home, text: &str) {
+    if home == Home::PackageJson {
+        return;
+    }
+    let sort = |scopes: &mut crate::raw::ScopeMap, base: &[&str]| {
+        if scopes.0.len() > 1 {
+            scopes.0.sort_by_key(|(name, _)| {
+                let mut path = base.to_vec();
+                path.push(name);
+                crate::trace::key_offset(home, text, &path).unwrap_or(usize::MAX)
+            });
+        }
+    };
+    sort(&mut raw.scope, &["scope"]);
+    for (name, p) in raw.profile.iter_mut() {
+        sort(&mut p.scope, &["profile", name, "scope"]);
+    }
+    for (name, p) in raw.profiles.iter_mut() {
+        sort(&mut p.scope, &["profiles", name, "scope"]);
+    }
 }
 
 impl ConfigFile {
     fn new(path: PathBuf, home: Home, raw: RawConfig, text: String) -> Result<ConfigFile, ConfigError> {
         let dir = path.parent().map(Path::to_path_buf).unwrap_or_default();
+        let mut raw = raw;
+        order_scopes(&mut raw, home, &text);
         if let Some(langs) = &raw.languages {
             for name in langs {
                 if Language::from_name(name).is_none() {
@@ -232,16 +261,44 @@ impl ConfigFile {
         for (id, s) in &raw.rules {
             validate_severity(&path, id, s)?;
         }
-        for (i, o) in raw.overrides.iter().enumerate() {
-            validate_override(&path, &format!("override #{}", i + 1), o)?;
+        for (name, sc) in &raw.scope.0 {
+            validate_scope(&path, &format!("scope `{name}`"), &sc.rules, sc.remap.as_ref())?;
         }
+        for (i, o) in raw.overrides.iter().enumerate() {
+            validate_scope(&path, &format!("override #{}", i + 1), &o.rules, o.remap.as_ref())?;
+        }
+        let mut profiles = raw.profile.clone();
+        let mut alias_profiles = BTreeSet::new();
         for (name, p) in &raw.profiles {
+            if profiles.contains_key(name) {
+                return Err(ConfigError::new(
+                    Some(path),
+                    format!("profile `{name}` is defined under both `[profile.{name}]` and the deprecated `[profiles.{name}]`; keep `[profile.{name}]`"),
+                ));
+            }
+            profiles.insert(name.clone(), p.clone());
+            alias_profiles.insert(name.clone());
+        }
+        for (name, p) in &profiles {
             for (id, s) in &p.rules {
                 validate_severity(&path, id, s)?;
             }
-            for (i, o) in p.overrides.iter().enumerate() {
-                validate_override(&path, &format!("profile `{name}` override #{}", i + 1), o)?;
+            for (sname, sc) in &p.scope.0 {
+                validate_scope(&path, &format!("profile `{name}` scope `{sname}`"), &sc.rules, sc.remap.as_ref())?;
             }
+            for (i, o) in p.overrides.iter().enumerate() {
+                validate_scope(&path, &format!("profile `{name}` override #{}", i + 1), &o.rules, o.remap.as_ref())?;
+            }
+        }
+        let mut deprecations = Vec::new();
+        let at = codelaw_core::normalize_path(&path);
+        if !raw.overrides.is_empty() || profiles.values().any(|p| !p.overrides.is_empty()) {
+            deprecations.push(format!(
+                "{at}: `[[overrides]]` is deprecated and goes in the next minor release; write `[scope.<name>]` (each entry loads as `scope.override-<n>`)"
+            ));
+        }
+        if !alias_profiles.is_empty() {
+            deprecations.push(format!("{at}: `[profiles.<name>]` is deprecated and goes in the next minor release; write `[profile.<name>]`"));
         }
         for e in raw.deps.ignore.iter().flatten() {
             let p = e.package();
@@ -257,10 +314,41 @@ impl ConfigFile {
         }
         let include = if raw.include.is_empty() { None } else { Some(glob_set(&raw.include, &path)?) };
         let exclude = glob_set(&raw.exclude, &path)?;
-        let overrides = override_globs(&raw.overrides, &path)?;
-        let profile_overrides =
-            raw.profiles.iter().map(|(name, p)| Ok((name.clone(), override_globs(&p.overrides, &path)?))).collect::<Result<_, ConfigError>>()?;
-        Ok(ConfigFile { path, dir, home, raw, text, include, exclude, overrides, profile_overrides })
+        let built = scope::build(&path, &raw, &profiles, &alias_profiles, &[], raw.extends.is_empty())?;
+        Ok(ConfigFile {
+            path,
+            dir,
+            home,
+            raw,
+            text,
+            include,
+            exclude,
+            scopes: built.scopes,
+            profile_scopes: built.profile_scopes,
+            profiles,
+            alias_profiles,
+            deprecations,
+        })
+    }
+
+    /// Rebuild the scopes with the presets' in front (the root config).
+    fn with_preset_scopes(&mut self, presets: &[PresetScope]) -> Result<(), ConfigError> {
+        let built = scope::build(&self.path, &self.raw, &self.profiles, &self.alias_profiles, presets, true)?;
+        self.scopes = built.scopes;
+        self.profile_scopes = built.profile_scopes;
+        Ok(())
+    }
+
+    /// Every rule table the project wrote in a scope or profile, to check
+    /// the ids against the rule set.
+    pub fn scope_rule_tables(&self) -> Vec<&BTreeMap<String, RuleSetting>> {
+        let mut out: Vec<&BTreeMap<String, RuleSetting>> = self.raw.scope.0.iter().map(|(_, s)| &s.rules).chain(self.raw.overrides.iter().map(|o| &o.rules)).collect();
+        for p in self.profiles.values() {
+            out.push(&p.rules);
+            out.extend(p.scope.0.iter().map(|(_, s)| &s.rules));
+            out.extend(p.overrides.iter().map(|o| &o.rules));
+        }
+        out
     }
 
     /// The path of `file` relative to this config's folder, if under it.
@@ -359,7 +447,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
-    "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profiles]",
+    "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
     "[deps]",
 ];
 
@@ -376,7 +464,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.markdown != Default::default(),
         raw.daemon != Default::default(),
         raw.lsp != Default::default(),
-        !raw.profiles.is_empty(),
+        !raw.profile.is_empty() || !raw.profiles.is_empty(),
         raw.deps != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
@@ -402,6 +490,7 @@ pub fn find_config(start: &Path) -> Result<Config, ConfigError> {
         dir = d.parent();
     }
     chain.reverse();
+    warnings.extend(chain.iter().flat_map(|f| f.deprecations.iter().cloned()));
     let root_dir = chain.first().map(|f| f.dir.clone()).unwrap_or(start_dir);
     let config = Config { root_dir, files: chain, warnings, profile: Profile::default() };
     config.check_nested()?;
@@ -419,7 +508,7 @@ impl Config {
         let path = root_dir.join("codelaw.toml");
         let raw = toml::from_str::<RawConfig>(text).map_err(|e| ConfigError::new(Some(path.clone()), toml_error(text, &e)))?;
         let file = ConfigFile::new(path, Home::CodelawToml, raw, text.to_owned())?;
-        Ok(Config { root_dir, files: vec![file], warnings: Vec::new(), profile: Profile::default() })
+        Ok(Config { root_dir, warnings: file.deprecations.clone(), files: vec![file], profile: Profile::default() })
     }
 
     fn check_nested(&self) -> Result<(), ConfigError> {
@@ -450,6 +539,7 @@ impl Config {
             ));
             return Ok(false);
         }
+        self.warnings.extend(file.deprecations.iter().cloned());
         self.files.push(file);
         self.files.sort_by_key(|f| f.dir.components().count());
         self.check_nested()?;
@@ -461,7 +551,7 @@ impl Config {
     /// nothing when absent.
     pub fn select_profile(&mut self, choice: &ProfileChoice) -> Result<(), ConfigError> {
         let profile = choice.resolve();
-        let defined = self.root_raw().map(|r| &r.profiles);
+        let defined = self.files.first().map(|f| &f.profiles);
         if !matches!(profile.name.as_str(), "ci" | "local") && defined.is_none_or(|d| !d.contains_key(&profile.name)) {
             let names: Vec<&str> = defined.into_iter().flat_map(|d| d.keys().map(String::as_str)).collect();
             let near = did_you_mean(&profile.name, names.iter().copied()).map(|n| format!("; did you mean `{n}`?")).unwrap_or_default();
@@ -478,14 +568,24 @@ impl Config {
     /// Whether the root config defines any profile: then every report
     /// names the one in use.
     pub fn profile_in_play(&self) -> bool {
-        self.root_raw().is_some_and(|r| !r.profiles.is_empty())
+        self.files.first().is_some_and(|f| !f.profiles.is_empty())
     }
 
     /// The root config and the profile in use, when it defines it.
-    pub(crate) fn active_profile(&self) -> Option<(&ConfigFile, &RawProfile, &[OverrideGlobs])> {
+    pub(crate) fn active_profile(&self) -> Option<(&ConfigFile, &RawProfile, &[Scope])> {
         let root = self.files.first()?;
-        let p = root.raw.profiles.get(&self.profile.name)?;
-        Some((root, p, root.profile_overrides.get(&self.profile.name).map(Vec::as_slice).unwrap_or_default()))
+        let p = root.profiles.get(&self.profile.name)?;
+        Some((root, p, root.profile_scopes.get(&self.profile.name).map(Vec::as_slice).unwrap_or_default()))
+    }
+
+    /// Put the scopes the presets ship in front of the root config's
+    /// (SR-CONFIG decision 4; SR-RULE-PACKS). A project scope of the same
+    /// name extends the preset's.
+    pub fn set_preset_scopes(&mut self, presets: &[PresetScope]) -> Result<(), ConfigError> {
+        match self.files.first_mut() {
+            Some(root) => root.with_preset_scopes(presets),
+            None => Ok(()),
+        }
     }
 
     fn root_raw(&self) -> Option<&RawConfig> {
@@ -631,39 +731,39 @@ impl Config {
         })
     }
 
-    /// The `[[overrides]]` that match `file`, in precedence order: each
-    /// config's, outermost first and in file order, then the profile's
-    /// (SR-CONFIG decision 4); each with whether it is the profile's and
-    /// its index in its list.
-    pub(crate) fn overrides_for<'a>(&'a self, file: &Path) -> Vec<(&'a ConfigFile, bool, usize, &'a RawOverride)> {
+    /// The scopes that match `file`, in precedence order: each config's,
+    /// outermost first and in order, then the profile's (SR-CONFIG
+    /// decision 4).
+    pub(crate) fn scopes_for<'a>(&'a self, file: &Path) -> Vec<(&'a ConfigFile, &'a Scope)> {
         let mut out = Vec::new();
-        let mut matching = |f: &'a ConfigFile, overrides: &'a [RawOverride], globs: &'a [(GlobSet, GlobSet)], in_profile: bool| {
+        let mut matching = |f: &'a ConfigFile, scopes: &'a [Scope]| {
             let Some(rel) = f.relative(file) else { return };
-            for (i, (o, (files, exclude))) in overrides.iter().zip(globs).enumerate() {
-                if files.is_match(rel) && !exclude.is_match(rel) {
-                    out.push((f, in_profile, i, o));
-                }
-            }
+            out.extend(scopes.iter().filter(|s| s.matches(rel)).map(|s| (f, s)));
         };
         for f in self.files.iter().filter(|f| file.starts_with(&f.dir)) {
-            matching(f, &f.raw.overrides, &f.overrides, false);
+            matching(f, &f.scopes);
         }
-        if let Some((f, p, globs)) = self.active_profile() {
-            matching(f, &p.overrides, globs, true);
+        if let Some((f, _, scopes)) = self.active_profile() {
+            matching(f, scopes);
         }
         out
     }
 
-    /// `<config> override #n`, or `<config> profile <name> override #n`.
-    pub(crate) fn override_label(&self, f: &ConfigFile, in_profile: bool, i: usize) -> String {
+    /// `<config> scope <name>`, `<config> profile <p> scope <name>`, or
+    /// the preset that ships a scope the project does not write.
+    pub(crate) fn scope_label(&self, f: &ConfigFile, s: &Scope) -> String {
         let path = codelaw_core::normalize_path(&f.path);
-        if in_profile { format!("{path} profile {} override #{}", self.profile.name, i + 1) } else { format!("{path} override #{}", i + 1) }
+        match (&s.profile, &s.toml_path) {
+            (Some(p), _) => format!("{path} profile {p} scope {}", s.name),
+            (None, Some(_)) => format!("{path} scope {}", s.name),
+            (None, None) => format!("{} scope {}", s.presets.join(", "), s.name),
+        }
     }
 
     /// The rule-setting layers for `file`, lowest precedence first: each
     /// config's `[rules]`, outermost first, then the profile's `rules`,
-    /// then the matching `[[overrides]]` in file order, then the profile's
-    /// (SR-CONFIG decision 4).
+    /// then the matching scopes in order, then the profile's (SR-CONFIG
+    /// decision 4).
     pub fn layers_for<'a>(&'a self, file: &'a Path) -> Vec<Layer<'a>> {
         let mut layers = Vec::new();
         for f in self.chain_for(file) {
@@ -672,24 +772,24 @@ impl Config {
         if let Some((f, p, _)) = self.active_profile().filter(|(f, _, _)| file.starts_with(&f.dir)) {
             layers.push(Layer { source: format!("{} profile {}", codelaw_core::normalize_path(&f.path), self.profile.name), rules: &p.rules });
         }
-        for (f, in_profile, i, o) in self.overrides_for(file) {
-            layers.push(Layer { source: self.override_label(f, in_profile, i), rules: &o.rules });
+        for (f, s) in self.scopes_for(file) {
+            layers.push(Layer { source: self.scope_label(f, s), rules: &s.rules });
         }
         layers
     }
 
-    /// Whether any override, a profile's included, sets `remap`: without
+    /// Whether any scope, a profile's included, sets `remap`: without
     /// one the stage costs nothing.
     pub fn has_remap(&self) -> bool {
-        self.files.iter().any(|f| f.raw.overrides.iter().chain(f.raw.profiles.values().flat_map(|p| &p.overrides)).any(|o| o.remap.is_some()))
+        self.files.iter().any(|f| f.scopes.iter().chain(f.profile_scopes.values().flatten()).any(|s| s.remap.is_some()))
     }
 
     /// What `remap` does to the findings in `file` (SR-CONFIG decision 11):
-    /// every matching override's table, later winning per key.
+    /// every matching scope's table, later winning per key.
     pub fn remap_for(&self, file: &Path) -> Remap {
         let mut r = Remap::default();
-        for (_, _, _, o) in self.overrides_for(file) {
-            if let Some(t) = &o.remap {
+        for (_, s) in self.scopes_for(file) {
+            if let Some(t) = &s.remap {
                 r.merge(t);
             }
         }
@@ -703,13 +803,8 @@ impl Config {
             for id in f.raw.rules.keys() {
                 out.push((id.clone(), f.path.clone()));
             }
-            for o in &f.raw.overrides {
-                for id in o.rules.keys() {
-                    out.push((id.clone(), f.path.clone()));
-                }
-            }
-            for p in f.raw.profiles.values() {
-                for id in p.rules.keys().chain(p.overrides.iter().flat_map(|o| o.rules.keys())) {
+            for t in f.scope_rule_tables() {
+                for id in t.keys() {
                     out.push((id.clone(), f.path.clone()));
                 }
             }
@@ -723,6 +818,12 @@ impl Config {
         for f in &self.files {
             k.push(codelaw_core::normalize_path(f.path.strip_prefix(&self.root_dir).unwrap_or(&f.path)));
             k.push(&f.text);
+        }
+        // Scopes a preset ships are not in the config text.
+        for f in self.files.iter().take(1) {
+            for s in f.scopes.iter().filter(|s| !s.presets.is_empty()) {
+                k.push(format!("scope {} {:?} {:?} {:?} {:?}", s.name, s.files, s.exclude, s.rules, s.remap));
+            }
         }
         // The profile picks severities, so it is part of the key: a warm
         // `hook` (ci) and an editor (local) never share a verdict.
@@ -812,7 +913,7 @@ mod tests {
         let d = temp("walk");
         fs::write(
             d.join("codelaw.toml"),
-            "exclude = [\"dist/**\"]\n[rules]\n\"a/x\" = \"warn\"\n[[overrides]]\nfiles = [\"pkg/**/*.ts\"]\nrules = { \"a/x\" = \"off\" }\n",
+            "exclude = [\"dist/**\"]\n[rules]\n\"a/x\" = \"warn\"\n[scope.pkg]\nfiles = [\"pkg/**/*.ts\"]\nrules = { \"a/x\" = \"off\" }\n",
         )
         .unwrap();
         fs::create_dir_all(d.join("pkg/src")).unwrap();
@@ -823,7 +924,7 @@ mod tests {
         let file = d.join("pkg/src/a.ts");
         let layers = c.layers_for(&file);
         assert_eq!(layers.len(), 3);
-        assert!(layers[2].source.ends_with("override #1"));
+        assert!(layers[2].source.ends_with("scope pkg"));
         assert_eq!(c.languages_for(&file), Some([Language::Typescript].into()));
         assert_eq!(c.languages_for(&d.join("b.ts")), None);
         assert!(!c.is_included(&d.join("dist/a.js")));
@@ -851,14 +952,14 @@ mod tests {
 
     #[test]
     fn profile_layers_and_remap_in_precedence_order() {
-        let text = "[rules]\n\"a/x\" = \"warn\"\n\n[[overrides]]\nfiles = [\"s/**\"]\nrules = { \"a/x\" = \"info\" }\nremap = { error = \"warn\", info = \"off\" }\n\n[profiles.ci]\nrules = { \"a/x\" = \"error\" }\noverrides = [{ files = [\"s/**\"], remap = { error = \"info\" } }]\n";
+        let text = "[rules]\n\"a/x\" = \"warn\"\n\n[scope.s]\nfiles = [\"s/**\"]\nrules = { \"a/x\" = \"info\" }\nremap = { error = \"warn\", info = \"off\" }\n\n[profile.ci]\nrules = { \"a/x\" = \"error\" }\nscope = { s = { remap = { error = \"info\" } } }\n";
         let mut c = Config::from_toml(PathBuf::from("/x"), text).unwrap();
         let file = PathBuf::from("/x/s/a.ts");
         let sources = |c: &Config| c.layers_for(&file).into_iter().map(|l| l.source).collect::<Vec<_>>();
-        assert_eq!(sources(&c), ["/x/codelaw.toml", "/x/codelaw.toml override #1"], "`local` is not defined: no change");
+        assert_eq!(sources(&c), ["/x/codelaw.toml", "/x/codelaw.toml scope s"], "`local` is not defined: no change");
         let local_key = c.fingerprint();
         c.select_profile(&ProfileChoice { ci: Some("true".into()), ..Default::default() }).unwrap();
-        assert_eq!(sources(&c), ["/x/codelaw.toml", "/x/codelaw.toml profile ci", "/x/codelaw.toml override #1", "/x/codelaw.toml profile ci override #1"]);
+        assert_eq!(sources(&c), ["/x/codelaw.toml", "/x/codelaw.toml profile ci", "/x/codelaw.toml scope s", "/x/codelaw.toml profile ci scope s"]);
         assert_ne!(c.fingerprint(), local_key, "the profile is part of every cache key");
         use codelaw_core::Severity::*;
         let r = c.remap_for(&file);
@@ -867,8 +968,8 @@ mod tests {
         assert!(c.has_remap());
         let err = c.select_profile(&ProfileChoice { flag: Some("cis".into()), ..Default::default() }).unwrap_err();
         assert!(err.message.contains("profile `cis` (from --profile) is not defined; did you mean `ci`?"), "{}", err.message);
-        let err = Config::from_toml(PathBuf::from("/x"), "[profiles.ci]\noverrides = [{ files = [\"a\"], remap = { eror = \"warn\" } }]\n").unwrap_err();
-        assert!(err.message.contains("profile `ci` override #1: `remap` key `eror`; did you mean `error`?"), "{}", err.message);
+        let err = Config::from_toml(PathBuf::from("/x"), "[profile.ci]\nscope = { a = { files = [\"a\"], remap = { eror = \"warn\" } } }\n").unwrap_err();
+        assert!(err.message.contains("profile `ci` scope `a`: `remap` key `eror`; did you mean `error`?"), "{}", err.message);
     }
 
     #[test]
@@ -880,5 +981,86 @@ mod tests {
         let err = find_config(&d.join("pkg")).unwrap_err();
         assert!(err.message.contains("can only be set in the root config"), "{}", err.message);
     }
-}
 
+    /// The `max` option of `js/max-lines` for `file`, folding the layers
+    /// the way the rule set does.
+    fn max_for(c: &Config, file: &str) -> Option<i64> {
+        let path = PathBuf::from("/x").join(file);
+        let mut max = None;
+        for l in c.layers_for(&path) {
+            if let Some(m) = l.rules.get("js/max-lines").and_then(|s| s.options()).and_then(|o| o.get("max")) {
+                max = m.as_i64();
+            }
+        }
+        max
+    }
+
+    fn preset_tests() -> Vec<PresetScope> {
+        let raw: crate::raw::RawConfig =
+            toml::from_str("[scope.tests]\nfiles = [\"**/*.test.*\", \"**/*.spec.*\"]\nrules = { \"js/max-lines\" = { options = { max = 300 } } }\n").unwrap();
+        raw.scope.0.into_iter().map(|(name, scope)| PresetScope { preset: "codelaw:js/recommended".into(), name, scope }).collect()
+    }
+
+    const GOAL: &str = r#"
+[rules]
+"js/max-lines" = { severity = "error", options = { max = 100 } }
+
+[scope.utils]
+files = ["**/*.utils.ts", "**/*.utils.tsx"]
+rules = { "js/max-lines" = { options = { max = 50 } } }
+
+[scope.tests]
+rules = { "js/max-lines" = { options = { max = 400 } } }
+
+[profile.ci]
+rules = { "js/no-console" = "error" }
+"#;
+
+    #[test]
+    fn a_project_scope_extends_the_presets_of_the_same_name() {
+        let mut c = Config::from_toml(PathBuf::from("/x"), &format!("extends = [\"codelaw:js/recommended\"]\n{GOAL}")).unwrap();
+        // `tests` has no `files` of its own: it needs the preset.
+        assert!(c.warnings.is_empty());
+        c.set_preset_scopes(&preset_tests()).unwrap();
+        assert_eq!(max_for(&c, "src/date.utils.ts"), Some(50));
+        assert_eq!(max_for(&c, "src/a.test.ts"), Some(400), "the project's value wins, the preset's files stay");
+        assert_eq!(max_for(&c, "src/b.spec.ts"), Some(400));
+        assert_eq!(max_for(&c, "src/Orders.tsx"), Some(100));
+        let names: Vec<(String, String)> = c.scope_list().into_iter().map(|s| (s.name, s.source)).collect();
+        assert_eq!(names[0], ("tests".to_owned(), "codelaw.toml:10, extends codelaw:js/recommended".to_owned()));
+        assert_eq!(names[1].0, "utils", "preset scopes first, then the project's in file order");
+    }
+
+    #[test]
+    fn scope_names_are_checked() {
+        for bad in ["default", "a b", "Utils", ""] {
+            let text = format!("[scope.\"{bad}\"]\nfiles = [\"a\"]\n");
+            let err = Config::from_toml(PathBuf::from("/x"), &text).unwrap_err();
+            assert!(err.message.contains("scope name"), "{bad}: {}", err.message);
+        }
+        let err = Config::from_toml(PathBuf::from("/x"), "[scope.utils]\nrules = {}\n").unwrap_err();
+        assert!(err.message.contains("scope `utils` has no `files`"), "{}", err.message);
+    }
+
+    #[test]
+    fn the_old_spellings_load_with_one_warning_each() {
+        let text = "[[overrides]]\nfiles = [\"a/**\"]\nrules = { \"js/max-lines\" = { options = { max = 7 } } }\n[[overrides]]\nfiles = [\"b/**\"]\n\n[profiles.ci]\nrules = { \"a/x\" = \"error\" }\n";
+        let mut c = Config::from_toml(PathBuf::from("/x"), text).unwrap();
+        assert_eq!(c.warnings.len(), 2, "{:?}", c.warnings);
+        assert!(c.warnings[0].contains("`[[overrides]]` is deprecated") && c.warnings[0].contains("[scope.<name>]"));
+        assert!(c.warnings[1].contains("`[profiles.<name>]` is deprecated") && c.warnings[1].contains("[profile.<name>]"));
+        assert_eq!(max_for(&c, "a/x.ts"), Some(7));
+        assert_eq!(c.scope_list().iter().map(|s| s.name.as_str()).collect::<Vec<_>>(), ["override-1", "override-2"]);
+        c.select_profile(&ProfileChoice { flag: Some("ci".into()), ..Default::default() }).unwrap();
+        let both = "[profile.ci]\nrules = {}\n[profiles.ci]\nrules = {}\n";
+        assert!(Config::from_toml(PathBuf::from("/x"), both).unwrap_err().message.contains("both"));
+    }
+
+    #[test]
+    fn scopes_apply_in_the_order_the_file_wrote_them() {
+        let text = "[scope.zeta]\nfiles = [\"a/**\"]\nrules = { \"js/max-lines\" = { options = { max = 1 } } }\n[scope.alpha]\nfiles = [\"a/**\"]\nrules = { \"js/max-lines\" = { options = { max = 2 } } }\n";
+        let c = Config::from_toml(PathBuf::from("/x"), text).unwrap();
+        assert_eq!(max_for(&c, "a/f.ts"), Some(2), "alpha is written last, so it wins");
+        assert_eq!(c.scope_list().iter().map(|s| s.name.as_str()).collect::<Vec<_>>(), ["zeta", "alpha"]);
+    }
+}

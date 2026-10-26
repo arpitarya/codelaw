@@ -7,6 +7,7 @@ mod baseline;
 mod compile;
 mod debug;
 mod discover;
+mod exceptions;
 mod files;
 mod fix;
 mod format;
@@ -22,6 +23,8 @@ mod watch;
 pub use baseline::{AsOf, BaselineAdd, Ratchet};
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;
+pub use codelaw_baseline::Date;
+pub use exceptions::{Exception, ExceptionKind, Exceptions};
 pub use fix::{FileFix, FileTrace, FixOptions, FixReport};
 pub use incremental::{DocumentTree, TreeCache};
 pub use format::{FormatReport, FormatRunOptions, FormattedFile, Formatting};
@@ -234,6 +237,7 @@ impl Project {
     pub fn from_parts(mut config: Config, rules: RuleSet, options: EngineOptions) -> Result<Project, EngineError> {
         baseline::check_dates(&options)?;
         // Before anything keys on the config: the profile is part of it.
+        config.set_preset_scopes(&rules.preset_scopes).map_err(EngineError::Config)?;
         config.select_profile(&options.profile_choice()).map_err(|e| EngineError::Usage(e.to_string()))?;
         if let Some(only) = &options.rules {
             for id in only {

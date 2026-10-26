@@ -4,11 +4,13 @@
 
 mod baseline_cmd;
 mod bench;
+mod ci;
 mod format_cmd;
 mod git_hooks;
 mod graph_cmd;
 mod config_cmd;
 mod deps_cmd;
+mod exceptions_cmd;
 mod init;
 mod match_cmd;
 mod rules_cmd;
@@ -86,6 +88,8 @@ enum Command {
         #[command(subcommand)]
         action: baseline_cmd::BaselineAction,
     },
+    /// List every exception (baseline entry, deprecation, inline ignore) with its deadline and owner (SR-BASELINE decision 11).
+    Exceptions(exceptions_cmd::ExceptionsArgs),
     /// Deprecate a symbol: write the registry entry and baseline every current use (SR-BASELINE decision 6).
     Deprecate(baseline_cmd::DeprecateArgs),
     /// Read npm and the Python index and write the dependency snapshot the
@@ -139,7 +143,7 @@ pub struct Common {
     /// Files in the index count as touched (needs git).
     #[arg(long)]
     staged: bool,
-    /// The `[profiles.<name>]` to run with; by default `ci` when `CI` is
+    /// The `[profile.<name>]` to run with; by default `ci` when `CI` is
     /// set, else `local` (or `CODELAW_PROFILE`).
     #[arg(long, value_name = "NAME")]
     profile: Option<String>,
@@ -591,6 +595,7 @@ fn main() -> ExitCode {
         }
         Command::Baseline { action } => baseline_cmd::baseline(action),
         Command::Deprecate(a) => baseline_cmd::deprecate(a),
+        Command::Exceptions(a) => exceptions_cmd::exceptions(a),
         Command::Daemon { action } => warm::daemon(action),
         Command::Bench(a) => bench::bench(a),
         Command::Deps(a) => deps_cmd::deps(a),

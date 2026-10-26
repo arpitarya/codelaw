@@ -80,6 +80,10 @@ fn the_schema_and_the_loader_accept_the_same_keys() {
     }
     let item: BTreeSet<String> = props(&s["properties"]["overrides"]["items"]).keys().cloned().collect();
     assert_eq!(accepted(json!({ "overrides": [{ "files": [], "__probe__": 0 }] })).unwrap(), item, "[[overrides]]");
+    let scope: BTreeSet<String> = props(&s["definitions"]["scope"]).keys().cloned().collect();
+    assert_eq!(accepted(json!({ "scope": { "a": { "__probe__": 0 } } })).unwrap(), scope, "[scope.<name>]");
+    let profile: BTreeSet<String> = props(&s["definitions"]["profile"]).keys().cloned().collect();
+    assert_eq!(accepted(json!({ "profile": { "a": { "__probe__": 0 } } })).unwrap(), profile, "[profile.<name>]");
     let langs: Vec<&str> = s["properties"]["languages"]["items"]["enum"].as_array().unwrap().iter().map(|v| v.as_str().unwrap()).collect();
     assert_eq!(langs, codelaw_core::Language::ALL.iter().map(|l| l.name()).collect::<Vec<_>>(), "`languages` names every L3 language");
 }
@@ -166,15 +170,17 @@ allow_pack_fixers = ["@acme/rules"]
 [rules]
 "py/no-print" = "off"
 "js/max" = { severity = "warn", options = { max = 3 } }
-[[overrides]]
+[scope.components]
 files = ["src/**/*.tsx"]
 exclude = ["src/legacy/**"]
 rules = { "js/exports-at-end" = "off" }
 remap = { error = "warn", warn = "off", info = "off" }
-[profiles.ci]
+[scope.tests]
+rules = { "js/max-lines" = { options = { max = 400 } } }
+[profile.ci]
 rules = { "js/no-console" = "error" }
-overrides = [{ files = ["scripts/**"], remap = { error = "warn" } }]
-[profiles.local.rules]
+scope = { scripts = { files = ["scripts/**"], remap = { error = "warn" } } }
+[profile.local.rules]
 "js/no-console" = "warn"
 [files]
 follow_symlinks = false
@@ -207,6 +213,10 @@ line_width = 100
             panic!("{what}: the schema refuses it: {e:#}");
         }
     }
+    let old = "[[overrides]]\nfiles = [\"a/**\"]\n[profiles.ci]\nrules = { \"js/no-console\" = \"error\" }\noverrides = [{ files = [\"scripts/**\"], remap = { error = \"warn\" } }]\n";
+    Config::from_toml(PathBuf::from("/x"), old).unwrap_or_else(|e| panic!("the deprecated spellings: the loader refuses them: {e}"));
+    let v: Value = serde_json::to_value(toml::from_str::<toml::Table>(old).unwrap()).unwrap();
+    schemas.validate(&v, idx).unwrap_or_else(|e| panic!("the deprecated spellings: the schema refuses them: {e:#}"));
     for (what, bad) in [
         ("an unknown key", json!({ "extend": [] })),
         ("an unknown [files] key", json!({ "files": { "max_file_sise": 1 } })),
@@ -214,10 +224,16 @@ line_width = 100
         ("an unknown language", json!({ "languages": ["pyhton"] })),
         ("a bad size", json!({ "cache": { "max_size": "1 parsec" } })),
         ("a negative tree cache", json!({ "lsp": { "tree_cache": -1 } })),
+        ("an unknown scope key", json!({ "scope": { "utils": { "file": ["a"] } } })),
+        ("the reserved scope name", json!({ "scope": { "default": { "files": ["a"] } } })),
+        ("a scope name with a space", json!({ "scope": { "a b": { "files": ["a"] } } })),
+        ("a bad scope remap", json!({ "scope": { "a": { "files": ["a"], "remap": { "error": "wran" } } } })),
+        ("an unknown profile scope key", json!({ "profile": { "ci": { "scope": { "a": { "fils": ["a"] } } } } })),
         ("an unknown remap key", json!({ "overrides": [{ "files": ["a"], "remap": { "eror": "warn" } }] })),
         ("a bad remap value", json!({ "overrides": [{ "files": ["a"], "remap": { "error": "wran" } }] })),
         ("an unknown profile key", json!({ "profiles": { "ci": { "rule": {} } } })),
-        ("a bad profile severity", json!({ "profiles": { "ci": { "rules": { "a/b": "eror" } } } })),
+        ("a bad profile severity", json!({ "profile": { "ci": { "rules": { "a/b": "eror" } } } })),
+        ("a bad deprecated profile severity", json!({ "profiles": { "ci": { "rules": { "a/b": "eror" } } } })),
     ] {
         assert!(schemas.validate(&bad, idx).is_err(), "the schema accepts {what}");
         assert!(Config::from_toml(PathBuf::from("/x"), &toml::to_string(&bad).unwrap()).is_err(), "the loader accepts {what}");

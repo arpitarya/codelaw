@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "the agent-facing files and skills"
 owns:
   - crates/codelaw-agents
-  - agents
+  - templates/agents
 laws: [L0, L3, L4, L5, L6]
 timestamp: 2026-10-24T08:00:00Z
 content_sha: ""
@@ -68,7 +68,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 
 #### 1. One source, generated everywhere
 
-- Skills live in the codelaw source tree as `agents/skills/<name>/SKILL.md`, with optional `references/` and `scripts/`. They follow the Agent Skills standard:
+- Skills live in the codelaw source tree as `templates/agents/skills/<name>/SKILL.md`, with optional `references/` and `scripts/`. They follow the Agent Skills standard:
   - `name`: lowercase, hyphens, at most 64 characters;
   - `description`: at most 1,024 characters, saying what the skill does **and** when to use it;
   - progressive disclosure: metadata about 100 tokens, `SKILL.md` body under 5,000 tokens, detail moved into `references/`.
@@ -144,7 +144,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 - **The Cowork plugin** is `.claude/plugins/codelaw/`: `.claude-plugin/plugin.json`, `skills/`, `hooks/hooks.json` and `.mcp.json`.
 - **The Kiro hook** is `.kiro/hooks/codelaw.json`: a `PostFileSave` trigger on the L3 extensions running `<command> hook {{filePath}}`.
 - **Codex** gets a printed `~/.codex/config.toml` snippet: `[mcp_servers.codelaw]` and a `[[hooks.PostToolUse]]` group.
-- **The skills are compiled into the binary** (`include_str!` of `agents/`), so both packages carry the same ones ([L6](0008_LAW-6-python-and-node-packages.md)).
+- **The skills are compiled into the binary** (`include_str!` of `templates/agents/`, [L10](0012_LAW-10-consumer-templates.md): every text `sync-agents` writes is a template there and code only fills its slots), so both packages carry the same ones ([L6](0008_LAW-6-python-and-node-packages.md)).
 - **`sync-agents --check`**: exit `0` when every planned file matches, `1` listing each file that differs or should be removed, `2` on a config, rule or file error. With no `[agents] targets` both forms exit `0` without loading the rules.
 
 ### The skill catalogue

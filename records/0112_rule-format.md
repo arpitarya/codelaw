@@ -105,7 +105,7 @@ The decider asked for a record of the rule-file template. The format so far exis
    - **Required:** `id`, `title`, `languages`, `fix`, plus `fix_reason` unless `fix: auto` ([L4](0006_LAW-4-every-rule-has-a-fix.md)).
    - **`ported_from:`** (optional) lists `<tool>/<rule>` ids, for example `[eslint/no-dupe-keys, ruff/F601]`: the source rules this one reimplements ([SR-RULE-PACKS](0101_rule-packs.md) decision 7). `codelaw-migrate` maps existing configs through it ([SR-AGENT-SURFACES](0102_agent-surfaces.md)).
    - **Unknown fields are a load error.**
-   - **`options:`** declares each option's type and default; a config value for one — in `[rules]`, an `[[overrides]]` entry or any `[profiles.<name>]`, not only the profile in use ([SR-CONFIG](0110_config.md) decision 10) — is checked against it at load, so a typo fails on a laptop as it would in CI.
+   - **`options:`** declares each option's type and default; a config value for one — in `[rules]`, a `[scope.<name>]` or any `[profile.<name>]`, not only the profile in use ([SR-CONFIG](0110_config.md) decision 10) — is checked against it at load, so a typo fails on a laptop as it would in CI.
 2a. **`security:`** (optional; W-53, the decider's ruling of 2026-10-25) maps a rule to the security catalogues Veracode, Black Duck, Xray and OWASP speak in: `security: { cwe: [<n>…], owasp: ["Ann:2025"…], severity: high | medium | low }`.
    - `cwe` lists CWE ids (integers from 1); `owasp` lists OWASP Top 10 categories with their edition, `A01:2025` … `A10:2025`; at least one of the two is named. `severity` is required. Any other key, or a value of the wrong shape, is a load error.
    - **A rule in a security pack's namespace (`sec-js`, `sec-ts`, `sec-html`, `sec-py`) must carry it**; any other rule may.

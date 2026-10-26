@@ -1,0 +1,14 @@
+[
+  "request.args",
+  "request.form",
+  "request.values",
+  "request.json",
+  "request.get_json",
+  "request.data",
+  "request.get_data",
+  "request.cookies",
+  "request.files",
+  "request.headers",
+  "request.view_args",
+  "request.stream"
+]

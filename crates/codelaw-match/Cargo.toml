@@ -14,5 +14,4 @@ ast-grep-core.workspace = true
 ast-grep-config.workspace = true
 serde_json.workspace = true
 regex.workspace = true
-strsim.workspace = true
 tree-sitter.workspace = true

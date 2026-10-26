@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "hooks": [{
+    "name": "codelaw",
+    "description": "codelaw checks and fixes each file the agent saves; what is left goes back to it.",
+    "trigger": "PostFileSave",
+    "matcher": "\\.({{extensions}})$",
+    "action": {"type": "command", "command": "{{cmd}} hook \{{filePath}}"}
+  }]
+}
