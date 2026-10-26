@@ -56,6 +56,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** none.
 - **Next:** Arpit looks at PR 3's Files changed tab.
 
+## 2026-10-26 — W-49 closed, W-70 filed (queue housekeeping)  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** Arpit: *"create a separate work item for example app"* for W-49; he publishes the new npm packages himself.
+- **Done:** filed W-70 (example apps on real Vite, webpack, Rspack, Next.js; L11 route: a CI job that installs them, alternative a ratified dev dependency); closed W-49 (DoD 1 and 4 moved to W-70), archived its detail file with the `archive/README.md` row, removed its OPEN-WORK row; RELEASING.md names the three plugin packages among the new names.
+- **Decided / left open:** W-70 starts on the CI-job route; no decider ruling needed. The first publish of `@codelaw/vite-plugin`, `webpack-plugin` and `next` is the decider's hand.
+- **Mistakes:** none.
+- **Next:** an agent builds W-70 on the CI-job route.
+
 ## 2026-10-26 — W-49: dev-server plugins for Vite, webpack, Rspack, Next.js  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** W-44's remaining agent work, then W-49 (lane brief).
