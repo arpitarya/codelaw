@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-44 tidied after the rulings  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** finish W-44's locally doable remainder.
+- **Done:** re-ran `tests/watch.rs` (6/6); the handoff's Blockers section now records the two questions as ruled and What is left lists only the CI items (DoD 5 on `win32-*`, `ubuntu-24.04` measurements).
+- **Decided / left open:** nothing new; DoD 5 and the runner measurements need CI.
+- **Mistakes:** none.
+- **Next:** read the `smoke` Windows legs and the runner bench once CI has run on main.
+
 ## 2026-10-26 — W-58: corpus counts confirmed, left list trimmed  ·  Claude Code (Sonnet 5.5), in a lockmaster worktree
 
 - **Asked:** finish W-58 except CI's `perf` run (DoD 6).
