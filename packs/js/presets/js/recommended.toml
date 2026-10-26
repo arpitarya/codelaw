@@ -64,6 +64,7 @@ description = "The correctness core of ESLint's recommended preset (@eslint/js 1
 "js/no-with" = "error"
 "js/preserve-caught-error" = "error"
 "js/require-yield" = "error"
+"js/use-instead" = "warn"
 "js/use-isnan" = "error"
 "js/valid-typeof" = "error"
 

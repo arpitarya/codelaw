@@ -5,12 +5,14 @@
 //! before any engine sees it. Compiling its `codelaw` block is the
 //! engines' job.
 
+mod calls;
 mod engine_rules;
 mod markdown;
 mod pack;
 mod rule;
 mod ruleset;
 
+pub use calls::{CallItem, MODE_SUFFIX, is_replace, parse_call_items, resolve_calls};
 pub use engine_rules::{ENGINE_RULES, EngineRule, engine_rule};
 pub use pack::{ExtendsSpec, FIRST_PARTY_NAMESPACES, FIRST_PARTY_PACKS, FirstPartyPack, PackManifest, PackSearch, Preset, RulePack, first_party, first_party_npm, first_party_pypi, load_pack, load_pack_from, load_rules_dir, namespace_pack};
 pub use rule::{

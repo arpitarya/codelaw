@@ -196,6 +196,27 @@ extends = ["codelaw:html/size", "codelaw:css/size"]
 
 A line holding code and a comment counts as code. A finding names the first line over the limit and carries the count: `412 lines (max 300; blank lines and comments not counted)`. The fix is manual: split the file.
 
+### Your own sanitizer, your own wrappers
+
+A rule that requires a function at a sink takes it from your config, matched by name and by where it is imported from. The five HTML-sink rules read `sanitizers`; `sanitizers_mode` is `extend` (add to the built-in list, the default) or `replace` (only yours count):
+
+```toml
+[rules."sec-js/no-dangerously-set-inner-html".options]
+sanitizers      = [{ name = "sanitizeHtml", module = "@acme/security" }]
+sanitizers_mode = "replace"      # a direct DOMPurify.sanitize at the sink is now reported
+```
+
+An item is a callee path (`"DOMPurify.sanitize"`, a global; `"*.createHTML"`, any receiver) or `{ name, module }`, where `module` is a string or a list. `js/use-instead` and `py/use-instead` hold the rest of the code to a wrapper, anywhere, not only at a sink; `drop_in = true` lets `codelaw fix` swap it in and add the import, and `allow_in` exempts the wrapper's own file:
+
+```toml
+[rules."js/use-instead".options.replacements]
+"fetch"              = { use = "apiFetch",     from = "@acme/http",     drop_in = true, allow_in = ["src/lib/http.ts"] }
+"DOMPurify.sanitize" = { use = "sanitizeHtml", from = "@acme/security", drop_in = true, allow_in = ["src/security/**"] }
+"console.log"        = { use = "logger.info",  from = "@acme/log" }
+```
+
+Neither follows a value through a variable: `const c = clean(x)` and then `c` at the sink is not a call.
+
 ### SCSS and CSS Modules
 
 `.scss` is a CSS dialect: `codelaw check` and `codelaw format` read it, and the `css/*` rules run on it. Install `@codelaw/rules-css` and `@codelaw/rules-scss` (`codelaw init` does, for `.scss` files or `sass` in `package.json`) and extend `codelaw:css/recommended` and `codelaw:scss/recommended`; `codelaw:scss/strict` adds Dart Sass's module migrations (`@import` to `@use`, `map-get()` to `map.get()`, `/` to `math.div()`), naming patterns and a nesting limit. The indented `.sass` syntax and Less are not read.

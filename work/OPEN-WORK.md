@@ -53,7 +53,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-70** `agent` Example apps for the dev-server plugins: one each for real Vite, webpack, Rspack, Next.js (a `debugger` in the overlay within a second; Rspack runs the webpack plugin unchanged), via a CI job that installs the hosts (L11). Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
 
-🟢 **W-73** `agent` Configurable approved calls: 5 HTML-sink rules take a `sanitizers` list (extend or replace the built-in; name + import source); `js/use-instead`, `py/use-instead` for wrappers. Filed by Arpit (Cowork). [detail](open/W-73-configurable-approved-calls.md)
+🟢 **W-73** `agent` Configurable approved calls built: `call[]` options with `_mode`, the `calls:` predicate and `$OPTION.<name>`; the 5 HTML-sink rules read `sanitizers` (extend or replace; name + import source); `js/use-instead` and `py/use-instead` (auto fix, import added once); left: the L8 `perf` run in release, and moving the validator-call lists of `sec-ts/next-server-action-validation` and `no-unchecked-cast-of-input` (DoD 3, 5). Filed by Arpit (Cowork). [detail](open/W-73-configurable-approved-calls.md)
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 

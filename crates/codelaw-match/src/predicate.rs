@@ -3,6 +3,7 @@
 //! and the rest, combined with `not`, `all` and `any`.
 
 use crate::source::{SourcePath, from_source, parse_source};
+use codelaw_rules::{CallItem, OptionSpec, parse_call_items, resolve_calls};
 use codelaw_semantic::SemanticModel;
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
@@ -41,6 +42,9 @@ pub enum Predicate {
     /// bound to one in the same function (`source.rs`; not taint
     /// analysis).
     FromSource { sources: Vec<SourcePath> },
+    /// The node is a call to one of the rule's `call[]` option `option`
+    /// (W-73); `default` is the rule's built-in list.
+    Calls { option: String, default: Vec<CallItem> },
     Not(Box<Predicate>),
     All(Vec<Predicate>),
     Any(Vec<Predicate>),
@@ -48,8 +52,23 @@ pub enum Predicate {
 
 const NAMES: &[&str] = &[
     "unused", "undeclared", "shadowed", "reassigned", "imported-from", "write", "declaration", "redeclared", "binding", "builtin", "from_source",
-    "not", "all", "any",
+    "calls", "not", "all", "any",
 ];
+
+impl Predicate {
+    /// Whether the predicate is about a call list: such an entry on a
+    /// capture the matched branch did not bind is skipped, since that
+    /// branch has no value to check (a rule whose `any:` binds `$V` in some
+    /// branches only).
+    pub fn skips_unbound(&self) -> bool {
+        match self {
+            Predicate::Calls { .. } => true,
+            Predicate::Not(p) => p.skips_unbound(),
+            Predicate::All(ps) | Predicate::Any(ps) => ps.iter().all(Predicate::skips_unbound),
+            _ => false,
+        }
+    }
+}
 
 const KINDS: &[&str] = &[
     "var", "let", "const", "function", "class", "param", "import", "catch-param", "interface", "type-alias", "enum", "namespace",
@@ -99,7 +118,7 @@ fn table_names(name: &str, data: &BTreeMap<String, Arc<Value>>) -> Result<Vec<St
     }
 }
 
-fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Predicate, String> {
+fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>, opts: &BTreeMap<String, OptionSpec>) -> Result<Predicate, String> {
     match v {
         Value::String(s) => match s.as_str() {
             "unused" => Ok(Predicate::Unused),
@@ -112,20 +131,21 @@ fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Predicate, St
             "builtin" => Ok(Predicate::Builtin),
             "imported-from" => Err("`imported-from` names a module: `{ imported-from: react }`".into()),
             "binding" => Err("`binding` names declaration kinds: `{ binding: [const, let] }`".into()),
+            "calls" => Err("`calls` names a `call[]` option of the rule: `{ calls: sanitizers }`".into()),
             "from_source" => Err("`from_source` names its sources: `{ from_source: { sources: [req.query], tables: [sources/express] } }`".into()),
             other => Err(unknown(other)),
         },
-        Value::Array(items) => Ok(Predicate::All(items.iter().map(|i| parse(i, data)).collect::<Result<_, _>>()?)),
+        Value::Array(items) => Ok(Predicate::All(items.iter().map(|i| parse(i, data, opts)).collect::<Result<_, _>>()?)),
         Value::Object(map) => {
             if map.len() != 1 {
                 return Err("a predicate object has exactly one key".into());
             }
             let (key, arg) = map.iter().next().expect("one key");
             match key.as_str() {
-                "not" => Ok(Predicate::Not(Box::new(parse(arg, data)?))),
+                "not" => Ok(Predicate::Not(Box::new(parse(arg, data, opts)?))),
                 "all" | "any" => {
                     let Value::Array(items) = arg else { return Err(format!("`{key}` takes a list")) };
-                    let list = items.iter().map(|i| parse(i, data)).collect::<Result<Vec<_>, _>>()?;
+                    let list = items.iter().map(|i| parse(i, data, opts)).collect::<Result<Vec<_>, _>>()?;
                     Ok(if key == "all" { Predicate::All(list) } else { Predicate::Any(list) })
                 }
                 "imported-from" => match arg {
@@ -141,6 +161,14 @@ fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Predicate, St
                     }
                     other => Ok(Predicate::ImportedFrom { modules: strings(other, "imported-from")?, name: None }),
                 },
+                "calls" => {
+                    let option = arg.as_str().ok_or("`calls` names one `call[]` option: `{ calls: sanitizers }`")?;
+                    let Some(spec) = opts.get(option).filter(|s| s.kind == "call[]") else {
+                        return Err(format!("`calls: {option}` names no `call[]` option of this rule (declare `{option}: {{ type: \"call[]\" }}` in `options:`)"));
+                    };
+                    let default = spec.default.as_ref().map(parse_call_items).transpose()?.unwrap_or_default();
+                    Ok(Predicate::Calls { option: option.to_owned(), default })
+                }
                 "undeclared" => {
                     let Value::Object(o) = arg else { return Err("`undeclared` takes `{ globals: [...], tables: [...] }`".into()) };
                     let mut globals = BTreeSet::new();
@@ -205,14 +233,14 @@ fn parse(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Predicate, St
 }
 
 /// Parse a `where:` block: capture name to predicate.
-pub fn parse_predicates(v: &Value, data: &BTreeMap<String, Arc<Value>>) -> Result<Vec<(String, Predicate)>, String> {
+pub fn parse_predicates(v: &Value, data: &BTreeMap<String, Arc<Value>>, opts: &BTreeMap<String, OptionSpec>) -> Result<Vec<(String, Predicate)>, String> {
     let Value::Object(map) = v else { return Err("`where:` maps captures (`$NAME`, `$$MATCH`) to predicates".into()) };
     let mut out = Vec::new();
     for (var, spec) in map {
         if !var.starts_with('$') {
             return Err(format!("`where:` key `{var}` must be a capture like `$NAME`, or `$$MATCH`"));
         }
-        out.push((var.clone(), parse(spec, data).map_err(|e| format!("`where: {var}`: {e}"))?));
+        out.push((var.clone(), parse(spec, data, opts).map_err(|e| format!("`where: {var}`: {e}"))?));
     }
     Ok(out)
 }
@@ -224,6 +252,8 @@ pub struct Subject<'a> {
     pub start: usize,
     pub node: Option<tree_sitter::Node<'a>>,
     pub source: &'a str,
+    /// The rule's options as the project resolved them, for `calls`.
+    pub options: &'a BTreeMap<String, Value>,
 }
 
 impl Predicate {
@@ -246,6 +276,9 @@ impl Predicate {
             Predicate::Binding { kinds } => model.symbol_at(start).is_some_and(|s| kinds.iter().any(|k| k == model.symbol(s).kind.name())),
             Predicate::Builtin => model.reference_at(start).is_some_and(|r| model.is_builtin_reference(r)),
             Predicate::FromSource { sources } => subject.node.is_some_and(|n| from_source(n, subject.source, model, sources)),
+            Predicate::Calls { option, default } => subject
+                .node
+                .is_some_and(|n| crate::calls::is_call_to(n, subject.source, model, &resolve_calls(default, subject.options, option))),
             Predicate::Not(p) => !p.holds(model, subject),
             Predicate::All(ps) => ps.iter().all(|p| p.holds(model, subject)),
             Predicate::Any(ps) => ps.iter().any(|p| p.holds(model, subject)),

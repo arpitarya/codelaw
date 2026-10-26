@@ -7,9 +7,26 @@ fix_reason: "whether the value needs markup at all is a decision for the author"
 stability: preview
 security: { cwe: [79], owasp: ["A05:2025"], severity: high }
 since: 0.3.0
+options:
+  sanitizers:
+    type: "call[]"
+    description: "functions whose result may reach the sink: a callee path (global) or { name, module }; `sanitizers_mode: replace` makes them the only ones that count"
+    default:
+      - { name: DOMPurify.sanitize, module: [dompurify, isomorphic-dompurify] }
+      - DOMPurify.sanitize
+      - { name: sanitizeHtml, module: sanitize-html }
+      - { name: xss, module: xss }
+      - { name: filterXSS, module: xss }
+      - { name: escapeHtml, module: escape-html }
+      - { name: escape, module: [lodash, lodash-es, lodash/escape, he] }
+      - { name: _.escape, module: [lodash, lodash-es] }
+      - { name: he.escape, module: he }
+      - "*.createHTML"
 ---
 
 React's `dangerouslySetInnerHTML` is given a literal, or a value that went through a sanitizer such as `DOMPurify.sanitize`.
+
+**Your sanitizer:** a value passes when it is a call to one of the `sanitizers`: the built-in list (DOMPurify, sanitize-html, xss, escape-html, lodash and he `escape`, Trusted Types `createHTML`) plus your own, each matched by name and by the module it is imported from, so a local `function sanitize(x) { return x }` does not pass. `sanitizers_mode = "replace"` makes yours the only ones that count. It does not follow a value through a variable: `const c = clean(x)` then `c` at the sink is not a call. Add a project function with `sanitizers = [{ name = "sanitizeHtml", module = "@acme/security" }]`.
 
 **Why:** The name is the warning: the value becomes the element's HTML, so markup an attacker supplies runs in the page (CWE-79).
 
@@ -19,8 +36,10 @@ match:
     context: '({ __html: $V })'
     selector: pair
 constraints:
-  V: { not: { any: [ { kind: string }, { regex: '^`[^`$]*`$' }, { regex: '^(DOMPurify\.sanitize|purify\.sanitize|sanitizeHtml|sanitize|xss|filterXSS|escapeHtml|escape|_\.escape|he\.escape|[A-Za-z_$][\w$]*\.createHTML)\s*\(' } ] } }
-message: "`$V` becomes HTML here without a sanitizer; markup in it runs in the page"
+  V: { not: { any: [ { kind: string }, { regex: '^`[^`$]*`$' } ] } }
+where:
+  $V: { not: { calls: sanitizers } }
+message: "`$V` becomes HTML here without one of: $OPTION.sanitizers (add yours to `sanitizers`); markup in it runs in the page"
 ```
 
 ## How to fix

@@ -76,5 +76,6 @@
 "js/prefer-spread" = 0
 "js/preserve-caught-error" = 0
 "js/require-yield" = 0
+"js/use-instead" = 0
 "js/use-isnan" = 0
 "js/valid-typeof" = 0

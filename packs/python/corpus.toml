@@ -99,6 +99,7 @@
 "py/unused-import" = 18
 "py/unused-loop-control-variable" = 21
 "py/unused-variable" = 9
+"py/use-instead" = 0
 "py/useless-comparison" = 2
 "py/useless-contextlib-suppress" = 0
 "py/useless-expression" = 32

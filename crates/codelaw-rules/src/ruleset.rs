@@ -91,10 +91,16 @@ fn check_options(rule: &RuleFile, setting: &RuleSetting, file: &std::path::Path,
                     .unwrap_or_default();
                 errors.push(LoadError::new(Some(file.to_owned()), format!("rule `{}` has no option `{name}`{near}", rule.id)));
             }
-            Some(spec) if !spec.accepts(value) => errors.push(LoadError::new(
-                Some(file.to_owned()),
-                format!("rule `{}` option `{name}` must be a `{}` (SR-LINTER decision 5)", rule.id, spec.kind),
-            )),
+            Some(spec) if !spec.accepts(value) => {
+                let why = match crate::calls::parse_call_items(value) {
+                    Err(e) if spec.kind == "call[]" => format!(": {e}"),
+                    _ => String::new(),
+                };
+                errors.push(LoadError::new(
+                    Some(file.to_owned()),
+                    format!("rule `{}` option `{name}` must be a `{}` (SR-LINTER decision 5){why}", rule.id, spec.kind),
+                ))
+            }
             Some(_) => {}
         }
     }

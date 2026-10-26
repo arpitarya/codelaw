@@ -14,6 +14,7 @@
 //! ```
 
 pub mod data;
+mod calls;
 mod explain;
 mod predicate;
 pub mod schema;
@@ -181,7 +182,7 @@ pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<se
     };
     let core = rule_core(matcher, constraints.as_ref(), utils.as_ref(), grammar)?;
     let predicates = match predicates {
-        Some(p) => parse_predicates(p, data)?,
+        Some(p) => parse_predicates(p, data, &rule.options)?,
         None => Vec::new(),
     };
     if !predicates.is_empty() && !matches!(grammar, Grammar::JavaScript | Grammar::TypeScript | Grammar::Tsx | Grammar::Python) {
@@ -215,6 +216,12 @@ impl CompiledMatch {
 
     /// Match one node.
     pub fn try_match(&self, node: SyntaxNode<'_>, semantic: Option<&SemanticModel>) -> Option<Match> {
+        self.try_match_with(node, semantic, &BTreeMap::new())
+    }
+
+    /// Match one node under the rule's resolved options (`calls:` reads
+    /// them; an option missing from `options` is the rule's default).
+    pub fn try_match_with(&self, node: SyntaxNode<'_>, semantic: Option<&SemanticModel>, options: &BTreeMap<String, serde_json::Value>) -> Option<Match> {
         let m = self.core.match_node(node)?;
         let env = m.get_env();
         let mut single = BTreeMap::new();
@@ -236,7 +243,8 @@ impl CompiledMatch {
         for (var, predicate) in &self.predicates {
             let target = if var == MATCH_KEY { Some(m.get_inner_node()) } else { env.get_match(var.trim_start_matches('$')).map(|n| n.get_inner_node()) };
             let holds = match (target, semantic) {
-                (Some(t), Some(model)) => predicate.holds(model, &Subject { start: t.start_byte(), node: Some(t), source }),
+                (Some(t), Some(model)) => predicate.holds(model, &Subject { start: t.start_byte(), node: Some(t), source, options }),
+                (None, _) if var != MATCH_KEY && predicate.skips_unbound() => true,
                 _ => false,
             };
             if !holds {
@@ -245,6 +253,51 @@ impl CompiledMatch {
         }
         Some(Match { start: range.start, end: range.end, kind: m.kind().to_string(), single, multi })
     }
+}
+
+/// Replace `$OPTION.<name>` in a message with the option as the project
+/// resolved it (SR-RULE-FORMAT decision 3b): a list is joined with `, `, and
+/// a `call[]` shows the names of its resolved items. An option the rule
+/// does not declare is left as written.
+pub fn expand_options(template: &str, specs: &BTreeMap<String, codelaw_rules::OptionSpec>, options: &BTreeMap<String, serde_json::Value>) -> String {
+    const KEY: &str = "$OPTION.";
+    if !template.contains(KEY) {
+        return template.to_owned();
+    }
+    let mut out = String::with_capacity(template.len());
+    let mut rest = template;
+    while let Some(at) = rest.find(KEY) {
+        out.push_str(&rest[..at]);
+        let after = &rest[at + KEY.len()..];
+        let len = after.bytes().take_while(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || *b == b'_').count();
+        let name = &after[..len];
+        let shown = specs.get(name).map(|spec| {
+            let value = options.get(name).cloned().or_else(|| spec.default.clone()).unwrap_or(serde_json::Value::Null);
+            if spec.kind == "call[]" {
+                let default = spec.default.as_ref().and_then(|d| codelaw_rules::parse_call_items(d).ok()).unwrap_or_default();
+                let mut names: Vec<String> = codelaw_rules::resolve_calls(&default, options, name).into_iter().map(|c| c.name).collect();
+                names.dedup();
+                return names.join(", ");
+            }
+            match value {
+                serde_json::Value::Array(a) => a.iter().map(|v| v.as_str().map(str::to_owned).unwrap_or_else(|| v.to_string())).collect::<Vec<_>>().join(", "),
+                serde_json::Value::String(s) => s,
+                other => other.to_string(),
+            }
+        });
+        match shown {
+            Some(v) if len > 0 => {
+                out.push_str(&v);
+                rest = &after[len..];
+            }
+            _ => {
+                out.push_str(KEY);
+                rest = after;
+            }
+        }
+    }
+    out.push_str(rest);
+    out
 }
 
 /// Replace `$NAME`, `$$$NAME` and `$$MATCH` (the whole matched text) in a
