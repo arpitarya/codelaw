@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (13)
+### build (12)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
@@ -44,8 +44,6 @@ here. Read that record before changing anything below it.
 🟢 **W-45** `agent` CI formats built; PR [#3](https://github.com/arpitarya/codelaw/pull/3) is open; left: Arpit looks at its annotations and says so (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
 
 🟢 **W-51** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); exceptions section done (W-46); left: a real GitHub run in a throwaway repo (DoD 1, 3). Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
-
-🟢 **W-58** `agent` Size limits for JS, TS and Python built (six rules, `js/size` and `py/size`, measured value in JSON and SARIF); left: CI's `perf` run (DoD 6); the six corpus counts are in. Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
 
 🔴 **W-62** `arpit` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: Arpit ratifies `tree-sitter-cli` 0.25.10 (L11), then grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
