@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-26: every new or edited function in JS, TS and Pyth
 item: W-71
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-26
-updated_by: "Arpit (Cowork, Opus 5.5) — voice design session folded in"
+updated: 2026-10-27
+updated_by: "Claude Code (Opus 5.5) — steps 2–6 built; only CI's perf run left"
 ball: agent
 ---
 
@@ -17,11 +17,11 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | The decider confirms **diff-scoped**: the rules judge only functions the change set adds or edits | old code is exempt with no baseline file | ✅ ruled 2026-10-26 |
-| 2 | Work out per function whether it is **new, edited or untouched**, against the base revision, by token stream | "edited" ignores formatting, moves and comments | 🟡 built for `--changed-since` and `--staged`; the agent hook\'s file not wired |
-| 3 | `graph/untested-function`: a new or edited function that no test file reaches is an error | "every new function has a test" | ⏳ |
-| 4 | `graph/function-coverage`: a new or edited function under **60%** line coverage (`min`) in an lcov report is an error | "and that test really runs it" | ⏳ |
-| 5 | `.codelawignore` exempts files and single functions; every line says how long (`expires=` or `forever`) and why; an edit revokes it (`on_touch`) unless it is `forever` | the escape hatch — deliberate, reasoned, visible in `codelaw exceptions` | ⏳ |
-| 6 | Flags, config, cache key, opt-in preset `codelaw:tests`, docs | usable in CI, pre-commit and the agent hook | ⏳ |
+| 2 | Work out per function whether it is **new, edited or untouched**, against the base revision, by token stream | "edited" ignores formatting, moves and comments | ✅ built: `--changed-since`, `--staged` and the agent hook's file (`codelaw hook` passes it as the change set, base `HEAD`) |
+| 3 | `graph/untested-function`: a new or edited function that no test file reaches is an error | "every new function has a test" | ✅ built 2026-10-27 |
+| 4 | `graph/function-coverage`: a new or edited function under **60%** line coverage (`min`) in an lcov report is an error | "and that test really runs it" | ✅ built 2026-10-27 |
+| 5 | `.codelawignore` exempts files and single functions; every line says how long (`expires=` or `forever`) and why; an edit revokes it (`on_touch`) unless it is `forever` | the escape hatch — deliberate, reasoned, visible in `codelaw exceptions` | ✅ built 2026-10-27 |
+| 6 | Flags, config, cache key, opt-in preset `codelaw:tests`, docs | usable in CI, pre-commit and the agent hook | ✅ built 2026-10-27; CI's `perf` run with a change set not yet seen (DoD 10) |
 
 **Arpit, 2026-10-26:** *"if a new function is added or if a file is being written, it should have a unit test for it. And by default, it should have a coverage of around 60%, which can be configured through options. It should be there for JS, TS, Python. But if there are older functions, then no need to have this rule. But there is an exception to it. If somebody is editing that function, then this rule again gets applied."*
 
@@ -184,6 +184,7 @@ on_touch_scope   = "file"
 | 4 | `.codelawignore`: parser, `on_touch` / `on_touch_scope` / `forever`, `[coverage.ignore]`, `codelaw/incomplete-ignore`, `codelaw/stale-ignore`, `codelaw exceptions` rows | 1 | Sonnet |
 | 5 | Flags, config, cache key, `codelaw:tests` preset, docs, CI's `perf` run | 2–4 | Sonnet |
 
+- **Steps 2–6 landed 2026-10-27** (one lane): `codelaw_engine::new_code` (both rules, `.codelawignore` applied, the header), `codelaw_engine::lcov`, `codelaw_baseline::ignore_file`, `codelaw_graph::{is_test_file, Graph::test_reaches}`, `[coverage]` in `codelaw-config` and the schema, five `ENGINE_RULES`, `--coverage`, MCP `coverage`, `codelaw exceptions` rows (kind `codelawignore`, `forever`). Found on the way: `export { a as b } from` lost `a` (`unquote` stripped an identifier's letters), so a renamed re-export was no use of `a` — fixed in `facts.rs`. Records amended: SR-PROJECT-GRAPH decision 9, SR-BASELINE decisions 3 and 12, SR-CONFIG, SR-CLI-MCP, SR-CACHE, SR-RULE-PACKS, SR-RULE-FORMAT, SR-CONSUMER-LAYOUT. The class-wide target (`#LegacyReport.*`) is not built: not ruled.
 - **Step 1 landed 2026-10-26** (`codelaw_lang::{functions, classify}`, `git::file_at`, `Project::changed_functions`, `codelaw debug changed-functions`); the shared list is a new `codelaw-lang` module, W-58's `size.rs` and `js_ast.rs` were left alone (W-58 was in flight) and are to be pointed at it later.
 - **Step 1 carries the risk;** it lands first, proven on fixtures, and is what SR-BASELINE's `on_touch_scope = "function"` needs too.
 - **Steps 2, 3 and 4 are parallel lockmaster lanes** once step 1 is on `main`.
@@ -194,15 +195,15 @@ on_touch_scope   = "file"
 | DoD | what | state |
 |---|---|---|
 | 1 · ruling | The decider confirms diff-scoped (step 1) | ✅ 2026-10-26 |
-| 2 · change set | new / edited / untouched per function for `--changed-since`, `--staged` and the hook, by token stream; a reformat-only commit judges no function; a rename is new; a new file's functions are all new | 🟡 `codelaw debug changed-functions` (`--changed-since`, `--staged`) on `main`; fixtures prove reformat-only, rename, new file; the hook\'s file is wired with step 2 (`untested-function`) |
-| 3 · `untested-function` | JS, TS (incl. JSX/TSX), Python; graph identity through aliases and re-exports; fixtures for each "not a function" case above | ⏳ |
-| 4 · `function-coverage` | lcov from Jest, Vitest and coverage.py fixtures; `min`, `mode`, `require_report`; `codelaw/stale-coverage` on a mismatched report; absolute and relative `SF:` paths | ⏳ |
-| 5 · `.codelawignore` | globs and `#function`; `on_touch` (`error` default, `warn`, `keep`) and `on_touch_scope` (`file` default, `function`), a revoked entry judging every function it covers; `forever`; `[coverage.ignore]` with `require_expiry` and `require_on_touch` on by default; the reason always required with a date or `forever`; `codelaw/incomplete-ignore` for every missing or contradictory field; `codelaw/stale-ignore` with its fix; `codelaw exceptions` rows | ⏳ |
-| 6 · surfaces | `--coverage <path>` and `[coverage] report = "…"`; the MCP `check` tool takes `coverage`; the two headers; JSON `data: { covered, lines, pct, min }` | ⏳ |
-| 7 · cache | the key gains the report's hash and the base content (SR-CACHE decision 1); the cold/warm test passes | ⏳ |
-| 8 · fixes ([L4](../../records/0006_LAW-4-every-rule-has-a-fix.md)) | both rules `manual`, `fix_reason:` "a test needs judgment", `## How to fix` steps; the `codelaw-fix` skill carries them | ⏳ |
-| 9 · preset + docs | opt-in `codelaw:tests` (not in `recommended`); USAGE "tests for new code" section; CHANGELOG | ⏳ |
-| 10 · budgets ([L8](../../records/0010_LAW-8-performance-budgets.md)) | CI's `perf` run with a change set: no budget exceeded | ⏳ |
+| 2 · change set | new / edited / untouched per function for `--changed-since`, `--staged` and the hook, by token stream; a reformat-only commit judges no function; a rename is new; a new file's functions are all new | ✅ fixtures prove reformat-only, rename, new file (`changed_functions.rs`); `tests_for_new_code.rs` runs `--changed-since`, `--staged` and `codelaw hook <file>` |
+| 3 · `untested-function` | JS, TS (incl. JSX/TSX), Python; graph identity through aliases and re-exports; fixtures for each "not a function" case above | ✅ `tests_for_new_code.rs` (JS/TS barrel + renamed re-export + unexported helper; Python class, alias, `mock.patch` string; test files not judged) and `codelaw-graph` `test_files_and_what_they_reach`; the "not a function" cases are step 1's `functions` tests |
+| 4 · `function-coverage` | lcov from Jest, Vitest and coverage.py fixtures; `min`, `mode`, `require_report`; `codelaw/stale-coverage` on a mismatched report; absolute and relative `SF:` paths | ✅ lcov reader (`lcov.rs`, absolute and relative `SF:`); `min`, `mode = "patch"`, `require_report`; three stale signals. Fixtures are hand-written lcov in the shape Jest, Vitest and coverage.py write (`SF`/`DA`/`end_of_record`), not files produced by those tools — no Node or Python runner in the engine's tests |
+| 5 · `.codelawignore` | globs and `#function`; `on_touch` (`error` default, `warn`, `keep`) and `on_touch_scope` (`file` default, `function`), a revoked entry judging every function it covers; `forever`; `[coverage.ignore]` with `require_expiry` and `require_on_touch` on by default; the reason always required with a date or `forever`; `codelaw/incomplete-ignore` for every missing or contradictory field; `codelaw/stale-ignore` with its fix; `codelaw exceptions` rows | ✅ parser tests in `codelaw-baseline` `ignore_file.rs` (7) and the CLI tests: globs, `#function`, all three `on_touch`, both scopes, revoked-file judging, `forever`, `[coverage.ignore]`, reason, incomplete, stale + its fix, expired/expiring, exceptions rows |
+| 6 · surfaces | `--coverage <path>` and `[coverage] report = "…"`; the MCP `check` tool takes `coverage`; the two headers; JSON `data: { covered, lines, pct, min }` | ✅ `--coverage`, `[coverage] report`, MCP `coverage` on `check_paths`/`fix_paths`, `new_code` header in text/agent/JSON, `data` on findings |
+| 7 · cache | the key gains the report's hash and the base content (SR-CACHE decision 1); the cold/warm test passes | ✅ by design, not by key: the verdicts are never cached — computed every run from the linked graph (facts cached as before), the base copies, the report and `.codelawignore`; `[coverage]` is config text, already in every key (SR-CACHE decision 1 amended). `FACTS_VERSION` bumped for the re-export fix |
+| 8 · fixes ([L4](../../records/0006_LAW-4-every-rule-has-a-fix.md)) | both rules `manual`, `fix_reason:` "a test needs judgment", `## How to fix` steps; the `codelaw-fix` skill carries them | ✅ `ENGINE_RULES`: both `manual` with steps ("a test needs judgment"); `stale-ignore` `auto`; `codelaw-fix` SKILL.md carries them; `docs/rules/engine.md` regenerated |
+| 9 · preset + docs | opt-in `codelaw:tests` (not in `recommended`); USAGE "tests for new code" section; CHANGELOG | ✅ `codelaw:tests` (engine preset, no pack, in no `recommended`); USAGE "Tests for new code"; CHANGELOG |
+| 10 · budgets ([L8](../../records/0010_LAW-8-performance-budgets.md)) | CI's `perf` run with a change set: no budget exceeded | ⏳ **left — needs a CI runner**: an agent cannot produce the `perf` job's measurement. Off by default, the rules add one `Option` check per run and build no graph, so `check_warm_10k` is unaffected; on, they cost one `git show` per changed file plus the graph build |
 
 ## Blockers
 

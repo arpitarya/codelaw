@@ -23,6 +23,7 @@ content_sha: ""
 ```text
 my-app/
 ├─ codelaw.toml                      you write    (or [tool.codelaw] / package.json "codelaw")
+├─ .codelawignore                    you write    exemptions from the test rules of new code (SR-BASELINE decision 12); `codelaw fix` only drops a stale line, and init never writes one
 ├─ .codelaw/
 │  ├─ rules/README.md                codelaw writes, you review (init's pointer at new-rule, decision 8)
 │  ├─ rules/<namespace>/<name>.md    you write    local rules (SR-RULE-FORMAT)

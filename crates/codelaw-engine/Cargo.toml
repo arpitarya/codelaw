@@ -22,6 +22,7 @@ codelaw-baseline.workspace = true
 globset.workspace = true
 ignore.workspace = true
 rayon.workspace = true
+regex.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 

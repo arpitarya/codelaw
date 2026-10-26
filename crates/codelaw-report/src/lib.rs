@@ -157,6 +157,10 @@ pub fn check_json(report: &CheckReport) -> Value {
     if let Some(p) = &report.profile {
         v["profile"] = json!({ "name": p.name, "source": p.source });
     }
+    // Only when the test rules of new code ran (W-71).
+    if let Some(n) = &report.new_code {
+        v["new_code"] = json!({ "change_set": n.change_set, "coverage": n.coverage });
+    }
     v
 }
 
@@ -292,6 +296,12 @@ fn text(report: &CheckReport, color: bool, fixed: Option<usize>, labels: &Labels
     if let Some(a) = &report.as_of {
         out.push_str(&format!("{}\n", a.line()));
     }
+    if let Some(n) = &report.new_code {
+        out.push_str(&format!("{}\n", n.change_set));
+        if let Some(c) = &n.coverage {
+            out.push_str(&format!("{c}\n"));
+        }
+    }
     for w in &report.warnings {
         out.push_str(&format!("{} {w}\n", paint.wrap("33", "warning:")));
     }
@@ -346,6 +356,12 @@ pub fn check_agent_with(report: &CheckReport, labels: &Labels) -> String {
     }
     if let Some(a) = &report.as_of {
         out.push_str(&format!("{}\n", a.line()));
+    }
+    if let Some(n) = &report.new_code {
+        out.push_str(&format!("{}\n", n.change_set));
+        if let Some(c) = &n.coverage {
+            out.push_str(&format!("{c}\n"));
+        }
     }
     for d in &report.diagnostics {
         let next = match d.fix {
@@ -408,6 +424,7 @@ mod tests {
             files_checked: 1,
             warnings: vec![],
             as_of: None,
+            new_code: None,
             ..Default::default()
         };
         let v = check_json(&r);
@@ -436,6 +453,7 @@ mod tests {
             files_checked: 1,
             warnings: vec![],
             as_of: None,
+            new_code: None,
             ..Default::default()
         };
         let t = check_text(&r, false);

@@ -453,3 +453,29 @@ export const k = s.x;
     let globbed = GraphConfig { css_modules: vec!["src/**/*.styles.css".into()], ..Default::default() };
     assert_eq!(module_findings("unused", &named, globbed), vec!["src/a.styles.css:y"]);
 }
+
+#[test]
+fn test_files_and_what_they_reach() {
+    for p in ["src/a.test.ts", "src/a.spec.jsx", "src/__tests__/a.ts", "tests/test_a.py", "a_test.py", "conftest.py"] {
+        assert!(is_test_file(p), "{p}");
+    }
+    for p in ["src/a.ts", "src/testing.ts", "src/a.test.css", "app/contest.py"] {
+        assert!(!is_test_file(p), "{p}");
+    }
+    let g = graph(
+        &[
+            ("src/a.ts", "export const viaAlias = () => 1;\nexport function direct() {}\nexport function unreached() {}\nfunction privateHelper() {}\n"),
+            ("src/index.ts", "export { viaAlias as renamed } from './a';\n"),
+            ("src/a.test.ts", "import { renamed as r } from './index';\nimport { direct } from './a';\nr(); direct();\n"),
+            ("app/m.py", "def f():\n    pass\n\ndef g():\n    pass\n"),
+            ("tests/test_m.py", "import app.m as mod\nfrom unittest import mock\nmod.f()\nmock.patch('app.m.g')\n"),
+        ],
+        GraphConfig::default(),
+    );
+    assert!(g.test_reaches("src/a.ts", "viaAlias", true), "a renamed re-export is identity");
+    assert!(g.test_reaches("src/a.ts", "direct", true));
+    assert!(!g.test_reaches("src/a.ts", "unreached", true));
+    assert!(g.test_reaches("src/a.ts", "privateHelper", false), "not importable: its module is imported by a test");
+    assert!(g.test_reaches("app/m.py", "f", true));
+    assert!(!g.test_reaches("app/m.py", "g", true), "a string is not identity");
+}

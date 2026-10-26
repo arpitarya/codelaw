@@ -65,6 +65,17 @@ Each manual diagnostic has `fix.steps`, numbered. For each one:
    decision only the user can make (a name, an API choice), ask.
 4. Re-check that file before moving to the next finding.
 
+**Tests for new code** (`graph/untested-function`, `graph/function-coverage`):
+a test needs judgment, so codelaw never writes one.
+
+- Write a unit test that imports the function (or its module, if it is not
+  exported) and calls it, in the test file the message names. A string such
+  as `mock.patch("pkg.mod.f")` does not count as reaching `f`.
+- For coverage, add cases for the lines the report shows as missed,
+  regenerate the lcov report, and re-check with `--coverage <report>`.
+- Exempting a function is the user's call: a `.codelawignore` line needs a
+  reason, and `expires=` with `on_touch=`, or `forever`. Ask before adding one.
+
 ## 5. Re-check until clean
 
 Run the same check as in step 1. New findings can appear after a fix (a

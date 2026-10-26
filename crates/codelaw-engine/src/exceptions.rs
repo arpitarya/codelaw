@@ -17,6 +17,8 @@ pub enum ExceptionKind {
     Deprecation,
     /// A `codelaw-ignore` comment, one per rule it names.
     Inline,
+    /// A `.codelawignore` line, one per test rule it exempts (W-71).
+    Ignore,
 }
 
 impl ExceptionKind {
@@ -25,6 +27,7 @@ impl ExceptionKind {
             ExceptionKind::Baseline => "baseline",
             ExceptionKind::Deprecation => "deprecation",
             ExceptionKind::Inline => "inline",
+            ExceptionKind::Ignore => "codelawignore",
         }
     }
 }
@@ -43,6 +46,8 @@ pub struct Exception {
     pub symbol: Option<String>,
     /// The first day it no longer holds.
     pub expires: Option<Date>,
+    /// A `.codelawignore` line that never expires and is never revoked.
+    pub forever: bool,
     pub added_by: Option<String>,
     pub reason: Option<String>,
     /// The uses it covers: the entry's `count`; 1 for an inline ignore.
@@ -84,6 +89,7 @@ impl Project {
                     files: vec![e.file.clone()],
                     symbol: e.symbol.clone(),
                     expires: self.entry_expires(e),
+                    forever: false,
                     added_by: e.added_by.clone(),
                     reason: e.reason.clone(),
                     uses: e.count,
@@ -103,6 +109,7 @@ impl Project {
                 files,
                 symbol: Some(d.symbol.clone()),
                 expires: d.policy.expires,
+                forever: false,
                 added_by: d.added_by.clone(),
                 reason: d.reason.clone(),
                 uses: entries.iter().map(|(_, e)| e.count).sum(),
@@ -132,6 +139,7 @@ impl Project {
                         files: vec![f.rel.clone()],
                         symbol: None,
                         expires: s.dated.expires,
+                        forever: false,
                         added_by: s.dated.by.clone(),
                         reason: s.reason.clone(),
                         uses: 1,
@@ -141,6 +149,7 @@ impl Project {
                 }
             }
         }
+        items.extend(self.ignore_exceptions());
         items.sort_by(|a, b| {
             let key = |e: &Exception| (e.expires.is_none(), e.expires.map(|d| d.days()), e.rule.clone(), e.files.first().cloned(), e.at.clone(), e.line);
             key(a).cmp(&key(b))

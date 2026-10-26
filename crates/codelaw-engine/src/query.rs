@@ -180,7 +180,7 @@ impl Project {
         let mut diagnostics = self.check_source(&rel, language, code);
         // `check` reports an unformatted file too (SR-FORMATTER decision 1).
         diagnostics.extend(crate::format::check_diagnostic(self, &crate::FileEntry { abs, rel: rel.clone(), language }, code));
-        let mut report = crate::CheckReport { diagnostics, skipped: Vec::new(), files_checked: 1, warnings: self.warnings.clone(), as_of: None, profile: None };
+        let mut report = crate::CheckReport { diagnostics, skipped: Vec::new(), files_checked: 1, warnings: self.warnings.clone(), as_of: None, profile: None, new_code: None };
         // The file's own rules ran, on this text: the baseline applies to
         // them as `check` applies it (SR-BASELINE).
         let ran = crate::baseline::Ran { files: [rel.clone()].into(), scopes: vec![rel], project: false };

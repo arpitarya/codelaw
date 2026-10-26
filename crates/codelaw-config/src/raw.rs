@@ -60,6 +60,10 @@ pub struct RawConfig {
     pub deprecation: Option<RawDeprecation>,
     /// SR-BASELINE decision 9: dated exceptions. Root config only.
     pub exceptions: Option<RawExceptions>,
+    /// SR-PROJECT-GRAPH decision 9 (W-71): the test rules of new code —
+    /// the lcov report and the rules' options; `[coverage.ignore]` is
+    /// SR-BASELINE decision 12's. Root config only.
+    pub coverage: Option<RawCoverage>,
     /// SR-RULE-PACKS decision 15: the dependency rules. Root config only.
     #[serde(default)]
     pub deps: RawDeps,
@@ -224,6 +228,39 @@ pub struct RawDeprecation {
 pub struct RawExceptions {
     pub require_expiry: Option<bool>,
     pub warn_days: Option<i64>,
+}
+
+/// `[coverage]`: SR-PROJECT-GRAPH decision 9. Values are checked when the
+/// project loads.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawCoverage {
+    /// The lcov report, relative to the config file; `--coverage` wins.
+    pub report: Option<String>,
+    /// `all` (default) or `public`.
+    pub scope: Option<String>,
+    /// Least line coverage per function, 0–100 (default 60).
+    pub min: Option<i64>,
+    /// `function` (default) or `patch`.
+    pub mode: Option<String>,
+    /// No report is an error, not a skip.
+    pub require_report: Option<bool>,
+    /// `skip` (default) or `all`.
+    pub on_no_change_set: Option<String>,
+    /// A regex: function names that are never judged.
+    pub ignore_names: Option<String>,
+    /// `[coverage.ignore]`: what every `.codelawignore` line must carry.
+    pub ignore: Option<RawCoverageIgnore>,
+}
+
+/// `[coverage.ignore]`: SR-BASELINE decision 12.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawCoverageIgnore {
+    pub require_expiry: Option<bool>,
+    pub require_on_touch: Option<bool>,
+    pub on_touch: Option<String>,
+    pub on_touch_scope: Option<String>,
 }
 
 /// `[css]`: which stylesheets are CSS Modules, and how the bundler maps class

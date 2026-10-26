@@ -10,7 +10,7 @@ mod resolve;
 mod scope;
 mod trace;
 
-pub use raw::{RawConfig, RawOverride, RawProfile, RawScope, RuleSetting, ScopeMap};
+pub use raw::{RawConfig, RawCoverage, RawCoverageIgnore, RawOverride, RawProfile, RawScope, RuleSetting, ScopeMap};
 pub use resolve::{Config, PresetScope, ScopeInfo, ConfigFile, DEFAULT_EXCLUDES, Home, Layer, Profile, ProfileChoice, Remap, RuleConfig, find_config, load_file};
 pub use scope::check_scope_name;
 pub use trace::{TraceEnv, Traced};

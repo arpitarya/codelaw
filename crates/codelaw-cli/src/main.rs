@@ -146,6 +146,9 @@ pub struct Common {
     /// Files in the index count as touched (needs git).
     #[arg(long)]
     staged: bool,
+    /// The lcov report `graph/function-coverage` reads; wins over `[coverage] report`.
+    #[arg(long, value_name = "PATH")]
+    coverage: Option<PathBuf>,
     /// The `[profile.<name>]` to run with; by default `ci` when `CI` is
     /// set, else `local` (or `CODELAW_PROFILE`).
     #[arg(long, value_name = "NAME")]
@@ -330,6 +333,7 @@ pub fn engine_options_in(common: &Common, env: EngineOptions) -> Result<EngineOp
     o.as_of = common.as_of.clone().or(o.as_of);
     o.changed_since = common.changed_since.clone();
     o.staged = common.staged;
+    o.coverage = common.coverage.as_ref().map(|p| std::path::absolute(p).unwrap_or_else(|_| p.clone()));
     o.profile = common.profile.clone();
     Ok(o)
 }

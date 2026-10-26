@@ -1048,6 +1048,7 @@ dependencies = [
  "globset",
  "ignore",
  "rayon",
+ "regex",
  "serde",
  "serde_json",
 ]

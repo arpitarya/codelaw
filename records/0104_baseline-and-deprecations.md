@@ -10,7 +10,7 @@ feature: "grandfathering violations and deprecations"
 owns:
   - crates/codelaw-baseline
 laws: [L0, L4, L5]
-timestamp: 2026-10-25T14:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -129,6 +129,7 @@ A file is touched when it's in the **change set**, and the change set always com
 - The change sets add up: `--changed-since` and `--staged` together count both. Paths come from `git diff --name-only --relative` run in the project root, so they are project-relative.
 - **Without `git`** or outside a repository, the flag adds a warning saying so, marks nothing as touched, and the rest of the run goes on ([SR-ARCHITECTURE](0108_architecture.md) decision 14).
 - `on_touch_scope = "file"` is the default. `"function"` narrows it to occurrences inside a function whose lines changed in the diff.
+- **The change set has functions too** (W-71): for each changed JS, TS or Python file, its functions set against the same file at the base revision (`--changed-since`: the merge base's copy; `--staged` and the agent hook's file: `HEAD`'s) are **new** (no function of that qualified name there; a rename is new), **edited** (the function's token stream differs, so reformatting, comment-only edits outside it and moves do not count) or **untouched**. No base copy: every function is new. `codelaw debug changed-functions` prints it. The test rules of new code judge only new and edited functions ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9), and `.codelawignore`'s `on_touch_scope=function` (decision 12) reads it; a baseline entry's `on_touch_scope = "function"` is still not built.
 
 #### 4. The clock is an input, never read implicitly ([L5](0007_LAW-5-no-model-in-the-engine.md))
 
@@ -294,6 +295,22 @@ $ codelaw check --as-of 2027-04-01          # what breaks on the day it expires?
 - **Exit codes:** 0 whatever it finds; `--fail-if-expiring <N>d` exits 1 when any *listed* exception has N days or fewer left, expired ones included, for a scheduled job; 2 for usage errors.
 - **MCP:** `list_exceptions` takes `expiring`, `expired`, `mine`, `rule`, `path`, `group_by` and `as_of` and returns the `json` object byte for byte ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 5).
 - **The test:** `crates/codelaw-cli/tests/exceptions.rs` builds one of each form with hand-counted days, and checks the filters, every grouping, the formats, `--as-of`, `--mine` and the exit codes; `mcp_parity.rs` the twin.
+
+#### 12. `.codelawignore`: the exemptions from the test rules of new code
+
+*Ruled by Arpit, 2026-10-26 (W-71, voice): "every exception, if the file is edited, it should again throw an error"; file or function as the trigger, "Both, I want it configurable"; "Forever means editing it won't also bring it back"; "If you are adding an expiry, or you are adding never expire, you need to add a reason. It's a mandatory thing"; `require_*` "configurable in the TOML file … On by default".*
+
+- **The file:** `.codelawignore` at the project root, one line per exemption, read at load. It covers `graph/untested-function` and `graph/function-coverage` only ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9); a general per-rule ignore file is a separate decision. `#` opens a comment only at the start of a line.
+- **A line:** a target — a `.gitignore`-style glob (every function in the matching files; a pattern without `/` matches a name at any depth, a folder covers what is under it) or `<path>#<qualified name>` for one function (`app/billing.py#Invoice.legacy_total`) — then keys, then `: <reason>`. The keys: `forever`, `expires=YYYY-MM-DD`, `warn_days=N`, `by=<email>`, `on_touch=error|warn|keep`, `on_touch_scope=file|function`. `expires`, `warn_days` and `by` are decision 9's: a warning (`codelaw/expiring-exception`) inside the window, `codelaw/expired-exception` on and after `expires`, when the line exempts nothing; `by` must be an email.
+- **`on_touch`** — what an edit does: `error` (default) revokes the exemption for that run, the findings coming back at their own severity; `warn` revokes it with the findings as warnings; `keep` keeps it. **A revoked line puts every function it covers in that file under the rule, edited or not** — touch `billing.py` and `legacy_total` is judged too.
+- **`on_touch_scope`** — what counts as an edit: `file` (default), the file is in the change set at all; `function`, that function is edited by tokens (decision 3). A glob has no single function to watch, so it is always `file`.
+- **`forever`** never expires and is never revoked; it is still listed by `codelaw exceptions` (as `forever`) and still stale when its target is gone.
+- **What every line must carry**, set in `codelaw.toml` (root config only; the `coverage.ignore` table, which this decision owns inside SR-PROJECT-GRAPH's `[coverage]`): `[coverage.ignore] require_expiry` (default `true`: every line says `expires=` or `forever`), `[coverage.ignore] require_on_touch` (default `true`: every line that is not `forever` says `on_touch=`), and the defaults of a line that omits them, `[coverage.ignore] on_touch` (`error`) and `[coverage.ignore] on_touch_scope` (`file`). **A reason is always required** with `expires=` or `forever`; it is not configurable.
+- **`codelaw/incomplete-ignore`** (`error`, `manual`): a line missing what the four checks need (the reason; `expires=` or `forever`; `on_touch=`) or contradicting itself (`forever` with `expires=`, `warn_days=`, `on_touch=` or `on_touch_scope=`; `on_touch_scope=function` on a glob; a `by=` that is not an email), at the line, its message naming every gap. **An incomplete line exempts nothing.** A key that cannot be read is `codelaw/unknown-suppression` and exempts nothing either. Decision 9's `codelaw/exception-without-expiry` does not apply here: `require_expiry` and `forever` replace it.
+- **`codelaw/stale-ignore`** (`warn`, `auto`): a line whose glob matches no file, or whose file has no function of that name (deleted, renamed). `codelaw fix` removes the line and nothing else.
+- **The inline `// codelaw-ignore graph/untested-function: <why>`** above a function keeps working (SR-LINTER decision 6).
+- **`codelaw exceptions`** (decision 11) lists each line once per rule it exempts, kind `codelawignore`, its `expires` shown as `forever` (days left `never`) when it is.
+- **The test:** `crates/codelaw-baseline/src/ignore_file.rs` (the sample, every gap, every contradiction, the switches) and `crates/codelaw-cli/tests/tests_for_new_code.rs` on real git repos: `forever`, `on_touch=error` revoking an untouched function in an edited file, `on_touch=warn` with `on_touch_scope=function`, an incomplete line, a stale line and its fix, an expired and an expiring line, the inline comment, and the exceptions rows.
 
 ### Consequences
 

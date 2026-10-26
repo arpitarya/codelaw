@@ -54,6 +54,7 @@ const LANG: &str = "Only these languages (as `--lang`), e.g. `typescript`, `pyth
 const AS_OF: &str = "Judge baseline and deprecation deadlines on this date, YYYY-MM-DD (as `--as-of`); `HEAD`'s commit date by default.";
 const CHANGED_SINCE: &str = "Files changed since the merge base with this git ref count as touched (as `--changed-since`).";
 const STAGED: &str = "Files in the git index count as touched (as `--staged`).";
+const COVERAGE: &str = "The lcov report `graph/function-coverage` reads (as `--coverage`); wins over `[coverage] report`.";
 
 /// SR-CLI-MCP decision 5's tools, each described by when to call it
 /// (decision 7).
@@ -95,6 +96,7 @@ or `manual` steps. Same JSON as `codelaw check --format json`.",
                     "as_of": string(AS_OF),
                     "changed_since": string(CHANGED_SINCE),
                     "staged": boolean(STAGED),
+                    "coverage": string(COVERAGE),
                 }),
                 &[],
             )
@@ -115,6 +117,7 @@ to show the user as a diff; apply them only once accepted, by calling again with
                     "as_of": string(AS_OF),
                     "changed_since": string(CHANGED_SINCE),
                     "staged": boolean(STAGED),
+                    "coverage": string(COVERAGE),
                 }),
                 &[],
             )
@@ -226,6 +229,7 @@ impl ArgsView<'_> {
         o.as_of = self.str("as_of")?.or(o.as_of);
         o.changed_since = self.str("changed_since")?;
         o.staged = self.flag("staged")?;
+        o.coverage = self.str("coverage")?.map(PathBuf::from);
         Ok(o)
     }
 }

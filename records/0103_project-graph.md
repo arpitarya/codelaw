@@ -11,8 +11,9 @@ owns:
   - crates/codelaw-graph
   - fixtures/css-modules
   - crates/codelaw-cli/tests/css_modules.rs
+  - crates/codelaw-cli/tests/tests_for_new_code.rs
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-26T18:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -45,6 +46,8 @@ It is built from the files alone, sorted and offline ([L5](0007_LAW-5-no-model-i
 | `graph/no-cycles` | Circular imports between modules or packages |
 | `graph/no-unused-css-classes` | A class defined in CSS that no HTML `class`, JSX `className` or TSX template references |
 | `graph/no-deprecated-usage` | Any reference to a deprecated symbol (see [SR-BASELINE](0104_baseline-and-deprecations.md)) |
+| `graph/untested-function` | A new or edited function that no test file reaches (decision 9) |
+| `graph/function-coverage` | A new or edited function an lcov report shows under `min` (decision 9) |
 
 **Prior art:**
 - **Knip** (JS/TS): unused files, exports, types and dependencies, with workspaces, entry points and framework plugins.
@@ -240,6 +243,23 @@ packages/legacy/src/plugins.py:14:1  info  graph/no-unused-exports  `register` l
 - **The bundler's names.** `[css] modules_convention` is css-loader's `localsConvention` (`asIs`, `camelCase`, `camelCaseOnly`, `dashes`, `dashesOnly`): `.btn-primary` is `styles["btn-primary"]` under `asIs` and also `styles.btnPrimary` under `camelCase`; both queries compare through it.
 - **Per-file rules** (`css-modules/composes-valid`, `class-naming`, `no-global`) are `native:` rules of the `css-modules` pack; `composes-valid` reads the file a `composes` points at through the project view ([SR-ARCHITECTURE](0108_architecture.md) decision 15b). The `css/*` rules read a module stylesheet in a *module mode* and report none of its syntax (`@value`, `composes`, `:export`, `:import()`, `:global`, `:local`).
 - **Not built:** the graph does not follow `composes` through an `@import`, a `@value … from` is read as an export only, and a module imported only from HTML or a template is unjudged.
+
+
+#### 9. Tests for new code: `graph/untested-function` and `graph/function-coverage`
+
+*Ruled by Arpit, 2026-10-26 (W-71): "if a new function is added … it should have a unit test for it. And by default, it should have a coverage of around 60%, which can be configured … for JS, TS, Python. But if there are older functions, then no need … If somebody is editing that function, then this rule again gets applied." Scope: "every function unless called out in a separate `.codelawignore` file"; coverage per function; diff-scoped, confirmed "yes".*
+
+- **Diff-scoped.** Only the change set's **new and edited** functions are judged ([SR-BASELINE](0104_baseline-and-deprecations.md) decision 3 says how a function is new, edited or untouched, by token stream). An untouched function is never reported, whatever its coverage. With no change set (plain `check`, no git, a shallow clone) nothing is judged and the header says `new code: no change set; test rules not evaluated`.
+- **What counts as a function** is `codelaw_lang::functions`: declarations, methods (getters and setters included), arrow and function expressions bound to a name (a `const`, a class field, an object property), Python `def` and `async def` at module or class level. Not: anonymous callbacks, nested functions (judged through the one that holds them), overload signatures, abstract methods, `.d.ts` files, and **test files** — the graph's test presets: Jest/Vitest `*.test.*` and `*.spec.*`, a file under `__tests__/`, pytest/unittest `test*.py`, `*_test.py`, `conftest.py` (`codelaw_graph::is_test_file`).
+- **`graph/untested-function`** (`error`, `manual`): a new or edited function that **no test file reaches**. A test reaches it by graph identity — imported under any alias, through a barrel or a renamed re-export (`export { a as b } from`), as `from pkg.mod import f` or `mod.f`; a method is reached when its class is. A function its module does not export is reached when a test file imports the module. A test that takes the whole module (`import *` passed around, `from m import *`) reaches every name in it. **Strings are not identity:** `mock.patch("pkg.mod.f")` does not reach `f`. The finding sits on the function's first line, so a `codelaw-ignore` above it covers it: "`computeTax` is new and no test reaches it (add one in `orders.test.ts`, or exempt it in `.codelawignore`)". It needs no report, so it also runs in the pre-commit hook and the agent hook.
+- **`graph/function-coverage`** (`error`, `manual`): a new or edited function whose line coverage in an **lcov** report is under `min`. Of the report's `DA` lines inside the function's span *as codelaw parses it now*, the share with hits above 0 — the tool's own `FN` records are not trusted, so Jest, Vitest, c8, coverage.py and pytest-cov are judged alike. "`computeTax` is 42% covered (5 of 12 lines; min 60)", with `data: { function, change, covered, lines, pct, min }`. A function with no instrumented line is skipped. codelaw reads lcov itself ([L11](0013_LAW-11-no-dependencies.md)); a `SF:` path may be absolute or relative to the report's folder or the project root. Only lcov is read; Istanbul's and coverage.py's JSON, and Cobertura XML, are not.
+- **The engine never runs tests** ([L5](0007_LAW-5-no-model-in-the-engine.md)): the report is an input, `--coverage <path>` or `[coverage] report` (relative to the config file; the flag wins). No report: not evaluated, and the header says `coverage: none; not evaluated` — unless `[coverage] require_report` is `true`, which makes it one error at the config file.
+- **`codelaw/stale-coverage`** (`warn`, `manual`): the report does not name a judged file, has a `DA` line past its end, or counts a line that is blank or a comment now. One finding at the file's first line, and no coverage verdict for that file. lcov carries no content hash, so a stale report is only mostly caught: generate it in the same CI job, before `codelaw check`.
+- **Options, in `[coverage]`** (root config only; the rules' severities stay in `[rules]`): `[coverage] scope` — `all` (default, Arpit's ruling) or `public` (exported in JS/TS; no leading `_` or in `__all__` in Python); `[coverage] min` — 0–100, default `60`; `[coverage] mode` — `function` (default) or `patch`, one finding when all judged functions' lines together are under `min` (diff-cover's measure); `[coverage] require_report` — default `false`; `[coverage] on_no_change_set` — `skip` (default) or `all`, every function judged, for a baseline roll-out; `[coverage] ignore_names` — a regex of function names never judged; `[coverage] report`; and `[coverage] ignore`, the `.codelawignore` policy, which is [SR-BASELINE](0104_baseline-and-deprecations.md) decision 12's.
+- **Exemptions:** `.codelawignore` ([SR-BASELINE](0104_baseline-and-deprecations.md) decision 12) and the inline `codelaw-ignore`.
+- **Opt-in** ([L8](0010_LAW-8-performance-budgets.md)): `extends = ["codelaw:tests"]` — the engine's own preset, not in any `recommended` ([SR-RULE-PACKS](0101_rule-packs.md) decision 3) — or a `[coverage]` table, or a rule named in `[rules]` (which turns on that one). Off, no graph is built for them and nothing here runs.
+- **The header** (`text` and `agent`, and `new_code` in JSON): `new code: 3 new, 1 edited functions since <base>` and, when the coverage rule runs, `coverage: <report> (N files)` ([SR-CLI-MCP](0115_cli-and-mcp.md)).
+- **The test:** `crates/codelaw-cli/tests/tests_for_new_code.rs` on real git repos — JS/TS with a renamed barrel re-export and an unexported helper, Python with a class, an alias and a `mock.patch` string, `--changed-since`, `--staged`, the agent hook, no change set and `on_no_change_set = "all"`, lcov with absolute and relative `SF:`, `min`, `mode = "patch"`, `require_report`, three kinds of stale report; and `crates/codelaw-graph/src/tests.rs` for what a test reaches.
 
 ### Consequences
 
