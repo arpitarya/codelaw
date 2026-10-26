@@ -36,6 +36,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 - **`remap` on a scope (first an `[[overrides]]` entry):** maps each severity in a glob to another or to `off` — `{ error = "warn" }` never fails the run, `{ warn = "error" }` admits no warnings — applied last, after the baseline, never to `codelaw/*` diagnostics (W-39).
 - **`js/no-console`:** calls on the global `console`, with an `allow` option and a `suggest` fix that deletes the statement; in `js/recommended` at `warn` (W-39).
 
+### Fixed
+
+- **`html/max-lines` and `css/max-lines` no longer panic on non-ASCII text:** the scanner sliced the source at a byte offset inside a multi-byte character (`<!--`, `<script`/`<style`, `url(` checks); 22 files of the pinned corpus (`—`, `¶`, `’`, `→`) crashed it.
+
 ### Changed
 
 - **Three fewer dependencies:** "did you mean …?" suggestions use codelaw's own `levenshtein` and `jaro_winkler` (same results), the cache writes its own binary format instead of `postcard` (old cache files are ignored and rebuilt; a truncated or corrupt one is a miss), and the unused `anyhow` line is gone from `codelaw-format` (L11, W-67).

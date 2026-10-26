@@ -2,6 +2,8 @@
 # Rewrite with --update-snapshot, and review the change.
 
 [findings]
+"data/outdated-dependency" = 0
+"data/stale-deps-snapshot" = 0
 "json/no-duplicate-keys" = 0
 "json/package-deps-sorted" = 1
 "json/package-engines" = 7

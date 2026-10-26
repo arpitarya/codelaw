@@ -91,9 +91,9 @@ All six are `fix: manual` — splitting a file or a function changes structure, 
 
 Landed 2026-10-26 (Claude Code, Sonnet 5.5): `crates/codelaw-native/src/size.rs` (the six rules as one `Size` rule over three measures), the six rule pages and cases, `js/size` and `py/size`, `NativeRule::data_of` and `Diagnostic::data` (JSON `data`, SARIF `properties.data`), and `options=<json>` on an example or case fence so a Don't can exceed a threshold (SR-RULE-FORMAT decision 5). `codelaw test packs/js` and `packs/python` pass; `crates/codelaw-cli/tests/size_limits.rs` covers DoD 3, 4 and 5 through the binary.
 
-Left, both on a runner I do not have:
+Left, on a runner I do not have (the corpus counts landed on 2026-10-26, in the CI repair):
 
-1. **Corpus counts:** `scripts/corpus.py run --binary <codelaw> --update --pack js` and `--pack python`, then commit the six new `[findings]` rows in `packs/js/corpus.toml` and `packs/python/corpus.toml` (needs the pinned repositories cloned).
+1. ~~**Corpus counts:** `scripts/corpus.py run --binary <codelaw> --update --pack js` and `--pack python`, then commit the six new `[findings]` rows in `packs/js/corpus.toml` and `packs/python/corpus.toml` (needs the pinned repositories cloned).~~ Done.
 2. **DoD 6:** CI's `perf` job on the merge, for `check_warm_10k` and `check_cold_10k` — and, if the decider wants it, the same workload with `js/size` on, to put a number on the opt-in cost.
 
 ## Blockers
