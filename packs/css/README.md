@@ -21,6 +21,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `css/standard` | 28 | the rules stylelint-config-standard 40.0.0 adds to the recommended set, less the 13 layout rules (see below). It holds only the additions: extend it together with `css/recommended` |
 | `css/conventions` | 1 | house conventions, opt-in: `css/no-important` |
 | `css/project` | 1 | `graph/no-unused-css-classes`, the rule that reads the whole repo, from purgecss — opt in |
+| `css/size` | 1 | Size limits for stylesheets, opt-in: a line limit per file (CSS, SCSS and CSS Modules) |
 
 <!-- /docs-sync:presets -->
 

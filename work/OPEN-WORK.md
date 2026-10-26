@@ -53,7 +53,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-60** `agent` L10: move every consumer-file text into `templates/` with a registry, a slot-only renderer and a test; output byte-identical. Filed by Arpit (Cowork). [detail](open/W-60-consumer-templates.md)
 
-🟢 **W-61** `agent` `html/max-lines` and `css/max-lines` (CSS, SCSS, CSS Modules) with skip options; `size` presets. Filed by Arpit (Cowork). [detail](open/W-61-max-lines-html-css.md)
+🟡 **W-61** waits on **W-59** `agent` `html/max-lines` and `css/max-lines` built with the `size` presets; left: DoD 3, a `[scope]` giving `_*.scss` partials their own limit, once W-59 (scope tables) and W-62 (SCSS) land, and `data` in JSON/SARIF once W-58's `data_of` lands. Filed by Arpit (Cowork). [detail](open/W-61-max-lines-html-css.md)
 
 🟢 **W-62** `agent` SCSS: L3 amended, Biome formats SCSS, CSS rules moved onto the tree-sitter-css fork + tree-sitter-scss (B-047 ruled), 15 rules in a new `scss` pack (npm + PyPI). Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 

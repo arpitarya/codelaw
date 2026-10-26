@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-61: `html/max-lines` and `css/max-lines`, with `html/size` and `css/size`  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-61 — a max-lines rule for HTML and CSS (CSS, SCSS and CSS Modules), with W-58's options shape.
+- **Done:** `crates/codelaw-native/src/size_lines.rs` (a text scanner, no tree: comments, strings, unquoted `url(…)`, SCSS `//`, `@import`/`@use`/`@forward` statements, HTML `<!-- -->` and `<script>`/`<style>` bodies); the two rule pages with cases; the two opt-in `size` presets, added to both pack manifests; USAGE's `Size limits` section; SR-RULE-PACKS decision on the `size` presets; unit tests for every option. Both rules do nothing on a region (a `<style>` in a page, a fence in Markdown): the host file only.
+- **Decided / left open:** W-58's counter is tree-based and not landed, so this item has its own text scanner rather than waiting. Left: DoD 3 (a `[scope]` for `_*.scss` partials) needs W-59 and W-62; the measured `data` in JSON/SARIF needs W-58's `data_of` trait method (the message already ends ` (max N…`, the shape its parser reads).
+- **Mistakes:** a shared `CARGO_TARGET_DIR` made cargo reuse another lane's artifacts for same-named workspace crates (one build failed on another lane's `Language::Scss`); verified with a private `RUSTFLAGS` so the fingerprints differ.
+- **Next:** merge main after W-58 and W-59 land, add `data_of`, and close DoD 3.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*

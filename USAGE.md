@@ -137,6 +137,24 @@ files = ["src/payments/**"]
 remap = { warn = "error" }
 ```
 
+### Size limits
+
+The `size` presets are opt-in (in no `recommended`): `codelaw:html/size` and `codelaw:css/size` turn on a line limit per file. HTML and CSS have no prior art in stylelint, html-validate or Biome, so the defaults are codelaw's own. The stylesheet limit covers `.css` and, as those languages arrive, SCSS and CSS Modules; a `<style>` or `<script>` inside a page is part of that page's count, never a file of its own.
+
+| rule | default | options |
+|---|---|---|
+| `html/max-lines` | 400 | `max`, `skip_blank_lines` (true), `skip_comments` (true, `<!-- -->`), `skip_embedded` (false: lines inside `<script>` and `<style>`) |
+| `css/max-lines` | 300 | `max`, `skip_blank_lines` (true), `skip_comments` (true, `/* */` and SCSS `//`), `skip_imports` (false: `@import`, `@use`, `@forward`) |
+
+```toml
+extends = ["codelaw:html/size", "codelaw:css/size"]
+
+[rules]
+"css/max-lines" = { severity = "warn", options = { max = 200, skip_imports = true } }
+```
+
+A line holding code and a comment counts as code. A finding names the first line over the limit and carries the count: `412 lines (max 300; blank lines and comments not counted)`. The fix is manual: split the file.
+
 ---
 
 ## Write your own rules
