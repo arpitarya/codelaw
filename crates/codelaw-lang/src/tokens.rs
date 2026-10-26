@@ -127,6 +127,21 @@ mod tests {
         assert!(same(Language::Python, "f(a,b)\n", "f(a, b)\n"));
     }
 
+    /// An irregular space is not layout: it is part of the name around it.
+    /// On Windows the SCSS scanner read U+00A0 as a descendant combinator
+    /// (MSVC's `iswspace`), so `.menu<U+00A0>.item` had the tokens of
+    /// `.menu .item` (W-44; the grammars' `c_locale_wctype.h`).
+    #[test]
+    fn an_irregular_space_is_not_layout() {
+        let spaces = ['\u{85}', '\u{a0}', '\u{1680}', '\u{2000}', '\u{2007}', '\u{200a}', '\u{2028}', '\u{2029}', '\u{202f}', '\u{205f}', '\u{3000}', '\u{feff}'];
+        for language in [Language::Css, Language::Scss] {
+            for space in spaces {
+                let irregular = format!(".menu{space}.item {{\n  color: red;\n}}\n");
+                assert!(!same(language, &irregular, ".menu .item {\n  color: red;\n}\n"), "{language:?}: U+{:04X} read as layout", space as u32);
+            }
+        }
+    }
+
     #[test]
     fn a_changed_token_is_not_layout() {
         assert!(!same(Language::Javascript, "a == b;", "a === b;"));

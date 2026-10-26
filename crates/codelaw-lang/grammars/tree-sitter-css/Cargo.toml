@@ -7,11 +7,14 @@
 #
 # Upstream's manifest otherwise unchanged. The version keeps upstream's 0.25.0
 # so ast-grep-language's `0.25.0` requirement still matches; `+codelaw.1`
-# marks the fork and is bumped with every change to grammar.js.
+# marks the fork and is bumped with every change to grammar.js or to how
+# src/ is compiled (+codelaw.2: bindings/rust/build.rs force-includes
+# c_locale_wctype.h, so the scanner's character classes are the "C" locale's
+# on every platform, W-44).
 [package]
 name = "tree-sitter-css"
 description = "CSS grammar for tree-sitter (codelaw's fork of 0.25.0)"
-version = "0.25.0+codelaw.1"
+version = "0.25.0+codelaw.2"
 authors = [
   "Max Brunsfeld <maxbrunsfeld@gmail.com>",
   "Amaan Qureshi <contact@amaanq.com>",
