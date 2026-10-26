@@ -7,7 +7,7 @@ filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-26
 updated_by: "Claude Code (Sonnet 5.5)"
-ball: agent
+ball: done
 ---
 
 # W-49 — Dev-server plugins — Vite, Webpack, Rspack, Next.js
@@ -36,19 +36,18 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | an example app per host: a `debugger` shows in the overlay/terminal within a second of saving | ⏳ the debugger-in-overlay path is tested per host against a fake of its API (`plugins.test.js`); an example app on real Vite, webpack, Rspack and Next.js needs those installed — L11 forbids them as dependencies, so it is a decider-approved dev install or a CI job |
+| 1 · | an example app per host: a `debugger` shows in the overlay/terminal within a second of saving | ➡️ moved to [W-70](W-70-dev-server-example-apps.md) (Arpit, 2026-10-26: *"create a separate work item for example app"*); the path is tested per host against a fake of its API (`plugins.test.js`) |
 | 2 · | `build` fails on a codelaw error | ✅ `plugins.test.js`: Vite `buildStart`, the webpack `run` hook and Next's Turbopack build all fail on `js/no-debugger` |
 | 3 · | killing the dev server kills the watcher (no orphan process) | ✅ `plugins.test.js`: `stop()` / server close / `watchClose` kill the child (`process.kill(pid, 0)` fails); the child is also killed on the host's `exit` |
-| 4 · | Rspack runs the webpack plugin unchanged | ⏳ the plugin uses only hooks and `compilation.errors`/`warnings` that Rspack documents; not run on a real Rspack |
+| 4 · | Rspack runs the webpack plugin unchanged | ➡️ moved to W-70; the plugin uses only hooks and `compilation.errors`/`warnings` that Rspack documents; not yet run on a real Rspack |
 
 ## Blockers
 
 None. W-44 (watch mode) has landed.
 
-## What is left
+## Closed 2026-10-26
 
-- DoD 1 and 4 on the real hosts: an example app each for Vite, webpack, Rspack and Next.js (webpack, Rspack, Vite and Next.js are third-party packages; L11 needs the decider to ratify them as dev dependencies of the examples, or the check runs in a CI job that installs them).
-- The first publish of the three packages and `scripts/npm-trust.sh` for them (the decider; no agent publishes).
+Everything W-49 set out to build is landed. Its DoD 1 and 4 (a real-host example app each, and Rspack running the webpack plugin) moved to **W-70**, as Arpit ruled on 2026-10-26. The first publish of the three `@codelaw` plugin packages (`vite-plugin`, `webpack-plugin`, `next`) and `scripts/npm-trust.sh` for them is the decider's hand, with the other new names ([RELEASING.md](../../RELEASING.md)); no agent publishes.
 
 ## Record affected
 

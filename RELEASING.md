@@ -56,7 +56,7 @@ exists, so the first npm publish cannot come from CI. PyPI can: a *pending*
 publisher creates the project on its first upload.
 
 **Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](archive/open/W-29-first-npm-publish.md)). **Step 5 done 2026-10-24** (both environments, tag rule `v*`, [W-18](work/open/W-18-release-hardening.md)). Left: step 4.
-Steps 2–3 come back for **every pack name new to npm**: at 0.2.0,
+Steps 2–3 come back for **every pack name new to npm**: the three dev-server plugins `@codelaw/vite-plugin`, `@codelaw/webpack-plugin` and `@codelaw/next` ([W-49](archive/open/W-49-dev-server-plugins.md), closed; SR-PACKAGES decision 3a), and at 0.2.0,
 `@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](archive/open/W-31-registry-pack-split.md)), and
 at the first release with the security packs `@codelaw/rules-security-js`, `-security-ts` and
 `-security-html` ([W-53](work/open/W-53-security-packs-groundwork.md)) —

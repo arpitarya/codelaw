@@ -47,7 +47,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: patch tree-sitter-scss (`@if not` is an `ERROR`), CSS rules onto trees, a pinned corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
-🟢 **W-49** `agent` Dev-server plugins (`@codelaw/vite-plugin`, `webpack-plugin` also for Rspack, `next`) built and tested against the binary; left: an example app per real host (needs Vite, webpack, Rspack, Next.js installed, L11) and the first npm publish. Filed by Arpit (Cowork). [detail](open/W-49-dev-server-plugins.md)
+🟢 **W-70** `agent` Example apps for the dev-server plugins: one each for real Vite, webpack, Rspack, Next.js (a `debugger` in the overlay within a second; Rspack runs the webpack plugin unchanged), via a CI job that installs the hosts (L11). Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
