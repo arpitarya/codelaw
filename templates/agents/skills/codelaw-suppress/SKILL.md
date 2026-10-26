@@ -39,14 +39,14 @@ and one that suppresses nothing as `info`.
 Re-run `check_paths` on the file: the finding is gone and no
 `codelaw/…suppression…` finding appeared.
 
-## 2. A per-glob override (many files, one reason)
+## 2. A per-glob scope (many files, one reason)
 
 Only when the same reason applies to a whole set of files (generated code,
 fixtures, a vendored folder), add to `codelaw.toml`:
 
 ```toml
 # <rule-id> is off for <files> because <reason> — <who decided>, <date>
-[[overrides]]
+[scope.<name>]
 files = ["<the narrowest glob that covers them>"]
 rules = { "<rule-id>" = "off" }
 ```
