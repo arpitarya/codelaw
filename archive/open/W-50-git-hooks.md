@@ -18,7 +18,7 @@ ball: agent
 |---|---|---|---|
 | 1 | Define the hooks in SR-CLI-MCP (`init`) and their change set in SR-BASELINE decision 3 (already `--staged`) | the record is the spec | ✅ SR-CLI-MCP decision 11 |
 | 2 | **pre-commit** (blocks): `codelaw fix --staged` on fully staged files only, re-stage them, then `codelaw check --staged` | nothing bad is committed | ✅ |
-| 3 | **post-commit** (never blocks): `codelaw exceptions --mine --expiring 7d` (W-46) and a one-line burn-down delta (W-47) | a reminder of what you owe | 🟡 hook and extension point (`.codelaw/hooks/post-commit.d/`) done; the two reminders wait on W-46 and W-47 |
+| 3 | **post-commit** (never blocks): `codelaw exceptions --mine --expiring 7d` (W-46) and a one-line burn-down delta (W-47) | a reminder of what you owe | ✅ hook, extension point (`.codelaw/hooks/post-commit.d/`) and the two reminders (2026-10-26) |
 | 4 | `codelaw init --git-hooks [pre-commit,post-commit]`: writes into `core.hooksPath` or `.git/hooks`, chains an existing hook, never overwrites | safe install | ✅ |
 | 5 | Ship `.pre-commit-hooks.yaml` at the repo root (pre-commit framework) and husky/lefthook snippets in USAGE | whatever the team already uses | ✅ (`language: system`; see DoD 5) |
 
@@ -48,9 +48,7 @@ ball: agent
 
 ## Blockers
 
-**The decider's move (2026-10-25):** (1) the hook passes no profile and so follows W-39's detection (`local` on a laptop); `CODELAW_HOOK_ARGS="--profile ci"` flips it — confirm or change; (2) DoD 5: add a root manifest so the pre-commit framework installs codelaw from the tag, or accept `language: system` (codelaw on `PATH`) and amend DoD 5. Post-commit's two reminders are still to wire once W-46 lands (W-47 has).
-
-post-commit's two reminders wait on **W-46** and **W-47**. The hook, its extension point and the pre-commit half landed (W-50, 2026-10-25). **Left:** when W-46 and W-47 land, each adds one executable to `.codelaw/hooks/post-commit.d/` that runs `codelaw exceptions --mine --expiring 7d` and the burn-down delta command, and `init --git-hooks` is taught to write them (or the post-commit script calls them directly).
+none. W-46 landed; the two reminders are written in the hook script itself (`exceptions --mine --expiring 7d`, and the `total` row of `baseline history --since 30d`), and `.codelaw/hooks/post-commit.d/` stays the extension point.
 
 ## Record affected
 
