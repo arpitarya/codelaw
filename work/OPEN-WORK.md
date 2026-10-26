@@ -45,7 +45,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-45** `agent` CI formats built; PR [#3](https://github.com/arpitarya/codelaw/pull/3) is open; left: Arpit looks at its annotations and says so (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
 
-🟢 **W-51** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); left: a real GitHub run (DoD 1, 3) and the exceptions section (W-46 landed). Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
+🟢 **W-51** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); exceptions section done (W-46); left: a real GitHub run in a throwaway repo (DoD 1, 3). Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
 
 🟢 **W-58** `agent` Size limits for JS, TS and Python built (six rules, `js/size` and `py/size`, measured value in JSON and SARIF); left: the six corpus counts and CI's `perf` run (DoD 6). Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
 

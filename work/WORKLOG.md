@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-51: the exceptions section goes unconditional  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *Finish W-51; the locally doable part is the exceptions section now W-46 has landed.*
+- **Done:** removed the `exceptions --help` guard from `templates/ci/github/codelaw-autofix.yml` and `templates/ci/gitlab/codelaw-autofix.yml`; the section runs `codelaw exceptions --expiring 30d --as-of "$(date +%F)" --format markdown`. `ci_autofix.rs` asserts it; 4/4 pass, actionlint clean. Landed via lockmaster.
+- **Decided / left open:** W-51 stays open for DoD 1 and 3 only: one run in a throwaway GitHub repo with fixable findings and `CODELAW_AUTOFIX_TOKEN`.
+- **Mistakes:** none.
+- **Next:** the decider (or CI) runs the workflow once in a throwaway repo.
+
 ## 2026-10-26 — Cross-lane cleanup after thirteen landings  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** fix what the thirteen parallel lanes left: a duplicate `D-33`, a red docs-sync, the MCP tool list, clippy, the build-tool declaration.

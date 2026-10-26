@@ -38,6 +38,9 @@ fn github_weekly_writes_one_job_and_is_actionlint_clean() {
     assert!(text.contains("contents: write") && text.contains("pull-requests: write"));
     assert!(text.contains(r#"--as-of "$day""#));
     assert!(text.contains("codelaw/autofix") && !text.contains("autofix-suggest"));
+    // W-46 landed: the exceptions section is unconditional and judged on the run's day.
+    assert!(text.contains(r#"codelaw exceptions --expiring 30d --as-of "$(date +%F)" --format markdown"#));
+    assert!(!text.contains("exceptions --help"), "no guard any more");
     assert!(!text.contains("\\{{"), "escapes are resolved");
     actionlint(&f);
     // A second run changes nothing.
