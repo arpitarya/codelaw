@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — W-77 filed (a separate package for everything agent-facing)  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit: *"I want a separate package to be created just for skills, and it will have a hard dependency on code law. Skills being agent facing scripts or files."* Then: *"write it again. I believe it got cleared out."*
+- **Done:** read `templates/agents/`, `crates/codelaw-agents/src/skills.rs` (agent files compiled into the binary), SR-AGENT-SURFACES ("ship inside both packages") and SR-PACKAGES (zero runtime dependencies). Asked four questions; filed W-77 with the rulings and its 🟢 `build` row. The file and this entry were lost from the working tree once (the row survived) and were rewritten.
+- **Decided / left open:** ruled by Arpit — the whole agent-facing set; npm `@codelaw/skills` and PyPI `codelaw-skills`; codelaw keeps nothing agent-facing (exit 2 without the package); exact same version. Open to the builder: discovery order on PyPI, the `codelaw.toml` override. Records are amended in the building change.
+- **Mistakes:** left uncommitted in a main checkout another session was cleaning; the untracked file and the WORKLOG edit were discarded. It needs landing through lockmaster promptly.
+- **Next:** land W-77's three files; then a Claude Code lane builds it (Opus), records first.
+
 ## 2026-10-27 — W-76: commit the main checkout's loose work; worktree cleanup  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"commit everything, look into worktrees if anything is not merged, merge it, and then do a cleanup."*

@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (13)
+### build (14)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
@@ -54,6 +54,8 @@ here. Read that record before changing anything below it.
 🟢 **W-73** `agent` Configurable approved calls: 5 HTML-sink rules take a `sanitizers` list (extend or replace the built-in; name + import source); `js/use-instead`, `py/use-instead` for wrappers. Filed by Arpit (Cowork). [detail](open/W-73-configurable-approved-calls.md)
 
 🟢 **W-74** `agent` Editor logs you can debug from: the VS Code extension and `codelaw lsp` say what runs, which config each file got, why a file shows nothing, and every failure; `codelaw.logLevel`; *Copy debug info*. Filed by Arpit (Cowork). [detail](open/W-74-editor-logs.md)
+
+🟢 **W-77** `agent` A separate package for everything agent-facing: `@codelaw/skills` (npm) and `codelaw-skills` (PyPI), pinned to the same codelaw version; codelaw itself keeps no agent files (ruled 2026-10-27). Filed by Arpit (Cowork). [detail](open/W-77-skills-package.md)
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
