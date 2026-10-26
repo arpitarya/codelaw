@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-34: the Fux index packages built (steps 2–4)  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** do W-34 steps 2–4 now that Fux's index-package item (fux item 299) is closed; leave step 5 (reserve names, publish) to Arpit.
+- **Done:** L6 decision 12 (and the law sentence, decision 10, the veto), SR-PACKAGES decision 14 and SR-RULE-PACKS decision 6; `scripts/fux-index.py` and a `suffix` on `package.py`'s pack builders; `ci.yml`'s `package` job; `init` prints the install and pin lines when `.fux/` exists and installs nothing (`tests/fux_index.rs`); RELEASING.md, DEPENDENCIES.md D-33, CHANGELOG.
+- **Decided / left open:** the two open questions answered in the item (print whenever `.fux/` exists; version left to Fux's pin plus our manifest check), for the decider to overrule. Sixteen packages, not twenty-two: the four empty security packs wait for a rule. Index packages stay out of `dist/npm` and `dist/pypi` so `publish.yml` cannot trip on an unreserved name. Left: Arpit reserves and publishes the 16 names, and ratifies `fux-engine` (L11).
+- **Mistakes:** none that landed; the first assemble run failed on the empty security packs and a temp-dir scope bug, both fixed before commit.
+- **Next:** Arpit's step 5.
+
 ## 2026-10-26 — W-66 closed: dependencies ruled (29 ratified, 3 to replace); W-67 filed  ·  Claude, cloud linked to the Mac (Opus 5.5)
 
 - **Asked:** by voice, *"explain to me in simple terms, go one by one"* — 32 cards, one ruling each; then *"based on the previous discussion, update the work items or create new ones."*

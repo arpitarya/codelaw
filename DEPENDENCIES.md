@@ -62,6 +62,12 @@ governed_by_path: records/0013_LAW-11-no-dependencies.md
 |---|---|---|---|---|
 | D-29 | **maturin** (+ `zig` on some CI legs) | build | builds the PyPI wheels around the binary | ratified 2026-10-26 — *"Ratify."* |
 
+## CI — Fux (build tool of the index packages)
+
+| id | unit | what it does | pin | status |
+|---|---|---|---|---|
+| D-33 | **fux-engine** (+ its three pinned dependencies `fux-core`, `fux-reader`, `fux-writer`, all 5.1.0), MIT | builds the optional Fux index packages in CI (`scripts/fux-index.py`, L6 decision 12); never in the engine, a package or a test | `==5.1.0` (`FUX_VERSION`) | **pending** — named as a build-time tool of CI by the decider's W-34 ruling of 2026-10-25, before L11; ratify it here by name, or W-34's build is removed |
+
 ## CI — GitHub Actions (`.github/workflows/`)
 
 | id | unit | what it does | status |
