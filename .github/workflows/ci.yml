@@ -135,6 +135,8 @@ jobs:
           python3 scripts/check-work-system.py
       - name: the public docs agree with the tree (scripts/docs-sync.py; SR-WORK-REGISTRY, W-26)
         run: python3 scripts/docs-sync.py --check
+      - name: the rule pages agree with the rule files (scripts/rule-docs.py; SR-WORK-REGISTRY)
+        run: python3 scripts/rule-docs.py --check
       - id: rustc # the pinned toolchain, read from the file — nothing is installed to learn it
         run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
       - id: verdict
