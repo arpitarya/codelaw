@@ -6,7 +6,7 @@ item: W-34
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-26
-updated_by: "Claude Code (Sonnet 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: arpit
 ---
 
@@ -18,9 +18,9 @@ ball: arpit
 |---|---|---|---|
 | 1 | Wait for Fux's spike (20 plain-words questions over the JS rules; bar 16 of 20 in the top 5) and Fux's design of a shipped index | proof that free-text search over the rules is worth a package | ✅ done — fux item 299 closed (fux 5.1.0; SR-PKG-INDEX, `fux pack`) |
 | 2 | Amend the records: L6 names a third kind of package on both registries; SR-RULE-PACKS and SR-PACKAGES say what it holds and how it is built | the packages are legal | ✅ L6 decision 12, SR-PACKAGES decision 14, SR-RULE-PACKS decision 6 |
-| 3 | Build: CI runs Fux over each pack's `rules/` and packs the index as `@codelaw/rules-<name>-fux-index` and `codelaw-rules-<name>-fux-index`, same version as the pack | 10 npm + 6 PyPI optional packages | ✅ `scripts/fux-index.py`; `ci.yml`'s `package` job; `dist/fux-index/`, not in the release set |
+| 3 | Build: CI runs Fux over each pack's `rules/` and packs the index as `@codelaw/rules-<name>-fux-index` and `codelaw-rules-<name>-fux-index`, same version as the pack | 15 npm + 10 PyPI optional packages | ✅ `scripts/fux-index.py` (pinned fux 5.1.1 since 2026-10-26); `ci.yml`'s `package` job; `dist/fux-index/`, not in the release set |
 | 4 | `codelaw init` leaves them out; it only prints how to add them when the repo uses Fux | nobody downloads an index they did not ask for | ✅ `crates/codelaw-cli/tests/fux_index.rs` |
-| 5 | Reserve the 16 names and publish with the next release | teams can install them | 🔴 Arpit's hand — open; RELEASING.md §"The optional Fux index packages" |
+| 5 | Reserve the 25 names and publish with the next release | teams can install them | 🔴 Arpit's hand — open; RELEASING.md §"The optional Fux index packages" |
 
 **Arpit, 2026-10-25 (voice):** *"I want codelaw to have a separate package for
 Fux index. It shouldn't be added as a default one."* → *"I would like to go with
@@ -69,7 +69,9 @@ the consumer's repo.
 
 ## What was built, and what is not the plan's
 
-- **16, not 22.** The four security packs hold no rule file yet, Fux refuses an empty index, so they get theirs with their first rule: ten npm and six PyPI, the number this item always said.
+- **16, not 22** (when built). The four security packs held no rule file yet, Fux refuses an empty index, so they got theirs with their first rule: ten npm and six PyPI.
+- **25 now** (2026-10-26). The four security packs and `scss` and `css-modules` have rules, so `assemble` builds 15 npm tarballs and 10 wheels — every name L6 decision 12 lists.
+- **Fux 5.1.1** (the decider, 2026-10-26: *"Implement Fux for the latest version that we have"*). `FUX_VERSION` moved from 5.1.0; `assemble` with fux 5.1.1 built all 25 and `check` passed (one version, zero dependencies, each manifest true to its shards, both registries byte-equal). The end-to-end `fux doctor` / `fux ask` proof below was run on 5.1.0 and not repeated.
 - **Out of the release set.** `publish.yml` uploads `dist/npm` and `dist/pypi` whole and its preflight demands a trusted publisher per tarball, so an unreserved index name would stop a release. They build into `dist/fux-index/` and are a CI artifact (`fux-index`); step 5 ends with a change to `publish.yml`.
 - **A manifest per registry.** `fux pack` writes both registry names; a pack on one registry has the other removed from the manifest's `content` (the manifest is outside the digest), so Fux never looks for a package that does not exist.
 - **`fux-engine` is a dependency under L11** (D-34, `pending` in `DEPENDENCIES.md`): named by this item's own ruling as a build tool of CI only, but ratified by name only on the decider's say.
@@ -77,7 +79,7 @@ the consumer's repo.
 
 ## Definition of done
 
-- ✅ The amended records name the 16 packages and cite this ruling.
+- ✅ The amended records name the packages (25 today) and cite this ruling.
 - ✅ CI builds each index from a pinned fux and checks its digest is reproducible.
 - ✅ `codelaw init` with no flag installs none of them (a test).
 - 🔴 The packages are on both registries at the release version — Arpit's hand.
