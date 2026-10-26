@@ -27,6 +27,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-76-commit-main-and-clean-worktrees.md`](open/W-76-commit-main-and-clean-worktrees.md) | 2026-10-27 | the commit itself and the worklog entry |
 | [`W-75-commit-main-checkout.md`](open/W-75-commit-main-checkout.md) | 2026-10-27 | the commit itself; the Fux setup is `fux.toml`, `.fux/` and [`AGENTS.md`](../AGENTS.md) |
 | [`W-49-dev-server-plugins.md`](open/W-49-dev-server-plugins.md) | 2026-10-26 | [`packaging/npm/`](../packaging/npm) (`dev-core`, `vite-plugin`, `webpack-plugin`, `next`), [SR-PACKAGES](../records/0107_packages.md) decision 3a, [`plugins.test.js`](../packaging/npm/dev-core/test/plugins.test.js); the real-host example apps are [W-70](../work/open/W-70-dev-server-example-apps.md) |
 | [`W-61-max-lines-html-css.md`](open/W-61-max-lines-html-css.md) | 2026-10-26 | [`size_lines.rs`](../crates/codelaw-native/src/size_lines.rs), [SR-RULE-PACKS](../records/0101_rule-packs.md) (`size` presets) and [`tests/size_limits.rs`](../crates/codelaw-cli/tests/size_limits.rs) |
