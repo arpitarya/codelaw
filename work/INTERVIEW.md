@@ -24,7 +24,7 @@ entry.**
 
 ## 1 · State of play
 
-**2026-10-26: L11 ratified** — no dependencies unless the decider ratifies each by name in `DEPENDENCIES.md` (ruled 2026-10-26: 29 ratified, `strsim`/`anyhow`/`postcard` replaced by W-67; W-65 builds the CI check).
+**2026-10-26: L11 ratified** — no dependencies unless the decider ratifies each by name in `DEPENDENCIES.md` (ruled 2026-10-26: 29 ratified, `strsim`/`anyhow`/`postcard` replaced by W-67; W-65 built the CI check: `crates/codelaw-cli/tests/dependencies.rs`).
 
 **2026-10-26 docket:** the inbox holds only W-38 (PyPI by hand). Ruled: watch polls (no `notify`), hook passes no profile, pre-commit `language: system` now + W-64 mirror later, CSS/SCSS rules move to the tree-sitter-css fork + tree-sitter-scss (B-047 → W-62), W-45's PR is Claude Code's.
 
