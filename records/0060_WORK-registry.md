@@ -94,6 +94,7 @@ into a scan anyone can do at task end.
 | Document | Update trigger | Last verified | Notes |
 |---|---|---|---|
 | `CLAUDE.md` | any rule or pointer changes | 2026-10-26 | 2026-10-26 — the L3 and L6 lines: SCSS as a CSS dialect, sixteen packs, fourteen on npm and ten on PyPI (W-62, the decider's ruling); named in the session output as SR-WORK-DOCS decision 7a requires · 2026-10-26 (W-63) — the L6 line and the `packs/` line: seventeen packs, fifteen on npm |
+| `AGENTS.md` | the Fux setup or how agents search the index changes | 2026-10-27 | 2026-10-27 — committed with the Fux setup (W-75) |
 | `work/README.md` | a file is added to or removed from `work/` | 2026-10-18 | 2026-10-18 — created at setup |
 | `work/OPEN-WORK.md` | the same change as the work it tracks | 2026-10-25 | 2026-10-25 — W-47, W-52, W-53 closed; W-44, W-45, W-50 to the inbox; W-54–W-57 unblocked |
 | `work/BACKLOG.md` | a record names something nobody is doing | 2026-10-25 | 2026-10-25 — B-050 (`migrate`), B-051 (`requirements*.txt`), B-052 (the deps agent hint) |
