@@ -183,8 +183,12 @@ fn from_source_reads_its_tables_and_refuses_bad_sources() {
 }
 
 fn call_rule(options: &str, language: Language, src: &str, opts: serde_json::Value) -> usize {
+    predicate_rule("$F($$$A)", "calls", options, language, src, opts)
+}
+
+fn predicate_rule(pattern: &str, predicate: &str, options: &str, language: Language, src: &str, opts: serde_json::Value) -> usize {
     let text = format!(
-        "---\nid: t/r\ntitle: \"t\"\nlanguages: [{lang}]\nfix: manual\nfix_reason: \"x\"\noptions:\n  ok:\n    type: \"call[]\"\n    default: {options}\n---\n\nT.\n\n**Why:** W.\n\n```codelaw\nmatch:\n  pattern: $F($$$A)\nwhere:\n  $$MATCH: {{ calls: ok }}\nmessage: \"m $OPTION.ok\"\n```\n\n## How to fix\n\n1. x\n\n## Examples\n\n### {title}\n\n#### Don't\n\n```{lang}\nx\n```\n\n#### Do\n\n```{lang}\ny\n```\n",
+        "---\nid: t/r\ntitle: \"t\"\nlanguages: [{lang}]\nfix: manual\nfix_reason: \"x\"\noptions:\n  ok:\n    type: \"call[]\"\n    default: {options}\n---\n\nT.\n\n**Why:** W.\n\n```codelaw\nmatch:\n  pattern: {pattern}\nwhere:\n  $$MATCH: {{ {predicate}: ok }}\nmessage: \"m $OPTION.ok\"\n```\n\n## How to fix\n\n1. x\n\n## Examples\n\n### {title}\n\n#### Don't\n\n```{lang}\nx\n```\n\n#### Do\n\n```{lang}\ny\n```\n",
         lang = language.name(),
         title = if language == Language::Python { "Python" } else { "JavaScript" }
     );
@@ -232,12 +236,49 @@ fn calls_in_python_follow_from_and_plain_imports() {
     assert_eq!(call_rule(d, Language::Python, "def clean(x): ...\nclean(x)\n", none), 0);
 }
 
+fn function_calls_rule(options: &str, language: Language, src: &str, opts: serde_json::Value) -> usize {
+    predicate_rule("risky($$$A)", "function_calls", options, language, src, opts)
+}
+
+#[test]
+fn function_calls_looks_through_the_enclosing_functions() {
+    let d = r#"[{ name: z.*, module: zod }, "*Schema.parse", "*.safeParse"]"#;
+    let none = serde_json::json!({});
+    let js = |src: &str| function_calls_rule(d, Language::Javascript, src, serde_json::json!({}));
+    // A validator anywhere in the function, before or after, holds.
+    assert_eq!(js("import { z } from \"zod\";\nfunction f(x) { risky(x); z.string().parse(x); }\n"), 1);
+    assert_eq!(js("function f(x) { const v = postSchema.parse(x); risky(v); }\n"), 1);
+    // An enclosing function's validator counts for a nested callback.
+    assert_eq!(js("function f(xs) { s.safeParse(xs); xs.map((x) => risky(x)); }\n"), 1);
+    // A validator in a nested callback counts for the outer function.
+    assert_eq!(js("function f(xs) { xs.forEach((x) => s.safeParse(x)); risky(xs); }\n"), 1);
+    // `JSON.parse` is not a schema; `z` from elsewhere is not zod.
+    assert_eq!(js("function f(x) { JSON.parse(x); risky(x); }\n"), 0);
+    assert_eq!(js("import { z } from \"other\";\nfunction f(x) { z.string(); risky(x); }\n"), 0);
+    // A validator in another function does not count, nor one at the top.
+    assert_eq!(js("function g(x) { s.safeParse(x); }\nfunction f(x) { risky(x); }\n"), 0);
+    assert_eq!(js("s.safeParse(x);\nrisky(x);\n"), 0);
+    // The project's list, extend and replace.
+    let mine = serde_json::json!([{ "name": "check", "module": "@acme/v" }]);
+    let src = "import { check } from \"@acme/v\";\nfunction f(x) { check(x); risky(x); }\nfunction g(x) { s.safeParse(x); risky(x); }\n";
+    assert_eq!(function_calls_rule(d, Language::Javascript, src, serde_json::json!({ "ok": mine })), 2);
+    assert_eq!(function_calls_rule(d, Language::Javascript, src, serde_json::json!({ "ok": mine, "ok_mode": "replace" })), 1);
+    assert_eq!(function_calls_rule(d, Language::Javascript, "function check(x) {}\nfunction f(x) { check(x); risky(x); }\n", serde_json::json!({ "ok": mine })), 0);
+    // Python functions and lambdas.
+    let py = r#"[{ name: validate, module: jsonschema }]"#;
+    assert_eq!(function_calls_rule(py, Language::Python, "from jsonschema import validate\ndef f(x):\n    validate(x, S)\n    risky(x)\n", none.clone()), 1);
+    assert_eq!(function_calls_rule(py, Language::Python, "def validate(x): ...\ndef f(x):\n    validate(x, S)\n    risky(x)\n", none), 0);
+}
+
 #[test]
 fn calls_must_name_a_call_option() {
     let text = "---\nid: t/r\ntitle: \"t\"\nlanguages: [javascript]\nfix: manual\nfix_reason: \"x\"\n---\n\nT.\n\n**Why:** W.\n\n```codelaw\nmatch:\n  pattern: $F($$$A)\nwhere:\n  $$MATCH: { calls: nope }\nmessage: \"m\"\n```\n\n## How to fix\n\n1. x\n\n## Examples\n\n### JavaScript\n\n#### Don't\n\n```js\nx\n```\n\n#### Do\n\n```js\ny\n```\n";
     let r = parse_rule_ok(text);
     let err = compile(&r, Grammar::JavaScript, &BTreeMap::new()).err().expect("an error");
     assert!(err.contains("names no `call[]` option"), "{err}");
+    let r = parse_rule_ok(&text.replace("{ calls: nope }", "{ function_calls: nope }"));
+    let err = compile(&r, Grammar::JavaScript, &BTreeMap::new()).err().expect("an error");
+    assert!(err.contains("`function_calls: nope` names no `call[]` option"), "{err}");
 }
 
 #[test]
