@@ -48,7 +48,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 - every rule in them carries `security:` metadata — CWE, OWASP Top 10:2025 category, severity ([SR-RULE-FORMAT](0112_rule-format.md) decision 2a);
 - each has a `recommended` preset (high-confidence rules, `error`) and a `strict` one (adds the heuristic rules, `warn`);
 - `security-ts` **extends** `security-js` (the `sec-js` rules already run on TypeScript), and `security-html` turns on the html pack's own security rules through `html/security` instead of copying them (decision 3);
-- **npm** carries thirteen packs and **PyPI** nine. `security-js` has its 66 rules since W-54 (2026-10-26, [archived](../archive/open/W-54-security-js-pack.md)): 55 in `sec-js/recommended` at `error`, 11 more in `strict` at `warn`, a `data/sources/` table per request-source family for `from_source:`, counts in `packs/security-js/corpus.toml` from the three pinned repositories. `security-ts` and `security-html` are still scaffolds until [W-55](../work/open/W-55-security-ts-pack.md) and [W-56](../work/open/W-56-security-html-pack.md). `security-python` has its 61 rules since W-57 (2026-10-26, [archived](../archive/open/W-57-security-python-pack.md)): `match:` rules only, from Bandit and Ruff `S`, Django, Flask, FastAPI, ML loaders and LLM sinks, in `packs/security-python/README.md`.
+- **npm** carries thirteen packs and **PyPI** nine. `security-js` has its 66 rules since W-54 (2026-10-26, [archived](../archive/open/W-54-security-js-pack.md)): 55 in `sec-js/recommended` at `error`, 11 more in `strict` at `warn`, a `data/sources/` table per request-source family for `from_source:`, counts in `packs/security-js/corpus.toml` from the three pinned repositories. `security-ts` has its 16 rules since W-55 (2026-10-26, [archived](../archive/open/W-55-security-ts-pack.md)): 10 in `sec-ts/recommended` at `error` (on top of `sec-js/recommended`), 6 more in `strict` at `warn`, syntax-only. `security-html` is still a scaffold until [W-56](../work/open/W-56-security-html-pack.md). `security-python` has its 61 rules since W-57 (2026-10-26, [archived](../archive/open/W-57-security-python-pack.md)): `match:` rules only, from Bandit and Ruff `S`, Django, Flask, FastAPI, ML loaders and LLM sinks, in `packs/security-python/README.md`.
 
 **Ruled by Arpit, 2026-10-26** (W-62): *"The CSS pack should work with SCSS, and CSS modules as well"* and *"Create separate packages for SCSS and CSS modules."* SCSS joins [L3](0005_LAW-3-languages.md) as a CSS dialect:
 - the `css` pack's rules declare `scss` and run on `.scss` files (the Sass at-rules and `//` comments are read, not reported);
@@ -57,7 +57,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 | Pack | npm | PyPI | Languages | Presets |
 |---|---|---|---|---|
 | engine | `codelaw` | `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics, the formatter's `format/unformatted` and `format/failed`, and `graph/no-deprecated-usage` | — |
-| `js` | `@codelaw/rules-js` | `codelaw-rules-js` | JS, JSX; its core rules also run on TS and TSX | `js/recommended`, `js/typescript`, `js/conventions`, `js/project` · *later:* `js/strict` |
+| `js` | `@codelaw/rules-js` | `codelaw-rules-js` | JS, JSX; its core rules also run on TS and TSX | `js/recommended`, `js/typescript`, `js/conventions`, `js/project`, `js/size` · *later:* `js/strict` |
 | `ts` | `@codelaw/rules-ts` | — | TS, TSX | `ts/recommended`, `ts/conventions` |
 | `react` | `@codelaw/rules-react` | `codelaw-rules-react` | JSX, TSX, and React in JS and TS | `react/recommended`, `react/conventions` |
 | `node` | `@codelaw/rules-node` | — | JS, JSX, TS, TSX run on Node.js | `node/recommended` |
@@ -65,7 +65,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 | `html` | `@codelaw/rules-html` | `codelaw-rules-html` | HTML, incl. HTML embedded in Markdown and templates | `html/recommended`, `html/a11y`, `html/document`, `html/conventions`, `html/security`, `html/size` |
 | `css` | `@codelaw/rules-css` | `codelaw-rules-css` | CSS, and SCSS for the rules that declare it | `css/recommended`, `css/standard`, `css/conventions`, `css/project`, `css/size` |
 | `scss` | `@codelaw/rules-scss` | `codelaw-rules-scss` | SCSS | `scss/recommended`, `scss/strict` (extends `scss/recommended`) |
-| `python` | — | `codelaw-rules-python` | Python | `py/recommended`, `py/conventions`, `py/project` · *later:* `py/strict` |
+| `python` | — | `codelaw-rules-python` | Python | `py/recommended`, `py/conventions`, `py/project`, `py/size` · *later:* `py/strict` |
 | `data` | `@codelaw/rules-data` | `codelaw-rules-data` | JSON, YAML, TOML, Markdown; the dependencies of `package.json` and `pyproject.toml` (decision 15) | `data/recommended`, `md/recommended`, `data/package-json`, `data/tsconfig`, `data/pyproject`, `data/github-actions`, `data/conventions` |
 | `tanstack-query` | `@codelaw/rules-tanstack-query` | — | JS, JSX, TS, TSX using TanStack Query | `tanstack-query/recommended` |
 | `redux-toolkit` | `@codelaw/rules-redux-toolkit` | — | JS, JSX, TS, TSX using Redux | `redux-toolkit/recommended` |

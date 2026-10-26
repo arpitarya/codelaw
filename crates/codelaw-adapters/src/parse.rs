@@ -418,6 +418,7 @@ impl Finding {
             steps,
             source: source.to_owned(),
             note: None,
+            data: None,
         }
     }
 }

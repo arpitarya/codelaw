@@ -2,3 +2,19 @@
 # Rewrite with --update-snapshot, and review the change.
 
 [findings]
+"sec-ts/angular-bypass-security-trust" = 0
+"sec-ts/angular-native-element-html" = 0
+"sec-ts/nest-cors" = 0
+"sec-ts/nest-missing-guard" = 0
+"sec-ts/nest-throttler" = 0
+"sec-ts/nest-validation-whitelist" = 0
+"sec-ts/next-server-action-validation" = 0
+"sec-ts/no-any-request-handler" = 0
+"sec-ts/no-permissive-schema" = 0
+"sec-ts/no-prisma-raw-unsafe" = 0
+"sec-ts/no-query-builder-raw" = 0
+"sec-ts/no-ts-ignore-on-sink" = 2
+"sec-ts/no-typeorm-string-query" = 0
+"sec-ts/no-unchecked-cast-of-input" = 21
+"sec-ts/trpc-public-mutation" = 0
+"sec-ts/typeorm-synchronize" = 0

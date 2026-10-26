@@ -79,6 +79,8 @@ struct Finding {
     message: String,
     edits: Option<Vec<TextEdit>>,
     note: Option<String>,
+    /// Structured facts a native rule attaches (`NativeRule::data_of`).
+    data: Option<serde_json::Value>,
     /// A graded finding's own severity (a native rule's `severity_of`).
     severity: Option<Severity>,
 }
@@ -116,6 +118,7 @@ pub(crate) fn meta_diagnostic(entry_rel: &str, layers: &[Layer], id: &str, messa
         steps: rule.steps.iter().map(|s| s.to_string()).collect(),
         source: "engine".into(),
         note: None,
+        data: None,
     })
 }
 
@@ -513,6 +516,7 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
             steps,
             source: rule.loaded.source.label(),
             note,
+            data: f.data,
         });
     }
 
@@ -634,7 +638,7 @@ fn apply_suppressions(
 const INTERNAL_ERROR: &str = "internal-error";
 
 fn internal_error(rule: usize, start: usize, end: usize, id: &str, what: &str) -> Finding {
-    Finding { rule, start, end, message: format!("rule `{id}` failed on this file: {what}"), edits: None, note: Some(INTERNAL_ERROR.into()), severity: None }
+    Finding { rule, start, end, message: format!("rule `{id}` failed on this file: {what}"), edits: None, note: Some(INTERNAL_ERROR.into()), data: None, severity: None }
 }
 
 fn panic_message(p: &(dyn std::any::Any + Send)) -> String {
@@ -768,8 +772,9 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                 let options = sectioned[slot].as_ref().unwrap_or(&unit.rules[slot].2.options);
                 for f in std::mem::take(&mut native[slot]) {
                     let severity = nr.severity_of(&f, options);
+                    let data = nr.data_of(&f, options);
                     let edits = (wants_fix && !f.edits.is_empty()).then_some(f.edits);
-                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: f.message, edits, note: None, severity });
+                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: f.message, edits, note: None, data, severity });
                 }
             }
             Matcher::Match(_) => {
@@ -825,7 +830,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     _ => {}
                 }
                 for (m, (edits, note)) in ms.iter().zip(per) {
-                    out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note, severity: None });
+                    out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note, data: None, severity: None });
                 }
             }
             Matcher::Graph(_) => {}
@@ -863,7 +868,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                         _ => (None, None),
                     };
                     let text = codelaw_match::target::interpolate(message, tree, &f.slot, &unit.text, f.error.as_deref());
-                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: text, edits, note, severity: None });
+                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: text, edits, note, data: None, severity: None });
                 }
             }
             Matcher::Unsupported(_) => {}

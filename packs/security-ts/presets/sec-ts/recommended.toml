@@ -2,3 +2,13 @@ description = "sec-js/recommended and the high-confidence TypeScript-only securi
 extends = ["codelaw:sec-js/recommended"]
 
 [rules]
+"sec-ts/angular-bypass-security-trust" = "error"
+"sec-ts/angular-native-element-html" = "error"
+"sec-ts/nest-cors" = "error"
+"sec-ts/nest-validation-whitelist" = "error"
+"sec-ts/next-server-action-validation" = "error"
+"sec-ts/no-permissive-schema" = "error"
+"sec-ts/no-prisma-raw-unsafe" = "error"
+"sec-ts/no-query-builder-raw" = "error"
+"sec-ts/no-typeorm-string-query" = "error"
+"sec-ts/typeorm-synchronize" = "error"

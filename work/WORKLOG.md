@@ -120,6 +120,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the shared `target/debug/codelaw` is overwritten by every lane's build, so a CLI test can run another lane's binary; the tests were run from a private copy of the binary with the baked path patched, after every `cargo test` that skipped the relink gave a false red.
 - **Next:** none for W-59.
 
+## 2026-10-26 — W-55 built: `security-ts`, 16 rules  ·  Claude Code, lockmaster (Sonnet 5.5)
+
+- **Asked:** *"W-55 (security-ts, 16 rules on top)"*, the second landing of the same sub-agent after W-54.
+- **Done:** 16 rule files under `packs/security-ts/rules/sec-ts/` with `.cases.md` sidecars, the two presets (extending `security-js`'s), the README, NOTICE, `corpus.toml`. `codelaw test packs/security-ts`: 16 rules · 198 checks · 0 failed. W-55 archived; SR-RULE-PACKS names what landed.
+- **Decided / left open:** no cargo integration test (disk); the pack's own examples, cases and corpus counts are the tests. `nest-missing-guard`, `nest-throttler`, `no-ts-ignore-on-sink` (21 hits in test code at first) are `strict` because a guard or a throttler registered in another file is not seen.
+- **Mistakes:** matched `class_declaration` for a decorated controller, but tree-sitter-typescript puts the decorators of an exported class on the `export_statement`; found by the Do example firing, fixed by matching the export (or an unexported class).
+- **Next:** the decider's inbox; W-56 and the rest of the queue.
+
 ## 2026-10-26 — W-54 built: `security-js`, 66 rules  ·  Claude Code, lockmaster (Sonnet 5.5)
 
 - **Asked:** *"W-54 (security-js pack, 66 rules), every rule with a fix (L4), fixtures and tests"* — a sub-agent of a parallel session, Arpit having approved everything.
@@ -135,6 +143,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Decided / left open:** the preset split is mine: `strict` holds `no-external-base`, `no-plugin-embed`, `no-sensitive-comments`, `form-csrf-token`, `iframe-allow-powerful`, the rules that cannot tell a legitimate use from a risky one; the rest are in `recommended`. Uploading the pack to npm and PyPI is the release's (W-38), not this item's.
 - **Mistakes:** `target/debug/codelaw` is one file shared by every lane building into the shared target dir, so a test that runs the binary can run another lane's build; a copy taken right after a forced rebuild gave the right one.
 - **Next:** none for W-56; W-54, W-55 and W-57 are the sibling packs.
+
+## 2026-10-26 — W-58: size limits for JS, TS and Python  ·  Claude Code (Sonnet 5.5), in a lockmaster worktree
+
+- **Asked:** W-58 — max lines per file, max lines per function and max parameters, each configurable, for JS, TS and Python.
+- **Done:** six native rules in one module (`size.rs`), their pages and cases (every option and form), presets `js/size` and `py/size`; `NativeRule::data_of` and `Diagnostic::data` carry the measured value and the limit into JSON and SARIF; `options=<json>` on an example or case fence (a Don't cannot be 300 lines long), with the test harness keying its compiled rule set on the options; USAGE "Size limits", the packs' README rows, CHANGELOG; SR-RULE-FORMAT 5, SR-ARCHITECTURE 15b, SR-CLI-MCP 4, SR-RULE-PACKS rows.
+- **Decided / left open:** the rule counts lines from the parsed tree's comment, docstring and import ranges; with `include_nested = false` an inner function's lines are removed from its first line to its last, as ESLint does; an invalid `ignore_names` expression is one finding at the file's start, and the rule still measures. Left: the six corpus counts and DoD 6 on CI's `perf` job.
+- **Mistakes:** the integration tests of `codelaw-cli` run `target/debug/codelaw`, which concurrent lanes sharing one target dir overwrite; five suites failed with another lane's binary until I re-ran each with a fresh build. A retry is the workaround, a per-lane target dir the fix.
+- **Next:** the two items under W-58's "what is left".
 
 ## 2026-10-26 — W-62: SCSS joins as a CSS dialect; the `scss` pack  ·  Claude Code (Sonnet 5.5)
 

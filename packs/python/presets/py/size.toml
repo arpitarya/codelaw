@@ -1,0 +1,6 @@
+description = "Size limits: max lines per module, max lines per function and max parameters (Pylint's and Ruff's defaults); opt in"
+
+[rules]
+"py/max-lines" = "warn"
+"py/max-lines-per-function" = "warn"
+"py/max-params" = "warn"

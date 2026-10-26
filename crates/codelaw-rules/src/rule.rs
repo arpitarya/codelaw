@@ -258,11 +258,16 @@ pub enum ExampleKind {
     Fixed,
 }
 
-/// One fenced example. The info string is `<tag> [path=<file>]`.
+/// One fenced example. The info string is `<tag> [path=<file>]
+/// [options=<json>]`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Snippet {
     pub code: String,
     pub path: Option<String>,
+    /// Options the example runs with, over the rule's defaults
+    /// (`options={"max":3}`, compact JSON): a threshold rule's Don't needs
+    /// a limit a snippet can exceed.
+    pub options: BTreeMap<String, serde_json::Value>,
     /// 1-based line of the fence in the rule file.
     pub line: usize,
 }
@@ -369,12 +374,21 @@ fn line_of(body: &str, offset: usize, body_line: usize) -> usize {
     body_line + body[..offset.min(body.len())].matches('\n').count()
 }
 
-/// Parse the info string of an example fence: `<tag> [path=<file>]`.
-fn fence_info(info: &str) -> (String, Option<String>) {
+/// A fence's tag, its `path=` and its `options=`.
+type FenceInfo = (String, Option<String>, BTreeMap<String, serde_json::Value>);
+
+/// Parse the info string of an example fence: `<tag> [path=<file>]
+/// [options=<json>]`. Options that are not a JSON object are an error.
+fn fence_info(info: &str) -> Result<FenceInfo, String> {
     let mut parts = info.split_whitespace();
     let tag = parts.next().unwrap_or_default().to_owned();
-    let path = parts.find_map(|p| p.strip_prefix("path=").map(|s| s.trim_matches('"').to_owned()));
-    (tag, path)
+    let rest: Vec<&str> = parts.collect();
+    let path = rest.iter().find_map(|p| p.strip_prefix("path=").map(|s| s.trim_matches('"').to_owned()));
+    let options = match rest.iter().find_map(|p| p.strip_prefix("options=")) {
+        None => BTreeMap::new(),
+        Some(json) => serde_json::from_str(json).map_err(|e| format!("`options=` must be a compact JSON object (no spaces): {e}"))?,
+    };
+    Ok((tag, path, options))
 }
 
 fn normalise_kind(heading: &str) -> Option<ExampleKind> {
@@ -697,7 +711,13 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
                 }
             }
             Piece::Fence { info, code } => {
-                let (tag, fence_path) = fence_info(info);
+                let (tag, fence_path, fence_options) = match fence_info(info) {
+                    Ok(t) => t,
+                    Err(e) => {
+                        err(&mut errors, line, e);
+                        (String::new(), None, BTreeMap::new())
+                    }
+                };
                 if h2.is_none() && tag == "codelaw" {
                     if block_seen {
                         err(&mut errors, line, "a rule has one `codelaw` block".into());
@@ -711,7 +731,7 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
                     && let (Some(l), Some(k)) = (lang, kind)
                 {
                     let entry = examples.iter_mut().find(|e| e.language == l).expect("pushed at its heading");
-                    let snippet = Snippet { code: code.clone(), path: fence_path, line };
+                    let snippet = Snippet { code: code.clone(), path: fence_path, options: fence_options, line };
                     match k {
                         ExampleKind::Dont => entry.donts.push(snippet),
                         ExampleKind::Do => entry.dos.push(snippet),
@@ -865,7 +885,13 @@ pub fn parse_cases(path: &Path, text: &str) -> Result<Vec<Case>, Vec<LoadError>>
             }
             Piece::Fence { info, code } => {
                 let Some(o) = open.as_mut() else { continue };
-                let (tag, fence_path) = fence_info(&info);
+                let (tag, fence_path, fence_options) = match fence_info(&info) {
+                    Ok(t) => t,
+                    Err(e) => {
+                        errors.push(LoadError::at(path, line, format!("case `{}`: {e}", o.title)));
+                        continue;
+                    }
+                };
                 match tag.as_str() {
                     "expect" => {
                         let lines: Vec<String> = code.lines().map(str::trim).filter(|l| !l.is_empty()).map(str::to_owned).collect();
@@ -873,7 +899,7 @@ pub fn parse_cases(path: &Path, text: &str) -> Result<Vec<Case>, Vec<LoadError>>
                     }
                     "fixed" => o.fixed = Some(code),
                     _ => match Language::from_fence_tag(&tag) {
-                        Some(l) if o.input.is_none() => o.input = Some((l, Snippet { code, path: fence_path, line })),
+                        Some(l) if o.input.is_none() => o.input = Some((l, Snippet { code, path: fence_path, options: fence_options, line })),
                         Some(_) => errors.push(LoadError::at(path, line, format!("case `{}` has two input fences", o.title))),
                         None => errors.push(LoadError::at(path, line, format!("case `{}`: unknown fence `{tag}`", o.title))),
                     },
@@ -889,6 +915,17 @@ pub fn parse_cases(path: &Path, text: &str) -> Result<Vec<Case>, Vec<LoadError>>
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_fence_takes_options_as_compact_json() {
+        let (tag, path, options) = fence_info("js path=src/a.js options={\"max\":3,\"skip_comments\":false}").unwrap();
+        assert_eq!((tag.as_str(), path.as_deref()), ("js", Some("src/a.js")));
+        assert_eq!(options.get("max"), Some(&serde_json::json!(3)));
+        assert_eq!(options.get("skip_comments"), Some(&serde_json::json!(false)));
+        assert!(fence_info("py").unwrap().2.is_empty());
+        assert!(fence_info("py options=[1]").is_err());
+        assert!(fence_info("py options={\"max\":").is_err());
+    }
 
     const GOOD: &str = r#"---
 id: acme/no-var

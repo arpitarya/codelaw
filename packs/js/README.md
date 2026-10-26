@@ -20,6 +20,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `js/typescript` | 4 | the four core rules typescript-eslint 8.71.2's `eslint-recommended` switches on for TypeScript: `js/no-var`, `js/prefer-const`, `js/prefer-rest-params`, `js/prefer-spread`; use it with `codelaw:ts/recommended` |
 | `js/conventions` | 3 | codelaw's starter catalogue: `js/exports-at-end`, `js/import-groups`, `js/no-default-export` — opt in |
 | `js/project` | 1 | `graph/no-unused-exports`, the rule that reads the whole repo, from knip's `exports` and `types` — opt in |
+| `js/size` | 3 | size limits at `warn`, with ESLint's defaults: `js/max-lines` (300 per file), `js/max-lines-per-function` (50) and `js/max-params` (3) — opt in |
 
 <!-- /docs-sync:presets -->
 
