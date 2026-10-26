@@ -47,7 +47,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-58** `agent` Size limits for JS, TS and Python built (six rules, `js/size` and `py/size`, measured value in JSON and SARIF); left: CI's `perf` run (DoD 6); the six corpus counts are in. Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
 
-🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: patch tree-sitter-scss (`@if not` is an `ERROR`), CSS rules onto trees, a pinned corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
+🔴 **W-62** `arpit` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: Arpit ratifies `tree-sitter-cli` 0.25.10 (L11), then grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-70** `agent` Example apps for the dev-server plugins on real Vite, webpack, Rspack, Next.js, via a CI job that installs the hosts (L11). Built; left: the first CI run on the real hosts, fix, close. Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
 

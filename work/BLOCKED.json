@@ -1,8 +1,10 @@
 {
- "decision": "PROCEED",
- "reason": "the go to publish was given — npm 0.1.0 by hand 2026-10-24; npm 0.2.0 from CI is W-37 (agent, now), PyPI 0.2.0 by hand is W-38, the inbox's one row",
- "questions": [],
- "safe_alternative": "",
+ "decision": "ASK",
+ "reason": "W-62's grammar patches (tree-sitter-scss `@if not`, the tree-sitter-css fork's ERROR forms) need the tree-sitter CLI (npm `tree-sitter-cli` 0.25.10, MIT) to regenerate src/ from grammar.js; it is not installed and not ratified in DEPENDENCIES.md (L11, any ecosystem or scope)",
+ "questions": [
+  "Ratify `tree-sitter-cli` 0.25.10 (MIT, dev/build-time only, npm, with its platform binary) as a DEPENDENCIES.md row, so W-62 can patch and regenerate both vendored grammars?"
+ ],
+ "safe_alternative": "none for the grammar patches; the pinned SCSS corpus waits on CI network either way; the rest of W-62 is built",
  "surfaced": true,
- "filed": "2026-10-24"
+ "filed": "2026-10-26"
 }

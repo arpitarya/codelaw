@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-26 — W-62 finish attempt: blocked on the tree-sitter CLI  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** finish W-62 (patch tree-sitter-scss, CSS rules onto trees, pinned corpus), blocking under L11 where a dependency is unratified.
+- **Done:** nothing in code. Regenerating a patched grammar needs the tree-sitter CLI, which is absent and not in `DEPENDENCIES.md`; filed `work/BLOCKED.json` (ASK), re-balled W-62 to `arpit` in `OPEN-WORK.md` and the item.
+- **Decided / left open:** ratify `tree-sitter-cli` 0.25.10 (build-time, MIT)? The corpus step needs CI network and was not attempted.
+- **Mistakes:** none.
+- **Next:** Arpit rules on the CLI; then an agent patches both grammars.
+
 ## 2026-10-26 — W-71 step 1: the per-function change set  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** implement W-71, step 1 first.
