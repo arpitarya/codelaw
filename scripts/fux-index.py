@@ -291,7 +291,8 @@ def check(out: pathlib.Path) -> None:
             bad.append(f"{rel}: its sha256 is not the one SHA256SUMS lists")
     # the release set itself must not carry them: they are published on their own
     for sub in ("npm", "pypi"):
-        for f in (out / sub).glob(f"*{SUFFIX.replace('-', '*')}*") if (out / sub).is_dir() else []:
+        # `fux?index`: npm's `-fux-index` and a wheel's `_fux_index` (no `**`: Python < 3.13 refuses it)
+        for f in (out / sub).glob(f"*{SUFFIX.lstrip('-').replace('-', '?')}*") if (out / sub).is_dir() else []:
             bad.append(f"{sub}/{f.name}: an index package is in the release set — publish.yml would upload it unreserved")
     if bad:
         fail(f"{len(bad)} fux-index check(s) failed:\n  " + "\n  ".join(bad))
