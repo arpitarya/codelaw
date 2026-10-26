@@ -1,10 +1,12 @@
 //! The agent surfaces (SR-AGENT-SURFACES): `codelaw hook`, which checks and
 //! fixes the files an agent just edited, and `codelaw sync-agents`, which
-//! writes every agent's files from one source — the skills in `agents/`
-//! and the project's rules. Like every surface it only translates; the
+//! writes every agent's files from one source — the installed skills
+//! package (`@codelaw/skills`, `codelaw-skills`: `templates/agents/` of the
+//! same release, W-77) and the project's rules. Like every surface it only translates; the
 //! verdicts come from `codelaw-engine` (SR-ARCHITECTURE decision 2).
 
 pub mod hook;
+pub mod package;
 pub mod skills;
 pub mod sync;
 

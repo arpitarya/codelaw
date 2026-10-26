@@ -10,7 +10,7 @@ feature: the licence and cost of every dependency
 owns:
   - crates/codelaw-cli/tests/licences.rs
 laws: [L0, L2]
-timestamp: 2026-10-22T20:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -108,6 +108,9 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
     `package.json` dependencies, and each one found must be declared in its
     `BUILD_TOOLS` table with its licence, its source and what it installs in
     turn. An undeclared install, or a declared one nothing installs, fails.
+    codelaw's own packages — `codelaw`, `@codelaw/*`, `codelaw-rules-*` and,
+    since W-77 (2026-10-27), `codelaw-skills` — are not third-party and are
+    not declared there.
 - **npm itself is `Artistic-2.0`,** allowed by decision 2 since the
   decider's ruling of 2026-10-22: codelaw runs npm to publish and ships none
   of it. `licences.rs` keeps an `AWAITING_RULING` list for the next licence

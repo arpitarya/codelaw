@@ -88,8 +88,26 @@ fn git(cwd: &Path, args: &[&str]) -> String {
 }
 
 fn codelaw(cwd: &Path, args: &[&str]) -> (i32, String) {
-    let out = Command::new(env!("CARGO_BIN_EXE_codelaw")).args(args).current_dir(cwd).env_remove("VIRTUAL_ENV").env_remove("CODELAW_CACHE_DIR").output().unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codelaw"))
+        .args(args)
+        .current_dir(cwd)
+        .env_remove("VIRTUAL_ENV")
+        .env_remove("CODELAW_CACHE_DIR")
+        .env("CODELAW_SKILLS", skills_package())
+        .output()
+        .unwrap();
     (out.status.code().unwrap_or(-1), format!("{}{}", String::from_utf8_lossy(&out.stdout), String::from_utf8_lossy(&out.stderr)))
+}
+
+/// The skills package `init --agents` reads (W-77), outside the consumer so
+/// it adds no path to its tree: `templates/agents/` and its manifest.
+fn skills_package() -> PathBuf {
+    let d = std::env::temp_dir().join(format!("codelaw-layout-skills-{}", std::process::id()));
+    if !d.join("codelaw-skills.json").is_file() {
+        copy_dir(&repo_root().join("templates/agents"), &d);
+        fs::write(d.join("codelaw-skills.json"), format!("{{\"name\": \"codelaw-skills\", \"version\": \"{}\"}}\n", env!("CARGO_PKG_VERSION"))).unwrap();
+    }
+    d
 }
 
 fn copy_dir(from: &Path, to: &Path) {

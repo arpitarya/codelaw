@@ -1,17 +1,17 @@
-//! The skill sources, compiled into the binary so both packages ship the
-//! same skills (SR-AGENT-SURFACES decision 1, L6).
+//! The skill catalogue. The texts are not in the binary: they ship in the
+//! skills package (`@codelaw/skills`, `codelaw-skills`; W-77), whose files
+//! are `templates/agents/` of the same release (SR-LAW-10), and are read
+//! from it through [`AgentFiles`].
 
-use codelaw_core::template;
-use std::sync::LazyLock;
+use crate::package::AgentFiles;
 
 /// One skill: its folder name and its `SKILL.md`.
-pub struct Skill {
+pub struct Skill<'a> {
     pub name: &'static str,
-    pub text: &'static str,
+    pub text: &'a str,
 }
 
-/// The catalogue, P1 first (SR-AGENT-SURFACES §The skill catalogue). The
-/// texts are templates/agents/skills/ (SR-LAW-10).
+/// The catalogue, P1 first (SR-AGENT-SURFACES §The skill catalogue).
 pub const NAMES: [&str; 12] = [
     "codelaw-write",
     "codelaw-fix",
@@ -27,27 +27,19 @@ pub const NAMES: [&str; 12] = [
     "codelaw-upgrade",
 ];
 
-pub static SKILLS: LazyLock<Vec<Skill>> = LazyLock::new(|| {
-    NAMES
-        .iter()
-        .map(|name| {
-            let t = template::TEMPLATES
-                .iter()
-                .find(|t| t.path.strip_prefix("agents/skills/").and_then(|p| p.strip_suffix("/SKILL.md")) == Some(*name))
-                .unwrap_or_else(|| panic!("no template for skill {name}"));
-            Skill { name, text: t.text }
-        })
-        .collect()
-});
+/// Every skill of the catalogue, from the package.
+pub fn skills(files: &AgentFiles) -> Result<Vec<Skill<'_>>, String> {
+    NAMES.iter().map(|name| Ok(Skill { name, text: files.text(&format!("skills/{name}/SKILL.md"))? })).collect()
+}
 
 /// The custom agent `codelaw-rule-author` (Claude Code and Copilot).
-pub fn rule_author() -> &'static str {
-    template::text("agents/agents/codelaw-rule-author.md")
+pub fn rule_author(files: &AgentFiles) -> Result<&str, String> {
+    files.text("agents/codelaw-rule-author.md")
 }
 
 /// The trigger evals of every skill (decision 5).
-pub fn trigger_evals() -> &'static str {
-    template::text("agents/evals/triggers.json")
+pub fn trigger_evals(files: &AgentFiles) -> Result<&str, String> {
+    files.text("evals/triggers.json")
 }
 
 /// Split `---` frontmatter from the body.
@@ -64,12 +56,19 @@ pub fn field<'a>(frontmatter: &'a str, key: &str) -> Option<&'a str> {
 
 /// A source with the "generated" note after its frontmatter, so a reader
 /// of the copy knows where to edit (decision 4).
-pub fn with_generated_note(text: &str) -> String {
-    let note = template::text("agents/note-skill.md");
+pub fn with_generated_note(files: &AgentFiles, text: &str) -> Result<String, String> {
+    let note = files.text("note-skill.md")?;
     match split(text) {
-        Some((fm, body)) => format!("---\n{fm}\n---\n{note}{body}"),
-        None => format!("{note}{text}"),
+        Some((fm, body)) => Ok(format!("---\n{fm}\n---\n{note}{body}")),
+        None => Ok(format!("{note}{text}")),
     }
+}
+
+/// The repo's own `templates/agents/`, for the tests: what the package holds.
+#[cfg(test)]
+pub(crate) fn source() -> AgentFiles {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../templates/agents");
+    AgentFiles::read_tree(&dir, env!("CARGO_PKG_VERSION").to_owned()).unwrap()
 }
 
 #[cfg(test)]
@@ -78,7 +77,8 @@ mod tests {
 
     #[test]
     fn every_skill_follows_the_agent_skills_format() {
-        for s in SKILLS.iter() {
+        let files = source();
+        for s in skills(&files).unwrap() {
             let (fm, body) = split(s.text).unwrap_or_else(|| panic!("{}: no frontmatter", s.name));
             assert_eq!(field(fm, "name"), Some(s.name), "{}: `name` must equal the folder", s.name);
             assert!(s.name.len() <= 64 && s.name.chars().all(|c| c.is_ascii_lowercase() || c == '-'), "{}", s.name);
@@ -96,7 +96,7 @@ mod tests {
     fn the_catalogue_is_what_fix_skill_may_name() {
         // L4 decision 10: a `fix_skill:` resolves at load only to a skill
         // codelaw ships; both lists must be the same.
-        let mut shipped: Vec<&str> = SKILLS.iter().map(|s| s.name).collect();
+        let mut shipped: Vec<&str> = NAMES.to_vec();
         shipped.sort();
         let mut known = codelaw_rules::KNOWN_SKILLS.to_vec();
         known.sort();
@@ -105,18 +105,20 @@ mod tests {
 
     #[test]
     fn every_skill_has_trigger_evals() {
-        let v: serde_json::Value = serde_json::from_str(trigger_evals()).unwrap();
-        for s in SKILLS.iter() {
+        let files = source();
+        let v: serde_json::Value = serde_json::from_str(trigger_evals(&files).unwrap()).unwrap();
+        for s in skills(&files).unwrap() {
             let e = &v["skills"][s.name];
             assert!(e["should"].as_array().is_some_and(|a| a.len() >= 3), "{}: needs prompts that fire it", s.name);
             assert!(e["should_not"].as_array().is_some_and(|a| a.len() >= 3), "{}: needs near-misses", s.name);
         }
-        assert_eq!(v["skills"].as_object().unwrap().len(), SKILLS.len());
+        assert_eq!(v["skills"].as_object().unwrap().len(), NAMES.len());
     }
 
     #[test]
     fn the_generated_note_keeps_frontmatter_first() {
-        let out = with_generated_note(SKILLS[0].text);
+        let files = source();
+        let out = with_generated_note(&files, skills(&files).unwrap()[0].text).unwrap();
         assert!(out.starts_with("---\nname: codelaw-write\n"));
         assert!(out.contains("---\n<!-- Generated by `codelaw sync-agents`"));
     }

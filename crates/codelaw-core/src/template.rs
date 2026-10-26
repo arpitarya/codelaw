@@ -1,7 +1,10 @@
 //! Consumer-file templates (SR-LAW-10, L10): every file codelaw writes into a
 //! consumer's repository is rendered from one template in `templates/` at
-//! this repo's root, embedded here at build time. Code computes values and
-//! fills the template's named slots; it holds no consumer text.
+//! this repo's root. Code computes values and fills the template's named
+//! slots; it holds no consumer text. Every template is embedded here at build
+//! time **except `templates/agents/`**, which ships as the skills package
+//! (`@codelaw/skills`, `codelaw-skills`; W-77, SR-LAW-10 decision 6) and is
+//! read from it by `codelaw-agents`, through [`render_text`].
 //!
 //! A template is text and `{{name}}` slots, nothing else: no conditions, no
 //! loops (an optional section is its own template, rendered into a slot).
@@ -22,41 +25,10 @@ macro_rules! t {
     };
 }
 
-/// Every template, in path order. `templates/README.md` is the registry of
+/// Every embedded template, in path order: all of `templates/` but
+/// `agents/`, the skills package's. `templates/README.md` is the registry of
 /// what each is for; the test in this module keeps the three in step.
 pub const TEMPLATES: &[Template] = &[
-    t!("agents/agents/codelaw-rule-author.md"),
-    t!("agents/always-on.md"),
-    t!("agents/block.md"),
-    t!("agents/claude/hook-group.json"),
-    t!("agents/codex/config.toml"),
-    t!("agents/copilot/hook.json"),
-    t!("agents/copilot/instructions.md"),
-    t!("agents/copilot/mcp-server.json"),
-    t!("agents/cowork/hooks.json"),
-    t!("agents/cowork/mcp.json"),
-    t!("agents/cowork/plugin.json"),
-    t!("agents/evals/triggers.json"),
-    t!("agents/kiro/hook.json"),
-    t!("agents/kiro/steering-language.md"),
-    t!("agents/kiro/steering.md"),
-    t!("agents/mcp-server.json"),
-    t!("agents/note-block.md"),
-    t!("agents/note-skill.md"),
-    t!("agents/path-scoped-rule.md"),
-    t!("agents/path-scoped.md"),
-    t!("agents/skills/codelaw-author-rule/SKILL.md"),
-    t!("agents/skills/codelaw-ci-triage/SKILL.md"),
-    t!("agents/skills/codelaw-debug-rule/SKILL.md"),
-    t!("agents/skills/codelaw-explain/SKILL.md"),
-    t!("agents/skills/codelaw-fix/SKILL.md"),
-    t!("agents/skills/codelaw-migrate/SKILL.md"),
-    t!("agents/skills/codelaw-pack/SKILL.md"),
-    t!("agents/skills/codelaw-review/SKILL.md"),
-    t!("agents/skills/codelaw-setup/SKILL.md"),
-    t!("agents/skills/codelaw-suppress/SKILL.md"),
-    t!("agents/skills/codelaw-upgrade/SKILL.md"),
-    t!("agents/skills/codelaw-write/SKILL.md"),
     t!("ci/github/autofix-suggest-job.yml"),
     t!("ci/github/codelaw-autofix.yml"),
     t!("ci/gitlab/autofix-suggest-job.yml"),
@@ -217,7 +189,9 @@ mod tests {
     }
 
     /// L10 decision 7: the folder, the embedded list and the registry
-    /// (`templates/README.md`) name the same files, and each renders.
+    /// (`templates/README.md`) name the same files, and each renders. The
+    /// folder is the embedded list plus `agents/`, which is the skills
+    /// package's and is never embedded (W-77).
     #[test]
     fn the_registry_matches_the_folder() {
         let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../templates");
@@ -226,7 +200,9 @@ mod tests {
         on_disk.retain(|p| p != "README.md");
         on_disk.sort();
         let embedded: Vec<&str> = TEMPLATES.iter().map(|t| t.path).collect();
-        assert_eq!(on_disk, embedded, "every file in templates/ is in TEMPLATES (crates/codelaw-core/src/template.rs) and the reverse");
+        assert!(embedded.iter().all(|p| !p.starts_with("agents/")), "templates/agents/ ships in the skills package, never in the binary (W-77)");
+        let not_agents: Vec<&str> = on_disk.iter().map(String::as_str).filter(|p| !p.starts_with("agents/")).collect();
+        assert_eq!(not_agents, embedded, "every file in templates/ outside agents/ is in TEMPLATES (crates/codelaw-core/src/template.rs) and the reverse");
 
         let readme = std::fs::read_to_string(root.join("README.md")).unwrap();
         let mut rows: Vec<String> = readme
@@ -235,18 +211,22 @@ mod tests {
             .filter_map(|l| l.split_once("` |").map(|(p, _)| p.to_owned()))
             .collect();
         rows.sort();
-        assert_eq!(rows, embedded, "every template has one registry row in templates/README.md and the reverse");
+        assert_eq!(rows, on_disk, "every template has one registry row in templates/README.md and the reverse");
 
-        for t in TEMPLATES {
-            let fixture = FIXTURES.iter().find(|(p, _)| *p == t.path).map_or(&[][..], |(_, s)| *s);
-            let mut names = slot_names(t.text);
+        for path in &on_disk {
+            let text = std::fs::read_to_string(root.join(path)).unwrap();
+            if let Some(t) = find(path) {
+                assert_eq!(t.text, text, "{path}: the embedded copy is the file");
+            }
+            let fixture = FIXTURES.iter().find(|(p, _)| p == path).map_or(&[][..], |(_, s)| *s);
+            let mut names = slot_names(&text);
             names.sort();
             let mut given: Vec<&str> = fixture.iter().map(|(n, _)| *n).collect();
             given.sort();
-            assert_eq!(names, given, "{}: the fixture fills exactly the template's slots", t.path);
-            let out = render(t.path, fixture).unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(names, given, "{path}: the fixture fills exactly the template's slots");
+            let out = render_text(&text, fixture).unwrap_or_else(|e| panic!("{path}: {e}"));
             if fixture.is_empty() {
-                assert_eq!(out, t.text, "{}: a template without slots renders as it stands", t.path);
+                assert_eq!(out, text, "{path}: a template without slots renders as it stands");
             }
         }
     }

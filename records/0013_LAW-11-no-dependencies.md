@@ -11,7 +11,7 @@ owns:
   - DEPENDENCIES.md
   - crates/codelaw-cli/tests/dependencies.rs
 laws: [L0, L2, L11]
-timestamp: 2026-10-26T06:50:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-26 (Cowork): Okay. Create a law, no dependencies. For Rust, for Python, for JavaScript, TypeScript, JSON, CSS, YAML, TOML, HTML, nothing. No dependencies. Create a law. And then tell me what all dependencies do we have. We will ratify them one by one."
 ---
@@ -62,6 +62,7 @@ On 2026-10-26 codelaw had 47 direct Rust crates (376 in `Cargo.lock` with their 
 1. **Default deny.** No third-party dependency in any ecosystem or scope without a `ratified` row in `DEPENDENCIES.md`. **Copying third-party source into the repo (vendoring, a fork, a pasted file) is a dependency** and needs a row like any other.
 2. **Not dependencies:** the language toolchains and their standard libraries (Rust `rustc`/`cargo`/`std`, CPython and its standard library, Node.js and npm), `git`, the operating system, and codelaw's own crates and packages.
 3. **One list:** `DEPENDENCIES.md` at the repo root — one row per ratification unit (a family of crates published together counts as one unit), with its ecosystem, scope, what it does, its pinned version, its transitive count, and its status: `pending`, `ratified YYYY-MM-DD` with the decider's words, or `remove`.
+   - **codelaw's own packages depending on each other** are not third-party, but a published package's runtime dependency is still a row: the skills package's dependency on `codelaw` at its exact version is D-35, ratified 2026-10-27 by the decider's W-77 ruling (*"it will have a hard dependency on code law"*); [SR-PACKAGES](0107_packages.md) decision 3b.
 4. **Ratifying a unit accepts its transitive tree as pinned at that moment.** An upgrade that adds a new transitive package, or a new major version, needs the unit ratified again.
 5. **Today's dependencies are `pending`:** they stay at their current pin until the decider rules each one. A `pending` unit may not be upgraded to a version that adds transitive packages. `remove` opens a work item that replaces it with codelaw's own code; the row goes when the code no longer uses it.
 6. **What ships to users already holds:** the npm and PyPI `codelaw` packages have zero runtime dependencies ([SR-PACKAGES](0107_packages.md)); this law keeps it so.

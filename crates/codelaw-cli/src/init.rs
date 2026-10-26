@@ -257,6 +257,16 @@ pub fn init(args: InitArgs) -> ExitCode {
         return fail(format!("{} already configures codelaw here", codelaw_core::normalize_path(&existing.path)));
     }
 
+    // `--agents --no-install` installs nothing, so the skills package must
+    // already be here at this binary's version: refuse before writing any
+    // file (W-77; SR-AGENT-SURFACES decision 8).
+    if !targets.is_empty()
+        && args.no_install
+        && let Err(e) = codelaw_agents::package::locate(&root)
+    {
+        return fail(format!("{e}\nnothing was written; install it, or run `codelaw init` without --no-install"));
+    }
+
     let languages = detect_languages(&root);
     let package_json = std::fs::read_to_string(root.join("package.json")).ok();
     let mut wanted = packs_for(&languages, package_json.as_deref());
@@ -367,9 +377,19 @@ pub fn init(args: InitArgs) -> ExitCode {
         println!("note: {s}");
     }
 
-    let commands: Vec<Vec<String>> = by_registry.iter().map(|(r, pkgs)| install_command(&root, *r, pkgs)).collect();
+    // With `--agents`, the skills package too, at this binary's version: the
+    // agent files are in it, not in codelaw (W-77, SR-AGENT-SURFACES decision 8).
+    let skills_spec = match preferred("skills") {
+        Registry::Npm => format!("{}@{}", codelaw_agents::package::NPM_NAME, env!("CARGO_PKG_VERSION")),
+        Registry::Pypi => format!("{}=={}", codelaw_agents::package::PYPI_NAME, codelaw_agents::package::pep440(env!("CARGO_PKG_VERSION"))),
+    };
+    let mut install = by_registry.clone();
+    if !targets.is_empty() {
+        install.entry(preferred("skills")).or_default().push(skills_spec.as_str());
+    }
+    let commands: Vec<Vec<String>> = install.iter().map(|(r, pkgs)| install_command(&root, *r, pkgs)).collect();
     if args.no_install && !commands.is_empty() {
-        println!("install the rule packs with:");
+        println!("install the rule packs{} with:", if targets.is_empty() { "" } else { " and the skills package" });
         for c in &commands {
             println!("  {}", c.join(" "));
         }
@@ -395,7 +415,7 @@ pub fn init(args: InitArgs) -> ExitCode {
                     println!("\n{n}");
                 }
             }
-            Err(e) => return fail(e),
+            Err(e) => return fail(format!("the agent files were not written: {e}\nthen run `codelaw sync-agents`")),
         }
     }
     if let Some((p, w)) = ci {

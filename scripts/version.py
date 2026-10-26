@@ -2,7 +2,8 @@
 """The one version (L6 decision 9; SR-PACKAGES decision 7).
 
 The version lives in ONE file: `Cargo.toml` [workspace.package] `version`.
-Every npm and PyPI manifest is generated from it by `scripts/package.py`; the
+Every npm and PyPI manifest — the skills package's and its `codelaw-skills.json`
+included (W-77) — is generated from it by `scripts/package.py`; the
 only other copies are the `packs/*/codelaw-pack.toml` files and the editor
 extension's `packaging/vscode/package.json` and `package-lock.json`, which this
 script writes and checks (W-27).

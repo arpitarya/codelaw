@@ -10,7 +10,7 @@ feature: "the consumer directory"
 owns:
   - crates/codelaw-cli/tests/consumer_layout.rs
 laws: [L0, L3, L5, L6]
-timestamp: 2026-10-24T08:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -18,7 +18,7 @@ content_sha: ""
 
 ## §1 — For humans
 
-**The decision in one line.** A consumer writes **two things**: the config ([SR-CONFIG](0110_config.md)) and `.codelaw/` content (rules, fixers, baselines, deprecations). Everything agent-facing is **generated** by `codelaw sync-agents` and never edited by hand. The engine and the rule packs are **installed** by npm or pip. The only thing gitignored is `.codelaw/cache/`.
+**The decision in one line.** A consumer writes **two things**: the config ([SR-CONFIG](0110_config.md)) and `.codelaw/` content (rules, fixers, baselines, deprecations). Everything agent-facing is **generated** by `codelaw sync-agents` and never edited by hand. The engine, the rule packs and — with agents — the skills package (`@codelaw/skills` / `codelaw-skills`, the source of every generated agent file since W-77, 2026-10-27; [SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 8) are **installed** by npm or pip. The only thing gitignored is `.codelaw/cache/`.
 
 ```text
 my-app/

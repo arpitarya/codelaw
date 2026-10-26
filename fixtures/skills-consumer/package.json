@@ -1,0 +1,9 @@
+{
+  "name": "skills-consumer",
+  "private": true,
+  "devDependencies": {
+    "codelaw": "*",
+    "@codelaw/rules-data": "*",
+    "@codelaw/skills": "*"
+  }
+}

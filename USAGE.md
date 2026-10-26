@@ -261,7 +261,8 @@ The rule file itself is shown in the [README](README.md#a-rule-is-one-markdown-f
 
 - **`codelaw mcp`** is an MCP server over stdio. An agent calls `rules_for_path` before writing, `check_snippet` on a draft, `explain_rule` on a finding, and `format_snippet` for the exact bytes `fix` would write.
 - **The same answer from the CLI:** `codelaw rules --for src/math.ts`.
-- **`codelaw init --agents claude,codex,copilot,kiro,cowork`** writes each agent's instruction files, skills, MCP registration and hook from your rules; `codelaw sync-agents` rewrites them when the rules change, and `--check` reports drift ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
+- **The agent files come from the skills package**, installed beside codelaw at the same version: `npm i -D @codelaw/skills` or `pip install codelaw-skills` (`uv add --dev codelaw-skills`). It depends on that exact `codelaw`, and codelaw itself carries no agent file; without it, or at another version, `init --agents` and `sync-agents` stop with exit 2 and the install line. `CODELAW_SKILLS=<folder>` points at a copy elsewhere.
+- **`codelaw init --agents claude,codex,copilot,kiro,cowork`** installs it with the packs and writes each agent's instruction files, skills, MCP registration and hook from it and your rules; `codelaw sync-agents` rewrites them when the rules change, and `--check` reports drift ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
 
 ### While: the edit is checked before it reaches disk
 

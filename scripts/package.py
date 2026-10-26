@@ -8,7 +8,8 @@ build jobs in `.github/workflows/ci.yml`.
     package.py prepare-wheel                 copy LICENSE and README into packaging/python for maturin
     package.py extract WHEEL OUTDIR          take the binary out of a maturin wheel (the npm copy)
     package.py assemble --bins B --wheels W --out dist
-                                             build the 25 npm tarballs and the 9 pack wheels; copy the 8 engine wheels
+                                             build every npm tarball, the pack wheels and the skills wheel; copy the 8 engine wheels
+    package.py stage-skills OUTDIR           the skills package's folder, as both registries ship it (W-77)
     package.py check dist                    the release checks, against what was assembled
     package.py sync-dev-core                 copy the dev-server plugins' shared source into each package (W-49)
     package.py names                         every name codelaw publishes (SR-PACKAGES §1)
@@ -42,6 +43,18 @@ LICENCE_FILES = ("LICENSE",)
 SCHEMA = ROOT / "crates" / "codelaw-config" / "codelaw.schema.json"  # shipped in npm codelaw (SR-PACKAGES decision 3)
 REPO = "https://github.com/arpitarya/codelaw"
 PACK_TABLE = ROOT / "crates" / "codelaw-rules" / "src" / "pack.rs"
+
+# The skills package (W-77; SR-PACKAGES decision 3b, SR-AGENT-SURFACES decision 8):
+# every agent file codelaw writes, `templates/agents/` byte for byte, plus a
+# manifest naming its version — the same files on npm and PyPI. Its one runtime
+# dependency is codelaw at the exact same version (L11: DEPENDENCIES.md).
+SKILLS_SRC = ROOT / "templates" / "agents"
+SKILLS_README = ROOT / "packaging" / "npm" / "skills" / "README.md"
+SKILLS_NPM = "@codelaw/skills"
+SKILLS_PYPI = "codelaw-skills"
+SKILLS_MODULE = "codelaw_skills"
+SKILLS_MANIFEST = "codelaw-skills.json"  # read by crates/codelaw-agents/src/package.rs
+SKILLS_DESC = "codelaw's agent files — skills, steering, instructions, hooks, MCP registration — for the codelaw of the same version"
 
 # The npm-only dev-server plugins (W-49, SR-PACKAGES decision 3a). Each is one folder
 # under packaging/npm/ holding index.js, index.d.ts and README.md; the shared
@@ -215,8 +228,14 @@ def pack_tarball(name: str, v: str, src: pathlib.Path, dest: pathlib.Path, suffi
     """`@codelaw/rules-<name>` as an npm tarball: `package/` is the staged folder plus
     its package.json. Written here, not by `npm pack`, so it is byte-for-byte the
     same wherever it is built: fixed mtimes and modes, sorted entries, gzip mtime 0."""
+    # npm names a scoped package's tarball without the `@` and with `-` for `/`.
+    return data_tarball(pack_manifest(name, v, suffix, description), src, dest / f"codelaw-rules-{name}{suffix}-{v}.tgz")
+
+
+def data_tarball(manifest: dict, src: pathlib.Path, out: pathlib.Path) -> pathlib.Path:
+    """A data-only npm tarball, reproducible (see pack_tarball)."""
     entries = [(f.relative_to(src).as_posix(), f.read_bytes()) for f in src.rglob("*") if f.is_file()]
-    entries.append(("package.json", (json.dumps(pack_manifest(name, v, suffix, description), indent=2) + "\n").encode("utf-8")))
+    entries.append(("package.json", (json.dumps(manifest, indent=2) + "\n").encode("utf-8")))
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w", format=tarfile.PAX_FORMAT) as tar:
         for rel, data in sorted(entries):
@@ -225,8 +244,6 @@ def pack_tarball(name: str, v: str, src: pathlib.Path, dest: pathlib.Path, suffi
             info.mtime = NPM_MTIME
             info.mode = 0o644
             tar.addfile(info, io.BytesIO(data))
-    # npm names a scoped package's tarball without the `@` and with `-` for `/`.
-    out = dest / f"codelaw-rules-{name}{suffix}-{v}.tgz"
     with open(out, "wb") as raw, gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as gz:
         gz.write(buf.getvalue())
     return out
@@ -244,18 +261,24 @@ def wheel_for_pack(name: str, v: str, src: pathlib.Path, dest: pathlib.Path, suf
     With `suffix="-fux-index"` it is `codelaw_rules_<name>_fux_index` holding a Fux
     index segment (L6 decision 12)."""
     dist = pack_module(name) + suffix.replace("-", "_")
-    pv = pep440(v)
+    return data_wheel(dist, f"codelaw-rules-{name}{suffix}", pep440(v), description or pack_meta(name)["description"], src, dest)
+
+
+def data_wheel(dist: str, name: str, pv: str, summary: str, src: pathlib.Path, dest: pathlib.Path, requires: tuple[str, ...] = ()) -> pathlib.Path:
+    """One pure py3-none-any wheel whose package `dist` is the folder `src`, reproducible.
+    `requires` are its Requires-Dist lines: none but the skills package's (W-77)."""
     info = f"{dist}-{pv}.dist-info"
     readme = (src / "README.md").read_text(encoding="utf-8")
     metadata = "\n".join([
         "Metadata-Version: 2.4",
-        f"Name: codelaw-rules-{name}{suffix}",
+        f"Name: {name}",
         f"Version: {pv}",
-        f"Summary: {description or pack_meta(name)['description']}",
+        f"Summary: {summary}",
         f"License-Expression: {LICENCE}",
         *[f"License-File: {f}" for f in LICENCE_FILES],
         f"Project-URL: Repository, {REPO}",
         "Requires-Python: >=3.11",
+        *[f"Requires-Dist: {r}" for r in requires],
         "Description-Content-Type: text/markdown",
         "",
         readme,
@@ -282,6 +305,34 @@ def wheel_for_pack(name: str, v: str, src: pathlib.Path, dest: pathlib.Path, suf
             zi.compress_type = zipfile.ZIP_DEFLATED
             z.writestr(zi, data)
     return out
+
+
+def stage_skills(stage: pathlib.Path) -> pathlib.Path:
+    """The skills package's folder: `templates/agents/` byte for byte, the licence,
+    the README and the manifest the engine reads its version from (W-77). The same
+    files go to npm (plus package.json) and to PyPI (as `codelaw_skills/`)."""
+    v = versionmod.read_version()
+    d = stage / "skills"
+    shutil.copytree(SKILLS_SRC, d, ignore=shutil.ignore_patterns(".*"))
+    for own in (SKILLS_MANIFEST, *LICENCE_FILES, "README.md", "package.json"):
+        if (SKILLS_SRC / own).exists():
+            fail(f"templates/agents/{own} would be taken for the package's own file")
+    copy_licences(d)
+    shutil.copyfile(SKILLS_README, d / "README.md")
+    (d / SKILLS_MANIFEST).write_text(skills_manifest(v), encoding="utf-8")
+    return d
+
+
+def skills_manifest(v: str) -> str:
+    """The manifest at the package's root: the Cargo version, on both registries."""
+    return json.dumps({"name": SKILLS_PYPI, "version": v}, indent=2) + "\n"
+
+
+def skills_npm_manifest(v: str) -> dict:
+    m = base_manifest(SKILLS_NPM, v, SKILLS_DESC)
+    m["keywords"] = ["codelaw", "agent-skills", "claude-code", "copilot", "kiro", "codex"]
+    m["dependencies"] = {"codelaw": v}  # the one runtime dependency, exact (SR-PACKAGES decision 3b)
+    return m
 
 
 def assemble(bins: pathlib.Path, wheels: pathlib.Path, out: pathlib.Path) -> None:
@@ -365,6 +416,10 @@ def assemble(bins: pathlib.Path, wheels: pathlib.Path, out: pathlib.Path) -> Non
             wheel_for_pack(name, v, pd, pypi_out)
         if name in NPM_PACKS:
             pack_tarball(name, v, pd, npm_out)
+    # the skills package: the same folder on both, codelaw at exactly v (W-77)
+    sd = stage_skills(stage)
+    data_tarball(skills_npm_manifest(v), sd, npm_out / f"codelaw-skills-{v}.tgz")
+    data_wheel(SKILLS_MODULE, SKILLS_PYPI, pep440(v), SKILLS_DESC, sd, pypi_out, requires=(f"codelaw=={pep440(v)}",))
     with concurrent.futures.ThreadPoolExecutor(8) as pool:
         list(pool.map(lambda d: npm_pack(d, npm_out), to_pack))
 
@@ -407,13 +462,16 @@ def check(out: pathlib.Path) -> None:
             if f not in files:
                 bad.append(f"{t.name}: has no {f}")
         for field in ("dependencies", "peerDependencies", "bundleDependencies", "bundledDependencies"):
-            if man.get(field):
-                bad.append(f"{t.name}: has {field} — every package has zero runtime dependencies (L6 decision 4)")
+            if man["name"] == SKILLS_NPM and field == "dependencies":
+                if man.get(field) != {"codelaw": v}:
+                    bad.append(f"{t.name}: dependencies {man.get(field)} != {{'codelaw': '{v}'}} — the skills package's one dependency is codelaw at exactly its version (SR-PACKAGES decision 3b)")
+            elif man.get(field):
+                bad.append(f"{t.name}: has {field} — every package but {SKILLS_NPM} has zero runtime dependencies (L6 decision 4)")
         if man["name"] != "codelaw" and man.get("optionalDependencies"):
             bad.append(f"{t.name}: only codelaw may have optionalDependencies")
         if "scripts" in man:
             bad.append(f"{t.name}: has lifecycle scripts")
-    want_npm = {"codelaw"} | {f"@codelaw/cli-{k}" for k in TARGETS} | {f"@codelaw/rules-{n}" for n in NPM_PACKS} | {n for n, _ in DEV_PLUGINS.values()}
+    want_npm = {"codelaw"} | {f"@codelaw/cli-{k}" for k in TARGETS} | {f"@codelaw/rules-{n}" for n in NPM_PACKS} | {n for n, _ in DEV_PLUGINS.values()} | {SKILLS_NPM}
     bad.extend(sync_dev_core(check=True))
     if set(npm) != want_npm:
         bad.append(f"npm names: missing {sorted(want_npm - set(npm))}, not allowed {sorted(set(npm) - want_npm)}")
@@ -427,8 +485,9 @@ def check(out: pathlib.Path) -> None:
     # PyPI: codelaw ×8 platform wheels and a pure codelaw-rules-* wheel per PyPI pack, nothing else, no sdist
     seen_tags: dict[str, str] = {}
     pypi_packs: dict[str, dict[str, bytes]] = {}
+    pypi_skills: dict[str, bytes] | None = None
     for w in sorted((out / "pypi").iterdir()):
-        m = re.match(r"^(codelaw(?:_rules_[a-z_]+)?)-([^-]+)-([^-]+)-([^-]+)-([^-]+)\.whl$", w.name)
+        m = re.match(r"^(codelaw(?:_rules_[a-z_]+|_skills)?)-([^-]+)-([^-]+)-([^-]+)-([^-]+)\.whl$", w.name)
         if not m:
             bad.append(f"pypi: {w.name} is not a wheel codelaw publishes")
             continue
@@ -438,7 +497,11 @@ def check(out: pathlib.Path) -> None:
         with zipfile.ZipFile(w) as z:
             meta = z.read(f"{dist}-{wv}.dist-info/METADATA").decode()
             names = z.namelist()
-            if re.search(r"(?m)^Requires-Dist:", meta):
+            requires = re.findall(r"(?m)^Requires-Dist: *(.*)$", meta)
+            if dist == SKILLS_MODULE:
+                if requires != [f"codelaw=={pv}"]:
+                    bad.append(f"{w.name}: Requires-Dist {requires} != ['codelaw=={pv}'] — codelaw at exactly its version (SR-PACKAGES decision 3b)")
+            elif requires:
                 bad.append(f"{w.name}: has Requires-Dist — zero runtime dependencies")
             if f"License-Expression: {LICENCE}" not in meta:
                 bad.append(f"{w.name}: METADATA has no License-Expression: {LICENCE}")
@@ -460,6 +523,11 @@ def check(out: pathlib.Path) -> None:
                 for f in ("codelaw/__init__.py", "codelaw/__main__.py", "codelaw/py.typed"):
                     if f not in names:
                         bad.append(f"{w.name}: has no {f}")
+            elif dist == SKILLS_MODULE:
+                if (py, abi, plat) != ("py3", "none", "any"):
+                    bad.append(f"{w.name}: the skills wheel is py3-none-any")
+                prefix = f"{dist}/"
+                pypi_skills = {n[len(prefix):]: z.read(n) for n in names if n.startswith(prefix) and not n.endswith("/")}
             else:
                 if (py, abi, plat) != ("py3", "none", "any"):
                     bad.append(f"{w.name}: a pack wheel is py3-none-any")
@@ -490,6 +558,21 @@ def check(out: pathlib.Path) -> None:
             diff = sorted(set(a) ^ set(b)) or sorted(k for k in a if a[k] != b.get(k))
             bad.append(f"rules-{name}: npm and PyPI differ ({len(diff)} files, e.g. {diff[:3]})")
 
+    # skills parity (W-77, L6): npm and PyPI hold templates/agents/ byte for byte,
+    # plus the licence, the README and a manifest at this version
+    want_skills = {p.relative_to(SKILLS_SRC).as_posix(): p.read_bytes() for p in SKILLS_SRC.rglob("*") if p.is_file() and not p.name.startswith(".")}
+    want_skills[SKILLS_MANIFEST] = skills_manifest(v).encode("utf-8")
+    want_skills["README.md"] = SKILLS_README.read_bytes()
+    for f in LICENCE_FILES:
+        want_skills[f] = (ROOT / f).read_bytes()
+    skills_copies = {"npm": {k: x for k, x in npm.get(SKILLS_NPM, {}).items() if k != "package.json"}, "PyPI": pypi_skills or {}}
+    if pypi_skills is None:
+        bad.append(f"PyPI: no {SKILLS_PYPI} wheel")
+    for reg, files in skills_copies.items():
+        if files != want_skills:
+            diff = sorted(set(files) ^ set(want_skills)) or sorted(k for k in files if files[k] != want_skills.get(k))
+            bad.append(f"{SKILLS_NPM if reg == 'npm' else SKILLS_PYPI}: the {reg} copy is not templates/agents/ + its manifest at {v} ({len(diff)} files differ, e.g. {diff[:3]})")
+
     # SHA256SUMS: exactly the files that will be uploaded, each with its digest (W-18)
     sums = out / "SHA256SUMS"
     listed: dict[str, str] = {}
@@ -512,8 +595,9 @@ def check(out: pathlib.Path) -> None:
 
     if bad:
         fail(f"{len(bad)} release check(s) failed:\n  " + "\n  ".join(bad))
-    print(f"✔ {len(npm)} npm packages and {len(seen_tags) + len(pypi_packs)} wheels at {v}: only the SR-PACKAGES names, one version, "
-          "zero dependencies, licensed, one binary per platform, each pack its folder on every registry it is on, SHA256SUMS true")
+    print(f"✔ {len(npm)} npm packages and {len(seen_tags) + len(pypi_packs) + 1} wheels at {v}: only the SR-PACKAGES names, one version, "
+          "zero dependencies but the skills package's codelaw, licensed, one binary per platform, each pack its folder on every registry it is on, "
+          "the skills package templates/agents/ on both, SHA256SUMS true")
 
 
 def main() -> None:
@@ -530,6 +614,8 @@ def main() -> None:
     c = sub.add_parser("check")
     c.add_argument("out", type=pathlib.Path)
     sub.add_parser("sync-dev-core")
+    s = sub.add_parser("stage-skills")
+    s.add_argument("outdir", type=pathlib.Path)
     sub.add_parser("names", help="every name codelaw publishes, one `registry name` per line")
     args = ap.parse_args()
     if args.cmd == "prepare-wheel":
@@ -542,10 +628,16 @@ def main() -> None:
         check(args.out)
     elif args.cmd == "sync-dev-core":
         sync_dev_core()
+    elif args.cmd == "stage-skills":
+        if args.outdir.exists():
+            fail(f"{args.outdir} exists; stage-skills writes a new folder")
+        args.outdir.mkdir(parents=True)
+        d = stage_skills(args.outdir)
+        print(f"✔ the skills package at {versionmod.read_version()} in {d} (CODELAW_SKILLS={d} points codelaw at it)")
     else:
-        for n in ["codelaw", *[f"@codelaw/cli-{k}" for k in TARGETS], *[f"@codelaw/rules-{x}" for x in NPM_PACKS], *[n for n, _ in DEV_PLUGINS.values()]]:
+        for n in ["codelaw", *[f"@codelaw/cli-{k}" for k in TARGETS], *[f"@codelaw/rules-{x}" for x in NPM_PACKS], *[n for n, _ in DEV_PLUGINS.values()], SKILLS_NPM]:
             print(f"npm {n}")
-        for n in ["codelaw", *[f"codelaw-rules-{x}" for x in PYPI_PACKS]]:
+        for n in ["codelaw", *[f"codelaw-rules-{x}" for x in PYPI_PACKS], SKILLS_PYPI]:
             print(f"pypi {n}")
 
 

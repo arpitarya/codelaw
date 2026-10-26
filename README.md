@@ -323,7 +323,7 @@ $ codelaw test acme/no-console-log
 - **Install.** Until 0.2.0 is on both registries, the full rule set is built from source; the [usage guide](USAGE.md#install) has the exact commands.
 - **`codelaw init`** detects your languages and writes `codelaw.toml` with the matching presets.
 - **`codelaw check`** reports every finding with its fix; **`codelaw fix`** applies the safe ones and formats.
-- **With an AI agent:** `codelaw init --agents claude,codex,copilot,kiro,cowork` installs the hooks and instruction files ([usage guide](USAGE.md#with-ai-agents)).
+- **With an AI agent:** `codelaw init --agents claude,codex,copilot,kiro,cowork` installs the skills package — `@codelaw/skills` (npm) or `codelaw-skills` (PyPI), at codelaw's exact version — and writes the hooks and instruction files from it ([usage guide](USAGE.md#with-ai-agents)).
 
 **→ [The usage guide](USAGE.md)**: install, configure, write rules, wire up agents, editors, pre-commit and CI, and every command.
 

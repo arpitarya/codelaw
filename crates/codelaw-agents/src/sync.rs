@@ -8,11 +8,16 @@
 //!
 //! User-level config (Codex) is printed, never written: codelaw does not
 //! touch the home directory (decision 2).
+//!
+//! Every text comes from the installed skills package (W-77,
+//! [`crate::package`]); with none at this binary's version, both commands
+//! refuse with exit 2 and the install line.
 
-use crate::skills::{SKILLS, rule_author, with_generated_note};
+use crate::package::{self, AgentFiles};
+use crate::skills::{rule_author, skills, with_generated_note};
 use crate::{AgentsConfig, Target, launcher};
 use clap::Args;
-use codelaw_core::template::{self, json_escape};
+use codelaw_core::template::json_escape;
 use codelaw_core::Language;
 use codelaw_engine::{EngineOptions, Project};
 use serde_json::{Value, json};
@@ -33,14 +38,14 @@ pub const END: &str = "<!-- codelaw:end -->";
 
 /// The generated note of a shared file's block and of the steering files
 /// (templates/agents/note-block.md, SR-LAW-10).
-fn note() -> &'static str {
-    template::text("agents/note-block.md").trim_end()
+fn note(files: &AgentFiles) -> Result<&str, String> {
+    Ok(files.text("note-block.md")?.trim_end())
 }
 
 /// Render a template that holds JSON into a value.
-fn json_template(path: &str, slots: &[(&str, &str)]) -> Result<Value, String> {
-    let text = template::render(path, slots)?;
-    serde_json::from_str(&text).map_err(|e| format!("templates/{path}: not valid JSON once rendered ({e})"))
+fn json_template(files: &AgentFiles, path: &str, slots: &[(&str, &str)]) -> Result<Value, String> {
+    let text = files.render(path, slots)?;
+    serde_json::from_str(&text).map_err(|e| format!("{}/{path}: not valid JSON once rendered ({e})", files.root.display()))
 }
 
 /// A list of words as a JSON array, for an `args` slot.
@@ -116,34 +121,34 @@ fn glob(language: Language) -> &'static str {
 
 /// The always-on text (decision 3: under 40 lines; what codelaw is, ask
 /// before you write, check what you changed, the presets, the skills).
-pub fn always_on(sources: &Sources, cmd: &str) -> String {
+pub fn always_on(files: &AgentFiles, sources: &Sources, cmd: &str) -> Result<String, String> {
     let presets = if sources.presets.is_empty() {
         "none (local rules only)".to_owned()
     } else {
         sources.presets.iter().map(|p| format!("`{p}`")).collect::<Vec<_>>().join(", ")
     };
-    template::render("agents/always-on.md", &[("cmd", cmd), ("presets", &presets)]).expect("agents/always-on.md")
+    files.render("always-on.md", &[("cmd", cmd), ("presets", &presets)])
 }
 
 /// The path-scoped text for one language (decision 3: one line per rule).
-fn path_scoped(language: Language, rules: &[&RuleLine], cmd: &str) -> String {
-    let lines: String = rules
+fn path_scoped(files: &AgentFiles, language: Language, rules: &[&RuleLine], cmd: &str) -> Result<String, String> {
+    let lines = rules
         .iter()
-        .map(|r| template::render("agents/path-scoped-rule.md", &[("id", r.id.as_str()), ("title", r.title.as_str()), ("fix", r.fix)]).expect("agents/path-scoped-rule.md"))
-        .collect();
-    template::render("agents/path-scoped.md", &[("language", language.display()), ("cmd", cmd), ("rules", &lines)]).expect("agents/path-scoped.md")
+        .map(|r| files.render("path-scoped-rule.md", &[("id", r.id.as_str()), ("title", r.title.as_str()), ("fix", r.fix)]))
+        .collect::<Result<String, String>>()?;
+    files.render("path-scoped.md", &[("language", language.display()), ("cmd", cmd), ("rules", &lines)])
 }
 
 /// Replace the marker block of a shared file, or append one.
-pub fn with_block(existing: Option<&str>, body: &str) -> String {
-    let block = template::render("agents/block.md", &[("note", note()), ("body", body)]).expect("agents/block.md");
-    let Some(text) = existing.filter(|t| !t.is_empty()) else { return block };
+pub fn with_block(files: &AgentFiles, existing: Option<&str>, body: &str) -> Result<String, String> {
+    let block = files.render("block.md", &[("note", note(files)?), ("body", body)])?;
+    let Some(text) = existing.filter(|t| !t.is_empty()) else { return Ok(block) };
     if let (Some(b), Some(e)) = (text.find(BEGIN), text.find(END))
         && b < e
     {
         let after = &text[e + END.len()..];
         let after = after.strip_prefix('\n').unwrap_or(after);
-        return format!("{}{block}{after}", &text[..b]);
+        return Ok(format!("{}{block}{after}", &text[..b]));
     }
     let sep = if text.ends_with("\n\n") {
         ""
@@ -152,7 +157,7 @@ pub fn with_block(existing: Option<&str>, body: &str) -> String {
     } else {
         "\n\n"
     };
-    format!("{text}{sep}{block}")
+    Ok(format!("{text}{sep}{block}"))
 }
 
 fn pretty(v: &Value) -> String {
@@ -185,12 +190,12 @@ fn is_codelaw_hook(entry: &Value) -> bool {
 }
 
 /// Claude Code's `PostToolUse` group (Claude Code and the Cowork plugin).
-fn claude_hook_group(cmd: &str) -> Result<Value, String> {
-    json_template("agents/claude/hook-group.json", &[("cmd", &json_escape(cmd))])
+fn claude_hook_group(files: &AgentFiles, cmd: &str) -> Result<Value, String> {
+    json_template(files, "claude/hook-group.json", &[("cmd", &json_escape(cmd))])
 }
 
 /// `.claude/settings.json` with codelaw's `PostToolUse` entry replaced.
-fn with_claude_hook(existing: Option<&str>, path: &str, cmd: &str) -> Result<String, String> {
+fn with_claude_hook(files: &AgentFiles, existing: Option<&str>, path: &str, cmd: &str) -> Result<String, String> {
     let mut v = parse_json(existing, path)?;
     let obj = v.as_object_mut().ok_or_else(|| format!("{path}: not a JSON object"))?;
     let hooks = obj.entry("hooks").or_insert_with(|| json!({}));
@@ -198,7 +203,7 @@ fn with_claude_hook(existing: Option<&str>, path: &str, cmd: &str) -> Result<Str
     let post = hooks.entry("PostToolUse").or_insert_with(|| json!([]));
     let post = post.as_array_mut().ok_or_else(|| format!("{path}: `hooks.PostToolUse` is not a list"))?;
     post.retain(|e| !is_codelaw_hook(e));
-    post.push(claude_hook_group(cmd)?);
+    post.push(claude_hook_group(files, cmd)?);
     Ok(pretty(&v))
 }
 
@@ -218,8 +223,9 @@ fn skills_dir(target: Target) -> &'static str {
 /// SR-CONSUMER-LAYOUT's tree lists as generated.
 pub const COWORK_PLUGIN: &str = ".claude/plugins/codelaw";
 
-/// Plan every file for `cfg.targets`. `read` gives a file's current text.
-pub fn plan(root: &Path, cfg: &AgentsConfig, sources: &Sources) -> Result<Plan, String> {
+/// Plan every file for `cfg.targets` from the skills package's `agents`.
+pub fn plan(root: &Path, cfg: &AgentsConfig, sources: &Sources, agents: &AgentFiles) -> Result<Plan, String> {
+    let catalogue = skills(agents)?;
     let words = launcher(root, cfg.command.as_deref());
     let cmd = words.join(" ");
     let mcp_command = words[0].clone();
@@ -228,7 +234,8 @@ pub fn plan(root: &Path, cfg: &AgentsConfig, sources: &Sources) -> Result<Plan, 
     let read = |p: &str| std::fs::read_to_string(root.join(p)).ok();
     let mut files: BTreeMap<String, Option<String>> = BTreeMap::new();
     let mut notes = Vec::new();
-    let body = always_on(sources, &cmd);
+    let body = always_on(agents, sources, &cmd)?;
+    let note = note(agents)?;
     let targets = &cfg.targets;
     let has = |t: Target| targets.contains(&t);
 
@@ -236,12 +243,12 @@ pub fn plan(root: &Path, cfg: &AgentsConfig, sources: &Sources) -> Result<Plan, 
     // the catalogue no longer has is removed.
     for t in targets {
         let dir = skills_dir(*t);
-        for s in SKILLS.iter() {
-            files.insert(format!("{dir}/{}/SKILL.md", s.name), Some(with_generated_note(s.text)));
+        for s in &catalogue {
+            files.insert(format!("{dir}/{}/SKILL.md", s.name), Some(with_generated_note(agents, s.text)?));
         }
         for e in std::fs::read_dir(root.join(dir)).into_iter().flatten().flatten() {
             let name = e.file_name().to_string_lossy().into_owned();
-            if name.starts_with("codelaw-") && !SKILLS.iter().any(|s| s.name == name) && e.path().join("SKILL.md").is_file() {
+            if name.starts_with("codelaw-") && !catalogue.iter().any(|s| s.name == name) && e.path().join("SKILL.md").is_file() {
                 files.insert(format!("{dir}/{name}/SKILL.md"), None);
             }
         }
@@ -264,8 +271,8 @@ pub fn plan(root: &Path, cfg: &AgentsConfig, sources: &Sources) -> Result<Plan, 
                         continue;
                     }
                     let path = format!("{dir}/codelaw-{}{ext}", l.name());
-                    let tpl = if *target == "copilot" { "agents/copilot/instructions.md" } else { "agents/kiro/steering-language.md" };
-                    let text = template::render(tpl, &[("glob", glob(l)), ("note", note()), ("body", &path_scoped(l, &these, &cmd))])?;
+                    let tpl = if *target == "copilot" { "copilot/instructions.md" } else { "kiro/steering-language.md" };
+                    let text = agents.render(tpl, &[("glob", glob(l)), ("note", note), ("body", &path_scoped(agents, l, &these, &cmd)?)])?;
                     files.insert(path.clone(), Some(text));
                     wanted.push(path);
                 }
@@ -287,55 +294,55 @@ pub fn plan(root: &Path, cfg: &AgentsConfig, sources: &Sources) -> Result<Plan, 
 
     // Always-on instructions.
     if has(Target::Claude) {
-        files.insert("CLAUDE.md".into(), Some(with_block(read("CLAUDE.md").as_deref(), &body)));
+        files.insert("CLAUDE.md".into(), Some(with_block(agents, read("CLAUDE.md").as_deref(), &body)?));
     }
     if has(Target::Copilot) || has(Target::Codex) {
-        files.insert("AGENTS.md".into(), Some(with_block(read("AGENTS.md").as_deref(), &body)));
+        files.insert("AGENTS.md".into(), Some(with_block(agents, read("AGENTS.md").as_deref(), &body)?));
     }
     if has(Target::Kiro) {
-        files.insert(".kiro/steering/codelaw.md".into(), Some(template::render("agents/kiro/steering.md", &[("note", note()), ("body", &body)])?));
+        files.insert(".kiro/steering/codelaw.md".into(), Some(agents.render("kiro/steering.md", &[("note", note), ("body", &body)])?));
     }
 
     // Custom agent.
     if has(Target::Claude) {
-        files.insert(".claude/agents/codelaw-rule-author.md".into(), Some(with_generated_note(rule_author())));
+        files.insert(".claude/agents/codelaw-rule-author.md".into(), Some(with_generated_note(agents, rule_author(agents)?)?));
     }
     if has(Target::Copilot) {
-        files.insert(".github/agents/codelaw-rule-author.agent.md".into(), Some(with_generated_note(rule_author())));
+        files.insert(".github/agents/codelaw-rule-author.agent.md".into(), Some(with_generated_note(agents, rule_author(agents)?)?));
     }
 
     // Hooks and MCP registration.
     let args_json = json_array(&mcp_args);
     let command_json = json_escape(&mcp_command);
-    let stdio = json_template("agents/mcp-server.json", &[("command", &command_json), ("args", &args_json)])?;
+    let stdio = json_template(agents, "mcp-server.json", &[("command", &command_json), ("args", &args_json)])?;
     if has(Target::Claude) {
-        files.insert(".claude/settings.json".into(), Some(with_claude_hook(read(".claude/settings.json").as_deref(), ".claude/settings.json", &cmd)?));
+        files.insert(".claude/settings.json".into(), Some(with_claude_hook(agents, read(".claude/settings.json").as_deref(), ".claude/settings.json", &cmd)?));
         files.insert(".mcp.json".into(), Some(with_json_key(read(".mcp.json").as_deref(), ".mcp.json", "mcpServers", stdio.clone())?));
     }
     if has(Target::Cowork) {
-        let hooks = json_template("agents/cowork/hooks.json", &[("group", &claude_hook_group(&cmd)?.to_string())])?;
-        let mcp = json_template("agents/cowork/mcp.json", &[("server", &stdio.to_string())])?;
-        let manifest = json_template("agents/cowork/plugin.json", &[("version", &json_escape(env!("CARGO_PKG_VERSION")))])?;
+        let hooks = json_template(agents, "cowork/hooks.json", &[("group", &claude_hook_group(agents, &cmd)?.to_string())])?;
+        let mcp = json_template(agents, "cowork/mcp.json", &[("server", &stdio.to_string())])?;
+        let manifest = json_template(agents, "cowork/plugin.json", &[("version", &json_escape(env!("CARGO_PKG_VERSION")))])?;
         files.insert(format!("{COWORK_PLUGIN}/.claude-plugin/plugin.json"), Some(pretty(&manifest)));
         files.insert(format!("{COWORK_PLUGIN}/hooks/hooks.json"), Some(pretty(&hooks)));
         files.insert(format!("{COWORK_PLUGIN}/.mcp.json"), Some(pretty(&mcp)));
     }
     if has(Target::Copilot) {
-        let hook = json_template("agents/copilot/hook.json", &[("cmd", &json_escape(&cmd))])?;
+        let hook = json_template(agents, "copilot/hook.json", &[("cmd", &json_escape(&cmd))])?;
         files.insert(".github/hooks/codelaw.json".into(), Some(pretty(&hook)));
-        let server = json_template("agents/copilot/mcp-server.json", &[("command", &command_json), ("args", &args_json)])?;
+        let server = json_template(agents, "copilot/mcp-server.json", &[("command", &command_json), ("args", &args_json)])?;
         files.insert(".vscode/mcp.json".into(), Some(with_json_key(read(".vscode/mcp.json").as_deref(), ".vscode/mcp.json", "servers", server)?));
     }
     if has(Target::Kiro) {
         let patterns: Vec<&str> = Language::ALL.iter().flat_map(|l| ext_alternatives(*l)).collect();
         let matcher = patterns.join("|");
-        let hook = json_template("agents/kiro/hook.json", &[("extensions", &json_escape(&matcher)), ("cmd", &json_escape(&cmd))])?;
+        let hook = json_template(agents, "kiro/hook.json", &[("extensions", &json_escape(&matcher)), ("cmd", &json_escape(&cmd))])?;
         files.insert(".kiro/hooks/codelaw.json".into(), Some(pretty(&hook)));
         files.insert(".kiro/settings/mcp.json".into(), Some(with_json_key(read(".kiro/settings/mcp.json").as_deref(), ".kiro/settings/mcp.json", "mcpServers", stdio.clone())?));
     }
     if has(Target::Codex) {
         let args: Vec<String> = mcp_args.iter().map(|a| format!("\"{a}\"")).collect();
-        let snippet = template::render("agents/codex/config.toml", &[("command", &mcp_command), ("args", &args.join(", ")), ("cmd", &cmd)])?;
+        let snippet = agents.render("codex/config.toml", &[("command", &mcp_command), ("args", &args.join(", ")), ("cmd", &cmd)])?;
         notes.push(format!("Codex reads its MCP servers and hooks from your user config, which codelaw never edits; add this to ~/.codex/config.toml:\n\n{snippet}"));
     }
 
@@ -390,6 +397,7 @@ pub fn apply(root: &Path, plan: &Plan) -> Result<Vec<String>, String> {
 /// project's rules when they load. Returns the paths written and the notes.
 pub fn write_for_init(root: &Path, targets: &[Target], command: Option<&str>) -> Result<(Vec<String>, Vec<String>), String> {
     let cfg = AgentsConfig { targets: targets.to_vec(), command: command.map(str::to_owned) };
+    let agents = package::locate(root)?;
     let sources = match Project::load(root, EngineOptions::from_env()) {
         Ok(p) => Sources::from_project(&p),
         Err(_) => {
@@ -398,7 +406,7 @@ pub fn write_for_init(root: &Path, targets: &[Target], command: Option<&str>) ->
             Sources { presets, rules: None }
         }
     };
-    let plan = plan(root, &cfg, &sources)?;
+    let plan = plan(root, &cfg, &sources, &agents)?;
     Ok((apply(root, &plan)?, plan.notes))
 }
 
@@ -427,7 +435,11 @@ pub fn sync_agents(args: SyncArgs) -> ExitCode {
         Err(e) => return fail(e.to_string()),
     };
     let root = project.root().to_path_buf();
-    let plan = match plan(&root, &cfg, &Sources::from_project(&project)) {
+    let agents = match package::locate(&root) {
+        Ok(a) => a,
+        Err(e) => return fail(e),
+    };
+    let plan = match plan(&root, &cfg, &Sources::from_project(&project), &agents) {
         Ok(p) => p,
         Err(e) => return fail(e),
     };
@@ -467,8 +479,10 @@ mod tests {
 
     #[test]
     fn the_block_leaves_the_team_text_alone() {
+        let a = crate::skills::source();
+        let with_block = |e: Option<&str>, b: &str| with_block(&a, e, b).unwrap();
         let first = with_block(Some("# Team notes\n\nOur text."), "body\n");
-        assert_eq!(first, format!("# Team notes\n\nOur text.\n\n{BEGIN}\n{}\n\nbody\n{END}\n", note()));
+        assert_eq!(first, format!("# Team notes\n\nOur text.\n\n{BEGIN}\n{}\n\nbody\n{END}\n", note(&a).unwrap()));
         let edited = first.replace("Our text.", "Our text, edited.") + "\nMore team text.\n";
         let second = with_block(Some(&edited), "new body\n");
         assert!(second.starts_with("# Team notes\n\nOur text, edited.\n\n"));
@@ -480,7 +494,7 @@ mod tests {
     #[test]
     fn always_on_stays_under_forty_lines() {
         let s = Sources { presets: vec!["codelaw:js/recommended".into()], rules: None };
-        let text = always_on(&s, "npx --no-install codelaw");
+        let text = always_on(&crate::skills::source(), &s, "npx --no-install codelaw").unwrap();
         assert!(text.lines().count() < 40 - 3, "{}", text.lines().count());
         assert!(text.contains("`codelaw:js/recommended`") && text.contains("`npx --no-install codelaw check <files>`"));
     }
@@ -488,14 +502,15 @@ mod tests {
     #[test]
     fn a_shared_json_keeps_its_other_entries() {
         let mine = r#"{"hooks":{"PostToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"./lint.sh"}]},{"matcher":"Edit","hooks":[{"type":"command","command":"codelaw hook"}]}]},"model":"x"}"#;
-        let out = with_claude_hook(Some(mine), "s", "uv run codelaw").unwrap();
+        let a = crate::skills::source();
+        let out = with_claude_hook(&a, Some(mine), "s", "uv run codelaw").unwrap();
         let v: Value = serde_json::from_str(&out).unwrap();
         let post = v["hooks"]["PostToolUse"].as_array().unwrap();
         assert_eq!(post.len(), 2);
         assert_eq!(post[0]["hooks"][0]["command"], "./lint.sh");
         assert_eq!(post[1]["hooks"][0]["command"], "uv run codelaw hook");
         assert_eq!(v["model"], "x");
-        assert_eq!(with_claude_hook(Some(&out), "s", "uv run codelaw").unwrap(), out);
+        assert_eq!(with_claude_hook(&a, Some(&out), "s", "uv run codelaw").unwrap(), out);
         let mcp = with_json_key(Some(r#"{"mcpServers":{"other":{"command":"o"}}}"#), "m", "mcpServers", json!({"command": "codelaw", "args": ["mcp"]})).unwrap();
         let v: Value = serde_json::from_str(&mcp).unwrap();
         assert_eq!(v["mcpServers"]["other"]["command"], "o");

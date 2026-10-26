@@ -12,7 +12,7 @@ owns:
   - fixtures/react-no-context
   - crates/codelaw-cli/tests/react_no_context.rs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-26T18:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -177,6 +177,7 @@ The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the
    - **The optional Fux index package is never installed (W-34; [L6](0008_LAW-6-python-and-node-packages.md) decision 12).** Each pack has a companion, `<pack's name>-fux-index` on the pack's registry, holding a Fux index of its rules. `init` installs none, with or without a flag. **When the repo has a `.fux/` folder** it prints, after the install step and under every flag, the install command for the index package of each pack it chose and the `fux setup --index` line that pins it; **with no `.fux/` it prints nothing about Fux.** `init` only prints it, never runs it, and writes nothing about Fux to `codelaw.toml` (`crates/codelaw-cli/tests/fux_index.rs`).
    - **`--no-install`** prints the install commands instead of running them.
    - **`--agents`** writes the agent files after the packs are installed, so the per-language instructions list the packs' rules; under `--no-install` they wait for `codelaw sync-agents` ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 7).
+   - **`--agents` also installs the skills package** (W-77, 2026-10-27): `@codelaw/skills` or `codelaw-skills` at the binary's exact version, from the registry the repo uses, beside the packs; the agent files come from it ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 8). Under `--no-install` it must already be installed, or `init` refuses (exit 2) before writing anything.
    - **`--git-hooks`** installs the git hooks after everything above, and alone in a repo that already has a `codelaw.toml`; it picks and installs no pack ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 11).
    - **With no pack and no local rule,** `codelaw check` reports one `codelaw/no-rules` info diagnostic naming `codelaw init`. The formatter works regardless ([L7](0009_LAW-7-linter-and-formatter.md)).
 7. **Ported rules are reimplemented, never vendored.**

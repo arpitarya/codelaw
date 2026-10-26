@@ -59,7 +59,9 @@ publisher creates the project on its first upload.
 Steps 2–3 come back for **every pack name new to npm**: the three dev-server plugins `@codelaw/vite-plugin`, `@codelaw/webpack-plugin` and `@codelaw/next` ([W-49](archive/open/W-49-dev-server-plugins.md), closed; SR-PACKAGES decision 3a), and at 0.2.0,
 `@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](archive/open/W-31-registry-pack-split.md)), and
 at the first release with the security packs `@codelaw/rules-security-js`, `-security-ts` and
-`-security-html` ([W-53](work/open/W-53-security-packs-groundwork.md)) —
+`-security-html` ([W-53](work/open/W-53-security-packs-groundwork.md)), and at the first release with W-77
+the skills package `@codelaw/skills` (`codelaw-skills-<v>.tgz`; it depends on `codelaw` at
+the same version, so publish it after `codelaw` is on npm at that version) —
 publish just those tarballs by hand from the 0.2.0 `dist`, then run
 `npm-trust.sh` again (it skips nothing, and re-binding an existing package is
 harmless); `publish.yml` then skips the versions already on npm.
@@ -86,6 +88,10 @@ harmless); `publish.yml` then skips the versions already on npm.
      with your account token, then a trusted publisher on each project's
      *Settings → Publishing*; `publish.yml` skips versions already uploaded.
      ([W-38](work/open/W-38-pypi-0-2-0-by-hand.md); the decider, 2026-10-25.)
+   - `codelaw-skills` (W-77, `codelaw_skills-<v>-py3-none-any.whl`): the same
+     way — the first version by hand with `twine upload`, then a trusted
+     publisher. Its `Requires-Dist: codelaw==<v>` means pip installs it only
+     once that `codelaw` is on PyPI too.
 5. **GitHub environments** `npm` and `pypi` (*Settings → Environments*) —
    **required, both:**
    - *Deployment branches and tags* → **Selected branches and tags** → add one
@@ -108,7 +114,7 @@ L6 decision 12: each pack that holds rules has a companion `@codelaw/rules-<name
 
 1. **Bump:** `python3 scripts/version.py --set 0.2.0` — Cargo.toml, Cargo.lock
    and the seventeen pack manifests; every npm and PyPI manifest is generated from
-   it. Commit and push to `main`.
+   it — the skills package's and its `codelaw-skills.json` too (W-77). Commit and push to `main`.
 2. **Wait for `ci.yml` to go green on that commit, on `main`.** `publish.yml`
    refuses anything else.
 3. **Publish:** `gh release create v0.2.0 --title "v0.2.0 — <what it is>"

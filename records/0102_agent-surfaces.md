@@ -3,7 +3,7 @@ type: Standing Record
 kind: component
 name: SR-AGENT-SURFACES
 title: "SR-AGENT-SURFACES (0102) — skills, steering, instructions, agent files and hooks, generated from one source"
-description: "codelaw ships a catalogue of Agent Skills plus always-on and path-scoped instructions, custom agents, hooks and MCP registration for Claude Code, Cowork, Copilot, Codex and Kiro, all generated from one source by codelaw sync-agents."
+description: "codelaw ships a catalogue of Agent Skills plus always-on and path-scoped instructions, custom agents, hooks and MCP registration for Claude Code, Cowork, Copilot, Codex and Kiro, all generated from one source by codelaw sync-agents; every one of those files ships in the skills package (@codelaw/skills, codelaw-skills), never in the engine."
 status: accepted
 date: 2026-10-18
 feature: "the agent-facing files and skills"
@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-agents
   - templates/agents
 laws: [L0, L3, L4, L5, L6]
-timestamp: 2026-10-24T08:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -22,7 +22,7 @@ content_sha: ""
 
 **Scope.** This record covers the **whole agent-facing set**: skills, steering, rules and instruction files, AGENTS.md / CLAUDE.md, custom agents, agent hooks and MCP registration.
 
-**The decision in one line.** codelaw ships **12 skills** written once in the open **Agent Skills** format (`SKILL.md`). `codelaw sync-agents` copies them into each agent's skills folder and generates every other agent file from the rules. Nothing agent-facing is ever hand-edited in a consumer repo.
+**The decision in one line.** codelaw ships **12 skills** written once in the open **Agent Skills** format (`SKILL.md`). `codelaw sync-agents` copies them into each agent's skills folder and generates every other agent file from the rules. Nothing agent-facing is ever hand-edited in a consumer repo. **Since 2026-10-27 (W-77) every one of those files ships in its own package, `@codelaw/skills` on npm and `codelaw-skills` on PyPI, at the engine's exact version; the codelaw binary carries none of them (decision 8).**
 
 **Three kinds of surface, three jobs:**
 
@@ -74,7 +74,7 @@ Each agent reads a different set of files from a different place. Maintaining th
   - progressive disclosure: metadata about 100 tokens, `SKILL.md` body under 5,000 tokens, detail moved into `references/`.
 - `codelaw sync-agents` writes each agent's files. Shared files (AGENTS.md, CLAUDE.md) get **marker blocks**, `<!-- codelaw:begin -->` … `<!-- codelaw:end -->`, so the team's own text is never touched.
 - `codelaw sync-agents --check` runs in CI and fails if any generated file differs from what the rules and skills would produce.
-- Skills ship inside both packages ([L6](0008_LAW-6-python-and-node-packages.md)), so a Python-only repo gets the same skills as a Node repo.
+- Skills, and every other file under `templates/agents/`, ship in **the skills package** on both registries (decision 8; [L6](0008_LAW-6-python-and-node-packages.md) decision 13), so a Python-only repo gets the same skills as a Node repo.
 
 #### 2. Surface matrix
 
@@ -144,8 +144,22 @@ Each agent reads a different set of files from a different place. Maintaining th
 - **The Cowork plugin** is `.claude/plugins/codelaw/`: `.claude-plugin/plugin.json`, `skills/`, `hooks/hooks.json` and `.mcp.json`.
 - **The Kiro hook** is `.kiro/hooks/codelaw.json`: a `PostFileSave` trigger on the L3 extensions running `<command> hook {{filePath}}`.
 - **Codex** gets a printed `~/.codex/config.toml` snippet: `[mcp_servers.codelaw]` and a `[[hooks.PostToolUse]]` group.
-- **The skills are compiled into the binary** (`include_str!` of `templates/agents/`, [L10](0012_LAW-10-consumer-templates.md): every text `sync-agents` writes is a template there and code only fills its slots), so both packages carry the same ones ([L6](0008_LAW-6-python-and-node-packages.md)).
+- **The texts come from the installed skills package** (decision 8): `templates/agents/` of the same release, byte for byte ([L10](0012_LAW-10-consumer-templates.md): every text `sync-agents` writes is a template there and code only fills its slots). The binary embeds none of them.
 - **`sync-agents --check`**: exit `0` when every planned file matches, `1` listing each file that differs or should be removed, `2` on a config, rule or file error. With no `[agents] targets` both forms exit `0` without loading the rules.
+
+#### 8. The skills package
+
+**Ruled by Arpit, 2026-10-27 (W-77):** *"I want a separate package to be created just for skills, and it will have a hard dependency on code law. Skills being agent facing scripts or files."* — the whole set, on npm and PyPI, nothing agent-facing left in the engine, and the exact same version. Written by an agent on that ruling, in the change that built it.
+
+- **What ships where.** Every file of `templates/agents/` — the skills, the always-on and path-scoped texts, the steering and instruction templates, the custom agent, the Claude, Cowork, Copilot, Kiro and Codex hook and MCP templates, the trigger evals — ships as `@codelaw/skills` (npm) and `codelaw-skills` (PyPI), with `codelaw-skills.json` naming its version ([SR-PACKAGES](0107_packages.md) decision 3b). The `codelaw` packages carry none of it; the commands — `init --agents`, `sync-agents`, `hook`, `mcp` — and the code that fills the slots stay in the engine.
+- **Found on disk, never fetched** ([L5](0007_LAW-5-no-model-in-the-engine.md)), in this order: `CODELAW_SKILLS` (a folder); `node_modules/@codelaw/skills` from the project root upwards; `codelaw_skills/` in the site-packages the rule packs are searched in (`CODELAW_SITE_PACKAGES`, else `$VIRTUAL_ENV`, else `.venv/`); the binary's own environment (a `pipx` or `uvx` codelaw), and `node_modules` above it. `crates/codelaw-agents/src/package.rs`.
+- **Only this binary's version is used.** A copy whose `codelaw-skills.json` names another version is passed over; when none matches, the command stops.
+- **Refusals, exit 2, nothing written:**
+  - none installed → the error names `npm i -D @codelaw/skills@<version>` and `pip install codelaw-skills==<version>`, and every place it looked;
+  - another version → the error names the folder, its version and this codelaw's, and the same two install lines;
+  - `init --agents --no-install` refuses before writing any file; `init --agents` with the install adds the skills package, at the binary's version, to the install command of the registry the repo uses.
+- **The output is unchanged** for the same version: the files are the templates the binary embedded before, so `sync-agents` writes byte-for-byte what it wrote before the split, from either registry's copy (`crates/codelaw-cli/tests/commands.rs`, `scripts/smoke.sh`).
+- **This repo** reads `templates/agents/` directly in its own tests; `scripts/package.py stage-skills <dir>` writes the package folder for a local `CODELAW_SKILLS`.
 
 ### The skill catalogue
 
@@ -188,6 +202,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 - **The Cowork plugin path and the Kiro hook schema (decision 7) are the least verified rows;** the veto check covers them first.
 - **Copilot ignores a `postToolUse` hook's output,** so on Copilot the hook applies `auto` fixes but cannot hand findings back; the always-on block's "run `codelaw check`" carries that.
 - **Evals cost CI time for each agent.**
+- **A consumer that runs `sync-agents` or `init --agents` installs one more package** (decision 8), and upgrades it with codelaw; a mismatch is refused, never silently served.
 
 ### Alternatives considered
 
@@ -201,7 +216,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 
 ### Veto condition
 
-**Reopen this decision if:** an agent in the decision-2 matrix changes where it reads skills, instructions, hooks or MCP config.
+**Reopen this decision if:** an agent in the decision-2 matrix changes where it reads skills, instructions, hooks or MCP config, or the binary carries an agent file again (decision 8).
 
 **How to check it:** `re-verify each row of the decision-2 matrix against that agent's current docs; a mismatch reopens this record`
 
@@ -211,6 +226,8 @@ Each agent reads a different set of files from a different place. Maintaining th
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-RULE-FORMAT](0112_rule-format.md)
+**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-RULE-FORMAT](0112_rule-format.md) · [SR-PACKAGES](0107_packages.md)
+
+**Work items** — [W-77](../work/open/W-77-skills-package.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)
