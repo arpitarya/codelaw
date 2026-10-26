@@ -51,7 +51,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-70** `agent` Example apps for the dev-server plugins on real Vite, webpack, Rspack, Next.js, via a CI job that installs the hosts (L11). Built; left: the first CI run on the real hosts, fix, close. Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
 
-🟢 **W-73** `agent` Configurable approved calls built: `call[]` options with `_mode`, the `calls:` predicate and `$OPTION.<name>`; the 5 HTML-sink rules read `sanitizers` (extend or replace; name + import source); `js/use-instead` and `py/use-instead` (auto fix, import added once); left: the L8 `perf` run in release, and moving the validator-call lists of `sec-ts/next-server-action-validation` and `no-unchecked-cast-of-input` (DoD 3, 5). Filed by Arpit (Cowork). [detail](open/W-73-configurable-approved-calls.md)
+🟢 **W-73** `agent` Approved calls built: `call[]` options, `calls:`, `sanitizers` on the 5 HTML-sink rules, `js/use-instead`, `py/use-instead`; left: release `perf` run, two validator lists (DoD 3, 5). [detail](open/W-73-configurable-approved-calls.md)
 
 🟢 **W-74** `agent` Editor logs you can debug from: the VS Code extension and `codelaw lsp` say what runs, which config each file got, why a file shows nothing, and every failure; `codelaw.logLevel`; *Copy debug info*. Filed by Arpit (Cowork). [detail](open/W-74-editor-logs.md)
 
