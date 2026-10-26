@@ -37,7 +37,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); left: DoD 5 on CI's Windows legs and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
-🟢 **W-45** `agent` CI formats built; left: Claude Code opens a PR running `--format github`, Arpit looks at the annotations (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
+🟢 **W-45** `agent` CI formats built; PR [#3](https://github.com/arpitarya/codelaw/pull/3) is open; left: Arpit looks at its annotations and says so (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
 
 🟢 **W-65** `agent` L11's check: CI fails on any dependency missing from `DEPENDENCIES.md`, or a ratified unit whose tree grew. Filed by Arpit (Cowork). [detail](open/W-65-dependency-check.md)
 
