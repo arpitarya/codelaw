@@ -37,6 +37,7 @@
 "html/long-title" = 1
 "html/map-dup-name" = 0
 "html/map-id-name" = 0
+"html/max-lines" = 3
 "html/meta-refresh" = 0
 "html/missing-doctype" = 1
 "html/multiple-labeled-controls" = 0

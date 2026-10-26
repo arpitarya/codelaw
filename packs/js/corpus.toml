@@ -8,6 +8,9 @@
 "js/for-direction" = 0
 "js/getter-return" = 0
 "js/import-groups" = 76
+"js/max-lines" = 23
+"js/max-lines-per-function" = 177
+"js/max-params" = 7
 "js/no-async-promise-executor" = 0
 "js/no-case-declarations" = 0
 "js/no-class-assign" = 0

@@ -45,6 +45,9 @@
 "py/late-future-import" = 0
 "py/loop-variable-overrides-iterator" = 0
 "py/map-without-explicit-strict" = 0
+"py/max-lines" = 13
+"py/max-lines-per-function" = 91
+"py/max-params" = 134
 "py/module-import-not-at-top" = 25
 "py/multiple-imports-on-one-line" = 0
 "py/multiple-starred-expressions" = 0

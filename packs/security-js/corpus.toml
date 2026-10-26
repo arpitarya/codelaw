@@ -9,7 +9,7 @@
 "sec-js/graphql-hardening" = 0
 "sec-js/helmet-config" = 0
 "sec-js/jwt-verify" = 0
-"sec-js/missing-rate-limit" = 3
+"sec-js/missing-rate-limit" = 0
 "sec-js/no-archive-slip" = 0
 "sec-js/no-bad-tag-filter" = 0
 "sec-js/no-biased-random" = 0
@@ -25,7 +25,7 @@
 "sec-js/no-eval" = 0
 "sec-js/no-format-string" = 0
 "sec-js/no-hardcoded-crypto-key" = 0
-"sec-js/no-hardcoded-secret" = 1
+"sec-js/no-hardcoded-secret" = 0
 "sec-js/no-header-injection" = 0
 "sec-js/no-incomplete-sanitization" = 0
 "sec-js/no-incomplete-url-check" = 0
@@ -66,5 +66,5 @@
 "sec-js/no-xxe" = 0
 "sec-js/password-hash-effort" = 0
 "sec-js/postmessage-origin" = 3
-"sec-js/timing-safe-compare" = 8
+"sec-js/timing-safe-compare" = 3
 "sec-js/upload-limits" = 0

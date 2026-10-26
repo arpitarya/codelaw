@@ -361,7 +361,15 @@ jobs:
         run: |
           b="out/bin/${{ matrix.key }}/codelaw"; [ -f "$b.exe" ] && b="$b.exe"
           python scripts/version.py --check --binary "$b"
-          for p in packs/*/; do "$b" test "$p" | tail -1; "$b" rules lint "$p" | tail -1; done
+          # Every pack runs, and a failing pack prints its failing checks: the
+          # last line alone said "1 failed" on win32 and not which check (W-72).
+          rc=0
+          for p in packs/*/; do
+            out="$("$b" test "$p" 2>&1)" || { echo "$out" | grep -A6 '✖' || true; rc=1; }
+            echo "$out" | tail -1
+            "$b" rules lint "$p" | tail -1
+          done
+          exit "$rc"
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: build-${{ matrix.key }}

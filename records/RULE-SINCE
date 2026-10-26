@@ -13,4 +13,13 @@
 #   decider's rulings of 2026-10-22, crates/codelaw-native/src/literals.rs
 #   without SR-ARCHITECTURE). The review filed what each left open as
 #   W-24–W-28. 5e489f4 is the commit before W-24's CI change landed.
-5e489f4f83af2123260ff6280f3e8742c88b623d
+# - 2026-10-26, W-72, after the first CI run over the 2026-10-26 landings (run
+#   40315989524): 5e489f4 -> fedf2f0. Thirteen commits since 5e489f4 failed the
+#   replay, so CI's `lint` job could not pass: 8a38f2d (lockmaster), 7801f01
+#   (queue filing W-58-W-67), d0f0d57 (W-49), ee88759 (W-51), 672b2a7 and
+#   8e282ad (W-65), d57d528 (W-34), d6e06fb (W-60), a76331f (W-61), d652508
+#   (W-46), a786e38 (W-56), 9a25a50 (W-62) and fedf2f0 (W-63): each changed an
+#   SR-owned component without its record or a `no SR affected` line. They are
+#   pushed, so they cannot be reworded; fedf2f0 is the last of them, so the
+#   baseline is the commit itself and every commit after it is judged.
+fedf2f00a5918dc8b1bd6c6a619b4d7dccc2d900

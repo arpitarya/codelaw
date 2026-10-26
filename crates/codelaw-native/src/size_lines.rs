@@ -231,7 +231,7 @@ fn classify_css(src: &str, scss: bool) -> Vec<Class> {
                 }
                 i = (i + 1).min(b.len());
             }
-            b'u' | b'U' if src[i..].len() >= 4 && src[i..i + 4].eq_ignore_ascii_case("url(") && !src[..i].ends_with(|c: char| c.is_alphanumeric() || c == '-' || c == '_') => {
+            b'u' | b'U' if b[i..].len() >= 4 && b[i..i + 4].eq_ignore_ascii_case(b"url(") && !src[..i].ends_with(|c: char| c.is_alphanumeric() || c == '-' || c == '_') => {
                 // `url(http://x/y)`: an unquoted URL holds `//` and `/*`.
                 code_from.get_or_insert(i);
                 i += 4;
@@ -290,7 +290,8 @@ fn classify_html(src: &str) -> Vec<Class> {
         }
     };
     while i < b.len() {
-        if src[i..].starts_with("<!--") {
+        // Bytes, not `src[i..]`: `i` steps one byte at a time and lands inside a multi-byte char.
+        if b[i..].starts_with(b"<!--") {
             flush(&mut lines, &mut text_from, i);
             let e = src[i + 4..].find("-->").map_or(src.len(), |p| i + 4 + p + 3);
             lines.mark(src, i, e, |m| m.comment = true);
@@ -320,9 +321,9 @@ fn classify_html(src: &str) -> Vec<Class> {
 
 /// `script` or `style` when an open tag of that name starts at `at`.
 fn raw_open(src: &str, at: usize) -> Option<&'static str> {
-    let rest = &src[at + 1..];
+    let rest = &src.as_bytes()[at + 1..];
     ["script", "style"].into_iter().find(|name| {
-        rest.len() > name.len() && rest[..name.len()].eq_ignore_ascii_case(name) && (rest.as_bytes()[name.len()].is_ascii_whitespace() || matches!(rest.as_bytes()[name.len()], b'>' | b'/'))
+        rest.len() > name.len() && rest[..name.len()].eq_ignore_ascii_case(name.as_bytes()) && (rest[name.len()].is_ascii_whitespace() || matches!(rest[name.len()], b'>' | b'/'))
     })
 }
 
@@ -423,6 +424,14 @@ mod tests {
 
     fn html(src: &str, opts: Value) -> Vec<NativeFinding> {
         run(&MaxLines::html("html/max-lines"), "a.html", src, opts)
+    }
+
+    #[test]
+    fn html_with_multibyte_text_does_not_panic() {
+        let src = "<p>caf\u{e9} \u{2014} \u{2192} \u{26f5}</p>\n<!-- \u{b6} -->\n<p>\u{201c}x\u{201d}</p>\n";
+        assert!(html(src, json!({ "max": 10 })).is_empty());
+        assert!(css("a { b: u\u{e9}\u{e9}x }\n", false, json!({ "max": 10 })).is_empty());
+        assert_eq!(html(src, json!({ "max": 1 })).len(), 1);
     }
 
     #[test]
