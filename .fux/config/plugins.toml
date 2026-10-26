@@ -1,0 +1,15 @@
+# .fux/config/plugins.toml -- the packages this repository's index needs (SR-PLUGINS).
+#
+# Committed. Only fux itself is mandatory; every decoder and fetcher package
+# runs only when declared here, at exactly this version and digest. An
+# installed package nobody declared is never loaded. A declared package that
+# is missing or differs stops fux with the install line -- two machines on
+# one repository never build different indexes.
+#
+# `fux setup` proposes rows from your sources; `fux setup --pin` re-pins every
+# row from what is installed, after an upgrade.
+
+[[package]]
+name = "fux-decoder-json"
+version = "5.1.1"
+digest = "sha256:63ffc10358ad75133176ac82751b87b20e059b2609d44d51c806d63c24a0f080"

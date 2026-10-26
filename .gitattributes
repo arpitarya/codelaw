@@ -6,3 +6,8 @@ work/OPEN-WORK.md merge=lockmaster-table-rows
 work/BACKLOG.md merge=lockmaster-table-rows
 archive/README.md merge=lockmaster-table-rows
 # lockmaster:end
+
+# fux: the committed index merges line by line, never textually.
+.fux/index/*.jsonl merge=fux-index
+.fux/index/REGISTER merge=fux-index
+.fux/index/sections/*.jsonl merge=fux-index

@@ -24,6 +24,94 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — W-76: commit the main checkout's loose work; worktree cleanup  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"commit everything, look into worktrees if anything is not merged, merge it, and then do a cleanup."*
+- **Done:** landed the main checkout's uncommitted Fux index refresh (`.fux/index`, three new shards) and `work/NOW.md` through lane W-76. Audited the three worktrees: the lockmaster-bootstrap worktree (at 7f0546c, 111 commits behind, no commits off main; its 33 dirty files were all superseded on main — every added line present, reworded, or its item archived; its `now-ledger.py` equals the kit) — removed with its branch; `W-45-demo` (`demo/W-45-annotations-v2`, clean, pushed, PR #3 open "do not merge") — worktree removed, branch kept for the PR; `W-73` — live lane of session fda9b580, untouched.
+- **Decided / left open:** nothing merged into main from any worktree — none held unlanded work meant for main. PR #3 still waits on the decider (W-45 DoD 2).
+- **Mistakes:** first line of the session said `work/NOW.md` was empty (the hook injected an empty snapshot); it held six rows — corrected in chat. Backed up the bootstrap worktree's tracked diff (568-line patch, session scratchpad) but not its 13 untracked files (`DEPENDENCIES.md`, records 0012/0013, item files W-58–W-67, archived W-66) before `git worktree remove --force` — they are gone; every path exists on main (or `archive/open/`) in a later version, so only early drafts were lost. Lesson: `git status --short` lists untracked files too; back up `ls-files --others` before a forced removal.
+- **Next:** the decider's inbox — W-62's `tree-sitter-cli` ratification, W-38, W-34.
+
+## 2026-10-26 — W-51: the exceptions section goes unconditional  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *Finish W-51; the locally doable part is the exceptions section now W-46 has landed.*
+- **Done:** removed the `exceptions --help` guard from `templates/ci/github/codelaw-autofix.yml` and `templates/ci/gitlab/codelaw-autofix.yml`; the section runs `codelaw exceptions --expiring 30d --as-of "$(date +%F)" --format markdown`. `ci_autofix.rs` asserts it; 4/4 pass, actionlint clean. Landed via lockmaster.
+- **Decided / left open:** W-51 stays open for DoD 1 and 3 only: one run in a throwaway GitHub repo with fixable findings and `CODELAW_AUTOFIX_TOKEN`.
+- **Mistakes:** none.
+- **Next:** the decider (or CI) runs the workflow once in a throwaway repo.
+
+## 2026-10-26 — W-34: Fux pinned at 5.1.1; what is unpublished  ·  Claude Code (Opus 5.5)
+
+- **Asked:** which packages are not on PyPI and npm (the decider publishes by hand); then *"Implement Fux for the latest version that we have."*
+- **Done:** listed the unpublished set (PyPI: `codelaw` and eight rule packs; npm: `scss`, `css-modules`, three security packs; all 25 Fux index packages). `FUX_VERSION` 5.1.0 → 5.1.1 with D-34, `licences.rs`, RELEASING.md, W-34 and OPEN-WORK; the count corrected from 16 to 25. Built all 25 with a scratch fux 5.1.1 venv; `check` passed.
+- **Decided / left open:** the pin moved on the decider's word; D-34 is still `pending`. No CI run has ever uploaded a `fux-index` artifact (the last green `main` run predates it; the two newest are red), so the decider builds locally with `--fux`.
+- **Mistakes:** gave the decider commands with `<run-id>`/`<tarball>` placeholders, which zsh ran literally, and told them to downgrade their venv to 5.1.0 before the pin moved; corrected in chat.
+- **Next:** the decider publishes the 25 from a local `assemble` and rules D-34.
+
+## 2026-10-26 — W-62 finish attempt: blocked on the tree-sitter CLI  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** finish W-62 (patch tree-sitter-scss, CSS rules onto trees, pinned corpus), blocking under L11 where a dependency is unratified.
+- **Done:** nothing in code. Regenerating a patched grammar needs the tree-sitter CLI, which is absent and not in `DEPENDENCIES.md`; filed `work/BLOCKED.json` (ASK), re-balled W-62 to `arpit` in `OPEN-WORK.md` and the item.
+- **Decided / left open:** ratify `tree-sitter-cli` 0.25.10 (build-time, MIT)? The corpus step needs CI network and was not attempted.
+- **Mistakes:** none.
+- **Next:** Arpit rules on the CLI; then an agent patches both grammars.
+
+## 2026-10-26 — W-71 step 1: the per-function change set  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** implement W-71, step 1 first.
+- **Done:** `codelaw-lang` gains `functions` / `classify` (new, edited by token stream, untouched; qualified names, `f#1` numbering, public flag); the engine gains `git::file_at` and `Project::changed_functions`; the CLI gains `codelaw debug changed-functions` (text and JSON). 13 unit tests and 3 end-to-end tests on real git repos (reformat-only judges nothing, rename is new, new file all new, no change set prints the header line). Also carried Cowork's staged ruling edits (W-71 file, OPEN-WORK row, two worklog entries) into this change, because they were staged in the main checkout and blocked other lanes.
+- **Decided / left open:** left: the agent hook's file as a change-set source; W-58's `size.rs`/`js_ast.rs` still have their own function finders (W-58 was in flight); steps 2-5. Restoring the staged copies in the main checkout was refused by the permission classifier and is left to the decider or coordinator once this lands.
+- **Mistakes:** edited two files in the main checkout before starting the lockmaster worktree; moved them into the worktree and restored the main copies.
+- **Next:** step 2 (`graph/untested-function`) and steps 3, 4 as parallel lanes.
+
+## 2026-10-26 — W-71 ruled diff-scoped; now agent-ready  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit: *"yes"* — to diff-scoped for W-71.
+- **Done:** W-71 DoD 1 and step 1 marked ruled; ball `agent`; queue row 🔴 → 🟢; its inbox row and `↳ blocks:` sub-row removed.
+- **Decided / left open:** diff-scoped is ruled. Still unasked-for: the class-wide `.codelawignore` target `File#Class.*` (out of scope until he says).
+- **Mistakes:** none.
+- **Next:** an agent starts W-71 step 1 on Opus.
+
+## 2026-10-26 — W-71 updated: `.codelawignore` design and build order  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit, after a voice walk-through: *"file the work item for what we talked about"*.
+- **Done:** W-71 gains the `.codelawignore` design — `on_touch` (`error` default, `warn`, `keep`) and `on_touch_scope` (`file` default, `function`); `forever`; reason mandatory with a date or `forever`; `[coverage.ignore]` `require_expiry` and `require_on_touch`, both on by default; one rule `codelaw/incomplete-ignore` — plus a five-step build order (step 1, the per-function change set, first; 2–4 parallel). Queue row unchanged (kept short).
+- **Decided / left open:** all `.codelawignore` choices are Arpit's voice rulings, quoted in the file. Still open to him: diff-scoped (inbox row) and a class-wide target `File#Class.*`.
+- **Mistakes:** none.
+- **Next:** Arpit's yes on diff-scoped flips W-71 to 🟢 `agent`; step 1 starts on Opus.
+
+## 2026-10-26 — W-70 example apps for the dev-server plugins  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** implement W-70: example apps for Vite, webpack, Rspack, Next.js plus a CI job that installs the hosts.
+- **Done:** `examples/dev-servers/` (four apps, `run.mjs` driver) and the `dev-servers` job in `ci.yml`. Route 1 of the item (hosts installed on the runner), so L11 needs no ratification and no `BLOCKED.json`. Syntax-checked the driver and the workflow YAML only.
+- **Decided / left open:** no host was installed locally (disk over budget, L9), so nothing ran on a real host; host version ranges and the Next.js/websocket assertions are unverified. W-70 stays open until the first CI run.
+- **Mistakes:** none.
+- **Next:** push, read the five `dev-servers` jobs, fix what the real hosts disagree on.
+
+## 2026-10-26 — W-44 tidied after the rulings  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** finish W-44's locally doable remainder.
+- **Done:** re-ran `tests/watch.rs` (6/6); the handoff's Blockers section now records the two questions as ruled and What is left lists only the CI items (DoD 5 on `win32-*`, `ubuntu-24.04` measurements).
+- **Decided / left open:** nothing new; DoD 5 and the runner measurements need CI.
+- **Mistakes:** none.
+- **Next:** read the `smoke` Windows legs and the runner bench once CI has run on main.
+
+## 2026-10-26 — W-58: corpus counts confirmed, left list trimmed  ·  Claude Code (Sonnet 5.5), in a lockmaster worktree
+
+- **Asked:** finish W-58 except CI's `perf` run (DoD 6).
+- **Done:** checked `packs/js/corpus.toml` (23/177/7) and `packs/python/corpus.toml` (13/91/134) hold the six `[findings]` rows (landed in the CI repair); removed the stale "six corpus counts" from OPEN-WORK and IMPLEMENTATION. No re-run of `corpus.py` (pinned repos not cloned here).
+- **Decided / left open:** left: DoD 6, CI's `perf` job on the merge (and, if the decider wants, a `js/size`-on workload).
+- **Mistakes:** none.
+- **Next:** read `perf` on the merge, then close W-58.
+
+## 2026-10-26 — W-74 filed (editor logs you can debug from)  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit: *"The VS Code extension doesn't have very good output or logging. Create a work item for better logs so that at least it can be debugged if there is any issue."*
+- **Done:** read `packaging/vscode/src/extension.ts` and `crates/codelaw-lsp/src/lib.rs`: the extension logs one line (the binary), never the server version it receives; the server logs only config errors and project warnings — a project that fails to load is a popup only, a failed request and a file with no project are silent. Filed W-74 (`work/open/W-74-editor-logs.md`, six steps, nine DoD) and its 🟢 `build` row; build count 12 → 13.
+- **Decided / left open:** nothing ruled. The design pointers in the file (`LogOutputChannel`, `codelaw.logLevel`, *Copy debug info*, never log source text) are proposals, not rulings. SR-EDITOR is amended by the building session.
+- **Mistakes:** none. Left uncommitted in the working tree; it lands through lockmaster.
+- **Next:** a Claude Code lane builds W-74 (Sonnet).
+
 ## 2026-10-27 — W-73: configurable approved calls  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** build W-73 as a lockmaster change: `sanitizers` on the five HTML-sink rules, `js/use-instead` and `py/use-instead`.

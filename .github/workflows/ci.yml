@@ -18,6 +18,8 @@
 #             included); on main, a build attestation of every file publish.yml uploads
 #             and, beside it and never in it, the optional Fux index packages (dist/fux-index/,
 #             W-34): built by a pinned fux, twice, and checked; nothing publishes them yet
+#   dev-servers ×5  W-70: vite, webpack, rspack (the webpack plugin unchanged), next, next on
+#             Turbopack — the hosts installed on the runner only; a saved `debugger` shows within a second
 #   smoke ×8  the L6 install matrix and runtime fence on every platform: `dist` is
 #             published to a throwaway staging index on localhost and installed
 #             from it; npm and PyPI give byte-equal output on the L3 fixtures + a pack
@@ -441,6 +443,33 @@ jobs:
             dist/fux-index/SHA256SUMS
           if-no-files-found: error
           retention-days: 30
+
+  dev-servers:
+    # W-70: the dev-server plugins on the REAL hosts. The hosts are installed on
+    # the runner, in a temp directory, by examples/dev-servers/run.mjs — never in
+    # a manifest or lockfile of this repo (L11). Each host saves a `debugger` and
+    # the job asserts the finding within a second (terminal, and the dev server's
+    # websocket where it has one). The runner is ubuntu-latest; timings are noisy.
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [vite, webpack, rspack, next, next-turbopack]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: dist
+          path: dist/
+      - name: ${{ matrix.host }} — a saved `debugger` reaches the overlay/terminal within a second
+        run: node examples/dev-servers/run.mjs ${{ matrix.host }} --dist dist --budget-ms 1000
 
   smoke:
     # L6 "How L6 is enforced": the install matrix and the runtime fence, on each

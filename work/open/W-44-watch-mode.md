@@ -51,16 +51,13 @@ ball: agent
 
 ## Blockers
 
-None that stop the build. Two questions for the decider:
-
-1. **`notify` is `CC0-1.0`.** L2 decision 1 admits only OSI-approved licences and CC0 is not one, so it was not taken. The watch polls instead: no dependency, the same on every platform, about a fifth of one core idle on the 10k workload, and up to 100 ms more latency than OS events. Options: (a) keep polling; (b) rule CC0-1.0 in for `notify` (an L2 amendment; its macOS/Linux/Windows deps are MIT/ISC/Apache); (c) a later item writes the three OS backends over `libc`/`windows-sys` (no new licence). The `Snapshot` is the one place that would change.
-2. **What DoD 1 times.** The engine's re-check is ~3–6 ms; the save-to-print is ~230–290 ms because the spec's own ~100 ms debounce plus the poll come first. Is DoD 1 met by the re-check (`watch_rerun`), or must save-to-print fit < 100 ms (then the debounce must go below 100 ms, or OS events in, or both)?
+None. Both questions the build raised were ruled by the decider on 2026-10-26 (see Rulings): keep polling (no `notify`, L2 unchanged) and DoD 1 is judged on the re-check. An OS-event backend over `libc`/`windows-sys` would be a later item only if latency ever matters.
 
 ## What is left
 
-- DoD 5 on CI's `win32-*` `smoke` legs.
-- The two questions above.
-- `watch_rerun` and `watch_save_to_print` measured on CI's `ubuntu-24.04` runner (they are context rows; nothing gates them).
+- DoD 5 on CI's `win32-*` `smoke` legs (`scripts/smoke.sh` runs `check --watch`; no Windows target on this Mac).
+- `watch_rerun` and `watch_save_to_print` measured on CI's `ubuntu-24.04` runner (context rows; nothing gates them).
+- Re-verified locally 2026-10-26: `cargo test -p codelaw-cli --test watch` 6 passed, 0 failed.
 
 ## Record affected
 

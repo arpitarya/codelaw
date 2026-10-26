@@ -4,6 +4,7 @@
 
 mod adapters;
 mod baseline;
+mod changed_functions;
 mod compile;
 mod debug;
 mod discover;
@@ -20,6 +21,7 @@ mod suppress;
 mod timings;
 mod watch;
 
+pub use changed_functions::{ChangedFile, ChangedFunction, ChangedFunctions};
 pub use baseline::{AsOf, BaselineAdd, Ratchet};
 pub use compile::{CompiledRule, Matcher};
 pub use discover::FileEntry;

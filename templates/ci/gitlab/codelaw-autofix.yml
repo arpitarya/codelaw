@@ -35,11 +35,9 @@ codelaw-autofix:
         echo "## This week's burn-down"
         codelaw baseline history --since 7d --by day --format markdown 2>/dev/null || echo "No baseline history in the last 7 days."
         echo
-        if codelaw exceptions --help > /dev/null 2>&1; then
-          echo "## Exceptions expiring in 30 days"
-          codelaw exceptions --expiring 30d 2>/dev/null || true
-          echo
-        fi
+        echo "## Exceptions expiring in 30 days"
+        codelaw exceptions --expiring 30d --as-of "$(date +%F)" --format markdown 2>/dev/null || echo "No exceptions listed."
+        echo
         echo "This merge request only lowers baseline counts; one that raises a count fails its own pipeline."
       } > body.md
       rm fix.json

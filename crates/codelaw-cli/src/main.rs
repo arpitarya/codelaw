@@ -7,6 +7,7 @@ mod bench;
 mod ci;
 mod format_cmd;
 mod git_hooks;
+mod debug_cmd;
 mod graph_cmd;
 mod config_cmd;
 mod deps_cmd;
@@ -68,6 +69,8 @@ enum Command {
         #[arg(long)]
         stdio: bool,
     },
+    /// Inspect what the engine sees: `changed-functions`.
+    Debug(debug_cmd::DebugArgs),
     /// Query the project graph: `refs`, `why-unused`.
     Graph(graph_cmd::GraphArgs),
     /// Print the resolved configuration with each value's source, or its JSON Schema.
@@ -583,6 +586,7 @@ fn main() -> ExitCode {
             let _warm = warm::serve_in_background(warm::Kind::Lsp);
             codelaw_lsp::run_stdio().map_or_else(fail, |()| ExitCode::SUCCESS)
         }
+        Command::Debug(a) => debug_cmd::debug(a),
         Command::Graph(a) => graph_cmd::graph(a),
         Command::Config(a) => config_cmd::run(a),
         Command::Cache { action } => cache(action),

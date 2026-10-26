@@ -217,7 +217,7 @@ const BUILD_TOOLS: &[BuildTool] = &[
         licence: "MIT",
         requires: &["fux-core", "fux-reader", "fux-writer"],
         extras: &[],
-        source: "DEPENDENCIES.md D-34 (MIT, 5.1.0; pending)",
+        source: "DEPENDENCIES.md D-34 (MIT, 5.1.1; pending)",
     },
     BuildTool { registry: "pypi", name: "fux-core", licence: "MIT", requires: &[], extras: &[], source: "DEPENDENCIES.md D-34 (fux-engine's pinned dependency)" },
     BuildTool { registry: "pypi", name: "fux-reader", licence: "MIT", requires: &[], extras: &[], source: "DEPENDENCIES.md D-34 (fux-engine's pinned dependency)" },

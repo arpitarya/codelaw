@@ -1,0 +1,136 @@
+# fux.register.v2	rules=5
+# loc	sha	decoder	[k=v ...]
+README.md	ca9475622406ba7c517b46e66f527f2c703f8495	prose
+archive/README.md	1606f0b0a0d723ebc387771905d1cf990b831ae7	prose	archived=true
+archive/bootstrap/WORK-SYSTEM.md	596ed34d20a3476fd702bfd021200e94eb35b91e	prose	archived=true
+archive/open/W-01-rule-pack-records.md	78910b43392f62d75923d781051e226450ef67a2	prose	archived=true
+archive/open/W-02-engine-p0.md	d973a1d8002070f691a826554ca3ee503ea8e0b3	prose	archived=true
+archive/open/W-03-rule-packs.md	a24b86c841f4932fa777e0468a187163851a2d1e	prose	archived=true
+archive/open/W-04-release-pipeline.md	a042e9e56bc101165a99c26d04ac9f6c285caf0e	prose	archived=true
+archive/open/W-06-consumer-readme.md	79f54503eb5fe5198d462b8a7ceb598f27acdbd6	prose	archived=true
+archive/open/W-07-formatter.md	5df652c3dc5f14ba88b6c9bc1e9364649bb19b7f	prose	archived=true
+archive/open/W-08-mcp-server.md	43b21d5bf01f583ff54b56fa85e821a8c85a0ed2	prose	archived=true
+archive/open/W-09-lsp-and-extension.md	3778b3ff73afcad384d44851203b60c101fe60a6	prose	archived=true
+archive/open/W-10-agent-surfaces.md	5b1f3bd4360a24b2f7825a11c2c26d9c1c9ca96f	prose	archived=true
+archive/open/W-11-project-graph.md	23458f83549cb9422cf72f3b0e4bc0c03d0e9085	prose	archived=true
+archive/open/W-12-structured-file-rules.md	a0788c7ac14251e705515d3818b2f4dd43b4697d	prose	archived=true
+archive/open/W-13-baseline-and-time.md	8a46c23a385dee69d3bdda0309d248b449e55152	prose	archived=true
+archive/open/W-14-adapters.md	835cc6cdc4e5f3cf10aa303958600f53f207393a	prose	archived=true
+archive/open/W-15-warm-processes.md	8f166ed758b1f790aea42e7295182fabd45c7143	prose	archived=true
+archive/open/W-16-commands-and-api.md	f99ffb98fe5336c4c808f83ab72408a9e7274331	prose	archived=true
+archive/open/W-17-engine-defects.md	99f9310167332d517139592c90a8b75dbcf51258	prose	archived=true
+archive/open/W-18-release-hardening.md	90ca9a17c57507bad8e38b181c6c846848d7cfb6	prose	archived=true
+archive/open/W-19-performance-budgets.md	f7c9ab912b0c9dedb8498c110e7d0b2ea736c7fd	prose	archived=true
+archive/open/W-20-conformance-tests.md	1cd85eb4ca5f7a42f4225f94bd29fb3418cdffda	prose	archived=true
+archive/open/W-21-pack-engine-gaps.md	7afda106f779f4a8e17bb926ad1535afb3252af6	prose	archived=true
+archive/open/W-22-record-drift.md	3b995fab0daff70b75da49d76ba8079fa4c178db	prose	archived=true
+archive/open/W-23-formatter-rest.md	6f6fbcc3e9a7c5acdca7b898e1a2b2705245c9e6	prose	archived=true
+archive/open/W-24-ci-green-on-main.md	d7d4d728ce8684f2cfbe3df1394d28d22c8eb50e	prose	archived=true
+archive/open/W-25-governance-drift.md	3db34e1232e8ba927f78ea5ddd2635e2b48b8eed	prose	archived=true
+archive/open/W-26-public-docs-from-the-tree.md	38b39c89ff670d6467c5c52d3866e1cd552d99c2	prose	archived=true
+archive/open/W-27-engine-and-packaging-hygiene.md	7af59a305f57502da1e9fd2dd2936a7b1ebbea1d	prose	archived=true
+archive/open/W-28-layout-check-by-tokens.md	ab81badbb60bb1b4fc945f38196f639598950c53	prose	archived=true
+archive/open/W-29-first-npm-publish.md	778f05aa5b4f5c307f77df08be34bf09f1ca2abc	prose	archived=true
+archive/open/W-30-first-pypi-publish.md	0edfb11be4d5aeada0de4e29dbf46b008586458d	prose	archived=true
+archive/open/W-31-registry-pack-split.md	b8b8a28b9d5ed3e9c5a89c5317108bff38c4b1d9	prose	archived=true
+archive/open/W-32-redux-and-query-packs.md	0891cad17a7b26bb13a7ff5125ba7cae1f52a79c	prose	archived=true
+archive/open/W-33-stencil-preset-gaps.md	2540eab19f1784b6b0828652199c7698ccdfc774	prose	archived=true
+archive/open/W-37-npm-0-2-0-through-the-pipeline.md	e2278986ec1aad823f0759d3cbf88760e6e39869	prose	archived=true
+archive/open/W-39-ci-and-local-profiles.md	5f46fc6dc5c7aed3341a600cc8676b98b18a2525	prose	archived=true
+archive/open/W-40-dated-exceptions.md	c1f4fa5b4f663a4078aba91c57a5fc06a45e0c99	prose	archived=true
+archive/open/W-41-react-no-context.md	da1ec0c7fc6427d90bcefbbdadbcb82d3a75a3f6	prose	archived=true
+archive/open/W-42-tanstack-query-hooks-rules.md	e4fcd3f03a628598de5cbcc73f0d335fa3779916	prose	archived=true
+archive/open/W-43-react-hooks-rules.md	1e25928f3badbf102d22ee069d221048e1089182	prose	archived=true
+archive/open/W-46-exceptions-report.md	3b9c5eaee10c8e8b1a5ea4fab30a518edee6cd88	prose	archived=true
+archive/open/W-47-baseline-burn-down.md	4516c7a23c1c0d964b6044cc60ca9c376bf60892	prose	archived=true
+archive/open/W-48-codelaw-migrate.md	7af5bc89c26ab90218b682979582f19531841dc3	prose	archived=true
+archive/open/W-49-dev-server-plugins.md	40427e6f5fd51c847fa480b4ac5bacc36cbb8cd8	prose	archived=true
+archive/open/W-50-git-hooks.md	516ada6a79bd8033dc44fa9f48f19a99b7f25cf4	prose	archived=true
+archive/open/W-52-dependency-latest-versions.md	c843d1254342ec7f1855bb3342712de382adebf6	prose	archived=true
+archive/open/W-53-security-packs-groundwork.md	9774b03a8a8d2990d564446afb7493e84995a4d2	prose	archived=true
+archive/open/W-54-security-js-pack.md	68f1b0dde9e3f6a39d188ffb97c15a941b573705	prose	archived=true
+archive/open/W-55-security-ts-pack.md	17c7e8153b4efcacbc04c074563c18871c2e8e2e	prose	archived=true
+archive/open/W-56-security-html-pack.md	4b43b02651944b542802c7faf1801b78bfbcb3bb	prose	archived=true
+archive/open/W-57-security-python-pack.md	20e3499a07e0733c6fd6e34ca24b810f55a60670	prose	archived=true
+archive/open/W-59-scope-and-profile-tables.md	fbab82d3c6e5a036d4b1de0e075fe7b7865aaa9f	prose	archived=true
+archive/open/W-60-consumer-templates.md	14e1fa349fc2f760a7ef63f612d5483a041094e5	prose	archived=true
+archive/open/W-61-max-lines-html-css.md	147118a7316deb71b80e9282b45d51fad532c85f	prose	archived=true
+archive/open/W-63-css-modules.md	ee92b7b92461ce18677477db38bb55cfebfefeb1	prose	archived=true
+archive/open/W-65-dependency-check.md	fecbdc138f66645136c7bc6988a8b3ae53786ba9	prose	archived=true
+archive/open/W-66-ratify-dependencies.md	211e8ee9821c68b7bd2fc9c0433b4c2b00c29a8a	prose	archived=true
+archive/open/W-67-replace-three-dependencies.md	a1c65ee713de6df5b46c65319a56a3014b01ba02	prose	archived=true
+archive/open/W-75-commit-main-checkout.md	d332f6aab3bf02a92041832c7736a387050baa1d	prose	archived=true
+docs/DESIGN.md	164f518611f272a308438fe9f0980c3eebc1864e	prose
+docs/GLOSSARY.md	d7968e0a92f7cc6e1554188ab45beb48ce17382b	prose
+records/0001_LAWS.md	fc68bd6308f459513969528a37b33c5cf9b1cfa8	prose
+records/0002_LAW-0-authority.md	258a325331c5e75a348fad8d1fcae25fd08429c4	prose
+records/0003_LAW-1-retired-records-archived.md	2ec4ffd655e5313c2344c9a5b953adf6389144e5	prose
+records/0004_LAW-2-foss-dependencies.md	92bc84bdda8e2a5f041323a6b630ed9a60a705e4	prose
+records/0005_LAW-3-languages.md	7240cead6c50b4442e1b4d0a38e65a7ede7f6ad2	prose
+records/0006_LAW-4-every-rule-has-a-fix.md	2697f0e8b510b1ada883ec3c4e09c473b59d4396	prose
+records/0007_LAW-5-no-model-in-the-engine.md	3e7771d96700cf0c51849482b03055235f2351ef	prose
+records/0008_LAW-6-python-and-node-packages.md	50ad526459eba18026bbabdf5f2b979053592999	prose
+records/0009_LAW-7-linter-and-formatter.md	7d04139c1435532f210e273bd3613a9cf02c59ca	prose
+records/0010_LAW-8-performance-budgets.md	c7b77347e3654b4c4cf1368621837eb375381095	prose
+records/0011_LAW-9-machine-budget.md	7d7c3902bbad96257c125b86b737f2dd7a1c8810	prose
+records/0012_LAW-10-consumer-templates.md	ad1301c2f84f09b0db6df2bac2bdac6725a3e164	prose
+records/0013_LAW-11-no-dependencies.md	0c7c40ffbaa85da69afed4e96f71c27fb24a5acb	prose
+records/0051_WORK-open-queue.md	81ea1e1928ef21f93a2542b54d2e0684e07809f7	prose
+records/0052_WORK-backlog.md	f31b16cf6433a7949fc3cc15da418430dc9b87eb	prose
+records/0053_WORK-lifecycle.md	6beee72d6c2cb0df11cfc54d8ee8d42a4a13e97f	prose
+records/0054_WORK-session.md	b0dda9768a116a448a31b03ff8c0b4d9aab03113	prose
+records/0055_WORK-docs.md	4a85e496462bdb018cf4296a8a9d23ac42c1197e	prose
+records/0056_WORK-blockers.md	11353a9b6eb9e86d1172a31e47809457a9f3366b	prose
+records/0057_WORK-archive.md	1360d7d398540cdab891dab3fcb22615306a1b2e	prose
+records/0058_WORK-ownership.md	4c538d16315273de183a141282f380bc26b20799	prose
+records/0059_WORK-governance.md	ed8c50e3a722b4c4c13ec2d1e1943619255ef2f7	prose
+records/0060_WORK-registry.md	83df81b67054348d351b2eca1aa4b817c75142bc	prose
+records/0061_WORK-now.md	6a5d4bd9d653c55d232d7abf7d13d968e30ba889	prose
+records/0062_WORK-cleanup.md	d01e97992d4efc37731cc7cdb1d6c0fab81456fb	prose
+records/0101_rule-packs.md	a5dc10d7d803a1334cbef6a2f92f04280f88c1e6	prose
+records/0102_agent-surfaces.md	7d1519cdc145c1ee20f2710a572af729ea29bf4e	prose
+records/0103_project-graph.md	6c3c671f1147145ff1ae318d04284d09baa5c0a8	prose
+records/0104_baseline-and-deprecations.md	895710abe0c8022cea42a203bb7ff9f295d97bb4	prose
+records/0105_formatter.md	a95a016965cd7995ce9ee0e3fc312ad6f5160d23	prose
+records/0106_linter.md	8aeedd12cdd21539d3dce8de3204e1afc61ee7b7	prose
+records/0107_packages.md	bfd0eb2aa7ca73c11475c5f592475c324e09b48c	prose
+records/0108_architecture.md	ba4ebe03c7dd1710476cc5cc31852fcc27047a4c	prose
+records/0109_cache.md	a73dd2677b7974e9fa60c4ced587c65dac54bbcd	prose
+records/0110_config.md	8f3ce0419ed96b720b538ff2be82856d5f67dedc	prose
+records/0111_consumer-layout.md	279a396d9ec76451b60b7c982db6b11ddae07199	prose
+records/0112_rule-format.md	916d5207e1f4e11f888ad44d22f2331fb71c3aaa	prose
+records/0113_rule-authoring.md	30808f09370925f4f4e6661c87dcb82790e7cf0c	prose
+records/0114_editor.md	f914b744391b835624528abc5e72df65d6752f7c	prose
+records/0115_cli-and-mcp.md	14166fa3a26035bc56503c8e8ffee0aa6558a446	prose
+records/README.md	525a62e8923039783d13552f02997a13e651f7a7	prose
+records/TEMPLATE.md	227d3572bfbb7da4327396f8d073d8269a2859ed	prose
+work/BACKLOG.md	6ababe5d93b7a939febaf9c45186a754190a0ce8	prose
+work/BLOCKED.json	d1cf19366dcd3b1a8431d8d1786011e0bff997d9	pkg:fux-decoder-json@5.1.1/json@1+limits@1
+work/IMPLEMENTATION.md	c679d9ec1756f16b5821930fd55914386ca69c55	prose
+work/INTERVIEW.md	7e632e9663916eb36f97bd17ca83b6c0663923dd	prose
+work/LESSONS.md	4a9885fe867f95f2fd1bcc046fa21922b9311198	prose
+work/MACHINE.md	a5b8840949acb76c0492068466e044d7a1950ad2	prose
+work/NOW.md	b0ff05e8900ab1a94f920e45ce6783a3fcc651af	prose
+work/OPEN-WORK.md	944a3facfc320718bfc97d2c0597ef7b65105c17	prose
+work/README.md	6b31915cf9322827f31f6b28dc4fbfe6cb29e3c4	prose
+work/WORKLOG.md	5fd559af0509ca3a32daa8997bdba55aa207014e	prose
+work/compare/README.md	18d791face63144aa25a2dd8b40d1aefa79a7d69	prose
+work/compare/ci-profiles-and-dated-exceptions.compare.md	8e0070ca1930c2bf2151d538dd7c6dc7c53e58bf	prose
+work/open/README.md	671c84a0497eb6fb302929fab4af30df8697a6f4	prose
+work/open/W-05-write-time-guidance.md	fea5835adfc526562bbc4c5149892d6e5585f042	prose
+work/open/W-34-fux-index-packages.md	d93d74c1861625ce3b86d194661b62409fdc3e54	prose
+work/open/W-35-before-while-after-positioning.md	3bac40145edb0e07ab42b812ad3ba88889f74c2e	prose
+work/open/W-36-position-against-eslint-and-biome.md	f1d83f149237dc0f003f33ce48a1a408b59f447a	prose
+work/open/W-38-pypi-0-2-0-by-hand.md	d768cf3d57752b27b935cd8a36791b56443860f0	prose
+work/open/W-44-watch-mode.md	75304bcb6418f5e41089381400e7b835006118ae	prose
+work/open/W-45-ci-report-formats.md	f0f2ff3199e70606f4c6a56e5bf99fd7e71f3385	prose
+work/open/W-51-scheduled-autofix-pr.md	d176a9019e25f7f2289b737f958fffc58db8fa8f	prose
+work/open/W-58-size-limits.md	33fe5240663d301f68ec9a242b315dea6677664d	prose
+work/open/W-62-scss-support.md	d843cb95e408f7fca0269c8b72325d17a631d529	prose
+work/open/W-64-codelaw-pre-commit-mirror.md	c03d59c1cc6804029b86b4d9df043ecef1e245f9	prose
+work/open/W-70-dev-server-example-apps.md	cfbc8783b70191277e8d3219b33b10ae7d67ebe4	prose
+work/open/W-71-tests-for-new-code.md	ca17c33c1652a963e96aa8d7ffd2f4fa136cc257	prose
+work/open/W-73-configurable-approved-calls.md	9178326085fa864a060553548e104b5349a3bade	prose
+work/open/W-74-editor-logs.md	cde8c9bb0d70199d155c29b284cffcd2002f80f3	prose
+work/proposals/README.md	fb4ea0b14c6582432ea279de4845401f78d15662	prose
+work/proposals/type-aware-rules.md	3bb35867a8d47b047f37893fc3a0ec5aaa21d8ca	prose

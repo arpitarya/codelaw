@@ -122,7 +122,7 @@ flowchart LR
     | npm | `@codelaw/rules-<name>-fux-index` for each npm pack of decision 11 that holds rules |
     | PyPI | `codelaw-rules-<name>-fux-index` for each PyPI pack that holds rules |
 
-    - **Today that is twelve on npm and seven on PyPI** (ten and six before the `scss` and `css-modules` packs, W-62 and W-63): the four security packs hold no rule file yet, Fux refuses an empty index, and each gets its package with its first rule.
+    - **Today that is fifteen on npm and ten on PyPI** — one per pack, every pack now holding rules (ten and six before the `scss` and `css-modules` packs, W-62 and W-63; twelve and seven until the four security packs held their first rule files): Fux refuses an empty index, so a pack gets its package with its first rule.
     - **What it holds:** Fux's index of that pack's `rules/` and nothing else — the shards, `identifiers.toml` and `fux-index.json` ([SR-PKG-INDEX](https://github.com/arpitarya/fux/blob/main/records/0166_pkg-index.md), Fux's record). **Pure data, zero runtime dependencies.** Fux reads it; codelaw's engine never does, so codelaw stays complete with no Fux ([L5](0007_LAW-5-no-model-in-the-engine.md)).
     - **Never inside the rule pack, never a dependency of it, never installed by `codelaw init`.** `init` only prints how to add them, and only when the repo has a `.fux/` folder ([SR-RULE-PACKS](0101_rule-packs.md) decision 6).
     - **A segment is the same on both registries** (one digest, Fux's SR-PKG-INDEX decision 4); a pack on one registry has its index on that registry only.

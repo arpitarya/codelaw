@@ -45,9 +45,9 @@ ball: agent
 
 ## Blockers
 
-None. The burn-down section (W-47) is in. The exceptions section (W-46) is guarded by `codelaw exceptions --help` and appears once W-46 lands. The deps-snapshot section (W-52) is not written: the job runs no networked command (L5), so the snapshot cannot change in it.
+None. The burn-down section (W-47) is in. The exceptions section (W-46) is in, unconditional, judged with `--as-of`. The deps-snapshot section (W-52) is not written: the job runs no networked command (L5), so the snapshot cannot change in it.
 
-**Left (human or runner):** run the workflow once in a throwaway GitHub repo with fixable findings (DoD 1, 3); remove the `needs:` and the `exceptions` guard only if W-46 changes its flags.
+**Left (human or runner):** run the workflow once in a throwaway GitHub repo with fixable findings (DoD 1, 3).
 
 ## Record affected
 

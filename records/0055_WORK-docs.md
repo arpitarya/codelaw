@@ -7,7 +7,7 @@ description: "How a doc is written, who may edit the agent-steering files and un
 status: accepted
 date: 2026-10-18
 feature: the documentation contract
-owns: []
+owns: [.claude/hooks/fux-index-hint.sh]
 laws: [L0]
 timestamp: 2026-10-18T12:52:51Z
 content_sha: ""

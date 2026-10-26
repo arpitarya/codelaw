@@ -7,7 +7,7 @@ filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-26
 updated_by: "Claude Code (Sonnet 5.5) — built"
-ball: agent
+ball: arpit
 ---
 
 # W-62 — SCSS in the CSS pack — L3 amended, parsed, formatted, linted
@@ -84,7 +84,7 @@ ball: agent
 
 ## Blockers
 
-None — B-047 ruled 2026-10-26 (own grammar + tree-sitter-scss).
+**ASK, 2026-10-26 (`work/BLOCKED.json`):** *Left* items 1 and 2 need the tree-sitter CLI (npm `tree-sitter-cli` 0.25.10, MIT, build-time only) to regenerate `src/` from a patched `grammar.js`. It is not installed on this machine and not in `DEPENDENCIES.md`, so L11 forbids it until the decider ratifies it by name. Question: ratify `tree-sitter-cli` 0.25.10? On a yes: add the D-row, patch both grammars, bump to `1.0.0+codelaw.1`, move the CSS rules onto trees, re-ball to agent. Item 3 (corpus) needs CI network and is independent. B-047 itself was ruled 2026-10-26.
 
 ## Record affected
 

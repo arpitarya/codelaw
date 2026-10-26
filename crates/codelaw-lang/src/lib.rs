@@ -7,11 +7,13 @@
 //! [`GRAMMARS_FINGERPRINT`] joins every cache key (SR-ARCHITECTURE
 //! decision 3).
 
+mod functions;
 mod grammar;
 mod regions;
 mod tokens;
 
 pub use ast_grep_core::Language as AgLanguage;
+pub use functions::{Change, Function, classify, functions, has_functions};
 pub use grammar::Grammar;
 pub use regions::{Hole, Region, RegionOptions, regions};
 pub use tokens::{Token, same_tokens, token_stream};
