@@ -137,6 +137,24 @@ files = ["src/payments/**"]
 remap = { warn = "error" }
 ```
 
+### Size limits
+
+The `size` presets are opt-in (in no `recommended`): `codelaw:html/size` and `codelaw:css/size` turn on a line limit per file. HTML and CSS have no prior art in stylelint, html-validate or Biome, so the defaults are codelaw's own. The stylesheet limit covers `.css` and, as those languages arrive, SCSS and CSS Modules; a `<style>` or `<script>` inside a page is part of that page's count, never a file of its own.
+
+| rule | default | options |
+|---|---|---|
+| `html/max-lines` | 400 | `max`, `skip_blank_lines` (true), `skip_comments` (true, `<!-- -->`), `skip_embedded` (false: lines inside `<script>` and `<style>`) |
+| `css/max-lines` | 300 | `max`, `skip_blank_lines` (true), `skip_comments` (true, `/* */` and SCSS `//`), `skip_imports` (false: `@import`, `@use`, `@forward`) |
+
+```toml
+extends = ["codelaw:html/size", "codelaw:css/size"]
+
+[rules]
+"css/max-lines" = { severity = "warn", options = { max = 200, skip_imports = true } }
+```
+
+A line holding code and a comment counts as code. A finding names the first line over the limit and carries the count: `412 lines (max 300; blank lines and comments not counted)`. The fix is manual: split the file.
+
 ---
 
 ## Write your own rules
@@ -228,7 +246,7 @@ flowchart LR
 - **Editor:** `codelaw lsp` is a language server — diagnostics, quick fixes and formatting. The VS Code extension is built; its Marketplace listing comes later ([SR-EDITOR](records/0114_editor.md)).
 - **Pre-commit:** `codelaw init --git-hooks` installs a `pre-commit` and a `post-commit` hook in the folder git uses (`core.hooksPath` or `.git/hooks`). An existing hook is kept as `<name>.pre-codelaw` and runs first; nothing is overwritten, and deleting the file uninstalls it ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 11).
   - **`pre-commit` blocks:** it runs `codelaw fix --staged` on the files that are fully staged and re-stages them, then `codelaw check --staged` on every staged file. A partly staged file is checked but never fixed, so your unstaged hunks stay yours. Add flags to both with `CODELAW_HOOK_ARGS` (for example `--profile ci`); skip once with `git commit --no-verify`.
-  - **`post-commit` never blocks:** it prints what the scripts in `.codelaw/hooks/post-commit.d/` print and always exits 0.
+  - **`post-commit` never blocks:** it reminds you of your exceptions that expire within 7 days (`codelaw exceptions --mine --expiring 7d`) and the baseline's 30-day burn-down in one line, then prints what the scripts in `.codelaw/hooks/post-commit.d/` print, and always exits 0.
   - **By hand:** `codelaw check --staged`.
   - **The pre-commit framework** — `codelaw` must be on `PATH`:
 
@@ -313,6 +331,7 @@ flowchart LR
 | `codelaw match <id> <file>` | Which clause of a rule matched or failed, and what it captured. `--explain` shows every candidate node |
 | `codelaw graph refs\|why-unused <symbol>` | Query the project graph: every use of a symbol, or why `graph/no-unused-exports` held |
 | `codelaw baseline add\|prune\|check` | Grandfather a rule's existing findings with a deadline, lower the counts, or fail when the baseline got looser ([SR-BASELINE](records/0104_baseline-and-deprecations.md)) |
+| `codelaw exceptions` | List every exception (baseline entry, deprecation, inline ignore) with its expiry, days left and owner: `--expiring 30d`, `--expired`, `--mine`, `--rule`, `--path`, `--group-by added_by\|rule\|file\|expires-month`, `--format text\|json\|csv\|markdown`, `--fail-if-expiring 7d` ([SR-BASELINE](records/0104_baseline-and-deprecations.md) decision 11) |
 | `codelaw deprecate <symbol>` | Deprecate a symbol: write the registry entry and baseline every current use, for `graph/no-deprecated-usage` |
 | `codelaw hook [paths]` | Check and fix the files an agent just edited; what is left goes back to it |
 | `codelaw sync-agents` | Write every agent's instruction files from the rules and skills; `--check` reports drift |

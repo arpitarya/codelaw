@@ -281,6 +281,20 @@ $ codelaw check --as-of 2027-04-01          # what breaks on the day it expires?
   `--format csv` or `json` feeds a dashboard the same way.
 - **The test:** `crates/codelaw-cli/tests/baseline_history.rs` builds five baseline commits, with a rule added, a rule file renamed and a file deleted, and checks hand-counted totals, the windows and buckets, the four formats, byte-identical output, the shallow warning and the exit-2 cases.
 
+#### 11. The exceptions report: `codelaw exceptions`
+
+*The decider's ask, 2026-10-25 (W-46).*
+
+- **What it answers:** what is excepted from the rules, what expires soon and who owns it. A read-only list of every exception of decision 9 — each **baseline entry**, each **deprecation**, each **inline `codelaw-ignore`** — and it lints nothing. `[[overrides]]` are configuration, not exceptions (decision 9), so they are not listed.
+- **One row per exception, once:** a baseline entry is one row (`uses` = its `count`); a deprecation is one row whose `uses` and files are those of the baseline entries of its symbol, which are folded into it and not listed again; an inline ignore is one row per rule it names (`uses` 1), at its comment's line. A comment whose keys cannot be read covers nothing and is not listed (`codelaw/unknown-suppression` reports it). Each row carries `kind`, `rule`, `files`, `symbol`, `expires`, `days_left`, `added_by`, `reason`, `uses`, `at` and `line`; rows are sorted by `expires` (undated last), then rule and file.
+- **Days left** is `expires` minus the as-of date (decision 4), never the wall clock: 0 or less is expired. Without an as-of date it is blank and `--expiring` and `--expired` are a usage error, exit 2. `--as-of` changes that column and which rows a window keeps, nothing else.
+- **Filters:** `--expiring <N>d|<N>w|<N>` keeps what expires 1 to N days after the as-of date; `--expired` what has (`expires` on or before it), and the two together are the union; `--mine` what `added_by` names `git config user.email` (case-insensitive; no email is exit 2); `--rule <id>` (repeatable) and `--path <path>` (a file or folder, project-relative).
+- **`--group-by added_by|rule|file|expires-month`** (also after the filters): groups sorted by key, the group of rows without that key last (`(no added_by)`, `(project)` for a deprecation spanning files, `(no expiry)`), each with its exception and use counts.
+- **`--format text|json|csv|markdown`**, default `text`: the as-of line, then one row per exception (grouped: a header line `key  N exceptions, M uses`, rows indented). `csv` is one line per exception with the columns above (and a leading `group` when grouped), quoted per RFC 4180. `markdown` is a GitHub table per group, `|` in a cell escaped. `json` is `{ schema_version, as_of{date,line}, group_by, exceptions[], groups, total{exceptions,uses} }`.
+- **Exit codes:** 0 whatever it finds; `--fail-if-expiring <N>d` exits 1 when any *listed* exception has N days or fewer left, expired ones included, for a scheduled job; 2 for usage errors.
+- **MCP:** `list_exceptions` takes `expiring`, `expired`, `mine`, `rule`, `path`, `group_by` and `as_of` and returns the `json` object byte for byte ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 5).
+- **The test:** `crates/codelaw-cli/tests/exceptions.rs` builds one of each form with hand-counted days, and checks the filters, every grouping, the formats, `--as-of`, `--mine` and the exit codes; `mcp_parity.rs` the twin.
+
 ### Consequences
 
 - **The baseline is committed and reviewed**, and CODEOWNERS approval on it is a process cost.

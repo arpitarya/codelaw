@@ -7,7 +7,7 @@ governed_by_path: records/0013_LAW-11-no-dependencies.md
 
 # DEPENDENCIES — every dependency, and whether the decider has ratified it
 
-**Ruled 2026-10-26** (the decider, by voice, one card per unit): 29 ratified, 3 to remove — `strsim`, `anyhow`, `postcard` (W-67). Each ratification accepts the unit's transitive tree as pinned in `Cargo.lock` / `package-lock.json` that day (L11 decision 4).
+**Ruled 2026-10-26** (the decider, by voice, one card per unit): 29 ratified; `strsim`, `anyhow` and `postcard` were replaced by codelaw's own code and removed (W-67, 2026-10-26) — `strsim` and `anyhow` still appear in `Cargo.lock` only as part of the ratified trees of `clap` and `markup_fmt`. Each ratification accepts the unit's transitive tree as pinned in `Cargo.lock` / `package-lock.json` that day (L11 decision 4).
 
 **The rule is [L11](records/0013_LAW-11-no-dependencies.md):** no dependency unless ratified here by name. Statuses: `pending` (today's pin, awaiting the decider) · `ratified YYYY-MM-DD` (with his words) · `remove` (a work item replaces it).
 
@@ -36,11 +36,8 @@ governed_by_path: records/0013_LAW-11-no-dependencies.md
 | D-17 | **file walking** | `ignore`, `globset` | `.gitignore`-aware discovery, globs | 0.4.33 / 0.4.20 | 22 | ratified 2026-10-26 — *"Ratify."* |
 | D-18 | **rayon** | `rayon` | checks files in parallel (L8 budgets) | 1.12.0 | 6 | ratified 2026-10-26 — *"Ratify."* |
 | D-19 | **blake3** | `blake3` | content hashes for the cache | 1.8.7 | 9 | ratified 2026-10-26 — *"Ratify."* |
-| D-20 | **postcard** | `postcard` | the cache's on-disk format | 1.1.3 | 24 | **remove** — *"Replace."* (2026-10-26) → W-67 |
 | D-21 | **similar** | `similar` | diffs (`--diff`, LSP range formatting) | 2.7.0 | 13 | ratified 2026-10-26 — *"Ratify."* |
 | D-22 | **semver** | `semver` | version ranges (`requires`, packs, deps) | 1.0.28 | 1 | ratified 2026-10-26 — *"Ratify."* |
-| D-23 | **strsim** | `strsim` | "did you mean …?" suggestions | 0.11.1 | 1 | **remove** — *"Remove"* (2026-10-26, voice) → W-67 |
-| D-24 | **anyhow** | `anyhow` | error type in the format crate | 1.0.104 | 1 | **remove** — *"Remove"* (2026-10-26, voice) → W-67 |
 | D-25 | **libc** | `libc` | OS calls (signals, Unix sockets) | 0.2.191 | 1 | ratified 2026-10-26 — *"Ratify."* |
 
 ## Rust — tests and build only

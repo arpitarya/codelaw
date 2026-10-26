@@ -225,6 +225,40 @@ fn post_commit_prints_and_never_fails() {
     assert!(out.contains("owed-reminder"), "{out}");
 }
 
+/// W-46's reminder: the post-commit hook prints the committer's own
+/// exceptions that expire within 7 days, judged on the as-of date, and
+/// nothing when there are none.
+#[test]
+fn post_commit_reminds_of_your_expiring_exceptions() {
+    if !have_git() {
+        return;
+    }
+    let d = temp("remind");
+    assert_eq!(codelaw(&d, &["init", "--git-hooks", "post-commit"]).0, 0);
+    git(&d, &["config", "user.email", "t@example.com"]);
+    fs::create_dir_all(d.join(".codelaw/baseline")).unwrap();
+    let entry = |expires: &str, by: &str| format!("[[allow]]\nfile = \"a.py\"\ncount = 1\nexpires = \"{expires}\"\nadded_by = \"{by}\"\nreason = \"legacy\"\n");
+    let commit = |name: &str| {
+        fs::write(d.join(name), "x\n").unwrap();
+        git(&d, &["add", "-A"]);
+        let mut c = Command::new("git");
+        c.args(["commit", "-q", "-m", name]).env("CODELAW_AS_OF", "2026-10-25");
+        run(&mut c, &d)
+    };
+    // Mine, 5 days left: reminded.
+    fs::write(d.join(".codelaw/baseline/fixture--py-no-print.toml"), entry("2026-10-30", "t@example.com")).unwrap();
+    let (code, out) = commit("one");
+    assert_eq!(code, 0, "{out}");
+    assert!(out.contains("expire within 7 days") && out.contains("2026-10-30") && out.contains("in 5 days") && out.contains("fixture/py-no-print"), "{out}");
+    // Mine but 40 days away, and someone else's 5 days away: silent.
+    fs::write(d.join(".codelaw/baseline/fixture--py-no-print.toml"), format!("{}\n{}", entry("2026-12-04", "t@example.com"), entry("2026-10-30", "other@example.com").replace("a.py", "b.py"))).unwrap();
+    let (code, out) = commit("two");
+    assert_eq!(code, 0, "{out}");
+    assert!(!out.contains("expire within"), "{out}");
+    // The burn-down line: the baseline had 1 entry when it was first committed (commit two), 2 now.
+    assert!(out.contains("baseline burn-down, last 30 days"), "{out}");
+}
+
 #[test]
 fn init_with_hooks_outside_a_repo_fails_cleanly() {
     let d = std::env::temp_dir().join(format!("codelaw-hooks-norepo-{}", std::process::id()));

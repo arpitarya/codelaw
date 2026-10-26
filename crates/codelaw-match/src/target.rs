@@ -402,7 +402,7 @@ impl Pred {
                 if k == "all" { Pred::All(preds) } else { Pred::Any(preds) }
             }
             other => {
-                let near = PREDICATES.iter().min_by_key(|p| strsim::levenshtein(p, other)).filter(|p| strsim::levenshtein(p, other) <= 2);
+                let near = PREDICATES.iter().min_by_key(|p| codelaw_core::similar::levenshtein(p, other)).filter(|p| codelaw_core::similar::levenshtein(p, other) <= 2);
                 return Err(format!(
                     "unknown assertion `{other}`{} (one of {})",
                     near.map(|p| format!("; did you mean `{p}`?")).unwrap_or_default(),

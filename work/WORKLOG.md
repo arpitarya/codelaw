@@ -64,6 +64,38 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** none that landed; the first assemble run failed on the empty security packs and a temp-dir scope bug, both fixed before commit.
 - **Next:** Arpit's step 5.
 
+## 2026-10-26 — W-61: `html/max-lines` and `css/max-lines`, with `html/size` and `css/size`  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-61 — a max-lines rule for HTML and CSS (CSS, SCSS and CSS Modules), with W-58's options shape.
+- **Done:** `crates/codelaw-native/src/size_lines.rs` (a text scanner, no tree: comments, strings, unquoted `url(…)`, SCSS `//`, `@import`/`@use`/`@forward` statements, HTML `<!-- -->` and `<script>`/`<style>` bodies); the two rule pages with cases; the two opt-in `size` presets, added to both pack manifests; USAGE's `Size limits` section; SR-RULE-PACKS decision on the `size` presets; unit tests for every option. Both rules do nothing on a region (a `<style>` in a page, a fence in Markdown): the host file only.
+- **Decided / left open:** W-58's counter is tree-based and not landed, so this item has its own text scanner rather than waiting. Left: DoD 3 (a `[scope]` for `_*.scss` partials) needs W-59 and W-62; the measured `data` in JSON/SARIF needs W-58's `data_of` trait method (the message already ends ` (max N…`, the shape its parser reads).
+- **Mistakes:** a shared `CARGO_TARGET_DIR` made cargo reuse another lane's artifacts for same-named workspace crates (one build failed on another lane's `Language::Scss`); verified with a private `RUSTFLAGS` so the fingerprints differ.
+- **Next:** merge main after W-58 and W-59 land, add `data_of`, and close DoD 3.
+
+## 2026-10-26 — W-50 closed: post-commit reminders  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** W-50 after W-46 landed (`2120458`).
+- **Done:** `post-commit.sh` prints the committer's exceptions expiring within 7 days and the 30-day burn-down total; test added; SR-CLI-MCP decision 11, USAGE, CHANGELOG updated; W-50 archived.
+- **Decided / left open:** the reminders live in the script, not as `post-commit.d` files, so an installed hook needs `init --git-hooks` re-run. The burn-down "delta" is `baseline history`'s total row (no new command).
+- **Mistakes:** first threshold counted lines (a one-row report is 2 lines, as is an empty one); the test caught it.
+- **Next:** none.
+
+## 2026-10-26 — W-46 built: `codelaw exceptions` and `list_exceptions`  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** build W-46 (CLI plus MCP twin), then W-50's post-commit reminder.
+- **Done:** engine `Project::exceptions()` collects baseline entries, deprecations (their symbol's baseline entries folded in) and inline ignores; `codelaw-report::exceptions` filters, groups and renders text, JSON, CSV and markdown; CLI `exceptions` and MCP `list_exceptions`; SR-BASELINE decision 11 and SR-CLI-MCP updated; tests `exceptions.rs` and the parity test.
+- **Decided / left open:** `[[overrides]]` are not listed (no `expires`; decision 9). `--fail-if-expiring` counts expired rows too.
+- **Mistakes:** the shared `CARGO_TARGET_DIR` lets lanes overwrite each other's `target/debug/codelaw` between build and test (an old binary answered "unrecognized subcommand"); rebuilt and reran until green.
+- **Next:** W-50's post-commit reminders.
+
+## 2026-10-26 — W-67 closed: strsim, anyhow and postcard replaced  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** replace the three dependencies the decider ruled "Remove" / "Replace" in W-66, and measure L8 before and after.
+- **Done:** `levenshtein` and `jaro_winkler` in `codelaw-core::similar` (with known-pair tests) replace `strsim` in config, schema and target; the unused `anyhow` line left `codelaw-format`; the cache body is now codelaw's own deterministic binary format (`codelaw-cache/src/codec.rs`, header version 2; tests: round trip, fixed layout, every truncation, bit flips, a huge length, an old-version entry, a truncated entry). `postcard` left the workspace; D-20, D-23, D-24 left `DEPENDENCIES.md`; SR-CACHE decision 4 and SR-LAW-11 context updated; W-67 archived.
+- **Decided / left open:** `strsim` (via clap) and `anyhow` (via markup_fmt) are still in `Cargo.lock` as parts of ratified trees — said so in `DEPENDENCIES.md`, not fought. L8 was measured on this (loaded) machine only: no slower; the CI-runner numbers are the `perf` job's.
+- **Mistakes:** concurrent lanes share one target dir and overwrite each other's `codelaw_core` artifacts (cargo then said `cannot find similar in codelaw_core`); worked around with a per-package profile setting so my builds had their own hash. `mcp_parity` reads another lane's clobbered `codelaw` binary (10 tools, not 9) — not this change.
+- **Next:** none for W-67.
+
 ## 2026-10-26 — W-60: L10 built, every consumer-file text is a template  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** *implement L10: one template per consumer file under `templates/`, a registry, a slot-only renderer and a test.*

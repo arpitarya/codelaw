@@ -6,6 +6,7 @@
 mod diagnostic;
 mod language;
 pub mod process;
+pub mod similar;
 pub mod template;
 mod text;
 

@@ -333,7 +333,7 @@ impl Project {
 
     /// The effective `expires` of a baseline entry: its own, else its
     /// deprecation's (decision 6's inheritance).
-    fn entry_expires(&self, e: &codelaw_baseline::Entry) -> Option<Date> {
+    pub(crate) fn entry_expires(&self, e: &codelaw_baseline::Entry) -> Option<Date> {
         e.expires.or_else(|| {
             let symbol = e.symbol.as_deref()?;
             let dep = self.deprecations.as_ref()?;

@@ -1,0 +1,4 @@
+description = "Size limits for pages and templates, opt-in: a line limit per file"
+
+[rules]
+"html/max-lines" = "error"

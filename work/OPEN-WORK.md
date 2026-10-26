@@ -31,9 +31,7 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### build (21)
-
-🟢 **W-67** `agent` Replace `strsim`, `anyhow` (unused) and `postcard` with codelaw's own code, then drop them (L11; ruled in W-66). Filed by Arpit (Cowork). [detail](open/W-67-replace-three-dependencies.md)
+### build (18)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
@@ -43,18 +41,14 @@ here. Read that record before changing anything below it.
 
 🟢 **W-45** `agent` CI formats built; PR [#3](https://github.com/arpitarya/codelaw/pull/3) is open; left: Arpit looks at its annotations and says so (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
 
-🟡 **W-50** waits on **W-46** `agent` Git hooks built; rulings in (no profile in the hook; `language: system`); left: post-commit's two reminders. Filed by Arpit (Cowork). [detail](open/W-50-git-hooks.md)
-
-🟡 **W-51** waits on **W-46** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); left: a real GitHub run (DoD 1, 3) and the exceptions section once W-46 lands. Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
-
-🟢 **W-46** `agent` `codelaw exceptions --expiring 30d --group-by added_by`: every exception, days left, owner; MCP twin. Filed by Arpit (Cowork). [detail](open/W-46-exceptions-report.md)
+🟢 **W-51** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); left: a real GitHub run (DoD 1, 3) and the exceptions section (W-46 landed). Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
 
 🟢 **W-58** `agent` Size limits for JS, TS and Python: `max-lines`, `max-lines-per-function`, `max-params` with configurable options; opt-in `size` presets. Filed by Arpit (Cowork). [detail](open/W-58-size-limits.md)
 
 🟢 **W-59** `agent` `[scope.<name>]` replaces `[[overrides]]` and `[profile.<name>]` replaces `[profiles.*]` (aliases for one release); presets ship `tests`, `stories`, `config` scopes. Filed by Arpit (Cowork). [detail](open/W-59-scope-and-profile-tables.md)
 
 
-🟢 **W-61** `agent` `html/max-lines` and `css/max-lines` (CSS, SCSS, CSS Modules) with skip options; `size` presets. Filed by Arpit (Cowork). [detail](open/W-61-max-lines-html-css.md)
+🟡 **W-61** waits on **W-59** `agent` `html/max-lines` and `css/max-lines` built with the `size` presets; left: DoD 3, a `[scope]` giving `_*.scss` partials their own limit, once W-59 (scope tables) and W-62 (SCSS) land, and `data` in JSON/SARIF once W-58's `data_of` lands. Filed by Arpit (Cowork). [detail](open/W-61-max-lines-html-css.md)
 
 🟢 **W-62** `agent` SCSS: L3 amended, Biome formats SCSS, CSS rules moved onto the tree-sitter-css fork + tree-sitter-scss (B-047 ruled), 15 rules in a new `scss` pack (npm + PyPI). Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
