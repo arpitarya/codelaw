@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Disk budget — law L9 (SR-LAW-9 decision 4).
+"""Disk budget — the repository's disk-budget law (L9 in codelaw, L14 in fux and
+sheetpane; the record that owns this hook says which).
 
 The budget lives in one place, work/MACHINE.md §Disk budget's `budget` row.
 What counts is the whole project: the repo (its .git and every worktree under
@@ -134,7 +135,7 @@ def pre(hook, st):
     st["pending"] = {k: v for k, v in st.get("pending", {}).items() if now - v["ts"] < 3600}
     st["pending"][hook.get("tool_use_id", "")] = {"gb": need, "ts": now}
     emit("PreToolUse", permissionDecision="ask", permissionDecisionReason=(
-        f"L9 disk budget: the project uses {gb:.1f} GB against a {budget:g} GB budget"
+        f"Disk budget: the project uses {gb:.1f} GB against a {budget:g} GB budget"
         f" (approved ceiling {ceiling:g} GB). Allowing this "
         f"{'new agent or worktree' if kind == 'new' else 'action'} approves one more GB,"
         f" up to {need} GB (work/MACHINE.md §Disk budget). Deny it to clean up instead."))
@@ -146,14 +147,14 @@ def post(hook, st):
     p = st.get("pending", {}).pop(hook.get("tool_use_id", ""), None)
     if p:
         st["approved_gb"] = max(st.get("approved_gb", 0), p["gb"])
-        notes.append(f"L9: the decider approved one more GB — the ceiling is now {p['gb']} GB.")
+        notes.append(f"Disk budget: the decider approved one more GB — the ceiling is now {p['gb']} GB.")
     if growing(tool, inp):
         gb, budget, ceiling = usage(st, fresh=True)
         if gb >= ceiling:
             mark = f"{ceiling:g}"
             if not NUDGED.exists() or NUDGED.read_text(encoding="utf-8") != mark:
                 NUDGED.write_text(mark, encoding="utf-8")
-                notes.append(f"L9: the project has grown to {gb:.1f} GB, past the approved"
+                notes.append(f"Disk budget: the project has grown to {gb:.1f} GB, past the approved"
                              f" {ceiling:g} GB (budget {budget:g} GB). Stop growing it: the next"
                              " build, install, agent or worktree asks the decider first.")
     if notes:
@@ -163,7 +164,7 @@ def post(hook, st):
 def prompt(_hook, st):
     gb, budget, ceiling = usage(st)
     if gb >= budget * 0.8:
-        print(f"<disk>L9: {gb:.1f} GB used of a {budget:g} GB budget"
+        print(f"<disk>Disk budget: {gb:.1f} GB used of a {budget:g} GB budget"
               f"{f' (approved to {ceiling:g} GB)' if ceiling > budget else ''}"
               " — work/MACHINE.md §Disk budget.</disk>")
 

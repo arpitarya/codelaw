@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # PostToolUse(Write|Edit|MultiEdit|NotebookEdit|Bash) — catches a malformed
-# "Blocked on the decider" section the moment a session writes one. Bash is in the
+# "Blocked on …" section the moment a session writes one. Bash is in the
 # matcher because a session told to prefer the shell edits files that way.
 # Also catches a 🟡 row that does not name its blocker right after its id.
-# The rules are SR-WORK-OPEN-QUEUE rules 45a and 23b — stated once there, NOT here.
+# The rules are SR-WORK-OPEN-QUEUE rule 45a and its 🟡-blocker rule — stated once there, NOT here.
 set -uo pipefail
 cd "$(dirname "$0")/../.." || exit 0
 git rev-parse --git-dir >/dev/null 2>&1 || exit 0

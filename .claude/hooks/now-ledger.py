@@ -89,14 +89,38 @@ def read_now():
     return head.rstrip() + "\n", flight, res
 
 
-def write_now(head, flight, res):
-    def table(header, rows, n):
-        out = [header, "|" + "---|" * n]
-        out += ["| " + " | ".join((r + [""] * n)[:n]) + " |" for r in rows]
-        return "\n".join(out)
+def renderer():
+    """lockmaster's NOW.md renderer (`lockmaster.now`) when it is importable —
+    installed, or this repository's own src/ — so NOW.md always equals
+    `lockmaster status --now` (SR-ARCHITECTURE decision 14, W-07)."""
+    for extra in (None, ROOT / "src"):
+        if extra is not None:
+            if not (extra / "lockmaster" / "now.py").is_file():
+                continue
+            sys.path.insert(0, str(extra))
+        try:
+            from lockmaster import now
+            return now
+        except ImportError:
+            continue
+    return None
 
-    text = (f"{head}\n## In flight\n\n{table(FLIGHT_HEAD, flight, 4)}\n\n"
-            f"## Resources this session created\n\n{table(RES_HEAD, res, 5)}\n")
+
+def write_now(head, flight, res):
+    mod = renderer()
+    if mod is not None:
+        text = mod.format_now(head, flight, mod.normalise(res, ROOT))
+    else:
+        # The same shape lockmaster.now writes, for a repo without lockmaster.
+        def table(header, rows, n):
+            out = [header, "|" + "---|" * n]
+            out += ["| " + " | ".join((r + [""] * n)[:n]) + " |" for r in rows]
+            return "\n".join(out)
+
+        res = [r for r in res if not (r[0] in PATH_KINDS and (p := where_path(r[1])) is not None
+                                      and not p.exists())]
+        text = (f"{head}\n## In flight\n\n{table(FLIGHT_HEAD, flight, 4)}\n\n"
+                f"## Resources this session created\n\n{table(RES_HEAD, res, 5)}\n")
     TMP.write_text(text, encoding="utf-8")
     os.replace(TMP, NOW_MD)
 
@@ -310,6 +334,8 @@ def end(sid, _hook):
 
 
 def main(argv):
+    if not NOW_MD.is_file():
+        return 0  # a repository without the work system has no NOW to keep (W-09)
     mode = argv[0] if argv else "show"
     fn = {"start": start, "show": show, "sync": sync, "stop": stop, "end": end}.get(mode)
     if fn is None:

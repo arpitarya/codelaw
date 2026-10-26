@@ -26,7 +26,8 @@ ROOT = Path(__file__).resolve().parents[2]
 BUILD_OUTPUT = {
     "target", "node_modules", "dist", "build", ".venv", "venv", "__pycache__",
     ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox", ".nox", ".cache",
-    ".turbo", ".next", ".parcel-cache", "coverage", ".coverage", ".codelaw",
+    ".turbo", ".next", ".parcel-cache", "coverage", ".coverage", ".lockmaster",
+    "htmlcov", ".eggs", "runtime", ".codelaw",  # fux's and codelaw's rulings, joined in the kit (W-09)
     ".DS_Store",
 }
 
