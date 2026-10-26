@@ -137,6 +137,30 @@ files = ["src/payments/**"]
 remap = { warn = "error" }
 ```
 
+### Size limits
+
+Six rules cap how big a file, a function and a parameter list may grow, for JavaScript, TypeScript and Python. They are in no default preset; `codelaw:js/size` and `codelaw:py/size` turn all three of a language on at `warn`.
+
+| rule | limit | default (JS / Python) |
+|---|---|---|
+| `js/max-lines` · `py/max-lines` | lines per file | 300 / 1000 |
+| `js/max-lines-per-function` · `py/max-lines-per-function` | lines per function | 50 / 50 |
+| `js/max-params` · `py/max-params` | parameters per function | 3 / 5 |
+
+```toml
+extends = ["codelaw:js/size", "codelaw:py/size"]
+
+[rules]
+"js/max-lines" = { severity = "error", options = { max = 500, skip_imports = true } }
+"js/max-lines-per-function" = { severity = "warn", options = { max = 80, ignore_names = "^(test|it|describe)" } }
+"py/max-params" = { severity = "warn", options = { max = 6, max_positional = 4 } }
+```
+
+- **What counts:** blank lines and comment-only lines do not (`skip_blank_lines`, `skip_comments`, both on); a line of code with a comment counts as code. Python docstrings are `skip_docstrings` (off for a file, on for a function), and the import block is `skip_imports`. A function's `include_nested` makes an inner function count toward the outer one.
+- **What they report:** the measured value and the limit, `renderOrders is 84 lines (max 50)`, and `--format json` and SARIF carry both as `data` (`{ "lines": 84, "max": 50 }`) for a dashboard or a burn-down.
+- **An existing codebase:** `codelaw baseline add --rule js/max-lines` keeps today's long files as exceptions, and a new long file fails.
+- **Every fix is yours:** splitting a file or a function changes its structure, so all six are `manual`. The rule's page, `codelaw explain js/max-lines`, lists the steps.
+
 ---
 
 ## Write your own rules

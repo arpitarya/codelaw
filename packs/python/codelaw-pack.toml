@@ -2,5 +2,5 @@ name = "codelaw-rules-python"
 version = "0.2.0"
 min_codelaw = "0.1.0"
 languages = ["python"]
-presets = ["py/recommended", "py/conventions", "py/project"]
+presets = ["py/recommended", "py/conventions", "py/project", "py/size"]
 description = "codelaw's rules for Python; PyPI only (SR-RULE-PACKS)"

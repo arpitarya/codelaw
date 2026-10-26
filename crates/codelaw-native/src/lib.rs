@@ -33,6 +33,7 @@ mod html_dom;
 mod html_rules;
 mod js_ast;
 mod js_console;
+mod size;
 mod literals;
 mod no_undef;
 mod no_unreachable;
@@ -189,6 +190,12 @@ pub trait NativeRule: Send + Sync {
     }
     /// The severity of one finding, for a rule that grades its findings;
     /// `None` keeps the rule's.
+    /// Structured data about one finding, for `--format json` and SARIF
+    /// (the measured value and the limit, for a size rule); `None` carries
+    /// none.
+    fn data_of(&self, _finding: &NativeFinding, _options: &BTreeMap<String, serde_json::Value>) -> Option<serde_json::Value> {
+        None
+    }
     fn severity_of(&self, _finding: &NativeFinding, _options: &BTreeMap<String, serde_json::Value>) -> Option<Severity> {
         None
     }
@@ -197,6 +204,12 @@ pub trait NativeRule: Send + Sync {
 const JS_ONLY: &[Language] = &[Language::Javascript, Language::Jsx];
 const TS_ONLY: &[Language] = &[Language::Typescript, Language::Tsx];
 
+static JS_MAX_LINES: size::Size = size::Size::js("js/max-lines", size::Measure::FileLines);
+static JS_MAX_LINES_PER_FUNCTION: size::Size = size::Size::js("js/max-lines-per-function", size::Measure::FunctionLines);
+static JS_MAX_PARAMS: size::Size = size::Size::js("js/max-params", size::Measure::Params);
+static PY_MAX_LINES: size::Size = size::Size::py("py/max-lines", size::Measure::FileLines);
+static PY_MAX_LINES_PER_FUNCTION: size::Size = size::Size::py("py/max-lines-per-function", size::Measure::FunctionLines);
+static PY_MAX_PARAMS: size::Size = size::Size::py("py/max-params", size::Measure::Params);
 static JS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "js/no-unused-vars", languages: JS_ONLY };
 static TS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "ts/no-unused-vars", languages: TS_ONLY };
 static TS_NO_UNUSED_EXPRESSIONS: typescript::NoUnusedExpressions = typescript::NoUnusedExpressions { id: "ts/no-unused-expressions", languages: TS_ONLY };
@@ -365,6 +378,12 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &literals::NoSparseArrays,
     &classes::NoThisBeforeSuper,
     &js_console::NoConsole,
+    &JS_MAX_LINES,
+    &JS_MAX_LINES_PER_FUNCTION,
+    &JS_MAX_PARAMS,
+    &PY_MAX_LINES,
+    &PY_MAX_LINES_PER_FUNCTION,
+    &PY_MAX_PARAMS,
     &no_undef::NoUndef,
     &literals::NoUnexpectedMultiline,
     &no_unreachable::NoUnreachable,

@@ -49,6 +49,9 @@ fn result(d: &Diagnostic, rule_index: Option<usize>) -> Value {
             "source": d.source,
         },
     });
+    if let Some(data) = &d.data {
+        r["properties"]["data"] = data.clone();
+    }
     if let Some(i) = rule_index {
         r["ruleIndex"] = json!(i);
     }

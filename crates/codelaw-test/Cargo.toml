@@ -16,3 +16,4 @@ codelaw-engine.workspace = true
 codelaw-format.workspace = true
 ignore.workspace = true
 toml.workspace = true
+serde_json.workspace = true

@@ -1050,6 +1050,7 @@ version = "0.2.0"
 dependencies = [
  "libc",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -1258,6 +1259,7 @@ dependencies = [
  "codelaw-rules",
  "codelaw-semantic",
  "ignore",
+ "serde_json",
  "toml",
 ]
 

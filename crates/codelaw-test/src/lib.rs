@@ -71,13 +71,15 @@ impl RuleReport {
 pub const RULE_INVARIANTS: &[&str] = &["exports-unchanged"];
 
 /// A project holding only `rule`, with no config and no disk access.
-fn project_for(loaded: &LoadedRule, keep_globs: bool) -> Project {
+fn project_for(loaded: &LoadedRule, keep_globs: bool, options: &std::collections::BTreeMap<String, serde_json::Value>) -> Project {
     let mut rule = (*loaded.rule).clone();
     if !keep_globs {
         rule.files.clear();
         rule.exclude.clear();
     }
-    let default = RuleConfig { severity: Some(rule.severity), options: rule.default_options() };
+    let mut defaults = rule.default_options();
+    defaults.extend(options.iter().map(|(k, v)| (k.clone(), v.clone())));
+    let default = RuleConfig { severity: Some(rule.severity), options: defaults };
     let lr = LoadedRule {
         rule: Arc::new(rule),
         default: Some(default),
@@ -85,7 +87,10 @@ fn project_for(loaded: &LoadedRule, keep_globs: bool) -> Project {
         external_allowed: true,
         ..loaded.clone()
     };
-    let rules = RuleSet { rules: vec![lr], packs: Vec::new(), warnings: Vec::new(), fingerprint: Key([0; 32]) };
+    // The compiled rule set is kept by fingerprint, and a rule compiled with
+    // other options is another rule set.
+    let fingerprint = if options.is_empty() { Key([0; 32]) } else { codelaw_cache::hash_bytes(format!("{}{}", loaded.rule.id, serde_json::to_string(options).unwrap_or_default()).as_bytes()) };
+    let rules = RuleSet { rules: vec![lr], packs: Vec::new(), warnings: Vec::new(), fingerprint };
     let config = Config::defaults(PathBuf::from("/codelaw-test"));
     Project::from_parts(config, rules, EngineOptions { no_cache: true, threads: Some(1), ..Default::default() })
         .expect("a single loaded rule compiles: it already passed load")
@@ -95,6 +100,8 @@ struct Tester<'a> {
     loaded: &'a LoadedRule,
     plain: Project,
     with_globs: Option<Project>,
+    /// Projects for examples that carry their own `options=`, by options.
+    optioned: Vec<(String, Project)>,
     report: RuleReport,
 }
 
@@ -113,9 +120,20 @@ fn first_difference(expected: &str, got: &str) -> String {
 
 impl<'a> Tester<'a> {
     fn project(&mut self, snippet: &Snippet) -> &Project {
+        if !snippet.options.is_empty() {
+            let key = format!("{}{}", snippet.path.is_some(), serde_json::to_string(&snippet.options).unwrap_or_default());
+            let at = match self.optioned.iter().position(|(k, _)| *k == key) {
+                Some(i) => i,
+                None => {
+                    self.optioned.push((key, project_for(self.loaded, snippet.path.is_some(), &snippet.options)));
+                    self.optioned.len() - 1
+                }
+            };
+            return &self.optioned[at].1;
+        }
         if snippet.path.is_some() {
             if self.with_globs.is_none() {
-                self.with_globs = Some(project_for(self.loaded, true));
+                self.with_globs = Some(project_for(self.loaded, true, &Default::default()));
             }
             self.with_globs.as_ref().expect("just set")
         } else {
@@ -356,7 +374,7 @@ impl<'a> Tester<'a> {
                 self.fail(Level::Cases, at.clone(), format!("expected {}, got {}", show(&want), show(&got)));
             }
             if let Some(fixed) = &case.fixed {
-                let expected = Snippet { code: fixed.clone(), path: case.input.path.clone(), line: case.input.line };
+                let expected = Snippet { code: fixed.clone(), path: case.input.path.clone(), options: case.input.options.clone(), line: case.input.line };
                 self.fix_checks(case.language, &case.input, Some(&expected), &at, Level::Cases);
             }
         }
@@ -426,7 +444,7 @@ pub fn test_rule(loaded: &LoadedRule, case: Option<&str>) -> RuleReport {
         failures: Vec::new(),
         warnings: Vec::new(),
     };
-    let mut t = Tester { loaded, plain: project_for(loaded, false), with_globs: None, report };
+    let mut t = Tester { loaded, plain: project_for(loaded, false, &Default::default()), with_globs: None, optioned: Vec::new(), report };
     for inv in &loaded.rule.invariants {
         if !RULE_INVARIANTS.contains(&inv.as_str()) {
             t.fail(Level::Invariants, "frontmatter".into(), format!("unknown invariant `{inv}` (one of {})", RULE_INVARIANTS.join(", ")));
@@ -465,7 +483,7 @@ pub fn corpus_rule(loaded: &LoadedRule, files: &[(String, Language, String)]) ->
         failures: Vec::new(),
         warnings: Vec::new(),
     };
-    let mut t = Tester { loaded, plain: project_for(loaded, true), with_globs: None, report };
+    let mut t = Tester { loaded, plain: project_for(loaded, true, &Default::default()), with_globs: None, optioned: Vec::new(), report };
     let id = loaded.rule.id.clone();
     if t.project_scope() {
         let run = |p: &Project| -> Vec<(String, u32, u32)> {

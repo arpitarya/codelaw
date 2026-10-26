@@ -6,7 +6,7 @@ item: W-58
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-26
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Sonnet 5.5)"
 ball: agent
 ---
 
@@ -16,11 +16,11 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Write the six rule pages (below) with options, examples and cases | the spec | ⏳ |
-| 2 | Implement them as `native:` rules in `codelaw-native` (SR-ARCHITECTURE decision 15b): line and parameter counting needs no pattern | the rules | ⏳ |
-| 3 | Add opt-in presets `codelaw:js/size` and `codelaw:py/size`; not in `recommended` | one line to turn all three on | ⏳ |
-| 4 | Put the measured value in JSON/SARIF (`data: { lines: 412, max: 300 }`) | dashboards and burn-down (W-47) can chart it | ⏳ |
-| 5 | Docs: USAGE "size limits" section, both packs' READMEs, CHANGELOG | users find it | ⏳ |
+| 1 | Write the six rule pages (below) with options, examples and cases | the spec | ✅ |
+| 2 | Implement them as `native:` rules in `codelaw-native` (SR-ARCHITECTURE decision 15b): line and parameter counting needs no pattern | the rules | ✅ |
+| 3 | Add opt-in presets `codelaw:js/size` and `codelaw:py/size`; not in `recommended` | one line to turn all three on | ✅ |
+| 4 | Put the measured value in JSON/SARIF (`data: { lines: 412, max: 300 }`) | dashboards and burn-down (W-47) can chart it | ✅ |
+| 5 | Docs: USAGE "size limits" section, both packs' READMEs, CHANGELOG | users find it | ✅ |
 
 **Arpit, 2026-10-26:** *"create a work item for max lines for TypeScript, JavaScript, and Python. There should be options as well to configure the number of lines and anything else that you can figure out would be useful … max lines per function and max params. Let's add those as well."*
 
@@ -80,12 +80,21 @@ All six are `fix: manual` — splitting a file or a function changes structure, 
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | each rule's cases cover blank and comment lines, nested functions, every function form, and every option | ⏳ |
-| 2 · | `codelaw test packs/js packs/python` green | ⏳ |
-| 3 · | a wrong option type (e.g. `max = "300"`) is a load error, exit 2 | ⏳ |
-| 4 · | `codelaw baseline add --rule js/max-lines` freezes today's long files; a new long file errors | ⏳ |
-| 5 · | JSON and SARIF carry the measured value and the limit | ⏳ |
-| 6 · | L8: `check_warm_10k` unchanged (counting reuses the parsed tree) | ⏳ |
+| 1 · | each rule's cases cover blank and comment lines, nested functions, every function form, and every option | ✅ |
+| 2 · | `codelaw test packs/js packs/python` green | ✅ |
+| 3 · | a wrong option type (e.g. `max = "300"`) is a load error, exit 2 | ✅ |
+| 4 · | `codelaw baseline add --rule js/max-lines` freezes today's long files; a new long file errors | ✅ |
+| 5 · | JSON and SARIF carry the measured value and the limit | ✅ |
+| 6 · | L8: `check_warm_10k` unchanged (counting reuses the parsed tree) | ⏳ CI's `perf` job on the merge: the six rules are in no preset the workload extends, so the budgeted operations do not run them; the opt-in cost is unmeasured |
+
+## Built, and what is left
+
+Landed 2026-10-26 (Claude Code, Sonnet 5.5): `crates/codelaw-native/src/size.rs` (the six rules as one `Size` rule over three measures), the six rule pages and cases, `js/size` and `py/size`, `NativeRule::data_of` and `Diagnostic::data` (JSON `data`, SARIF `properties.data`), and `options=<json>` on an example or case fence so a Don't can exceed a threshold (SR-RULE-FORMAT decision 5). `codelaw test packs/js` and `packs/python` pass; `crates/codelaw-cli/tests/size_limits.rs` covers DoD 3, 4 and 5 through the binary.
+
+Left, both on a runner I do not have:
+
+1. **Corpus counts:** `scripts/corpus.py run --binary <codelaw> --update --pack js` and `--pack python`, then commit the six new `[findings]` rows in `packs/js/corpus.toml` and `packs/python/corpus.toml` (needs the pinned repositories cloned).
+2. **DoD 6:** CI's `perf` job on the merge, for `check_warm_10k` and `check_cold_10k` — and, if the decider wants it, the same workload with `js/size` on, to put a number on the opt-in cost.
 
 ## Blockers
 

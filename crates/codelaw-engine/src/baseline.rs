@@ -216,6 +216,7 @@ impl Project {
                 steps,
                 source: "engine".into(),
                 note: None,
+                data: None,
             };
             per_file.entry(src.rel.as_str()).or_default().push((diag, u.symbol.clone(), policy));
         }

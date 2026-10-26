@@ -690,3 +690,25 @@ fn target_rules_refuse_what_they_cannot_do() {
     let Err(EngineError::Load(e)) = r.project() else { panic!("a `target:` rule for JavaScript loaded") };
     assert!(e.iter().any(|e| e.message.contains("`target:` rules read JSON, YAML and TOML")), "{e:?}");
 }
+
+/// W-58: a size rule's finding carries the measured value and the limit, and
+/// an option of the wrong type is a load error.
+#[test]
+fn a_size_rule_reports_its_measured_value() {
+    let text = rule("js/max-lines", &[Language::Javascript], "manual", "native: js/max-lines", &[(Language::Javascript, "x", "y")])
+        .replace("stability: stable\n", "stability: stable\noptions:\n  max: { type: \"integer\", default: 300 }\n");
+    let build = |name: &str, options: &str| {
+        let r = Repo::new(name);
+        pack(&r, "node_modules/@codelaw/rules-js", "@codelaw/rules-js", "0.1.0", &[("js/max-lines", text.clone())], &[("js/size", "[rules]\n\"js/max-lines\" = \"warn\"\n")]);
+        r.file("codelaw.toml", &format!("extends = [\"codelaw:js/size\"]\n[rules]\n\"js/max-lines\" = {{ severity = \"warn\", options = {{ {options} }} }}\n")).file("a.js", "a();\nb();\nc();\nd();\n");
+        r
+    };
+    let r = build("size", "max = 2");
+    let d = r.check();
+    assert_eq!(summary(&d), ["a.js:3:1 js/max-lines manual"]);
+    assert_eq!(d[0].data, Some(serde_json::json!({ "lines": 4, "max": 2 })));
+    assert_eq!(d[0].message, "4 lines (max 2; blank lines and comments not counted)");
+    let wrong = build("size-wrong", "max = \"2\"");
+    let e = wrong.project().err().unwrap().to_string();
+    assert!(e.contains("option `max` must be a `integer`"), "{e}");
+}
