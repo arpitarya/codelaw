@@ -52,6 +52,8 @@ pub struct Node {
 pub struct Sheet {
     pub nodes: Vec<Node>,
     pub top: Vec<usize>,
+    /// Read as SCSS (`//` comments blanked, Sass statements kept apart).
+    pub scss: bool,
 }
 
 impl Sheet {
@@ -155,6 +157,31 @@ pub fn skip_comment(src: &str, i: usize) -> usize {
     src[i + 2..].find("*/").map_or(src.len(), |e| i + 2 + e + 2)
 }
 
+/// Skip an SCSS interpolation `#{…}` starting at the `#` at `i`; returns the
+/// offset past its closing brace (strings inside it are skipped whole).
+pub fn skip_interpolation(b: &[u8], i: usize) -> usize {
+    let mut depth = 0usize;
+    let mut j = i + 1;
+    while j < b.len() {
+        match b[j] {
+            b'"' | b'\'' => {
+                j = skip_string(b, j);
+                continue;
+            }
+            b'{' => depth += 1,
+            b'}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return j + 1;
+                }
+            }
+            _ => {}
+        }
+        j += 1;
+    }
+    b.len()
+}
+
 /// Scan from `i` to the first of `stops` outside strings, comments,
 /// parentheses and brackets (and braces, when `braces` is set). Returns
 /// the offset and the byte found (0 at the end).
@@ -174,6 +201,11 @@ fn scan(src: &str, mut i: usize, end: usize, stops: &[u8], braces: bool) -> (usi
             }
             b'\\' => {
                 i += 2;
+                continue;
+            }
+            // SCSS interpolation `#{…}` is one unit, whatever it holds.
+            b'#' if b.get(i + 1) == Some(&b'{') => {
+                i = skip_interpolation(b, i).min(end);
                 continue;
             }
             b'(' | b'[' => depth += 1,
@@ -229,6 +261,27 @@ pub fn trim_comments(src: &str, r: Range) -> Range {
 struct Parser<'s> {
     src: &'s str,
     nodes: Vec<Node>,
+    scss: bool,
+}
+
+/// The at-rules only Sass has. In an SCSS sheet they become `Other`
+/// statements (with their blocks), so no `css/*` rule judges Sass as CSS;
+/// the `scss/*` rules read them.
+pub const SASS_AT_RULES: &[&str] = &[
+    "mixin", "include", "function", "return", "if", "else", "each", "for", "while", "use", "forward", "extend", "debug", "warn", "error",
+    "content", "at-root", "import",
+];
+
+/// Whether a rule prelude is a Sass nested property (`font: {` or
+/// `font: bold {`): a colon followed by a space or the end.
+fn nested_property(prelude: &str) -> bool {
+    let t = prelude.trim_end();
+    if t.starts_with(['&', '.', '#', '%', '[', '*', ':', '>', '+', '~', '@']) || t.contains("#{") {
+        return false;
+    }
+    let Some(c) = t.find(':') else { return false };
+    let (name, rest) = t.split_at(c);
+    !name.is_empty() && name.bytes().all(|b| is_ident_byte(b)) && (rest.len() == 1 || rest.as_bytes().get(1).is_some_and(u8::is_ascii_whitespace))
 }
 
 impl Parser<'_> {
@@ -272,7 +325,8 @@ impl Parser<'_> {
             if b[i] == b'@' {
                 let name_end = ident_end(src, i + 1);
                 let (stop_at, stop) = scan(src, name_end, b.len(), b"{;}", false);
-                let mut n = Self::node(Kind::AtRule, start, stop_at, parent);
+                let sass = self.scss && SASS_AT_RULES.contains(&src[i + 1..name_end].to_ascii_lowercase().as_str());
+                let mut n = Self::node(if sass { Kind::Other } else { Kind::AtRule }, start, stop_at, parent);
                 n.name = (i + 1, name_end);
                 n.params = trim(src, name_end, stop_at);
                 let id = self.push(n);
@@ -287,7 +341,8 @@ impl Parser<'_> {
             };
             let (stop_at, stop) = scan(src, i, b.len(), b";{}", custom);
             if stop == b'{' {
-                let mut n = Self::node(Kind::Rule, start, stop_at, parent);
+                let nested = self.scss && nested_property(&src[start..stop_at]);
+                let mut n = Self::node(if nested { Kind::Other } else { Kind::Rule }, start, stop_at, parent);
                 n.name = trim(src, start, stop_at);
                 let id = self.push(n);
                 list.push(id);
@@ -340,6 +395,15 @@ impl Parser<'_> {
         match stop {
             b'{' => {
                 let (kids, close) = self.block(at + 1, Some(id));
+                // A Sass nested property block (`font: { family: x }`) holds
+                // property suffixes, not declarations: its statements are not kept.
+                let nested = self.scss && self.nodes[id].kind == Kind::Other && !self.src[self.nodes[id].start..].starts_with('@');
+                let kids = if nested {
+                    self.nodes.truncate(id + 1);
+                    Vec::new()
+                } else {
+                    kids
+                };
                 let n = &mut self.nodes[id];
                 n.children = kids;
                 n.block = Some((at, close));
@@ -362,27 +426,80 @@ impl Parser<'_> {
 }
 
 pub fn parse(src: &str) -> Sheet {
-    let mut p = Parser { src, nodes: Vec::new() };
+    let mut p = Parser { src, nodes: Vec::new(), scss: false };
     let (top, _) = p.block(0, None);
-    Sheet { nodes: p.nodes, top }
+    Sheet { nodes: p.nodes, top, scss: false }
+}
+
+/// Parse SCSS: `//` comments are blanked first (same byte length, so every
+/// range is a range of `src`), Sass statements are kept as `Other`.
+pub fn parse_scss(src: &str) -> Sheet {
+    let view = scss_view(src);
+    let mut p = Parser { src: &view, nodes: Vec::new(), scss: true };
+    let (top, _) = p.block(0, None);
+    Sheet { nodes: p.nodes, top, scss: true }
+}
+
+/// The byte ranges of the `//` comments of an SCSS source, each from its
+/// `//` to the end of its line (not the newline). Strings, `/* */`
+/// comments, unquoted `url(…)` and `#{…}` interpolation are not scanned.
+pub fn scss_line_comments(src: &str) -> Vec<Range> {
+    let b = src.as_bytes();
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < b.len() {
+        match b[i] {
+            b'"' | b'\'' => i = skip_string(b, i),
+            b'/' if b.get(i + 1) == Some(&b'*') => i = skip_comment(src, i),
+            b'#' if b.get(i + 1) == Some(&b'{') => i = skip_interpolation(b, i),
+            b'/' if b.get(i + 1) == Some(&b'/') => {
+                let mut end = src[i..].find('\n').map_or(b.len(), |o| i + o);
+                if end > i && b[end - 1] == b'\r' {
+                    end -= 1;
+                }
+                out.push((i, end));
+                i = end;
+            }
+            b'u' | b'U' if src[i..].len() >= 4 && src[i..i + 4].eq_ignore_ascii_case("url(") && (i == 0 || !is_ident_byte(b[i - 1])) => {
+                if src[i + 4..].trim_start().starts_with(['"', '\'']) {
+                    i += 4;
+                } else {
+                    i = src[i..].find(')').map_or(b.len(), |o| i + o);
+                }
+            }
+            _ => i += 1,
+        }
+    }
+    out
+}
+
+/// `src` with every `//` comment replaced by spaces — the same length, the
+/// same offsets.
+pub fn scss_view(src: &str) -> String {
+    let mut out = src.as_bytes().to_vec();
+    for (s, e) in scss_line_comments(src) {
+        out[s..e].fill(b' ');
+    }
+    String::from_utf8(out).expect("blanking whole comments keeps UTF-8")
 }
 
 thread_local! {
-    static CACHE: RefCell<Option<(String, Rc<Sheet>)>> = const { RefCell::new(None) };
+    static CACHE: RefCell<Option<(String, bool, Rc<Sheet>)>> = const { RefCell::new(None) };
 }
 
-/// The parsed sheet of a source; each file is parsed once, however many
-/// CSS rules run on it.
-pub fn sheet(src: &str) -> Rc<Sheet> {
+/// The parsed sheet of a source (`scss`: read as SCSS); each file is parsed
+/// once, however many CSS rules run on it.
+pub fn sheet_for(src: &str, scss: bool) -> Rc<Sheet> {
     CACHE.with(|c| {
         let mut c = c.borrow_mut();
-        if let Some((s, sheet)) = c.as_ref()
+        if let Some((s, k, sheet)) = c.as_ref()
+            && *k == scss
             && s == src
         {
             return sheet.clone();
         }
-        let sheet = Rc::new(parse(src));
-        *c = Some((src.to_owned(), sheet.clone()));
+        let sheet = Rc::new(if scss { parse_scss(src) } else { parse(src) });
+        *c = Some((src.to_owned(), scss, sheet.clone()));
         sheet
     })
 }
@@ -696,7 +813,8 @@ pub fn complex(src: &str, start: usize, end: usize) -> Complex {
                 Simple { kind: if element { SKind::PseudoElement } else { SKind::PseudoClass }, start: s, end: i, name: (ns, e), args }
             }
             b'&' => {
-                i += 1;
+                // Sass's parent suffix (`&-wide`, `&__item`) is part of the nesting selector.
+                i = ident_end(src, i + 1).min(end);
                 Simple { kind: SKind::Nesting, start: s, end: i, name: (s, i), args: None }
             }
             b'*' => {
@@ -921,15 +1039,21 @@ macro_rules! css_rule {
                 $id
             }
             fn languages(&self) -> &'static [codelaw_core::Language] {
-                &[codelaw_core::Language::Css]
+                &[codelaw_core::Language::Css, codelaw_core::Language::Scss]
             }
             fn kinds(&self) -> &'static [&'static str] {
-                &["stylesheet"]
+                // The root is an `ERROR` node when the grammar cannot recover
+                // (tree-sitter-scss does not read all of modern Sass): the
+                // rules read the text, so they still run, once, on the root.
+                &["stylesheet", "ERROR"]
             }
             #[allow(unused_variables)]
-            fn check(&self, _node: codelaw_lang::SyntaxNode<'_>, $ctx: &$crate::NativeContext<'_>, $out: &mut Vec<$crate::NativeFinding>) {
+            fn check(&self, node: codelaw_lang::SyntaxNode<'_>, $ctx: &$crate::NativeContext<'_>, $out: &mut Vec<$crate::NativeFinding>) {
+                if node.parent().is_some() {
+                    return;
+                }
                 let $src: &str = $ctx.source;
-                let sheet_rc = $crate::css_syntax::sheet($src);
+                let sheet_rc = $crate::css_syntax::sheet_for($src, $ctx.language == codelaw_core::Language::Scss);
                 let $sheet: &$crate::css_syntax::Sheet = &sheet_rc;
                 $body
             }
@@ -999,6 +1123,30 @@ mod tests {
         assert_eq!(text(src, s.nodes[3].params), "{ b: c }");
         assert_eq!(text(src, s.nodes[4].name), "&:hover");
         assert_eq!(text(src, s.nodes[7].params), "(min-width: 1px)");
+    }
+
+    #[test]
+    fn scss_statements() {
+        let src = "// c\n$a: 1px !default;\n@mixin m($x: 1) { top: $x }\n.b {\n  font: { family: x; }\n  &-c { @include m; }\n  background: url(//x.png);\n}\n@import \"a\";\n";
+        let s = parse_scss(src);
+        let kinds: Vec<Kind> = s.walk().iter().map(|&i| s.nodes[i].kind).collect();
+        // `$a` decl, `@mixin` (other) + its decl, `.b` rule, `font:` (other, its block unread), `&-c` rule, `@include` (other), url decl, `@import` (other).
+        assert_eq!(kinds, [Kind::Decl, Kind::Other, Kind::Decl, Kind::Rule, Kind::Other, Kind::Rule, Kind::Other, Kind::Decl, Kind::Other]);
+        assert!(s.scss);
+        assert_eq!(text(src, s.nodes[0].name), "$a");
+        assert_eq!(text(src, s.nodes[0].important.unwrap()), "!default");
+        // The `//` inside `url()` is not a comment, the one on line 1 is.
+        assert_eq!(scss_line_comments(src), [(0, 4)]);
+        assert_eq!(scss_view(src).len(), src.len());
+    }
+
+    #[test]
+    fn interpolation_is_one_unit() {
+        let src = "#{$sel} { #{$p}-top: 1px; width: calc(100% - #{$a}); }";
+        let s = parse_scss(src);
+        assert_eq!(s.nodes.len(), 3);
+        assert_eq!(text(src, s.nodes[0].name), "#{$sel}");
+        assert_eq!(text(src, s.nodes[1].name), "#{$p}-top");
     }
 
     #[test]

@@ -17,11 +17,13 @@ pub enum Language {
     Toml,
     Markdown,
     Css,
+    /// SCSS, a CSS dialect (L3 amendment, 2026-10-26).
+    Scss,
     Html,
 }
 
 impl Language {
-    pub const ALL: [Language; 11] = [
+    pub const ALL: [Language; 12] = [
         Language::Javascript,
         Language::Jsx,
         Language::Typescript,
@@ -32,6 +34,7 @@ impl Language {
         Language::Toml,
         Language::Markdown,
         Language::Css,
+        Language::Scss,
         Language::Html,
     ];
 
@@ -48,6 +51,7 @@ impl Language {
             Language::Toml => "toml",
             Language::Markdown => "markdown",
             Language::Css => "css",
+            Language::Scss => "scss",
             Language::Html => "html",
         }
     }
@@ -65,6 +69,7 @@ impl Language {
             Language::Toml => "TOML",
             Language::Markdown => "Markdown",
             Language::Css => "CSS",
+            Language::Scss => "SCSS",
             Language::Html => "HTML",
         }
     }
@@ -94,6 +99,7 @@ impl Language {
             "toml" => Language::Toml,
             "md" | "markdown" => Language::Markdown,
             "css" => Language::Css,
+            "scss" => Language::Scss,
             "html" | "htm" => Language::Html,
             _ => return None,
         })
@@ -112,6 +118,7 @@ impl Language {
             Language::Toml => "toml",
             Language::Markdown => "md",
             Language::Css => "css",
+            Language::Scss => "scss",
             Language::Html => "html",
         }
     }
@@ -131,9 +138,16 @@ impl Language {
             "toml" => Language::Toml,
             "md" | "mdx" => Language::Markdown,
             "css" => Language::Css,
+            "scss" => Language::Scss,
             "html" | "htm" => Language::Html,
             _ => return None,
         })
+    }
+
+    /// CSS and its dialect SCSS: the languages the `css/*` rules and the CSS
+    /// formatter's family cover.
+    pub fn is_css_family(self) -> bool {
+        matches!(self, Language::Css | Language::Scss)
     }
 
     /// The JavaScript family shares one semantic model and most rules.

@@ -1,7 +1,7 @@
 ---
 id: css/font-family-no-duplicate-names
 title: "No font family listed twice"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 ported_from: [stylelint/font-family-no-duplicate-names]
@@ -31,6 +31,23 @@ a {
 #### Do
 
 ```css
+a {
+  font-family: Arial, Helvetica, sans-serif;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  font-family: Arial, Helvetica, Arial, sans-serif;
+}
+```
+
+#### Do
+
+```scss
 a {
   font-family: Arial, Helvetica, sans-serif;
 }

@@ -9,7 +9,7 @@ date: 2026-10-18
 feature: "linter and formatter, always both"
 owns: []
 laws: [L0, L3, L7]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-26T14:00:00Z
 content_sha: ""
 ---
 
@@ -52,7 +52,7 @@ The decider ruled that codelaw is both a linter and a formatter. Until now that 
 
 ### Decision
 
-1. **Both, for every language.** A language enters [L3](0005_LAW-3-languages.md) only with a lint engine **and** a formatter for it.
+1. **Both, for every language.** A language enters [L3](0005_LAW-3-languages.md) only with a lint engine **and** a formatter for it. **SCSS entered on 2026-10-26 (W-62) on that footing:** its formatter is Biome's SCSS one ([SR-FORMATTER](0105_formatter.md) decision 2), measured against Prettier's SCSS at 98.6 % identical files, and its layout-only lint rule, `scss/operator-no-unspaced`, was not shipped because decision 3 below refuses it.
 2. **One binary, one config.** `codelaw check` lints and reports unformatted files, `codelaw format` formats, and `codelaw fix` does both. Each job's mechanism is its own record: [SR-LINTER](0106_linter.md) and [SR-FORMATTER](0105_formatter.md).
 3. **The line between the jobs.**
    - Layout (whitespace, line breaks, quotes, semicolons, trailing commas) belongs to the formatter.

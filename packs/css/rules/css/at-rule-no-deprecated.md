@@ -1,7 +1,7 @@
 ---
 id: css/at-rule-no-deprecated
 title: "No deprecated at-rules"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 options:
@@ -35,6 +35,28 @@ native: css/at-rule-no-deprecated
 #### Do
 
 ```css
+.card {
+  .theme-dark & {
+    color: white;
+  }
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+.card {
+  @nest .theme-dark & {
+    color: white;
+  }
+}
+```
+
+#### Do
+
+```scss
 .card {
   .theme-dark & {
     color: white;

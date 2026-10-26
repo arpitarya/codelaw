@@ -1,7 +1,7 @@
 ---
 id: css/length-zero-no-unit
 title: "No units on zero lengths"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 options:
@@ -33,6 +33,23 @@ a {
 #### Do
 
 ```css
+a {
+  margin: 0;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  margin: 0px;
+}
+```
+
+#### Do
+
+```scss
 a {
   margin: 0;
 }

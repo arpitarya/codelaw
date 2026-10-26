@@ -20,7 +20,7 @@ content_sha: ""
 
 ## §1 — For humans
 
-**The decision.** codelaw's linter is **one engine for nine languages**: JavaScript, TypeScript, JSON, Python, CSS, HTML, YAML, TOML and Markdown ([L3](0005_LAW-3-languages.md)). It is the partner of [SR-FORMATTER](0105_formatter.md): **the linter owns meaning and structure; the formatter owns layout.**
+**The decision.** codelaw's linter is **one engine for nine languages**: JavaScript, TypeScript, JSON, Python, CSS (with its dialect SCSS), HTML, YAML, TOML and Markdown ([L3](0005_LAW-3-languages.md)). It is the partner of [SR-FORMATTER](0105_formatter.md): **the linter owns meaning and structure; the formatter owns layout.**
 
 **Rules come in three scopes:**
 
@@ -77,6 +77,7 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | JSON · JSONC | `tree-sitter-json` | yes |
    | Python | `tree-sitter-python` | yes |
    | CSS | `tree-sitter-css`: codelaw's in-tree fork of 0.25.0, which adds range media features, `layer()` in `@import` and fractional keyframe percentages ([SR-ARCHITECTURE](0108_architecture.md) decision 3); the `css/*` rules still read the text themselves (decision 15b there) | yes, patched in place of ast-grep's |
+   | SCSS | `tree-sitter-scss` 1.0.0: codelaw's in-tree copy, unchanged ([SR-ARCHITECTURE](0108_architecture.md) decision 3; B-047, ruled 2026-10-26). The `css/*` rules run on `.scss` through the same text reader in its SCSS mode; the `scss/*` rules read the Sass statements | no: a path crate, like the CSS fork |
    | HTML | `tree-sitter-html` | yes |
    | YAML | `tree-sitter-yaml` | yes |
    | TOML | `tree-sitter-toml` | **no**: registered by codelaw as a custom language |

@@ -1,7 +1,7 @@
 ---
 id: css/annotation-no-unknown
 title: "No unknown `!` annotations"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended annotation is the author's call"
 stability: preview
@@ -38,6 +38,23 @@ a {
 #### Do
 
 ```css
+a {
+  color: green !important;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: green !imprtant;
+}
+```
+
+#### Do
+
+```scss
 a {
   color: green !important;
 }

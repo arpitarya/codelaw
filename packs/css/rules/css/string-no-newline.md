@@ -1,7 +1,7 @@
 ---
 id: css/string-no-newline
 title: "No line breaks inside selector strings"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "whether the line break was meant is the author's call"
 stability: preview
@@ -39,6 +39,24 @@ two"] {
 #### Do
 
 ```css
+[title="one two"] {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+[title="one
+two"] {
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 [title="one two"] {
   color: red;
 }

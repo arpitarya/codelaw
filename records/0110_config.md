@@ -23,7 +23,7 @@ content_sha: ""
 ```toml
 #:schema ./node_modules/codelaw/codelaw.schema.json
 extends   = ["codelaw:js/recommended", "codelaw:ts/recommended", "codelaw:py/recommended"]
-languages = ["javascript", "jsx", "typescript", "tsx", "python", "json", "yaml", "toml", "css", "html", "markdown"]
+languages = ["javascript", "jsx", "typescript", "tsx", "python", "json", "yaml", "toml", "css", "scss", "html", "markdown"]
 include   = ["src/**", "packages/*/src/**"]
 exclude   = ["dist/**", "**/*.generated.*"]
 

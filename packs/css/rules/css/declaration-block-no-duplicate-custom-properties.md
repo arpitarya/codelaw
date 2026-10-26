@@ -1,7 +1,7 @@
 ---
 id: css/declaration-block-no-duplicate-custom-properties
 title: "No custom property declared twice in one block"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "which value should win can't be known from the code"
 stability: preview
@@ -38,6 +38,24 @@ a {
 #### Do
 
 ```css
+a {
+  --gap: 8px;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  --gap: 4px;
+  --gap: 8px;
+}
+```
+
+#### Do
+
+```scss
 a {
   --gap: 8px;
 }

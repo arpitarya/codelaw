@@ -21,7 +21,8 @@ pub(crate) fn format(language: Language, path: &str, text: &str, o: &FormatOptio
             markers::native(text, &["//", "/*"], BIOME, |t| biome_js(js_source(language, path), t, o, o.line_width))
         }
         Language::Json => markers::native(text, &["//", "/*"], BIOME, |t| biome_json(t, o, o.line_width)),
-        Language::Css => markers::native(text, &["/*"], BIOME, |t| biome_css(t, o, o.line_width)),
+        Language::Css => markers::native(text, &["/*"], BIOME, |t| biome_css(t, o, o.line_width, biome_languages::CssFileSource::css())),
+        Language::Scss => markers::native(text, &["//", "/*"], BIOME, |t| biome_css(t, o, o.line_width, biome_languages::CssFileSource::scss())),
         Language::Python => markers::python(text, |t| ruff(path, t, o, o.python_line_width)),
         Language::Yaml => markers::native(text, &["#"], PRETTIER, |t| yaml(t, o, o.line_width)),
         Language::Toml => markers::toml(text, |t| toml_fmt(t, o, o.line_width)),
@@ -38,6 +39,7 @@ pub(crate) fn parse_error(language: Language, path: &str, text: &str) -> Option<
         }
         Language::Json => biome_json_parser::parse_json(text, json_parser_options()).has_errors(),
         Language::Css => biome_css_parser::parse_css(text, biome_languages::CssFileSource::css(), biome_css_parser::CssParserOptions::default()).has_errors(),
+        Language::Scss => biome_css_parser::parse_css(text, biome_languages::CssFileSource::scss(), biome_css_parser::CssParserOptions::default()).has_errors(),
         Language::Python => ruff_python_parser::parse_module(text).is_err(),
         Language::Yaml => return pretty_yaml::format_text(text, &Default::default()).err().map(|e| e.to_string()),
         Language::Toml => !taplo::parser::parse(text).errors.is_empty(),
@@ -154,9 +156,8 @@ fn biome_json(text: &str, o: &FormatOptions, width: u16) -> Result<String, Forma
     Ok(formatted.print().map_err(engine_error)?.into_code())
 }
 
-fn biome_css(text: &str, o: &FormatOptions, width: u16) -> Result<String, FormatError> {
+fn biome_css(text: &str, o: &FormatOptions, width: u16, source: biome_languages::CssFileSource) -> Result<String, FormatError> {
     use biome_css_formatter::context::CssFormatOptions;
-    let source = biome_languages::CssFileSource::css();
     let parsed = biome_css_parser::parse_css(text, source, biome_css_parser::CssParserOptions::default());
     if parsed.has_errors() {
         return Err(FormatError::Syntax("biome_css_parser rejects it".into()));
@@ -241,6 +242,7 @@ fn tag_language(tag: &str) -> Option<(Language, &'static str)> {
         "tsx" => (Language::Tsx, "x.tsx"),
         "json" | "jsonc" | "json5" => (Language::Json, "x.json"),
         "css" => (Language::Css, "x.css"),
+        "scss" => (Language::Scss, "x.scss"),
         "py" | "python" | "python3" => (Language::Python, "x.py"),
         "pyi" => (Language::Python, "x.pyi"),
         "yaml" | "yml" => (Language::Yaml, "x.yaml"),

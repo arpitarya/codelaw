@@ -25,7 +25,7 @@ pub fn engine(language: Language) -> &'static str {
     match language {
         Language::Javascript | Language::Jsx | Language::Typescript | Language::Tsx => "biome_js_formatter",
         Language::Json => "biome_json_formatter",
-        Language::Css => "biome_css_formatter",
+        Language::Css | Language::Scss => "biome_css_formatter",
         Language::Python => "ruff_python_formatter",
         Language::Yaml => "pretty_yaml",
         Language::Toml => "taplo",

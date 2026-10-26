@@ -1,7 +1,7 @@
 ---
 id: css/no-descending-specificity
 title: "Less specific selectors come first"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "reordering rules can change which declarations win"
 stability: preview
@@ -43,6 +43,32 @@ a {
 #### Do
 
 ```css
+a {
+  color: blue;
+}
+
+#nav a {
+  color: red;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+#nav a {
+  color: red;
+}
+
+a {
+  color: blue;
+}
+```
+
+#### Do
+
+```scss
 a {
   color: blue;
 }

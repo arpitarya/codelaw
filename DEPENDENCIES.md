@@ -39,6 +39,7 @@ governed_by_path: records/0013_LAW-11-no-dependencies.md
 | D-21 | **similar** | `similar` | diffs (`--diff`, LSP range formatting) | 2.7.0 | 13 | ratified 2026-10-26 — *"Ratify."* |
 | D-22 | **semver** | `semver` | version ranges (`requires`, packs, deps) | 1.0.28 | 1 | ratified 2026-10-26 — *"Ratify."* |
 | D-25 | **libc** | `libc` | OS calls (signals, Unix sockets) | 0.2.191 | 1 | ratified 2026-10-26 — *"Ratify."* |
+| D-33 | **tree-sitter-scss (vendored)** | in-tree copy of `tree-sitter-scss` 1.0.0, commit `5da5ba7` (MIT, +`tree-sitter-language`, `cc` already counted) | the SCSS grammar (W-62; B-047) | vendored | 0 new | ratified 2026-10-26 — *"Own grammar / tree-sitter-scss"* (B-047, docket) |
 
 ## Rust — tests and build only
 
@@ -164,6 +165,8 @@ D-04 cargo tree aho-corasick@1 allocator-api2@0.2 cc@1 equivalent@1 find-msvc-to
    tree-sitter@0.27 unicode-ident@1 zmij@1
 D-05 cargo members cc tree-sitter-css
 D-05 cargo tree cc@1 find-msvc-tools@0.1 shlex@2 tree-sitter-css@0.25 tree-sitter-language@0.1
+D-33 cargo members tree-sitter-scss
+D-33 cargo tree cc@1 find-msvc-tools@0.1 shlex@2 tree-sitter-language@0.1 tree-sitter-scss@1
 D-06 cargo members taplo
 D-06 cargo tree ahash@0.8 aho-corasick@1 allocator-api2@0.2 arc-swap@1 autocfg@1 beef@0.5 bstr@1
    cfg-if@1 countme@3 deranged@0.5 either@1 equivalent@1 fnv@1 foldhash@0.2 getrandom@0.3 globset@0.4

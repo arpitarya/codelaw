@@ -1,0 +1,19 @@
+# `codelaw test --corpus` finding counts (SR-RULE-AUTHORING decision 4).
+# Rewrite with --update-snapshot, and review the change.
+
+[findings]
+"scss/at-extend-no-missing-placeholder" = 0
+"scss/at-if-no-null" = 0
+"scss/at-mixin-pattern" = 0
+"scss/at-rule-no-unknown" = 1
+"scss/dollar-variable-pattern" = 0
+"scss/double-slash-comment-empty" = 0
+"scss/function-no-unknown" = 0
+"scss/load-no-partial-leading-underscore" = 0
+"scss/max-nesting-depth" = 0
+"scss/no-duplicate-dollar-variables" = 0
+"scss/no-duplicate-mixins" = 0
+"scss/no-global-function-names" = 3
+"scss/no-import" = 1
+"scss/no-slash-division" = 3
+"scss/percent-placeholder-pattern" = 0

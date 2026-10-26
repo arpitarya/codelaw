@@ -1,7 +1,7 @@
 ---
 id: css/shorthand-property-no-redundant-values
 title: "No repeated values in shorthands"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 ported_from: [stylelint/shorthand-property-no-redundant-values]
@@ -31,6 +31,23 @@ a {
 #### Do
 
 ```css
+a {
+  margin: 1px;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  margin: 1px 1px;
+}
+```
+
+#### Do
+
+```scss
 a {
   margin: 1px;
 }

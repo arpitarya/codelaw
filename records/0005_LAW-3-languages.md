@@ -3,15 +3,17 @@ type: Standing Record
 kind: law
 name: SR-LAW-3
 title: "SR-LAW-3 (0005) — L3 — nine languages, each alone or in any combination"
-description: "codelaw lints and formats JavaScript, TypeScript, Python, JSON, YAML, TOML, Markdown, CSS and HTML, for a repo holding any one of them or any mix, from one binary in one run."
+description: "codelaw lints and formats JavaScript, TypeScript, Python, JSON, YAML, TOML, Markdown, CSS (with its dialect SCSS) and HTML, for a repo holding any one of them or any mix, from one binary in one run."
 status: accepted
 date: 2026-10-18
 feature: "the languages codelaw lints"
 owns:
   - fixtures/l3
   - crates/codelaw-cli/tests/laws.rs
+  - fixtures/scss
+  - crates/codelaw-cli/tests/scss.rs
 laws: [L0, L3]
-timestamp: 2026-10-21T12:00:00Z
+timestamp: 2026-10-26T12:00:00Z
 content_sha: ""
 ---
 
@@ -22,9 +24,9 @@ content_sha: ""
 
 **The law (L3).**
 
-> **codelaw lints and formats nine languages, eleven file types: JavaScript, JSX, TypeScript, TSX, JSON (with JSONC), YAML, TOML, CSS, HTML, Markdown and Python.** JSX and TSX are first-class: every capability that works for `.js`/`.ts` works for `.jsx`/`.tsx`. It works on a repo that holds **only one** of them and on a repo that holds **any combination**, from **one binary**, in **one run**. **No language is second-class**: every capability that ships for one ships for all nine, unless a rule explicitly limits itself to some.
+> **codelaw lints and formats nine languages, twelve file types: JavaScript, JSX, TypeScript, TSX, JSON (with JSONC), YAML, TOML, CSS, SCSS, HTML, Markdown and Python.** JSX and TSX are first-class: every capability that works for `.js`/`.ts` works for `.jsx`/`.tsx`. **SCSS is a CSS dialect, as JSX is a JavaScript one:** `.scss` files are linted and formatted, and every capability that works for `.css` works for `.scss` (the `.sass` indented syntax and Less stay out). It works on a repo that holds **only one** of them and on a repo that holds **any combination**, from **one binary**, in **one run**. **No language is second-class**: every capability that ships for one ships for all nine, unless a rule explicitly limits itself to some.
 
-**Ruled by Arpit, 2026-10-18;** CSS and HTML added by his ruling the same day, keeping YAML, TOML and Markdown.
+**Ruled by Arpit, 2026-10-18;** CSS and HTML added by his ruling the same day, keeping YAML, TOML and Markdown. **Amended 2026-10-26 (W-62)** on his ruling that SCSS joins as a CSS dialect — *"The CSS pack should work with SCSS, and CSS modules as well"* and *"Create separate packages for SCSS and CSS modules"* — with B-047 ruled the same day, *"Own grammar / tree-sitter-scss"*. **This amendment was written by an agent on that ruling.**
 
 **Why it exists.** Real repos are mixed: a React or Stencil front end, Python services or tooling, and a pile of config (`package.json`, `tsconfig.json`, `pyproject.toml`, CI YAML) and docs. A linter that covers only some of these pushes the rest back to five different tools, five configs, and five things an agent has to know about.
 
@@ -71,7 +73,7 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
    | YAML | multi-document files | `.yml` `.yaml` |
    | TOML | | `.toml` |
    | Markdown | YAML frontmatter | `.md` `.mdx` (MDX: Markdown parts only) |
-   | CSS | | `.css` |
+   | CSS | SCSS (a dialect: `$variables`, nesting, `@mixin`/`@include`, `@use`, `//` comments; the `.sass` indented syntax and Less are not) | `.css`, `.scss` |
    | HTML | inline `<script>`, `<style>` and `style=""` are linted and formatted as JS/TS and CSS ([SR-LINTER](0106_linter.md) decision 3) | `.html` `.htm` |
 
 2. **Independently.** A repo containing only one language needs no configuration about the other eight. It also needs no runtime for them: `pip install codelaw` in a Python-only repo pulls no Node, and `npm i -D codelaw` in a JS-only repo pulls no Python. The same holds for rules: a Python-only repo gets its rule packs from PyPI (`codelaw-rules-python`, `codelaw-rules-data`) and a JS-only repo gets them from npm ([L6](0008_LAW-6-python-and-node-packages.md) decision 11).
@@ -92,14 +94,15 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 #### Out of scope until this law is amended
 
 - Vue, Svelte and Angular templates.
-- SCSS, Sass and Less (CSS dialects).
+- The `.sass` indented syntax and Less (CSS dialects). SCSS is in, as of 2026-10-26.
 - **Type-aware checks**, which need a type checker. tree-sitter has none, so these go to adapters (typescript-eslint/oxlint, pyright/mypy). See DESIGN §3.6.
 - Any eighth language.
 
 ### Consequences
 
 - **Every capability is tested nine times.** The fixture matrix is the price of decision 6.
-- **Vue, Svelte, Angular, SCSS/Less and type-aware checks stay outside the core** until this law is amended; adapters cover them.
+- **Vue, Svelte, Angular, Sass (indented)/Less and type-aware checks stay outside the core** until this law is amended; adapters cover them.
+- **SCSS** (2026-10-26): `crates/codelaw-cli/tests/scss.rs` runs the `css` and `scss` packs over `fixtures/scss/corpus` against pinned counts, checks that the `css/*` rules stay quiet on valid Sass, and that `codelaw format` on `.scss` is idempotent; `laws.rs`'s matrix includes `scss` as a twelfth file type.
 - **Checked on every CI run** by `crates/codelaw-cli/tests/laws.rs`: `l3_each_language_alone_and_together` (the fixture matrix and decision 5's isolation diff) and `l3_a_language_switched_off_costs_nothing`. The runtime fence runs in `scripts/smoke.sh` (W-18).
 
 ### Alternatives considered

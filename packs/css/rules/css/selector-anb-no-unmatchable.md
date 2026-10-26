@@ -1,7 +1,7 @@
 ---
 id: css/selector-anb-no-unmatchable
 title: "No An+B selector that matches nothing"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended position is the author's call"
 stability: preview
@@ -36,6 +36,23 @@ li:nth-child(0) {
 #### Do
 
 ```css
+li:nth-child(1) {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+li:nth-child(0) {
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 li:nth-child(1) {
   color: red;
 }

@@ -1,7 +1,7 @@
 ---
 id: css/named-grid-areas-no-invalid
 title: "Named grid areas are rectangles"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended layout is the author's call"
 stability: preview
@@ -39,6 +39,27 @@ a {
 #### Do
 
 ```css
+a {
+  grid-template-areas:
+    "head head head"
+    "side main main";
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  grid-template-areas:
+    "head head"
+    "side main main";
+}
+```
+
+#### Do
+
+```scss
 a {
   grid-template-areas:
     "head head head"

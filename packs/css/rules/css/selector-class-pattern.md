@@ -1,7 +1,7 @@
 ---
 id: css/selector-class-pattern
 title: "Class selectors are kebab-case"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "renaming must update the markup and scripts that use the class"
 stability: preview
@@ -39,6 +39,23 @@ native: css/selector-class-pattern
 #### Do
 
 ```css
+.nav-bar {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+.navBar {
+  color: red;
+}
+```
+
+#### Do
+
+```scss
 .nav-bar {
   color: red;
 }

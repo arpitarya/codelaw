@@ -203,7 +203,9 @@ css_rule!(ColorFunctionAliasNotation, "css/color-function-alias-notation", |shee
             if n.kind == VKind::Func {
                 let name = n.name(src);
                 let lower = name.to_ascii_lowercase();
-                if lower == "rgba" || lower == "hsla" {
+                // Sass's `rgba($color, $alpha)` takes two arguments: not the alias.
+                let sass_two_args = sheet.scss && significant(&n.nodes).iter().filter(|a| a.kind == VKind::Div && a.text(src) == ",").count() == 1;
+                if (lower == "rgba" || lower == "hsla") && !sass_two_args {
                     let short = &name[..3];
                     out.push(fixed(n.name.0, n.name.1, format!("`{name}()` is an alias; write `{short}()`"), vec![TextEdit::new(n.name.0, n.name.1, short)]));
                 }

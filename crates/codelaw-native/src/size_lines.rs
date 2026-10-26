@@ -40,17 +40,21 @@ impl NativeRule for MaxLines {
     }
     fn languages(&self) -> &'static [Language] {
         match self.lang {
-            Lang::Css => &[Language::Css],
+            Lang::Css => &[Language::Css, Language::Scss],
             Lang::Html => &[Language::Html],
         }
     }
     fn kinds(&self) -> &'static [&'static str] {
         match self.lang {
-            Lang::Css => &["stylesheet"],
+            // `ERROR` is the root when tree-sitter-scss cannot recover.
+            Lang::Css => &["stylesheet", "ERROR"],
             Lang::Html => &["document"],
         }
     }
-    fn check(&self, _node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        if node.parent().is_some() {
+            return;
+        }
         let ext = file_ext(ctx.file.path());
         let scss = ext == "scss";
         let whole_file = match self.lang {

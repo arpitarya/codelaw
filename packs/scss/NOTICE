@@ -1,0 +1,19 @@
+@codelaw/rules-scss / codelaw-rules-scss
+
+The rules are reimplementations written for codelaw. Their `ported_from:`
+fields name the stylelint-scss rules (https://github.com/stylelint-scss/stylelint-scss,
+MIT License, Copyright (c) 2015 - present stylelint-scss contributors) and
+the stylelint rule (https://stylelint.io, MIT License) whose documented
+behaviour they reproduce; no stylelint-scss or stylelint code or
+documentation text is included. `scss/no-import`, `scss/no-slash-division`
+and `scss/double-slash-comment-empty` follow Dart Sass's deprecations
+(https://sass-lang.com/documentation/breaking-changes/) and have no source
+rule.
+
+The data tables in data/scss/ are lists of names:
+
+- at-rules.json: the CSS at-rule names of codelaw-rules-css's table
+  (extracted from stylelint 17.16.0's reference lists, MIT License) and
+  Sass's own at-rule names.
+- functions.json: CSS function names (from the CSS specifications) and the
+  names of Dart Sass's built-in functions (https://sass-lang.com/documentation/modules/).

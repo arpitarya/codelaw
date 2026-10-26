@@ -1,7 +1,7 @@
 ---
 id: css/selector-no-vendor-prefix
 title: "No vendor-prefixed selectors"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "browsers that need the prefix lose the rule"
 stability: preview
@@ -34,6 +34,23 @@ input::-moz-placeholder {
 #### Do
 
 ```css
+input::placeholder {
+  color: gray;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+input::-moz-placeholder {
+  color: gray;
+}
+```
+
+#### Do
+
+```scss
 input::placeholder {
   color: gray;
 }

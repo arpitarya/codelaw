@@ -2,10 +2,10 @@
 
 **One release, both registries, one version** ([L6](records/0008_LAW-6-python-and-node-packages.md)
 decision 9). What ships is [SR-PACKAGES](records/0107_packages.md) §1: npm
-`codelaw` + eight `@codelaw/cli-*` + thirteen `@codelaw/rules-*` (`js`, `ts`,
-`react`, `node`, `stencil`, `html`, `css`, `data`, `tanstack-query`,
+`codelaw` + eight `@codelaw/cli-*` + fourteen `@codelaw/rules-*` (`js`, `ts`,
+`react`, `node`, `stencil`, `html`, `css`, `scss`, `data`, `tanstack-query`,
 `redux-toolkit`, `security-js`, `security-ts`, `security-html`), PyPI `codelaw`
-(eight wheels) + nine `codelaw-rules-*` (`js`, `react`, `html`, `css`,
+(eight wheels) + ten `codelaw-rules-*` (`js`, `react`, `html`, `css`, `scss`,
 `python`, `data`, `security-js`, `security-html`, `security-python`). Which pack goes where is `FIRST_PARTY_PACKS` in
 `crates/codelaw-rules/src/pack.rs`; `python3 scripts/package.py names` prints
 every name.
@@ -107,7 +107,7 @@ L6 decision 12: each pack that holds rules has a companion `@codelaw/rules-<name
 ## Every release
 
 1. **Bump:** `python3 scripts/version.py --set 0.2.0` — Cargo.toml, Cargo.lock
-   and the nine pack manifests; every npm and PyPI manifest is generated from
+   and the sixteen pack manifests; every npm and PyPI manifest is generated from
    it. Commit and push to `main`.
 2. **Wait for `ci.yml` to go green on that commit, on `main`.** `publish.yml`
    refuses anything else.

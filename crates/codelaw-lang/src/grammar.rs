@@ -21,6 +21,7 @@ pub enum Grammar {
     /// block grammar's `inline` nodes.
     MarkdownInline,
     Css,
+    Scss,
     Html,
 }
 
@@ -36,6 +37,7 @@ impl Grammar {
             Language::Toml => Grammar::Toml,
             Language::Markdown => Grammar::Markdown,
             Language::Css => Grammar::Css,
+            Language::Scss => Grammar::Scss,
             Language::Html => Grammar::Html,
         }
     }
@@ -53,6 +55,7 @@ impl Grammar {
             Language::Yaml => &[Grammar::Yaml],
             Language::Toml => &[Grammar::Toml],
             Language::Css => &[Grammar::Css],
+            Language::Scss => &[Grammar::Scss],
             Language::Html => &[Grammar::Html],
         }
     }
@@ -72,6 +75,10 @@ macro_rules! delegate {
             Grammar::Css => { let $g = agl::Css; $e }
             Grammar::Html => { let $g = agl::Html; $e }
             Grammar::Toml => $t,
+            // SCSS is codelaw's own grammar, patterned like CSS: it borrows
+            // CSS's pattern syntax (`$` is not an SCSS identifier start in
+            // patterns, so the CSS expando applies).
+            Grammar::Scss => { let $g = agl::Css; $e }
         }
     };
 }
@@ -130,6 +137,9 @@ impl LanguageExt for Grammar {
     fn get_ts_language(&self) -> TSLanguage {
         if *self == Grammar::MarkdownInline {
             return tree_sitter_md::INLINE_LANGUAGE.into();
+        }
+        if *self == Grammar::Scss {
+            return tree_sitter_scss::LANGUAGE.into();
         }
         delegate!(self, g => g.get_ts_language(), toml => toml_language())
     }

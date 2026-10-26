@@ -1,7 +1,7 @@
 ---
 id: css/at-rule-no-vendor-prefix
 title: "No vendor-prefixed at-rules"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "browsers that need the prefix lose the rule"
 stability: preview
@@ -36,6 +36,27 @@ native: css/at-rule-no-vendor-prefix
 #### Do
 
 ```css
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@-webkit-keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+```
+
+#### Do
+
+```scss
 @keyframes fade {
   from {
     opacity: 0;

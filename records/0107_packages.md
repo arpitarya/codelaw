@@ -2,7 +2,7 @@
 type: Standing Record
 kind: component
 name: SR-PACKAGES
-title: "SR-PACKAGES (0107) — what goes into which package: 20 internal crates, one engine on npm (with eight @codelaw binaries) and PyPI, fifteen rule packs — thirteen on npm, nine on PyPI, one editor extension"
+title: "SR-PACKAGES (0107) — what goes into which package: 20 internal crates, one engine on npm (with eight @codelaw binaries) and PyPI, sixteen rule packs — fourteen on npm, ten on PyPI, one editor extension"
 description: "Defines every package codelaw builds and publishes, and exactly what each one contains, so nothing is shipped twice or left out."
 status: accepted
 date: 2026-10-18
@@ -25,15 +25,15 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-25T18:00:00Z
+timestamp: 2026-10-26T14:00:00Z
 content_sha: ""
 ---
 
-# SR-PACKAGES — what goes into which package: 20 internal crates, one engine on npm (with eight @codelaw binaries) and PyPI, fifteen rule packs — thirteen on npm, nine on PyPI, one editor extension
+# SR-PACKAGES — what goes into which package: 20 internal crates, one engine on npm (with eight @codelaw binaries) and PyPI, sixteen rule packs — fourteen on npm, ten on PyPI, one editor extension
 
 ## §1 — For humans
 
-**The decision in one line.** The engine is **one Rust workspace of 20 internal crates** compiled into **one binary**. That binary is published as **`codelaw` on npm** (with eight `@codelaw/cli-<os>-<arch>` binary packages) and **`codelaw` on PyPI** (eight platform wheels). The rules ship as **fifteen rule packs — thirteen on npm, nine on PyPI** — each built from `packs/<name>/` ([SR-RULE-PACKS](0101_rule-packs.md); the decider's rulings of 2026-10-24, [W-31](../archive/open/W-31-registry-pack-split.md) and [W-32](../archive/open/W-32-redux-and-query-packs.md), and of 2026-10-25, [W-53](../work/open/W-53-security-packs-groundwork.md)). There are also **three npm-only dev-server plugins** (`@codelaw/vite-plugin`, `@codelaw/webpack-plugin` — which Rspack runs too — and `@codelaw/next`; W-49) and **one editor extension**. Nothing else is published ([L6](0008_LAW-6-python-and-node-packages.md)).
+**The decision in one line.** The engine is **one Rust workspace of 20 internal crates** compiled into **one binary**. That binary is published as **`codelaw` on npm** (with eight `@codelaw/cli-<os>-<arch>` binary packages) and **`codelaw` on PyPI** (eight platform wheels). The rules ship as **sixteen rule packs — fourteen on npm, ten on PyPI** — each built from `packs/<name>/` ([SR-RULE-PACKS](0101_rule-packs.md); the decider's rulings of 2026-10-24, [W-31](../archive/open/W-31-registry-pack-split.md) and [W-32](../archive/open/W-32-redux-and-query-packs.md), of 2026-10-25, [W-53](../work/open/W-53-security-packs-groundwork.md), and of 2026-10-26, W-62's `scss` pack). There are also **three npm-only dev-server plugins** (`@codelaw/vite-plugin`, `@codelaw/webpack-plugin` — which Rspack runs too — and `@codelaw/next`; W-49) and **one editor extension**. Nothing else is published ([L6](0008_LAW-6-python-and-node-packages.md)).
 
 | Published as | Name | Contains |
 |---|---|---|
@@ -43,8 +43,8 @@ content_sha: ""
 | npm | `@codelaw/vite-plugin`, `@codelaw/webpack-plugin`, `@codelaw/next` | the dev-server plugins: codelaw's findings in Vite's, webpack's, Rspack's and Next.js's overlay and terminal; each spawns the `codelaw` binary and lints nothing itself |
 | npm | `@codelaw/rules-<name>` × 13 | a rule pack (`js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `data`, `tanstack-query`, `redux-toolkit`, `security-js`, `security-ts`, `security-html`): rules, presets, data tables; no code, no dependencies |
 | PyPI | `codelaw-rules-<name>` × 9 | a rule pack (`js`, `react`, `html`, `css`, `python`, `data`, `security-js`, `security-html`, `security-python`) as one pure `py3-none-any` wheel; a pack on npm too holds the same files as there |
-| npm | `@codelaw/rules-<name>-fux-index` × 10 | an optional Fux index of one pack's rules (decision 14): data only, never installed by default; the four security packs get theirs with their first rule |
-| PyPI | `codelaw-rules-<name>-fux-index` × 6 | the same, as one pure `py3-none-any` wheel |
+| npm | `@codelaw/rules-<name>-fux-index` × 11 | an optional Fux index of one pack's rules (decision 14): data only, never installed by default; the four security packs get theirs with their first rule |
+| PyPI | `codelaw-rules-<name>-fux-index` × 7 | the same, as one pure `py3-none-any` wheel |
 | VS Code Marketplace + Open VSX | `codelaw.codelaw` | LSP client ([SR-EDITOR](0114_editor.md)) |
 
 ```mermaid
@@ -129,7 +129,7 @@ The decider asked for a record of what goes into which package, under the naming
    - each wheel holds the binary, a `codelaw` Python module (`check`, `fix`, `format`, `rules_for`; the same calls and JSON as decision 3, options as keyword arguments) and `py.typed`;
    - no sdist ([L6](0008_LAW-6-python-and-node-packages.md) decision 7).
 6. **The editor extension `codelaw.codelaw`** (source: `packaging/vscode`) is published as platform-specific packages. It runs the project's own codelaw first (`node_modules/.bin`, then `.venv/bin`) and falls back to a bundled binary ([SR-EDITOR](0114_editor.md)).
-7. **One version for everything:** every crate, both registries' engine packages, the fifteen rule packs and the extension carry the same version from one file ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
+7. **One version for everything:** every crate, both registries' engine packages, the sixteen rule packs and the extension carry the same version from one file ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
    - `scripts/version.py --set` writes every copy that is not generated — the pack manifests, `Cargo.lock`'s workspace crates and the extension's `packaging/vscode/package.json` and `package-lock.json` — and `--check` fails when any one drifts (W-27).
 8. **Not in any package:**
    - adapters (external tools);
@@ -138,7 +138,7 @@ The decider asked for a record of what goes into which package, under the naming
    - anything downloaded at runtime.
 
    codelaw never fetches code after install ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 3).
-9. **The fifteen rule packs:** npm `@codelaw/rules-<name>` for `js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `data`, `tanstack-query`, `redux-toolkit`, `security-js`, `security-ts` and `security-html`; PyPI `codelaw-rules-<name>` for `js`, `react`, `html`, `css`, `python`, `data`, `security-js`, `security-html` and `security-python` ([L6](0008_LAW-6-python-and-node-packages.md) decision 11).
+9. **The sixteen rule packs:** npm `@codelaw/rules-<name>` for `js`, `ts`, `react`, `node`, `stencil`, `html`, `css`, `scss`, `data`, `tanstack-query`, `redux-toolkit`, `security-js`, `security-ts` and `security-html`; PyPI `codelaw-rules-<name>` for `js`, `react`, `html`, `css`, `scss`, `python`, `data`, `security-js`, `security-html` and `security-python` ([L6](0008_LAW-6-python-and-node-packages.md) decision 11).
    - **A wheel's Python package is `codelaw_rules_<name>` with every `-` as `_`** (`codelaw_rules_security_js`), and so is its file name (PEP 427): `scripts/package.py`'s `pack_module`, the engine's `FirstPartyPack::module` and the site-packages search agree (W-53, 2026-10-25; before it no PyPI pack had a `-` in its name).
    - **Which pack is on which registry** is `FIRST_PARTY_PACKS` in `crates/codelaw-rules/src/pack.rs`; `scripts/package.py` reads that table (and refuses when it and `packs/` name different packs), so the engine's resolution and the release's names are one list.
    - **Built** from `packs/<name>/` in the source repo by the release job (`scripts/package.py assemble`, decision 11), through **one pack builder** in `scripts/package.py`: `stage_pack` (the folder plus `LICENSE`), `pack_tarball` (the npm tarball, written in Python with deterministic entries and npm's fixed mtime, not by `npm pack`) and `wheel_for_pack` (W-27). Every published copy holds the folder's files — so a pack on both registries holds the same files in its npm tarball and its wheel's `codelaw_rules_<name>/` package data; the only additions are each registry's own metadata (`package.json`, `*.dist-info/`).
@@ -151,7 +151,7 @@ The decider asked for a record of what goes into which package, under the naming
     - Each pack folder carries its own copy as `packs/<name>/LICENSE` (SR-RULE-PACKS §2 layout).
 11. **Built once, in CI; published as built.** The release job of [L6](0008_LAW-6-python-and-node-packages.md) decision 9 is two workflows.
     - **`ci.yml`, every push:** one maturin wheel per platform (decision 5). The npm binary is **taken out of that wheel**, so both registries ship the same bytes for a platform.
-    - **`scripts/package.py assemble`** builds the 22 npm tarballs and the nine pack wheels from those binaries and `packs/`; nothing is compiled there. With the eight engine wheels that is **32 packages in 39 files** (npm 22 packages, 22 tarballs; PyPI 10 projects, 17 wheels) — docs count packages, and say files when they mean files.
+    - **`scripts/package.py assemble`** builds the 23 npm tarballs and the ten pack wheels from those binaries and `packs/`; nothing is compiled there. With the eight engine wheels that is **34 packages in 41 files** (npm 23 packages, 23 tarballs; PyPI 11 projects, 18 wheels) — docs count packages, and say files when they mean files.
     - **`scripts/package.py check`** refuses the set unless it is exactly §1's names, at one version, with zero runtime dependencies, licensed (decision 10), one binary per platform on both registries, every published pack its `packs/` folder byte for byte (so a pack on both is equal on both), and `SHA256SUMS` listing exactly its files with their digests.
     - **The install smoke** (`scripts/smoke.sh`, [L6](0008_LAW-6-python-and-node-packages.md) §How L6 is enforced) runs on each of the eight platforms in `ci.yml`'s `smoke` job, the musl two in a clean Alpine container.
     - **It installs from a staging index (W-18, 2026-10-22).** `scripts/staging-index.py` serves a throwaway npm registry and a PyPI simple index on `127.0.0.1` only, from the Python standard library, so it adds no dependency ([L2](0004_LAW-2-foss-dependencies.md)). The smoke publishes every file of the set to it — `npm publish` for each tarball, `uv publish` for each wheel — then installs `codelaw` and a pack **by name**, as a user does: `npm i` (npm picks `@codelaw/cli-<key>` itself), `npx`, `pip install` (the staging index is pip's only index) and `uvx`. Every npm and uv cache and config it uses is its own, so each install downloads from the index, and the smoke fails unless the index served those downloads. It never publishes to any other registry; TestPyPI is not used. The index binds without `HTTPServer`'s reverse-DNS lookup of its own address, which stalled it past the smoke's wait on the macOS runners (W-24, 2026-10-24).
@@ -164,7 +164,7 @@ The decider asked for a record of what goes into which package, under the naming
     - **Only a `v*` tag may deploy** to the `npm` and `pypi` environments (a deployment rule the decider sets in GitHub; `RELEASING.md`): a trusted publisher checks repository, workflow and environment, not the ref.
     - **Hardening (W-18):** every `run:` is `bash -eo pipefail`; every action is pinned by commit SHA; the OIDC jobs install an exact npm version; no checkout keeps its credentials.
     - **Nothing is written until npm trusts the workflow for every package:** a preflight job makes npm's OIDC exchange per package, and both registry jobs wait on it.
-    - **npm order:** the eight binaries, then the thirteen npm packs, then `codelaw` — so a failure leaves the previous `codelaw` as `latest`. A version already published is skipped, so a failed job is re-run, not re-released.
+    - **npm order:** the eight binaries, then the fourteen npm packs, then `codelaw` — so a failure leaves the previous `codelaw` as `latest`. A version already published is skipped, so a failed job is re-run, not re-released.
     - **npm dist-tag:** a pre-release goes to `next`; a version older than `codelaw`'s current `latest` (a backport) to `release-<major>.<minor>`; any other to `latest`.
     - **The one version** is `Cargo.toml`'s; `scripts/version.py` writes and checks every copy.
 12. **A half-published release is withdrawn by the decider.** A CI OIDC token may publish but not deprecate, and PyPI has no yank API.
@@ -175,7 +175,7 @@ The decider asked for a record of what goes into which package, under the naming
     - It is bumped in a commit of its own. The MSRV stays `Cargo.toml`'s `rust-version`.
     - **The MSRV is the dependencies' floor, and informational:** `rust-version = "1.97"` because the pinned `ruff_*` 0.0.18 crates declare 1.97 (the highest `rust-version` in `Cargo.lock`; `cargo` refuses an older compiler). It promises `cargo install` users a compiler that builds codelaw; no release input reads it. `ci.yml`'s `msrv` job runs `cargo +<rust-version> check --workspace --all-targets --locked`, so the number stays true. Raise it whenever a dependency raises its own (W-27, 2026-10-24; it said 1.85 before, which no build could pass).
 
-14. **The optional Fux index packages** ([L6](0008_LAW-6-python-and-node-packages.md) decision 12; W-34). One per pack that holds rules, on the registries the pack is on: ten npm tarballs and six wheels today. **Built by `scripts/fux-index.py`, in CI only,** after `package.py assemble`:
+14. **The optional Fux index packages** ([L6](0008_LAW-6-python-and-node-packages.md) decision 12; W-34). One per pack that holds rules, on the registries the pack is on: eleven npm tarballs and seven wheels today. **Built by `scripts/fux-index.py`, in CI only,** after `package.py assemble`:
     - **Fux is pinned** (`FUX_VERSION`, `fux-engine`, MIT; [DEPENDENCIES.md](../DEPENDENCIES.md)) and the script refuses any other `fux`; CI installs exactly that version in a throwaway venv. Nothing in codelaw's engine, its packages or its tests imports or runs Fux.
     - **A segment is built from `packs/<name>/rules/`** in a scratch repository whose root is the pack's (`fux setup`, `fux ingest --no-fetch`, `fux pack`), so a rule's id is `file:rules/<path>`, a path inside the installed pack and the one Fux reads in place. It is **built twice, in two fresh folders, and the build fails if the two differ.**
     - **Packed with `package.py`'s own builders** (`pack_tarball`, `wheel_for_pack`, which take the `-fux-index` suffix): an npm package holds the segment at its root, a wheel holds it as the import package `codelaw_rules_<name>_fux_index` (no `__init__.py`), each with `LICENSE` and a `README.md`. The manifest's `content` names the pack on the registries it is on.
@@ -185,7 +185,7 @@ The decider asked for a record of what goes into which package, under the naming
 
 - **One binary is larger than a modular install,** but there's nothing to mismatch and nothing to download later.
 - **Twenty crates add some build-graph overhead,** but they make the layering checkable and keep compile times incremental.
-- **Twenty-two pack packages publish with every release** (thirteen on npm, nine on PyPI), built by one job from `packs/`.
+- **Twenty-four pack packages publish with every release** (fourteen on npm, ten on PyPI), built by one job from `packs/`.
 - **A release costs one CI run, not a rebuild** (decision 11): `publish.yml` only uploads, so a release takes as long as its slowest upload. The price is that a release can only be cut from a commit whose `ci.yml` run still holds its `dist` artifact (30 days).
 - **Sixteen index packages ride along unpublished** (decision 14) until the decider reserves their names; the release does not wait on them and does not upload them.
 - **Withdrawal is manual** (decision 12), so L6 decision 9's *"everything already published is yanked or deprecated"* depends on one person acting — not ungated, but not automatic.

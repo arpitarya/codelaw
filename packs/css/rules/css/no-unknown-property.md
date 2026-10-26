@@ -1,7 +1,7 @@
 ---
 id: css/no-unknown-property
 title: "No unknown properties"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "the closest known name is a guess at what was meant"
 stability: preview
@@ -35,6 +35,24 @@ a {
 #### Do
 
 ```css
+a {
+  color: red;
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  colr: red;
+}
+```
+
+#### Do
+
+```scss
 a {
   color: red;
 }

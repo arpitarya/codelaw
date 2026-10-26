@@ -1,7 +1,7 @@
 ---
 id: css/media-feature-name-value-no-unknown
 title: "Media features have valid values"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended value is the author's call"
 stability: preview
@@ -38,6 +38,27 @@ native: css/media-feature-name-value-no-unknown
 #### Do
 
 ```css
+@media (orientation: portrait) {
+  a {
+    color: red;
+  }
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@media (orientation: sideways) {
+  a {
+    color: red;
+  }
+}
+```
+
+#### Do
+
+```scss
 @media (orientation: portrait) {
   a {
     color: red;

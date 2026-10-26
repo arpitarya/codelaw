@@ -1,7 +1,7 @@
 ---
 id: css/hue-degree-notation
 title: "Hues are angles"
-languages: [css]
+languages: [css, scss]
 fix: auto
 stability: preview
 ported_from: [stylelint/hue-degree-notation]
@@ -31,6 +31,24 @@ a {
 #### Do
 
 ```css
+a {
+  color: hsl(120deg 60% 50%);
+}
+```
+
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: hsl(120 60% 50%);
+}
+```
+
+#### Do
+
+```scss
 a {
   color: hsl(120deg 60% 50%);
 }

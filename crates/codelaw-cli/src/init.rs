@@ -53,12 +53,21 @@ fn packs_for(languages: &BTreeSet<Language>, package_json: Option<&str>) -> BTre
             Language::Javascript | Language::Jsx | Language::Typescript | Language::Tsx => "js",
             Language::Html => "html",
             Language::Css => "css",
+            Language::Scss => "scss",
             Language::Python => "python",
             Language::Json | Language::Yaml | Language::Toml | Language::Markdown => "data",
         });
         if l.is_typescript() {
             out.insert("ts");
         }
+    }
+    // `sass` (or `sass-embedded`, `node-sass`) in package.json adds the scss pack too, and
+    // SCSS files get the `css` pack as well: its rules run on `.scss`.
+    if package_json.is_some_and(|j| depends_on(j, "sass") || depends_on(j, "sass-embedded") || depends_on(j, "node-sass")) {
+        out.insert("scss");
+    }
+    if out.contains("scss") {
+        out.insert("css");
     }
     if out.contains("js") {
         if package_json.is_some_and(|j| depends_on(j, "react")) {
@@ -118,6 +127,7 @@ fn presets(packs: &BTreeSet<&str>, languages: &BTreeSet<Language>) -> Vec<String
             "redux-toolkit" => out.push("codelaw:redux-toolkit/recommended".into()),
             "html" => out.push("codelaw:html/recommended".into()),
             "css" => out.push("codelaw:css/recommended".into()),
+            "scss" => out.push("codelaw:scss/recommended".into()),
             "python" => out.push("codelaw:py/recommended".into()),
             "data" => {
                 out.push("codelaw:data/recommended".into());
@@ -433,6 +443,17 @@ mod tests {
                 "codelaw:ts/recommended"
             ]
         );
+    }
+
+    #[test]
+    fn scss_files_or_sass_in_package_json_add_the_scss_pack_and_css() {
+        let pj = r#"{"devDependencies":{"sass":"^1.80"}}"#;
+        let from_files = packs_for(&[Language::Scss].into(), None);
+        assert_eq!(from_files.iter().copied().collect::<Vec<_>>(), ["css", "scss"]);
+        let from_dep = packs_for(&[Language::Javascript].into(), Some(pj));
+        assert_eq!(from_dep.iter().copied().collect::<Vec<_>>(), ["css", "js", "scss"]);
+        let langs: BTreeSet<Language> = [Language::Scss].into();
+        assert_eq!(presets(&from_files, &langs), ["codelaw:css/recommended", "codelaw:scss/recommended"]);
     }
 
     #[test]

@@ -1,7 +1,7 @@
 ---
 id: css/syntax-string-no-invalid
 title: "`@property` syntax strings are valid"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the intended type is the author's call"
 stability: preview
@@ -38,6 +38,27 @@ native: css/syntax-string-no-invalid
 #### Do
 
 ```css
+@property --size {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@property --size {
+  syntax: "<size>";
+  inherits: false;
+  initial-value: 0px;
+}
+```
+
+#### Do
+
+```scss
 @property --size {
   syntax: "<length>";
   inherits: false;

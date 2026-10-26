@@ -1,7 +1,7 @@
 ---
 id: css/custom-media-pattern
 title: "Custom media names are kebab-case"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "renaming must update every use of the name"
 stability: preview
@@ -37,5 +37,18 @@ native: css/custom-media-pattern
 #### Do
 
 ```css
+@custom-media --small-viewport (width <= 30em);
+```
+### SCSS
+
+#### Don't
+
+```scss
+@custom-media --smallViewport (width <= 30em);
+```
+
+#### Do
+
+```scss
 @custom-media --small-viewport (width <= 30em);
 ```

@@ -1,7 +1,7 @@
 ---
 id: css/declaration-block-no-duplicate-properties
 title: "No property declared twice in one block"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "the earlier declaration may be a deliberate fallback for browsers that reject the later value"
 stability: preview
@@ -37,6 +37,26 @@ a {
 #### Do
 
 ```css
+a {
+  background: orange;
+  color: orange;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  color: pink;
+  background: orange;
+  color: orange;
+}
+```
+
+#### Do
+
+```scss
 a {
   background: orange;
   color: orange;

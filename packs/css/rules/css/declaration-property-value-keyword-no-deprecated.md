@@ -1,7 +1,7 @@
 ---
 id: css/declaration-property-value-keyword-no-deprecated
 title: "No deprecated keywords in property values"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "the replacement keyword is the closest modern one, not always identical"
 stability: preview
@@ -34,6 +34,23 @@ a {
 #### Do
 
 ```css
+a {
+  overflow: auto;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  overflow: overlay;
+}
+```
+
+#### Do
+
+```scss
 a {
   overflow: auto;
 }

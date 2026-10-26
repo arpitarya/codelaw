@@ -22,8 +22,8 @@ says so (`codelaw/no-rules`).
 
 | registry | named | packs |
 |---|---|---|
-| npm | `@codelaw/rules-<name>` | `js` · `ts` · `react` · `node` · `stencil` · `html` · `css` · `data` · `tanstack-query` · `redux-toolkit` · `security-js` · `security-ts` · `security-html` |
-| PyPI | `codelaw-rules-<name>` | `js` · `react` · `html` · `css` · `python` · `data` · `security-js` · `security-html` · `security-python` |
+| npm | `@codelaw/rules-<name>` | `js` · `ts` · `react` · `node` · `stencil` · `html` · `css` · `scss` · `data` · `tanstack-query` · `redux-toolkit` · `security-js` · `security-ts` · `security-html` |
+| PyPI | `codelaw-rules-<name>` | `js` · `react` · `html` · `css` · `scss` · `python` · `data` · `security-js` · `security-html` · `security-python` |
 
 <!-- /docs-sync:registries -->
 

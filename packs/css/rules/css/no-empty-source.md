@@ -1,7 +1,7 @@
 ---
 id: css/no-empty-source
 title: "No empty stylesheets"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "whether to delete the file or fill it is the author's call"
 stability: preview
@@ -34,6 +34,21 @@ native: css/no-empty-source
 #### Do
 
 ```css
+a {
+  color: red;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+
+```
+
+#### Do
+
+```scss
 a {
   color: red;
 }

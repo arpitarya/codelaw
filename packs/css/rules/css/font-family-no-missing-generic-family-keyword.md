@@ -1,7 +1,7 @@
 ---
 id: css/font-family-no-missing-generic-family-keyword
 title: "Font lists end with a generic family"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "which generic family suits the fonts is a design call"
 stability: preview
@@ -38,6 +38,23 @@ a {
 #### Do
 
 ```css
+a {
+  font-family: Helvetica, Arial, sans-serif;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  font-family: Helvetica, Arial;
+}
+```
+
+#### Do
+
+```scss
 a {
   font-family: Helvetica, Arial, sans-serif;
 }

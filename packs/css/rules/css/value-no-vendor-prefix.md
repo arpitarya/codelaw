@@ -1,7 +1,7 @@
 ---
 id: css/value-no-vendor-prefix
 title: "No vendor-prefixed values"
-languages: [css]
+languages: [css, scss]
 fix: suggest
 fix_reason: "browsers that need the prefix lose the value"
 stability: preview
@@ -34,6 +34,23 @@ a {
 #### Do
 
 ```css
+a {
+  display: flex;
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+a {
+  display: -webkit-flex;
+}
+```
+
+#### Do
+
+```scss
 a {
   display: flex;
 }

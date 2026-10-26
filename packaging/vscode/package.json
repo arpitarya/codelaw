@@ -21,6 +21,7 @@
     "onLanguage:toml",
     "onLanguage:markdown",
     "onLanguage:css",
+    "onLanguage:scss",
     "onLanguage:html",
     "workspaceContains:codelaw.toml"
   ],

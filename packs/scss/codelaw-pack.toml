@@ -1,0 +1,6 @@
+name = "@codelaw/rules-scss"
+version = "0.2.0"
+min_codelaw = "0.1.0"
+languages = ["scss"]
+presets = ["scss/recommended", "scss/strict"]
+description = "codelaw's rules for SCSS (Sass), ported from stylelint-scss, with Dart Sass's module-system migrations (SR-RULE-PACKS)"

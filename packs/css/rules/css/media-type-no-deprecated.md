@@ -1,7 +1,7 @@
 ---
 id: css/media-type-no-deprecated
 title: "No deprecated media types"
-languages: [css]
+languages: [css, scss]
 fix: manual
 fix_reason: "the media features that describe the device are the author's call"
 stability: preview
@@ -40,6 +40,27 @@ native: css/media-type-no-deprecated
 #### Do
 
 ```css
+@media screen {
+  a {
+    color: red;
+  }
+}
+```
+### SCSS
+
+#### Don't
+
+```scss
+@media tv {
+  a {
+    color: red;
+  }
+}
+```
+
+#### Do
+
+```scss
 @media screen {
   a {
     color: red;

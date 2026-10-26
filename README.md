@@ -10,7 +10,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 
 ![status: preview](https://img.shields.io/badge/status-preview-orange)
 ![version 0.2.0](https://img.shields.io/badge/version-0.2.0-blue)
-![rules: 630](https://img.shields.io/badge/rules-630-informational)
+![rules: 645](https://img.shields.io/badge/rules-645-informational)
 ![languages: 9](https://img.shields.io/badge/languages-9-informational)
 ![licence: MIT](https://img.shields.io/badge/licence-MIT-green)
 ![engine: Rust](https://img.shields.io/badge/engine-Rust-b7410e)
@@ -74,7 +74,7 @@ Every door gets the same answer, because they all call the same engine.
 ---
 
 > [!IMPORTANT]
-> **codelaw is a preview.** 0.2.0 is on npm — the engine, the eight platform binaries and all ten npm packs below; on PyPI, two of the six packs are up and the rest, with `codelaw` itself, follow within days. The linter, the fixer, the formatter, the MCP server, the language server and all fifteen rule packs work today if you build from source. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
+> **codelaw is a preview.** 0.2.0 is on npm — the engine, the eight platform binaries and all ten npm packs below; on PyPI, two of the six packs are up and the rest, with `codelaw` itself, follow within days. The linter, the fixer, the formatter, the MCP server, the language server and all sixteen rule packs work today if you build from source. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
 
 ---
 
@@ -88,7 +88,7 @@ Every door gets the same answer, because they all call the same engine.
 |---|---|---|
 | **Tools** | ESLint, Prettier, Ruff, stylelint, markdownlint, … | one binary |
 | **Config** | one file per tool | one `codelaw.toml` (or `[tool.codelaw]` in `pyproject.toml`, `"codelaw"` in `package.json`) |
-| **Languages in one run** | one family per tool | nine: JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, HTML |
+| **Languages in one run** | one family per tool | nine: JS, TS, Python, JSON, YAML, TOML, Markdown, CSS (with SCSS), HTML |
 | **Your team's own rule** | code against a plugin API, where the tool has one | one Markdown file in `.codelaw/rules/`: pattern, message, fix, examples |
 | **What a finding gives you** | a message, sometimes a fix | always a way out: an automatic fix, a diff to review, or numbered steps |
 | **A rule's documentation** | kept apart from the code that runs it | the rule file itself, tested against its own examples |
@@ -195,14 +195,14 @@ def greet(names=None):
 
 | | |
 |---|---|
-| 🧰 **One tool, nine languages** | JS, TS, Python, JSON, YAML, TOML, Markdown, CSS and HTML, from one binary in one run. A Python-only repo doesn't need Node, and a JS-only repo doesn't need Python. |
+| 🧰 **One tool, nine languages** | JS, TS, Python, JSON, YAML, TOML, Markdown, CSS (and its dialect SCSS) and HTML, from one binary in one run. A Python-only repo doesn't need Node, and a JS-only repo doesn't need Python. |
 | 📝 **A rule is a Markdown file** | Front matter for metadata, one fenced block for the matcher and fix, and `Do` / `Don't` examples. People read it, agents read it, and the engine runs it. |
 | 🧪 **The docs are the tests** | `codelaw test` runs every rule against its own examples, so a rule's docs can't drift from what it does. |
 | 🔧 **Every finding comes with a fix** | `auto` fixes apply themselves, `suggest` fixes come as a reviewable diff, and `manual` findings list the exact steps. No rule just says "this is wrong". |
 | 🧱 **Fixes can restructure code** | Fix primitives move and regroup code, for example gathering every `export` into one block at the end of the file. A plain node-for-node replace can't do that. |
 | 🔁 **Deterministic** | Same files and config in, same output out, with or without an AI agent. Every fix is re-parsed and checked before it's written, and a fix that would break the file is rolled back. |
 | 🤖 **Built for AI coding agents** | `--format agent` gives one line per finding with its fix, ready to feed back to an agent after every edit. |
-| 📦 **Standard rules included** | 630 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
+| 📦 **Standard rules included** | 645 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
 
 **For the person who owns the codebase:** the review comment you keep writing becomes a rule file, once. From then on a person, a CI job and every AI agent get the same answer — and the answer can be audited, because it is a file in your repo and not a model's opinion.
 
@@ -210,7 +210,7 @@ def greet(names=None):
 
 ## Rule packs
 
-Fifteen first-party packs: thirteen on npm as `@codelaw/rules-<pack>`, nine on PyPI as `codelaw-rules-<pack>`. A pack on both registries holds the same files on both.
+Sixteen first-party packs: fourteen on npm as `@codelaw/rules-<pack>`, ten on PyPI as `codelaw-rules-<pack>`. A pack on both registries holds the same files on both.
 
 <!-- docs-sync:packs -->
 
@@ -224,6 +224,7 @@ Fifteen first-party packs: thirteen on npm as `@codelaw/rules-<pack>`, nine on P
 | [`python`](packs/python/README.md) | — | ✅ | 102 | `py/recommended` · `py/conventions` · `py/project` · `py/size` | Ruff 0.17's default `E4`/`E7`/`E9`/`F`, every stable flake8-bugbear rule, isort `I001`, `RUF022` |
 | [`html`](packs/html/README.md) | ✅ | ✅ | 73 | `html/recommended` · `html/a11y` · `html/document` · `html/conventions` · `html/security` · `html/size` | html-validate 11 recommended, a11y and document |
 | [`css`](packs/css/README.md) | ✅ | ✅ | 72 | `css/recommended` · `css/standard` · `css/conventions` · `css/project` · `css/size` | stylelint-config-recommended 18 (all 41), stylelint-config-standard 40 |
+| [`scss`](packs/scss/README.md) | ✅ | ✅ | 15 | `scss/recommended` · `scss/strict` | stylelint-scss, and Dart Sass's module-system migrations |
 | [`data`](packs/data/README.md) | ✅ | ✅ | 39 | `data/recommended` · `md/recommended` · `data/package-json` · `data/tsconfig` · `data/pyproject` · `data/github-actions` · `data/conventions` | markdownlint 0.42, plus JSON/YAML/TOML correctness checks |
 | [`tanstack-query`](packs/tanstack-query/README.md) | ✅ | — | 13 | `tanstack-query/recommended` | @tanstack/eslint-plugin-query 5 recommended (all 7), and 6 rules from TanStack Query v5's guides |
 | [`redux-toolkit`](packs/redux-toolkit/README.md) | ✅ | — | 12 | `redux-toolkit/recommended` | codelaw's own, from the Redux Style Guide's Priority A and B rules |
@@ -243,15 +244,15 @@ Fifteen first-party packs: thirteen on npm as `@codelaw/rules-<pack>`, nine on P
 - **`*/project` presets are opt-in too**: the rules that read the whole repo, `graph/no-unused-exports` (`js/project`, `py/project`) and `graph/no-unused-css-classes` (`css/project`). `codelaw graph why-unused <symbol>` says why a finding held.
 - **The counts on this page are checked.** `python3 scripts/docs-sync.py --check` fails CI when a pack's rules, presets or fix classes and this page disagree.
 
-### Fix classes across all 630 rules
+### Fix classes across all 645 rules
 
 <!-- docs-sync:fix-classes -->
 
 | class | rules | what happens |
 |---|---|---|
-| `auto` | 71 | `codelaw fix` applies it. It's safe and meaning-preserving. |
-| `suggest` | 120 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
-| `manual` | 439 | The finding lists numbered steps, for a person or an agent to follow. |
+| `auto` | 75 | `codelaw fix` applies it. It's safe and meaning-preserving. |
+| `suggest` | 122 | `codelaw fix --unsafe` applies it. Review the diff, because it can change behaviour. |
+| `manual` | 448 | The finding lists numbered steps, for a person or an agent to follow. |
 
 <!-- /docs-sync:fix-classes -->
 
@@ -355,7 +356,7 @@ $ codelaw test acme/no-console-log
 |---|---|---|---|
 | ✅ | Engine: nine languages, one binary, parse once, cache | [SR-ARCHITECTURE](records/0108_architecture.md) | built |
 | ✅ | `check`, `fix`, `format`, `test`, `rules`, `explain`, `tree`, `match`, `config`, `new-rule`, `init`, `cache` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
-| ✅ | Fifteen rule packs: 630 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
+| ✅ | Sixteen rule packs: 645 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
 | ✅ | `--format agent`, `--format json` and `--format sarif`; `--timings` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | Watch mode: `check --watch` and `fix --watch` re-check on every save | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | npm package (`npx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0 published from CI with provenance, ten packs |
