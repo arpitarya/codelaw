@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — Voice docket filed: five publishing items, L11 "dependencies", two ratifications, W-45 closed, W-51 parked  ·  Cowork (Opus 5.5)
+
+- **Asked:** a voice walk through the blockers, one by one; then *"file whatever we talked about."*
+- **Done:** W-85 (npm first publish of the nine missing names + trust, incl. the 15 Fux index packages), W-86–W-89 (PyPI, four new projects a day, Wed 10-28 to Sat 10-31, each inbox row carrying its command); W-38 → 🟡 on W-86, W-34 → 🟡 on W-85/W-87/W-88, W-77 → 🟡 on W-85/W-88. `DEPENDENCIES.md`: D-34 ratified unversioned, D-36 `tree-sitter-cli` 0.25.10 ratified; `BLOCKED.json` → `PROCEED`, W-62 → 🟢. W-90 (L11 renamed "dependencies", holds the list, `DEPENDENCIES.md` archived) and W-91 (fux auto-bump by PR) filed. W-45 closed and archived; W-51 archived as parked, B-053. IMPLEMENTATION rows for both and for the PyPI trusted publishers. Not committed — main checkout; lockmaster is not reachable from this session.
+- **Decided / left open:** Arpit's rulings, quoted in each item. Left for him: the version W-85 first-publishes at (none of the nine, nor `codelaw-skills`, `codelaw-rules-scss`, the security packs, is in v0.2.0; recommended the next release's). PR #3 and its branch still to close.
+- **Mistakes:** the voice call said the v0.2.0 Release waits for day 4 and that seven of the nine npm names are rule packs; the Release needs only day 1 (v0.2.0's `dist` holds six PyPI packs), and five are rule packs, three plugins, one skills package. Corrected in the items.
+- **Next:** land these edits through lockmaster; W-86 on Wed 2026-10-28.
+
+## 2026-10-27 — OPEN-WORK brought up to date; trusted publishers on PyPI; W-84 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *trusted-publisher list updated for PyPI and npm for all published packages*; then *is OPEN-WORK up to date?*; then *update it to the latest*.
+- **Done:** PyPI trusted publishers (`arpitarya/codelaw` · `publish.yml` · `pypi`) added on `codelaw-rules-css`, `-data`, and the `-fux-index` projects for `css`, `data`, `html`, `js`; `codelaw`'s pending publisher confirmed. npm: all 19 release packages already trust `publish.yml`; the 15 `-fux-index` packages trust nothing (adding needs Arpit's security key per package). OPEN-WORK: W-38 and W-34 inbox rows and item files reflect the registries; W-62 and W-45 get inbox rows (W-45's ball → `arpit`); W-44 and W-70 rows and files carry the CI runs; W-84 filed (CI red on `main` since 2026-10-26 11:33 UTC, untracked). Not committed — edited in the main checkout; lockmaster is not reachable from this session.
+- **Decided / left open:** `rules-tanstack-query` and `rules-redux-toolkit` on npm show *Pending validation* and only `npm publish` permission; W-51 is marked `agent` but needs a throwaway repo and a token.
+- **Mistakes:** said W-38's inbox and file `filed` dates disagree — they do not; the file absorbed the inbox row of 2026-10-20.
+- **Next:** land these edits through lockmaster; then W-84.
+
 ## 2026-10-27 — A page per rule, generated: `docs/rules/` and `scripts/rule-docs.py`  ·  Claude (Opus 5.5)
 
 - **Asked:** *a detailed document with examples on how each and every rule can be configured with its options — one doc per rule is fine*; then *do it right now here itself*.

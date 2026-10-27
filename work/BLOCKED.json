@@ -1,10 +1,8 @@
 {
- "decision": "ASK",
- "reason": "W-62's grammar patches (tree-sitter-scss `@if not`, the tree-sitter-css fork's ERROR forms) need the tree-sitter CLI (npm `tree-sitter-cli` 0.25.10, MIT) to regenerate src/ from grammar.js; it is not installed and not ratified in DEPENDENCIES.md (L11, any ecosystem or scope)",
- "questions": [
-  "Ratify `tree-sitter-cli` 0.25.10 (MIT, dev/build-time only, npm, with its platform binary) as a DEPENDENCIES.md row, so W-62 can patch and regenerate both vendored grammars?"
- ],
- "safe_alternative": "none for the grammar patches; the pinned SCSS corpus waits on CI network either way; the rest of W-62 is built",
+ "decision": "PROCEED",
+ "reason": "Ruled 2026-10-27 (voice docket): tree-sitter-cli 0.25.10 ratified as D-36 — exact pin, regenerated src/ committed, run only when a grammar changes; W-62 re-balled to agent",
+ "questions": [],
+ "safe_alternative": "",
  "surfaced": true,
- "filed": "2026-10-26"
+ "filed": "2026-10-27"
 }

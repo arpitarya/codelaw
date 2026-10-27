@@ -43,6 +43,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Fixed
 
+- **CI on `main` is green again (W-84):** every `ci.yml` job passes (run 40437239647); the commit guard's replay starts after the last pushed commit that skipped its record, and the release smoke runs on Alpine's BusyBox `diff` and compares Windows' `--prefer-warm` with a fresh check.
 - **CSS and SCSS read the same on Windows, Linux and macOS (W-44):** the grammars' scanners asked the C library what a space is, and Windows' answer includes U+00A0, so on Windows `.menu<U+00A0>.item` in a `.scss` file read as two classes and `css/no-irregular-whitespace` could not see the no-break space (musl builds differed the same way on U+2028 and U+3000). Both grammars now use the same ASCII classes on every platform; cached results are invalidated once.
 - **`html/max-lines` and `css/max-lines` no longer panic on non-ASCII text:** the scanner sliced the source at a byte offset inside a multi-byte character (`<!--`, `<script`/`<style`, `url(` checks); 22 files of the pinned corpus (`—`, `¶`, `’`, `→`) crashed it.
 

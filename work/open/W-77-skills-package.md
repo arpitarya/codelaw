@@ -6,8 +6,8 @@ item: W-77
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5), W-77 build lane"
-ball: arpit
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: agent
 ---
 
 # W-77 — A separate package for everything agent-facing
@@ -64,7 +64,7 @@ ball: arpit
 | 3 · engine | the binary no longer embeds `templates/agents/**`; `init --agents`, `sync-agents` and the hook installer read the installed package; output identical to today's for the same version (golden test) | ✅ `TEMPLATES` holds no `agents/` file (test refuses one); `crates/codelaw-agents/src/package.rs` finds the package (`CODELAW_SKILLS`, `node_modules/@codelaw/skills` upwards, site-packages, the binary's own env); golden: the assembled npm tarball and PyPI wheel each give the same 79 files, byte for byte, as the pre-W-77 binary on a 5-target consumer; `commands.rs` requires npm = PyPI |
 | 4 · refusals | no skills package → exit 2 with `npm i -D @codelaw/skills` / `pip install codelaw-skills`; version mismatch → exit 2 naming both; tests for each, on both packagings | ✅ none → exit 2, both install lines, where it looked; other version → exit 2 naming both, on the npm and the PyPI layout; `init --agents --no-install` refuses before writing; `the_skills_package_is_found_or_refused`, `package::tests` |
 | 5 · release | `scripts/package.py check` knows the set and the exception; version script bumps both; `ci.yml` builds and checks; `publish.yml` uploads; `fixtures/` gains a consumer that installs both | ✅ `package.py check`: names, the one exact dependency, npm = PyPI = `templates/agents/` + manifest; `version.py` docstring (generated, nothing to write); `ci.yml` (assemble/check already cover it); `publish.yml` publishes it after `codelaw`; `smoke.sh` installs both by name and diffs `sync-agents` output in `fixtures/skills-consumer`; `npm-trust.sh`/`withdraw.sh` read `names` |
-| 6 · publish | names reserved and first-published by hand, trusted publishers added — filed as an inbox row when DoD 5 is green | 🔴 Arpit — inbox row filed 2026-10-27 |
+| 6 · publish | names reserved and first-published by hand, trusted publishers added — filed as an inbox row when DoD 5 is green | 🔴 npm ✅ 2026-10-27 — `@codelaw/skills@0.2.0` published and trusted (W-85); PyPI → [W-88](W-88-pypi-day-3.md) (PyPI, Fri 2026-10-30), ruled 2026-10-27 |
 | 7 · docs | README install lines; `RELEASING.md`; CHANGELOG (breaking: `sync-agents` now needs `@codelaw/skills` / `codelaw-skills`) with a migration note; `IMPLEMENTATION.md` | ✅ README, USAGE, `packaging/README.md`, `RELEASING.md`, `templates/README.md`, CHANGELOG (*Changed*, with *Before you upgrade*), `IMPLEMENTATION.md` |
 
 ## Blockers
