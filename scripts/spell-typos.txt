@@ -1,0 +1,9 @@
+# Known typos added by hand to the spell pack's generated list (SR-SPELL
+# decision 6). scripts/spell-data.py merges these over the generated entries.
+#
+#   typo fix[,fix…]      lowercase ASCII letters; several fixes make the
+#                        finding a suggestion, not an auto fix
+#
+# Every entry is written here by a person, from a typo seen in real text.
+# Never copy an entry from `typos`, codespell or Wikipedia's lists of common
+# misspellings (SR-SPELL decision 6 and its veto condition).

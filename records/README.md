@@ -110,7 +110,7 @@ Start from `TEMPLATE.md`.
 | [0005](0005_LAW-3-languages.md) | **SR-LAW-3** | **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS (with its dialect SCSS), HTML — each alone or in any combination | accepted | partly |
 | [0006](0006_LAW-4-every-rule-has-a-fix.md) | **SR-LAW-4** | **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix | accepted | partly |
 | [0007](0007_LAW-5-no-model-in-the-engine.md) | **SR-LAW-5** | **L5** — no model in the engine; works the same with or without an agent | accepted | partly |
-| [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as seventeen packs, fifteen on npm (`@codelaw/rules-*`) and ten on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` | accepted | partly |
+| [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as eighteen packs, sixteen on npm (`@codelaw/rules-*`) and eleven on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` | accepted | partly |
 | [0009](0009_LAW-7-linter-and-formatter.md) | **SR-LAW-7** | **L7** — always both a linter and a formatter, for every L3 language | accepted | yes |
 | [0010](0010_LAW-8-performance-budgets.md) | **SR-LAW-8** | **L8** — performance budgets — set from measurement, never exceeded, never loosened | accepted | partly |
 | [0011](0011_LAW-9-machine-budget.md) | **SR-LAW-9** | **L9** — `work/MACHINE.md`'s budget section is always followed — 5 GB of disk per project, all agents combined; every GB past it approved first | accepted | yes |
@@ -143,7 +143,7 @@ Start from `TEMPLATE.md`.
 | [0113](0113_rule-authoring.md) | **SR-RULE-AUTHORING** | Writing rules by hand or with an agent skill; the debug tools; four test levels | accepted | partly |
 | [0114](0114_editor.md) | **SR-EDITOR** | The LSP server in the binary and the thin VS Code extension | accepted | partly |
 | [0115](0115_cli-and-mcp.md) | **SR-CLI-MCP** | The CLI and the MCP server — one engine, two doors, same answers | accepted | partly |
-| [0116](0116_spell.md) | **SR-SPELL** | Spelling as its own rule pack — a known-typo check on by default, a dictionary check opt-in, codelaw's own word data from SCOWL, VarCon and the MIT software terms | accepted | no |
+| [0116](0116_spell.md) | **SR-SPELL** | Spelling as its own rule pack — a known-typo check on by default, a dictionary check opt-in, codelaw's own word data from SCOWL, VarCon and the MIT software terms | accepted | partly |
 
 ---
 
@@ -229,7 +229,11 @@ yet is owned by an open `W-nn`.
 | `scripts/bench-rivals.py` | SR-CLI-MCP | decision 10: the side-by-side bench, which runs a rival only when L11 ratifies it (W-99) |
 | `.github/workflows/bench-rivals.yml` | SR-CLI-MCP | decision 10: the side-by-side bench's job, skipped until a rival is ratified (W-99) |
 | `experiments/guidance-vs-check` | W-102 | no decision yet: the guidance-vs-check experiment — its consumer repo, 20 tasks, harness and scorer; it drives an agent, so it sits outside the engine (L5) and is no governing file (SR-WORK-GOVERNANCE) |
-| `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the seventeen first-party packs' rules, presets and data |
+| `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the eighteen first-party packs' rules, presets and data |
+| `packs/spell` | SR-SPELL | decisions 1, 2, 5 and 6: the spell pack — its presets, rules, generated word data and notices |
+| `crates/codelaw-native/src/spell.rs` | SR-SPELL | decisions 3–5 and 8: the text read, the words and the `spell/*` native rules |
+| `scripts/spell-data.py` | SR-SPELL | decision 6: writes `packs/spell/data/spell/` from the pinned sources (L11 §3 D-42–D-44) |
+| `scripts/spell-typos.txt` | SR-SPELL | decision 6: the known typos added by hand, merged by `spell-data.py` |
 | `LICENSE` | SR-PACKAGES | decision 10: the licence every package carries |
 | `packaging` | SR-PACKAGES | decisions 3 and 5: the npm launcher and API, the PyPI module and its maturin build |
 | `packaging/vscode` | SR-EDITOR | decision 4: the thin VS Code extension (SR-PACKAGES decision 6 is how it ships) |

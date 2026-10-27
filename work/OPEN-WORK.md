@@ -67,7 +67,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-93** `arpit` `codelaw hook --pre` and `codelaw brief` built and landed (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: the decider rules `hook_pre`'s budget (inbox), then close. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
-🟢 **W-103** `agent` Spell pack (`@codelaw/rules-spell` / `codelaw-rules-spell`): known-typo check on (auto-fix), dictionary opt-in; own word data from SCOWL, VarCon, software terms (D-42–D-44). SR-SPELL written; build, then measure. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
+🟢 **W-103** `agent` Spell pack (`@codelaw/rules-spell` / `codelaw-rules-spell`): pack, generated known-typo list (188,151 from SCOWL) and `spell/known-typo` (auto fix, nine languages) landed; left: `known-typo-identifier`, the dictionary, `unknown-word`, `[spell]` config, `suspicious-word`, `locale-variant` (VarCon), `inconsistent-term`, fixtures, corpus, then the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🔴 **W-100** `arpit` Rule promotion: `scripts/corpus.py promote` reports which preview rules pass, in CI's corpus summary; `--write` refuses until ratified. Left: Arpit's ruling on the criterion (SR-RULE-AUTHORING 6a), then the first batch. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
 

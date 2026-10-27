@@ -1,0 +1,6 @@
+name = "@codelaw/rules-spell"
+version = "0.2.0"
+min_codelaw = "0.2.0"
+languages = ["javascript", "jsx", "typescript", "tsx", "python", "json", "yaml", "toml", "markdown", "css", "scss", "html"]
+presets = ["spell/recommended", "spell/strict"]
+description = "codelaw's spell checker: known typos fixed unattended, in every L3 language; word data generated from SCOWL (SR-SPELL)"

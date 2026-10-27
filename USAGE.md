@@ -24,7 +24,7 @@ codelaw init --no-install
 # 3. Until the packs are published, link them from the clone:
 #    the npm packs into node_modules/, the PyPI-only ones where a Python install would put them
 mkdir -p node_modules/@codelaw .codelaw-packs
-for p in js ts react node stencil html css scss css-modules data tanstack-query redux-toolkit security-js security-ts security-html; do
+for p in js ts react node stencil html css scss css-modules data tanstack-query redux-toolkit security-js security-ts security-html spell; do
   ln -s "$OLDPWD/codelaw/packs/$p" "node_modules/@codelaw/rules-$p"
 done
 for p in python security-python; do

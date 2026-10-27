@@ -3,13 +3,17 @@ type: Standing Record
 kind: component
 name: SR-SPELL
 title: "SR-SPELL (0116) — spelling as its own rule pack: a known-typo check on by default, a dictionary check opt-in, codelaw's own word data"
-description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Not built yet (W-103)."
+description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, the generated known-typo list and spell/known-typo with its auto fix; the identifier, dictionary, locale, consistency and words rules are not."
 status: accepted
 date: 2026-10-27
 feature: "spell checking — the spell pack"
-owns: []
+owns:
+  - packs/spell
+  - crates/codelaw-native/src/spell.rs
+  - scripts/spell-data.py
+  - scripts/spell-typos.txt
 laws: [L2, L3, L4, L5, L6, L8, L10, L11]
-timestamp: 2026-10-27T05:50:00Z
+timestamp: 2026-10-27T14:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-27 (Cowork, voice), on the CSpell research: the typo list — \"Let's go with B.\" (codelaw builds its own from SCOWL); SCOWL and VarCon — \"Approve both.\"; the software-terms dictionary — \"Approve it.\"; packaging — \"want it as a separate package.\"; defaults and where the data lives — \"Go with the recommendation.\"; writing it up — \"go ahead\". W-103."
 ---
@@ -95,11 +99,32 @@ question its maintainers left open. The forks and the rulings are in
    string values; identifiers and CSS class names **where they are declared**,
    never at each use. Each language's selection is a query file the engine
    ships beside its grammars, starting from the grammars' `@spell` captures.
+   - **As built (W-103, 2026-10-27):** the selection is a table per language
+     in `crates/codelaw-native/src/spell.rs` — node kinds and the parent
+     each must have (a JSON string that is a pair's key is a name; a YAML
+     scalar under a mapping key is a name; a JS template or Python f-string
+     with a substitution is not read) — not query files: the engine hands a
+     native rule its nodes by kind (SR-ARCHITECTURE decision 15), and no
+     grammar the workspace pins ships `@spell` captures. A string is prose
+     only when it holds whitespace. Markdown is the block tree's `inline`
+     text with code spans, link targets, autolinks and inline HTML blanked;
+     CSS and SCSS give only their comments.
 4. **Words.** An identifier splits at case changes (`HTTPServer` → `HTTP`,
    `Server`), `_`, `-`, `.` and digits. A token is skipped when it is a URL,
    an email address, a hex or CSS colour, a UUID, base64, a commit hash, an
    SPDX id, a semver, a file path, or shorter than four letters. Words compare
    after NFC and a simple case fold.
+   - **As built for prose (W-103):** a whitespace-separated token is skipped
+     when it holds `://`, starts with `www.`, `#`, `@` or `$`, holds a path,
+     code or markup character inside it (a slash or backslash, `_`, `=`,
+     braces, angle or square brackets, parentheses, a backtick, `#`, `|`, `~`,
+     `^`, `*`, `:`, `;` or `,`), a call (`name(`), a dotted name (`a.b`),
+     letters and digits together (hashes, UUIDs, base64, ids, versions), or a lower-case letter
+     followed by an upper-case one: an identifier written in prose is the
+     identifier rule's, where it is declared, not the prose rule's to rename.
+     The list is ASCII, so a word with another letter is not looked up; a
+     word is fixed in its own case (lower, Capitalised, UPPER), and a word in
+     mixed case is reported with no edit.
 5. **The rules and their fixes** ([L4](0006_LAW-4-every-rule-has-a-fix.md)):
 
    | rule | reports | fix |
@@ -126,6 +151,24 @@ question its maintainers left open. The forks and the rulings are in
      exactly one source word — and writes it with the dictionary. The output
      is committed; the same input writes the same bytes. Entries added by
      hand sit in a separate file the script merges.
+   - **As built (W-103, 2026-10-27):** the source words are SCOWL's
+     English, American and British word lists of size 20 and below, four
+     letters or more; the variants are two neighbouring letters swapped, a
+     letter dropped, a consonant doubled, and — for the size-10 words only —
+     a letter replaced by its neighbour on the same keyboard row; the first
+     letter is never changed. A variant is kept when it has four letters or
+     more, is in no SCOWL word list of size 80 or below, in no SCOWL name,
+     abbreviation or contraction list of any size and in no software term,
+     and comes from exactly one source word. SCOWL's size-95 word lists are
+     left out of the "is a word" test because they hold the commonest
+     misspellings (`untill`, `accomodate`, `enviroment`) among their rare
+     words. Hand entries are `scripts/spell-typos.txt` (empty so far). The
+     table is `data/spell/typos.json`: one JSON object whose `entries`
+     string holds `typo:fix` pairs sorted by byte, which the rule
+     binary-searches in place — still JSON (SR-RULE-PACKS decision 3), with
+     no per-entry value to build. The pins are L11 §3's D-42 (SCOWL
+     2020.12.07) and D-44 (software terms 5.4.8); VarCon (D-43) is fetched
+     and checked but not read until the locale table lands.
    - **Never used:** `typos`' word list, codespell's lists and Wikipedia's
      *Lists of common misspellings* (share-alike), and any GPL, LGPL or MPL
      dictionary.
@@ -146,6 +189,16 @@ question its maintainers left open. The forks and the rulings are in
    Its budget — the time it adds to `codelaw check` on the pinned corpus, and
    the bytes the data adds to each pack — is set from measurement in W-103 and
    then never loosened.
+   - **Measured (W-103, 2026-10-27; not yet a budget):** the generated list
+     holds **188,151 entries**, 3,531,613 bytes of JSON; the whole pack is a
+     625,127-byte npm tarball and a 636,231-byte wheel. Loading it adds about
+     **9 ms** to a one-file `codelaw check` (median of 15, release build,
+     28.8 → 37.8 ms, on a machine at load 21: read, parse and hash of the
+     table). On 1,108 files of this repository's docs and scripts,
+     `spell/known-typo` took 3.5% of the rules phase (2.5 s of 71.7 s summed
+     over ten threads, same load). The budget waits for three CI `perf` runs
+     on `main` with the pack on, put to the decider by L8's method (W-103
+     step 6).
 10. **English only.** Another language needs a word list under a permissive
     licence and its own ratified row.
 

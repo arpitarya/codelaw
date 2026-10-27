@@ -2,11 +2,11 @@
 
 **One release, both registries, one version** ([L6](records/0008_LAW-6-python-and-node-packages.md)
 decision 9). What ships is [SR-PACKAGES](records/0107_packages.md) §1: npm
-`codelaw` + eight `@codelaw/cli-*` + fifteen `@codelaw/rules-*` (`js`, `ts`,
+`codelaw` + eight `@codelaw/cli-*` + sixteen `@codelaw/rules-*` (`js`, `ts`,
 `react`, `node`, `stencil`, `html`, `css`, `scss`, `css-modules`, `data`, `tanstack-query`,
-`redux-toolkit`, `security-js`, `security-ts`, `security-html`), PyPI `codelaw`
-(eight wheels) + ten `codelaw-rules-*` (`js`, `react`, `html`, `css`, `scss`,
-`python`, `data`, `security-js`, `security-html`, `security-python`). Which pack goes where is `FIRST_PARTY_PACKS` in
+`redux-toolkit`, `security-js`, `security-ts`, `security-html`, `spell`), PyPI `codelaw`
+(eight wheels) + eleven `codelaw-rules-*` (`js`, `react`, `html`, `css`, `scss`,
+`python`, `data`, `security-js`, `security-html`, `security-python`, `spell`). Which pack goes where is `FIRST_PARTY_PACKS` in
 `crates/codelaw-rules/src/pack.rs`; `python3 scripts/package.py names` prints
 every name.
 
@@ -72,7 +72,8 @@ Steps 2–3 come back for **every pack name new to npm**: the three dev-server p
 at the first release with the security packs `@codelaw/rules-security-js`, `-security-ts` and
 `-security-html` ([W-53](work/open/W-53-security-packs-groundwork.md)), and at the first release with W-77
 the skills package `@codelaw/skills` (`codelaw-skills-<v>.tgz`; it depends on `codelaw` at
-the same version, so publish it after `codelaw` is on npm at that version) —
+the same version, so publish it after `codelaw` is on npm at that version), and at
+the first release with W-103 the spell pack `@codelaw/rules-spell` —
 publish just those tarballs by hand from the 0.2.0 `dist`, then run
 `npm-trust.sh` again (a name already trusted answers E409, which counts as
 trusted; `--fux-index` adds the Fux index packages); `publish.yml` then skips the versions already on npm.
@@ -94,7 +95,7 @@ trusted; `--fux-index` adds the Fux index packages); `publish.yml` then skips th
      (done 2026-10-25); the first release's `publish.yml` creates the project.
    - `codelaw-rules-{js,react,html,css,python,data}`, and with W-53
      `codelaw-rules-{security-js,security-html,security-python}` (wheels
-     `codelaw_rules_security_*.whl`): the first version by hand,
+     `codelaw_rules_security_*.whl`), and with W-103 `codelaw-rules-spell`: the first version by hand,
      `twine upload dist/pypi/codelaw_rules_*.whl` from the release's `dist`
      with your account token, then a trusted publisher on each project's
      *Settings → Publishing*; `publish.yml` skips versions already uploaded.
@@ -143,7 +144,7 @@ SR-PACKAGES decision 6: `codelaw.codelaw` ships as eight platform `.vsix` files,
    listed at the end and the script exits 1.
    ([W-85](archive/open/W-85-npm-first-publish.md).)
 1. **Bump:** `python3 scripts/version.py --set 0.2.0` — Cargo.toml, Cargo.lock
-   and the seventeen pack manifests; every npm and PyPI manifest is generated from
+   and the eighteen pack manifests; every npm and PyPI manifest is generated from
    it — the skills package's and its `codelaw-skills.json` too (W-77). Commit and push to `main`.
 2. **Wait for `ci.yml` to go green on that commit, on `main`.** `publish.yml`
    refuses anything else.

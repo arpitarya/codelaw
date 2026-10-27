@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — W-103's first increment: the spell pack and `spell/known-typo`  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *build W-103 — the spell pack, known-typo on with an auto fix, dictionary opt-in, word data from SCOWL, VarCon and the software terms; land coherent increments.*
+- **Done:** licences read from each source (all notice-only or MIT, no decider ask); SCOWL 2020.12.07 and software terms 5.4.8 pinned by SHA-256; `scripts/spell-data.py` generates 188,151 known typos; `packs/spell/` with `spell/known-typo` (native, `auto`, all nine languages, 107 test checks); eighteen packs in `FIRST_PARTY_PACKS`, L6, SR-RULE-PACKS, SR-PACKAGES, SR-RULE-FORMAT, **`CLAUDE.md`'s L6 and `packs/` lines** (a fact, on the decider's ruling in SR-SPELL — said here per SR-WORK-DOCS 7a), the laws index, DESIGN, README, RELEASING, GLOSSARY; the compiled-rule-set key now carries each rule's default (a one-rule pack's `codelaw test` reused a set compiled with the rule off).
+- **Decided / left open:** as built, not as written — text is chosen by a node-kind table, not query files (no pinned grammar ships `@spell` captures); SCOWL's size-95 lists are not "words" for the generator because they hold `untill`, `accomodate`; identifiers in prose are skipped. All in SR-SPELL *as built*. The L8 budget is the decider's after CI's perf runs.
+- **Mistakes:** none landed; a first measurement ran on a machine at load 21, said so in SR-SPELL decision 9.
+- **Next:** W-103's left list, item 1: `spell/known-typo-identifier`.
+
 ## 2026-10-27 — W-101 researched and ruled: type-aware TS rules on the project's own TypeScript 7.1  ·  Cowork (Fable 5.1, then Opus 5.5)
 
 - **Asked:** *"W101. research and propose."* Then a voice walk-through (how it works, what is built, decisions, blockers) and *"go ahead and write all these things."*

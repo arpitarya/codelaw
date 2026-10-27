@@ -2,8 +2,8 @@
 type: Standing Record
 kind: component
 name: SR-RULE-PACKS
-title: "SR-RULE-PACKS (0101) — seventeen first-party rule packs published apart from the engine, fourteen on npm and ten on PyPI; team packs and local rules on the same footing"
-description: "codelaw's own rules ship as seventeen separately published packs — js, ts, react, node, stencil, html, css, scss, css-modules, python, data, tanstack-query, redux-toolkit, security-js, security-ts, security-html, security-python — fifteen on npm (@codelaw/rules-*) and ten on PyPI (codelaw-rules-*), released with the engine at one version; the engine carries no rules of its own beyond meta diagnostics; teams publish packs the same way, and project rules live in .codelaw/rules."
+title: "SR-RULE-PACKS (0101) — eighteen first-party rule packs published apart from the engine, sixteen on npm and eleven on PyPI; team packs and local rules on the same footing"
+description: "codelaw's own rules ship as eighteen separately published packs — js, ts, react, node, stencil, html, css, scss, css-modules, python, data, tanstack-query, redux-toolkit, security-js, security-ts, security-html, security-python, spell — sixteen on npm (@codelaw/rules-*) and eleven on PyPI (codelaw-rules-*), released with the engine at one version; the engine carries no rules of its own beyond meta diagnostics; teams publish packs the same way, and project rules live in .codelaw/rules."
 status: accepted
 date: 2026-10-18
 feature: "predefined rules and rule packs"
@@ -12,16 +12,16 @@ owns:
   - fixtures/react-no-context
   - crates/codelaw-cli/tests/react_no_context.rs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-27T12:00:00Z
+timestamp: 2026-10-27T14:00:00Z
 content_sha: ""
 ---
 
 
-# SR-RULE-PACKS — seventeen first-party rule packs published apart from the engine, fourteen on npm and ten on PyPI; team packs and local rules on the same footing
+# SR-RULE-PACKS — eighteen first-party rule packs published apart from the engine, sixteen on npm and eleven on PyPI; team packs and local rules on the same footing
 
 ## §1 — For humans
 
-**The decision in one line.** The engine package, `codelaw`, carries **no rules**. codelaw's own rules ship as **seventeen rule packs**. A pack is published on **npm as `@codelaw/rules-<name>`**, on **PyPI as `codelaw-rules-<name>`**, or on both, as §1's table says, in the same release and at the same version as the engine. `codelaw init` installs the packs for the languages it finds. Teams publish their own packs the same way, and project rules stay in `.codelaw/rules/`.
+**The decision in one line.** The engine package, `codelaw`, carries **no rules**. codelaw's own rules ship as **eighteen rule packs**. A pack is published on **npm as `@codelaw/rules-<name>`**, on **PyPI as `codelaw-rules-<name>`**, or on both, as §1's table says, in the same release and at the same version as the engine. `codelaw init` installs the packs for the languages it finds. Teams publish their own packs the same way, and project rules stay in `.codelaw/rules/`.
 
 **Ruled by Arpit, 2026-10-19:**
 - the packs are separately published, not just separate in the source tree;
@@ -56,6 +56,8 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 
 **Ruled by Arpit, 2026-10-26** (W-63): *"Create separate packages for SCSS and CSS modules."* A `css-modules` pack, **npm only** (CSS Modules are a JavaScript-bundler feature), holds the `css-modules/*` rules (no-unused-class, no-undefined-class, composes-valid, class-naming, no-global) with `css-modules/recommended` and `css-modules/strict`. The `css` pack's rules read a module stylesheet without reporting its syntax; **npm** carries fifteen packs and **PyPI** ten.
 
+**Ruled by Arpit, 2026-10-27** (W-103, Cowork, by voice, on the CSpell research): *"want it as a separate package."* A `spell` pack, on **both registries**, holds the `spell/*` rules — codelaw's own spell checker, with its word data in the pack's `data/spell/`, generated from SCOWL ([SR-SPELL](0116_spell.md)); `spell/recommended` and `spell/strict`. `init` never adds it (decision 6); **npm** carries sixteen packs and **PyPI** eleven.
+
 | Pack | npm | PyPI | Languages | Presets |
 |---|---|---|---|---|
 | engine | `codelaw` | `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics, the formatter's `format/unformatted` and `format/failed`, and `graph/no-deprecated-usage` | — |
@@ -76,6 +78,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 | `security-ts` | `@codelaw/rules-security-ts` | — | TS, TSX (TypeScript-only security rules) | `sec-ts/recommended`, `sec-ts/strict` (extend `sec-js/*`) |
 | `security-html` | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | HTML | `sec-html/recommended` (14 rules at `error`), `sec-html/strict` (5 more at `warn`); both extend `html/security`; 19 native rules, each with `security:` (W-56, 2026-10-26) |
 | `security-python` | — | `codelaw-rules-security-python` | Python (61 rules, W-57) | `sec-py/recommended`, `sec-py/strict` |
+| `spell` | `@codelaw/rules-spell` | `codelaw-rules-spell` | all nine L3 languages: their comments, docs, prose strings, Markdown and HTML text (W-103) | `spell/recommended`, `spell/strict` (extends `spell/recommended`) |
 
 `FIRST_PARTY_PACKS` in `crates/codelaw-rules/src/pack.rs` is this table in code, and `scripts/package.py` reads it, so the engine and the release name the same packs on the same registries.
 
@@ -125,7 +128,7 @@ The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the
    - the test rules of new code, `graph/untested-function` and `graph/function-coverage`, with `codelaw/stale-coverage` ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9), and `.codelawignore`'s `codelaw/incomplete-ignore` and `codelaw/stale-ignore` (SR-BASELINE decision 12). They belong to no pack and are off until the project turns them on: the engine's own preset `codelaw:tests` (`extends = ["codelaw:tests"]`, no namespace, resolved by no pack and in no `recommended`), a `[coverage]` table, or the rule named in `[rules]`.
 
    Every other rule codelaw publishes lives in a pack.
-2. **The seventeen first-party packs, their registries and their presets** are §1's table. A library pack (`tanstack-query`, `redux-toolkit`) checks one library's API in the JS-family languages; its rules that follow a hook or a constructor check that it is imported from that library, so the same name from elsewhere is left alone.
+2. **The eighteen first-party packs, their registries and their presets** are §1's table. A library pack (`tanstack-query`, `redux-toolkit`) checks one library's API in the JS-family languages; its rules that follow a hook or a constructor check that it is imported from that library, so the same name from elsewhere is left alone.
    - Graph rules live with their language: `graph/no-unused-exports` in `js` and `python`, and `graph/no-unused-css-classes` in `css`. A graph rule two packs ship loads as one rule over both packs' languages with the later pack's body, so **the copies' `codelaw` blocks are identical** (a `codelaw-graph` test holds them so): when the `python` copy listed fewer kinds, a TypeScript repo lost its `interface` and `enum` findings whenever `python` loaded last (W-11 corpus run, 2026-10-22). A pack rule may also be `scope: project` under its own prefix: `node/recommended`'s six import rules (`node/no-{missing,extraneous,unpublished}-{import,require}`) run on the graph's `import:` query ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 6). A file-scope native rule that reads the files around it stays file-scope: `node/hashbang` reads the nearest `package.json`'s `bin`, `md/relative-links` checks each relative link's target, and `html/no-utf8-bom` reads the file's bytes (SR-ARCHITECTURE decision 15b; W-21, 2026-10-22).
    - **A rule's fix class follows what the grammar can verify.** The engine refuses a fix whose output parses worse than its input (SR-ARCHITECTURE decision 5), so a rule whose fix writes syntax the grammar rejects ships `manual`. `css/media-feature-range-notation` is `auto` because codelaw's CSS grammar fork parses the range syntax it writes (SR-ARCHITECTURE decision 3; W-21, 2026-10-22).
    - There's **no umbrella preset that spans packs**, because it would require packs the repo hasn't installed.
@@ -161,17 +164,18 @@ The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the
      - `data`, `md`, `json`, `yaml`, `toml` → `rules-data`;
      - `tanstack-query` → `rules-tanstack-query`; `redux-toolkit` → `rules-redux-toolkit`;
      - `sec-js` → `rules-security-js`; `sec-ts` → `rules-security-ts`; `sec-html` → `rules-security-html`; `sec-py` → `rules-security-python`.
+     - `spell` → `rules-spell` (W-103).
    - **The pack is found in this order,** each place only for a registry the pack is published on:
      1. `node_modules/@codelaw/rules-<name>`, walking up from the config file's directory.
      2. The Python environment: the site-packages paths the Python launcher passes in (`CODELAW_SITE_PACKAGES`); otherwise `$VIRTUAL_ENV`; otherwise `.venv/` at the project root.
 
      The first one found wins. Both copies of one version are identical (decision 3).
    - **A missing pack stops the run:** exit 2, with an error naming every install command the pack has, for example `npm i -D @codelaw/rules-js` and `pip install codelaw-rules-js`; a pack on one registry is named as that registry's only (`@codelaw/rules-ts, which is published on npm only`).
-5. **One version, released together.** The engine and the seventeen packs carry one version and are published by one release job ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
+5. **One version, released together.** The engine and the eighteen packs carry one version and are published by one release job ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
    - Each pack's manifest declares `min_codelaw`. An engine older than that refuses the pack, with an error naming the upgrade.
    - `codelaw rules --why <id>` and the JSON output name the pack and version each rule came from.
 6. **`codelaw init` installs what it detects.**
-   - **Languages to packs:** JS/JSX → `js`; TS/TSX → `js` and `ts`; HTML → `html`; CSS → `css`; SCSS → `scss` and `css` (also `sass`, `sass-embedded` or `node-sass` in `package.json`; W-62); a `*.module.css` or `*.module.scss` file → `css-modules`, which is npm only (W-63); Python → `python`; JSON/YAML/TOML/Markdown → `data`. With JS or TS, `react` when `package.json` depends on `react`, `stencil` when it depends on `@stencil/core`, `tanstack-query` when it depends on `@tanstack/react-query` or `react-query`, and `redux-toolkit` when it depends on `@reduxjs/toolkit` or `redux`. `node` and the four security packs are never added by `init`: a security pack is chosen, not detected.
+   - **Languages to packs:** JS/JSX → `js`; TS/TSX → `js` and `ts`; HTML → `html`; CSS → `css`; SCSS → `scss` and `css` (also `sass`, `sass-embedded` or `node-sass` in `package.json`; W-62); a `*.module.css` or `*.module.scss` file → `css-modules`, which is npm only (W-63); Python → `python`; JSON/YAML/TOML/Markdown → `data`. With JS or TS, `react` when `package.json` depends on `react`, `stencil` when it depends on `@stencil/core`, `tanstack-query` when it depends on `@tanstack/react-query` or `react-query`, and `redux-toolkit` when it depends on `@reduxjs/toolkit` or `redux`. `node`, the four security packs and `spell` are never added by `init`: a security pack or the spell checker is chosen, not detected.
    - **How it installs:** it adds those packs as dev dependencies with the package manager the repo already uses: npm, pnpm, yarn or bun for a `package.json` repo; uv, pip or poetry for a `pyproject.toml` repo. A repo with both uses both — `rules-python` from PyPI, the other packs from npm — unless `--registry npm|pypi` picks one.
    - **A pack the chosen registry does not publish** (§1) comes from the other registry when the repo uses that one too, or uses neither; otherwise — and always under `--registry` — it is left out, its presets are not written, and `init` prints a `note:` naming the registry it is on. An npm repo with a few Python files gets no `codelaw:py/recommended` until `codelaw-rules-python` is installed from PyPI.
    - **What it writes** (its text is `templates/init/`, [L10](0012_LAW-10-consumer-templates.md)): `extends` with each installed pack's `recommended` presets, and `js/typescript` when the repo has TypeScript ([SR-CONFIG](0110_config.md) decision 8).
@@ -275,7 +279,7 @@ That's 34 rules: 9 auto, 11 suggest and 14 manual. **33 ship today** (all but `m
 ### Consequences
 
 - **`codelaw` installed alone lints nothing.** It formats every language and reports `codelaw/no-rules`. `codelaw init` is the documented path, and `codelaw-setup` follows it ([SR-AGENT-SURFACES](0102_agent-surfaces.md)).
-- **Each release publishes thirty-five packages:** on npm, `codelaw`, the eight `@codelaw/cli-*` binary packages and fifteen packs (twenty-four); on PyPI, `codelaw` and ten packs (eleven). That is 42 files — 24 npm tarballs and 18 wheels — because PyPI's `codelaw` is eight platform wheels. One failed publish fails the release ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
+- **Each release publishes thirty-seven packages:** on npm, `codelaw`, the eight `@codelaw/cli-*` binary packages and sixteen packs (twenty-five); on PyPI, `codelaw` and eleven packs (twelve). That is 44 files — 25 npm tarballs and 19 wheels — because PyPI's `codelaw` is eight platform wheels. One failed publish fails the release ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
 - **`@codelaw/rules-python@0.1.0` and `@codelaw/rules-js@0.1.0` predate the split** (the first npm publish, 2026-10-24, W-29): `rules-python` is unpublished from npm by hand, and 0.2.0 is the first release in this layout ([W-31](../archive/open/W-31-registry-pack-split.md)).
 - **A repo carries only its ecosystems' rules and data tables.** A Python-only repo stays on PyPI ([L3](0005_LAW-3-languages.md) decision 2).
 - **Rules still update with engine releases** (one version). Engine and rules can't drift, which was the reason for embedding them in the first version: `min_codelaw` and the native-id check keep that guarantee.
