@@ -1,0 +1,91 @@
+# bench-rivals — codelaw beside ESLint, Prettier, Biome, oxlint and Ruff (W-99).
+# Weekly, and by hand:
+#
+#     gh workflow run bench-rivals.yml -R arpitarya/codelaw
+#
+# L8's reference machine (ubuntu-24.04) and three pinned repos
+# (scripts/corpus.json), one run, one day, so every number in the table was
+# measured beside the others. `scripts/bench-rivals.py` reads the tools from
+# perf/rivals.toml and times each the way `codelaw bench` does: lint and
+# format apart, cold and warm, the median and p95 of 10 runs.
+#
+# ⛔ SKIPPED UNTIL THE DECIDER RATIFIES THE RIVALS (L11). The switch is L11's
+#   list itself (records/0013_LAW-11-dependencies.md §3): `bench-rivals.py
+#   gate` says run=true only when at least one rival's row is `ratified` at
+#   the table's version, and `install` and `run` refuse every other rival.
+#   No step below installs a package by name; the script installs exactly
+#   the ratified pins (npm into a throwaway prefix, Ruff into a venv).
+#
+# The results are context rows for L8 §Measurements and the README's claim
+# (W-99 step 3) — never a budget; this job gates nothing.
+name: bench-rivals
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 21 * * 0" # Monday 02:30 IST
+
+permissions:
+  contents: read
+
+jobs:
+  bench-rivals:
+    runs-on: ubuntu-24.04 # L8 reference machine (the decider, 2026-10-24); never ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - id: gate # the table is well-formed; run only when L11 ratifies a rival
+        run: |
+          python3 scripts/bench-rivals.py --self-test
+          python3 scripts/bench-rivals.py plan | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 scripts/bench-rivals.py gate --github-output "$GITHUB_OUTPUT"
+          grep -q '^run=true' "$GITHUB_OUTPUT" || echo "::notice title=bench-rivals::skipped — no rival is ratified in L11's list (W-99)"
+      - id: rustc
+        if: steps.gate.outputs.run == 'true'
+        run: echo "v=$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" >> "$GITHUB_OUTPUT"
+      - if: steps.gate.outputs.run == 'true'
+        run: rustup toolchain install ${{ steps.rustc.outputs.v }} --profile minimal --no-self-update
+      - if: steps.gate.outputs.run == 'true'
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          cache-on-failure: true
+      - if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - if: steps.gate.outputs.run == 'true'
+        run: cargo build --release --locked -p codelaw-cli
+      - name: the ratified rivals, at their pins (perf/rivals.toml; L11 §3)
+        if: steps.gate.outputs.run == 'true'
+        run: python3 scripts/bench-rivals.py install --tools "$RUNNER_TEMP/tools"
+      - name: the machine measured
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          {
+            echo '### bench-rivals: the runner'
+            echo '```'
+            lscpu | grep -E '^(Model name|CPU\(s\)|Thread|Core|Socket)' || true
+            free -m | sed -n '1,2p'
+            echo "load: $(cut -d' ' -f1-3 /proc/loadavg)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: the three pinned real repos (L8 decision 2; scripts/corpus.json)
+        if: steps.gate.outputs.run == 'true'
+        run: python3 scripts/corpus.py fetch --dir "$RUNNER_TEMP/corpus" --repo djangoproject.com --repo full-stack-fastapi-template --repo html5-boilerplate
+      - name: bench-rivals.py run
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          python3 scripts/bench-rivals.py run --binary target/release/codelaw --corpus "$RUNNER_TEMP/corpus" --tools "$RUNNER_TEMP/tools" --out "$RUNNER_TEMP/bench-rivals"
+          cat "$RUNNER_TEMP/bench-rivals/results.md" >> "$GITHUB_STEP_SUMMARY"
+          cp "$RUNNER_TEMP/tools/installed.json" "$RUNNER_TEMP/bench-rivals/"
+      - if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: bench-rivals
+          path: |
+            ${{ runner.temp }}/bench-rivals/results.json
+            ${{ runner.temp }}/bench-rivals/results.md
+            ${{ runner.temp }}/bench-rivals/installed.json
+          if-no-files-found: ignore

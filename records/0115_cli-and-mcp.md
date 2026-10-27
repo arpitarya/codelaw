@@ -12,6 +12,9 @@ owns:
   - crates/codelaw-cli
   - crates/codelaw-mcp
   - .pre-commit-hooks.yaml
+  - perf/rivals.toml
+  - scripts/bench-rivals.py
+  - .github/workflows/bench-rivals.yml
 laws: [L0, L3, L4, L5, L7, L8]
 timestamp: 2026-10-27T18:00:00Z
 content_sha: ""
@@ -173,6 +176,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
     - **Runs:** `--runs N` (10) per operation; the first is discarded; the report gives median, p95 (nearest rank), min and max. `--only <ops>` narrows it.
     - **Output:** `--format text|json`; `--output <file>` also writes the JSON report (`schema_version`, `codelaw_version`, `workload {seed, files, digest, reference}`, `runs`, `repos[]` with `name`, `files`, `path`, `operations[]` with `repo` (a repo row's name; `null` on the workload), `samples`, `median`, `p95`, `min`, `max`, `budget`, `proposed`, `verdict`).
     - **Exit codes:** `0` measured, nothing over a set budget · `1` a p95 over a budget the decider set (`--budgets <file>`) · `2` a usage error, a malformed budgets file, or an operation that failed to run.
+    - **The side-by-side bench is not this command** (W-99): `scripts/bench-rivals.py` applies this method — `--runs` (10), first discarded, median and nearest-rank p95, spawn to exit; cold an empty cache per run, warm a primed cache in its own process — to codelaw and to the rival tools in `perf/rivals.toml` (each at an exact version, its recommended preset, lint and format apart) on the same three repos, and times codelaw again with `--lang` scoped to each rival's languages. It installs or runs a rival only when that rival's row in [L11](0013_LAW-11-dependencies.md)'s list is `ratified` at the table's version; until then it times codelaw alone and `.github/workflows/bench-rivals.yml` (weekly and by hand, `ubuntu-24.04`) skips. Its numbers are context rows for L8 §Measurements, never a budget.
 
 11. **Git hooks: `init --git-hooks [pre-commit,post-commit]`** (W-50, 2026-10-25). `crates/codelaw-cli/src/git_hooks.rs`; the two POSIX `sh` scripts are `templates/git-hooks/pre-commit` and `post-commit` ([L10](0012_LAW-10-consumer-templates.md), moved there by W-60). The hooks need no agent and no Node ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 4).
     - **Where it writes:** the folder git itself resolves for hooks (`git rev-parse --git-path hooks`: `core.hooksPath`, else `.git/hooks`, a linked worktree included). In a repo `codelaw.toml` already configures, `--git-hooks` installs only the hooks; in an unconfigured one it runs the rest of `init` first. Outside a git repository it exits `2` and writes nothing.
