@@ -61,7 +61,7 @@ ball: agent
 | DoD | what | state |
 |---|---|---|
 | 1 · | L3 and L7 records amended; register updated | ✅ |
-| 2 · | a `.scss` corpus: no `css/*` rule reports SCSS syntax as an error | ✅ `fixtures/scss/corpus/modern.scss` (valid modern Sass), pinned in `fixtures/scss/css-pack.toml`; `tests/scss.rs`. Bootstrap 6's real SCSS is not in the pinned corpus — see *Left* |
+| 2 · | a `.scss` corpus: no `css/*` rule reports SCSS syntax as an error | ✅ `fixtures/scss/corpus/modern.scss` (valid modern Sass), pinned in `fixtures/scss/css-pack.toml`; `tests/scss.rs`; since 2026-10-27 Bootstrap 5.3.8's real SCSS is in the pinned corpus (`packs/css/corpus.toml`, `packs/scss/corpus.toml`) |
 | 3 · | `codelaw format` on SCSS is idempotent and parity-checked | ✅ `tests/scss.rs`; `scripts/format-parity.py` measures SCSS (SR-FORMATTER consequences) |
 | 4 · | every SCSS rule has cases; `scss/no-global-function-names` fix adds the `@use` once | ✅ `packs/scss/rules/scss/*.cases.md` (`two calls add the @use once`) |
 
@@ -80,11 +80,17 @@ ball: agent
 - **`scss/at-if-no-null` fixes `== null` too** (to `not $x`), now that the verifier's grammar reads `@if not`; two new cases.
 - Parse throughput on the same files (tree-sitter CLI, 3 runs): CSS ~20 → ~21 MB/s, SCSS ~8.5 → ~24 MB/s. `codelaw bench` main vs branch, alternated twice on this loaded Mac (load ~21): `check_cold_10k` median 6907/5760 ms vs 6318/5793 ms; warm runs are 10 001 cache hits and parse nothing.
 
+## Built (2026-10-27, Claude Code) — the pinned SCSS corpus
+
+- `scripts/corpus.json`: **Bootstrap 5.3.8** (`25aa8cc`, MIT) for the `css` and `scss` packs, and the `scss` pack on djangoproject.com; `scss` joins `corpus.py`'s `PACKS`. Fetched and run on this machine; `packs/scss/corpus.toml` has a count for every `scss/*` rule (2 repos, 986 files, 798 findings) and `packs/css/corpus.toml` grows with Bootstrap (1 278 files).
+- **Five SCSS false positives the corpus showed, fixed, each with a case:** `css/custom-property-pattern` on interpolated names (`--#{$prefix}color`: 1 295 on Bootstrap's `scss/`); words of a `//` comment inside a selector list read as type selectors (`css/selector-type-no-unknown`) — every `css/*` rule now reads SCSS with `//` comments blanked, and drops a fix that would overwrite one; `css/no-duplicate-selector` and `css/no-descending-specificity` treated a Sass block (`@include respond-min(…) { … }`) as the enclosing context; `css/no-invalid-position-declaration` on a declaration under a mixin's `@media`; and, from the blanking, `css/no-empty-block` / `css/no-empty-source` now count a `//` comment as content.
+- **Counts that moved on the old corpus, and why:** on djangoproject.com's SCSS `css/no-descending-specificity` 350 → 319, `css/no-duplicate-selector` 26 → 15, `css/selector-type-no-unknown` 1 → 0 — each removed finding checked by hand: rules inside different `@include respond-min/max(…)` blocks, and `//display none list` inside a selector list. The rest of `packs/css/corpus.toml`'s changes are Bootstrap's own findings (most from `dist/css`).
+
 ## Left (honest)
 
 1. **Step 2's second half: move the `css/*` (and `scss/*`) rules from `css_syntax.rs` onto the trees.** The grammars now read the forms SR-ARCHITECTURE decision 15b named as the reason the rules read text; the move itself — about 70 native rules across `css_atrules.rs`, `css_declarations.rs`, `css_media.rs`, `css_selectors.rs`, `css_values.rs`, `css_misc.rs`, `css_modules.rs` and `scss_rules.rs` — has not started. Rules that exist to report CSS the grammar rejects (`css/media-query-no-invalid`, `css/at-rule-prelude-no-invalid`) keep reading text.
 2. **Grammar forms still read as `ERROR`** (the READMEs list them): SCSS `@container #{$name} (…)`, a string holding an interpolation with its own quotes, `:not(.a)#{$x}`, an escape after an interpolation; CSS an unquoted `url(data:…;…)` holding `;`, `@nest`, `@value` (W-63), a backslash-newline in a string. The CSS fork's `upstream/grammar.patch` covers the 2026-10-22 forms only.
-3. **Pinned corpora** (`scripts/corpus.json`): an SCSS one (Bootstrap) and a CSS Modules one (W-63's step), a `corpus.toml` count for each `scss/*` and `css-modules/*` rule, then `stable` for those with no false positive. Fetching works on this machine (2026-10-27), so it does not wait on CI.
+3. **After the corpus:** `css/no-descending-specificity` does not resolve `&` against its parent, so it still compares `&::after` under `&:not(.collapsed)` with a top-level `&::after` — 43 findings on Bootstrap's `scss/`, most false; `stable` for the `scss/*` rules waits on W-100's criterion (no rule is promoted until it is ratified); a CSS Modules corpus is W-63's step.
 4. **The graph does not read `.scss`:** `graph/no-unused-css-classes` and `css/project` stay CSS-only (W-63 extends the graph for modules).
 5. **Not shipped on purpose:** `scss/operator-no-unspaced` (layout; the formatter's) — the item's table listed it.
 

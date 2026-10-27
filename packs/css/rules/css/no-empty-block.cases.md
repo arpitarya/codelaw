@@ -40,3 +40,17 @@ a {
   color: red;
 }
 ```
+
+### case: an SCSS block holding only a line comment
+
+```scss
+@if $a == null {
+  // Do nothing
+} @else {
+  a { color: red; }
+}
+```
+
+```expect
+(none)
+```

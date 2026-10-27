@@ -74,12 +74,20 @@
       "packs": ["css"]
     },
     {
+      "name": "bootstrap",
+      "url": "https://github.com/twbs/bootstrap",
+      "commit": "25aa8cc0b32f0d1a54be575347e6d84b70b1acd7",
+      "licence": "MIT",
+      "licence_file": "LICENSE",
+      "packs": ["css", "scss"]
+    },
+    {
       "name": "djangoproject.com",
       "url": "https://github.com/django/djangoproject.com",
       "commit": "c78c1306b3135809a109b207ac40a5916ef9f1c0",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE",
-      "packs": ["python", "html", "css", "security-python", "security-html"]
+      "packs": ["python", "html", "css", "security-python", "security-html", "scss"]
     },
     {
       "name": "ionic-framework",
