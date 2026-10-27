@@ -1,0 +1,32 @@
+# Written by `codelaw init --ci github`; the template is templates/ci/github/codelaw.yml.
+#
+# Checks every push and pull request with codelaw's GitHub Action: each finding
+# annotates the diff, and on a pull request the files it changed count as
+# touched (`--changed-since` its base). The tag pins the engine: `@v{{version}}`
+# installs codelaw {{version}}. To see the findings under Security → Code
+# scanning as well, set `sarif: true` and add `security-events: write` below.
+#
+# The rule packs come from the repository's own dependencies, so install them
+# first: npm packs land in node_modules; install PyPI packs into `.venv/` in
+# that step (python3 -m venv .venv && .venv/bin/pip install …).
+name: codelaw
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install the repository's dependencies (its rule packs)
+        run: |
+          if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile
+          elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile
+          elif [ -f package-lock.json ]; then npm ci
+          fi
+      - uses: arpitarya/codelaw@v{{version}}

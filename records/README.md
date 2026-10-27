@@ -236,6 +236,8 @@ yet is owned by an open `W-nn`.
 | `scripts/staging-index.py` | SR-PACKAGES | decision 11: the localhost staging index the install smoke publishes to and installs from |
 | `scripts/withdraw.sh` | SR-PACKAGES | decision 12 |
 | `scripts/npm-trust.sh` | SR-PACKAGES | decision 11: the one-time npm trusted-publisher setup |
+| `action.yml` | SR-PACKAGES | decision 15: codelaw's GitHub Action (W-97) |
+| `fixtures/github-action` | SR-PACKAGES | decision 15: the project CI's `action` job runs the Action on (W-97) |
 | `.github/workflows` | SR-PACKAGES | decision 11: build once in CI, publish as built |
 | `RELEASING.md` | SR-PACKAGES | decision 11: how a release is cut |
 | `rust-toolchain.toml` | SR-PACKAGES | decision 13: the one pinned Rust toolchain |
