@@ -86,6 +86,8 @@ enum Command {
     Hook(codelaw_agents::HookArgs),
     /// Write every agent's files from the rules and skills, or with --check report drift.
     SyncAgents(codelaw_agents::SyncArgs),
+    /// What is specific to this repo for the files an agent is about to write (SR-CLI-MCP decision 14).
+    Brief(codelaw_agents::BriefArgs),
     /// Grandfather a rule's existing findings, lower the counts, or check the ratchet (SR-BASELINE).
     Baseline {
         #[command(subcommand)]
@@ -619,5 +621,6 @@ fn main() -> ExitCode {
         Command::Deps(a) => deps_cmd::deps(a),
         Command::Hook(a) => codelaw_agents::hook(a),
         Command::SyncAgents(a) => codelaw_agents::sync_agents(a),
+        Command::Brief(a) => codelaw_agents::brief(a),
     }
 }

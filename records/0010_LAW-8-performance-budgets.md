@@ -11,7 +11,7 @@ owns:
   - fixtures/perf
   - perf/budgets.toml
 laws: [L0, L3, L5, L8]
-timestamp: 2026-10-25T12:00:00Z
+timestamp: 2026-10-27T18:00:00Z
 content_sha: ""
 ---
 
@@ -55,7 +55,7 @@ The decider wants performance to be a key property and accepts that today's numb
 
 ### Decision
 
-1. **The budgets file.** `perf/budgets.toml` in the codelaw repo holds one entry per operation. Every value is `unset` today.
+1. **The budgets file.** `perf/budgets.toml` in the codelaw repo holds one entry per operation. Every value started `unset`.
 
    | Operation | What is timed |
    |---|---|
@@ -66,6 +66,7 @@ The decider wants performance to be a key property and accepts that today's numb
    | `fix_one_file` | the agent-hook path: fix + format + verify on one changed file |
    | `lsp_after_edit` | edit to published diagnostics in the LSP |
    | `mcp_rules_for_path` | one MCP `rules_for_path` call |
+   | `hook_pre` | the pre-write gate: `codelaw hook --pre` on one agent `Edit` payload — the file rebuilt in memory, judged against the file on disk, the verdict printed (added 2026-10-27, W-93; [SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 9; design target < 100 ms warm, the class of `fix_one_file`, and Windsurf asks a hook for < 100 ms) |
    | `peak_memory_10k` | peak resident memory during `check_cold_10k` |
 
 2. **The reference workload.**
@@ -142,11 +143,21 @@ The decider wants performance to be a key property and accepts that today's numb
 - With `js/project` and `py/project` added to the workload's config, so the graph is linked and its rules run on every save, the save-to-print median is about 15 ms more (268 against 253 ms, measured by hand the same day).
 - Polling 10,000 files every 100 ms costs about a fifth of one core while nothing changes.
 
+**`hook_pre`, first measurements, 2026-10-27 (W-93). A loaded developer Mac; not the reference machine, so no budget is set from them.** Apple M4, 10 cores, release build, load average 16–20 with other agents compiling; three `codelaw bench --only hook_pre,fix_one_file` sessions over the reference workload, 10 runs each, first discarded:
+
+| operation | median per session | p95 per session | worst × 1.5 | design target |
+|---|---|---|---|---|
+| `hook_pre` | 68.4 / 46.3 / 73.0 ms | 70.3 / 51.9 / 79.3 ms | 118.95 | < 100 ms warm |
+| `fix_one_file` (same sessions) | 111.6 / 69.1 / 93.6 ms | 138.1 / 86.6 / 104.8 ms | — | < 100 ms warm |
+
+- `hook_pre` costs less than `fix_one_file`: it checks two texts in memory and writes nothing, and like it its time is mostly loading the project.
+- On these numbers decision 4's guard would hold it back (100 < 118.95), as it did `fix_one_file`. `perf/budgets.toml` carries it `unset` with `proposed = 100` (the design target): printed, never compared, until three `perf` runs on `main` give the reference machine's numbers and the decider rules.
+
 ### Consequences
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
-- **The gate binds seven of the eight operations** since 2026-10-25 (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`).
+- **The gate binds seven of the nine operations** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset` until decision 4's method is applied to three `perf` runs on `main` and the decider rules.
 
 ### Alternatives considered
 

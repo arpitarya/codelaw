@@ -21,7 +21,7 @@ use std::path::{Path, PathBuf};
 pub const PROTOCOL_VERSIONS: &[&str] = &["2025-06-18", "2025-03-26", "2024-11-05"];
 
 const INSTRUCTIONS: &str = "codelaw lints and fixes JS, TS, Python, JSON, YAML, TOML, Markdown, CSS and HTML against the rules this repo configures. \
-Before you write or edit a file, call `rules_for_path` and follow those rules. After you write, call `check_paths` on the files you changed \
+Before a task, call `brief_for_task` with the files it will touch: what is specific to this repo there. Before you write or edit a file, call `rules_for_path` and follow those rules. After you write, call `check_paths` on the files you changed \
 and handle each finding by its fix class: `auto` — call `fix_paths`; `suggest` — show the diff and apply it only once accepted; \
 `manual` — follow the steps exactly. Never disable or suppress a rule to make a check pass. Every verdict comes from these tools, never from judgment.";
 
@@ -64,6 +64,13 @@ const TOOLS: &[Tool] = &[
         description: "Call BEFORE you create or edit a file: the rules that apply to that path, one short card each (id, severity, fix class, title). \
 Write code that complies; ask `explain_rule` for any rule you need detail on. Same JSON as `codelaw rules --for <path> --format json`.",
         schema: || object(json!({ "path": string("The file you are about to write; it need not exist yet.") }), &["path"]),
+    },
+    Tool {
+        name: "brief_for_task",
+        description: "Call BEFORE a task that writes files, with every file it will touch: only what is specific to this repo there — its own rules, \
+the pack rules it configures, the rules with exceptions there, the security rules with a manual fix — and how many standard rules remain. \
+Same JSON as `codelaw brief --for <path>… --format json`.",
+        schema: || object(json!({ "paths": strings("The files the task will write, relative to the folder the server runs in; they need not exist yet.") }), &["paths"]),
     },
     Tool {
         name: "explain_rule",
@@ -254,6 +261,11 @@ pub fn call_tool(name: &str, args: &Map<String, Value>) -> Result<Value, String>
             let p = project(std::slice::from_ref(&path), EngineOptions::from_env())?;
             let rows = p.rules_for(&path).map_err(err)?;
             Ok(codelaw_report::rules_json(&rows, Some(&codelaw_core::normalize_path(&path))))
+        }
+        "brief_for_task" => {
+            let paths = a.paths()?;
+            let mut p = project(&paths, EngineOptions::from_env())?;
+            Ok(codelaw_report::brief_json(&codelaw_report::brief(&mut p, &paths)?))
         }
         "explain_rule" => {
             let id = a.required("id")?;
@@ -487,7 +499,7 @@ mod tests {
         let names: Vec<&str> = r["result"]["tools"].as_array().unwrap().iter().map(|t| t["name"].as_str().unwrap()).collect();
         assert_eq!(
             names,
-            ["rules_for_path", "explain_rule", "list_rules", "check_snippet", "check_paths", "fix_paths", "format_snippet", "dump_tree", "list_exceptions", "trace_rule"]
+            ["rules_for_path", "brief_for_task", "explain_rule", "list_rules", "check_snippet", "check_paths", "fix_paths", "format_snippet", "dump_tree", "list_exceptions", "trace_rule"]
         );
         for t in r["result"]["tools"].as_array().unwrap() {
             assert_eq!(t["inputSchema"]["type"], "object", "{t}");

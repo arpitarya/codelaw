@@ -1,0 +1,220 @@
+# The side-by-side bench's tools (W-99): what `scripts/bench-rivals.py` times
+# beside codelaw, each at an exact version, with the command it runs for
+# lint and for format. The method is `codelaw bench`'s (SR-CLI-MCP decision
+# 10): N runs, the first discarded, median and nearest-rank p95, spawn to
+# exit; cold = a fresh empty cache folder per run, warm = a primed cache in
+# its own process.
+#
+# NO RIVAL MAY RUN UNTIL ITS L11 ROW IS RATIFIED. Each [tool.<name>] names
+# its row in L11's list (records/0013_LAW-11-dependencies.md §3, `l11`).
+# The script reads that list and refuses to install or run a tool whose row
+# is missing, is not `ratified …`, or does not name this `version`. The rows
+# are proposed in work/open/W-99-side-by-side-bench.md; none is in §3 yet, so
+# today only codelaw runs (the dry run) and bench-rivals.yml skips.
+#
+# Placeholders in a command: {bin} the tool's installed bin folder, {cache}
+# the cache folder of this run (cold: new and empty; warm: primed). A tool
+# with `cache = false` has no cache: every run is cold and only `cold` is
+# reported for it.
+#
+# Equal work (the item's first hazard). Every tool runs its own recommended
+# preset with no project config: the repo's own configs for these tools are
+# removed from each copy (`strip`), and the config below is written at the
+# copy's root. Each tool covers different languages, so the table also times
+# codelaw scoped to the same languages (`codelaw_lang`, codelaw's `--lang`);
+# compare a rival with the scoped codelaw row, never with the full one.
+
+[bench]
+runs = 10
+repos = [
+  "djangoproject.com",
+  "full-stack-fastapi-template",
+  "html5-boilerplate",
+] # L8 decision 2's three, pinned in scripts/corpus.json
+machine = "GitHub-hosted ubuntu-24.04 runner (L8's reference machine)"
+# Removed from every copy, at any depth, so no tool reads the repo's own config.
+strip = [
+  ".git",
+  "node_modules",
+  ".venv",
+  "codelaw.toml",
+  ".eslintrc",
+  ".eslintrc.js",
+  ".eslintrc.cjs",
+  ".eslintrc.json",
+  ".eslintrc.yml",
+  ".eslintrc.yaml",
+  ".eslintignore",
+  "eslint.config.js",
+  "eslint.config.mjs",
+  "eslint.config.cjs",
+  "eslint.config.ts",
+  "eslint.config.mts",
+  "eslint.config.cts",
+  ".prettierrc",
+  ".prettierrc.json",
+  ".prettierrc.yml",
+  ".prettierrc.yaml",
+  ".prettierrc.js",
+  ".prettierrc.cjs",
+  ".prettierrc.mjs",
+  ".prettierrc.toml",
+  "prettier.config.js",
+  "prettier.config.cjs",
+  "prettier.config.mjs",
+  ".prettierignore",
+  "biome.json",
+  "biome.jsonc",
+  ".oxlintrc.json",
+  "oxlintrc.json",
+  "ruff.toml",
+  ".ruff.toml",
+]
+
+# codelaw itself: the reference workload's config (every first-party pack's
+# recommended presets, preview on), with format checking left out of `check`
+# so lint and format are timed apart (SR-FORMATTER decision 1).
+[tool.codelaw]
+version = "this commit's build"
+licence = "MIT"
+l11 = "own"
+rule_set = "every first-party pack's recommended presets, preview = true"
+languages = "all nine L3 languages"
+cache = true
+env = { CODELAW_CACHE_DIR = "{cache}" }
+lint = ["{bin}/codelaw", "check", "--no-adapters"]
+format = ["{bin}/codelaw", "format", "--check"]
+ok_exit = [0, 1]
+error_prefix = "error:" # a finding is exit 1; `error:` on stderr is not (as `codelaw bench`)
+config_file = "codelaw.toml"
+config = '''
+preview = true
+extends = [
+  "codelaw:js/recommended",
+  "codelaw:js/typescript",
+  "codelaw:ts/recommended",
+  "codelaw:react/recommended",
+  "codelaw:py/recommended",
+  "codelaw:data/recommended",
+  "codelaw:md/recommended",
+  "codelaw:css/recommended",
+  "codelaw:html/recommended",
+]
+
+[format]
+check = false
+'''
+
+[tool.eslint]
+version = "10.13.0"
+licence = "MIT (78 packages with @eslint/js: 54 MIT, 12 Apache-2.0, 6 BSD-2-Clause, 4 ISC, 1 BSD-3-Clause, 1 BlueOak-1.0.0)"
+l11 = "D-37"
+install = { npm = ["eslint@10.13.0", "@eslint/js@10.0.1"] }
+rule_set = "@eslint/js recommended"
+languages = "JavaScript, JSX (TypeScript needs typescript-eslint, not proposed)"
+codelaw_lang = "javascript,jsx"
+cache = true
+lint = [
+  "{bin}/eslint",
+  "--cache",
+  "--cache-location",
+  "{cache}/",
+  "--no-error-on-unmatched-pattern",
+  ".",
+]
+ok_exit = [0, 1]
+config_file = "eslint.config.mjs"
+# {tools} is the folder the npm tools are installed in.
+config = '''
+import { createRequire } from "node:module";
+const js = createRequire("{tools}/package.json")("@eslint/js");
+export default [{
+  files: ["**/*.{js,mjs,cjs,jsx}"],
+  languageOptions: { ecmaVersion: "latest", sourceType: "module", parserOptions: { ecmaFeatures: { jsx: true } } },
+  rules: js.configs.recommended.rules,
+}];
+'''
+
+[tool.prettier]
+version = "3.9.10"
+licence = "MIT (1 package, no dependencies)"
+l11 = "D-38"
+install = { npm = ["prettier@3.9.10"] }
+rule_set = "Prettier's defaults (--no-config)"
+languages = "JavaScript, TypeScript, JSX, TSX, JSON, CSS, SCSS, HTML, YAML, Markdown"
+codelaw_lang = "javascript,jsx,typescript,tsx,json,css,scss,html,yaml,markdown"
+cache = true
+format = [
+  "{bin}/prettier",
+  "--check",
+  "--no-config",
+  "--no-editorconfig",
+  "--ignore-unknown",
+  "--cache",
+  "--cache-location",
+  "{cache}/prettier",
+  ".",
+]
+# 2 is also "a file could not be parsed" (a template with Django tags, say);
+# each run's exit code is kept in the report.
+ok_exit = [0, 1, 2]
+
+[tool.biome]
+version = "2.6.3"
+licence = "MIT OR Apache-2.0 (1 package + 1 platform binary of 10 optional ones)"
+l11 = "D-39"
+install = { npm = ["@biomejs/biome@2.6.3"] }
+rule_set = "recommended rules, default formatter options"
+languages = "JavaScript, TypeScript, JSX, TSX, JSON, CSS"
+codelaw_lang = "javascript,jsx,typescript,tsx,json,css"
+cache = false
+lint = ["{bin}/biome", "lint", "."]
+format = ["{bin}/biome", "format", "."]
+ok_exit = [0, 1]
+config_file = "biome.json"
+config = '''
+{
+  "root": true,
+  "vcs": { "enabled": false },
+  "files": { "ignoreUnknown": true },
+  "linter": { "enabled": true, "rules": { "recommended": true } },
+  "formatter": { "enabled": true }
+}
+'''
+
+[tool.oxlint]
+version = "1.89.0"
+licence = "MIT (1 package + 1 platform binary of 19 optional ones)"
+l11 = "D-40"
+install = { npm = ["oxlint@1.89.0"] }
+rule_set = "default (the correctness category)"
+languages = "JavaScript, TypeScript, JSX, TSX"
+codelaw_lang = "javascript,jsx,typescript,tsx"
+cache = false
+lint = ["{bin}/oxlint", "-c", ".oxlintrc.json", "."]
+ok_exit = [0, 1]
+config_file = ".oxlintrc.json"
+config = '''
+{}
+'''
+
+[tool.ruff]
+version = "0.17.3"
+licence = "MIT (1 wheel, no dependencies)"
+l11 = "D-41"
+install = { pypi = ["ruff==0.17.3"] }
+rule_set = "default (E4, E7, E9, F), --isolated"
+languages = "Python"
+codelaw_lang = "python"
+cache = true
+lint = ["{bin}/ruff", "check", "--isolated", "--cache-dir", "{cache}", "."]
+format = [
+  "{bin}/ruff",
+  "format",
+  "--check",
+  "--isolated",
+  "--cache-dir",
+  "{cache}",
+  ".",
+]
+ok_exit = [0, 1]

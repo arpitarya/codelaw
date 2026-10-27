@@ -1,15 +1,20 @@
 //! The agent surfaces (SR-AGENT-SURFACES): `codelaw hook`, which checks and
-//! fixes the files an agent just edited, and `codelaw sync-agents`, which
+//! fixes the files an agent just edited, `codelaw hook --pre`, which judges
+//! a write before it lands (the Gate), `codelaw brief`, what is specific to
+//! the repo for the files an agent is about to write, and `codelaw sync-agents`, which
 //! writes every agent's files from one source — the installed skills
 //! package (`@codelaw/skills`, `codelaw-skills`: `templates/agents/` of the
 //! same release, W-77) and the project's rules. Like every surface it only translates; the
 //! verdicts come from `codelaw-engine` (SR-ARCHITECTURE decision 2).
 
+pub mod brief;
 pub mod hook;
 pub mod package;
+pub mod pre;
 pub mod skills;
 pub mod sync;
 
+pub use brief::{BriefArgs, brief};
 pub use hook::{HookArgs, hook};
 pub use sync::{SyncArgs, sync_agents, write_for_init};
 

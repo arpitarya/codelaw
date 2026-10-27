@@ -27,6 +27,7 @@ what consumers receive, edit the template here — the diff is the change.
 | `agents/always-on.md` | the body of the `CLAUDE.md` and `AGENTS.md` blocks and of `.kiro/steering/codelaw.md` | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/block.md` | the marker block in `CLAUDE.md` and `AGENTS.md` (the merge stays in code) | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/claude/hook-group.json` | the `PostToolUse` entry of `.claude/settings.json` and the Cowork `hooks.json` | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
+| `agents/claude/pre-hook-group.json` | the `PreToolUse` entry of `.claude/settings.json` and the Cowork `hooks.json`: `codelaw hook --pre` | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/codex/config.toml` | printed, not written: what to add to `~/.codex/config.toml` | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/copilot/hook.json` | .github/hooks/codelaw.json | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/copilot/instructions.md` | .github/instructions/codelaw-<language>.instructions.md | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
