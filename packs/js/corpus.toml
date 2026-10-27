@@ -2,7 +2,7 @@
 # Rewrite with --update-snapshot, and review the change.
 
 [findings]
-"graph/no-unused-exports" = 118
+"graph/no-unused-exports" = 117
 "js/constructor-super" = 0
 "js/exports-at-end" = 436
 "js/for-direction" = 0
