@@ -38,6 +38,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Side-by-side bench — ratify these 5 tools for CI-only bench use** ([W-99](open/W-99-side-by-side-bench.md); [L11](../records/0013_LAW-11-dependencies.md) §3). Installed only by `scripts/bench-rivals.py install` inside `.github/workflows/bench-rivals.yml` (weekly and by hand, a throwaway folder on `ubuntu-24.04`); never in the engine, a package, a test or `ci.yml`. **D-37 ESLint** `eslint@10.13.0` + `@eslint/js@10.0.1` — MIT, 78 packages (54 MIT, 12 Apache-2.0, 6 BSD-2-Clause, 4 ISC, 1 BSD-3-Clause, 1 **BlueOak-1.0.0** = `minimatch`, OSI-approved permissive but not one of L2's named examples) · **D-38 Prettier** `prettier@3.9.10` — MIT, no dependencies · **D-39 Biome** `@biomejs/biome@2.6.3` — MIT OR Apache-2.0, + one platform binary · **D-40 oxlint** `oxlint@1.89.0` — MIT, + one platform binary · **D-41 Ruff** `ruff==0.17.3` — MIT, one wheel, no dependencies. Say **"ratify D-37 to D-41"**, or name the ones to strike. | 2026-10-27 |
 | ↳ **blocks:** W-99 itself (the first real run and step 3, the README's speed claim); W-100's source-tool agreement | |
+| 🔴 **`hook_pre`'s budget — the guard held it back** ([W-93](open/W-93-hook-pre-and-brief.md); [SR-LAW-8](../records/0010_LAW-8-performance-budgets.md) decision 4). Three `perf` runs on `main` (`ubuntu-24.04`): p95 **62.4 / 78.3 / 86.2 ms**; worst 86.2 × 1.5 = **129.3 > the 100 ms target**, so the method leaves it unset and asks you. Say **"leave it unset"** (as you ruled for `fix_one_file`, 2026-10-25), or **"set 100 ms"** (1.16 × headroom over the worst run). | 2026-10-27 | 0 d |
+| ↳ **blocks:** W-93 itself | |
 
 ---
 
@@ -61,7 +63,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-62** `agent` SCSS built: Biome formats it, 64 `css/*` rules run on `.scss`, `scss` pack; both grammars patched (D-36), Bootstrap's SCSS clean and in the pinned corpus; left: CSS rules onto trees, `&` in no-descending-specificity. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
-🟢 **W-93** `agent` `codelaw hook --pre` and `codelaw brief` built (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: three CI `perf` runs on `main` timing `hook_pre`, then its budget to the decider by L8's method. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
+🔴 **W-93** `arpit` `codelaw hook --pre` and `codelaw brief` built and landed (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: the decider rules `hook_pre`'s budget (inbox), then close. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
 🟢 **W-94** `agent` `codelaw migrate eslint|prettier|biome|ruff|stylelint`: translate a config into `codelaw.toml` with a report; accept `eslint-disable`/`noqa` as ignore aliases. Filed by Arpit (Cowork). [detail](open/W-94-codelaw-migrate.md)
 
