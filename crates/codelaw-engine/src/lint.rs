@@ -542,9 +542,13 @@ fn apply_suppressions(
     active: &[(usize, &CompiledRule, RuleConfig)],
     diagnostics: &mut Vec<Diagnostic>,
 ) {
-    let mut sups = suppress::find(text, comments, index);
+    let aliases = project.aliases.as_ref();
+    let mut sups = suppress::find_with(text, comments, index, aliases.map_or(&[][..], |a| &a.tools[..]));
     if sups.is_empty() {
         return;
+    }
+    if let Some(a) = aliases {
+        suppress::translate(&mut sups, &a.ported);
     }
     // Dated exceptions (SR-BASELINE decision 9): the as-of date is read
     // only when a comment carries a date; an expired one covers nothing.
@@ -559,7 +563,7 @@ fn apply_suppressions(
             if s.dated.bad.is_some() || matches!(states[i], Expiry::Expired { .. }) {
                 continue;
             }
-            if s.reason.is_some() && s.target_line == d.start.line && s.rules.contains(&d.rule) {
+            if s.reason.is_some() && s.target_line == d.start.line && suppress::covers(s, &d.rule) {
                 s.used = true;
                 return false;
             }
@@ -567,6 +571,11 @@ fn apply_suppressions(
         true
     });
     for (s, state) in sups.iter().zip(&states) {
+        // Another tool's comment is that tool's to judge: never unknown,
+        // unreasoned or unused here (SR-LINTER decision 6).
+        if s.alias.is_some() {
+            continue;
+        }
         let meta = |id: &str, message: String, fix: Option<TextEdit>| -> Option<Diagnostic> {
             let mut d = meta_diagnostic(rel, layers, id, message)?;
             d.start_byte = s.start;

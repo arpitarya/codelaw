@@ -1,0 +1,4 @@
+src/a.js:1 eslint/no-var js/no-var
+src/a.js:2 eslint/prefer-const js/prefer-const
+src/a.js:3 eslint/no-console js/no-console
+src/a.js:5 eslint/no-debugger js/no-debugger

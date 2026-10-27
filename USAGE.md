@@ -70,6 +70,59 @@ codelaw explain js/use-isnan  # what a rule wants, why, and how to fix it
 
 ---
 
+## Coming from another tool
+
+`codelaw migrate <tool>` reads the old tool's config and prints the `codelaw.toml` that runs the same rules, with a report: **mapped**, **changed** (an option it could not carry, a preset that differs), **unmapped** (no codelaw rule ports it, by name) and **ignored** (a setting codelaw has no key for). Nothing is dropped silently. `--write` writes the file — or, when `codelaw.toml` exists, adds only what it does not set — and `--format json` gives the report as data. It maps through each rule's `ported_from:`, so install the packs first (`codelaw init`); packs that are not installed are listed, not searched. A config that is a program is never run: convert it to JSON first, or list the rules by hand.
+
+### Coming from ESLint
+
+```bash
+codelaw migrate eslint            # read it, print the report and the file
+codelaw migrate eslint --write
+```
+
+- Reads `eslint.config.*` without running it: the literal parts of the exported array (`js.configs.recommended`, `...tseslint.configs.recommended`, `{ files, rules }`); then `.eslintrc.{json,yaml,yml}`, `.eslintrc` and `package.json`'s `eslintConfig`. `.eslintrc.js` is refused.
+- `eslint:recommended` becomes `codelaw:js/recommended`; typescript-eslint's `recommended` becomes `codelaw:js/typescript` and `codelaw:ts/recommended`. A `files` group becomes a `[scope.eslint-<n>]`.
+- `// eslint-disable-next-line` and `// eslint-disable-line` keep working: the file it writes sets `[lint] ignore_aliases = ["eslint"]`.
+
+### Coming from Prettier
+
+```bash
+codelaw migrate prettier --write   # after `migrate eslint --write`, it adds [format] to the same file
+```
+
+`printWidth`, `tabWidth`, `useTabs`, `endOfLine`, `singleQuote`, `semi` and `trailingComma` become `[format]` keys; every other option is listed as not imported. Same as `codelaw format --import-config`.
+
+### Coming from Biome
+
+```bash
+codelaw migrate biome --write
+```
+
+- Each Biome rule maps through the ESLint, typescript-eslint, React or stylelint rule Biome names as its source; one with none is listed as unmapped. Biome's `recommended` becomes `codelaw:js/recommended`, which is ESLint's core and differs rule by rule — the report says so.
+- `formatter` and `javascript.formatter` become `[format]`; `// biome-ignore lint/...: reason` keeps working (`ignore_aliases = ["biome"]`).
+
+### Coming from Ruff
+
+```bash
+codelaw migrate ruff --write
+```
+
+- Reads `ruff.toml`, `.ruff.toml` or `[tool.ruff]`. `select`, `extend-select` and `ignore` expand over the codes codelaw ports (Ruff's default `E4, E7, E9, F` when `select` is unset); `per-file-ignores` becomes a `[scope.ruff-<n>]`; `line-length` becomes `[format.python] line_width`.
+- `# noqa` and `# noqa: F401` keep working (`ignore_aliases = ["ruff"]`).
+
+### Coming from stylelint
+
+```bash
+codelaw migrate stylelint --write
+```
+
+Reads `.stylelintrc{,.json,.yaml,.yml}` or `package.json`'s `stylelint`. `stylelint-config-recommended` becomes `codelaw:css/recommended`, `-standard` adds `codelaw:css/standard`, the SCSS configs add `codelaw:scss/recommended`; `scss/*` rules map to the `scss` pack. Layout rules are the formatter's in codelaw.
+
+Run the old tool and `codelaw check` side by side before removing it; the `codelaw-migrate` agent skill walks the comparison.
+
+---
+
 ## Configure
 
 `codelaw.toml` at the repo root. The same keys also work as `[tool.codelaw]` in `pyproject.toml` or `"codelaw"` in `package.json`.
@@ -462,6 +515,7 @@ flowchart LR
 | `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set ([L8](records/0010_LAW-8-performance-budgets.md)) |
 | `codelaw debug` | Inspect what the engine sees: `changed-functions` |
 | `codelaw brief` | What is specific to this repo for the files an agent is about to write (SR-CLI-MCP decision 14) |
+| `codelaw migrate` | Translate an ESLint, Prettier, Biome, Ruff or stylelint config into codelaw.toml, with a report of what mapped and what did not (SR-CLI-MCP decision 14) |
 
 <!-- /docs-sync:commands -->
 

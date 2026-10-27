@@ -312,6 +312,12 @@ impl ConfigFile {
                 return Err(ConfigError::new(Some(path), format!("`[deps] ignore`: `expires = \"{x}\"` is not a date; write it as YYYY-MM-DD")));
             }
         }
+        if let Some(a) = raw.lint.ignore_aliases.iter().flatten().find(|a| !crate::raw::IGNORE_ALIASES.contains(&a.as_str())) {
+            return Err(ConfigError::new(
+                Some(path),
+                format!("`[lint] ignore_aliases`: `{a}` is not one of {}", crate::raw::IGNORE_ALIASES.iter().map(|c| format!("`{c}`")).collect::<Vec<_>>().join(", ")),
+            ));
+        }
         if let Some(c) = raw.css.modules_convention.as_deref().filter(|c| !crate::raw::CSS_MODULES_CONVENTIONS.contains(c)) {
             return Err(ConfigError::new(
                 Some(path),
@@ -730,6 +736,12 @@ impl Config {
 
     pub fn tagged_templates(&self) -> bool {
         self.root_raw().and_then(|r| r.lint.tagged_templates).unwrap_or(false)
+    }
+
+    /// `[lint] ignore_aliases`: the tools whose line suppressions count as
+    /// `codelaw-ignore`; none by default.
+    pub fn ignore_aliases(&self) -> Vec<String> {
+        self.root_raw().and_then(|r| r.lint.ignore_aliases.clone()).unwrap_or_default()
     }
 
     /// The configs that govern `file` (absolute), outermost first.

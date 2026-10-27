@@ -196,7 +196,13 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "tagged_templates": { "type": "boolean", "description": "Lint css`…` and html`…` tagged templates as CSS and HTML; off by default." }
+        "tagged_templates": { "type": "boolean", "description": "Lint css`…` and html`…` tagged templates as CSS and HTML; off by default." },
+        "ignore_aliases": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["eslint", "ruff", "biome"] },
+          "uniqueItems": true,
+          "description": "Read these tools' line suppressions (eslint-disable-next-line / eslint-disable-line, # noqa, biome-ignore) as codelaw-ignore, through each rule's ported_from; none by default. `codelaw migrate` turns its tool's on."
+        }
       }
     },
     "markdown": {

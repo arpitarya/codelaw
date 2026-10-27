@@ -240,6 +240,7 @@ yet is owned by an open `W-nn`.
 | `scripts/withdraw.sh` | SR-PACKAGES | decision 12 |
 | `scripts/npm-trust.sh` | SR-PACKAGES | decision 11: the one-time npm trusted-publisher setup |
 | `action.yml` | SR-PACKAGES | decision 15: codelaw's GitHub Action (W-97) |
+| `fixtures/migrate` | SR-CLI-MCP | decision 15: the three repos `codelaw migrate` is tested on (W-94) |
 | `fixtures/github-action` | SR-PACKAGES | decision 15: the project CI's `action` job runs the Action on (W-97) |
 | `.github/workflows` | SR-PACKAGES | decision 11: build once in CI, publish as built |
 | `RELEASING.md` | SR-PACKAGES | decision 11: how a release is cut |

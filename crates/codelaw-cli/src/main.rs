@@ -14,6 +14,7 @@ mod deps_cmd;
 mod exceptions_cmd;
 mod init;
 mod match_cmd;
+mod migrate;
 mod rules_cmd;
 mod tree;
 mod warm;
@@ -62,6 +63,9 @@ enum Command {
     NewRule(rules_cmd::NewRuleArgs),
     /// Set codelaw up in this repo: config, rule packs, folders.
     Init(init::InitArgs),
+    /// Translate an ESLint, Prettier, Biome, Ruff or stylelint config into
+    /// codelaw.toml, with a report of what mapped and what did not (SR-CLI-MCP decision 15).
+    Migrate(migrate::MigrateArgs),
     /// Serve the Language Server Protocol over stdio (SR-EDITOR).
     Lsp {
         /// Talk over stdin and stdout: the default and only transport;
@@ -596,6 +600,7 @@ fn main() -> ExitCode {
         Command::Match(a) => match_cmd::run(a),
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
+        Command::Migrate(a) => migrate::migrate(a),
         Command::Lsp { .. } => {
             // A warm process for `--prefer-warm` runs for as long as the
             // editor's session (SR-ARCHITECTURE decision 21).

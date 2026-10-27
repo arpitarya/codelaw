@@ -226,6 +226,8 @@ impl Config {
         push("lsp.tree_cache", json!(self.lsp_tree_cache()), s);
         let (v, s) = root_key(&["lint", "tagged_templates"], |r| r.lint.tagged_templates.map(|x| json!(x)), json!(false));
         push("lint.tagged_templates", v, s);
+        let (v, s) = root_key(&["lint", "ignore_aliases"], |r| r.lint.ignore_aliases.as_ref().map(|x| json!(x)), json!([]));
+        push("lint.ignore_aliases", v, s);
         let (v, s) = root_key(&["markdown", "lint_code_blocks"], |r| r.markdown.lint_code_blocks.map(|x| json!(x)), json!(false));
         push("markdown.lint_code_blocks", v, s);
         let (v, s) = root_key(&["agents", "targets"], |r| r.agents.targets.as_ref().map(|x| json!(x)), json!([]));

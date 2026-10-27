@@ -41,9 +41,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (17)
+## Open items (16)
 
-### build (15)
+### build (14)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -62,8 +62,6 @@ here. Read that record before changing anything below it.
 🟢 **W-62** `agent` SCSS built: Biome formats it, 64 `css/*` rules run on `.scss`, `scss` pack; both grammars patched (D-36): Bootstrap's SCSS 233/236 files clean, from 52; left: CSS rules onto trees, pinned SCSS corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-93** `agent` `codelaw hook --pre` and `codelaw brief` built (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: three CI `perf` runs on `main` timing `hook_pre`, then its budget to the decider by L8's method. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
-
-🟢 **W-94** `agent` `codelaw migrate eslint|prettier|biome|ruff|stylelint`: translate a config into `codelaw.toml` with a report; accept `eslint-disable`/`noqa` as ignore aliases. Filed by Arpit (Cowork). [detail](open/W-94-codelaw-migrate.md)
 
 🔴 **W-100** `arpit` Rule promotion: `scripts/corpus.py promote` reports which preview rules pass, in CI's corpus summary; `--write` refuses until ratified. Left: Arpit's ruling on the criterion (SR-RULE-AUTHORING 6a), then the first batch. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
 

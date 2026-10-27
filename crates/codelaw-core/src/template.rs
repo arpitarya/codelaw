@@ -40,6 +40,9 @@ pub const TEMPLATES: &[Template] = &[
     t!("init/codelaw-agents.toml"),
     t!("init/codelaw.toml"),
     t!("init/gitignore"),
+    t!("migrate/codelaw.toml"),
+    t!("migrate/lint.toml"),
+    t!("migrate/preview.toml"),
     t!("new-rule/example.md"),
     t!("new-rule/fix-line.md"),
     t!("new-rule/fix-reason.md"),
@@ -165,6 +168,8 @@ mod tests {
         ("ci/gitlab/codelaw-autofix.yml", &[("cron", "17 4 * * *"), ("version", "0.0.0"), ("suggest_job", "")]),
         ("init/codelaw-agents.toml", &[("targets", "\"claude\"")]),
         ("init/codelaw.toml", &[("extends", ""), ("agents", "")]),
+        ("migrate/codelaw.toml", &[("tool", "eslint"), ("sources", ".eslintrc.json"), ("extends", ""), ("preview", ""), ("lint", ""), ("tables", "")]),
+        ("migrate/lint.toml", &[("tool", "eslint"), ("aliases", "\"eslint\"")]),
         ("new-rule/example.md", &[("language", "Python"), ("ext", "py")]),
         ("new-rule/rule.md", &[("id", "a/b"), ("languages", "python"), ("scope", ""), ("fix", "auto"), ("fix_reason", ""), ("since", "0.0.0"), ("matcher", ""), ("fix_line", ""), ("how_to_fix", ""), ("examples", "")]),
     ];

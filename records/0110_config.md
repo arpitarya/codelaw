@@ -145,6 +145,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 8. **Creating it.**
    - `codelaw init` writes a minimal `codelaw.toml`: `extends` with the `recommended` presets of the rule packs it installs for the languages it detects ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and nothing else; with `--agents`, also the `[agents]` section naming them ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 6).
    - `codelaw format --import-config` converts Prettier, Ruff or Black configs ([SR-FORMATTER](0105_formatter.md) decision 5).
+   - `codelaw migrate eslint|prettier|biome|ruff|stylelint` writes the whole file from another tool's config: `extends`, `[rules]`, a `[scope.<tool>-<n>]` per files group, `[format]` and the tool's ignore alias, with a report of every setting that did not map ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 15). Into an existing `codelaw.toml` it adds only what that file does not set.
 9. **Deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)):** the resolved config is a pure function of the files, environment and flags. Its hash is part of every cache key ([SR-CACHE](0109_cache.md)).
 10. **Profiles: warn on a laptop, fail in CI.**
     - `[profile.<name>]` holds `rules` and `scope`, the same shapes as the top-level `[rules]` and `[scope.<name>]`; a `[profile.<name>.scope.<scope>]` without `files` takes the files of the scope of that name. Root config only.

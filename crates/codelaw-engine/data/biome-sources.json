@@ -1,0 +1,538 @@
+{
+ "about": "Each Biome rule and the upstream rules Biome names as its source, as biomejs.dev/linter/rules-sources/ lists them (read 2026-10-27, Biome 2.x). `codelaw migrate biome` and the `biome-ignore` alias go Biome rule -> these ids -> the codelaw rule whose `ported_from:` names one (SR-CLI-MCP decision 15, SR-LINTER decision 6). It is data about Biome, not about codelaw: a Biome rule missing here has no ESLint, typescript-eslint, React or stylelint source, and the report says so.",
+ "sources": {
+  "noArguments": [
+   "eslint/prefer-rest-params"
+  ],
+  "noArrayIndexKey": [
+   "eslint-plugin-react/no-array-index-key"
+  ],
+  "noAssignInExpressions": [
+   "eslint/no-cond-assign"
+  ],
+  "noAsyncPromiseExecutor": [
+   "eslint/no-async-promise-executor"
+  ],
+  "noBannedTypes": [
+   "typescript-eslint/ban-types"
+  ],
+  "noBlankTarget": [
+   "eslint-plugin-react/jsx-no-target-blank"
+  ],
+  "noCatchAssign": [
+   "eslint/no-ex-assign"
+  ],
+  "noChildrenProp": [
+   "eslint-plugin-react/no-children-prop"
+  ],
+  "noClassAssign": [
+   "eslint/no-class-assign"
+  ],
+  "noCommaOperator": [
+   "eslint/no-sequences"
+  ],
+  "noCommentText": [
+   "eslint-plugin-react/jsx-no-comment-textnodes"
+  ],
+  "noCommonJs": [
+   "typescript-eslint/no-require-imports"
+  ],
+  "noCompareNegZero": [
+   "eslint/no-compare-neg-zero"
+  ],
+  "noConfusingLabels": [
+   "eslint/no-labels"
+  ],
+  "noConfusingVoidType": [
+   "typescript-eslint/no-invalid-void-type"
+  ],
+  "noConsole": [
+   "eslint/no-console"
+  ],
+  "noConstAssign": [
+   "eslint/no-const-assign"
+  ],
+  "noConstantCondition": [
+   "eslint/no-constant-condition"
+  ],
+  "noConstructorReturn": [
+   "eslint/no-constructor-return"
+  ],
+  "noControlCharactersInRegex": [
+   "eslint/no-control-regex"
+  ],
+  "noDangerouslySetInnerHtml": [
+   "eslint-plugin-react/no-danger"
+  ],
+  "noDangerouslySetInnerHtmlWithChildren": [
+   "eslint-plugin-react/no-danger-with-children"
+  ],
+  "noDebugger": [
+   "eslint/no-debugger"
+  ],
+  "noDescendingSpecificity": [
+   "stylelint/no-descending-specificity"
+  ],
+  "noDoubleEquals": [
+   "eslint/eqeqeq"
+  ],
+  "noDuplicateAtImportRules": [
+   "stylelint/no-duplicate-at-import-rules"
+  ],
+  "noDuplicateCase": [
+   "eslint/no-duplicate-case"
+  ],
+  "noDuplicateClassMembers": [
+   "eslint/no-dupe-class-members",
+   "typescript-eslint/no-dupe-class-members"
+  ],
+  "noDuplicateCustomProperties": [
+   "stylelint/declaration-block-no-duplicate-custom-properties"
+  ],
+  "noDuplicateElseIf": [
+   "eslint/no-dupe-else-if"
+  ],
+  "noDuplicateFontNames": [
+   "stylelint/font-family-no-duplicate-names"
+  ],
+  "noDuplicateJsxProps": [
+   "eslint-plugin-react/jsx-no-duplicate-props"
+  ],
+  "noDuplicateObjectKeys": [
+   "eslint/no-dupe-keys"
+  ],
+  "noDuplicateParameters": [
+   "eslint/no-dupe-args"
+  ],
+  "noDuplicateProperties": [
+   "stylelint/declaration-block-no-duplicate-properties"
+  ],
+  "noDuplicateSelectorsKeyframeBlock": [
+   "stylelint/keyframe-block-no-duplicate-selectors"
+  ],
+  "noEmptyBlock": [
+   "stylelint/block-no-empty"
+  ],
+  "noEmptyBlockStatements": [
+   "eslint/no-empty",
+   "eslint/no-empty-function",
+   "eslint/no-empty-static-block",
+   "typescript-eslint/no-empty-function"
+  ],
+  "noEmptyCharacterClassInRegex": [
+   "eslint/no-empty-character-class"
+  ],
+  "noEmptyInterface": [
+   "typescript-eslint/no-empty-interface"
+  ],
+  "noEmptyPattern": [
+   "eslint/no-empty-pattern"
+  ],
+  "noExplicitAny": [
+   "typescript-eslint/no-explicit-any"
+  ],
+  "noExtraBooleanCast": [
+   "eslint/no-extra-boolean-cast"
+  ],
+  "noExtraNonNullAssertion": [
+   "typescript-eslint/no-extra-non-null-assertion"
+  ],
+  "noFallthroughSwitchClause": [
+   "eslint/no-fallthrough"
+  ],
+  "noFunctionAssign": [
+   "eslint/no-func-assign"
+  ],
+  "noGlobalAssign": [
+   "eslint/no-global-assign"
+  ],
+  "noGlobalEval": [
+   "eslint/no-eval"
+  ],
+  "noGlobalObjectCalls": [
+   "eslint/no-obj-calls"
+  ],
+  "noImplicitBoolean": [
+   "eslint-plugin-react/jsx-boolean-value"
+  ],
+  "noImportAssign": [
+   "eslint/no-import-assign"
+  ],
+  "noImportantInKeyframe": [
+   "stylelint/keyframe-declaration-no-important"
+  ],
+  "noInferrableTypes": [
+   "typescript-eslint/no-inferrable-types"
+  ],
+  "noInnerDeclarations": [
+   "eslint/no-inner-declarations"
+  ],
+  "noInvalidBuiltinInstantiation": [
+   "eslint/no-new-native-nonconstructor"
+  ],
+  "noInvalidConstructorSuper": [
+   "eslint/constructor-super"
+  ],
+  "noInvalidDirectionInLinearGradient": [
+   "stylelint/function-linear-gradient-no-nonstandard-direction"
+  ],
+  "noInvalidGridAreas": [
+   "stylelint/named-grid-areas-no-invalid"
+  ],
+  "noInvalidPositionAtImportRule": [
+   "stylelint/no-invalid-position-at-import-rule"
+  ],
+  "noInvalidUseBeforeDeclaration": [
+   "eslint/no-use-before-define",
+   "typescript-eslint/no-use-before-define"
+  ],
+  "noIrregularWhitespace": [
+   "eslint/no-irregular-whitespace",
+   "stylelint/no-irregular-whitespace"
+  ],
+  "noLabelVar": [
+   "eslint/no-label-var"
+  ],
+  "noMisleadingCharacterClass": [
+   "eslint/no-misleading-character-class"
+  ],
+  "noMisleadingInstantiator": [
+   "typescript-eslint/no-misused-new"
+  ],
+  "noMissingVarFunction": [
+   "stylelint/custom-property-no-missing-var-function"
+  ],
+  "noMultipleSpacesInRegex": [
+   "eslint/no-regex-spaces"
+  ],
+  "noNamespace": [
+   "typescript-eslint/no-namespace"
+  ],
+  "noNegationElse": [
+   "eslint/no-negated-condition"
+  ],
+  "noNestedTernary": [
+   "eslint/no-nested-ternary"
+  ],
+  "noNewSymbol": [
+   "eslint/no-new-symbol"
+  ],
+  "noNonNullAssertion": [
+   "typescript-eslint/no-non-null-assertion"
+  ],
+  "noNonoctalDecimalEscape": [
+   "eslint/no-nonoctal-decimal-escape"
+  ],
+  "noOctalEscape": [
+   "eslint/no-octal-escape"
+  ],
+  "noParameterAssign": [
+   "eslint/no-param-reassign"
+  ],
+  "noParameterProperties": [
+   "typescript-eslint/parameter-properties"
+  ],
+  "noPrecisionLoss": [
+   "eslint/no-loss-of-precision",
+   "typescript-eslint/no-loss-of-precision"
+  ],
+  "noPrototypeBuiltins": [
+   "eslint/no-prototype-builtins",
+   "eslint/prefer-object-has-own"
+  ],
+  "noRedeclare": [
+   "eslint/no-redeclare",
+   "typescript-eslint/no-redeclare"
+  ],
+  "noRestrictedGlobals": [
+   "eslint/no-restricted-globals"
+  ],
+  "noRestrictedImports": [
+   "eslint/no-restricted-imports",
+   "typescript-eslint/no-restricted-imports"
+  ],
+  "noRestrictedTypes": [
+   "typescript-eslint/no-restricted-types"
+  ],
+  "noSelfAssign": [
+   "eslint/no-self-assign"
+  ],
+  "noSelfCompare": [
+   "eslint/no-self-compare"
+  ],
+  "noSetterReturn": [
+   "eslint/no-setter-return"
+  ],
+  "noShadowRestrictedNames": [
+   "eslint/no-shadow-restricted-names"
+  ],
+  "noShorthandPropertyOverrides": [
+   "stylelint/declaration-block-no-shorthand-property-overrides"
+  ],
+  "noSparseArray": [
+   "eslint/no-sparse-arrays"
+  ],
+  "noStaticOnlyClass": [
+   "typescript-eslint/no-extraneous-class"
+  ],
+  "noSwitchDeclarations": [
+   "eslint/no-case-declarations"
+  ],
+  "noTemplateCurlyInString": [
+   "eslint/no-template-curly-in-string"
+  ],
+  "noUndeclaredVariables": [
+   "eslint/no-undef"
+  ],
+  "noUnknownFunction": [
+   "stylelint/function-no-unknown"
+  ],
+  "noUnknownMediaFeatureName": [
+   "stylelint/media-feature-name-no-unknown"
+  ],
+  "noUnknownProperty": [
+   "stylelint/property-no-unknown"
+  ],
+  "noUnknownPseudoClass": [
+   "stylelint/selector-pseudo-class-no-unknown"
+  ],
+  "noUnknownPseudoElement": [
+   "stylelint/selector-pseudo-element-no-unknown"
+  ],
+  "noUnknownTypeSelector": [
+   "stylelint/selector-type-no-unknown"
+  ],
+  "noUnknownUnit": [
+   "stylelint/unit-no-unknown"
+  ],
+  "noUnmatchableAnbSelector": [
+   "stylelint/selector-anb-no-unmatchable"
+  ],
+  "noUnreachable": [
+   "eslint/no-unreachable"
+  ],
+  "noUnreachableSuper": [
+   "eslint/no-this-before-super"
+  ],
+  "noUnsafeDeclarationMerging": [
+   "typescript-eslint/no-unsafe-declaration-merging"
+  ],
+  "noUnsafeFinally": [
+   "eslint/no-unsafe-finally"
+  ],
+  "noUnsafeNegation": [
+   "eslint/no-unsafe-negation"
+  ],
+  "noUnsafeOptionalChaining": [
+   "eslint/no-unsafe-optional-chaining"
+  ],
+  "noUnusedLabels": [
+   "eslint/no-unused-labels"
+  ],
+  "noUnusedPrivateClassMembers": [
+   "eslint/no-unused-private-class-members"
+  ],
+  "noUnusedVariables": [
+   "eslint/no-unused-vars",
+   "typescript-eslint/no-unused-vars"
+  ],
+  "noUselessCatch": [
+   "eslint/no-useless-catch"
+  ],
+  "noUselessConstructor": [
+   "eslint/no-useless-constructor",
+   "typescript-eslint/no-useless-constructor"
+  ],
+  "noUselessElse": [
+   "eslint/no-else-return"
+  ],
+  "noUselessEmptyExport": [
+   "typescript-eslint/no-useless-empty-export"
+  ],
+  "noUselessEscapeInRegex": [
+   "eslint/no-useless-escape"
+  ],
+  "noUselessFragments": [
+   "eslint-plugin-react/jsx-no-useless-fragment"
+  ],
+  "noUselessLabel": [
+   "eslint/no-extra-label"
+  ],
+  "noUselessLoneBlockStatements": [
+   "eslint/no-lone-blocks"
+  ],
+  "noUselessRename": [
+   "eslint/no-useless-rename"
+  ],
+  "noUselessStringConcat": [
+   "eslint/no-useless-concat"
+  ],
+  "noUselessTernary": [
+   "eslint/no-unneeded-ternary"
+  ],
+  "noUselessThisAlias": [
+   "typescript-eslint/no-this-alias"
+  ],
+  "noUselessTypeConstraint": [
+   "typescript-eslint/no-unnecessary-type-constraint"
+  ],
+  "noUselessUndefinedInitialization": [
+   "eslint/no-undef-init"
+  ],
+  "noVar": [
+   "eslint/no-var"
+  ],
+  "noVoid": [
+   "eslint/no-void"
+  ],
+  "noVoidElementsWithChildren": [
+   "eslint-plugin-react/void-dom-elements-no-children"
+  ],
+  "noWith": [
+   "eslint/no-with"
+  ],
+  "noYodaExpression": [
+   "eslint/yoda"
+  ],
+  "useAdjacentOverloadSignatures": [
+   "typescript-eslint/adjacent-overload-signatures"
+  ],
+  "useArrayLiterals": [
+   "eslint/no-array-constructor",
+   "typescript-eslint/no-array-constructor"
+  ],
+  "useArrowFunction": [
+   "eslint/prefer-arrow-callback"
+  ],
+  "useAsConstAssertion": [
+   "typescript-eslint/prefer-as-const"
+  ],
+  "useAwait": [
+   "eslint/require-await",
+   "typescript-eslint/require-await"
+  ],
+  "useBlockStatements": [
+   "eslint/curly"
+  ],
+  "useButtonType": [
+   "eslint-plugin-react/button-has-type"
+  ],
+  "useCollapsedElseIf": [
+   "eslint/no-lonely-if"
+  ],
+  "useConsistentArrayType": [
+   "typescript-eslint/array-type"
+  ],
+  "useConsistentBuiltinInstantiation": [
+   "eslint/no-new-wrappers"
+  ],
+  "useConsistentCurlyBraces": [
+   "eslint-plugin-react/jsx-curly-brace-presence"
+  ],
+  "useConsistentMemberAccessibility": [
+   "typescript-eslint/explicit-member-accessibility"
+  ],
+  "useConst": [
+   "eslint/prefer-const"
+  ],
+  "useDefaultParameterLast": [
+   "eslint/default-param-last",
+   "typescript-eslint/default-param-last"
+  ],
+  "useDefaultSwitchClause": [
+   "eslint/default-case"
+  ],
+  "useDefaultSwitchClauseLast": [
+   "eslint/default-case-last"
+  ],
+  "useEnumInitializers": [
+   "typescript-eslint/prefer-enum-initializers"
+  ],
+  "useExhaustiveDependencies": [
+   "eslint-plugin-react-hooks/exhaustive-deps"
+  ],
+  "useExplicitType": [
+   "typescript-eslint/explicit-function-return-type"
+  ],
+  "useExponentiationOperator": [
+   "eslint/prefer-exponentiation-operator"
+  ],
+  "useExportType": [
+   "typescript-eslint/consistent-type-exports"
+  ],
+  "useForOf": [
+   "typescript-eslint/prefer-for-of"
+  ],
+  "useFragmentSyntax": [
+   "eslint-plugin-react/jsx-fragments"
+  ],
+  "useGenericFontNames": [
+   "stylelint/font-family-no-missing-generic-family-keyword"
+  ],
+  "useGetterReturn": [
+   "eslint/getter-return"
+  ],
+  "useGuardForIn": [
+   "eslint/guard-for-in"
+  ],
+  "useHookAtTopLevel": [
+   "eslint-plugin-react-hooks/rules-of-hooks"
+  ],
+  "useImportType": [
+   "typescript-eslint/consistent-type-imports"
+  ],
+  "useIsNan": [
+   "eslint/use-isnan"
+  ],
+  "useJsxKeyInIterable": [
+   "eslint-plugin-react/jsx-key"
+  ],
+  "useLiteralEnumMembers": [
+   "typescript-eslint/prefer-literal-enum-member"
+  ],
+  "useLiteralKeys": [
+   "eslint/dot-notation",
+   "typescript-eslint/dot-notation"
+  ],
+  "useNamespaceKeyword": [
+   "typescript-eslint/prefer-namespace-keyword"
+  ],
+  "useNamingConvention": [
+   "typescript-eslint/naming-convention"
+  ],
+  "useNumericLiterals": [
+   "eslint/prefer-numeric-literals"
+  ],
+  "useOptionalChain": [
+   "typescript-eslint/prefer-optional-chain"
+  ],
+  "useRegexLiterals": [
+   "eslint/prefer-regex-literals"
+  ],
+  "useShorthandAssign": [
+   "eslint/operator-assignment"
+  ],
+  "useShorthandFunctionType": [
+   "typescript-eslint/prefer-function-type"
+  ],
+  "useSingleVarDeclarator": [
+   "eslint/one-var"
+  ],
+  "useTemplate": [
+   "eslint/prefer-template"
+  ],
+  "useThrowOnlyError": [
+   "eslint/no-throw-literal",
+   "typescript-eslint/only-throw-error"
+  ],
+  "useValidForDirection": [
+   "eslint/for-direction"
+  ],
+  "useValidTypeof": [
+   "eslint/valid-typeof"
+  ],
+  "useYield": [
+   "eslint/require-yield"
+  ]
+ }
+}
