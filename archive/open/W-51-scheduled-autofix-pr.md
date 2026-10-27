@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-25: codelaw init --ci github --autofix weekly write
 item: W-51
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
+updated: 2026-10-27
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
@@ -26,6 +26,8 @@ ball: agent
 **Arpit, 2026-10-25:** *"schedule fix PR, create a work item for it. I like the approach."* (on the design given in chat the same day)
 
 **Model:** Sonnet — a workflow template and an installer, tested on a fixture repo.
+
+**Arpit, 2026-10-27 (voice docket):** *"Put this in the backlog for now."* **Parked 2026-10-27** as [B-053](../../work/BACKLOG.md): what is left is one real run in a throwaway GitHub repo with fixable findings and a `CODELAW_AUTOFIX_TOKEN` secret (DoD 1, 3). Nothing built is removed.
 
 ## Goal
 

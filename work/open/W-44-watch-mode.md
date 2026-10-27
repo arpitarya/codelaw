@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-25: a watch mode that re-checks changed files, and 
 item: W-44
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-26
-updated_by: "Arpit (Cowork, Opus 5.5) — docket"
+updated: 2026-10-27
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
@@ -55,7 +55,7 @@ None. Both questions the build raised were ruled by the decider on 2026-10-26 (s
 
 ## What is left
 
-- DoD 5 on CI's `win32-*` `smoke` legs (`scripts/smoke.sh` runs `check --watch`; no Windows target on this Mac).
+- DoD 5 on CI's `win32-*` `smoke` legs (`scripts/smoke.sh` runs `check --watch`; no Windows target on this Mac). The watch step passed on both `win32` legs in run 40388001095 (IMPLEMENTATION 2026-10-27); the `smoke` job stays red for another reason (npm and PyPI output not byte-equal, all eight legs) — W-84. Close on the first green `smoke` run.
 - `watch_rerun` and `watch_save_to_print` measured on CI's `ubuntu-24.04` runner (context rows; nothing gates them).
 - Re-verified locally 2026-10-26: `cargo test -p codelaw-cli --test watch` 6 passed, 0 failed.
 

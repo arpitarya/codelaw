@@ -6,7 +6,7 @@ item: W-70
 filed: 2026-10-26
 filed_by: "Arpit (chat), written by Claude Code (Sonnet 5.5)"
 updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5)"
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
@@ -16,9 +16,9 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | One tiny app per host under `examples/dev-servers/` (Vite, webpack, Rspack, Next.js), each wired to its `@codelaw/*` plugin | the plugins run on the real hosts | 🔨 built, not yet run on a real host |
-| 2 | A CI job (`dev-servers` in `ci.yml`) installs the hosts on the runner via `examples/dev-servers/run.mjs`, saves a file holding a `debugger`, and asserts the finding reaches the terminal (and the dev server's websocket, which feeds the overlay) within a second | W-49 DoD 1 | 🔨 written, first CI run pending |
-| 3 | The Rspack app loads `@codelaw/webpack-plugin` unchanged | W-49 DoD 4 | 🔨 `rspack.config.js` imports the same package with the same options as `webpack.config.js`; unrun |
+| 1 | One tiny app per host under `examples/dev-servers/` (Vite, webpack, Rspack, Next.js), each wired to its `@codelaw/*` plugin | the plugins run on the real hosts | ✅ built; ran on the real hosts in CI run 40388001095 (below) |
+| 2 | A CI job (`dev-servers` in `ci.yml`) installs the hosts on the runner via `examples/dev-servers/run.mjs`, saves a file holding a `debugger`, and asserts the finding reaches the terminal (and the dev server's websocket, which feeds the overlay) within a second | W-49 DoD 1 | 🔨 first run 40388001095: vite and next-turbopack ✅; webpack, rspack, next ✗, fixed (`Origin`, `.gitignore`); `3f3d054`'s run then failed vite (it refuses `Origin`), fixed in `f419f32`; a green run waits on W-84 |
+| 3 | The Rspack app loads `@codelaw/webpack-plugin` unchanged | W-49 DoD 4 | 🔨 ran unchanged on Rspack in 40388001095 (the finding reached the terminal); the overlay websocket check waits on the next green run |
 
 **Arpit, 2026-10-26:** *"create a separate work item for example app"* (the ruling that closed W-49 and filed this).
 
