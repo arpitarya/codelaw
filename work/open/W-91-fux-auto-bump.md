@@ -19,7 +19,7 @@ ball: agent
 | 1 | A scheduled workflow (daily) asks PyPI for `fux-engine`'s latest version and compares it with `FUX_VERSION` in `scripts/fux-index.py` | a new fux is noticed within a day | ⏳ |
 | 2 | On a newer one: bump `FUX_VERSION`, re-run `fux-index.py assemble` + `check`, commit on `deps/fux-<v>`, open or update one PR | the bump arrives as a reviewable change | ⏳ |
 | 3 | The PR's CI builds the indexes with the new fux and checks their digests reproduce | a bump that breaks the index is red, not merged | ⏳ |
-| 4 | D-34's row says "unversioned; each commit pins `FUX_VERSION`, bumped by this job" | the record matches | ✅ 2026-10-27 (`DEPENDENCIES.md`, D-34) |
+| 4 | D-34's row says "unversioned; each commit pins `FUX_VERSION`, bumped by this job" | the record matches | ✅ 2026-10-27 (L11's list, D-34; W-90 moved it from the old root file) |
 
 **Arpit, 2026-10-27 (voice docket):** *"For Fux, what I want is whenever there is a latest version available, we should be using that."* On the trade-off (CI grabbing "latest" would break W-34's reproducible digest): *"Go with the recommendation."* — ratify fux-engine with no fixed version; pin per commit; a scheduled job bumps the pin and opens a PR.
 
@@ -31,7 +31,7 @@ ball: agent
 
 ## Record affected
 
-`DEPENDENCIES.md` D-34 (done) — moves into L11 with W-90; [SR-PACKAGES](../../records/0107_packages.md) decision 14 if it names the pin.
+L11's list D-34 (done; moved into [SR-LAW-11](../../records/0013_LAW-11-dependencies.md) by W-90); [SR-PACKAGES](../../records/0107_packages.md) decision 14 if it names the pin.
 
 ## Hazards
 

@@ -47,7 +47,7 @@ PACK_TABLE = ROOT / "crates" / "codelaw-rules" / "src" / "pack.rs"
 # The skills package (W-77; SR-PACKAGES decision 3b, SR-AGENT-SURFACES decision 8):
 # every agent file codelaw writes, `templates/agents/` byte for byte, plus a
 # manifest naming its version — the same files on npm and PyPI. Its one runtime
-# dependency is codelaw at the exact same version (L11: DEPENDENCIES.md).
+# dependency is codelaw at the exact same version (L11's list, D-35).
 SKILLS_SRC = ROOT / "templates" / "agents"
 SKILLS_README = ROOT / "packaging" / "npm" / "skills" / "README.md"
 SKILLS_NPM = "@codelaw/skills"

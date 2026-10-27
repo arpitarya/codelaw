@@ -16,7 +16,7 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Name each rival at an exact version as a CI-only bench tool, one `DEPENDENCIES.md` row each (L11 — the decider ratifies each row by name when it lands) | the tools may be installed in CI | ⏳ then 🔴 Arpit ratifies the rows |
+| 1 | Name each rival at an exact version as a CI-only bench tool, one row each in L11's list (§3 of `records/0013_LAW-11-dependencies.md`) (L11 — the decider ratifies each row by name when it lands) | the tools may be installed in CI | ⏳ then 🔴 Arpit ratifies the rows |
 | 2 | A `bench-rivals` CI job (manual and weekly): the three pinned corpus repos, the same runner image, same day; equivalent rule sets (recommended presets), lint and format separately, cold and warm | numbers a reader can reproduce | ⏳ |
 | 3 | Results in L8 §Measurements as context rows; the README states a claim only from these, with the date and machine | an honest claim | ⏳ |
 
@@ -32,7 +32,7 @@ Why: every rival publishes a speed claim (Biome "~35x Prettier", oxlint "50–10
 
 ## Record affected
 
-SR-LAW-11 / `DEPENDENCIES.md` (CI-only rows) · SR-LAW-8 §Measurements (context rows).
+SR-LAW-11 §3 (CI-only rows) · SR-LAW-8 §Measurements (context rows).
 
 ## Hazards
 

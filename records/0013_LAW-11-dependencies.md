@@ -1,19 +1,106 @@
 ---
-type: Registry
-description: "L11's list: every third-party dependency codelaw uses, one row per ratification unit, with its status. Nothing outside this list may be used."
-governed_by: SR-LAW-11
-governed_by_path: records/0013_LAW-11-no-dependencies.md
+type: Standing Record
+kind: law
+name: SR-LAW-11
+title: "SR-LAW-11 (0013) — L11 — dependencies: none unless the decider ratifies each one by name, and the list of those he has"
+description: "codelaw takes no third-party dependency — in Rust, Python, JavaScript/TypeScript or any other ecosystem, in any scope (runtime, build, dev, CI) — unless the decider has ratified it by name in this record's list (§3). The list, its statuses and the ledger the CI check reads live here (W-90; the old list is archive/DEPENDENCIES.md)."
+status: accepted
+date: 2026-10-26
+feature: "dependencies by ratification only"
+owns:
+  - crates/codelaw-cli/tests/dependencies.rs
+laws: [L0, L2, L11]
+timestamp: 2026-10-27T18:00:00Z
+content_sha: ""
+ratifies: "Arpit, 2026-10-26 (Cowork): Okay. Create a law, no dependencies. For Rust, for Python, for JavaScript, TypeScript, JSON, CSS, YAML, TOML, HTML, nothing. No dependencies. Create a law. And then tell me what all dependencies do we have. We will ratify them one by one."
 ---
 
-# DEPENDENCIES — every dependency, and whether the decider has ratified it
+# SR-LAW-11 — L11 — dependencies
+
+## §1 — For humans
+
+**The law (L11).**
+
+> **codelaw has no dependencies.** No third-party code — no Rust crate, Python package, npm package, grammar, CI action or copied-in source — is used in any scope (runtime, build, dev, test, CI) **unless the decider has ratified it by name** in [this record's list](#3--the-list). A ratified dependency still passes [L2](0004_LAW-2-foss-dependencies.md) (free, open source, permissive).
+
+**Ruled by Arpit, 2026-10-26:** *"Create a law, no dependencies. For Rust, for Python, for JavaScript, TypeScript, JSON, CSS, YAML, TOML, HTML, nothing. No dependencies. Create a law. And then tell me what all dependencies do we have. We will ratify them one by one."*
+
+**Why it exists.** Every dependency is code codelaw ships but did not write: an upgrade it must test, an API that can break, a licence to keep, a supply-chain risk. Default-deny makes each one a decision instead of a habit.
+
+**Renamed and given the list, Arpit, 2026-10-27 (voice docket, W-90):** *"Remove dependencies.md and everything that goes into dependencies.md should be moved into the law that was created. Rather than having that law named no dependency, let's call that law as dependency."* — and of the old file, *"Move it to archive."* The rule did not change; its name and its list's home did. The old file is [`archive/DEPENDENCIES.md`](../archive/DEPENDENCIES.md).
+
+```mermaid
+flowchart LR
+    N["a dependency (new, or one of today's)"] --> L{"in L11's list<br/>as ratified?"}
+    L -->|yes| L2{"passes L2?"} -->|yes| OK["allowed, at its ratified tree"]
+    L -->|pending| P["allowed at today's pin;<br/>the decider rules it"]
+    L -->|no| X["refused — the check fails"]
+    P -->|ratify| OK
+    P -->|remove| W["a work item replaces it"]
+```
+
+<details>
+<summary><b>ASCII twin</b></summary>
+
+```text
+   dependency --> ratified in L11's list?     --yes--> passes L2? --yes--> allowed
+                         | pending --> allowed at today's pin until ruled --> ratify / remove (work item)
+                         | no -------> refused
+```
+
+</details>
+
+---
+
+## §2 — For agents
+
+### Context
+
+On 2026-10-26 codelaw had 47 direct Rust crates (376 in `Cargo.lock` with their own dependencies), one runtime npm package and three dev ones in the VS Code extension, a Python build backend, and ten CI actions. None had been chosen by the decider one by one. **Ruled 2026-10-26 (W-66):** 29 units ratified; `strsim`, `anyhow`, `postcard` replaced by codelaw's own code and dropped (W-67); `strsim` and `anyhow` remain only inside the ratified trees of `clap` and `markup_fmt`.
+
+### Decision
+
+1. **Default deny.** No third-party dependency in any ecosystem or scope without a `ratified` row in this record's list (§3). **Copying third-party source into the repo (vendoring, a fork, a pasted file) is a dependency** and needs a row like any other.
+2. **Not dependencies:** the language toolchains and their standard libraries (Rust `rustc`/`cargo`/`std`, CPython and its standard library, Node.js and npm), `git`, the operating system, and codelaw's own crates and packages.
+3. **One list:** §3 of this record (until 2026-10-27 a file at the repo root, now `archive/DEPENDENCIES.md`; W-90) — one row per ratification unit (a family of crates published together counts as one unit), with its ecosystem, scope, what it does, its pinned version, its transitive count, and its status: `pending`, `ratified YYYY-MM-DD` with the decider's words, or `remove`.
+   - **codelaw's own packages depending on each other** are not third-party, but a published package's runtime dependency is still a row: the skills package's dependency on `codelaw` at its exact version is D-35, ratified 2026-10-27 by the decider's W-77 ruling (*"it will have a hard dependency on code law"*); [SR-PACKAGES](0107_packages.md) decision 3b.
+4. **Ratifying a unit accepts its transitive tree as pinned at that moment.** An upgrade that adds a new transitive package, or a new major version, needs the unit ratified again.
+   - **Except a unit ratified unversioned:** D-34 (`fux-engine`) is ratified for every release (the decider, 2026-10-27: *"whenever there is a latest version available, we should be using that"*); each commit pins one in `FUX_VERSION` and a scheduled job bumps it by PR (W-91). It is a CI build tool, so it has no ledger tree.
+5. **Today's dependencies are `pending`:** they stay at their current pin until the decider rules each one. A `pending` unit may not be upgraded to a version that adds transitive packages. `remove` opens a work item that replaces it with codelaw's own code; the row goes when the code no longer uses it.
+6. **What ships to users already holds:** the npm and PyPI `codelaw` packages have zero runtime dependencies ([SR-PACKAGES](0107_packages.md)); this law keeps it so.
+7. **Checked mechanically** (built, W-65): `crates/codelaw-cli/tests/dependencies.rs`, run by CI's `cargo test --workspace`, compares every manifest and lockfile — `Cargo.toml`/`Cargo.lock`, `packaging/**/package.json` and `package-lock.json`, `pyproject.toml` build requirements, `.github/workflows/*.yml` (`uses:` and `pip`/`npm`/`cargo install`) — with the ledger at the end of this record (§3). It fails on any dependency that is a member of no unit, on a transitive package its unit's ledger line does not hold (a patch or minor bump passes; a new package or a new major fails), on a unit in use whose row has no valid status, and on a script in `scripts/` or `.claude/hooks/` that imports past the Python standard library. Code codelaw wrote itself (`option-ext`'s stand-in, the sibling tool `lockmaster`) is listed as `own` in the ledger, not as a dependency.
+
+### Consequences
+
+- Every new crate, action or package is a question for the decider before it lands.
+- A `remove` ruling on a large unit (a formatter, a parser) is a large work item; L7 still requires a formatter for every L3 language, so the replacement must exist before the dependency goes.
+- L2 stays: it answers *which* licences are acceptable; L11 answers *whether* to depend at all.
+
+### Alternatives considered
+
+- **Zero dependencies at once** — not ruled: the decider asked to ratify one by one, and L7 forbids dropping a formatter before its replacement exists.
+- **Ratifying only direct dependencies, ignoring the tree** — rejected by decision 4: a crate's own dependencies are code codelaw ships too.
+
+### Reference (required)
+
+- [§3 — The list](#3--the-list) — the list (decision 3); its earlier home is [`archive/DEPENDENCIES.md`](../archive/DEPENDENCIES.md), named, not cited.
+- [SR-LAW-2](0004_LAW-2-foss-dependencies.md) — the licence test a ratified dependency still passes.
+
+### Veto condition
+
+**Reopen this decision if:** a dependency is in use with no row in §3.
+
+**How to check it:** `cargo test -p codelaw-cli --test dependencies` (CI runs it).
+
+---
+
+## §3 — The list
 
 **Ruled 2026-10-26** (the decider, by voice, one card per unit): 29 ratified; `strsim`, `anyhow` and `postcard` were replaced by codelaw's own code and removed (W-67, 2026-10-26) — `strsim` and `anyhow` still appear in `Cargo.lock` only as part of the ratified trees of `clap` and `markup_fmt`. Each ratification accepts the unit's transitive tree as pinned in `Cargo.lock` / `package-lock.json` that day (L11 decision 4).
 
-**The rule is [L11](records/0013_LAW-11-no-dependencies.md):** no dependency unless ratified here by name. Statuses: `pending` (today's pin, awaiting the decider) · `ratified YYYY-MM-DD` (with his words) · `remove` (a work item replaces it).
-
 **Already dependency-free:** the published `codelaw` packages on npm and PyPI (zero runtime dependencies; the npm one names only its own `@codelaw/cli-*` binaries), every rule pack and dev-server plugin; the skills package's one dependency is codelaw itself (D-35); and every script in `scripts/` and `.claude/hooks/` (Python standard library only).
 
-## Rust — compiled into the `codelaw` binary (runtime)
+### Rust — compiled into the `codelaw` binary (runtime)
 
 | id | unit | crates | what it does for codelaw | pin | crates incl. transitive | status |
 |---|---|---|---|---|---|---|
@@ -41,44 +128,44 @@ governed_by_path: records/0013_LAW-11-no-dependencies.md
 | D-25 | **libc** | `libc` | OS calls (signals, Unix sockets) | 0.2.191 | 1 | ratified 2026-10-26 — *"Ratify."* |
 | D-33 | **tree-sitter-scss (vendored)** | in-tree copy of `tree-sitter-scss` 1.0.0, commit `5da5ba7` (MIT, +`tree-sitter-language`, `cc` already counted) | the SCSS grammar (W-62; B-047) | vendored | 0 new | ratified 2026-10-26 — *"Own grammar / tree-sitter-scss"* (B-047, docket) |
 
-## Rust — tests and build only
+### Rust — tests and build only
 
 | id | unit | what it does | pin | status |
 |---|---|---|---|---|
 | D-26 | **boon** | validates JSON Schema and SARIF in tests | 0.6.1 | ratified 2026-10-26 — *"Ratify."* |
 
-## VS Code extension (`packaging/vscode`)
+### VS Code extension (`packaging/vscode`)
 
 | id | unit | scope | what it does | pin | status |
 |---|---|---|---|---|---|
 | D-27 | **vscode-languageclient** | runtime | connects VS Code to `codelaw lsp` | 9.0.1 | ratified 2026-10-26 — *"Ratify."* |
 | D-28 | **typescript, @types/node, @types/vscode** | dev | compile the extension | 5.6.3 / 20.17.6 / 1.82.0 | ratified 2026-10-26 — *"Ratify."* |
 
-## Python packaging
+### Python packaging
 
 | id | unit | scope | what it does | status |
 |---|---|---|---|---|
 | D-29 | **maturin** (+ `zig` on some CI legs) | build | builds the PyPI wheels around the binary | ratified 2026-10-26 — *"Ratify."* |
 
-## Published packages — runtime dependencies
+### Published packages — runtime dependencies
 
 | id | unit | package that depends on it | what it does | pin | status |
 |---|---|---|---|---|---|
-| D-35 | **codelaw** (codelaw's own engine, on npm and PyPI) | the skills package: `@codelaw/skills` (`"dependencies": { "codelaw": "<version>" }`) and `codelaw-skills` (`Requires-Dist: codelaw==<version>`) | the engine the agent files were written for; installing the skills package brings it (W-77; [SR-PACKAGES](records/0107_packages.md) decision 3b) | exactly the skills package's own version, generated by `scripts/package.py` | ratified 2026-10-27 — the decider's W-77 ruling: *"it will have a hard dependency on code law"*, at *"the exact same version"*. codelaw's own package, so it brings no third-party code; `scripts/package.py check` refuses any other dependency on any published package |
+| D-35 | **codelaw** (codelaw's own engine, on npm and PyPI) | the skills package: `@codelaw/skills` (`"dependencies": { "codelaw": "<version>" }`) and `codelaw-skills` (`Requires-Dist: codelaw==<version>`) | the engine the agent files were written for; installing the skills package brings it (W-77; [SR-PACKAGES](0107_packages.md) decision 3b) | exactly the skills package's own version, generated by `scripts/package.py` | ratified 2026-10-27 — the decider's W-77 ruling: *"it will have a hard dependency on code law"*, at *"the exact same version"*. codelaw's own package, so it brings no third-party code; `scripts/package.py check` refuses any other dependency on any published package |
 
-## Grammar tooling — by hand, when a vendored grammar changes
+### Grammar tooling — by hand, when a vendored grammar changes
 
 | id | unit | what it does | pin | status |
 |---|---|---|---|---|
 | D-36 | **tree-sitter-cli** (npm, MIT, with its platform binary) | regenerates a vendored grammar's `src/` from a patched `grammar.js` (W-62: tree-sitter-scss, the tree-sitter-css fork); the generated `src/` is committed, so CI, the engine and users never run it | `=0.25.10`, exact | ratified 2026-10-27 — *"Ratify it."*, on the terms put to the decider: exact pin, generated source committed, run only when a grammar changes |
 
-## CI — Fux (build tool of the index packages)
+### CI — Fux (build tool of the index packages)
 
 | id | unit | what it does | pin | status |
 |---|---|---|---|---|
 | D-34 | **fux-engine** (+ its three dependencies `fux-core`, `fux-reader`, `fux-writer`, at the same version), MIT | builds the optional Fux index packages in CI (`scripts/fux-index.py`, L6 decision 12); never in the engine, a package or a test | **unversioned** — every fux-engine release is ratified; each commit pins one in `FUX_VERSION` (`==5.1.1` today), and a scheduled job bumps it by PR (W-91) | ratified 2026-10-27 — *"whenever there is a latest version available, we should be using that"*; on keeping each commit reproducible, *"Go with the recommendation"* (pinned per commit, bumped by PR) |
 
-## CI — GitHub Actions (`.github/workflows/`)
+### CI — GitHub Actions (`.github/workflows/`)
 
 | id | unit | what it does | status |
 |---|---|---|---|
@@ -86,13 +173,13 @@ governed_by_path: records/0013_LAW-11-no-dependencies.md
 | D-31 | **Swatinem/rust-cache** | caches Rust builds in CI | ratified 2026-10-26 — *"Ratify."* |
 | D-32 | **pypa/gh-action-pypi-publish** | uploads to PyPI with trusted publishing | ratified 2026-10-26 — *"Ratify."* |
 
-## How it was taken
+### How it was taken
 
 2026-10-26, from `Cargo.toml` of every crate (47 direct crates; 376 external packages in `Cargo.lock`), the transitive counts from `Cargo.lock`'s graph, `packaging/vscode/package.json`, `packaging/python/pyproject.toml`, the npm manifests `scripts/package.py` generates, `.github/workflows/*.yml`, and the imports of `scripts/` and `.claude/hooks/`. W-65 turns this into a CI check.
 
-## The ledger — what the CI check compares (W-65)
+### The ledger — what the CI check compares (W-65)
 
-`crates/codelaw-cli/tests/dependencies.rs` reads this block. Per unit: `members` are the crates, packages, actions or tools the unit covers (action names lower-case); `tree` is its transitive set as ratified, each package as `name@major` (`name@0.minor` below 1.0) — a patch or minor bump passes, a new package or a new major fails (L11 decision 4). `own` is code codelaw wrote itself, not a dependency. After the decider ratifies a unit again, regenerate with `CODELAW_DEPS_PRINT=1 cargo test -p codelaw-cli --test dependencies print_ledger -- --nocapture` and paste the output over the block. A removed unit's lines go with its row (W-67).
+`crates/codelaw-cli/tests/dependencies.rs` reads this block, from this record. Per unit: `members` are the crates, packages, actions or tools the unit covers (action names lower-case); `tree` is its transitive set as ratified, each package as `name@major` (`name@0.minor` below 1.0) — a patch or minor bump passes, a new package or a new major fails (L11 decision 4). `own` is code codelaw wrote itself, not a dependency. After the decider ratifies a unit again, regenerate with `CODELAW_DEPS_PRINT=1 cargo test -p codelaw-cli --test dependencies print_ledger -- --nocapture` and paste the output over the block. A removed unit's lines go with its row (W-67).
 
 <!-- l11-ledger:begin -->
 ```text
@@ -279,3 +366,9 @@ D-31 action members swatinem/rust-cache
 D-32 action members pypa/gh-action-pypi-publish
 ```
 <!-- l11-ledger:end -->
+
+---
+
+## References
+
+**Records** — [SR-LAWS](0001_LAWS.md) · [SR-LAW-2](0004_LAW-2-foss-dependencies.md) · [SR-LAW-7](0009_LAW-7-linter-and-formatter.md) · [SR-PACKAGES](0107_packages.md)

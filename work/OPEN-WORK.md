@@ -33,9 +33,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (22)
+## Open items (21)
 
-### build (20)
+### build (19)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -46,8 +46,6 @@ here. Read that record before changing anything below it.
 🔴 **W-89** `arpit` PyPI day 4 (Sat 10-31): `codelaw-rules-security-{js,html,python}` 0.2.0, then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-89-pypi-day-4.md)
 
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack; `tree-sitter-cli` 0.25.10 ratified (D-36, 2026-10-27); left: grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
-
-🟢 **W-90** `agent` L11 renamed "dependencies" and holds the list: `DEPENDENCIES.md`'s tables move into it, the file goes to `archive/` with a banner, every reference (scripts, tests, records) repointed. Filed by Arpit (Cowork). [detail](open/W-90-l11-holds-the-dependency-list.md)
 
 🟢 **W-91** `agent` fux-engine always at its latest: a scheduled CI job finds a new release, bumps `FUX_VERSION` and opens a PR; each commit stays pinned and reproducible (D-34, ratified 2026-10-27). Filed by Arpit (Cowork). [detail](open/W-91-fux-auto-bump.md)
 

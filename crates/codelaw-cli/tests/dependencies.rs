@@ -1,6 +1,8 @@
-//! L11's check (SR-LAW-11 decision 7): no dependency outside `DEPENDENCIES.md`.
+//! L11's check (SR-LAW-11 decision 7): no dependency outside L11's list.
 //!
-//! The ledger at the end of `DEPENDENCIES.md` carries, per ratification unit,
+//! The list is §3 of the law itself, `records/0013_LAW-11-dependencies.md`
+//! (W-90): prose, then the tables of units, then the ledger. The ledger at the
+//! end of the record carries, per ratification unit,
 //! its members (the crates, packages, actions or tools) and — for Cargo and
 //! npm — its transitive tree as ratified. This test reads every manifest and
 //! lockfile and fails on
@@ -44,6 +46,9 @@ struct Unit {
     tree: BTreeSet<String>,
 }
 
+/// L11 itself: the rule, its list (§3) and the ledger.
+const LAW: &str = "records/0013_LAW-11-dependencies.md";
+
 const BEGIN: &str = "<!-- l11-ledger:begin -->";
 const END: &str = "<!-- l11-ledger:end -->";
 
@@ -51,8 +56,8 @@ const END: &str = "<!-- l11-ledger:end -->";
 /// whitespace. `<ID> <ecosystem> members <name>…`, `<ID> <ecosystem> tree
 /// <name@ver>…`, and `own <ecosystem> <name>…` for code codelaw wrote itself.
 fn parse_ledger(md: &str) -> (BTreeMap<String, Unit>, BTreeMap<String, BTreeSet<String>>) {
-    let start = md.find(BEGIN).expect("DEPENDENCIES.md has no ledger begin marker") + BEGIN.len();
-    let end = md.find(END).expect("DEPENDENCIES.md has no ledger end marker");
+    let start = md.find(BEGIN).expect("L11 has no ledger begin marker") + BEGIN.len();
+    let end = md.find(END).expect("L11 has no ledger end marker");
     let mut logical: Vec<String> = Vec::new();
     for line in md[start..end].lines() {
         let t = line.trim();
@@ -90,12 +95,27 @@ fn parse_ledger(md: &str) -> (BTreeMap<String, Unit>, BTreeMap<String, BTreeSet<
     (units, own)
 }
 
-/// Rows of the tables: id -> the whole row text.
+/// Rows of the unit tables: id -> the whole row text. The law holds prose as
+/// well as tables, so only a table whose header's first cell is `id` counts:
+/// its rows run from the line after the `|---` separator to the first line
+/// that is not a table line, and each row's first cell is its `D-nn` id.
 fn rows(md: &str) -> BTreeMap<String, String> {
-    md.lines()
-        .filter(|l| l.starts_with("| D-"))
-        .map(|l| (l[2..].split('|').next().unwrap().trim().to_owned(), l.to_owned()))
-        .collect()
+    let mut out = BTreeMap::new();
+    let mut lines = md.lines().peekable();
+    while let Some(line) = lines.next() {
+        let is_header = line.starts_with('|') && line[1..].split('|').next().is_some_and(|c| c.trim() == "id");
+        if !is_header || !lines.peek().is_some_and(|l| l.starts_with("|---")) {
+            continue;
+        }
+        lines.next();
+        while let Some(row) = lines.next_if(|l| l.starts_with('|')) {
+            let id = row[1..].split('|').next().unwrap_or("").trim();
+            if id.starts_with("D-") {
+                out.insert(id.to_owned(), row.to_owned());
+            }
+        }
+    }
+    out
 }
 
 fn status_ok(row: &str) -> bool {
@@ -423,7 +443,7 @@ fn workflow_direct(root: &Path) -> BTreeMap<(String, String), String> {
 
 fn load() -> (PathBuf, String, BTreeMap<String, Unit>, BTreeMap<String, BTreeSet<String>>) {
     let root = root();
-    let md = read(&root.join("DEPENDENCIES.md"));
+    let md = read(&root.join(LAW));
     let (units, own) = parse_ledger(&md);
     (root, md, units, own)
 }
@@ -444,7 +464,7 @@ fn every_dependency_belongs_to_a_ratified_unit() {
             used.insert(u.id.clone());
         }
         None => problems.push(format!(
-            "{eco} dependency `{name}` ({from}) is in no unit of DEPENDENCIES.md — L11: ask the decider to ratify it by name"
+            "{eco} dependency `{name}` ({from}) is in no unit of L11's list ({LAW}) — L11: ask the decider to ratify it by name"
         )),
     };
 
@@ -469,7 +489,7 @@ fn every_dependency_belongs_to_a_ratified_unit() {
 
     for id in &used {
         match table.get(id) {
-            None => problems.push(format!("unit {id} is in use but has no row in DEPENDENCIES.md")),
+            None => problems.push(format!("unit {id} is in use but has no row in L11's list ({LAW})")),
             Some(row) if !status_ok(row) => {
                 problems.push(format!("unit {id}'s row has no status of pending, ratified YYYY-MM-DD or remove: {row}"))
             }
@@ -652,10 +672,30 @@ fn versions_keys_and_workflow_lines() {
 
 #[test]
 fn an_unlisted_dependency_is_reported_with_its_name_and_origin() {
-    let md = "| D-01 | **x** | ratified 2026-10-26 |\n<!-- l11-ledger:begin -->\n```text\nD-01 cargo members clap\nD-01 cargo tree clap@4\n```\n<!-- l11-ledger:end -->";
+    let md = "| id | unit | status |\n|---|---|---|\n| D-01 | **x** | ratified 2026-10-26 |\n<!-- l11-ledger:begin -->\n```text\nD-01 cargo members clap\nD-01 cargo tree clap@4\n```\n<!-- l11-ledger:end -->";
     let (units, _) = parse_ledger(md);
     assert!(owner(&units, "cargo", "clap").is_some());
     assert!(owner(&units, "cargo", "left-pad").is_none());
     assert!(status_ok(&rows(md)["D-01"]));
     assert!(!status_ok("| D-02 | **y** | maybe |"));
+}
+
+/// W-90: the list lives in a record with prose around it; only rows of a table
+/// headed `| id |` are units, so a `| D-` line elsewhere is not read as one.
+#[test]
+fn rows_are_read_from_tables_headed_id_only() {
+    let md = "prose\n\n| step | what |\n|---|---|\n| D-09 | not a unit |\n\n| id | unit | status |\n|---|---|---|\n| D-01 | **x** | ratified 2026-10-26 |\n| D-02 | **y** | pending |\nafter\n| D-03 | stray | pending |\n";
+    let r = rows(md);
+    assert_eq!(r.keys().map(String::as_str).collect::<Vec<_>>(), ["D-01", "D-02"]);
+}
+
+/// W-90: the law holds every unit row the old file did (D-01…D-36 less the removed ones).
+#[test]
+fn the_law_holds_the_list() {
+    let md = read(&root().join(LAW));
+    let r = rows(&md);
+    for id in ["D-01", "D-05", "D-26", "D-27", "D-29", "D-30", "D-33", "D-34", "D-35", "D-36"] {
+        assert!(r.contains_key(id), "{id} is not a row of L11's list");
+    }
+    assert!(r.values().all(|row| status_ok(row)), "every row of L11's list has a status");
 }

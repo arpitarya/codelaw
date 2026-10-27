@@ -48,7 +48,7 @@ ast-grep-language = { version = "=0.51.0", default-features = false, features = 
 tree-sitter = "=0.27.0"
 tree-sitter-toml-ng = "=0.7.0"
 tree-sitter-md = "=0.5.3"
-# tree-sitter-scss: codelaw's in-tree copy of 1.0.0 (MIT); DEPENDENCIES.md D-33.
+# tree-sitter-scss: codelaw's in-tree copy of 1.0.0 (MIT); L11's list (records/0013_LAW-11-dependencies.md) D-33.
 tree-sitter-scss = { path = "crates/codelaw-lang/grammars/tree-sitter-scss" }
 
 bit-set = "0.11"

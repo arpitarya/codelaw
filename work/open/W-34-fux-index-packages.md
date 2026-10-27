@@ -76,7 +76,7 @@ the consumer's repo.
 - **Fux 5.1.1** (the decider, 2026-10-26: *"Implement Fux for the latest version that we have"*). `FUX_VERSION` moved from 5.1.0; `assemble` with fux 5.1.1 built all 25 and `check` passed (one version, zero dependencies, each manifest true to its shards, both registries byte-equal). The end-to-end `fux doctor` / `fux ask` proof below was run on 5.1.0 and not repeated.
 - **Out of the release set.** `publish.yml` uploads `dist/npm` and `dist/pypi` whole and its preflight demands a trusted publisher per tarball, so an unreserved index name would stop a release. They build into `dist/fux-index/` and are a CI artifact (`fux-index`); step 5 ends with a change to `publish.yml`.
 - **A manifest per registry.** `fux pack` writes both registry names; a pack on one registry has the other removed from the manifest's `content` (the manifest is outside the digest), so Fux never looks for a package that does not exist.
-- **`fux-engine` is a dependency under L11** (D-34, `pending` in `DEPENDENCIES.md`): named by this item's own ruling as a build tool of CI only, but ratified by name only on the decider's say.
+- **`fux-engine` is a dependency under L11** (D-34 in L11's list; `pending` when this was written, ratified 2026-10-27): named by this item's own ruling as a build tool of CI only, but ratified by name only on the decider's say.
 - **Proven end to end:** the js wheel and `codelaw-rules-js` installed beside fux 5.1.0: `fux setup --index` pinned it, `fux doctor` reported it verified with 74 documents, `fux ask "stop using debugger statements" --scope packages` ranked `rules/js/no-debugger.md` first.
 
 ## Definition of done
