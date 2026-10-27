@@ -18,6 +18,8 @@
 #             and the release checks (SHA256SUMS included); on main, a build attestation of every file publish.yml uploads
 #             and, beside it and never in it, the optional Fux index packages (dist/fux-index/,
 #             W-34): built by a pinned fux, twice, and checked; nothing publishes them yet
+#   vscode    W-95: the extension compiled and tested, then one .vsix per platform with that
+#             build's binary (scripts/vsix.py) and checked; the artifact `vscode`; nothing publishes it yet
 #   dev-servers ×5  W-70: vite, webpack, rspack (the webpack plugin unchanged), next, next on
 #             Turbopack — the hosts installed on the runner only; a saved `debugger` shows within a second
 #   smoke ×8  the L6 install matrix and runtime fence on every platform: `dist` is
@@ -444,6 +446,43 @@ jobs:
             dist/fux-index/npm/*.tgz
             dist/fux-index/pypi/*.whl
             dist/fux-index/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
+
+  vscode:
+    # W-95: the editor extension's eight platform packages (SR-PACKAGES decision 6),
+    # each with the build's binary as bin/codelaw. Written by scripts/vsix.py
+    # (the standard library; @vscode/vsce is not ratified, L11). The output is the
+    # artifact `vscode`, never `dist`: publish.yml does not upload it until the
+    # decider has created the publisher and the tokens (RELEASING.md).
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: build-*
+          path: out/
+          merge-multiple: true
+      - name: compile and test the extension (its lockfile only, L11 D-27/D-28)
+        working-directory: packaging/vscode
+        run: npm ci --ignore-scripts --no-audit --no-fund && npm test
+      - name: one .vsix per platform, each with its binary
+        run: python3 scripts/vsix.py build --bins out/bin --out dist
+      - name: the extension checks — identity, version, licence, icon, one binary each and the build's, no sources, SHA256SUMS
+        run: python3 scripts/vsix.py check dist --bins out/bin
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: vscode
+          path: |
+            dist/vscode/*.vsix
+            dist/vscode/SHA256SUMS
           if-no-files-found: error
           retention-days: 30
 

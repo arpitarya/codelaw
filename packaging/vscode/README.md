@@ -1,8 +1,11 @@
 # codelaw for VS Code
 
-Diagnostics, quick fixes and (once the formatter ships) formatting from
-`codelaw lsp`. The extension holds no lint logic; it starts the server and adds
-commands ([SR-EDITOR](../../records/0114_editor.md)).
+Diagnostics, quick fixes, fix-on-save and formatting from
+[codelaw](https://github.com/arpitarya/codelaw) — one linter and formatter for
+JavaScript, TypeScript, Python, JSON, YAML, TOML, Markdown, CSS, SCSS and HTML.
+The extension holds no lint logic: it starts `codelaw lsp` and adds commands, so
+the editor shows exactly what `codelaw check` reports
+([SR-EDITOR](https://github.com/arpitarya/codelaw/blob/main/records/0114_editor.md)).
 
 **Which codelaw runs:** `codelaw.path`, else the workspace's
 `node_modules/.bin/codelaw`, else `.venv/bin/codelaw` (or beside
@@ -25,11 +28,18 @@ Copy debug info.
   one line per check with the rule count, diagnostic count and milliseconds.
   `codelaw.trace.server` is the raw protocol, for protocol bugs only.
 - **Reporting a problem:** run *codelaw: Copy debug info* and paste the result
-  in the issue. It holds versions, the binary path, settings and the last 200
-  log lines; the log never holds your source text or environment variables.
+  in [an issue](https://github.com/arpitarya/codelaw/issues). It holds versions,
+  the binary path, settings and the last 200 log lines; the log never holds
+  your source text or environment variables.
+
+## Developing
 
 ```bash
 npm ci && npm test     # compiles and tests the binary lookup and the logging helpers
 ```
 
-`version` is the one version (L6 decision 9): `scripts/version.py --set` writes it here and in `package-lock.json`, and `--check` fails when either drifts.
+`version` is the one version (L6 decision 9): `scripts/version.py --set` writes
+it here and in `package-lock.json`, and `--check` fails when either drifts.
+`scripts/vsix.py build` makes the eight platform `.vsix` files, each with its
+`bin/codelaw`; `scripts/vsix.py check` checks them. Every link in this file is
+absolute: it is the Marketplace and Open VSX page, where a relative link breaks.
