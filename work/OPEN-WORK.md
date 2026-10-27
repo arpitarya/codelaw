@@ -33,9 +33,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (23)
+## Open items (22)
 
-### build (21)
+### build (20)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -44,8 +44,6 @@ here. Read that record before changing anything below it.
 🔴 **W-88** `arpit` PyPI day 3 (Fri 10-30): `security-html`, `security-python` Fux index, `codelaw-skills` and `codelaw-rules-scss`, all 0.2.0; then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-88-pypi-day-3.md)
 
 🔴 **W-89** `arpit` PyPI day 4 (Sat 10-31): `codelaw-rules-security-{js,html,python}` 0.2.0, then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-89-pypi-day-4.md)
-
-🟢 **W-85** `agent` npm: the nine new packages live at 0.2.0 and all 24 untrusted names now trust `publish.yml` (2026-10-27); left: `npm-trust.sh` treats E409 as trusted, and re-check the pending ones before the next release. Filed by Arpit (Cowork). [detail](open/W-85-npm-first-publish.md)
 
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack; `tree-sitter-cli` 0.25.10 ratified (D-36, 2026-10-27); left: grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
