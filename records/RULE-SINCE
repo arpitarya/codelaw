@@ -31,4 +31,11 @@
 #   they touch were brought current by later commits (13bcaa9 for
 #   SR-ARCHITECTURE and SR-AGENT-SURFACES). 791b189 is the last of them, so the
 #   baseline is the commit itself and every commit after it is judged.
-791b18984ace720098c144493bc87033879dbfff
+# - 2026-10-27, W-97, CI's `lint` red on main from run 40455259854: 791b189 ->
+#   2ba53d3. One commit since 791b189 failed the replay: 2ba53d3 (W-97), the
+#   first `lockmaster submit`, which the commit-msg guard refused for
+#   crates/codelaw-cli/src/init.rs without SR-RULE-PACKS — yet it landed, and
+#   the resubmit added the record as its own commit ab4d3f7 on top. It is
+#   pushed, so it cannot be reworded; ab4d3f7 brought SR-RULE-PACKS current.
+#   Every other commit since 791b189 passes. 2ba53d3 is the baseline.
+2ba53d3d47eed2e0bdfe13b3e5765661920a4e8e
