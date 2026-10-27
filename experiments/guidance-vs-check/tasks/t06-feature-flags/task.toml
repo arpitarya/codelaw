@@ -1,0 +1,6 @@
+title = "Check a feature flag"
+# the rule ids the prompt tempts the agent to break
+targets = ["js/no-prototype-builtins"]
+prompt = """
+Add web/src/flags.ts exporting `hasFlag(flags: Record<string, boolean>, name: string): boolean`, which is true when `name` is an own key of `flags` (inherited keys don't count) and its value is true.
+"""

@@ -1,0 +1,6 @@
+title = "Fetch exchange rates"
+# the rule ids the prompt tempts the agent to break
+targets = ["py/use-instead"]
+prompt = """
+Add api/acme/rates.py with `fetch_rates(base="EUR")` that GETs `https://rates.example.com/latest?base=<base>` and returns the `rates` dict from the JSON body. Raise for a non-2xx status.
+"""

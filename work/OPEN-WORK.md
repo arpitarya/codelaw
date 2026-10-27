@@ -40,6 +40,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-99 itself (the first real run and step 3, the README's speed claim); W-100's source-tool agreement | |
 | 🔴 **`hook_pre`'s budget — the guard held it back** ([W-93](open/W-93-hook-pre-and-brief.md); [SR-LAW-8](../records/0010_LAW-8-performance-budgets.md) decision 4). Three `perf` runs on `main` (`ubuntu-24.04`): p95 **62.4 / 78.3 / 86.2 ms**; worst 86.2 × 1.5 = **129.3 > the 100 ms target**, so the method leaves it unset and asks you. Say **"leave it unset"** (as you ruled for `fix_one_file`, 2026-10-25), or **"set 100 ms"** (1.16 × headroom over the worst run). | 2026-10-27 | 0 d |
 | ↳ **blocks:** W-93 itself | |
+| 🔴 **Guidance-vs-check experiment — approve running it** ([W-102](open/W-102-guidance-vs-check-experiment.md)). 180 Claude Code sessions (arms A, B, C × 20 tasks × 3 runs) of `claude-opus-5-5`; estimate per session ~250k–450k input tokens (mostly cache reads), ~30k–50k cache writes, ~6k–9k output → **~$86 in all (range ~$45–$170)**, 9–18 hours one at a time; disk a few MB. **1. Name the agent CLI** — proposed: Claude Code 2.1, `claude -p … --setting-sources project --strict-mcp-config` (`experiment.toml` `[agent.claude]`; `--bare` instead if you run on `ANTHROPIC_API_KEY`). **2. Allow `fux` (D-34) in arm C outside CI** — its ratified scope is the CI build of the index packages. **3. Run it** from the main checkout: `python3 experiments/guidance-vs-check/harness.py run --agent claude --out experiments/guidance-vs-check/runs/2026-10-w102` (the same command resumes; `harness.py plan` reprints the estimate; `--arms A,B,C,D` adds the optional check arm, 60 sessions, ~$22). Say **"approve running it"** (and which CLI), or name a cheaper model or fewer runs. | 2026-10-27 |
+| ↳ **blocks:** W-102 itself (the runs, the write-up, step 4's README line); W-35's line on it | |
 
 ---
 
@@ -87,7 +89,7 @@ here. Read that record before changing anything below it.
 
 ### testing (1)
 
-🟢 **W-102** `agent` Experiment: does an agent with Fux and the rule docs still break rules? 3 arms × 20 tasks × 3 runs; decides the README's "rules it can't skip" line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
+🔴 **W-102** `arpit` Experiment built in `experiments/guidance-vs-check/` (20 tasks, arms A–C, scorer, table; fake-agent dry run 180/180; arm D on `hook --pre`); left: Arpit approves ~$86 of runs and the agent CLI (inbox), then the runs and the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
 ### record update (1)
 
