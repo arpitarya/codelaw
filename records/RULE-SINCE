@@ -22,4 +22,13 @@
 #   SR-owned component without its record or a `no SR affected` line. They are
 #   pushed, so they cannot be reworded; fedf2f0 is the last of them, so the
 #   baseline is the commit itself and every commit after it is judged.
-fedf2f00a5918dc8b1bd6c6a619b4d7dccc2d900
+# - 2026-10-27, W-84, CI red on main since run 40315989524: fedf2f0 -> 791b189.
+#   Eight commits since fedf2f0 failed the replay, so CI's `lint` job could not
+#   pass: 0219eb1 (W-51), b88d0cc (W-70), a84b15a (W-71 step 1), 5b4cfff
+#   (W-34), ed70075 and 1edb7ff (W-73), 3e02464 (W-81) and 791b189 (W-71):
+#   each changed an SR-owned component without its record or a `no SR
+#   affected` line. They are pushed, so they cannot be reworded; the records
+#   they touch were brought current by later commits (13bcaa9 for
+#   SR-ARCHITECTURE and SR-AGENT-SURFACES). 791b189 is the last of them, so the
+#   baseline is the commit itself and every commit after it is judged.
+791b18984ace720098c144493bc87033879dbfff
