@@ -288,11 +288,14 @@ scss_rule!(AtIfNoNull, "scss/at-if-no-null", |sheet, src, ctx, out| {
         let whole = m.get(0).expect("group 0");
         let (op, a) = (&m["op"], &m["a"]);
         let (s, e) = (n.params.0 + offset + whole.start(), n.params.0 + offset + whole.end());
-        // `not $x` is the text for `== null`, but tree-sitter-scss 1.0.0 reads
-        // `@if not …` as a syntax error and the fix verifier refuses an edit that
-        // adds one: only `!= null` is fixed.
+        // `!= null` becomes the value, `== null` becomes `not` the value; a
+        // comparison that is only part of a condition is reported, not fixed.
         let only = expr.trim() == whole.as_str();
-        let edits = if only && op == "!=" { vec![TextEdit::new(s, e, a.to_owned())] } else { Vec::new() };
+        let edits = match (only, op) {
+            (true, "!=") => vec![TextEdit::new(s, e, a.to_owned())],
+            (true, _) => vec![TextEdit::new(s, e, format!("not {a}"))],
+            _ => Vec::new(),
+        };
         out.push(fixed(s, e, format!("Don't compare to `null` with `{op}`; test the value itself"), edits));
     }
 });

@@ -28,10 +28,10 @@ pub type Root = AstGrep<StrDoc<Grammar>>;
 pub type SyntaxNode<'r> = Node<'r, StrDoc<Grammar>>;
 
 /// Names every grammar and its pinned version; part of every cache key.
-/// The CSS fork's and the SCSS copy's versions carry `+codelaw.N`, bumped
+/// The CSS fork's and the SCSS fork's versions carry `+codelaw.N`, bumped
 /// with every change to a `grammar.js` or to how `src/` is compiled, so a
 /// grammar change invalidates cached results.
-pub const GRAMMARS_FINGERPRINT: &str = "ast-grep-language=0.51.0;tree-sitter=0.27.0;tree-sitter-toml-ng=0.7.0;tree-sitter-md=0.5.3;tree-sitter-css=0.25.0+codelaw.2;tree-sitter-scss=1.0.0+codelaw.1";
+pub const GRAMMARS_FINGERPRINT: &str = "ast-grep-language=0.51.0;tree-sitter=0.27.0;tree-sitter-toml-ng=0.7.0;tree-sitter-md=0.5.3;tree-sitter-css=0.25.0+codelaw.3;tree-sitter-scss=1.0.0+codelaw.2";
 
 /// Parse source text with the grammar for `language`.
 pub fn parse(language: Language, source: &str) -> Root {
@@ -126,6 +126,16 @@ mod tests {
             "@import url(\"a.css\") layer(base.components) screen;\n",
             "@import \"a.css\" layer;\n",
             "@keyframes k { from, 12.5% { opacity: 0; } 50% { opacity: 1; } to { opacity: 0; } }\n",
+            // +codelaw.3 (W-62)
+            "@import url(a.css) supports(display: grid) screen;\n",
+            "@custom-media --small (max-width: 30em);\n",
+            "@container sidebar (min-width: 400px) { .a { color: red; } }\n",
+            "@font-feature-values Font One { @styleset { nice-style: 12; } }\n",
+            "@page :first { margin: 1in; }\n",
+            "@keyframes r { entry 0% { opacity: 0; } exit 100% { opacity: 1; } }\n",
+            ".a { .b & { color: red; } }\n",
+            ":root { --x: { color: red; }; }\n",
+            ".a { color: red !ie; }\n",
         ];
         for src in samples {
             let root = parse(Language::Css, src);
@@ -133,6 +143,27 @@ mod tests {
         }
         let range = parse(Language::Css, "@media (width >= 600px) {}\n");
         assert!(range.root().get_inner_node().to_sexp().contains("range_query"));
+    }
+
+    /// The SCSS fork (+codelaw.2, W-62) reads the Sass module system and the
+    /// modern Sass that tree-sitter-scss 1.0.0 gave `ERROR` on.
+    #[test]
+    fn modern_scss_parses() {
+        let samples = [
+            "@use \"sass:map\";\n@use \"config\" as *;\n@use \"x\" as cfg with ($a: 1, $b: (c: 2));\n",
+            "@forward \"config\" show defaults, $x;\n@forward \"lib\" as btn-* hide reset;\n",
+            "$a: 1 !default;\n$m: (a: 1, \"b\": 2) !default;\n$l: ();\n",
+            ".a { @if not $n { color: red; } @else if $a and not $b { color: blue; } }\n",
+            "@mixin m($args...) { @content; }\n.a { @include m(); @include bp.up(md) { color: red; } }\n",
+            ".a { --#{$p}color: #{$c}; color: var(--#{$p}x); margin: { top: 1px; } }\n",
+            ".a { > .b:nth-child(n + 3) { width: math.div(100%, 3); padding: -$g (-$g); } }\n",
+            "@for $i from 1 to 3 { .a-#{$i} { width: 10px * $i % 4; } }\n",
+            ".a { @extend %p !optional; color: if(sass($on): red; else: null); }\n",
+        ];
+        for src in samples {
+            let root = parse(Language::Scss, src);
+            assert_eq!(syntax_error_count(&root), 0, "{src} failed to parse: {}", root.root().get_inner_node().to_sexp());
+        }
     }
 
     /// The fingerprint names the CSS fork's version as `Cargo.lock` resolves
@@ -147,8 +178,8 @@ mod tests {
         assert!(GRAMMARS_FINGERPRINT.contains(&format!("tree-sitter-css={version}")), "GRAMMARS_FINGERPRINT lacks tree-sitter-css={version}");
     }
 
-    /// The same for the SCSS copy, whose `+codelaw.N` marks codelaw's
-    /// build of upstream's unchanged `src/`.
+    /// The same for the SCSS fork, whose `+codelaw.N` is bumped with every
+    /// change to its grammar or to how its `src/` is compiled.
     #[test]
     fn fingerprint_names_the_scss_copy() {
         let lock = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../Cargo.lock")).unwrap();

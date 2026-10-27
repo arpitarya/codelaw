@@ -10,11 +10,13 @@
 # marks the fork and is bumped with every change to grammar.js or to how
 # src/ is compiled (+codelaw.2: bindings/rust/build.rs force-includes
 # c_locale_wctype.h, so the scanner's character classes are the "C" locale's
-# on every platform, W-44).
+# on every platform, W-44; +codelaw.3: `supports()` in `@import`, a name
+# before an at-rule's query, page selectors, named-range keyframes, `.b &`,
+# a custom property holding a block and `!ie`-style annotations, W-62).
 [package]
 name = "tree-sitter-css"
 description = "CSS grammar for tree-sitter (codelaw's fork of 0.25.0)"
-version = "0.25.0+codelaw.2"
+version = "0.25.0+codelaw.3"
 authors = [
   "Max Brunsfeld <maxbrunsfeld@gmail.com>",
   "Amaan Qureshi <contact@amaanq.com>",

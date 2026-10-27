@@ -3515,7 +3515,7 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-css"
-version = "0.25.0+codelaw.2"
+version = "0.25.0+codelaw.3"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -3579,7 +3579,7 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-scss"
-version = "1.0.0+codelaw.1"
+version = "1.0.0+codelaw.2"
 dependencies = [
  "cc",
  "tree-sitter-language",

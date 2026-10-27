@@ -1,15 +1,17 @@
 # codelaw's in-tree copy of tree-sitter-scss 1.0.0 (MIT, see LICENSE), commit
 # 5da5ba71a558b007b352c505bfcd9095ae337022 of tree-sitter-grammars/tree-sitter-scss.
-# Vendored unchanged (SR-LAW-11: a copy is a dependency, ratified as D-33;
-# B-047 ruled 2026-10-26: "Own grammar / tree-sitter-scss"). The generated
-# src/ is upstream's, not regenerated; bindings/rust is codelaw's, on
+# A fork since +codelaw.2 (SR-LAW-11: a copy is a dependency, ratified as
+# D-33; B-047 ruled 2026-10-26: "Own grammar / tree-sitter-scss"): grammar.js
+# is built on codelaw's tree-sitter-css fork and reads the Sass module system
+# and modern Sass (W-62); src/ is regenerated with tree-sitter-cli 0.25.10
+# (D-36). README.md lists the changes. bindings/rust is codelaw's, on
 # tree-sitter-language like the CSS fork's. +codelaw.1: its build.rs
 # force-includes c_locale_wctype.h, so the scanner's character classes are
 # the "C" locale's on every platform (W-44); bumped with every such change.
 [package]
 name = "tree-sitter-scss"
 description = "SCSS grammar for tree-sitter (codelaw's in-tree copy of 1.0.0)"
-version = "1.0.0+codelaw.1"
+version = "1.0.0+codelaw.2"
 authors = ["Amaan Qureshi <amaanq12@gmail.com>"]
 license = "MIT"
 keywords = ["incremental", "parsing", "tree-sitter", "scss"]

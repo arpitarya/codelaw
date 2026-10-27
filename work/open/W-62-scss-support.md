@@ -6,7 +6,7 @@ item: W-62
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-27
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -17,7 +17,7 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Amend L3: `scss` joins `languages` as a CSS dialect (like `jsx`/`tsx`); `.sass` indented syntax and Less stay out. On the decider's ruling of 2026-10-26 | the law allows it | ✅ 2026-10-26 |
-| 2 | **Parser — B-047, ruled 2026-10-26: own grammar.** Extend codelaw's tree-sitter-css fork for the CSS forms that still give `ERROR`, and take **tree-sitter-scss** (MIT, tree-sitter-grammars) for `.scss`; move the CSS rules off `css_syntax.rs` onto these trees. Biome stays the formatter only | CSS and SCSS rules on real trees, under codelaw's control | ◐ tree-sitter-scss vendored (D-33) and `Language::Scss` parses with it; the CSS fork was not extended and the `css/*` rules were **not** moved onto trees — see *Left* |
+| 2 | **Parser — B-047, ruled 2026-10-26: own grammar.** Extend codelaw's tree-sitter-css fork for the CSS forms that still give `ERROR`, and take **tree-sitter-scss** (MIT, tree-sitter-grammars) for `.scss`; move the CSS rules off `css_syntax.rs` onto these trees. Biome stays the formatter only | CSS and SCSS rules on real trees, under codelaw's control | ◐ both grammars patched (2026-10-27): the CSS fork reads the forms that gave `ERROR`, the SCSS fork (built on it) reads Bootstrap's SCSS — 233 of 236 files without an error, from 52; the `css/*` rules are **not** yet moved onto the trees — see *Left* |
 | 3 | Formatter (L7): Biome's SCSS formatter at the pinned revision; `format-parity.py` against Prettier's SCSS on a corpus | SCSS formats like CSS does | ✅ Biome's SCSS source; 98.6 % identical files vs Prettier (212 files) |
 | 4 | Every `css/*` rule declares `languages: [css, scss]` or says why not; cases for `$var`, nesting, `@mixin`/`@include`, `#{}` interpolation, `//` comments, placeholders | no false positives on SCSS | ✅ 64 of 71 declare `scss`; a two-file SCSS corpus with a pinned count per rule |
 | 5 | SCSS rules (below), ported from stylelint-scss with `ported_from:` | SCSS-specific checks | ✅ 15 of 16: `scss/operator-no-unspaced` is a layout rule (SR-FORMATTER decision 3) |
@@ -72,11 +72,19 @@ ball: agent
 - The CSS statement reader has an SCSS mode (`css_syntax::parse_scss`): `//` comments blanked (same offsets), `#{}` interpolation as one unit, Sass at-rules and nested-property blocks kept as `Other` statements, `&-suffix` as one nesting selector, `!default`/`!global`/`!optional` not unknown annotations, `rgba($c, $a)` not an alias, `&` inside a mixin rooted. The 70 `css_rule!` rules run on `Scss`; 64 declare it. Rules run on the root even when it is `ERROR` (tree-sitter-scss cannot read all modern Sass), once.
 - The `scss` pack: 15 rules, `scss/recommended` (7) and `scss/strict` (extends it, +8), data tables `scss/at-rules` and `scss/functions`.
 
+## Built (2026-10-27, Claude Code) — the grammar patches
+
+- **The CSS fork, `0.25.0+codelaw.3`:** `supports()` in `@import`, a name before an at-rule's query (`@container sidebar (…)`, `@custom-media`, `@font-feature-values Font One`), page selectors (`@page :first`), named-range keyframes (`entry 0%`), `.b &`, a custom property holding a block, `!ie`-style annotations; `test/corpus/modern.txt` has one case per form. On 738 stylesheets the files without an error went from 586 to 723 and every tree that had none is byte-identical.
+- **The SCSS fork, `1.0.0+codelaw.2`:** `grammar.js` extends the CSS fork (not npm `tree-sitter-css` 0.20, which L11 has not ratified) and reads the module system, maps, flags, `@if not`/`and`/`or`, rest and keyword arguments, `using`, interpolation in property names, placeholders, pseudo-elements, media features and `:nth-child()`, nested properties, signed variables and `if(sass(…): …; else: …)`; its scanner skips `#{…}`. `test/corpus/codelaw.txt` has one case per change (79 corpus tests pass). Bootstrap 5.3.8 + `main` (`d793f28`): 233 of 236 files without an error, from 52; no file that parsed clean gained an error. The folders' READMEs list every change and what is still not read.
+- `src/` regenerated with exactly `npx -y tree-sitter-cli@0.25.10 generate` (D-36) and committed; both `+codelaw.N` bumps are in `Cargo.lock` and `GRAMMARS_FINGERPRINT`; `codelaw-lang`'s `modern_css_parses` grows nine forms and `modern_scss_parses` is new.
+- **`scss/at-if-no-null` fixes `== null` too** (to `not $x`), now that the verifier's grammar reads `@if not`; two new cases.
+- Parse throughput on the same files (tree-sitter CLI, 3 runs): CSS ~20 → ~21 MB/s, SCSS ~8.5 → ~24 MB/s. `codelaw bench` main vs branch, alternated twice on this loaded Mac (load ~21): `check_cold_10k` median 6907/5760 ms vs 6318/5793 ms; warm runs are 10 001 cache hits and parse nothing.
+
 ## Left (honest)
 
-1. **Step 2's second half:** extend the tree-sitter-css fork and move the CSS rules from `css_syntax.rs` onto trees. Not done: tree-sitter-scss 1.0.0 gives `ERROR` on much modern Sass (`@if not …`, and in a spot check on 2026-10-26 the first 40 files listed of Bootstrap's `scss/` all had `ERROR` nodes), so the `css/*` and `scss/*` rules still read the text, as SR-ARCHITECTURE decision 15b records for CSS. To do: patch `tree-sitter-scss`'s `grammar.js` (CLI 0.25.10 + tree-sitter-css 0.20 as upstream builds it), bump to `1.0.0+codelaw.1`, regenerate `src/`, add tests.
-2. **`scss/at-if-no-null` fixes `!= null` only:** `== null` → `not $x` is refused by the fix verifier because the grammar reads `@if not …` as an error. Lands with item 1.
-3. **Pinned corpora** (`scripts/corpus.json`): an SCSS one (e.g. Bootstrap, Foundation) and a CSS Modules one (a React repo that uses them, W-63's step), and a `corpus.toml` count for each `scss/*` and `css-modules/*` rule, then `stable` for those with no false positive. Needs CI network.
+1. **Step 2's second half: move the `css/*` (and `scss/*`) rules from `css_syntax.rs` onto the trees.** The grammars now read the forms SR-ARCHITECTURE decision 15b named as the reason the rules read text; the move itself — about 70 native rules across `css_atrules.rs`, `css_declarations.rs`, `css_media.rs`, `css_selectors.rs`, `css_values.rs`, `css_misc.rs`, `css_modules.rs` and `scss_rules.rs` — has not started. Rules that exist to report CSS the grammar rejects (`css/media-query-no-invalid`, `css/at-rule-prelude-no-invalid`) keep reading text.
+2. **Grammar forms still read as `ERROR`** (the READMEs list them): SCSS `@container #{$name} (…)`, a string holding an interpolation with its own quotes, `:not(.a)#{$x}`, an escape after an interpolation; CSS an unquoted `url(data:…;…)` holding `;`, `@nest`, `@value` (W-63), a backslash-newline in a string. The CSS fork's `upstream/grammar.patch` covers the 2026-10-22 forms only.
+3. **Pinned corpora** (`scripts/corpus.json`): an SCSS one (Bootstrap) and a CSS Modules one (W-63's step), a `corpus.toml` count for each `scss/*` and `css-modules/*` rule, then `stable` for those with no false positive. Fetching works on this machine (2026-10-27), so it does not wait on CI.
 4. **The graph does not read `.scss`:** `graph/no-unused-css-classes` and `css/project` stay CSS-only (W-63 extends the graph for modules).
 5. **Not shipped on purpose:** `scss/operator-no-unspaced` (layout; the formatter's) — the item's table listed it.
 
@@ -86,11 +94,11 @@ ball: agent
 
 ## Blockers
 
-**ASK, 2026-10-26 (`work/BLOCKED.json`):** *Left* items 1 and 2 need the tree-sitter CLI (npm `tree-sitter-cli` 0.25.10, MIT, build-time only) to regenerate `src/` from a patched `grammar.js`. It is not installed on this machine and not in L11's list, so L11 forbids it until the decider ratifies it by name. Question: ratify `tree-sitter-cli` 0.25.10? On a yes: add the D-row, patch both grammars, bump to `1.0.0+codelaw.1`, move the CSS rules onto trees, re-ball to agent. Item 3 (corpus) needs CI network and is independent. B-047 itself was ruled 2026-10-26.
+None. **Resolved 2026-10-27** (D-36 ratified; the grammars were patched with it). The ask was: **ASK, 2026-10-26 (`work/BLOCKED.json`):** *Left* items 1 and 2 need the tree-sitter CLI (npm `tree-sitter-cli` 0.25.10, MIT, build-time only) to regenerate `src/` from a patched `grammar.js`. It is not installed on this machine and not in L11's list, so L11 forbids it until the decider ratifies it by name. Question: ratify `tree-sitter-cli` 0.25.10? On a yes: add the D-row, patch both grammars, bump to `1.0.0+codelaw.1`, move the CSS rules onto trees, re-ball to agent. Item 3 (corpus) needs CI network and is independent. B-047 itself was ruled 2026-10-26.
 
 ## Record affected
 
-L3 (SCSS as a CSS dialect) · L7 (its formatter) · SR-LINTER / SR-FORMATTER (the dialect) · L6 (the `scss` pack) · SR-RULE-PACKS (the `scss` pack's row; the css pack's rules declare `scss`) · B-047 closes.
+L3 (SCSS as a CSS dialect) · L7 (its formatter) · SR-LINTER / SR-FORMATTER (the dialect) · SR-ARCHITECTURE decisions 3 and 15b (both grammar forks; why the CSS rules still read text) · L6 (the `scss` pack) · SR-RULE-PACKS (the `scss` pack's row; the css pack's rules declare `scss`) · B-047 closes.
 
 ## Hazards
 

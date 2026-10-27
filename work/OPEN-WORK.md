@@ -55,7 +55,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-97** `arpit` GitHub Action built (`action.yml`, CI's `action` job, `init --ci github`); left: your three calls in the inbox — SARIF route, the release-tag proof, Marketplace and `v0`. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
-🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack; `tree-sitter-cli` 0.25.10 ratified (D-36, 2026-10-27); left: grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
+🟢 **W-62** `agent` SCSS built: Biome formats it, 64 `css/*` rules run on `.scss`, `scss` pack; both grammars patched (D-36): Bootstrap's SCSS 233/236 files clean, from 52; left: CSS rules onto trees, pinned SCSS corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-93** `agent` `codelaw hook --pre` (refuse a write that adds an error, for every agent with a pre-write hook, fail-open) and `codelaw brief` (only what is specific to the repo); records first. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
