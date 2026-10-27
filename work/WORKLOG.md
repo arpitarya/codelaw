@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — W-107 closed: oxlint type-aware through the adapter  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *Implement and close W-107: prove and document that oxlint's type-aware mode flows through the oxlint adapter, `typescript/*` ids included; a test on a recorded oxlint JSON; the live run a decider ask.*
+- **Done:** fixture `crates/codelaw-adapters/tests/fixtures/oxlint-type-aware/` (built from oxlint's JSON formatter and oxc's tsgolint snapshots), a mapping test and a binary test with a stand-in oxlint; adapter fixes `ported_plugins` (oxlint `typescript/` = `typescript-eslint/`, so shown once works) and `uncached_when = "typeAware"`; USAGE *Type rules today*; SR-LINTER decision 2, SR-ARCHITECTURE decision 19.
+- **Decided / left open:** closed on the built fixture; the live capture is an inbox row (no oxlint is installed or ratified here, L11). oxlint's `react`/`node` plugin names still miss the packs' `eslint-plugin-*` `ported_from:` names — unverified, not mapped.
+- **Mistakes:** none.
+- **Next:** the decider runs the capture, or says "skip it".
+
 ## 2026-10-27 — W-101 researched and ruled: type-aware TS rules on the project's own TypeScript 7.1  ·  Cowork (Fable 5.1, then Opus 5.5)
 
 - **Asked:** *"W101. research and propose."* Then a voice walk-through (how it works, what is built, decisions, blockers) and *"go ahead and write all these things."*

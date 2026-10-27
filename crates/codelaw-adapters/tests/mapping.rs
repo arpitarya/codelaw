@@ -30,8 +30,13 @@ fn read(path: &Path) -> String {
 
 /// Every diagnostic the fixture's report maps to, in report order.
 fn mapped(name: &str, source: &str) -> (String, Vec<Diagnostic>) {
+    mapped_from(name, name, source)
+}
+
+/// As `mapped`, for adapter `name`'s report in fixture folder `folder`.
+fn mapped_from(name: &str, folder: &str, source: &str) -> (String, Vec<Diagnostic>) {
     let m = manifest(name).unwrap();
-    let dir = fixture(name);
+    let dir = fixture(folder);
     let out = |f: &str| std::fs::read_to_string(dir.join(f)).unwrap_or_default().replace("@ROOT@", "/root");
     let parsed = parse(m.output, &out("stdout.json"), &out("stderr.json")).unwrap();
     let text = read(&dir.join(source));
@@ -81,6 +86,59 @@ fn oxlint_maps_byte_spans_and_every_finding_is_manual() {
         assert_eq!(x.source, "oxlint@test");
     }
     assert_eq!(debugger.steps[0], "Remove the debugger statement");
+}
+
+/// W-107: oxlint's type-aware mode (`options.typeAware` with
+/// `oxlint-tsgolint` installed beside it) reports through the same
+/// `--format=json`, so its `typescript(<rule>)` findings pass through the
+/// adapter unchanged in kind. `tests/fixtures/oxlint-type-aware/stdout.json`
+/// is built from oxlint's documented JSON shape (its `output_formatter/json.rs`,
+/// and the codes, messages and docs links of its tsgolint snapshots), not
+/// captured from a run: no oxlint is installed here (L11), so the live
+/// capture is the decider's to run, in that folder:
+///
+/// ```text
+/// npm i -D oxlint oxlint-tsgolint typescript@7 && npx oxlint --format=json src/index.ts > stdout.json
+/// ```
+#[test]
+fn oxlint_type_aware_findings_keep_their_typescript_ids() {
+    let (text, d) = mapped_from("oxlint", "oxlint-type-aware", "src/index.ts");
+    assert_eq!(d.len(), 2);
+    let floating = find(&d, "adapter/oxlint/typescript/no-floating-promises");
+    assert_eq!(floating.severity, Severity::Error);
+    assert_eq!((floating.start, floating.end), (at(7, 3), at(7, 9)));
+    assert_eq!(&text[floating.start_byte..floating.end_byte], "load()");
+    let thenable = find(&d, "adapter/oxlint/typescript/await-thenable");
+    assert_eq!(thenable.severity, Severity::Warn);
+    assert_eq!(&text[thenable.start_byte..thenable.end_byte], "await 42");
+    // oxlint's JSON carries no edits for type rules either: `manual`, with
+    // the help line and the rule's docs.
+    for x in &d {
+        assert_eq!(x.fix, FixClass::Manual);
+        assert!(x.edits.is_empty());
+        assert!(x.steps.last().unwrap().contains("https://oxc.rs/docs/guide/usage/linter/rules/typescript/"), "{:?}", x.steps);
+    }
+    assert_eq!(thenable.steps[0], "Remove unnecessary `await`.");
+    // The `ts` pack names typescript-eslint's rules `typescript-eslint/<rule>`
+    // in `ported_from:`, so W-105's rule replaces this finding (shown once);
+    // the eslint plugin keeps its own name.
+    let m = manifest("oxlint").unwrap();
+    assert_eq!(m.ported_id("typescript/no-floating-promises"), "typescript-eslint/no-floating-promises");
+    assert_eq!(m.ported_id("eslint/no-debugger"), "eslint/no-debugger");
+}
+
+/// W-107: a type-aware result depends on the whole program, so a config
+/// that names `typeAware` is not cached; any other oxlint config is.
+#[test]
+fn oxlint_type_aware_config_is_not_cached() {
+    let m = manifest("oxlint").unwrap();
+    let config = read(&fixture("oxlint-type-aware").join(".oxlintrc.json"));
+    assert!(m.uncached(config.as_bytes()));
+    assert!(!m.uncached(br#"{ "rules": { "eslint/no-debugger": "error" } }"#));
+    assert!(!m.uncached(b""));
+    for other in ["ruff", "stylelint", "html-validate"] {
+        assert!(!manifest(other).unwrap().uncached(config.as_bytes()), "{other}");
+    }
 }
 
 #[test]

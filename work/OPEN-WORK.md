@@ -42,12 +42,14 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-93 itself | |
 | 🔴 **Guidance-vs-check experiment — approve running it** ([W-102](open/W-102-guidance-vs-check-experiment.md)). 180 Claude Code sessions (arms A, B, C × 20 tasks × 3 runs) of `claude-opus-5-5`; estimate per session ~250k–450k input tokens (mostly cache reads), ~30k–50k cache writes, ~6k–9k output → **~$86 in all (range ~$45–$170)**, 9–18 hours one at a time; disk a few MB. **1. Name the agent CLI** — proposed: Claude Code 2.1, `claude -p … --setting-sources project --strict-mcp-config` (`experiment.toml` `[agent.claude]`; `--bare` instead if you run on `ANTHROPIC_API_KEY`). **2. Allow `fux` (D-34) in arm C outside CI** — its ratified scope is the CI build of the index packages. **3. Run it** from the main checkout: `python3 experiments/guidance-vs-check/harness.py run --agent claude --out experiments/guidance-vs-check/runs/2026-10-w102` (the same command resumes; `harness.py plan` reprints the estimate; `--arms A,B,C,D` adds the optional check arm, 60 sessions, ~$22). Say **"approve running it"** (and which CLI), or name a cheaper model or fewer runs. | 2026-10-27 |
 | ↳ **blocks:** W-102 itself (the runs, the write-up, step 4's README line); W-35's line on it | |
+| 🔴 **oxlint type-aware — a live capture** ([W-107](../archive/open/W-107-oxlint-type-aware-gap.md), closed on a fixture built from oxlint's documented JSON). Nothing here installs oxlint (L11), so run it in your own shell, outside the repo: `d=$(mktemp -d) && cp -R crates/codelaw-adapters/tests/fixtures/oxlint-type-aware/. "$d" && cd "$d" && npm init -y >/dev/null && npm add -D oxlint oxlint-tsgolint typescript@7 && printf '{"compilerOptions":{"strict":true,"target":"es2022","module":"nodenext"}}' > tsconfig.json && npx oxlint --format=json src/index.ts > stdout.json; npx oxlint --version` — then hand `stdout.json` and the version to an agent, which swaps it in (`@ROOT@` for the folder) and checks the test still holds. Or say **"skip it"**: the fixture stands. | 2026-10-27 |
+| ↳ **blocks:** nothing else in the queue | |
 
 ---
 
-## Open items (20)
+## Open items (19)
 
-### build (18)
+### build (17)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -79,7 +81,6 @@ here. Read that record before changing anything below it.
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
-🟢 **W-107** `agent` Type rules today: prove oxlint's type-aware mode (`oxlint-tsgolint` 7.x, `options.typeAware`) flows through the oxlint adapter; USAGE section. Filed by Arpit (Cowork). [detail](open/W-107-oxlint-type-aware-gap.md)
 
 🟡 **W-105** waits on **W-104** `agent` Type-aware rules: `codelaw-types` Node helper on the project's TypeScript 7.1 API, `type:` clause, warm programs, `ts/type-error`, first rules in `ts` — preview on the 7.1 RC (11-10), stable after GA (11-24). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
