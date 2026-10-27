@@ -1,0 +1,147 @@
+# fux-bump — fux-engine at its latest, every commit still pinned (W-91; D-34;
+# SR-PACKAGES decision 14). Daily, and by hand:
+#
+#     gh workflow run fux-bump.yml -R arpitarya/codelaw                    # PyPI's latest
+#     gh workflow run fux-bump.yml -R arpitarya/codelaw -f version=5.1.0   # an exact release: a rollback, or a test of this job
+#
+# `scripts/fux-index.py latest` compares fux-engine's latest release on PyPI
+# (one read-only GET) with FUX_VERSION. The same: nothing is written, the run is
+# green. Newer: `fux-index.py bump <v>`, then `assemble --out dist` and
+# `check dist` with exactly that fux, and the one-line change is committed on
+# `deps/fux-<v>` and proposed as ONE pull request:
+#   - the branch is rebuilt from main on every run and pushed only when its tree
+#     changed (main moved, or the bump did), so a re-run of the same version
+#     updates that branch and its PR rather than opening another;
+#   - the open PR is found by its head branch — `gh pr edit` if there is one,
+#     `gh pr create` if not — and an open PR from an OLDER `deps/fux-*` branch is
+#     closed as superseded, so at most one fux bump is ever open.
+#
+# 🔑 Token: GITHUB_TOKEN only, no secret to keep. A push or PR made with
+#   GITHUB_TOKEN starts no workflow, so ci.yml would never judge the bump. The
+#   one event GITHUB_TOKEN may start is workflow_dispatch: after each push this
+#   job runs `gh workflow run ci.yml --ref deps/fux-<v>` (hence `actions: write`).
+#   The trade-off, chosen over a personal token (a secret that expires and
+#   carries a person's rights): ci.yml runs as a `workflow_dispatch` run on the
+#   branch, not a `pull_request` one — every job runs fresh (dispatch never
+#   reuses a verdict), its checks land on the PR's head commit, and the PR body
+#   links the run. A human push to the branch, or closing and reopening the PR,
+#   starts the ordinary push / pull_request runs.
+# ⚠ `gh pr create` needs the repository setting *Allow GitHub Actions to create
+#   and approve pull requests* (Settings → Actions → General) — the decider's.
+#   While it is off the job pushes the branch and then fails, red, naming it.
+#
+# Every `run:` is `bash -eo pipefail`; every action is pinned by commit SHA and
+# its comment names the release (W-18). No third-party action or package (L11):
+# `gh`, `git` and the standard-library Python on the runner, and two actions
+# ci.yml already pins.
+name: fux-bump
+on:
+  schedule:
+    - cron: '0 4 * * *' # 09:30 IST, after ci.yml's nightly
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'an exact fux-engine release to pin instead of PyPI''s latest (blank: the latest)'
+        required: false
+        default: ''
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash # an explicit `bash` is `bash --noprofile --norc -eo pipefail`; the implicit default has no pipefail
+concurrency:
+  group: fux-bump
+  cancel-in-progress: false
+jobs:
+  bump:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write # push deps/fux-<v>
+      pull-requests: write # open or update its one PR
+      actions: write # dispatch ci.yml on the branch — the one event GITHUB_TOKEN may start
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: true # this job pushes deps/fux-<v>, and nothing else
+      - name: fux-engine on PyPI against FUX_VERSION
+        id: want
+        env:
+          FUX_LATEST: ${{ inputs.version }} # blank on the schedule: PyPI's latest
+        run: |
+          python3 scripts/fux-index.py latest > "$RUNNER_TEMP/latest"
+          read -r state version < "$RUNNER_TEMP/latest"
+          pinned="$(sed -n 's/^FUX_VERSION = "\([^"]*\)".*/\1/p' scripts/fux-index.py)"
+          { echo "state=$state"; echo "version=$version"; echo "pinned=$pinned"; } >> "$GITHUB_OUTPUT"
+          if [ "$state" = current ]; then
+            echo "✔ fux-engine $pinned is pinned and is the latest — nothing to do" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - if: steps.want.outputs.state == 'newer'
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: '3.12' # fux-engine needs >= 3.12
+      - name: bump FUX_VERSION, then build every index package with that fux, twice, and check them
+        if: steps.want.outputs.state == 'newer'
+        env:
+          V: ${{ steps.want.outputs.version }}
+        run: |
+          python3 scripts/fux-index.py bump "$V"
+          python3 -m venv "$RUNNER_TEMP/fux"
+          "$RUNNER_TEMP/fux/bin/pip" install --quiet "fux-engine==$V"
+          python3 scripts/fux-index.py assemble --out dist --fux "$RUNNER_TEMP/fux/bin/fux"
+          python3 scripts/fux-index.py check dist
+      - name: commit on deps/fux-<v>, open or update its one PR, run ci.yml on it
+        if: steps.want.outputs.state == 'newer'
+        env:
+          V: ${{ steps.want.outputs.version }}
+          OLD: ${{ steps.want.outputs.pinned }}
+        run: |
+          branch="deps/fux-$V"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -q -c "$branch"
+          git add scripts/fux-index.py
+          printf 'deps: fux-engine %s → %s (W-91, fux-bump.yml)\n\nBuilt and checked by %s: fux-index.py assemble + check with fux %s.\n\nno SR affected\n' \
+            "$OLD" "$V" "$run_url" "$V" | git commit -q -F -
+          dispatch=false
+          if git fetch -q origin "refs/heads/$branch" 2>/dev/null \
+            && [ "$(git rev-parse 'FETCH_HEAD^{tree}')" = "$(git rev-parse 'HEAD^{tree}')" ]; then
+            echo "$branch already holds this tree — not pushed"
+          else
+            git push -q --force origin "HEAD:refs/heads/$branch" # the job's own branch, rebuilt from main each run
+            dispatch=true
+          fi
+          printf '%s\n' \
+            "fux-engine **$OLD → $V**, found by [fux-bump.yml]($run_url) (W-91; D-34: every fux-engine release is ratified, each commit pins one)." \
+            "" \
+            "- \`scripts/fux-index.py\`'s \`FUX_VERSION\` is the only change." \
+            "- That run built every Fux index package with fux $V, twice, and \`fux-index.py check dist\` passed." \
+            "- ci.yml runs on this branch as a \`workflow_dispatch\` run (a PR opened with GITHUB_TOKEN starts no \`pull_request\` run); its checks are on the head commit. Merge when it is green." \
+            > "$RUNNER_TEMP/body.md"
+          pr="$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --body-file "$RUNNER_TEMP/body.md" >/dev/null
+            echo "updated #$pr" >> "$GITHUB_STEP_SUMMARY"
+          else
+            url="$(gh pr create --base main --head "$branch" --title "deps: fux-engine $OLD → $V" --body-file "$RUNNER_TEMP/body.md")" || {
+              echo "::error title=fux-bump::gh pr create failed — the repository setting 'Allow GitHub Actions to create and approve pull requests' (Settings → Actions → General) must be on. $branch is pushed."
+              exit 1
+            }
+            pr="${url##*/}"
+            dispatch=true # a PR that is new to this run has had no CI run yet
+            echo "opened $url" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          gh pr list --state open --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"' |
+            while read -r n head; do
+              case "$head" in
+                deps/fux-*) [ "$head" = "$branch" ] || gh pr close "$n" --delete-branch --comment "Superseded by #$pr (fux-engine $V)." ;;
+              esac
+            done
+          if [ "$dispatch" = true ]; then
+            gh workflow run ci.yml --ref "$branch"
+            echo "dispatched ci.yml on $branch" >> "$GITHUB_STEP_SUMMARY"
+          fi
