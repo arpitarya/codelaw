@@ -144,6 +144,10 @@ served_pypi="$(grep -c '"GET /files/[^ ]*\.whl HTTP/1.1" 200' "$work/index.log" 
 # ── the skills package (W-77): the agent files, from the npm install and from the PyPI install ──
 for reg in npm pypi; do
   a="$work/$reg/agents"; mkdir -p "$a"; cp -R "$root/fixtures/skills-consumer/." "$a/"; git -C "$a" init -q
+  # inside the smoke project, so its node_modules / venv are found upwards; `root = true`
+  # makes it its own project, as it is in a consumer's repo (CI run 40390477529: a nested
+  # config may not set `extends`, SR-CONFIG decision 2)
+  { printf 'root = true\n'; cat "$a/codelaw.toml"; } >"$a/codelaw.toml.new" && mv "$a/codelaw.toml.new" "$a/codelaw.toml"
 done
 (cd "$work/npm/agents" && node "$(native "$work/npm/node_modules/codelaw/bin/codelaw.js")" sync-agents >/dev/null &&
   node "$(native "$work/npm/node_modules/codelaw/bin/codelaw.js")" sync-agents --check >/dev/null) ||
