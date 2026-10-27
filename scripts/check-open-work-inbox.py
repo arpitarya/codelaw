@@ -5,8 +5,8 @@ directly beneath it is exactly one `*Empty since YYYY-MM-DD ...*` declaration
 and nothing else; when it carries rows, nothing follows them.
 
 It also checks rule 23b: every 🟡 row names what it waits on right
-after its id (`🟡 **W-nn** waits on **W-mm**`), and rule 37b: every group heading
-under `## Open items` carries its count of open items (`### build (10)`).
+after its id (`🟡 **W-nn** waits on **W-mm**`), and rule 37b: `## Open items (12)` and every group
+heading under it carry their count of open items (`### build (10)`).
 
 Read-only. Exits 0 (silent) if well-formed or absent; exits 1 with a one-line
 reason on stdout if not. This script states no rule of its own.
@@ -90,7 +90,7 @@ def check_yellow(open_work: Path):
     """Every reason a 🟡 row under `## Open items` breaks rule 23b, or an empty list."""
     lines = open_work.read_text(encoding="utf-8").splitlines()
     try:
-        start = next(i for i, l in enumerate(lines) if l.strip() == "## Open items")
+        start = next(i for i, l in enumerate(lines) if OPEN_HEAD.match(l.strip()))
     except StopIteration:
         return []
     rows = []
@@ -134,13 +134,15 @@ def check_yellow(open_work: Path):
 # `## Open items` carries the number of open items under it — `### build (10)`,
 # `### testing (0)`. The rule is stated in the record, not here.
 RULE_COUNTS = "37b"
+#: `## Open items (12)` — the total, the same rule (Arpit, 2026-10-27).
+OPEN_HEAD = re.compile(r"^## Open items(?: \((?P<n>\d+)\))?$")
 GROUP_HEAD = re.compile(r"^### (?P<name>.+?)(?: \((?P<n>\d+)\))?\s*$")
 
 
 def group_counts(lines):
     """[(line index, name, stated count or None, rows under it)] for `## Open items`."""
     try:
-        start = next(i for i, l in enumerate(lines) if l.strip() == "## Open items")
+        start = next(i for i, l in enumerate(lines) if OPEN_HEAD.match(l.strip()))
     except StopIteration:
         return []
     groups = []
@@ -159,11 +161,24 @@ def group_counts(lines):
 def check_counts(open_work: Path):
     """Every reason a group heading's count is missing or wrong, or an empty list."""
     lines = open_work.read_text(encoding="utf-8").splitlines()
-    return [
+    out = [
         f"rule {RULE_COUNTS}: `### {name}` must read `### {name} ({rows})`"
         + ("" if stated is None else f" — it says ({stated})")
         for _, name, stated, rows in group_counts(lines) if stated != rows
     ]
+    head = next((OPEN_HEAD.match(l.strip()) for l in lines if OPEN_HEAD.match(l.strip())), None)
+    if head is not None:
+        start = next(i for i, l in enumerate(lines) if OPEN_HEAD.match(l.strip()))
+        total = 0
+        for l in lines[start + 1:]:
+            if l.startswith(("# ", "## ")):
+                break
+            total += bool(ROW_LEAD.match(l))
+        stated = None if head.group("n") is None else int(head.group("n"))
+        if stated != total:
+            out.insert(0, f"rule {RULE_COUNTS}: `## Open items` must read `## Open items ({total})`"
+                       + ("" if stated is None else f" — it says ({stated})"))
+    return out
 
 
 def main():

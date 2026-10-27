@@ -175,6 +175,7 @@ the top.
 37b. **Every group heading carries its count of open items** (Arpit,
     2026-10-26: *"in front of every title in open items put a count of open
     items"*) — `### build (10)`, `### testing (0)`; an empty group says `(0)`.
+    `## Open items (12)` carries the total the same way (Arpit, 2026-10-27).
     The count is of rows, and changes in the same edit as the row it counts.
     Checked on every write by `scripts/check-open-work-inbox.py`.
 38. Each item's file names the record its change will update, or says

@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items
+## Open items (13)
 
 ### build (11)
 

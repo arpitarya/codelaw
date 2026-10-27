@@ -45,7 +45,8 @@ SKIP_DIRS = {".git", "target", "node_modules", "worktrees"}
 def section(lines, heading):
     """The lines under `heading` up to the next `---` line or `## ` heading."""
     try:
-        start = next(i for i, l in enumerate(lines) if l.strip() == heading)
+        # `## Open items (12)` is `## Open items` (SR-WORK-OPEN-QUEUE rule 37b)
+        start = next(i for i, l in enumerate(lines) if re.sub(r" \(\d+\)$", "", l.strip()) == heading)
     except StopIteration:
         return None
     out = []
