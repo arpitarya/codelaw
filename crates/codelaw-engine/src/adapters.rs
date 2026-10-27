@@ -85,30 +85,34 @@ impl Project {
 
     /// One adapter over `files`: cached results where the file, the
     /// adapter's version and its config are unchanged, one run for the rest.
+    /// A config that turns on whole-program checking (the manifest's
+    /// `uncached_when`) is never cached: its findings depend on other files.
     fn run_adapter(&self, ready: &Ready, files: &[&FileEntry]) -> AdapterRun {
         let mut out = AdapterRun::default();
         let source = ready.source();
         let mut memo = BTreeMap::new();
-        let mut misses: Vec<(&FileEntry, OnDisk, codelaw_cache::Key)> = Vec::new();
+        let mut misses: Vec<(&FileEntry, OnDisk, codelaw_cache::Key, bool)> = Vec::new();
         for entry in files.iter().copied().filter(|e| ready.manifest.handles(e.language)) {
             let Some(file) = on_disk(entry) else { continue };
+            let config = self.adapter_config(ready, &entry.rel, &mut memo);
+            let cached = !ready.manifest.uncached(&config);
             let key = KeyBuilder::new("adapter")
                 .part(CACHE_VERSION)
                 .part(&source)
                 .part(ready.manifest.args.join("\0"))
                 .part(&entry.rel)
                 .part(&file.bytes)
-                .part(self.adapter_config(ready, &entry.rel, &mut memo))
+                .part(config)
                 .key();
-            match self.cache.get::<Vec<Diagnostic>>(&key) {
+            match cached.then(|| self.cache.get::<Vec<Diagnostic>>(&key)).flatten() {
                 Some(d) => out.diagnostics.extend(d),
-                None => misses.push((entry, file, key)),
+                None => misses.push((entry, file, key, cached)),
             }
         }
         if misses.is_empty() {
             return out;
         }
-        let rels: Vec<String> = misses.iter().map(|(e, _, _)| e.rel.clone()).collect();
+        let rels: Vec<String> = misses.iter().map(|(e, _, _, _)| e.rel.clone()).collect();
         let report = match codelaw_adapters::check_files(ready, self.root(), &rels, self.config.adapter_timeout()) {
             Ok(r) => r,
             Err(e) => {
@@ -117,7 +121,7 @@ impl Project {
             }
         };
         out.warnings.extend(report.warnings.iter().map(|w| format!("adapter `{}`: {w}", ready.manifest.name)));
-        for (entry, file, key) in misses {
+        for (entry, file, key, cached) in misses {
             let mut d: Vec<Diagnostic> = report
                 .findings
                 .get(&entry.rel)
@@ -128,7 +132,9 @@ impl Project {
             if file.bom {
                 shift_for_bom(&mut d);
             }
-            self.cache.put(&key, &d);
+            if cached {
+                self.cache.put(&key, &d);
+            }
             out.diagnostics.extend(d);
         }
         out
