@@ -32,6 +32,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** none.
 - **Next:** the decider runs the capture, or says "skip it".
 
+## 2026-10-27 — W-104: the records for type-aware rules  ·  Claude Code (Opus 5.5)
+
+- **Asked:** implement and close W-104 — amend L3, L5, L6, L8 on W-101's ruling; write SR-TYPES; the `type:` clause; resolve SR-ARCHITECTURE's open line; the decider confirms L11. Records only.
+- **Done:** L3 decision 9, L5 (TypeScript version an input), L6 decision 3's runtime exception, L8's two `unset` operations and decision 8 — each quoting the ruling's words from the proposal §3; SR-TYPES (0117, accepted, built: no); SR-RULE-FORMAT 3f; SR-ARCHITECTURE's Consequences line and decision 28; DESIGN §3.6 and its risks row; glossary *type question*, *type helper*. No `CLAUDE.md` change: no law's handle line changed.
+- **Decided / left open:** agent's calls, flagged: L3 decision 9 says JavaScript is not type-checked and restates decision 5's isolation for a TS program; L8's operations are not put in `perf/budgets.toml` until W-105 can time them; SR-TYPES gets no Ownership row (nothing it owns exists yet). Put to the decider: (1) the project's TypeScript is no dependency; (2) codelaw's own CI/test copy of `typescript` 7.1 (Apache-2.0) is one and needs a row. W-104 stays open on them.
+- **Mistakes:** none.
+- **Next:** the decider answers the L11 row; then W-104 closes and W-105 starts.
+
 ## 2026-10-27 — W-101 researched and ruled: type-aware TS rules on the project's own TypeScript 7.1  ·  Cowork (Fable 5.1, then Opus 5.5)
 
 - **Asked:** *"W101. research and propose."* Then a voice walk-through (how it works, what is built, decisions, blockers) and *"go ahead and write all these things."*

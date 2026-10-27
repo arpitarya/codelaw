@@ -13,7 +13,7 @@ owns:
   - fixtures/scss
   - crates/codelaw-cli/tests/scss.rs
 laws: [L0, L3]
-timestamp: 2026-10-26T12:00:00Z
+timestamp: 2026-10-27T20:00:00Z
 content_sha: ""
 ---
 
@@ -24,9 +24,9 @@ content_sha: ""
 
 **The law (L3).**
 
-> **codelaw lints and formats nine languages, twelve file types: JavaScript, JSX, TypeScript, TSX, JSON (with JSONC), YAML, TOML, CSS, SCSS, HTML, Markdown and Python.** JSX and TSX are first-class: every capability that works for `.js`/`.ts` works for `.jsx`/`.tsx`. **SCSS is a CSS dialect, as JSX is a JavaScript one:** `.scss` files are linted and formatted, and every capability that works for `.css` works for `.scss` (the `.sass` indented syntax and Less stay out). It works on a repo that holds **only one** of them and on a repo that holds **any combination**, from **one binary**, in **one run**. **No language is second-class**: every capability that ships for one ships for all nine, unless a rule explicitly limits itself to some.
+> **codelaw lints and formats nine languages, twelve file types: JavaScript, JSX, TypeScript, TSX, JSON (with JSONC), YAML, TOML, CSS, SCSS, HTML, Markdown and Python.** JSX and TSX are first-class: every capability that works for `.js`/`.ts` works for `.jsx`/`.tsx`. **SCSS is a CSS dialect, as JSX is a JavaScript one:** `.scss` files are linted and formatted, and every capability that works for `.css` works for `.scss` (the `.sass` indented syntax and Less stay out). It works on a repo that holds **only one** of them and on a repo that holds **any combination**, from **one binary**, in **one run**. **No language is second-class**: every capability that ships for one ships for all nine, unless a rule explicitly limits itself to some. **Type-aware checks of TypeScript are in the core when the project has TypeScript ≥ 7.1:** codelaw asks the project's own TypeScript, never a copy of its own.
 
-**Ruled by Arpit, 2026-10-18;** CSS and HTML added by his ruling the same day, keeping YAML, TOML and Markdown. **Amended 2026-10-26 (W-62)** on his ruling that SCSS joins as a CSS dialect — *"The CSS pack should work with SCSS, and CSS modules as well"* and *"Create separate packages for SCSS and CSS modules"* — with B-047 ruled the same day, *"Own grammar / tree-sitter-scss"*. **This amendment was written by an agent on that ruling.**
+**Ruled by Arpit, 2026-10-18;** CSS and HTML added by his ruling the same day, keeping YAML, TOML and Markdown. **Amended 2026-10-26 (W-62)** on his ruling that SCSS joins as a CSS dialect — *"The CSS pack should work with SCSS, and CSS modules as well"* and *"Create separate packages for SCSS and CSS modules"* — with B-047 ruled the same day, *"Own grammar / tree-sitter-scss"*. **This amendment was written by an agent on that ruling.** **Amended 2026-10-27 (W-104)** on his ruling of W-101 the same day (by voice, rulings R1, R5 and R6 of [the proposal](../work/proposals/type-aware-rules.md) §3), that type-aware TypeScript checks come into the core through TypeScript 7.1's own API — *"wouldn't it be a good idea to go with TypeScript one since it's already close?"* · *"It does."* — with the rules in the `ts` pack — *"the rules go in TS pack, the existing one."* — on the project's installed copy — *"go with the copy that project already uses … based on different version, there could be different rules."* Decision 9; **written by an agent on that ruling.**
 
 **Why it exists.** Real repos are mixed: a React or Stencil front end, Python services or tooling, and a pile of config (`package.json`, `tsconfig.json`, `pyproject.toml`, CI YAML) and docs. A linter that covers only some of these pushes the rest back to five different tools, five configs, and five things an agent has to know about.
 
@@ -80,9 +80,13 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 3. **Together.** A repo with any mix is checked in **one invocation**, with one config, one report and one exit code.
 4. **Selectable.** Any language can be switched off per repo (`languages = [...]` in `codelaw.toml`) or per run (`--lang python`, `--lang js,ts`). A language that's off costs nothing: its grammar isn't loaded and its rules aren't parsed.
 5. **Isolation.** A file's diagnostics and fixed bytes are identical whether it's checked alone, inside a single-language repo, or inside the all-languages repo.
-6. **Equal capability.** `check`, `fix`, `test`, `rules --for`, `explain`, MCP tools, hooks and LSP all work for all nine. A rule that applies to only some languages says so in its `languages:` field; that is the only permitted asymmetry.
+6. **Equal capability.** `check`, `fix`, `test`, `rules --for`, `explain`, MCP tools, hooks and LSP all work for all nine. A rule that applies to only some languages says so in its `languages:` field; that is the only permitted asymmetry. Type-aware rules (decision 9) are such rules: their `languages:` is TypeScript's.
 7. **Distribution.** How codelaw reaches Python and Node users, and the guarantee that both packages behave identically, is [L6](0008_LAW-6-python-and-node-packages.md)'s, and isn't restated here.
 8. **Markdown is linted as Markdown.** Headings, links, code fences and frontmatter are in scope. Fenced code blocks inside Markdown are linted with their own language's rules only when `markdown.lint_code_blocks = true`; it's off by default, because examples in docs are often deliberately wrong (codelaw's own `Don't` blocks, for instance).
+9. **Type-aware TypeScript.** TypeScript and TSX files get type-aware checks when the project has **TypeScript ≥ 7.1** installed: codelaw asks **the project's own copy**, through its API, a fixed set of type questions, and reports TypeScript's own errors; the design is [SR-TYPES](0117_types.md).
+   - **The rules live in the `ts` pack** (`@codelaw/rules-ts`); TypeScript's own errors are `ts/type-error`.
+   - **A project without TypeScript ≥ 7.1, or without Node, loses only the type rules:** they are skipped with a note, and every other capability runs. A Python-only or JS-only repo is unaffected (decision 2).
+   - **Isolation (decision 5) holds:** a type check reads the file's TypeScript program — its `tsconfig.json` and the files that program includes — and nothing else, so other languages in the repo change nothing.
 
 #### How L3 is enforced
 
@@ -95,13 +99,14 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 
 - Vue, Svelte and Angular templates.
 - The `.sass` indented syntax and Less (CSS dialects). SCSS is in, as of 2026-10-26.
-- **Type-aware checks**, which need a type checker. tree-sitter has none, so these go to adapters (typescript-eslint/oxlint, pyright/mypy). See DESIGN §3.6.
+- **Type-aware checks of Python**, which need a type checker codelaw does not drive; tree-sitter has none, so they go to adapters (pyright/mypy). Type-aware checks of TypeScript are in, as of 2026-10-27 (decision 9); until they are built (W-105), oxlint's type-aware mode covers them through the oxlint adapter (W-107).
 - Any eighth language.
 
 ### Consequences
 
 - **Every capability is tested nine times.** The fixture matrix is the price of decision 6.
-- **Vue, Svelte, Angular, Sass (indented)/Less and type-aware checks stay outside the core** until this law is amended; adapters cover them.
+- **Vue, Svelte, Angular, Sass (indented)/Less and Python's type-aware checks stay outside the core** until this law is amended; adapters cover them.
+- **Type-aware TypeScript (2026-10-27) brings a runtime for one capability:** the type rules run on Node and the project's TypeScript ≥ 7.1 ([L6](0008_LAW-6-python-and-node-packages.md) decision 3), and only in a project that has both. Built by W-105; until then decision 9 is law with no code, and the register says `partly`.
 - **SCSS** (2026-10-26): `crates/codelaw-cli/tests/scss.rs` runs the `css` and `scss` packs over `fixtures/scss/corpus` against pinned counts, checks that the `css/*` rules stay quiet on valid Sass, and that `codelaw format` on `.scss` is idempotent; `laws.rs`'s matrix includes `scss` as a twelfth file type.
 - **Checked on every CI run** by `crates/codelaw-cli/tests/laws.rs`: `l3_each_language_alone_and_together` (the fixture matrix and decision 5's isolation diff) and `l3_a_language_switched_off_costs_nothing`. The runtime fence runs in `scripts/smoke.sh` (W-18).
 
@@ -114,6 +119,7 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 
 - [`docs/DESIGN.md`](../docs/DESIGN.md) §3: the engine and the grammars this law constrains.
 - The decider's ruling of 2026-10-18 (worklog entry of that date).
+- [SR-TYPES](0117_types.md): how decision 9's type-aware checks work; the ruling of 2026-10-27 is [the proposal](../work/proposals/type-aware-rules.md) §3.
 
 ### Veto condition
 
@@ -127,6 +133,6 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-LINTER](0106_linter.md) · [SR-LAW-6](0008_LAW-6-python-and-node-packages.md)
+**Records** — [SR-LINTER](0106_linter.md) · [SR-LAW-6](0008_LAW-6-python-and-node-packages.md) · [SR-TYPES](0117_types.md)
 
-**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)
+**Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [`work/proposals/type-aware-rules.md`](../work/proposals/type-aware-rules.md)
