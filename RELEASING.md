@@ -63,8 +63,8 @@ at the first release with the security packs `@codelaw/rules-security-js`, `-sec
 the skills package `@codelaw/skills` (`codelaw-skills-<v>.tgz`; it depends on `codelaw` at
 the same version, so publish it after `codelaw` is on npm at that version) —
 publish just those tarballs by hand from the 0.2.0 `dist`, then run
-`npm-trust.sh` again (it skips nothing, and re-binding an existing package is
-harmless); `publish.yml` then skips the versions already on npm.
+`npm-trust.sh` again (a name already trusted answers E409, which counts as
+trusted; `--fux-index` adds the Fux index packages); `publish.yml` then skips the versions already on npm.
 
 1. **npm:** create the `@codelaw` organisation (account with 2FA).
 2. **npm, first publish by hand** — from the `dist` artifact of a green
@@ -110,10 +110,21 @@ L6 decision 12: each pack that holds rules has a companion `@codelaw/rules-<name
 
 **The pin moves by pull request, never by hand-edit on main (W-91; D-34).** `.github/workflows/fux-bump.yml` runs daily and on `gh workflow run fux-bump.yml` (`-f version=<v>` pins an exact release instead: a rollback, or a test of the job). `python3 scripts/fux-index.py latest` compares PyPI's fux-engine with `FUX_VERSION`; on a newer one the job runs `bump <v>`, `assemble` and `check` with that fux, commits on `deps/fux-<v>` and opens one PR, or updates the open one (and closes an older `deps/fux-*` PR as superseded). It uses `GITHUB_TOKEN` only, so it dispatches `ci.yml` on the branch itself: the PR's CI is a `workflow_dispatch` run on its head commit. Merge it when green. **It needs the repository setting *Allow GitHub Actions to create and approve pull requests* (Settings → Actions → General)**; while that is off the job pushes the branch and fails naming it.
 
-**Step 5 of W-34, the decider's hand, is open.** Per name, as the pack names were done: npm first publish by hand from the `fux-index` artifact (`gh run download <run-id> -n fux-index`; `npm publish dist/fux-index/npm/<tarball> --access public`), then `scripts/npm-trust.sh` for the new names; PyPI by `twine upload` of the ten wheels with your token (four new projects a day), then a trusted publisher on each project. Only after that does `publish.yml` learn to upload `dist/fux-index/` (a follow-up change to its `npm` and `pypi` jobs), so a release never waits on a name nobody reserved. **Built locally instead of from CI:** `--fux <path>` takes a fux at exactly `FUX_VERSION` (`pip install fux-engine==<FUX_VERSION>` in a venv of its own); any other version is refused.
+**Step 5 of W-34, the decider's hand, is open.** Per name, as the pack names were done: npm first publish by hand from the `fux-index` artifact (`gh run download <run-id> -n fux-index`; `npm publish dist/fux-index/npm/<tarball> --access public`), then `scripts/npm-trust.sh --fux-index` for the new names; PyPI by `twine upload` of the ten wheels with your token (four new projects a day), then a trusted publisher on each project. Only after that does `publish.yml` learn to upload `dist/fux-index/` (a follow-up change to its `npm` and `pypi` jobs), so a release never waits on a name nobody reserved. **Built locally instead of from CI:** `--fux <path>` takes a fux at exactly `FUX_VERSION` (`pip install fux-engine==<FUX_VERSION>` in a venv of its own); any other version is refused.
 
 ## Every release
 
+0. **Re-check the npm trusted publishers.** npm lists a new trusted publisher
+   as *Pending validation* until a publish uses it, with a deadline (*"Publish
+   once before … to validate this configuration"*, about two days); past it,
+   the configuration lapses. A name that is already on npm at the release's
+   version is skipped by `publish.yml`, so nothing validates it — the Fux
+   index packages above are never published by CI yet. Read each package's
+   *Trusted Publisher* on npmjs.com (or let `publish.yml`'s `trust` job
+   report), then re-add what lapsed: `scripts/npm-trust.sh --fux-index`. A name
+   still trusted answers E409 and counts as trusted; any other failure is
+   listed at the end and the script exits 1.
+   ([W-85](archive/open/W-85-npm-first-publish.md).)
 1. **Bump:** `python3 scripts/version.py --set 0.2.0` — Cargo.toml, Cargo.lock
    and the seventeen pack manifests; every npm and PyPI manifest is generated from
    it — the skills package's and its `codelaw-skills.json` too (W-77). Commit and push to `main`.

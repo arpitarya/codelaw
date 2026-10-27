@@ -6,8 +6,8 @@ item: W-85
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-27
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5)"
+ball: closed
 ---
 
 # W-85 — npm: first-publish the nine new packages, then trust `publish.yml`
@@ -18,7 +18,7 @@ ball: agent
 |---|---|---|---|
 | 1 | The decider picks the version these nine are first published at | every package agrees with the engine it needs | ✅ **0.2.0** — Arpit published at 0.2.0, 2026-10-27 07:33 IST, from a local build of `main` |
 | 2 | `npm publish` by hand: `@codelaw/rules-scss`, `rules-css-modules`, `rules-security-js`, `rules-security-ts`, `rules-security-html`, `@codelaw/vite-plugin`, `webpack-plugin`, `next`, `@codelaw/skills` | the nine names exist on npm (a trusted publisher binds only to a package that exists) | ✅ 2026-10-27 — all nine `latest: 0.2.0` (dist-tags endpoint; the package pages lagged) |
-| 3 | `scripts/npm-trust.sh` | every release package trusts `publish.yml` · `npm`, the nine included | ✗ 2026-10-27: stopped at the first name, `codelaw` — **E409**, *"a trusted publisher configuration … already exists"* — under `set -e`, so none of the nine was reached. → ✅ the 24 untrusted names, 2026-10-27 (browser 11, Arpit's CLI loop the rest); `npm-trust.sh`'s E409 fix is left (an agent) |
+| 3 | `scripts/npm-trust.sh` | every release package trusts `publish.yml` · `npm`, the nine included | ✗ 2026-10-27: stopped at the first name, `codelaw` — **E409**, *"a trusted publisher configuration … already exists"* — under `set -e`, so none of the nine was reached. → ✅ the 24 untrusted names, 2026-10-27 (browser 11, Arpit's CLI loop the rest); `npm-trust.sh`'s E409 fix ✅ 2026-10-27 (an agent): E409 counts as trusted, the loop carries on, failures listed with exit 1 |
 | 4 | The 15 `@codelaw/rules-<name>-fux-index` packages trust `publish.yml` too — `npm-trust.sh` reads `package.py names`, which does not list them | W-34's later `publish.yml` upload is accepted | ✅ 2026-10-27 — added in the browser and by Arpit's CLI loop; all 15 show `arpitarya/codelaw` · `publish.yml` · `npm` |
 | 5 | Check each package's *Trusted Publisher* shows `arpitarya/codelaw` · `publish.yml` · `npm` | proof, not belief | ✅ 2026-10-27 07:52 IST — all 24 read back in the browser: *Pending validation*, `npm publish` allowed |
 
@@ -46,8 +46,10 @@ npm lists every new trusted publisher as *Pending validation* with a deadline: *
 
 ## What is left
 
-- `scripts/npm-trust.sh`: an E409 (*"already exists"*) counts as trusted and the loop carries on; `fux-index.py names` included, or a flag for them.
-- The expiry re-check above, as a step of the next release (RELEASING.md §Every release).
+Nothing — closed 2026-10-27 (an agent, Claude Code):
+
+- ✅ `scripts/npm-trust.sh`: an E409 (*"already exists"*) counts as trusted and the loop carries on; any other failure prints ✗, the loop carries on, and the script exits 1 listing the failed names. The 15 Fux index names come in behind `--fux-index` (a flag, because `publish.yml` does not publish them yet and each name costs a security-key tap); `--dry-run` kept; fd 3 kept, so npm keeps stdin. Verified offline: `bash -n`, and a stubbed `npx` on `PATH` returning E409 for `codelaw` and E403 for `@codelaw/rules-css` (E404 for `@codelaw/rules-css-fux-index` with `--fux-index`) — exit 1, both failures listed, every other name reached.
+- ✅ The expiry re-check: RELEASING.md §Every release, step 0.
 
 ## The commands as filed (before the publish)
 
@@ -80,6 +82,8 @@ while read -r r n <&3; do [ "$r" = npm ] && npx -y npm@12 trust github "$n" --fi
 npm: the nine still missing are W-85; the 15 Fux index packages are live and get their trust in W-85 too. Nothing else in `package.py names` or `fux-index.py names` is unpublished.
 
 ## Definition of done
+
+✅ all met, 2026-10-27.
 
 - The nine show `<v>` on npmjs.com; each package's *Trusted Publisher* lists `arpitarya/codelaw` · `publish.yml` · `npm` — and so do the 15 Fux index packages.
 - The version picked in step 1 is written here with the decider's words.

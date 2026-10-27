@@ -12,7 +12,7 @@ descendant selector on Windows only, and `css/no-irregular-whitespace` failed th
 
 **Why it exists.** *Arpit, 2026-10-26 (B-047): "Own grammar / tree-sitter-scss".* SCSS
 (`.scss`) is a CSS dialect under L3; `codelaw-lang` parses it with this grammar. It is a
-dependency under L11 (a copy is one): `DEPENDENCIES.md` D-33.
+dependency under L11 (a copy is one): [L11's list](../../../../records/0013_LAW-11-dependencies.md) D-33.
 
 **Not a fork yet.** `src/` is upstream's, as published. When a construct needs a grammar
 change, bump the version suffix (`1.0.0+codelaw.1`) and `GRAMMARS_FINGERPRINT`, as the CSS

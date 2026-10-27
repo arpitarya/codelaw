@@ -210,18 +210,18 @@ const BUILD_TOOLS: &[BuildTool] = &[
         source: "https://pypi.org/pypi/uv/0.11.3/json (license_expression; no requires_dist)",
     },
     // The optional Fux index packages (scripts/fux-index.py, W-34). A licence declaration
-    // only: whether Fux may be depended on is DEPENDENCIES.md D-34, `pending` the decider's ruling.
+    // only: whether Fux may be depended on is L11's list D-34 (records/0013_LAW-11-dependencies.md), ratified 2026-10-27.
     BuildTool {
         registry: "pypi",
         name: "fux-engine",
         licence: "MIT",
         requires: &["fux-core", "fux-reader", "fux-writer"],
         extras: &[],
-        source: "DEPENDENCIES.md D-34 (MIT, 5.1.1; pending)",
+        source: "SR-LAW-11 list, D-34 (MIT; ratified unversioned, FUX_VERSION pins one)",
     },
-    BuildTool { registry: "pypi", name: "fux-core", licence: "MIT", requires: &[], extras: &[], source: "DEPENDENCIES.md D-34 (fux-engine's pinned dependency)" },
-    BuildTool { registry: "pypi", name: "fux-reader", licence: "MIT", requires: &[], extras: &[], source: "DEPENDENCIES.md D-34 (fux-engine's pinned dependency)" },
-    BuildTool { registry: "pypi", name: "fux-writer", licence: "MIT", requires: &[], extras: &[], source: "DEPENDENCIES.md D-34 (fux-engine's pinned dependency)" },
+    BuildTool { registry: "pypi", name: "fux-core", licence: "MIT", requires: &[], extras: &[], source: "SR-LAW-11 list, D-34 (fux-engine's pinned dependency)" },
+    BuildTool { registry: "pypi", name: "fux-reader", licence: "MIT", requires: &[], extras: &[], source: "SR-LAW-11 list, D-34 (fux-engine's pinned dependency)" },
+    BuildTool { registry: "pypi", name: "fux-writer", licence: "MIT", requires: &[], extras: &[], source: "SR-LAW-11 list, D-34 (fux-engine's pinned dependency)" },
     BuildTool {
         registry: "npm",
         name: "npm",

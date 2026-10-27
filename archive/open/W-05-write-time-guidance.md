@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-20: codelaw guides an agent while it writes code, n
 item: W-05
 filed: 2026-10-20
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
+updated: 2026-10-27
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: cowork
+ball: arpit
 ---
 
 # W-05 — Guide the agent while it writes, not only after
@@ -28,6 +28,10 @@ ball: cowork
 **Arpit, 2026-10-25 (voice), on the Fux layer:** the package author builds the index — *"rather than Fux trying to re-ingest it, it can search through multiple indexes … one Fux index present at the root of a project … another index present inside node modules package"* — and codelaw ships it as *"a separate package for Fux index. It shouldn't be added as a default one"*, `@codelaw/rules-js-fux-index`, on *"NPM as well as PyPI"*. So: **neither A nor B below** — the Fux half is Fux's item 298 and codelaw's W-34; the before/while/after story is W-35.
 
 **Model:** Cowork — research; step 2's prototype may hand to Claude Code once step 1 is done.
+
+**Researched 2026-10-27 (Cowork, Opus 5.5):** step 1 done for eight agents (all have a pre-write hook; Cowork's is unreliable); step 3 measured — matcher roots give a construct for ~20 of 652 rules, so the brief is cut by what is specific to the repo instead; step 2's timing taken from the existing `fix_one_file` / `watch_rerun` measurements (p95 76 ms / 3–6 ms). [The proposal](../proposals/write-time-guidance.md); the decider rules R1–R3 (inbox row filed 2026-10-27), then step 5's records and step 6's build item.
+
+**Arpit, 2026-10-27 (voice):** *"Yes to all three."* — on W-05's R1 (build `hook --pre` for every agent with a pre-write hook, fail-open, deny only new `error`s), R2 (brief by what is specific to this repo) and R3 (the surface kind *Gate* and an L8 budget). [Proposal](../proposals/write-time-guidance.md). **Closed 2026-10-27:** the rulings are in; the build is [W-93](../../work/open/W-93-hook-pre-and-brief.md), which writes the record amendments first.
 
 ## Goal
 

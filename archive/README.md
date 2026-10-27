@@ -22,11 +22,16 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 | `proposals/` | implemented or rejected proposals |
 | `worklog/` | worklog slices cut at each major release |
 | `bootstrap/` | the WORK-SYSTEM.md this repo's work system was set up from |
+| `DEPENDENCIES.md` | a retired root file (W-90); see *Root files* |
 
 ## `open/`
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-90-l11-holds-the-dependency-list.md`](open/W-90-l11-holds-the-dependency-list.md) | 2026-10-27 | [SR-LAW-11](../records/0013_LAW-11-dependencies.md) — L11 "dependencies", its §3 the list and the ledger; `crates/codelaw-cli/tests/dependencies.rs` |
+| [`W-85-npm-first-publish.md`](open/W-85-npm-first-publish.md) | 2026-10-27 | [`RELEASING.md`](../RELEASING.md) §One time, by hand and §Every release step 0; [`scripts/npm-trust.sh`](../scripts/npm-trust.sh) |
+| [`W-36-position-against-eslint-and-biome.md`](open/W-36-position-against-eslint-and-biome.md) | 2026-10-27 | [proposal](../work/proposals/linter-for-ai-positioning.md); gaps W-94–W-100, W-101, W-102; the README |
+| [`W-05-write-time-guidance.md`](open/W-05-write-time-guidance.md) | 2026-10-27 | [proposal](../work/proposals/write-time-guidance.md); the build [W-93](../work/open/W-93-hook-pre-and-brief.md) |
 | [`W-44-watch-mode.md`](open/W-44-watch-mode.md) | 2026-10-27 | `codelaw check --watch` / `fix --watch`: [SR-ARCHITECTURE](../records/0108_architecture.md) decisions 22 and 22a, [SR-CLI-MCP](../records/0115_cli-and-mcp.md), `crates/codelaw-engine/src/watch.rs`, the smoke's watch step |
 | [`W-71-tests-for-new-code.md`](open/W-71-tests-for-new-code.md) | 2026-10-27 | `graph/untested-function`, `graph/function-coverage`, `.codelawignore` and `codelaw:tests` — their rule pages in [`packs/`](../packs) and USAGE "tests for new code"; `codelaw debug changed-functions` |
 | [`W-70-dev-server-example-apps.md`](open/W-70-dev-server-example-apps.md) | 2026-10-27 | [`examples/dev-servers/`](../examples/dev-servers) and CI's `dev-servers` job; [SR-PACKAGES](../records/0107_packages.md) decision 3a |
@@ -158,6 +163,12 @@ B-043, B-044 and B-045 are live in [`work/BACKLOG.md`](../work/BACKLOG.md).
 
 | file | outcome | successor |
 |---|---|---|
+
+## Root files
+
+| file | archived | ruling | successor |
+|---|---|---|---|
+| [`DEPENDENCIES.md`](DEPENDENCIES.md) | 2026-10-27 | the decider, W-90 (voice docket): *"Move it to archive."* | [SR-LAW-11](../records/0013_LAW-11-dependencies.md) §3 — the list, its statuses and the ledger |
 
 ## `bootstrap/`
 

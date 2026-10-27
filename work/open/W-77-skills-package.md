@@ -59,7 +59,7 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · records | L6 lists the two packages; SR-PACKAGES §1 gains them and names the one allowed runtime dependency (codelaw, exact); SR-AGENT-SURFACES moves "ship inside both packages" to the skills package; `DEPENDENCIES.md` ratifies `codelaw` as the skills package's dependency (L11, Arpit 2026-10-27) — all in the same change as the code | ✅ L6 decisions 4, 10, 13 + enforcement; SR-PACKAGES §1, decisions 2, 3b, 7, 11; SR-AGENT-SURFACES decisions 1, 7, 8; SR-LAW-10 decisions 6–7 (the `agents/` exception); `DEPENDENCIES.md` D-35 — same change as the code |
+| 1 · records | L6 lists the two packages; SR-PACKAGES §1 gains them and names the one allowed runtime dependency (codelaw, exact); SR-AGENT-SURFACES moves "ship inside both packages" to the skills package; L11's list ratifies `codelaw` as the skills package's dependency (L11, Arpit 2026-10-27) — all in the same change as the code | ✅ L6 decisions 4, 10, 13 + enforcement; SR-PACKAGES §1, decisions 2, 3b, 7, 11; SR-AGENT-SURFACES decisions 1, 7, 8; SR-LAW-10 decisions 6–7 (the `agents/` exception); L11's list D-35 — same change as the code |
 | 2 · packages | `packaging/npm/skills` → `@codelaw/skills` (`dependencies: { "codelaw": "X" }`); `codelaw-skills` pure-data wheel (`py3-none-any`, `codelaw==X`); both generated like every other manifest (SR-PACKAGES) | ✅ `scripts/package.py` `stage_skills` → `data_tarball` (`codelaw-skills-<v>.tgz`, `dependencies: {codelaw: v}`) and `data_wheel` (`codelaw_skills-<v>-py3-none-any.whl`, `Requires-Dist: codelaw==<pep440>`); README `packaging/npm/skills/README.md`; manifests generated from the one version; `stage-skills <dir>` for a local copy |
 | 3 · engine | the binary no longer embeds `templates/agents/**`; `init --agents`, `sync-agents` and the hook installer read the installed package; output identical to today's for the same version (golden test) | ✅ `TEMPLATES` holds no `agents/` file (test refuses one); `crates/codelaw-agents/src/package.rs` finds the package (`CODELAW_SKILLS`, `node_modules/@codelaw/skills` upwards, site-packages, the binary's own env); golden: the assembled npm tarball and PyPI wheel each give the same 79 files, byte for byte, as the pre-W-77 binary on a 5-target consumer; `commands.rs` requires npm = PyPI |
 | 4 · refusals | no skills package → exit 2 with `npm i -D @codelaw/skills` / `pip install codelaw-skills`; version mismatch → exit 2 naming both; tests for each, on both packagings | ✅ none → exit 2, both install lines, where it looked; other version → exit 2 naming both, on the npm and the PyPI layout; `init --agents --no-install` refuses before writing; `the_skills_package_is_found_or_refused`, `package::tests` |
@@ -73,7 +73,7 @@ None to build — built 2026-10-27. **DoD 6 is Arpit's**, filed as an inbox row 
 
 ## Record affected
 
-[SR-LAW-6](../../records/0008_LAW-6-python-and-node-packages.md) (the package list), [SR-PACKAGES](../../records/0107_packages.md) §1 and the zero-runtime-dependency rule, [SR-AGENT-SURFACES](../../records/0102_agent-surfaces.md) (where the files ship), [SR-LAW-11](../../records/0013_LAW-11-no-dependencies.md) via `DEPENDENCIES.md`.
+[SR-LAW-6](../../records/0008_LAW-6-python-and-node-packages.md) (the package list), [SR-PACKAGES](../../records/0107_packages.md) §1 and the zero-runtime-dependency rule, [SR-AGENT-SURFACES](../../records/0102_agent-surfaces.md) (where the files ship), [SR-LAW-11](../../records/0013_LAW-11-dependencies.md) via L11's list.
 
 ## Hazards
 
@@ -86,4 +86,4 @@ None to build — built 2026-10-27. **DoD 6 is Arpit's**, filed as an inbox row 
 ## Reference
 
 - `templates/agents/` · `crates/codelaw-agents/src/{skills,sync,hook}.rs` · `crates/codelaw-cli/src/{init,main}.rs`
-- [SR-LAW-6](../../records/0008_LAW-6-python-and-node-packages.md) · [SR-PACKAGES](../../records/0107_packages.md) · [SR-AGENT-SURFACES](../../records/0102_agent-surfaces.md) · [SR-LAW-10](../../records/0012_LAW-10-consumer-templates.md) · [SR-LAW-11](../../records/0013_LAW-11-no-dependencies.md)
+- [SR-LAW-6](../../records/0008_LAW-6-python-and-node-packages.md) · [SR-PACKAGES](../../records/0107_packages.md) · [SR-AGENT-SURFACES](../../records/0102_agent-surfaces.md) · [SR-LAW-10](../../records/0012_LAW-10-consumer-templates.md) · [SR-LAW-11](../../records/0013_LAW-11-dependencies.md)

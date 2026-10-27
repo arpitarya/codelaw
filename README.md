@@ -33,7 +33,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 
 Your rules live in five tools, five config files and one wiki page — and only some of those places can say no.
 
-**codelaw puts every rule in one Markdown file that people, CI and AI agents all read, and one engine that enforces it.** The agent gets the rules before it writes, is checked while it writes, and is fixed after. Your editor, your pre-commit hook and your CI run the very same check — with no AI anywhere in it.
+**codelaw puts every rule in one Markdown file that people, CI and AI agents all read, and one engine that enforces it.** The agent gets the rules before it writes and is fixed after; checking each edit while it writes is being built ([W-93](work/open/W-93-hook-pre-and-brief.md)). Your editor, your pre-commit hook and your CI run the very same check — with no AI anywhere in it.
 
 ---
 
@@ -41,8 +41,8 @@ Your rules live in five tools, five config files and one wiki page — and only 
 
 | moment | what happens | where it stands |
 |---|---|---|
-| **Before** the AI writes | it asks what applies to this file and gets the rules for it | ✅ today: the MCP tool `rules_for_path` (or `codelaw rules --for <path>`), and the skills `codelaw init --agents` installs. Narrowing that list to the few rules a task needs (`brief_for_task`) is in design, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
-| **While** the AI writes | every edit is checked before it reaches disk; a bad line is refused with the reason and the fix | 🧪 **in design**: `codelaw hook --pre`, tracked in [W-05](work/open/W-05-write-time-guidance.md) |
+| **Before** the AI writes | it asks what applies to this file and gets the rules for it | ✅ today: the MCP tool `rules_for_path` (or `codelaw rules --for <path>`), and the skills `codelaw init --agents` installs. Narrowing that list to the few rules a task needs (`brief_for_task`) is in design, tracked in [W-93](work/open/W-93-hook-pre-and-brief.md) |
+| **While** the AI writes | every edit is checked before it reaches disk; a bad line is refused with the reason and the fix | 🧪 **in design**: `codelaw hook --pre`, tracked in [W-93](work/open/W-93-hook-pre-and-brief.md) |
 | **After** the AI writes | anything that slips through is fixed on save, in the hook and in CI | ✅ today: `codelaw hook`, `codelaw check`, `codelaw fix`, and fix-on-save in the editor extension |
 | **Without AI** | a person, an editor, a pre-commit hook or a CI job runs `check`, `fix` and `format` — the way you run ESLint and Prettier, or Biome | ✅ today: the CLI, `codelaw lsp`, `--format sarif` for code scanning |
 
@@ -94,7 +94,7 @@ Every door gets the same answer, because they all call the same engine.
 | **A rule's documentation** | kept apart from the code that runs it | the rule file itself, tested against its own examples |
 | **AI agents** | read your instructions file | ask codelaw for the rules, and are checked after every edit |
 
-You keep the rules you know: **441 rules are reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint**, and none of those tools needs to be installed.
+You keep the rules you know: **492 rules are reimplemented from ESLint and its plugins, typescript-eslint, Ruff, Bandit, stylelint, html-validate and markdownlint**, and none of those tools needs to be installed.
 
 **A warning on your laptop, an error in CI** — one config, no second file for the pipeline. codelaw runs the `ci` profile when `CI` is set, `local` otherwise, and an AI agent's hook runs `ci`, so an agent never leaves behind what CI would fail. A glob can be told never to fail the run, or never to warn ([usage guide](USAGE.md#warn-on-a-laptop-fail-in-ci)):
 
@@ -202,7 +202,7 @@ def greet(names=None):
 | 🧱 **Fixes can restructure code** | Fix primitives move and regroup code, for example gathering every `export` into one block at the end of the file. A plain node-for-node replace can't do that. |
 | 🔁 **Deterministic** | Same files and config in, same output out, with or without an AI agent. Every fix is re-parsed and checked before it's written, and a fix that would break the file is rolled back. |
 | 🤖 **Built for AI coding agents** | `--format agent` gives one line per finding with its fix, ready to feed back to an agent after every edit. |
-| 📦 **Standard rules included** | 652 rules reimplemented from ESLint, typescript-eslint, Ruff, stylelint, html-validate and markdownlint, so your team's own rules sit on top of a familiar base. |
+| 📦 **Standard rules included** | 652 rules reimplemented or written new: 492 ported from ESLint and its plugins, typescript-eslint, Ruff, Bandit, stylelint, html-validate and markdownlint, and 160 of codelaw's own — so your team's rules sit on top of a familiar base. |
 
 **For the person who owns the codebase:** the review comment you keep writing becomes a rule file, once. From then on a person, a CI job and every AI agent get the same answer — and the answer can be audited, because it is a file in your repo and not a model's opinion.
 

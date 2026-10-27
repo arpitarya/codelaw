@@ -30,7 +30,7 @@ ball: agent
 
 **Model:** Opus — it amends a law and moves every CSS rule onto new trees.
 
-**Arpit, 2026-10-27 (voice docket):** *"Ratify it."* — `tree-sitter-cli` 0.25.10 is **D-36** in `DEPENDENCIES.md`, on the terms put to the decider: exact pin, the regenerated `src/` committed (so CI, the engine and users never need the tool), run only when a grammar changes. `work/BLOCKED.json` back to `PROCEED`; W-62 re-balled to agent. *Left* items 1–2 can start.
+**Arpit, 2026-10-27 (voice docket):** *"Ratify it."* — `tree-sitter-cli` 0.25.10 is **D-36** in L11's list, on the terms put to the decider: exact pin, the regenerated `src/` committed (so CI, the engine and users never need the tool), run only when a grammar changes. `work/BLOCKED.json` back to `PROCEED`; W-62 re-balled to agent. *Left* items 1–2 can start.
 
 ## Goal
 
@@ -68,7 +68,7 @@ ball: agent
 
 ## Built (2026-10-26, Claude Code)
 
-- `Language::Scss` (`.scss`, `scss` fence and heading), `Grammar::Scss` over `crates/codelaw-lang/grammars/tree-sitter-scss` (1.0.0, commit `5da5ba7`, unchanged `src/`, own `bindings/rust`; `DEPENDENCIES.md` D-33), the grammar fingerprint, Biome's SCSS formatter and parser check, `format` markers for `//`, the config schema, the VS Code extension, `codelaw init`.
+- `Language::Scss` (`.scss`, `scss` fence and heading), `Grammar::Scss` over `crates/codelaw-lang/grammars/tree-sitter-scss` (1.0.0, commit `5da5ba7`, unchanged `src/`, own `bindings/rust`; L11's list D-33), the grammar fingerprint, Biome's SCSS formatter and parser check, `format` markers for `//`, the config schema, the VS Code extension, `codelaw init`.
 - The CSS statement reader has an SCSS mode (`css_syntax::parse_scss`): `//` comments blanked (same offsets), `#{}` interpolation as one unit, Sass at-rules and nested-property blocks kept as `Other` statements, `&-suffix` as one nesting selector, `!default`/`!global`/`!optional` not unknown annotations, `rgba($c, $a)` not an alias, `&` inside a mixin rooted. The 70 `css_rule!` rules run on `Scss`; 64 declare it. Rules run on the root even when it is `ERROR` (tree-sitter-scss cannot read all modern Sass), once.
 - The `scss` pack: 15 rules, `scss/recommended` (7) and `scss/strict` (extends it, +8), data tables `scss/at-rules` and `scss/functions`.
 
@@ -86,7 +86,7 @@ ball: agent
 
 ## Blockers
 
-**ASK, 2026-10-26 (`work/BLOCKED.json`):** *Left* items 1 and 2 need the tree-sitter CLI (npm `tree-sitter-cli` 0.25.10, MIT, build-time only) to regenerate `src/` from a patched `grammar.js`. It is not installed on this machine and not in `DEPENDENCIES.md`, so L11 forbids it until the decider ratifies it by name. Question: ratify `tree-sitter-cli` 0.25.10? On a yes: add the D-row, patch both grammars, bump to `1.0.0+codelaw.1`, move the CSS rules onto trees, re-ball to agent. Item 3 (corpus) needs CI network and is independent. B-047 itself was ruled 2026-10-26.
+**ASK, 2026-10-26 (`work/BLOCKED.json`):** *Left* items 1 and 2 need the tree-sitter CLI (npm `tree-sitter-cli` 0.25.10, MIT, build-time only) to regenerate `src/` from a patched `grammar.js`. It is not installed on this machine and not in L11's list, so L11 forbids it until the decider ratifies it by name. Question: ratify `tree-sitter-cli` 0.25.10? On a yes: add the D-row, patch both grammars, bump to `1.0.0+codelaw.1`, move the CSS rules onto trees, re-ball to agent. Item 3 (corpus) needs CI network and is independent. B-047 itself was ruled 2026-10-26.
 
 ## Record affected
 

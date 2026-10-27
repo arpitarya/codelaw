@@ -293,7 +293,7 @@ The rule file itself is shown in the [README](README.md#a-rule-is-one-markdown-f
 
 ### While: the edit is checked before it reaches disk
 
-🧪 **In design**, not built: `codelaw hook --pre` checks a proposed edit and refuses it with the reason and the fix. Tracked in [W-05](work/open/W-05-write-time-guidance.md).
+🧪 **In design**, not built: `codelaw hook --pre` checks a proposed edit and refuses it with the reason and the fix. Tracked in [W-93](work/open/W-93-hook-pre-and-brief.md).
 
 ### After: every edit is checked and fixed
 

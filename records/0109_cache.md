@@ -62,7 +62,7 @@ The decider made performance a law (L8) and asked for a caching record. Caches w
 3. **Location:** `.codelaw/cache/` in the repo root, gitignored ([SR-CONSUMER-LAYOUT](0111_consumer-layout.md)). It can be overridden with `CODELAW_CACHE_DIR` or `[cache] dir`. In CI the folder can be restored between runs (for example with `actions/cache`), keyed by the codelaw version.
 4. **Format on disk:**
    - one file per entry, in subfolders by the first two key bytes;
-   - a versioned header, then a compact binary body in codelaw's own format (`crates/codelaw-cache/src/codec.rs`: fixed-width little-endian numbers, `u64` length-prefixed strings and sequences, fixed field order — no crate, [L11](0013_LAW-11-no-dependencies.md)). The header's version number changes with the body format: an entry with another version, a short or corrupt body, or trailing bytes is a miss.
+   - a versioned header, then a compact binary body in codelaw's own format (`crates/codelaw-cache/src/codec.rs`: fixed-width little-endian numbers, `u64` length-prefixed strings and sequences, fixed field order — no crate, [L11](0013_LAW-11-dependencies.md)). The header's version number changes with the body format: an entry with another version, a short or corrupt body, or trailing bytes is a miss.
 5. **Safe under concurrency and crashes:**
    - writes go to a temp file and are renamed into place (atomic);
    - readers never see half an entry;
