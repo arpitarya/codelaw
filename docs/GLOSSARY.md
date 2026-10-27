@@ -35,8 +35,10 @@ description: "Recurring terms, defined once."
 | project root | the topmost config, or a nested config with `root = true`; one graph and one baseline per project root (SR-ARCHITECTURE) |
 | warm socket | the `.codelaw/cache/run/<pid>.sock` a running lsp, mcp or daemon registers so one-shot runs can reuse it (SR-ARCHITECTURE) |
 | semantic model | the per-file map of scopes, bindings and references that rules like `no-unused-vars` query (SR-ARCHITECTURE decision 15a) |
-| brief | the rules for a set of paths and constructs, given to an agent before it writes; `codelaw brief`, MCP `brief_for_task` (proposed, W-05) |
-| pre-write check | `codelaw hook --pre`: the proposed file checked in memory before it reaches disk; only new violations reported (proposed, W-05) |
+| brief | what is specific to this repo for a set of paths, given to an agent before it writes: its own rules, the pack rules it configures, the rules with exceptions there and the `manual` security rules, then a count of the standard rest; `codelaw brief --for`, MCP `brief_for_task`; SR-CLI-MCP decision 14 |
+| pre-write check | `codelaw hook --pre`: the proposed file checked in memory before it reaches disk; only what the write adds counts, a new `error` refuses it; SR-AGENT-SURFACES decision 9 |
+| gate | the fourth kind of agent surface, beside Instruct, Query and Enforce: a pre-write hook that can refuse a write before it lands, and that fails open on codelaw's own failure; SR-AGENT-SURFACES |
+| rebuilt buffer | the text a file will hold once an agent's edit tool has run, built in memory from the file on disk and the hook payload (`Write`, `Edit`, `edits[]`, `apply_patch`) exactly as the tool would build it; SR-AGENT-SURFACES decision 9 |
 | native rule | a rule whose matcher is implemented in the engine in Rust; its Markdown file still carries docs, fix class and examples (SR-ARCHITECTURE decision 15b) |
 | change set | the files counted as touched: from `--changed-since`, `--staged` or the agent hook, never inferred; SR-BASELINE |
 | ratchet | a baseline may only shrink: `fix` and `baseline prune` lower counts, only `baseline add` raises one, and `baseline check --since` fails CI on any loosening; SR-BASELINE decision 5 |

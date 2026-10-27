@@ -288,12 +288,15 @@ The rule file itself is shown in the [README](README.md#a-rule-is-one-markdown-f
 
 - **`codelaw mcp`** is an MCP server over stdio. An agent calls `rules_for_path` before writing, `check_snippet` on a draft, `explain_rule` on a finding, and `format_snippet` for the exact bytes `fix` would write.
 - **The same answer from the CLI:** `codelaw rules --for src/math.ts`.
+- **Only what is specific to this repo:** `brief_for_task` (MCP) or `codelaw brief --for src/math.ts [--format json]` lists this repo's own rules, the pack rules your config sets options for, the rules with baseline entries or other exceptions under those paths, and the security rules whose fix is `manual` — then one line counting the standard rules left, which the agent already knows from ESLint or Ruff ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 14).
 - **The agent files come from the skills package**, installed beside codelaw at the same version: `npm i -D @codelaw/skills` or `pip install codelaw-skills` (`uv add --dev codelaw-skills`). It depends on that exact `codelaw`, and codelaw itself carries no agent file; without it, or at another version, `init --agents` and `sync-agents` stop with exit 2 and the install line. `CODELAW_SKILLS=<folder>` points at a copy elsewhere.
 - **`codelaw init --agents claude,codex,copilot,kiro,cowork`** installs it with the packs and writes each agent's instruction files, skills, MCP registration and hook from it and your rules; `codelaw sync-agents` rewrites them when the rules change, and `--check` reports drift ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
 
 ### While: the edit is checked before it reaches disk
 
-🧪 **In design**, not built: `codelaw hook --pre` checks a proposed edit and refuses it with the reason and the fix. Tracked in [W-93](work/open/W-93-hook-pre-and-brief.md).
+- **`codelaw hook --pre`** is the pre-write hook. It reads the agent's proposed `Write`, `Edit`, `MultiEdit`, `apply_patch`, `write_file` or `replace` from stdin, rebuilds the file in memory exactly as the tool would, and checks it against the file on disk with the `ci` profile. **Only what the edit adds counts:** a new `error` refuses the write, with each rule, line and fix; new warnings are allowed and handed back as context on Claude Code and Codex.
+- **It fails open.** A payload it cannot read, a broken config, a crash or a run past `--timeout-ms` (5,000) lets the write through with one line on stderr and exit 0. Shell writes (`sed -i`, `>`) skip every pre-write hook; the post-write hook below stays the backstop.
+- **Every agent with a pre-write hook:** `--agent claude|codex|copilot|vscode|kiro|cursor|gemini|windsurf` picks the answer's shape (read off the payload when omitted). `codelaw init --agents` writes it for Claude Code (`PreToolUse` in `.claude/settings.json`, which Cursor and VS Code also read), the Cowork plugin, and Codex's printed snippet; Copilot's and Kiro's wait for a confirmed payload ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md) decision 9).
 
 ### After: every edit is checked and fixed
 
@@ -441,12 +444,14 @@ flowchart LR
 | `codelaw exceptions` | List every exception (baseline entry, deprecation, inline ignore) with its expiry, days left and owner: `--expiring 30d`, `--expired`, `--mine`, `--rule`, `--path`, `--group-by added_by\|rule\|file\|expires-month`, `--format text\|json\|csv\|markdown`, `--fail-if-expiring 7d` ([SR-BASELINE](records/0104_baseline-and-deprecations.md) decision 11) |
 | `codelaw deprecate <symbol>` | Deprecate a symbol: write the registry entry and baseline every current use, for `graph/no-deprecated-usage` |
 | `codelaw hook [paths]` | Check and fix the files an agent just edited; what is left goes back to it |
+| `codelaw hook --pre [--agent <name>]` | Judge the write an agent proposes before it reaches disk; refuse it when it adds an error. Fails open |
 | `codelaw sync-agents` | Write every agent's instruction files from the rules and skills; `--check` reports drift |
 | `codelaw daemon start\|stop\|status` | An opt-in warm process that `--prefer-warm` runs use; the output is the same |
 | `codelaw deps refresh` | Read npm and the Python index for every dependency the manifests name and write `.codelaw/deps-snapshot.json`, which `data/outdated-dependency` reads offline; the only command that uses the network. `--as-of` sets the `fetched` day |
 | `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
 | `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set ([L8](records/0010_LAW-8-performance-budgets.md)) |
 | `codelaw debug` | Inspect what the engine sees: `changed-functions` |
+| `codelaw brief` | What is specific to this repo for the files an agent is about to write (SR-CLI-MCP decision 14) |
 
 <!-- /docs-sync:commands -->
 

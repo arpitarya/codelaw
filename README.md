@@ -33,7 +33,7 @@ JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML �
 
 Your rules live in five tools, five config files and one wiki page — and only some of those places can say no.
 
-**codelaw puts every rule in one Markdown file that people, CI and AI agents all read, and one engine that enforces it.** The agent gets the rules before it writes and is fixed after; checking each edit while it writes is being built ([W-93](work/open/W-93-hook-pre-and-brief.md)). Your editor, your pre-commit hook and your CI run the very same check — with no AI anywhere in it.
+**codelaw puts every rule in one Markdown file that people, CI and AI agents all read, and one engine that enforces it.** The agent gets the rules before it writes, each edit is checked before it lands, and anything left is fixed after. Your editor, your pre-commit hook and your CI run the very same check — with no AI anywhere in it.
 
 ---
 
@@ -41,8 +41,8 @@ Your rules live in five tools, five config files and one wiki page — and only 
 
 | moment | what happens | where it stands |
 |---|---|---|
-| **Before** the AI writes | it asks what applies to this file and gets the rules for it | ✅ today: the MCP tool `rules_for_path` (or `codelaw rules --for <path>`), and the skills `codelaw init --agents` installs. Narrowing that list to the few rules a task needs (`brief_for_task`) is in design, tracked in [W-93](work/open/W-93-hook-pre-and-brief.md) |
-| **While** the AI writes | every edit is checked before it reaches disk; a bad line is refused with the reason and the fix | 🧪 **in design**: `codelaw hook --pre`, tracked in [W-93](work/open/W-93-hook-pre-and-brief.md) |
+| **Before** the AI writes | it asks what applies to these files and gets the handful of rules that matter here — this repo's own, the ones it configures, the ones this code has got wrong — not a wall of standard ones | ✅ today: the MCP tool `brief_for_task` (or `codelaw brief --for <path>`), `rules_for_path` for the full list, and the skills `codelaw init --agents` installs |
+| **While** the AI writes | every edit is checked before it reaches disk; a bad line is refused with the reason and the fix | ✅ today: `codelaw hook --pre`, the pre-write hook of Claude Code, Codex, Copilot, VS Code, Kiro, Cursor, Gemini and Windsurf; it fails open |
 | **After** the AI writes | anything that slips through is fixed on save, in the hook and in CI | ✅ today: `codelaw hook`, `codelaw check`, `codelaw fix`, and fix-on-save in the editor extension |
 | **Without AI** | a person, an editor, a pre-commit hook or a CI job runs `check`, `fix` and `format` — the way you run ESLint and Prettier, or Biome | ✅ today: the CLI, `codelaw lsp`, `--format sarif` for code scanning |
 

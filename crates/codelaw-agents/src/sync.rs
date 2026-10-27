@@ -182,7 +182,7 @@ fn parse_json(existing: Option<&str>, path: &str) -> Result<Value, String> {
 }
 
 /// Whether a Claude Code hook entry is codelaw's: a command that runs
-/// `codelaw … hook`.
+/// `codelaw … hook` (`hook --pre` under `PreToolUse`).
 fn is_codelaw_hook(entry: &Value) -> bool {
     entry["hooks"].as_array().is_some_and(|hs| {
         hs.iter().any(|h| h["command"].as_str().is_some_and(|c| c.contains("codelaw") && c.split_whitespace().any(|w| w == "hook")))
@@ -194,16 +194,24 @@ fn claude_hook_group(files: &AgentFiles, cmd: &str) -> Result<Value, String> {
     json_template(files, "claude/hook-group.json", &[("cmd", &json_escape(cmd))])
 }
 
-/// `.claude/settings.json` with codelaw's `PostToolUse` entry replaced.
+/// Claude Code's `PreToolUse` group, the Gate (decision 9).
+fn claude_pre_hook_group(files: &AgentFiles, cmd: &str) -> Result<Value, String> {
+    json_template(files, "claude/pre-hook-group.json", &[("cmd", &json_escape(cmd))])
+}
+
+/// `.claude/settings.json` with codelaw's `PreToolUse` and `PostToolUse`
+/// entries replaced.
 fn with_claude_hook(files: &AgentFiles, existing: Option<&str>, path: &str, cmd: &str) -> Result<String, String> {
     let mut v = parse_json(existing, path)?;
     let obj = v.as_object_mut().ok_or_else(|| format!("{path}: not a JSON object"))?;
     let hooks = obj.entry("hooks").or_insert_with(|| json!({}));
     let hooks = hooks.as_object_mut().ok_or_else(|| format!("{path}: `hooks` is not an object"))?;
-    let post = hooks.entry("PostToolUse").or_insert_with(|| json!([]));
-    let post = post.as_array_mut().ok_or_else(|| format!("{path}: `hooks.PostToolUse` is not a list"))?;
-    post.retain(|e| !is_codelaw_hook(e));
-    post.push(claude_hook_group(files, cmd)?);
+    for (event, group) in [("PreToolUse", claude_pre_hook_group(files, cmd)?), ("PostToolUse", claude_hook_group(files, cmd)?)] {
+        let list = hooks.entry(event).or_insert_with(|| json!([]));
+        let list = list.as_array_mut().ok_or_else(|| format!("{path}: `hooks.{event}` is not a list"))?;
+        list.retain(|e| !is_codelaw_hook(e));
+        list.push(group);
+    }
     Ok(pretty(&v))
 }
 
@@ -320,7 +328,8 @@ pub fn plan(root: &Path, cfg: &AgentsConfig, sources: &Sources, agents: &AgentFi
         files.insert(".mcp.json".into(), Some(with_json_key(read(".mcp.json").as_deref(), ".mcp.json", "mcpServers", stdio.clone())?));
     }
     if has(Target::Cowork) {
-        let hooks = json_template(agents, "cowork/hooks.json", &[("group", &claude_hook_group(agents, &cmd)?.to_string())])?;
+        let pre = claude_pre_hook_group(agents, &cmd)?.to_string();
+        let hooks = json_template(agents, "cowork/hooks.json", &[("pre", &pre), ("group", &claude_hook_group(agents, &cmd)?.to_string())])?;
         let mcp = json_template(agents, "cowork/mcp.json", &[("server", &stdio.to_string())])?;
         let manifest = json_template(agents, "cowork/plugin.json", &[("version", &json_escape(env!("CARGO_PKG_VERSION")))])?;
         files.insert(format!("{COWORK_PLUGIN}/.claude-plugin/plugin.json"), Some(pretty(&manifest)));
@@ -507,6 +516,7 @@ mod tests {
         let v: Value = serde_json::from_str(&out).unwrap();
         let post = v["hooks"]["PostToolUse"].as_array().unwrap();
         assert_eq!(post.len(), 2);
+        assert_eq!(v["hooks"]["PreToolUse"][0]["hooks"][0]["command"], "uv run codelaw hook --pre --agent claude");
         assert_eq!(post[0]["hooks"][0]["command"], "./lint.sh");
         assert_eq!(post[1]["hooks"][0]["command"], "uv run codelaw hook");
         assert_eq!(v["model"], "x");

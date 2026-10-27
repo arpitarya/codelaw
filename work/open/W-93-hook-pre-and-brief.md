@@ -6,7 +6,7 @@ item: W-93
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-27
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -16,14 +16,14 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 0 | Records first: SR-AGENT-SURFACES gains the surface kind **Gate** and the pre-write column of the agent matrix; SR-CLI-MCP gains `hook --pre`, `brief --for`, MCP `brief_for_task`, fail-open; SR-LAW-8 gains `hook_pre` (< 100 ms warm target); glossary *gate*, *brief*, *rebuilt buffer* | the spec before the code | ⏳ |
-| 1 | The core: rebuild the post-edit file from disk + payload exactly as the tool would (exact match, `replace_all`/`allow_multiple`, `edits[]` in order, CRLF kept); old text not found → allow; check under its path, `ci` profile; only **new** diagnostics count | one verdict, testable with no agent | ⏳ |
-| 2 | Adapters with pinned payload fixtures: Claude Code (`Write`, `Edit`), Codex (`apply_patch` parser, multi-file), Gemini (`write_file`, `replace`), Cursor, Copilot / VS Code; Windsurf and Kiro by exit 2 + stderr | every agent with a pre-write hook | ⏳ |
-| 3 | Verdict: new `error` → deny with `--format agent` lines and each fix; new `warning`s → allow + context; `auto` fixes named, never applied through the agent's input; own crash/timeout/unknown payload → **allow**, exit 0, a stderr line | safe to switch on | ⏳ |
-| 4 | `codelaw init --agents` writes the pre hook beside the post hook; `sync-agents --check` covers it | adoption | ⏳ |
-| 5 | `codelaw brief --for <paths>` / MCP `brief_for_task(paths)`: the repo's own rules → pack rules whose options the repo sets → rules with open baseline entries or exceptions under the path → the path's `manual` security rules → one line naming how many standard rules remain; `constructs` only for rules that declare `constructs:` | the before moment, short | ⏳ |
-| 6 | `hook_pre` in CI's `perf`; its budget by L8's ruled method | L8 | ⏳ |
-| 7 | README's *While* row and hero move to ✅; W-35 then closes | the story, true | ⏳ |
+| 0 | Records first: SR-AGENT-SURFACES gains the surface kind **Gate** and the pre-write column of the agent matrix; SR-CLI-MCP gains `hook --pre`, `brief --for`, MCP `brief_for_task`, fail-open; SR-LAW-8 gains `hook_pre` (< 100 ms warm target); glossary *gate*, *brief*, *rebuilt buffer* | the spec before the code | ✅ 2026-10-27: SR-AGENT-SURFACES §1, decisions 2, 6, 7, 9; SR-CLI-MCP decisions 1, 3, 5, 8, 10, 14; SR-LAW-8 decision 1 and §Measurements; SR-LAW-10 decision 7 (the fixtures table); glossary *brief*, *pre-write check*, *gate*, *rebuilt buffer* |
+| 1 | The core: rebuild the post-edit file from disk + payload exactly as the tool would (exact match, `replace_all`/`allow_multiple`, `edits[]` in order, CRLF kept); old text not found → allow; check under its path, `ci` profile; only **new** diagnostics count | one verdict, testable with no agent | ✅ `crates/codelaw-agents/src/pre.rs` (`rebuild`, `added`, `judge`) |
+| 2 | Adapters with pinned payload fixtures: Claude Code (`Write`, `Edit`), Codex (`apply_patch` parser, multi-file), Gemini (`write_file`, `replace`), Cursor, Copilot / VS Code; Windsurf and Kiro by exit 2 + stderr | every agent with a pre-write hook | ✅ Claude Code, Codex, Gemini, Copilot / VS Code, Cursor, Windsurf, Kiro shapes, unit-tested; Claude, Codex, Gemini and Kiro through the binary (`crates/codelaw-cli/tests/hook_pre.rs`). Copilot, Kiro and Cursor fixtures are built from the docs, not captured payloads |
+| 3 | Verdict: new `error` → deny with `--format agent` lines and each fix; new `warning`s → allow + context; `auto` fixes named, never applied through the agent's input; own crash/timeout/unknown payload → **allow**, exit 0, a stderr line | safe to switch on | ✅ deny / allow + context / silent; fail-open on bad payload, config error, panic, timeout (`--timeout-ms`) |
+| 4 | `codelaw init --agents` writes the pre hook beside the post hook; `sync-agents --check` covers it | adoption | ✅ Claude Code `PreToolUse`, Cowork plugin, Codex snippet (`templates/agents/claude/pre-hook-group.json`); Copilot and Kiro wait for a captured payload (SR-AGENT-SURFACES decision 2) |
+| 5 | `codelaw brief --for <paths>` / MCP `brief_for_task(paths)`: the repo's own rules → pack rules whose options the repo sets → rules with open baseline entries or exceptions under the path → the path's `manual` security rules → one line naming how many standard rules remain; `constructs` only for rules that declare `constructs:` | the before moment, short | ✅ `codelaw brief --for` and MCP `brief_for_task` (`crates/codelaw-report/src/brief.rs`); `constructs` not built (no rule declares it) |
+| 6 | `hook_pre` in CI's `perf`; its budget by L8's ruled method | L8 | 🔄 `hook_pre` in `codelaw bench` and so in CI's `perf`; `unset`, `proposed = 100` from a loaded Mac (p95 70.3 / 51.9 / 79.3 ms). Left: the method on three `perf` runs on `main`, then the decider's ruling |
+| 7 | README's *While* row and hero move to ✅; W-35 then closes | the story, true | ✅ README's Before and While rows; W-35 closed |
 
 **Arpit, 2026-10-27 (voice):** *"Yes to all three."* — on W-05's R1 (build `hook --pre` for every agent with a pre-write hook, fail-open, deny only new `error`s), R2 (brief by what is specific to this repo) and R3 (the surface kind *Gate* and an L8 budget). [Proposal](../proposals/write-time-guidance.md).
 
@@ -32,6 +32,10 @@ ball: agent
 Design, sources and the eight-agent matrix: [`work/proposals/write-time-guidance.md`](../proposals/write-time-guidance.md) (graduated into this item). Fux stays optional (W-34, Fux item 298).
 
 ## Definition of done
+
+**State, 2026-10-27 (Claude Code):** the first three met (`crates/codelaw-cli/tests/hook_pre.rs`: Claude `Write`/`Edit`, Codex `apply_patch` and Gemini `write_file`/`replace` refused with rule, line and fix; a `js/no-console` warning allowed with context; an edit on the already-failing line silent; a malformed payload, a missing file and a broken config allowed with exit 0; the panic and the timeout in `pre::tests`; the brief's own / configured / exceptions / security groups and its count line, byte-identical across runs). The fourth is half met: `hook_pre` is benched in CI's `perf` from this change on, and its budget waits for three runs on `main`.
+
+**Left:** (1) three `perf` runs on `main` that time `hook_pre` (the push run plus two `workflow_dispatch` runs); (2) apply SR-LAW-8 decision 4's method to them in `perf/budgets.toml`, and put the result to the decider as an inbox row; then close.
 
 - A proposed `Write` and `Edit` that add a `js/no-debugger` error are refused on Claude Code, Codex and Gemini fixtures with the rule, line and fix; one that adds only a warning is allowed with context; one that touches an already-failing line adds no new verdict.
 - A malformed payload, a missing file and an engine panic each allow the write and exit 0.

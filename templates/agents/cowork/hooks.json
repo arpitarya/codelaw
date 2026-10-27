@@ -1,1 +1,1 @@
-{"hooks": {"PostToolUse": [{{group}}]}}
+{"hooks": {"PreToolUse": [{{pre}}], "PostToolUse": [{{group}}]}}

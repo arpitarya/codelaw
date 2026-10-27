@@ -28,6 +28,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-35-before-while-after-positioning.md`](open/W-35-before-while-after-positioning.md) | 2026-10-27 | the README's *One set of rules, four moments*; `hook --pre` and `brief` in [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) decision 9 and [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 14 |
 | [`W-90-l11-holds-the-dependency-list.md`](open/W-90-l11-holds-the-dependency-list.md) | 2026-10-27 | [SR-LAW-11](../records/0013_LAW-11-dependencies.md) — L11 "dependencies", its §3 the list and the ledger; `crates/codelaw-cli/tests/dependencies.rs` |
 | [`W-85-npm-first-publish.md`](open/W-85-npm-first-publish.md) | 2026-10-27 | [`RELEASING.md`](../RELEASING.md) §One time, by hand and §Every release step 0; [`scripts/npm-trust.sh`](../scripts/npm-trust.sh) |
 | [`W-36-position-against-eslint-and-biome.md`](open/W-36-position-against-eslint-and-biome.md) | 2026-10-27 | [proposal](../work/proposals/linter-for-ai-positioning.md); gaps W-94–W-100, W-101, W-102; the README |
