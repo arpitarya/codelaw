@@ -56,7 +56,7 @@ codelaw writes a dozen kinds of files into a consumer's repo. Their text is the 
 
 ### Decision
 
-1. **What is a consumer file:** any file codelaw creates, or writes fixed text into, in a consumer's repository — the `codelaw.toml` and `.codelaw/rules/README.md` from `init`, the lines it adds to `.gitignore`, git hooks, agent instruction blocks, agent hook and MCP settings, skills, agents and the Cowork plugin from `sync-agents`, CI workflows from `init --ci`, and the scaffold from `new-rule`.
+1. **What is a consumer file:** any file codelaw creates, or writes fixed text into, in a consumer's repository — the `codelaw.toml` and `.codelaw/rules/README.md` from `init`, the lines it adds to `.gitignore`, git hooks, agent instruction blocks, agent hook and MCP settings, skills, agents and the Cowork plugin from `sync-agents`, CI workflows from `init --ci`, the scaffold from `new-rule`, and the `codelaw.toml` `migrate --write` writes (W-94).
 2. **What is not:** data codelaw serialises from state, whose shape the owning record defines — baseline files, deprecation entries, the deps snapshot, the cache, fixed or formatted source, report output, and a pack rule copied by `rules eject`.
 3. **Layout:** `templates/<area>/<path as it lands>` — for example `templates/init/codelaw.toml`, `templates/git-hooks/pre-commit`, `templates/agents/claude/CLAUDE.md`, `templates/agents/skills/<name>/SKILL.md`, `templates/ci/github/codelaw-autofix.yml`, `templates/ci/github/codelaw.yml` (the check workflow that runs codelaw's GitHub Action, W-97), `templates/new-rule/rule.md`. **`templates/README.md` is the registry:** one row per template — its consumer path, the command that writes it, the record that owns that command.
 4. **Slots, no logic:** a template holds text and `{{name}}` slots only — no conditionals, no loops. Code renders a list or an optional section into a slot. `\{{` writes a literal `{{`. The renderer is codelaw's own (no dependency, L2).
@@ -79,7 +79,7 @@ codelaw writes a dozen kinds of files into a consumer's repo. Their text is the 
 ### Reference (required)
 
 - [SR-AGENT-SURFACES](0102_agent-surfaces.md) — what `sync-agents` writes.
-- [SR-CLI-MCP](0115_cli-and-mcp.md) — `init`, `new-rule`, `init --git-hooks`, `init --ci`.
+- [SR-CLI-MCP](0115_cli-and-mcp.md) — `init`, `new-rule`, `init --git-hooks`, `init --ci`, `migrate` (`templates/migrate/`, decision 15).
 
 ### Veto condition
 
