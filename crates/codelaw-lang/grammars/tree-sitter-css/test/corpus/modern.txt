@@ -215,3 +215,204 @@ Keyframes with fractional percentages
           (declaration
             (property_name)
             (integer_value)))))))
+
+================================================================================
+supports() in @import
+================================================================================
+
+@import url(a.css) supports(display: grid) screen;
+@import "b.css" layer(base) supports(not (display: grid));
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (import_statement
+    (call_expression
+      (function_name)
+      (arguments
+        (plain_value)))
+    (call_expression
+      (function_name)
+      (arguments
+        (feature_query
+          (feature_name)
+          (plain_value))))
+    (keyword_query))
+  (import_statement
+    (string_value
+      (string_content))
+    (call_expression
+      (function_name)
+      (arguments
+        (plain_value)))
+    (call_expression
+      (function_name)
+      (arguments
+        (unary_query
+          (feature_query
+            (feature_name)
+            (plain_value)))))))
+
+================================================================================
+A name before the query of an at-rule
+================================================================================
+
+@custom-media --small (max-width: 30em);
+@container sidebar (min-width: 400px) {}
+@font-feature-values Font One { @styleset { nice-style: 12; } }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (at_rule
+    (at_keyword)
+    (keyword_query)
+    (feature_query
+      (feature_name)
+      (integer_value
+        (unit))))
+  (at_rule
+    (at_keyword)
+    (keyword_query)
+    (feature_query
+      (feature_name)
+      (integer_value
+        (unit)))
+    (block))
+  (at_rule
+    (at_keyword)
+    (keyword_query)
+    (keyword_query)
+    (block
+      (at_rule
+        (at_keyword)
+        (block
+          (declaration
+            (property_name)
+            (integer_value)))))))
+
+================================================================================
+Page selectors
+================================================================================
+
+@page :first { margin: 1in; }
+@page wide:left {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (at_rule
+    (at_keyword)
+    (page_selector
+      (class_name))
+    (block
+      (declaration
+        (property_name)
+        (integer_value
+          (unit)))))
+  (at_rule
+    (at_keyword)
+    (page_selector
+      (tag_name)
+      (class_name))
+    (block)))
+
+================================================================================
+Named-range keyframe selectors
+================================================================================
+
+@keyframes reveal { entry 0% { opacity: 0; } exit 100% { opacity: 1; } }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (keyframes_statement
+    (keyframes_name)
+    (keyframe_block_list
+      (keyframe_block
+        (keyframe_range
+          (plain_value)
+          (integer_value
+            (unit)))
+        (block
+          (declaration
+            (property_name)
+            (integer_value))))
+      (keyframe_block
+        (keyframe_range
+          (plain_value)
+          (integer_value
+            (unit)))
+        (block
+          (declaration
+            (property_name)
+            (integer_value)))))))
+
+================================================================================
+A nesting selector after a compound selector
+================================================================================
+
+.a { .b & { color: red; } }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (rule_set
+        (selectors
+          (descendant_selector
+            (class_selector
+              (class_name
+                (identifier)))
+            (nesting_selector)))
+        (block
+          (declaration
+            (property_name)
+            (plain_value)))))))
+
+================================================================================
+A custom property holding a block
+================================================================================
+
+:root { --x: { color: red; }; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (pseudo_class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name)
+        (block
+          (declaration
+            (property_name)
+            (plain_value)))))))
+
+================================================================================
+Annotations other than !important
+================================================================================
+
+.a { color: red !ie; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name)
+        (plain_value)
+        (important_value)))))

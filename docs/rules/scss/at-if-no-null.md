@@ -142,7 +142,7 @@ codelaw config --print --for <file>      # the resolved setting, and where it ca
 
 ## Differences from the source
 
-`$x != null` is fixed. `$x == null` is reported without a fix: `not $x` is the right text, but `tree-sitter-scss` 1.0.0 reads `@if not …` as a syntax error, and the fix verifier refuses an edit that adds one. A comparison that is only part of a condition is reported without a fix too.
+`$x != null` is fixed to `$x` and `$x == null` to `not $x`. A comparison that is only part of a condition is reported without a fix.
 
 ---
 

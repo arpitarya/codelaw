@@ -192,25 +192,25 @@ a {
           (function_name)
           (arguments
             (binary_expression
+              (integer_value
+                (unit))
               (binary_expression
-                (integer_value
-                  (unit))
                 (parenthesized_value
                   (binary_expression
                     (integer_value)
-                    (integer_value))))
-              (parenthesized_value
-                (binary_expression
-                  (parenthesized_value
-                    (binary_expression
-                      (integer_value
-                        (unit))
-                      (integer_value
-                        (unit))))
-                  (parenthesized_value
-                    (binary_expression
-                      (integer_value)
-                      (integer_value))))))))))))
+                    (integer_value)))
+                (parenthesized_value
+                  (binary_expression
+                    (parenthesized_value
+                      (binary_expression
+                        (integer_value
+                          (unit))
+                        (integer_value
+                          (unit))))
+                    (parenthesized_value
+                      (binary_expression
+                        (integer_value)
+                        (integer_value)))))))))))))
 
 ============================
 Strings
@@ -233,7 +233,10 @@ a {
         (string_value))
       (declaration
         (property_name)
-        (string_value)))))
+        (string_value
+          (escape_sequence)
+          (string_content)
+          (escape_sequence))))))
 
 ============================
 URLs
@@ -468,8 +471,7 @@ Mixins with interpolations and content
         (interpolation
           (variable))
         (block
-          (at_rule
-            (at_keyword)))))))
+          (content_statement))))))
 
 =================================
 Mixins with at-root
@@ -491,15 +493,16 @@ Mixins with at-root
         (variable)))
     (block
       (at_root_statement
-        (interpolation
-          (call_expression
-            (function_name)
-            (arguments
-              (nesting_selector)
-              (variable))))
+        (selectors
+          (tag_name
+            (interpolation
+              (call_expression
+                (function_name)
+                (arguments
+                  (nesting_selector)
+                  (variable))))))
         (block
-          (at_rule
-            (at_keyword)))))))
+          (content_statement))))))
 
 =================================
 Placeholders

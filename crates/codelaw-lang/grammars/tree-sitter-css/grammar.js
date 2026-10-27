@@ -52,6 +52,7 @@ export default grammar({
       '@import',
       $._value,
       optional($._import_layer),
+      optional($._import_supports),
       sep(',', $._query),
       ';',
     ),
@@ -68,6 +69,30 @@ export default grammar({
       alias('layer', $.function_name),
       $.arguments,
     ),
+
+    // `supports(…)` after the URL (and layer) of an `@import` (Cascade 5):
+    // a condition, or a bare declaration such as `supports(display: grid)`.
+    _import_supports: $ => alias($._import_supports_function, $.call_expression),
+
+    _import_supports_function: $ => seq(
+      alias('supports', $.function_name),
+      alias($._import_supports_arguments, $.arguments),
+    ),
+
+    _import_supports_arguments: $ => seq(
+      token.immediate('('),
+      choice(
+        $._query,
+        alias($._supports_declaration, $.feature_query),
+      ),
+      ')',
+    ),
+
+    _supports_declaration: $ => prec.left(seq(
+      alias($.identifier, $.feature_name),
+      ':',
+      repeat1($._value),
+    )),
 
     media_statement: $ => seq(
       '@media',
@@ -104,8 +129,15 @@ export default grammar({
     ),
 
     keyframe_block: $ => seq(
-      sep1(',', choice($.from, $.to, $.integer_value, $.float_value)),
+      sep1(',', choice($.from, $.to, $.integer_value, $.float_value, $.keyframe_range)),
       $.block,
+    ),
+
+    // A named timeline range and a percentage (Scroll-driven Animations):
+    // `entry 0%`, `exit 100%`.
+    keyframe_range: $ => seq(
+      alias($.identifier, $.plain_value),
+      choice($.integer_value, $.float_value),
     ),
 
     from: _ => 'from',
@@ -134,11 +166,23 @@ export default grammar({
       ';',
     )),
 
+    // Any other at-rule. Each comma-separated part of the prelude is one or
+    // more queries, so a name may come before a query (`@container sidebar
+    // (min-width: 400px)`, `@custom-media --small (max-width: 30em)`), a
+    // family name may be several words (`@font-feature-values Font One`),
+    // and a page selector may follow `@page` (`@page :first`, `@page wide:left`).
     at_rule: $ => seq(
       $.at_keyword,
-      sep(',', $._query),
+      sep(',', repeat1(choice($._query, $.page_selector))),
       choice(';', $.block),
     ),
+
+    page_selector: $ => prec.left(1, choice(
+      seq(alias($.identifier, $.tag_name), repeat1($._page_pseudo)),
+      seq(':', alias($.identifier, $.class_name), repeat($._page_pseudo)),
+    )),
+
+    _page_pseudo: $ => seq(token.immediate(':'), alias($.identifier, $.class_name)),
 
     // Rule sets
 
@@ -312,16 +356,25 @@ export default grammar({
 
     // Declarations
 
-    declaration: $ => seq(
-      alias($.identifier, $.property_name),
-      ':',
-      $._value,
-      repeat(seq(
-        optional(','),
+    declaration: $ => choice(
+      seq(
+        alias($.identifier, $.property_name),
+        ':',
         $._value,
-      )),
-      optional($.important),
-      ';',
+        repeat(seq(
+          optional(','),
+          $._value,
+        )),
+        optional(choice($.important, $.important_value)),
+        ';',
+      ),
+      // A custom property whose value is a `{}` block (`--x: { color: red }`).
+      seq(
+        alias($.identifier, $.property_name),
+        ':',
+        $.block,
+        optional(';'),
+      ),
     ),
 
     last_declaration: $ => prec(1, seq(
@@ -332,7 +385,7 @@ export default grammar({
         optional(','),
         $._value,
       )),
-      optional($.important),
+      optional(choice($.important, $.important_value)),
     )),
 
     important: _ => '!important',

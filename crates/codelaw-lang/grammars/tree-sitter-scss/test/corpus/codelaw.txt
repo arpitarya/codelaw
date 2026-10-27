@@ -1,0 +1,761 @@
+================================================================================
+@use with as and with
+================================================================================
+
+@use "config" as *;
+@use "config" as cfg;
+@use "config" as cfg with ($primary: #3b82f6, $radius: 4px);
+@use "x" with ($a: 1, $b: (c: 2));
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (use_statement
+    (string_value
+      (string_content))
+    (as_clause))
+  (use_statement
+    (string_value
+      (string_content))
+    (as_clause
+      (module_name)))
+  (use_statement
+    (string_value
+      (string_content))
+    (as_clause
+      (module_name))
+    (with_clause
+      (map_value
+        (map_pair
+          (variable)
+          (color_value))
+        (map_pair
+          (variable)
+          (integer_value
+            (unit))))))
+  (use_statement
+    (string_value
+      (string_content))
+    (with_clause
+      (map_value
+        (map_pair
+          (variable)
+          (integer_value))
+        (map_pair
+          (variable)
+          (map_value
+            (map_pair
+              (plain_value)
+              (integer_value))))))))
+
+================================================================================
+@forward with show, hide and a prefix
+================================================================================
+
+@forward "config" show defaults, $x;
+@forward "src/list" hide list-reset, $gap;
+@forward "library" as btn-*;
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (forward_statement
+    (string_value
+      (string_content))
+    (show_clause
+      (identifier)
+      (variable)))
+  (forward_statement
+    (string_value
+      (string_content))
+    (hide_clause
+      (identifier)
+      (variable)))
+  (forward_statement
+    (string_value
+      (string_content))
+    (as_clause
+      (module_name))))
+
+================================================================================
+Variable flags
+================================================================================
+
+$a: 1 !default;
+$b: 1 !global;
+$c: (xs: 0, sm: 576px) !default;
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (declaration
+    (property_name)
+    (integer_value)
+    (important_value))
+  (declaration
+    (property_name)
+    (integer_value)
+    (important_value))
+  (declaration
+    (property_name)
+    (map_value
+      (map_pair
+        (plain_value)
+        (integer_value))
+      (map_pair
+        (plain_value)
+        (integer_value
+          (unit))))
+    (important_value)))
+
+================================================================================
+Maps and empty lists
+================================================================================
+
+$m: (a: 1, "b": 2, c: (d: 3));
+$l: ();
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (declaration
+    (property_name)
+    (map_value
+      (map_pair
+        (plain_value)
+        (integer_value))
+      (map_pair
+        (string_value
+          (string_content))
+        (integer_value))
+      (map_pair
+        (plain_value)
+        (map_value
+          (map_pair
+            (plain_value)
+            (integer_value))))))
+  (declaration
+    (property_name)
+    (list_value)))
+
+================================================================================
+@if not, and, or
+================================================================================
+
+.a {
+  @if not $n { color: red; }
+  @if $a and $b or not $c { color: red; } @else if not $d { color: blue; } @else { color: green; }
+}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (if_statement
+        (unary_expression
+          (variable))
+        (block
+          (declaration
+            (property_name)
+            (plain_value))))
+      (if_statement
+        (binary_expression
+          (binary_expression
+            (variable)
+            (variable))
+          (unary_expression
+            (variable)))
+        (block
+          (declaration
+            (property_name)
+            (plain_value)))
+        (else_if_clause
+          (unary_expression
+            (variable))
+          (block
+            (declaration
+              (property_name)
+              (plain_value))))
+        (else_clause
+          (block
+            (declaration
+              (property_name)
+              (plain_value))))))))
+
+================================================================================
+Empty parameters and arguments, rest arguments
+================================================================================
+
+@mixin clearfix() { clear: both; }
+@mixin t($args...) { transition: $args; }
+.a { @include clearfix(); @include t($a, $b...); }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (mixin_statement
+    (identifier)
+    (parameters)
+    (block
+      (declaration
+        (property_name)
+        (plain_value))))
+  (mixin_statement
+    (identifier)
+    (parameters
+      (parameter
+        (variable)))
+    (block
+      (declaration
+        (property_name)
+        (variable))))
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (include_statement
+        (identifier)
+        (arguments))
+      (include_statement
+        (identifier)
+        (arguments
+          (argument
+            (variable))
+          (argument
+            (variable)))))))
+
+================================================================================
+Namespaced @include with using
+================================================================================
+
+.a {
+  @include bp.media-up(md) { color: red; }
+  @include m($x: 1) using ($slide) { color: $slide; }
+}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (include_statement
+        (identifier)
+        (arguments
+          (argument
+            (plain_value)))
+        (block
+          (declaration
+            (property_name)
+            (plain_value))))
+      (include_statement
+        (identifier)
+        (arguments
+          (argument
+            (variable)
+            (integer_value)))
+        (parameters
+          (parameter
+            (variable)))
+        (block
+          (declaration
+            (property_name)
+            (variable)))))))
+
+================================================================================
+Interpolated custom property names and values
+================================================================================
+
+.a {
+  --#{$prefix}color: #{$c};
+  color: var(--#{$prefix}gradient);
+  #{$prop}: #{$value};
+}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name
+          (identifier)
+          (interpolation
+            (variable))
+          (identifier))
+        (interpolation
+          (variable)))
+      (declaration
+        (property_name)
+        (call_expression
+          (function_name)
+          (arguments
+            (identifier)
+            (interpolation
+              (variable))
+            (identifier))))
+      (declaration
+        (property_name
+          (interpolation
+            (variable)))
+        (interpolation
+          (variable))))))
+
+================================================================================
+Interpolated pseudo-elements and @at-root selectors
+================================================================================
+
+.a {
+  &::#{$pseudo} { color: red; }
+  @at-root [data-x] #{&}:hover { color: red; }
+}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (rule_set
+        (selectors
+          (pseudo_element_selector
+            (nesting_selector)
+            (tag_name
+              (interpolation
+                (variable)))))
+        (block
+          (declaration
+            (property_name)
+            (plain_value))))
+      (at_root_statement
+        (selectors
+          (pseudo_class_selector
+            (descendant_selector
+              (attribute_selector
+                (attribute_name))
+              (tag_name
+                (interpolation
+                  (nesting_selector))))
+            (class_name
+              (identifier))))
+        (block
+          (declaration
+            (property_name)
+            (plain_value)))))))
+
+================================================================================
+Nested properties
+================================================================================
+
+.a { margin: { top: 1px; bottom: 2px; } }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name)
+        (block
+          (declaration
+            (property_name)
+            (integer_value
+              (unit)))
+          (declaration
+            (property_name)
+            (integer_value
+              (unit))))))))
+
+================================================================================
+@for to
+================================================================================
+
+@for $i from 1 to 3 { .a-#{$i} { width: 10px * $i; } }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (for_statement
+    (variable)
+    (integer_value)
+    (integer_value)
+    (block
+      (rule_set
+        (selectors
+          (class_selector
+            (class_name
+              (identifier)
+              (interpolation
+                (variable)))))
+        (block
+          (declaration
+            (property_name)
+            (binary_expression
+              (integer_value
+                (unit))
+              (variable))))))))
+
+================================================================================
+@extend !optional
+================================================================================
+
+.a { @extend %placeholder !optional; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (extend_statement
+        (placeholder
+          (identifier))
+        (important_value)))))
+
+================================================================================
+Operators and modulo
+================================================================================
+
+$z: $a + $b * 2 - $c / 3 % 4;
+.a { width: math.div(100%, 3); }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (declaration
+    (property_name)
+    (binary_expression
+      (binary_expression
+        (variable)
+        (binary_expression
+          (variable)
+          (integer_value)))
+      (binary_expression
+        (binary_expression
+          (variable)
+          (integer_value))
+        (integer_value))))
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name)
+        (call_expression
+          (function_name)
+          (arguments
+            (integer_value
+              (unit))
+            (integer_value)))))))
+
+================================================================================
+Media features with variables and interpolation
+================================================================================
+
+@media (min-width: $bp) {}
+@media (prefers-color-scheme: #{$name}) {}
+@media (width >= $bp) {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (media_statement
+    (feature_query
+      (feature_name)
+      (variable))
+    (block))
+  (media_statement
+    (feature_query
+      (feature_name)
+      (interpolation
+        (variable)))
+    (block))
+  (media_statement
+    (range_query
+      (feature_name)
+      (variable))
+    (block)))
+
+================================================================================
+Interpolation followed by a number, and a signed interpolation
+================================================================================
+
+.a { --#{$c}-500: 1px; width: -#{$y}; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name
+          (identifier)
+          (interpolation
+            (variable))
+          (identifier))
+        (integer_value
+          (unit)))
+      (declaration
+        (property_name)
+        (interpolation
+          (variable))))))
+
+================================================================================
+Signed variables
+================================================================================
+
+.a { padding: -$gap (-$gap) +$gap; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name)
+        (variable)
+        (parenthesized_value
+          (variable))
+        (variable)))))
+
+================================================================================
+@return with a list, @content with arguments
+================================================================================
+
+@function f($v) { @return red($v), green($v); }
+@mixin m { @content ($args...); }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (function_statement
+    (identifier)
+    (parameters
+      (parameter
+        (variable)))
+    (block
+      (return_statement
+        (call_expression
+          (function_name)
+          (arguments
+            (variable)))
+        (call_expression
+          (function_name)
+          (arguments
+            (variable))))))
+  (mixin_statement
+    (identifier)
+    (block
+      (content_statement
+        (arguments
+          (argument
+            (variable)))))))
+
+================================================================================
+@import with a list
+================================================================================
+
+@import "legacy-a", "legacy-b";
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (import_statement
+    (string_value
+      (string_content))
+    (string_value
+      (string_content))))
+
+================================================================================
+Interpolated placeholders
+================================================================================
+
+%box-#{$bp} { color: red; }
+.a { @extend %box-#{$bp}; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (placeholder
+        (identifier)
+        (interpolation
+          (variable))))
+    (block
+      (declaration
+        (property_name)
+        (plain_value))))
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (extend_statement
+        (placeholder
+          (identifier)
+          (interpolation
+            (variable)))))))
+
+================================================================================
+Interpolated media feature names
+================================================================================
+
+@media (#{$p}: #{$v}) and (#{$q}: #{$v}) {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (media_statement
+    (binary_query
+      (feature_query
+        (feature_name
+          (interpolation
+            (variable)))
+        (interpolation
+          (variable)))
+      (feature_query
+        (feature_name
+          (interpolation
+            (variable)))
+        (interpolation
+          (variable))))
+    (block)))
+
+================================================================================
+Keyword arguments and if(sass(): ; else:)
+================================================================================
+
+.a { color: map.get($m, $key: x); cursor: if(sass($on): pointer; else: null); }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name)
+        (call_expression
+          (function_name)
+          (arguments
+            (variable)
+            (variable)
+            (plain_value))))
+      (declaration
+        (property_name)
+        (call_expression
+          (function_name)
+          (arguments
+            (call_expression
+              (function_name)
+              (arguments
+                (variable)))
+            (plain_value)
+            (plain_value)
+            (plain_value)))))))
+
+================================================================================
+Escaped class names and nth-child
+================================================================================
+
+.lg\:drawer { > .b:nth-child(n + 3) { color: red; } > :nth-child(#{$n}) { color: red; } }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier)
+          (escape_sequence)
+          (identifier))))
+    (block
+      (rule_set
+        (selectors
+          (pseudo_class_selector
+            (child_selector
+              (class_selector
+                (class_name
+                  (identifier))))
+            (class_name)
+            (arguments
+              (plain_value))))
+        (block
+          (declaration
+            (property_name)
+            (plain_value))))
+      (rule_set
+        (selectors
+          (child_selector
+            (pseudo_class_selector
+              (class_name)
+              (arguments
+                (interpolation
+                  (variable))))))
+        (block
+          (declaration
+            (property_name)
+            (plain_value)))))))
+
+================================================================================
+@include with a space before its arguments
+================================================================================
+
+.a { @include _rfs-media-query () { color: red; } }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (include_statement
+        (identifier)
+        (arguments)
+        (block
+          (declaration
+            (property_name)
+            (plain_value)))))))

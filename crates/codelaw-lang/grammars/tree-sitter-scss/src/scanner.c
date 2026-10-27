@@ -80,10 +80,31 @@ bool tree_sitter_scss_external_scanner_scan(void *payload, TSLexer *lexer, const
             if (lexer->lookahead == ':') {
                 return false;
             }
+            // A pseudo-class's name follows its colon directly: `margin: { … }`
+            // is a nested property, `--x: { … }` a block value (codelaw).
+            if (iswspace(lexer->lookahead)) {
+                return false;
+            }
             lexer->mark_end(lexer);
-            // We need a { to be a pseudo class selector, a ; indicates a property
+            // We need a { to be a pseudo class selector, a ; indicates a property.
+            // `#{…}` is interpolation, not the start of a block (codelaw).
             while (lexer->lookahead != ';' && lexer->lookahead != '}' && !lexer->eof(lexer)) {
+                bool hash = lexer->lookahead == '#';
                 advance(lexer);
+                if (hash && lexer->lookahead == '{') {
+                    unsigned depth = 1;
+                    advance(lexer);
+                    while (depth > 0 && !lexer->eof(lexer)) {
+                        if (lexer->lookahead == '{') depth++;
+                        if (lexer->lookahead == '}') depth--;
+                        advance(lexer);
+                    }
+                    if (lexer->lookahead == '{') {
+                        lexer->result_symbol = PSEUDO_CLASS_SELECTOR_COLON;
+                        return true;
+                    }
+                    continue;
+                }
                 if (lexer->lookahead == '{') {
                     lexer->result_symbol = PSEUDO_CLASS_SELECTOR_COLON;
                     return true;
