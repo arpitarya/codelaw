@@ -116,6 +116,59 @@ fn a_ported_rule_and_its_adapter_report_once() {
     let _ = fs::remove_dir_all(&d);
 }
 
+/// W-107: oxlint's type-aware mode through the binary. A stand-in `oxlint`
+/// prints what oxlint with `oxlint-tsgolint` prints for `src/index.ts`
+/// (`typescript(<rule>)` codes in the same `--format=json`) and counts its
+/// runs. Its findings keep their `typescript/` ids; one the `ts` pack ports
+/// from typescript-eslint is shown once, as codelaw's; and a config with
+/// `typeAware` is never served from the cache, since a file's findings then
+/// depend on the files it imports.
+#[test]
+fn oxlint_type_aware_findings_pass_through_and_are_not_cached() {
+    use std::os::unix::fs::PermissionsExt;
+    const TS: &str = "// @ts-ignore\nconst n: number = 1;\nasync function load(): Promise<number> { return n; }\nload();\n";
+    let call = TS.find("load();").unwrap();
+    let report = format!(
+        r#"{{ "diagnostics": [{{"message": "Do not use \"@ts-ignore\" because it alters compilation errors.","code": "typescript(ban-ts-comment)","severity": "error","causes": [],"url": "https://oxc.rs/docs/guide/usage/linter/rules/typescript/ban-ts-comment.html","help": "Use \"@ts-expect-error\" instead.","filename": "src/index.ts","labels": [{{"span": {{"offset": 0,"length": 13,"line": 1,"column": 1}}}}],"related": []}},
+{{"message": "Promises must be awaited, add void operator to ignore.","code": "typescript(no-floating-promises)","severity": "error","causes": [],"url": "https://oxc.rs/docs/guide/usage/linter/rules/typescript/no-floating-promises.html","help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.","filename": "src/index.ts","labels": [{{"label": "This unhandled promise-like value has type `Promise<number>`.","span": {{"offset": {call},"length": 6,"line": 4,"column": 1}}}}],"related": []}}],
+  "number_of_files": 1, "number_of_rules": 98, "threads_count": 1, "start_time": 0.2 }}"#
+    );
+    let d = temp("type-aware");
+    fs::write(d.join("codelaw.toml"), "extends = [\"codelaw:ts/recommended\"]\npreview = true\n[rules]\n\"ts/ban-ts-comment\" = \"error\"\n").unwrap();
+    fs::write(d.join(".oxlintrc.json"), "{ \"options\": { \"typeAware\": true } }\n").unwrap();
+    fs::create_dir_all(d.join("src")).unwrap();
+    fs::write(d.join("src/index.ts"), TS).unwrap();
+    copy_dir(&Path::new(env!("CARGO_MANIFEST_DIR")).ancestors().nth(2).unwrap().join("packs/ts"), &d.join("node_modules/@codelaw/rules-ts"));
+    fs::write(d.join("report.json"), report).unwrap();
+    let oxlint = d.join("node_modules/.bin/oxlint");
+    fs::create_dir_all(oxlint.parent().unwrap()).unwrap();
+    fs::write(&oxlint, "#!/bin/sh\ncase \"$1\" in --version) echo 'Version: 1.89.0'; exit 0;; esac\necho x >> runs\ncat report.json\nexit 1\n").unwrap();
+    fs::set_permissions(&oxlint, fs::Permissions::from_mode(0o755)).unwrap();
+    let runs = || fs::read_to_string(d.join("runs")).unwrap_or_default().lines().count();
+
+    let (code, out, err) = codelaw(&d, &["check", "--format", "json", "src/index.ts"]);
+    let found = diagnostics(&out);
+    let floating = found.iter().find(|x| x["rule"] == "adapter/oxlint/typescript/no-floating-promises").unwrap_or_else(|| panic!("{out}{err}"));
+    assert_eq!(code, 1, "{out}{err}");
+    assert_eq!(floating["severity"], "error", "{floating}");
+    assert_eq!(floating["source"], "oxlint@1.89.0");
+    assert_eq!(floating["file"], "src/index.ts");
+    assert_eq!((&floating["range"]["start"]["line"], &floating["range"]["start"]["column"]), (&Value::from(4), &Value::from(1)), "{floating}");
+    assert_eq!(floating["fix"]["class"], "manual", "{floating}");
+    let ids = rules(&found);
+    assert!(ids.contains(&"ts/ban-ts-comment"), "{ids:?}");
+    assert!(!ids.contains(&"adapter/oxlint/typescript/ban-ts-comment"), "ported from typescript-eslint/ban-ts-comment, so shown once: {ids:?}");
+    // typeAware: every check runs oxlint again.
+    codelaw(&d, &["check", "--format", "json", "src/index.ts"]);
+    assert_eq!(runs(), 2);
+    // Without it, the second check is served from the cache.
+    fs::write(d.join(".oxlintrc.json"), "{ \"rules\": {} }\n").unwrap();
+    codelaw(&d, &["check", "--format", "json", "src/index.ts"]);
+    codelaw(&d, &["check", "--format", "json", "src/index.ts"]);
+    assert_eq!(runs(), 3);
+    let _ = fs::remove_dir_all(&d);
+}
+
 fn copy_dir(from: &Path, to: &Path) {
     fs::create_dir_all(to).unwrap();
     for e in fs::read_dir(from).unwrap().flatten() {
