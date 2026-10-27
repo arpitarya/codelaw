@@ -105,5 +105,17 @@
       "licence_file": "LICENSE",
       "packs": ["tanstack-query"]
     }
-  ]
+  ],
+  "promotion": {
+    "about": "W-100: the criterion `corpus.py promote` holds each preview rule to. PROPOSED in SR-RULE-AUTHORING decision 6a, not ratified: `ratified` stays null, and `promote --write` refuses, until the decider rules on the numbers. `reviewed` is a person's verdict on a rule's corpus findings, valid only while `findings` equals the rule's count in packs/<pack>/corpus.toml; `promoted` is what `--write` recorded, with the run that proved it.",
+    "ratified": null,
+    "criterion": {
+      "min_repos": 3,
+      "min_files": 10,
+      "zero_findings_is_evidence": true,
+      "min_releases_in_preview": 1
+    },
+    "reviewed": {},
+    "promoted": {}
+  }
 }

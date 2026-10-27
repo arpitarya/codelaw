@@ -163,9 +163,10 @@ struct CheckArgs {
     paths: Vec<PathBuf>,
     #[command(flatten)]
     common: Common,
-    /// text, json, sarif, agent, github, gitlab, junit or checkstyle.
-    #[arg(long, default_value = "text")]
-    format: String,
+    /// text, json, sarif, agent, github, gitlab, junit or checkstyle; by
+    /// default `CODELAW_FORMAT`, else `agent` inside a coding agent, else `text`.
+    #[arg(long)]
+    format: Option<String>,
     /// Fail when there are more warnings than this.
     #[arg(long)]
     max_warnings: Option<usize>,
@@ -192,9 +193,10 @@ struct FixArgs {
     /// Show each pass of the fix loop: what was offered, applied or refused, and why.
     #[arg(long)]
     trace: bool,
-    /// text, json, sarif, agent, github, gitlab, junit or checkstyle.
-    #[arg(long, default_value = "text")]
-    format: String,
+    /// text, json, sarif, agent, github, gitlab, junit or checkstyle; by
+    /// default `CODELAW_FORMAT`, else `agent` inside a coding agent, else `text`.
+    #[arg(long)]
+    format: Option<String>,
     #[arg(long)]
     max_warnings: Option<usize>,
     /// Don't run the installed external linters (oxlint, Ruff, stylelint,
@@ -243,13 +245,15 @@ pub fn fail(e: impl std::fmt::Display) -> ExitCode {
 pub struct Ctx {
     pub color: bool,
     pub env: EngineOptions,
+    /// What `check` and `fix` print without `--format` (SR-CLI-MCP decision 4a).
+    pub format_env: codelaw_report::FormatEnv,
     /// Running in a warm process for a client.
     pub warm: bool,
 }
 
 impl Ctx {
     pub fn here() -> Ctx {
-        Ctx { color: color(), env: EngineOptions::from_env(), warm: false }
+        Ctx { color: color(), env: EngineOptions::from_env(), format_env: codelaw_report::FormatEnv::from_env(std::io::stdout().is_terminal()), warm: false }
     }
 }
 
@@ -352,8 +356,14 @@ pub fn format(s: &str) -> Result<Format, String> {
     Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif, agent, github, gitlab, junit or checkstyle)"))
 }
 
+/// `check`'s and `fix`'s format: `--format`, else what the environment
+/// says (SR-CLI-MCP decision 4a).
+pub fn report_format(flag: Option<&str>, env: &codelaw_report::FormatEnv) -> Result<Format, String> {
+    codelaw_report::resolve_format(flag, env).map(|(f, _)| f)
+}
+
 fn check(args: CheckArgs, ctx: &Ctx) -> Output {
-    let fmt = match format(&args.format) {
+    let fmt = match report_format(args.format.as_deref(), &ctx.format_env) {
         Ok(f) => f,
         Err(e) => return Output::fail(e),
     };
@@ -405,7 +415,7 @@ fn json_line(v: &serde_json::Value) -> String {
 /// would inherit the warm process's environment rather than the client's
 /// (SR-ARCHITECTURE decisions 18 and 21): the client runs it itself.
 fn fix(args: FixArgs, ctx: &Ctx) -> Option<Output> {
-    let fmt = match format(&args.format) {
+    let fmt = match report_format(args.format.as_deref(), &ctx.format_env) {
         Ok(f) => f,
         Err(e) => return Some(Output::fail(e)),
     };

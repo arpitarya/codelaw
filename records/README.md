@@ -163,6 +163,7 @@ yet is owned by an open `W-nn`.
 | `scripts/check-work-system.py` | SR-WORK-OPEN-QUEUE | the row, inbox and lost-id checks; it also runs the ownership, registry and archive checks |
 | `scripts/build-packs.py` | SR-PACKAGES | decision 9: the pack tarballs and wheels, built from `packs/` |
 | `scripts/fux-index.py` | SR-PACKAGES | decision 14: the optional Fux index packages, built in CI from a pinned fux |
+| `scripts/vsix.py` | SR-PACKAGES | decision 6: the editor extension's eight platform `.vsix` files, built and checked in CI (W-95) |
 | `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | rule 45a, in-session |
 | `.claude/hooks/inject-inbox.sh` | SR-WORK-BLOCKERS | decision 7 |
 | `.claude/hooks/stop-if-blocked.sh` | SR-WORK-BLOCKERS | decision 7 |
@@ -208,7 +209,7 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-cli/tests/consumer_layout.rs` | SR-CONSUMER-LAYOUT | the veto's `init` check against §1's tree (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/promotion.rs` | SR-RULE-AUTHORING | decisions 4 and 6: level 4 and the `stable` gate (a different decision from the CLI's) |
 | `scripts/docs-sync.py` | SR-WORK-REGISTRY | its Consequences: `README.md`'s, `USAGE.md`'s and `CHANGELOG.md`'s triggers, checked in CI (W-26) |
-| `scripts/rule-docs.py` | SR-WORK-REGISTRY | `docs/rules/`, one page per rule generated from the rule files, presets and cases; `--check` in CI |
+| `scripts/rule-docs.py` | SR-WORK-REGISTRY | `docs/rules/`, one page per rule generated from the rule files, presets and cases, and `llms.txt`, `docs/rules/llms-full.txt` and `docs/rules/rules.json` for agents (W-98); `--check` in CI |
 | `scripts/corpus.py` | SR-RULE-AUTHORING | decision 4: fetches the pinned corpus and runs level 4 per pack (W-20) |
 | `scripts/corpus.json` | SR-RULE-AUTHORING | decision 4: the pinned corpus — repositories, commits, licences, packs |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |

@@ -239,6 +239,20 @@ mod unix {
         })
     }
 
+    fn format_env_json(env: &codelaw_report::FormatEnv) -> Value {
+        json!({ "format": env.format, "agent_vars": env.agent_vars, "tty": env.tty })
+    }
+
+    /// The client's format inputs (SR-CLI-MCP decision 4a).
+    fn format_env_from(v: &Value) -> codelaw_report::FormatEnv {
+        let pairs = v["agent_vars"].as_array().into_iter().flatten();
+        codelaw_report::FormatEnv {
+            format: v["format"].as_str().map(str::to_owned),
+            agent_vars: pairs.filter_map(|p| Some((p[0].as_str()?.to_owned(), p[1].as_str()?.to_owned()))).collect(),
+            tty: v["tty"].as_bool().unwrap_or(false),
+        }
+    }
+
     fn env_from(v: &Value) -> EngineOptions {
         let s = |k: &str| v[k].as_str().map(str::to_owned);
         // The client's profile inputs, never the warm process's own
@@ -265,7 +279,7 @@ mod unix {
         let (dir, _) = run_dir(&start_of(paths), ctx.env.cache_dir_env.as_deref())?;
         let cwd = canonical_cwd()?;
         let argv: Vec<String> = std::env::args_os().map(|a| a.into_string()).collect::<Result<_, _>>().ok()?;
-        let request = json!({ "op": "run", "version": VERSION, "argv": argv, "cwd": cwd.to_string_lossy(), "color": ctx.color, "env": env_json(&ctx.env) });
+        let request = json!({ "op": "run", "version": VERSION, "argv": argv, "cwd": cwd.to_string_lossy(), "color": ctx.color, "env": env_json(&ctx.env), "format_env": format_env_json(&ctx.format_env) });
         for (registration, mut stream) in discover(&dir) {
             if registration.version != VERSION || !(registration.any_cwd || registration.cwd == cwd) {
                 continue;
@@ -378,7 +392,7 @@ mod unix {
         }
         let cwd = PathBuf::from(request["cwd"].as_str().ok_or("no folder")?);
         let argv: Vec<String> = request["argv"].as_array().ok_or("no command line")?.iter().map(|a| a.as_str().map(str::to_owned)).collect::<Option<_>>().ok_or("a command line is strings")?;
-        let ctx = Ctx { color: request["color"].as_bool().unwrap_or(false), env: env_from(&request["env"]), warm: true };
+        let ctx = Ctx { color: request["color"].as_bool().unwrap_or(false), env: env_from(&request["env"]), format_env: format_env_from(&request["format_env"]), warm: true };
         let go = || std::panic::catch_unwind(|| crate::serve_command(&argv, &ctx)).ok().flatten().ok_or_else(|| "not served".to_owned());
         if cwd == reg.registration.cwd {
             go()

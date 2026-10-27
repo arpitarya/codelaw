@@ -112,6 +112,12 @@ L6 decision 12: each pack that holds rules has a companion `@codelaw/rules-<name
 
 **Step 5 of W-34, the decider's hand, is open.** Per name, as the pack names were done: npm first publish by hand from the `fux-index` artifact (`gh run download <run-id> -n fux-index`; `npm publish dist/fux-index/npm/<tarball> --access public`), then `scripts/npm-trust.sh --fux-index` for the new names; PyPI by `twine upload` of the ten wheels with your token (four new projects a day), then a trusted publisher on each project. Only after that does `publish.yml` learn to upload `dist/fux-index/` (a follow-up change to its `npm` and `pypi` jobs), so a release never waits on a name nobody reserved. **Built locally instead of from CI:** `--fux <path>` takes a fux at exactly `FUX_VERSION` (`pip install fux-engine==<FUX_VERSION>` in a venv of its own); any other version is refused.
 
+## The VS Code extension (W-95) — built, not yet published
+
+SR-PACKAGES decision 6: `codelaw.codelaw` ships as eight platform `.vsix` files, each with that platform's binary as `bin/codelaw`. `ci.yml`'s `vscode` job compiles and tests `packaging/vscode`, writes them with `python3 scripts/vsix.py build --bins out/bin --out dist` (the standard library; no `vsce`) and checks them with `scripts/vsix.py check dist --bins out/bin`, into **`dist/vscode/`**, uploaded as the artifact **`vscode`** — beside `dist`, never in it, so **`publish.yml` neither uploads nor waits on them.** To try one: `gh run download <run-id> -n vscode`, then `code --install-extension codelaw-<target>-<v>.vsix` (`darwin-arm64`, `linux-x64`, `alpine-x64`, `win32-x64`, …).
+
+**The decider's one-time steps are W-95's inbox row in [`work/OPEN-WORK.md`](work/OPEN-WORK.md):** the GitHub environment `vscode` (tag rule `v*`, like `npm` and `pypi`), the Marketplace publisher `codelaw` and its token as the environment secret `VSCE_PAT`, the Open VSX namespace `codelaw` and its token as `OVSX_PAT`, and a ruling on the upload tool. `@vscode/vsce` and `ovsx` are not ratified (L11), and L2 refuses both as they stand: `ovsx` is EPL-2.0 (copyleft), and `vsce` brings `@vscode/vsce-sign` under Microsoft's proprietary licence. Only after that ruling does `publish.yml` gain its `vscode` job (W-95 step 3), after the engine's.
+
 ## Every release
 
 0. **Re-check the npm trusted publishers.** npm lists a new trusted publisher

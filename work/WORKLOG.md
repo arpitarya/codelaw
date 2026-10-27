@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — W-96 closed: `--format agent` by itself inside a coding agent  ·  Claude Code (Opus 5.5)
+
+- **Asked:** implement and close W-96 — pick `--format agent` when an agent's variable is set; `--format` wins; CI and a person's terminal are not an agent.
+- **Done:** `codelaw-report` `agent_env.rs` (`AGENT_VARS`, `FormatEnv`, `resolve_format`); `check`/`fix`/`--watch` use it, warm processes get the client's; `config --print` shows `format` and its source; SR-CLI-MCP decision 4a; USAGE; tests `agent_format.rs`; `.cargo/config.toml` pins `CODELAW_FORMAT=text` for this repo's tests.
+- **Decided / left open:** only variables an agent's own docs or source name: Claude Code, Codex, Gemini CLI. `CLAUDECODE` counts only off a terminal (Claude Code's IDE extensions set it in the integrated terminal). Cursor (`CURSOR_AGENT`), Copilot CLI (`COPILOT_CLI`) and oxlint's other variables not detected until their agents document them.
+- **Mistakes:** none.
+- **Next:** add `CURSOR_AGENT` / `COPILOT_CLI` to `AGENT_VARS` once Cursor's or Copilot's docs name them.
+
+---
+
 ## 2026-10-27 — W-05 and W-36 ruled and filed: W-93 to W-102; README fixed  ·  Cowork (Opus 5.5)
 
 - **Asked:** a voice walk-through of the two proposals, rulings *"Yes to all three"* (W-05) and *"Yes to all four"* (W-36); then *"write to the repo."*

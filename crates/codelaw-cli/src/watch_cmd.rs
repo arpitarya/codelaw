@@ -191,7 +191,7 @@ fn next_change(watch: &mut Watch) -> Option<Changes> {
 }
 
 pub fn check(args: CheckArgs) -> ExitCode {
-    let format = match crate::format(&args.format) {
+    let format = match crate::report_format(args.format.as_deref(), &crate::Ctx::here().format_env) {
         Ok(f) => f,
         Err(e) => return crate::fail(e),
     };
@@ -217,7 +217,7 @@ pub fn check(args: CheckArgs) -> ExitCode {
 }
 
 pub fn fix(args: FixArgs) -> ExitCode {
-    let format = match crate::format(&args.format) {
+    let format = match crate::report_format(args.format.as_deref(), &crate::Ctx::here().format_env) {
         Ok(f) => f,
         Err(e) => return crate::fail(e),
     };
