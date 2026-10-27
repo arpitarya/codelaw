@@ -16,9 +16,9 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | One tiny app per host under `examples/dev-servers/` (Vite, webpack, Rspack, Next.js), each wired to its `@codelaw/*` plugin | the plugins run on the real hosts | 🔨 built, not yet run on a real host |
-| 2 | A CI job (`dev-servers` in `ci.yml`) installs the hosts on the runner via `examples/dev-servers/run.mjs`, saves a file holding a `debugger`, and asserts the finding reaches the terminal (and the dev server's websocket, which feeds the overlay) within a second | W-49 DoD 1 | 🔨 written, first CI run pending |
-| 3 | The Rspack app loads `@codelaw/webpack-plugin` unchanged | W-49 DoD 4 | 🔨 `rspack.config.js` imports the same package with the same options as `webpack.config.js`; unrun |
+| 1 | One tiny app per host under `examples/dev-servers/` (Vite, webpack, Rspack, Next.js), each wired to its `@codelaw/*` plugin | the plugins run on the real hosts | ✅ run 40434117921: all five hosts within 1000 ms |
+| 2 | A CI job (`dev-servers` in `ci.yml`) installs the hosts on the runner via `examples/dev-servers/run.mjs`, saves a file holding a `debugger`, and asserts the finding reaches the terminal (and the dev server's websocket, which feeds the overlay) within a second | W-49 DoD 1 | ✅ green on run 40434117921 |
+| 3 | The Rspack app loads `@codelaw/webpack-plugin` unchanged | W-49 DoD 4 | ✅ run 40434117921: 131 / 130 ms |
 
 **Arpit, 2026-10-26:** *"create a separate work item for example app"* (the ruling that closed W-49 and filed this).
 
@@ -30,9 +30,9 @@ Prove on the real hosts what `plugins.test.js` proves against fakes: a `debugger
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | an example app per host (Vite, webpack, Rspack, Next.js): saving a `debugger` shows it in the overlay/terminal within a second | 🔨 apps written (plus a Next.js-on-Turbopack run); not yet proven on a real host |
-| 2 · | Rspack runs `@codelaw/webpack-plugin` unchanged (same package, same options) | 🔨 config written; unrun |
-| 3 · | the check runs in CI on a runner that installs the hosts, with no host in any repo manifest or lockfile | 🔨 the examples carry no `package.json`; the driver writes one in a temp dir; first CI run pending |
+| 1 · | an example app per host (Vite, webpack, Rspack, Next.js): saving a `debugger` shows it in the overlay/terminal within a second | ✅ 2026-10-27 — CI run 40434117921 (`dev-servers`, ubuntu-latest, Node 22), save → finding: vite terminal 154 ms / overlay websocket 153 ms; webpack 201 / 194 ms; rspack 131 / 130 ms; next (webpack) terminal 182 ms; next-turbopack terminal 118 ms — all under 1000 ms |
+| 2 · | Rspack runs `@codelaw/webpack-plugin` unchanged (same package, same options) | ✅ 2026-10-27 — run 40434117921: `rspack.config.js` loads `@codelaw/webpack-plugin` with webpack's options; the finding reaches Rspack's terminal and its dev server's websocket in 131 / 130 ms |
+| 3 · | the check runs in CI on a runner that installs the hosts, with no host in any repo manifest or lockfile | ✅ 2026-10-27 — the `dev-servers` job installs each host in a temp dir from the ranges in `run.mjs` (all five held: vite ^7, webpack 5.112.2, webpack-dev-server ^5, @rspack ^1, next 15.5.28); no host in any manifest or lockfile (the L11 test passes) |
 
 ## Blockers
 
@@ -58,6 +58,10 @@ No decider ruling is recorded; the item proceeds on route 1 (no blocker, so no `
 | next | `next ^15` → 15.5.28 | ✗ the watch checked Next's own output, `.next/server/app/page.js` (`js/no-unused-vars` on webpack's wrapper), and that error was all Next printed |
 
 The version ranges held: every host installed and started. Fixes (2026-10-27): the driver sends an `Origin` header on its websocket, as a browser does (webpack-dev-server 5 checks it), and on a timeout prints every websocket message type it saw; the Next.js example gets the `.gitignore` create-next-app writes (`/.next/`, `/node_modules/`), which codelaw honours without a git repository.
+
+Second run, 40390477529: webpack, rspack and next passed after those fixes; vite failed because Vite refuses a websocket that sends an `Origin` without its token, so the driver now sends `Origin` only to the webpack-dev-server hosts. Third run, 40434117921: all five green.
+
+**Closed 2026-10-27:** every DoD met.
 
 ## Record affected
 

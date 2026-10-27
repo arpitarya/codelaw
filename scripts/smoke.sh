@@ -156,7 +156,10 @@ done
   VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" sync-agents --check >/dev/null) ||
   { echo "✗ PyPI: sync-agents did not write the agent files from codelaw-skills" >&2; exit 1; }
 [ -f "$work/npm/agents/.claude/skills/codelaw-fix/SKILL.md" ] || { echo "✗ the skills package wrote no skill" >&2; exit 1; }
-diff -r -x .git "$work/npm/agents" "$work/pypi/agents" >&2 || { echo "✗ @codelaw/skills and codelaw-skills wrote different agent files" >&2; exit 1; }
+# BusyBox diff (the Alpine legs) has no -x: drop the two .git folders, which
+# only `sync-agents --check` needed, and compare the rest
+rm -rf "$work/npm/agents/.git" "$work/pypi/agents/.git"
+diff -r "$work/npm/agents" "$work/pypi/agents" >&2 || { echo "✗ @codelaw/skills and codelaw-skills wrote different agent files" >&2; exit 1; }
 agent_files="$(cd "$work/npm/agents" && find . -type f -not -path './.git/*' | wc -l | tr -d ' ')"
 
 # ── compare ──
@@ -191,8 +194,11 @@ if [ "$win" = 1 ]; then
   want="error: \`codelaw daemon\` needs Unix domain sockets; on this system every command runs in its own process"
   [ "$st" = 2 ] && [ "$(tr -d '\r' <"$work/daemon.err")" = "$want" ] ||
     { echo "✗ win32 \`codelaw daemon status\` exited $st with '$(cat "$work/daemon.err")'; expected exit 2 and '$want'" >&2; exit 1; }
+  # against a `check` of the tree as it is now: the steps above added files to it
+  # (the skills step's agents/), so pypi.json is not this tree's report
+  (cd "$work/pypi" && fenced "$(bare_path pypi)" VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" check --format json --no-cache >"$work/now.json") || [ $? = 1 ]
   (cd "$work/pypi" && fenced "$(bare_path pypi)" VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" check --prefer-warm --format json --no-cache >"$work/warm.json") || [ $? = 1 ]
-  cmp -s "$work/warm.json" "$work/pypi.json" || { echo "✗ win32: \`check --prefer-warm\` differs from \`check\`" >&2; exit 1; }
+  cmp -s "$work/warm.json" "$work/now.json" || { echo "✗ win32: \`check --prefer-warm\` differs from \`check\`" >&2; diff "$work/now.json" "$work/warm.json" | head -20 >&2; exit 1; }
   oneshot="; one-shot: \`codelaw daemon\` refuses (exit 2) and \`--prefer-warm\` runs in-process, byte-identical"
 fi
 echo "✔ $key, installed from the staging index: npm (no Python on PATH) and PyPI (no Node on PATH) agree byte for byte: $n diagnostics; the JS and Python APIs agree; codelaw --version is codelaw $version through uvx and through npx; the index served $served_npm tarballs and $served_pypi wheels; check --watch re-checked a save; @codelaw/skills and codelaw-skills wrote the same $agent_files files$oneshot"

@@ -6,7 +6,7 @@ item: W-71
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5) — steps 2–6 built; only CI's perf run left"
+updated_by: "Claude Code (Opus 5.5) — DoD 10 from CI's perf run; closed"
 ball: agent
 ---
 
@@ -21,7 +21,7 @@ ball: agent
 | 3 | `graph/untested-function`: a new or edited function that no test file reaches is an error | "every new function has a test" | ✅ built 2026-10-27 |
 | 4 | `graph/function-coverage`: a new or edited function under **60%** line coverage (`min`) in an lcov report is an error | "and that test really runs it" | ✅ built 2026-10-27 |
 | 5 | `.codelawignore` exempts files and single functions; every line says how long (`expires=` or `forever`) and why; an edit revokes it (`on_touch`) unless it is `forever` | the escape hatch — deliberate, reasoned, visible in `codelaw exceptions` | ✅ built 2026-10-27 |
-| 6 | Flags, config, cache key, opt-in preset `codelaw:tests`, docs | usable in CI, pre-commit and the agent hook | ✅ built 2026-10-27; CI's `perf` run with a change set not yet seen (DoD 10) |
+| 6 | Flags, config, cache key, opt-in preset `codelaw:tests`, docs | usable in CI, pre-commit and the agent hook | ✅ built 2026-10-27; CI's `perf` run 40434117921 within every budget (DoD 10) |
 
 **Arpit, 2026-10-26:** *"if a new function is added or if a file is being written, it should have a unit test for it. And by default, it should have a coverage of around 60%, which can be configured through options. It should be there for JS, TS, Python. But if there are older functions, then no need to have this rule. But there is an exception to it. If somebody is editing that function, then this rule again gets applied."*
 
@@ -203,7 +203,7 @@ on_touch_scope   = "file"
 | 7 · cache | the key gains the report's hash and the base content (SR-CACHE decision 1); the cold/warm test passes | ✅ by design, not by key: the verdicts are never cached — computed every run from the linked graph (facts cached as before), the base copies, the report and `.codelawignore`; `[coverage]` is config text, already in every key (SR-CACHE decision 1 amended). `FACTS_VERSION` bumped for the re-export fix |
 | 8 · fixes ([L4](../../records/0006_LAW-4-every-rule-has-a-fix.md)) | both rules `manual`, `fix_reason:` "a test needs judgment", `## How to fix` steps; the `codelaw-fix` skill carries them | ✅ `ENGINE_RULES`: both `manual` with steps ("a test needs judgment"); `stale-ignore` `auto`; `codelaw-fix` SKILL.md carries them; `docs/rules/engine.md` regenerated |
 | 9 · preset + docs | opt-in `codelaw:tests` (not in `recommended`); USAGE "tests for new code" section; CHANGELOG | ✅ `codelaw:tests` (engine preset, no pack, in no `recommended`); USAGE "Tests for new code"; CHANGELOG |
-| 10 · budgets ([L8](../../records/0010_LAW-8-performance-budgets.md)) | CI's `perf` run with a change set: no budget exceeded | ⏳ **left — needs a CI runner**: an agent cannot produce the `perf` job's measurement. Off by default, the rules add one `Option` check per run and build no graph, so `check_warm_10k` is unaffected; on, they cost one `git show` per changed file plus the graph build |
+| 10 · budgets ([L8](../../records/0010_LAW-8-performance-budgets.md)) | CI's `perf` run with a change set: no budget exceeded | ✅ 2026-10-27 — CI run 40434117921, `perf` on `f419f32` (carries W-71's `23c5c7f`; ubuntu-24.04 runner, the L8 reference machine): every budgeted operation within — `check_warm_10k` p95 179.3 ms / 331, `check_cold_10k` 9427.7 / 13118, `format_warm_10k` 1480.5 / 2379, `lsp_after_edit` 2.6 / 5, `mcp_rules_for_path` 39.0 / 65, `peak_memory_10k` 57.7 / 72 MB, `startup` 1.5 / 3. The bench workload passes no change set, so the opt-in rules' own cost (one `git show` per changed file plus the graph build) is unmeasured; off by default they leave every budget as it was |
 
 ## Blockers
 

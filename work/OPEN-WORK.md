@@ -31,15 +31,13 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (13)
+## Open items (11)
 
-### build (11)
+### build (9)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
 🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, fux 5.1.1, CI, `init` prints not installs); left: reserve the 25 names and publish them by hand (npm fifteen, PyPI ten), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
-
-🟢 **W-71** `agent` Tests for new or edited functions (JS, TS, Python), diff-scoped; steps 1–6 built (`graph/untested-function`, lcov `graph/function-coverage`, `.codelawignore`, `codelaw:tests`); left: CI's `perf` run with a change set (DoD 10), after it lands. Filed by Arpit (Cowork). [detail](open/W-71-tests-for-new-code.md)
 
 🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); left: DoD 5 on CI's Windows legs and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
@@ -48,8 +46,6 @@ here. Read that record before changing anything below it.
 🟢 **W-51** `agent` A scheduled auto-fix PR built (`init --ci github|gitlab --autofix daily|weekly [--unsafe]`, one PR, burn-down in the body); exceptions section done (W-46); left: a real GitHub run in a throwaway repo (DoD 1, 3). Filed by Arpit (Cowork). [detail](open/W-51-scheduled-autofix-pr.md)
 
 🔴 **W-62** `arpit` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack (15 rules, npm + PyPI), `init`; left: Arpit ratifies `tree-sitter-cli` 0.25.10 (L11), then grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
-
-🟢 **W-70** `agent` Example apps for the dev-server plugins on real Vite, webpack, Rspack, Next.js, via a CI job that installs the hosts (L11). Built; left: the first CI run on the real hosts, fix, close. Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
 
 
 🔴 **W-77** `arpit` Skills package built: `@codelaw/skills` / `codelaw-skills` hold every agent file at codelaw's exact version; the binary has none; missing or mismatched → exit 2. Left: Arpit's first publish + trusted publishers (DoD 6). Filed by Arpit (Cowork). [detail](open/W-77-skills-package.md)
