@@ -33,9 +33,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (18)
+## Open items (15)
 
-### build (16)
+### build (13)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -52,12 +52,6 @@ here. Read that record before changing anything below it.
 🟢 **W-90** `agent` L11 renamed "dependencies" and holds the list: `DEPENDENCIES.md`'s tables move into it, the file goes to `archive/` with a banner, every reference (scripts, tests, records) repointed. Filed by Arpit (Cowork). [detail](open/W-90-l11-holds-the-dependency-list.md)
 
 🟢 **W-91** `agent` fux-engine always at its latest: a scheduled CI job finds a new release, bumps `FUX_VERSION` and opens a PR; each commit stays pinned and reproducible (D-34, ratified 2026-10-27). Filed by Arpit (Cowork). [detail](open/W-91-fux-auto-bump.md)
-
-🟢 **W-71** `agent` Tests for new or edited functions (JS, TS, Python), diff-scoped; steps 1–6 built (`graph/untested-function`, lcov `graph/function-coverage`, `.codelawignore`, `codelaw:tests`); left: CI's `perf` run with a change set (DoD 10), after it lands. Filed by Arpit (Cowork). [detail](open/W-71-tests-for-new-code.md)
-
-🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); the watch step passed on both `win32` smoke legs (run 40388001095); left: DoD 5 confirmed on a green `smoke` run (W-84) and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
-
-🟢 **W-70** `agent` Dev-server example apps on real Vite, webpack, Rspack, Next.js. CI run 40388001095: vite, next-turbopack pass; the other three fixed, and vite's `Origin` refusal (`f419f32`); left: a green `dev-servers` run (W-84), close. Filed by Arpit (chat). [detail](open/W-70-dev-server-example-apps.md)
 
 🟡 **W-38** waits on **W-86** `agent` PyPI 0.2.0: `css`, `data` live and trusted; day 1 uploads the other four and publishes the Release; then an agent checks `pip install codelaw` and `uvx codelaw` and writes it down. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 

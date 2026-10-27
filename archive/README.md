@@ -27,6 +27,9 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-44-watch-mode.md`](open/W-44-watch-mode.md) | 2026-10-27 | `codelaw check --watch` / `fix --watch`: [SR-ARCHITECTURE](../records/0108_architecture.md) decisions 22 and 22a, [SR-CLI-MCP](../records/0115_cli-and-mcp.md), `crates/codelaw-engine/src/watch.rs`, the smoke's watch step |
+| [`W-71-tests-for-new-code.md`](open/W-71-tests-for-new-code.md) | 2026-10-27 | `graph/untested-function`, `graph/function-coverage`, `.codelawignore` and `codelaw:tests` — their rule pages in [`packs/`](../packs) and USAGE "tests for new code"; `codelaw debug changed-functions` |
+| [`W-70-dev-server-example-apps.md`](open/W-70-dev-server-example-apps.md) | 2026-10-27 | [`examples/dev-servers/`](../examples/dev-servers) and CI's `dev-servers` job; [SR-PACKAGES](../records/0107_packages.md) decision 3a |
 | [`W-84-ci-green-on-main.md`](open/W-84-ci-green-on-main.md) | 2026-10-27 | CI's `ci.yml` on `main` (run 40437239647, all green); the guard's baseline in [`records/RULE-SINCE`](../records/RULE-SINCE) |
 | [`W-51-scheduled-autofix-pr.md`](open/W-51-scheduled-autofix-pr.md) | 2026-10-27 (parked) | [`work/BACKLOG.md`](../work/BACKLOG.md) B-053; the workflow `codelaw init --ci github --autofix` writes, [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | [`W-45-ci-report-formats.md`](open/W-45-ci-report-formats.md) | 2026-10-27 | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 4 (`--format github`, `gitlab`, `junit`, `checkstyle`); USAGE's CI snippets |
@@ -39,7 +42,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 | [`W-78-commit-main-checkout.md`](open/W-78-commit-main-checkout.md) | 2026-10-27 | the commit itself; W-77 lives in [`work/open/`](../work/open/W-77-skills-package.md) |
 | [`W-76-commit-main-and-clean-worktrees.md`](open/W-76-commit-main-and-clean-worktrees.md) | 2026-10-27 | the commit itself and the worklog entry |
 | [`W-75-commit-main-checkout.md`](open/W-75-commit-main-checkout.md) | 2026-10-27 | the commit itself; the Fux setup is `fux.toml`, `.fux/` and [`AGENTS.md`](../AGENTS.md) |
-| [`W-49-dev-server-plugins.md`](open/W-49-dev-server-plugins.md) | 2026-10-26 | [`packaging/npm/`](../packaging/npm) (`dev-core`, `vite-plugin`, `webpack-plugin`, `next`), [SR-PACKAGES](../records/0107_packages.md) decision 3a, [`plugins.test.js`](../packaging/npm/dev-core/test/plugins.test.js); the real-host example apps are [W-70](../work/open/W-70-dev-server-example-apps.md) |
+| [`W-49-dev-server-plugins.md`](open/W-49-dev-server-plugins.md) | 2026-10-26 | [`packaging/npm/`](../packaging/npm) (`dev-core`, `vite-plugin`, `webpack-plugin`, `next`), [SR-PACKAGES](../records/0107_packages.md) decision 3a, [`plugins.test.js`](../packaging/npm/dev-core/test/plugins.test.js); the real-host example apps are [W-70](open/W-70-dev-server-example-apps.md) (closed 2026-10-27) |
 | [`W-61-max-lines-html-css.md`](open/W-61-max-lines-html-css.md) | 2026-10-26 | [`size_lines.rs`](../crates/codelaw-native/src/size_lines.rs), [SR-RULE-PACKS](../records/0101_rule-packs.md) (`size` presets) and [`tests/size_limits.rs`](../crates/codelaw-cli/tests/size_limits.rs) |
 | [`W-63-css-modules.md`](open/W-63-css-modules.md) | 2026-10-26 | [`packs/css-modules/`](../packs/css-modules/README.md), [SR-PROJECT-GRAPH](../records/0103_project-graph.md) decision 8 and [`tests/css_modules.rs`](../crates/codelaw-cli/tests/css_modules.rs) |
 | [`W-60-consumer-templates.md`](open/W-60-consumer-templates.md) | 2026-10-26 | [`templates/`](../templates/README.md), [`template.rs`](../crates/codelaw-core/src/template.rs) and [SR-LAW-10](../records/0012_LAW-10-consumer-templates.md) |
