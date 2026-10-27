@@ -26,4 +26,4 @@ timestamp: <ISO 8601>
 |-----|------|--------------------|--------|
 | [write-time-guidance](write-time-guidance.md) | `hook --pre` for every agent with a pre-write hook; the brief cut by what is specific to the repo (W-05) | ruled 2026-10-27 → built by W-93 | graduated |
 | [linter-for-ai-positioning](linter-for-ai-positioning.md) | codelaw beside ESLint, Prettier, Biome, Ruff, oxc: claims, README changes, gaps G1–G8 (W-36) | ruled 2026-10-27 → W-94–W-102 | graduated |
-| [type-aware-rules](type-aware-rules.md) | type-aware TS rules and TS errors through a typescript-go helper | reopened 2026-10-27 → research W-101 | graduated |
+| [type-aware-rules](type-aware-rules.md) | type-aware TS rules and TS errors through the project's own TypeScript 7.1 API, a Node helper (W-101) | ruled 2026-10-27 → W-104–W-107 | graduated |

@@ -159,6 +159,18 @@ On 2026-10-26 codelaw had 47 direct Rust crates (376 in `Cargo.lock` with their 
 |---|---|---|---|---|
 | D-36 | **tree-sitter-cli** (npm, MIT, with its platform binary) | regenerates a vendored grammar's `src/` from a patched `grammar.js` (W-62: tree-sitter-scss, the tree-sitter-css fork); the generated `src/` is committed, so CI, the engine and users never run it | `=0.25.10`, exact | ratified 2026-10-27 — *"Ratify it."*, on the terms put to the decider: exact pin, generated source committed, run only when a grammar changes |
 
+### Word data — vendored into the spell pack (`packs/spell/data/spell/`)
+
+Copied-in data is a dependency (decision 1). These three are read only by `scripts/spell-data.py`, which writes the pack's word data from them; the engine and every other package carry none of it ([SR-SPELL](0116_spell.md) decision 6). Each source's copyright notice goes in `packs/spell/NOTICE`. No ledger line: no manifest or lockfile names them.
+
+| id | unit | licence (L2) | what it does | pin | status |
+|---|---|---|---|---|---|
+| D-42 | **SCOWL** (Spell Checker Oriented Word Lists, Kevin Atkinson) — the US and British English lists | permissive, notice only (*"Permission to use, copy, modify, distribute and sell …"*); its Ispell part BSD-style | the dictionary of `spell/unknown-word`, and the words the known-typo list is generated from | the release W-103 vendors, recorded here in that change | ratified 2026-10-27 — *"Approve both."* (the decider, voice; with D-43) |
+| D-43 | **VarCon** (Kevin Atkinson) — US↔British↔Canadian↔Australian spelling variants | permissive, notice only, as D-42 | `spell/locale-variant`'s table | as D-42 | ratified 2026-10-27 — *"Approve both."* |
+| D-44 | **`@cspell/dict-software-terms`** (streetsidesoftware), the word list only, not the package | MIT | software jargon (`debounce`, `coroutine`) the dictionary check accepts | the version W-103 vendors, recorded here in that change | ratified 2026-10-27 — *"Approve it."* (the decider, voice) |
+
+**Ruled with them, 2026-10-27:** `typos`' word list is **not** ratified — the decider chose a list codelaw generates itself (*"Let's go with B."*); codespell's lists and Wikipedia's are share-alike and fail L2.
+
 ### CI — Fux (build tool of the index packages)
 
 | id | unit | what it does | pin | status |
