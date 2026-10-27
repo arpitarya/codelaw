@@ -345,6 +345,7 @@ flowchart LR
 
 - **The same command works in any agent with post-edit hooks** (Codex, Copilot, Kiro), and in pre-commit and CI.
 - **`codelaw hook`** is that recipe built in: it reads the agent's hook payload on stdin, fixes, and returns what is left. `codelaw init --agents claude,codex,copilot,kiro,cowork` installs the hooks and writes each agent's instruction files from the rules; `codelaw sync-agents` rewrites them when the rules change, and `--check` reports drift ([SR-AGENT-SURFACES](records/0102_agent-surfaces.md)).
+- **An agent that runs `codelaw check` or `codelaw fix` itself gets `--format agent` with no flag.** codelaw sees the variable the agent sets in the commands it runs: `CLAUDE_CODE_CHILD_SESSION` or `CLAUDECODE` (Claude Code; `CLAUDECODE` only when the output is not a terminal, since Claude Code's IDE extensions set it in the terminal you type in), `CODEX_THREAD_ID`, `CODEX_SANDBOX` or `CODEX_SANDBOX_NETWORK_DISABLED` (Codex) and `GEMINI_CLI` (Gemini CLI). `--format` always wins; `CODELAW_FORMAT=json` (or any format) sets the default for every run; `CI` alone never picks `agent`. `codelaw config --print` shows which applied and why. Cursor and Copilot CLI are not detected yet: pass `--format agent` there ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 4a).
 
 ---
 
@@ -424,7 +425,7 @@ flowchart LR
 
 | command | what it does |
 |---|---|
-| `codelaw check [paths]` | Report every finding with its fix. `--format text\|json\|sarif\|agent\|github\|gitlab\|junit\|checkstyle`, `--max-warnings N`, `--lang`, `--rule`, `--timings`; `--no-adapters` skips the installed oxlint, Ruff, stylelint and html-validate; `--watch` checks again on every save until Ctrl-C |
+| `codelaw check [paths]` | Report every finding with its fix. `--format text\|json\|sarif\|agent\|github\|gitlab\|junit\|checkstyle` (default: `CODELAW_FORMAT`, else `agent` inside a coding agent, else `text`), `--max-warnings N`, `--lang`, `--rule`, `--timings`; `--no-adapters` skips the installed oxlint, Ruff, stylelint and html-validate; `--watch` checks again on every save until Ctrl-C |
 | `codelaw fix [paths]` | Apply `auto` fixes, format, then report what's left. `--unsafe` adds `suggest` fixes; `--dry-run` writes nothing; `--trace` shows each pass; `--watch` fixes each file again when you save it |
 | `codelaw format [paths]` | Format every file: Prettier-style JS/TS/JSON/CSS/HTML/YAML/Markdown, Black-style Python, taplo-style TOML. `--check` and `--diff` change nothing |
 | `codelaw mcp` · `codelaw lsp` | The MCP server for agents and the language server for editors, from the same binary |

@@ -37,9 +37,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (19)
+## Open items (18)
 
-### build (17)
+### build (16)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -57,7 +57,6 @@ here. Read that record before changing anything below it.
 
 🟢 **W-94** `agent` `codelaw migrate eslint|prettier|biome|ruff|stylelint`: translate a config into `codelaw.toml` with a report; accept `eslint-disable`/`noqa` as ignore aliases. Filed by Arpit (Cowork). [detail](open/W-94-codelaw-migrate.md)
 
-🟢 **W-96** `agent` Pick `--format agent` automatically when an agent's environment variable is set; an explicit `--format` wins. Filed by Arpit (Cowork). [detail](open/W-96-agent-format-autodetect.md)
 
 🟢 **W-97** `agent` A first-party GitHub Action (`uses: arpitarya/codelaw@v…`): install, `check --format github`, optional SARIF upload. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 

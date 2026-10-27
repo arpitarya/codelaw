@@ -2,11 +2,13 @@
 //! format carries the L4 fix fields: the class, and the edits or the steps.
 //! SARIF is `sarif.rs`; the debug commands' output is `debug.rs`.
 
+mod agent_env;
 mod ci;
 mod debug;
 pub mod exceptions;
 mod sarif;
 
+pub use agent_env::{AGENT_VARS, FormatEnv, resolve_format};
 pub use ci::{check_checkstyle, check_github, check_gitlab, check_junit, fingerprints};
 pub use debug::{config_json, config_text, match_json, match_text, timings_json, timings_text, trace_json, trace_text};
 pub use sarif::{SARIF_SCHEMA, check_sarif};
@@ -55,6 +57,20 @@ impl Format {
             "checkstyle" => Format::Checkstyle,
             _ => return None,
         })
+    }
+
+    /// What `--format` calls it.
+    pub fn name(self) -> &'static str {
+        match self {
+            Format::Text => "text",
+            Format::Json => "json",
+            Format::Sarif => "sarif",
+            Format::Agent => "agent",
+            Format::Github => "github",
+            Format::Gitlab => "gitlab",
+            Format::Junit => "junit",
+            Format::Checkstyle => "checkstyle",
+        }
     }
 }
 

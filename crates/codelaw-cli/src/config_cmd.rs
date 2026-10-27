@@ -73,7 +73,13 @@ pub fn run(args: ConfigArgs) -> ExitCode {
     }
     let env = TraceEnv { cache_dir: std::env::var("CODELAW_CACHE_DIR").ok(), no_cache: args.no_cache };
     let file = args.for_path.as_deref();
-    let values = project.config_trace(file, &env);
+    let mut values = project.config_trace(file, &env);
+    // The format `check` and `fix` print without `--format` (SR-CLI-MCP
+    // decision 4a): an input of the run, so shown with its source.
+    let format_env = codelaw_report::FormatEnv::from_env(std::io::IsTerminal::is_terminal(&std::io::stdout()));
+    if let Ok((fmt, source)) = codelaw_report::resolve_format(None, &format_env) {
+        values.push(codelaw_config::Traced { key: "format".into(), value: serde_json::json!(fmt.name()), source });
+    }
     let abs = file.map(|f| std::fs::canonicalize(f).unwrap_or_else(|_| f.to_path_buf()));
     let files = project.config.governing_files(abs.as_deref());
     if json {

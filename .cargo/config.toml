@@ -1,0 +1,6 @@
+# This repo's tests run inside coding agents, whose environment would make
+# every `check` and `fix` a test spawns print the agent format
+# (SR-CLI-MCP decision 4a). A test that wants the detection removes it;
+# a `CODELAW_FORMAT` already in the environment still wins.
+[env]
+CODELAW_FORMAT = "text"

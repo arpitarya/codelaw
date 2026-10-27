@@ -13,7 +13,7 @@ owns:
   - crates/codelaw-mcp
   - .pre-commit-hooks.yaml
 laws: [L0, L3, L4, L5, L7, L8]
-timestamp: 2026-10-27T12:00:00Z
+timestamp: 2026-10-27T18:00:00Z
 content_sha: ""
 ---
 
@@ -86,7 +86,7 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - `--changed-since <ref>`, `--staged`, `--as-of <date>`;
    - `--coverage <path>`: the lcov report `graph/function-coverage` reads; it wins over `[coverage] report` ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9). When the test rules of new code run, `text` and `agent` output opens with `new code: …` (`new code: 3 new, 1 edited functions since <base>`, or `new code: no change set; test rules not evaluated`) and, when the coverage rule runs, `coverage: <report> (N files)` or `coverage: none; not evaluated`; `json` carries them as `new_code: { change_set, coverage }`, and each finding of the two rules carries `data` (`function`, `change`; the coverage rule also `covered`, `lines`, `pct`, `min`);
    - `--profile <name>`: the `[profile.<name>]` to run with; without it, `CODELAW_PROFILE`, then `ci` when `CI` is set, else `local` ([SR-CONFIG](0110_config.md) decision 10). `codelaw hook` and `config --print` take it too;
-   - `--format text|json|sarif|agent|github|gitlab|junit|checkstyle`;
+   - `--format text|json|sarif|agent|github|gitlab|junit|checkstyle`; on `check` and `fix` without it, `CODELAW_FORMAT`, else `agent` inside a coding agent, else `text` (decision 4a);
    - `--unsafe` (apply `suggest` fixes), `--dry-run`;
    - `--no-adapters` on `check` and `fix`: don't run the installed external linters those two commands run otherwise ([SR-LINTER](0106_linter.md) decision 2);
    - `--watch` on `check` and `fix` (W-44, 2026-10-25): keep running and run again on every save, until Ctrl-C, which exits `0` (a second Ctrl-C exits at once). How it watches is [SR-ARCHITECTURE](0108_architecture.md) decision 22a.
@@ -104,6 +104,21 @@ The decider asked for an SR stating that codelaw has both an MCP server and a CL
    - `agent`: compact, token-budgeted lines for hooks.
    - `github`, `gitlab`, `junit`, `checkstyle`: what CI platforms read, so findings show inline on a pull request without a SARIF upload. On `check`, `fix` (what is left) and `format` (with `--check`, each file that would change is a `format/unformatted` warn, as `check` reports it; `--diff` takes none of them). Exit codes are the text run's.
    - **A security rule's finding names its CWE** in `text` and `agent` output, after the rule id: `sec-js/no-child-process-shell (CWE-78)` (W-53).
+
+   - **4a. The default format follows the environment** (W-96, 2026-10-27; W-36 gap G4). On `check` and `fix` (`--watch` included), in order: `--format`, which always wins; `CODELAW_FORMAT` (any of the eight; an unknown name is exit `2`); `agent` when a coding agent's own variable says it ran the command; else `text`. `crates/codelaw-report/src/agent_env.rs` (`AGENT_VARS`, `resolve_format`).
+     - **The variables**, each named by that agent's own documentation or source; a variable none names is not detected:
+
+       | variable | agent | source |
+       |---|---|---|
+       | `CLAUDE_CODE_CHILD_SESSION` | Claude Code | set in the Bash and PowerShell tools and hook commands; IDE extensions do not set it ([env vars](https://code.claude.com/docs/en/env-vars)) |
+       | `CLAUDECODE` | Claude Code | set in every subprocess, **and in its IDE extensions' integrated terminals**, so it counts only when stdout is not a terminal (same page) |
+       | `CODEX_THREAD_ID`, `CODEX_SANDBOX`, `CODEX_SANDBOX_NETWORK_DISABLED` | Codex | injected into a shell tool call's environment (`codex-rs/core/src/exec_env.rs`, `spawn.rs`) |
+       | `GEMINI_CLI` | Gemini CLI | set in the shell tool's subprocess ([shell tool](https://geminicli.com/docs/tools/shell/)) |
+
+       Empty, `0` and `false` count as unset. Not detected, because no agent's own source named them when this was built: `CURSOR_AGENT` (Cursor), `COPILOT_CLI` (Copilot CLI), `OPENCODE`, `JUNIE_DATA`/`JUNIE_SHIM_PATH`, `AI_AGENT`, `CLAUDE_CODE` — all from oxlint's `apps/oxlint/src/agent_detection.rs`. Its substring guesses (`TERM_PROGRAM` holding `kiro`, `EDITOR` holding `devin`, `PATH` holding `.pi/agent`) and `REPL_ID` (Replit) are left out on purpose: each is also true in a terminal a person types in.
+     - **CI and a person are not an agent:** `CI`, `GITHUB_ACTIONS`, `GITLAB_CI` and `TERM_PROGRAM` are not in the list, so a pipeline prints `text` unless it asks. An agent running inside CI still gets `agent`: the reader is the agent.
+     - **An input like any flag** ([L5](0007_LAW-5-no-model-in-the-engine.md)): the same variables give the same bytes. A warm process uses its client's variables and terminal, never its own ([SR-ARCHITECTURE](0108_architecture.md) decision 21). `config --print` shows the default as the value `format` with its source: `--format` is not read there, so `CODELAW_FORMAT`, `CLAUDECODE=1 (Claude Code)` or `default`.
+     - The other commands keep their own `--format` default; `codelaw hook` and the MCP tools have their own output ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 6; decision 5 here). This repo's `.cargo/config.toml` sets `CODELAW_FORMAT=text` so its tests, often run inside an agent, see `text`; `crates/codelaw-cli/tests/agent_format.rs` clears it and tests each variable.
 
    Every format carries the [L4](0006_LAW-4-every-rule-has-a-fix.md) fix fields.
 
