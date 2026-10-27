@@ -1,0 +1,4 @@
+
+[lint]
+# {{tool}}'s line suppressions count as `codelaw-ignore` (SR-LINTER decision 6).
+ignore_aliases = [{{aliases}}]

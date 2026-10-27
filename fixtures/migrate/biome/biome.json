@@ -1,0 +1,19 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.0/schema.json",
+  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },
+  "javascript": { "formatter": { "quoteStyle": "single" } },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": false,
+      "suspicious": {
+        "noDebugger": "error",
+        "noConsole": "warn",
+        "noDoubleEquals": "error",
+        "noVar": "error",
+        "noSparseArray": "error"
+      },
+      "performance": { "noAccumulatingSpread": "error" }
+    }
+  }
+}

@@ -39,6 +39,8 @@ libc.workspace = true
 # the rest of the file as written (SR-FORMATTER decision 5). MIT OR Apache-2.0.
 toml_edit = "0.25"
 codelaw-format.workspace = true
+# `codelaw migrate` reads `.eslintrc.yaml` and `.stylelintrc.yaml` (SR-CLI-MCP decision 14).
+serde-saphyr.workspace = true
 # `codelaw deps refresh` (SR-RULE-PACKS decision 15): the manifest, lockfile
 # and version code the dependency rules use, so both read the same.
 codelaw-native.workspace = true

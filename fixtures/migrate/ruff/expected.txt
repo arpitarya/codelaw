@@ -1,0 +1,3 @@
+app.py:3 ruff/F401 py/unused-import
+app.py:6 ruff/B006 py/no-mutable-default
+app.py:7 ruff/E711 py/none-comparison

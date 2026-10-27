@@ -10,6 +10,19 @@ column: **covered**, **covered differently**, **dropped (with a reason)** or
 **needs a human**. You produce that table; codelaw's own rule metadata is the
 source of the mapping, not your memory of the old tool.
 
+## 0. Run `codelaw migrate` first
+
+For ESLint, Prettier, Biome, Ruff and stylelint the translation is a
+command, not a judgement: `codelaw migrate <tool> --format json` reads the
+config (never running one that is a program), maps every rule through
+`ported_from:`, and returns `mapped`, `changed`, `unmapped` and `ignored`
+lines and the `config` it would write. Show the user the report, then
+`codelaw migrate <tool> --write` (run it once per tool; a second tool adds to
+the same `codelaw.toml`). Your work starts from its `changed` and `unmapped`
+lines: steps 2–5 below, for those only. A config it refuses as a program:
+ask the user to convert it to JSON, or list its rules with them by hand.
+For html-validate, markdownlint and prose conventions, start at step 1.
+
 ## 1. Inventory the source
 
 Collect every config in scope: `eslint.config.*` / `.eslintrc*`,

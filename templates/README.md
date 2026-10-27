@@ -67,6 +67,9 @@ what consumers receive, edit the template here — the diff is the change.
 | `init/codelaw-agents.toml` | the `[agents]` section of `codelaw.toml` | `init --agents` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `init/codelaw.toml` | codelaw.toml | `init` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `init/gitignore` | the line `init` adds to `.gitignore` (the merge stays in code) | `init` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
+| `migrate/codelaw.toml` | codelaw.toml | `migrate <tool> --write` (printed without it) | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 15 |
+| `migrate/lint.toml` | the `[lint]` section of that codelaw.toml: the tool's line suppressions as aliases (eslint, biome, ruff) | `migrate <tool>` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 15 |
+| `migrate/preview.toml` | the `preview = true` lines of that codelaw.toml, when a mapped rule is `preview` | `migrate <tool>` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 15 |
 | `new-rule/example.md` | .codelaw/rules/<namespace>/<name>.md — one language's Don't/Do pair | `new-rule` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `new-rule/fix-line.md` | .codelaw/rules/<namespace>/<name>.md — the `fix:` line of the rule block | `new-rule` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `new-rule/fix-reason.md` | .codelaw/rules/<namespace>/<name>.md — the `fix_reason:` line | `new-rule` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |

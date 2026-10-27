@@ -19,7 +19,7 @@ mod lint;
 mod new_code;
 mod query;
 mod project;
-mod suppress;
+pub mod suppress;
 mod timings;
 mod watch;
 
@@ -218,6 +218,32 @@ pub struct Project {
     /// The as-of date and the change set, read on first use.
     as_of: std::sync::OnceLock<AsOf>,
     touched: std::sync::OnceLock<(BTreeSet<String>, Vec<String>)>,
+    /// `[lint] ignore_aliases` (SR-LINTER decision 6): the tools whose
+    /// line suppressions count, and `ported_from:` id → codelaw ids.
+    pub(crate) aliases: Option<Aliases>,
+}
+
+/// The other tools' suppressions a project reads, and the ids they map to.
+#[derive(Debug, Default)]
+pub(crate) struct Aliases {
+    pub tools: Vec<suppress::Alias>,
+    pub ported: std::collections::BTreeMap<String, Vec<String>>,
+}
+
+impl Aliases {
+    fn load(config: &Config, rules: &RuleSet) -> Option<Aliases> {
+        let tools: Vec<suppress::Alias> = config.ignore_aliases().iter().filter_map(|a| suppress::Alias::parse(a)).collect();
+        if tools.is_empty() {
+            return None;
+        }
+        let mut ported: std::collections::BTreeMap<String, Vec<String>> = std::collections::BTreeMap::new();
+        for r in &rules.rules {
+            for p in &r.rule.ported_from {
+                ported.entry(p.clone()).or_default().push(r.rule.id.clone());
+            }
+        }
+        Some(Aliases { tools, ported })
+    }
 }
 
 fn pool(threads: Option<usize>) -> rayon::ThreadPool {
@@ -285,6 +311,7 @@ impl Project {
         }
         let (baselines, deprecations, exceptions) = baseline::load(&config)?;
         let tests = new_code::load(&config)?;
+        let aliases = Aliases::load(&config, &rules);
         let pool = pool(options.threads);
         let adapters = std::sync::OnceLock::new();
         Ok(Project {
@@ -304,6 +331,7 @@ impl Project {
             tests,
             as_of: std::sync::OnceLock::new(),
             touched: std::sync::OnceLock::new(),
+            aliases,
         })
     }
 

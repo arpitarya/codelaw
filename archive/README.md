@@ -28,6 +28,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-94-codelaw-migrate.md`](open/W-94-codelaw-migrate.md) | 2026-10-27 | `codelaw migrate` in [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 15; `[lint] ignore_aliases` in [SR-LINTER](../records/0106_linter.md) decision 6; USAGE *Coming from another tool* |
 | [`W-101-type-aware-ts-research.md`](open/W-101-type-aware-ts-research.md) | 2026-10-27 | [proposal](../work/proposals/type-aware-rules.md); the build W-104–W-107 |
 | [`W-35-before-while-after-positioning.md`](open/W-35-before-while-after-positioning.md) | 2026-10-27 | the README's *One set of rules, four moments*; `hook --pre` and `brief` in [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) decision 9 and [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 14 |
 | [`W-91-fux-auto-bump.md`](open/W-91-fux-auto-bump.md) | 2026-10-27 | [`.github/workflows/fux-bump.yml`](../.github/workflows/fux-bump.yml), `scripts/fux-index.py latest`/`bump`; [SR-PACKAGES](../records/0107_packages.md) decision 14 |

@@ -1,0 +1,6 @@
+# codelaw configuration, written by `codelaw migrate {{tool}}` from {{sources}}.
+# Each rule below is one {{tool}} turned on, or a rule of a preset it needs
+# that {{tool}} left off. The report `migrate` printed names every setting
+# that did not map, and why; `codelaw config --print` shows the result.
+extends = [{{extends}}]
+{{preview}}{{lint}}{{tables}}

@@ -1,0 +1,36 @@
+{
+ "about": "The presets `codelaw migrate` maps to codelaw presets (SR-CLI-MCP decision 15): a source preset → the codelaw presets that port it, each named in its pack's README with what differs. A flat ESLint config names a preset by the package its object is imported from and the path read off it (`@eslint/js:configs.recommended`). A preset not here is reported as not mapped; its rules then map only where the config lists them.",
+ "eslint": {
+  "eslint:recommended": ["codelaw:js/recommended"],
+  "@eslint/js:configs.recommended": ["codelaw:js/recommended"],
+  "plugin:@typescript-eslint/recommended": ["codelaw:js/typescript", "codelaw:ts/recommended"],
+  "plugin:@typescript-eslint/eslint-recommended": ["codelaw:js/typescript"],
+  "typescript-eslint:configs.recommended": ["codelaw:js/typescript", "codelaw:ts/recommended"],
+  "typescript-eslint:configs.eslintRecommended": ["codelaw:js/typescript"],
+  "plugin:react/recommended": ["codelaw:react/recommended"],
+  "eslint-plugin-react:configs.flat.recommended": ["codelaw:react/recommended"],
+  "plugin:react-hooks/recommended": ["codelaw:react/recommended"],
+  "eslint-plugin-react-hooks:configs.recommended": ["codelaw:react/recommended"],
+  "eslint-plugin-react-hooks:configs.recommended-latest": ["codelaw:react/recommended"],
+  "eslint-plugin-react-hooks:configs.flat.recommended": ["codelaw:react/recommended"],
+  "plugin:n/recommended-module": ["codelaw:node/recommended"],
+  "eslint-plugin-n:configs.flat/recommended-module": ["codelaw:node/recommended"],
+  "plugin:@tanstack/query/recommended": ["codelaw:tanstack-query/recommended"],
+  "@tanstack/eslint-plugin-query:configs.flat/recommended": ["codelaw:tanstack-query/recommended"],
+  "plugin:@stencil-community/recommended": ["codelaw:stencil/recommended"]
+ },
+ "biome": {
+  "recommended": ["codelaw:js/recommended"]
+ },
+ "stylelint": {
+  "stylelint-config-recommended": ["codelaw:css/recommended"],
+  "stylelint-config-standard": ["codelaw:css/recommended", "codelaw:css/standard"],
+  "stylelint-config-recommended-scss": ["codelaw:css/recommended", "codelaw:scss/recommended"],
+  "stylelint-config-standard-scss": ["codelaw:css/recommended", "codelaw:css/standard", "codelaw:scss/recommended"]
+ },
+ "notes": {
+  "recommended": "Biome's recommended set is Biome's, not ESLint's: codelaw:js/recommended is the correctness core of ESLint's recommended, so the two differ rule by rule",
+  "plugin:react/recommended": "codelaw:react/recommended also holds react-hooks' rules-of-hooks and exhaustive-deps",
+  "stylelint-config-standard": "the standard set's layout rules are the formatter's in codelaw (SR-LINTER decision 7)"
+ }
+}

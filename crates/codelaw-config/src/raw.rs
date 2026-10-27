@@ -407,7 +407,13 @@ pub struct RawLsp {
 #[serde(deny_unknown_fields)]
 pub struct RawLint {
     pub tagged_templates: Option<bool>,
+    /// Other tools' line suppressions read as `codelaw-ignore` (SR-LINTER
+    /// decision 6; W-94): `eslint`, `ruff`, `biome`.
+    pub ignore_aliases: Option<Vec<String>>,
 }
+
+/// The values `[lint] ignore_aliases` takes.
+pub const IGNORE_ALIASES: &[&str] = &["eslint", "ruff", "biome"];
 
 /// `[agents]`: SR-AGENT-SURFACES decision 6. The names are checked
 /// against the agents of the matrix by `codelaw-agents`, which knows them.
