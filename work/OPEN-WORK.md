@@ -33,9 +33,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (21)
+## Open items (20)
 
-### build (19)
+### build (18)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -58,8 +58,6 @@ here. Read that record before changing anything below it.
 🟢 **W-96** `agent` Pick `--format agent` automatically when an agent's environment variable is set; an explicit `--format` wins. Filed by Arpit (Cowork). [detail](open/W-96-agent-format-autodetect.md)
 
 🟢 **W-97** `agent` A first-party GitHub Action (`uses: arpitarya/codelaw@v…`): install, `check --format github`, optional SARIF upload. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
-
-🟢 **W-98** `agent` `llms.txt`, `llms-full.txt` and a `rules.json` catalogue generated from `docs/rules/`, checked in CI. Filed by Arpit (Cowork). [detail](open/W-98-llms-txt.md)
 
 🟢 **W-99** `agent` Side-by-side bench against ESLint, Prettier, Biome, oxlint, Ruff on the pinned repos and runner; no speed claim before it. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
