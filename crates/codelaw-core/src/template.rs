@@ -31,6 +31,7 @@ macro_rules! t {
 pub const TEMPLATES: &[Template] = &[
     t!("ci/github/autofix-suggest-job.yml"),
     t!("ci/github/codelaw-autofix.yml"),
+    t!("ci/github/codelaw.yml"),
     t!("ci/gitlab/autofix-suggest-job.yml"),
     t!("ci/gitlab/codelaw-autofix.yml"),
     t!("git-hooks/post-commit"),
@@ -159,6 +160,7 @@ mod tests {
         ("agents/path-scoped.md", &[("language", "Python"), ("cmd", "codelaw"), ("rules", "")]),
         ("ci/github/autofix-suggest-job.yml", &[("version", "0.0.0")]),
         ("ci/github/codelaw-autofix.yml", &[("cron", "17 4 * * *"), ("version", "0.0.0"), ("suggest_job", "")]),
+        ("ci/github/codelaw.yml", &[("version", "0.0.0")]),
         ("ci/gitlab/autofix-suggest-job.yml", &[("version", "0.0.0")]),
         ("ci/gitlab/codelaw-autofix.yml", &[("cron", "17 4 * * *"), ("version", "0.0.0"), ("suggest_job", "")]),
         ("init/codelaw-agents.toml", &[("targets", "\"claude\"")]),

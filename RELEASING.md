@@ -49,6 +49,17 @@ uploads nothing whose digest is not in `SHA256SUMS` and not attested by `ci.yml`
 on the release commit. A version older than npm's current `latest` (a backport)
 goes to the dist-tag `release-<major>.<minor>`, so `latest` stays on the newest line.
 
+**The GitHub Action (W-97).** `action.yml` at the root makes every release tag
+an Action: `uses: arpitarya/codelaw@v0.3.0` installs codelaw 0.3.0, because
+`version.py --set` writes the Action's default `version` and `--check` fails
+when it disagrees. So a release tag is never moved or re-pointed — it is the
+Action's contract too ([SR-PACKAGES](records/0107_packages.md) decision 15).
+`ci.yml`'s `action` job runs it on every push. Listing it on the GitHub
+Marketplace is the decider's: accept the Marketplace Developer Agreement once,
+then tick *Publish this Action to the GitHub Marketplace* when creating the
+release (`gh release create` cannot tick it; use the web form or edit the
+release after).
+
 ## One time, by hand (the decider)
 
 In this order. npm binds a trusted publisher only to a package that already

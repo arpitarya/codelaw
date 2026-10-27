@@ -37,7 +37,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | rule | fix | flags |
 |---|---|---|
 | `scss/at-extend-no-missing-placeholder` | manual | `@extend .class` instead of a `%placeholder` |
-| `scss/at-if-no-null` | auto | `@if $x != null` (fixed) and `@if $x == null` (reported) |
+| `scss/at-if-no-null` | auto | `@if $x != null` (fixed to `$x`) and `@if $x == null` (fixed to `not $x`) |
 | `scss/at-mixin-pattern` | manual | mixin names outside the pattern (kebab-case) |
 | `scss/at-rule-no-unknown` | manual | at-rules neither CSS nor Sass defines |
 | `scss/dollar-variable-pattern` | manual | `$variable` names outside the pattern (kebab-case) |

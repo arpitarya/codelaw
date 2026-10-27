@@ -12,7 +12,7 @@ owns:
   - crates/codelaw-match
   - crates/codelaw-adapters
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-24T12:00:00Z
+timestamp: 2026-10-27T12:00:00Z
 content_sha: ""
 ---
 
@@ -76,8 +76,8 @@ The decider asked for an SR for the linter itself, covering JavaScript, TypeScri
    | TypeScript · TSX | `tree-sitter-typescript` (both dialects; Stencil decorators parse as decorators) | yes |
    | JSON · JSONC | `tree-sitter-json` | yes |
    | Python | `tree-sitter-python` | yes |
-   | CSS | `tree-sitter-css`: codelaw's in-tree fork of 0.25.0, which adds range media features, `layer()` in `@import` and fractional keyframe percentages ([SR-ARCHITECTURE](0108_architecture.md) decision 3); the `css/*` rules still read the text themselves (decision 15b there) | yes, patched in place of ast-grep's |
-   | SCSS | `tree-sitter-scss` 1.0.0: codelaw's in-tree copy, `src/` unchanged, its scanner's character classes pinned to the "C" locale's ([SR-ARCHITECTURE](0108_architecture.md) decision 3; B-047, ruled 2026-10-26). The `css/*` rules run on `.scss` through the same text reader in its SCSS mode; the `scss/*` rules read the Sass statements | no: a path crate, like the CSS fork |
+   | CSS | `tree-sitter-css`: codelaw's in-tree fork of 0.25.0, which adds range media features, `layer()` in `@import`, fractional keyframe percentages and (`+codelaw.3`, W-62) `supports()` in `@import`, a name before an at-rule's query, page selectors, named-range keyframes, `.b &`, a custom property holding a block and `!ie`-style annotations ([SR-ARCHITECTURE](0108_architecture.md) decision 3); the `css/*` rules still read the text themselves (decision 15b there) | yes, patched in place of ast-grep's |
+   | SCSS | `tree-sitter-scss` 1.0.0: codelaw's in-tree fork, built on the CSS fork and reading the Sass module system and modern Sass since `+codelaw.2` (W-62), its scanner's character classes pinned to the "C" locale's ([SR-ARCHITECTURE](0108_architecture.md) decision 3; B-047, ruled 2026-10-26). The `css/*` rules run on `.scss` through the same text reader in its SCSS mode; the `scss/*` rules read the Sass statements | no: a path crate, like the CSS fork |
    | HTML | `tree-sitter-html` | yes |
    | YAML | `tree-sitter-yaml` | yes |
    | TOML | `tree-sitter-toml` | **no**: registered by codelaw as a custom language |

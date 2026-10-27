@@ -14,6 +14,7 @@
 #   build ×8  one maturin wheel per platform; the npm binary is taken OUT of it, so
 #             both registries ship the same bytes (L6 decision 2); each runs its
 #             binary's --version and every pack's tests on its own platform
+#   action    W-97: action.yml (`uses: ./`) on fixtures/github-action, from this run's linux wheel
 #   package   every npm tarball and wheel — the skills package (W-77) among them —
 #             and the release checks (SHA256SUMS included); on main, a build attestation of every file publish.yml uploads
 #             and, beside it and never in it, the optional Fux index packages (dist/fux-index/,
@@ -390,6 +391,49 @@ jobs:
           path: out/
           if-no-files-found: error
           retention-days: 7
+
+  action:
+    # W-97: this repository's own GitHub Action (action.yml, `uses: ./`) on
+    # fixtures/github-action, installed from the wheel this run built (the
+    # published codelaw may predate what the Action calls). One local rule makes
+    # its one `debugger` an error: exit 1, one annotation at the path from the
+    # repository root, and a SARIF file with that result. Nothing is uploaded.
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false # nothing here pushes (W-18)
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: build-linux-x64-gnu
+          path: ${{ runner.temp }}/build
+      - id: wheel
+        run: echo "path=$(ls "$RUNNER_TEMP"/build/wheel/*.whl)" >> "$GITHUB_OUTPUT"
+      - id: codelaw
+        uses: ./
+        continue-on-error: true # the fixture's error is the point; the next step judges
+        with:
+          registry: pypi
+          package: ${{ steps.wheel.outputs.path }}
+          working-directory: fixtures/github-action
+          sarif: true
+          upload-sarif: false
+      - name: exit 1, one result at fixtures/github-action/src/app.js
+        env:
+          CODE: ${{ steps.codelaw.outputs.exit-code }}
+          SARIF: ${{ steps.codelaw.outputs.sarif-file }}
+        run: |
+          [ "$CODE" = 1 ] || { echo "::error title=action::exit code $CODE, not 1"; exit 1; }
+          python3 - "$SARIF" <<'PY'
+          import json, sys
+          results = [r for run in json.load(open(sys.argv[1]))["runs"] for r in run["results"]]
+          uris = [l["physicalLocation"]["artifactLocation"]["uri"] for r in results for l in r["locations"]]
+          assert [r["ruleId"] for r in results] == ["fixture/no-debugger"], results
+          assert uris == ["fixtures/github-action/src/app.js"], uris
+          print("✔ the Action: exit 1, one SARIF result at", uris[0])
+          PY
 
   package:
     needs: build
