@@ -295,6 +295,13 @@ jobs:
           { echo '### corpus: level 4 per pack'; echo '```'; cat "$RUNNER_TEMP/corpus.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           [ "$code" = 0 ] || echo "::error title=corpus::a pack's corpus run failed — an invariant broke on a real file, or a finding count moved (rerun scripts/corpus.py run --update and review the diff)"
           exit "$code"
+      - name: which preview rules the promotion criterion passes (W-100 — a report; it promotes nothing)
+        # Runs only after the counts above held, so each count it reads is this
+        # run's. `promote --write` is a reviewed local change, never CI's.
+        if: steps.verdict.outputs.cache-hit != 'true'
+        run: |
+          python3 scripts/corpus.py promote --dir "$RUNNER_TEMP/corpus" | tee "$RUNNER_TEMP/promote.txt"
+          { echo '### promotion: which preview rules the criterion passes'; echo '```'; cat "$RUNNER_TEMP/promote.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: mkdir -p .verdict && echo "${{ github.sha }}" > .verdict/sha
       - if: steps.verdict.outputs.cache-hit != 'true'

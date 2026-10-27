@@ -370,7 +370,7 @@ $ codelaw test acme/no-console-log
 | ✅ | Project-wide rules (`graph/no-unused-exports`, `graph/no-unused-css-classes`, the `node/no-*-import` rules) | [SR-PROJECT-GRAPH](records/0103_project-graph.md) | built, `preview` |
 | ✅ | Baselines and deprecations (`baseline`, `deprecate`) | [SR-BASELINE](records/0104_baseline-and-deprecations.md) | built |
 | ✅ | External linters as adapters (oxlint, Ruff, stylelint, html-validate) and the warm `daemon` | [SR-ARCHITECTURE](records/0108_architecture.md) | built |
-| 🔜 | Promotion to `stable`: the pinned corpus and its CI job | [SR-RULE-AUTHORING](records/0113_rule-authoring.md) | designed |
+| 🔜 | Promotion to `stable`: the pinned corpus, its CI job and the promotion report are built; the criterion waits on a ruling | [SR-RULE-AUTHORING](records/0113_rule-authoring.md) | built, not yet used |
 
 <!-- /docs-sync:roadmap -->
 
@@ -396,7 +396,7 @@ No. The pack rules are reimplemented natively in codelaw.
 Fixes run in passes until nothing more changes, up to ten passes. After each pass the file is re-parsed, and a fix that would introduce a syntax error is rolled back. Fixes that could change behaviour are `suggest`, and they only apply with `--unsafe`.
 
 **Why is every rule `preview`?**
-A rule becomes stable after it has been run over real third-party code and compared with the tool it was ported from. The packs have had those corpus runs by hand; `codelaw test --corpus <dir>` now runs one, but the pinned corpus and the CI job that promotes a rule are not built yet.
+Because no rule has yet met the promotion criterion on the record. CI runs every pack over 13 pinned third-party repositories on every change and holds each rule's finding count; `scripts/corpus.py promote` then reports which preview rules pass the criterion — enough repositories and files, no false positive among its findings, its fixes verified, one release in preview — and why each other rule is held. The numbers in that criterion are proposed and wait on a ruling ([SR-RULE-AUTHORING](records/0113_rule-authoring.md) decision 6a); the first rules are promoted on it once it is ratified. Until then, set `preview = true` to run them.
 
 **Can I use it in a Python-only repo without Node?**
 Yes. Nothing in codelaw runs Node or Python. Once released, the PyPI package will be a self-contained binary.
