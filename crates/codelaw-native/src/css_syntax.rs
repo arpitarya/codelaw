@@ -72,12 +72,15 @@ impl Sheet {
     pub fn in_keyframes(&self, i: usize, src: &str) -> bool {
         self.nodes[i].parent.is_some_and(|p| self.nodes[p].kind == Kind::AtRule && self.at_name(p, src) == "keyframes")
     }
-    /// The nearest enclosing at-rule.
+    /// The nearest enclosing at-rule. In SCSS a Sass at-rule's block
+    /// (`@include x { … }`, `@if`, `@each`, a mixin's body) is an `Other`
+    /// node, and a context of its own: `.a` inside `@include up(sm) { … }`
+    /// does not repeat a top-level `.a` (W-62).
     pub fn at_rule_context(&self, i: usize) -> Option<usize> {
         let mut p = self.nodes[i].parent;
         while let Some(x) = p {
             match self.nodes[x].kind {
-                Kind::AtRule => return Some(x),
+                Kind::AtRule | Kind::Other => return Some(x),
                 Kind::Rule => p = self.nodes[x].parent,
                 _ => return None,
             }
@@ -509,6 +512,43 @@ type CachedSheet = (String, (bool, bool), Rc<Sheet>);
 
 thread_local! {
     static CACHE: RefCell<Option<CachedSheet>> = const { RefCell::new(None) };
+    static VIEW: RefCell<Option<(String, Rc<str>)>> = const { RefCell::new(None) };
+}
+
+/// The text a CSS rule reads: an SCSS source with its `//` comments blanked
+/// ([`scss_view`], same offsets), so a comment inside a selector list or a
+/// value is not read as CSS (W-62: `.a, // note` gave `css/selector-type-no-unknown`
+/// on the comment's words); a CSS source as it is. Computed once per file.
+pub fn rule_source(src: &str, scss: bool) -> Rc<str> {
+    if !scss {
+        return Rc::from(src);
+    }
+    VIEW.with(|c| {
+        let mut c = c.borrow_mut();
+        if let Some((s, view)) = c.as_ref()
+            && s == src
+        {
+            return view.clone();
+        }
+        let view: Rc<str> = Rc::from(scss_view(src));
+        *c = Some((src.to_owned(), view.clone()));
+        view
+    })
+}
+
+/// A fix whose edit covers part of an SCSS `//` comment is dropped (the
+/// finding stays): the rule built its text from [`rule_source`], where the
+/// comment is blanks, so the edit would delete it.
+pub fn keep_line_comments(source: &str, out: &mut [crate::NativeFinding], from: usize) {
+    let comments = scss_line_comments(source);
+    if comments.is_empty() {
+        return;
+    }
+    for f in &mut out[from..] {
+        if f.edits.iter().any(|e| comments.iter().any(|&(s, end)| e.start < end && s < e.end.max(e.start + 1))) {
+            f.edits.clear();
+        }
+    }
 }
 
 /// The parsed sheet of a source (`scss`: read as SCSS); each file is parsed
@@ -1103,10 +1143,18 @@ macro_rules! css_rule {
                 if node.parent().is_some() {
                     return;
                 }
-                let $src: &str = $ctx.source;
-                let sheet_rc = $crate::css_syntax::sheet_for($src, $ctx.language == codelaw_core::Language::Scss, $crate::css_syntax::is_module($ctx));
+                let scss = $ctx.language == codelaw_core::Language::Scss;
+                let view = $crate::css_syntax::rule_source($ctx.source, scss);
+                let $src: &str = &view;
+                let sheet_rc = $crate::css_syntax::sheet_for($ctx.source, scss, $crate::css_syntax::is_module($ctx));
                 let $sheet: &$crate::css_syntax::Sheet = &sheet_rc;
-                $body
+                let from = $out.len();
+                // A closure, so a rule's early `return` still reaches the check below.
+                #[allow(clippy::redundant_closure_call)]
+                (|| $body)();
+                if scss {
+                    $crate::css_syntax::keep_line_comments($ctx.source, $out, from);
+                }
             }
         }
     };

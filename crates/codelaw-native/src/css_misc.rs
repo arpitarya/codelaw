@@ -9,7 +9,8 @@ css_rule!(NoEmptyBlock, "css/no-empty-block", |sheet, src, ctx, out| {
     for i in sheet.walk() {
         let n = &sheet.nodes[i];
         let Some((open, close)) = n.block else { continue };
-        if !n.children.is_empty() || !src[open + 1..close.min(src.len())].trim().is_empty() {
+        // `ctx.source`, not `src`: an SCSS `//` comment is content, as a `/* */` one is.
+        if !n.children.is_empty() || !ctx.source[open + 1..close.min(ctx.source.len())].trim().is_empty() {
             continue;
         }
         // `@layer name {}` fixes the layer's place in the cascade order.
@@ -49,7 +50,8 @@ css_rule!(CommentNoEmpty, "css/comment-no-empty", |sheet, src, ctx, out| {
 });
 
 css_rule!(NoEmptySource, "css/no-empty-source", |sheet, src, ctx, out| {
-    if src.trim().is_empty() {
+    // `ctx.source`: a stylesheet of SCSS `//` comments is not empty.
+    if ctx.source.trim().is_empty() {
         out.push(finding(0, src.len(), "Empty stylesheet"));
     }
 });

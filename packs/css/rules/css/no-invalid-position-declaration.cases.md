@@ -33,3 +33,19 @@ a {
 ```expect
 2:3 css/no-invalid-position-declaration
 ```
+
+### case: a declaration in a media query inside a Sass mixin
+
+```scss
+@mixin transition($t) {
+  @if $t != none {
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+}
+```
+
+```expect
+(none)
+```

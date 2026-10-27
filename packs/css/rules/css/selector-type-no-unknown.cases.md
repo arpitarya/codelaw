@@ -39,3 +39,17 @@ foreignObject {
 ```expect
 1:5 css/selector-type-no-unknown
 ```
+
+### case: an SCSS line comment inside a selector list
+
+```scss
+.container,
+// 100% wide container at all breakpoints
+.container-fluid {
+  color: red;
+}
+```
+
+```expect
+(none)
+```

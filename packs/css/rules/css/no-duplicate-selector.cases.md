@@ -65,3 +65,20 @@ a, b, a {
 ```expect
 (none)
 ```
+
+### case: the same selector inside a Sass @include block
+
+```scss
+.modal {
+  color: red;
+}
+@include media-breakpoint-up(sm) {
+  .modal {
+    color: blue;
+  }
+}
+```
+
+```expect
+(none)
+```
