@@ -1,0 +1,164 @@
+# codelaw's GitHub Action (W-97; SR-PACKAGES decision 15).
+#
+#   - uses: actions/checkout@<sha> # v5
+#   - uses: arpitarya/codelaw@v0.3.0
+#
+# Installs codelaw at an exact version, runs `codelaw check --format github`
+# (every finding annotates the diff) and, with `sarif: true`, writes SARIF and
+# uploads it to code scanning. On a pull request it passes the base commit as
+# `--changed-since`, so the touch policy and the new-code rules judge the PR.
+#
+# The release tags ARE this Action's contract: `@v<version>` installs exactly
+# that codelaw, because scripts/version.py writes `version`'s default below at
+# every bump. It uses no other action (L11): the install is npm or pip, the
+# upload is GitHub's code-scanning REST API.
+name: codelaw
+description: Lint and format-check JS, TS, Python, CSS, HTML, JSON, YAML, TOML and Markdown with codelaw; findings annotate the pull request.
+author: arpitarya
+branding:
+  icon: check-square
+  color: blue
+inputs:
+  version:
+    description: The codelaw version to install, exact. The default is the version of this Action's tag.
+    default: '0.2.0' # scripts/version.py writes this line
+  registry:
+    description: Where to install codelaw from — `npm` (needs Node, on every hosted runner) or `pypi` (into a venv of its own).
+    default: npm
+  package:
+    description: A local wheel or npm tarball (or any npm/pip spec) to install instead of codelaw@version — for testing a build.
+    default: ''
+  working-directory:
+    description: The project folder, where its codelaw.toml is. Paths in the annotations and the SARIF are rewritten to the repository root.
+    default: '.'
+  args:
+    description: More arguments for `codelaw check`, split on spaces — paths, `--profile ci`, `--max-warnings 0`.
+    default: ''
+  changed-since:
+    description: The ref passed as `--changed-since`. Empty (the default) means the base commit on a pull request and nothing otherwise; `none` turns it off.
+    default: ''
+  sarif:
+    description: '`true` also writes SARIF (output `sarif-file`) and, unless `upload-sarif` is `false`, uploads it to code scanning (the job needs `security-events: write`).'
+    default: 'false'
+  upload-sarif:
+    description: '`false` writes the SARIF file without uploading it.'
+    default: 'true'
+  fail-on-error:
+    description: '`false` lets the step pass when codelaw finds errors (exit 1); the exit code is still in output `exit-code`. A usage or config error (exit 2) always fails.'
+    default: 'true'
+  token:
+    description: The token for the SARIF upload.
+    default: ${{ github.token }}
+outputs:
+  exit-code:
+    description: '`codelaw check`''s exit code — 0 clean, 1 errors (or more warnings than --max-warnings), 2 a usage or config error.'
+    value: ${{ steps.check.outputs.exit-code }}
+  sarif-file:
+    description: The SARIF file's path, when `sarif` is `true`.
+    value: ${{ steps.check.outputs.sarif-file }}
+runs:
+  using: composite
+  steps:
+    - name: Install codelaw ${{ inputs.package || inputs.version }} from ${{ inputs.registry }}
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        REGISTRY: ${{ inputs.registry }}
+        PACKAGE: ${{ inputs.package }}
+      run: |
+        set -euo pipefail
+        case "$REGISTRY" in
+          npm)
+            npm install --global --no-audit --no-fund "${PACKAGE:-codelaw@$VERSION}"
+            ;;
+          pypi)
+            py="$(command -v python3 || command -v python)"
+            "$py" -m venv "$RUNNER_TEMP/codelaw-venv"
+            bin="$RUNNER_TEMP/codelaw-venv/bin"; [ -d "$bin" ] || bin="$RUNNER_TEMP/codelaw-venv/Scripts"
+            "$bin/python" -m pip install --disable-pip-version-check --quiet "${PACKAGE:-codelaw==$VERSION}"
+            echo "$bin" >> "$GITHUB_PATH"
+            export PATH="$bin:$PATH"
+            ;;
+          *)
+            echo "::error title=codelaw action::registry is \`npm\` or \`pypi\`, not \`$REGISTRY\`"
+            exit 2
+            ;;
+        esac
+        codelaw --version
+    - id: check
+      name: codelaw check --format github
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        ARGS: ${{ inputs.args }}
+        CHANGED_SINCE: ${{ inputs.changed-since }}
+        PR_BASE: ${{ github.event.pull_request.base.sha }}
+        SARIF: ${{ inputs.sarif }}
+        UPLOAD: ${{ inputs.upload-sarif }}
+        FAIL_ON_ERROR: ${{ inputs.fail-on-error }}
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        set -o pipefail # no -u: macOS runners have bash 3.2, where an empty "${a[@]}" is unbound
+        py="$(command -v python3 || command -v python)"
+        # The project folder relative to the repository root: GitHub places an
+        # annotation and a SARIF result by a path from the root.
+        prefix="$("$py" -c 'import os,sys; print(os.path.relpath(os.getcwd(), sys.argv[1]).replace(os.sep, "/"))' "$GITHUB_WORKSPACE")"
+        read -r -a extra <<< "$ARGS"
+        flags=()
+        ref="$CHANGED_SINCE"
+        [ -z "$ref" ] && ref="$PR_BASE"
+        if [ -n "$ref" ] && [ "$ref" != none ]; then
+          # A default checkout is one commit deep: fetch until the merge base exists.
+          git merge-base HEAD "$ref" >/dev/null 2>&1 || git fetch --no-tags --quiet --depth=1 origin "$ref" 2>/dev/null || true
+          git merge-base HEAD "$ref" >/dev/null 2>&1 || git fetch --no-tags --quiet --unshallow origin 2>/dev/null || true
+          if git merge-base HEAD "$ref" >/dev/null 2>&1; then
+            flags=(--changed-since "$ref")
+          else
+            echo "::warning title=codelaw action::no merge base with $ref; ran without --changed-since (check out with fetch-depth: 0)"
+          fi
+        fi
+        rc=0
+        codelaw check --format github "${flags[@]}" "${extra[@]}" > "$RUNNER_TEMP/codelaw-github.txt" || rc=$?
+        if [ "$prefix" = . ]; then cat "$RUNNER_TEMP/codelaw-github.txt"; else sed -E "s#^(::[a-z]+ file=)#\1$prefix/#" "$RUNNER_TEMP/codelaw-github.txt"; fi
+        echo "exit-code=$rc" >> "$GITHUB_OUTPUT"
+        if [ "$SARIF" = true ] && [ "$rc" -lt 2 ]; then
+          sarif="$RUNNER_TEMP/codelaw.sarif"
+          src=0
+          codelaw check --format sarif "${flags[@]}" "${extra[@]}" > "$sarif.raw" || src=$?
+          if [ "$src" -ge 2 ]; then echo "::error title=codelaw action::the SARIF run exited $src"; exit "$src"; fi
+          # Rewrite each result's path to the repository root, and build the
+          # upload's body: the SARIF gzipped and base64-encoded.
+          "$py" - "$sarif.raw" "$sarif" "$prefix" "$RUNNER_TEMP/codelaw-upload.json" <<'PY'
+        import base64, gzip, json, os, sys
+        raw, out, prefix, body = sys.argv[1:5]
+        doc = json.load(open(raw, encoding="utf-8"))
+        def walk(node):
+            if isinstance(node, dict):
+                loc = node.get("artifactLocation")
+                if prefix != "." and isinstance(loc, dict) and isinstance(loc.get("uri"), str):
+                    loc["uri"] = prefix + "/" + loc["uri"]
+                for v in node.values():
+                    walk(v)
+            elif isinstance(node, list):
+                for v in node:
+                    walk(v)
+        walk(doc)
+        text = json.dumps(doc, ensure_ascii=False, indent=2)
+        open(out, "w", encoding="utf-8").write(text)
+        json.dump({
+            "commit_sha": os.environ["GITHUB_SHA"],
+            "ref": os.environ["GITHUB_REF"],
+            "sarif": base64.b64encode(gzip.compress(text.encode("utf-8"))).decode("ascii"),
+            "tool_name": "codelaw",
+        }, open(body, "w", encoding="utf-8"))
+        PY
+          echo "sarif-file=$sarif" >> "$GITHUB_OUTPUT"
+          if [ "$UPLOAD" = true ]; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/code-scanning/sarifs" --input "$RUNNER_TEMP/codelaw-upload.json" --jq '"uploaded SARIF to code scanning: " + .url' || {
+              echo "::error title=codelaw action::the SARIF upload failed — the job needs \`permissions: security-events: write\`, and code scanning must be available on this repository"
+              exit 2
+            }
+          fi
+        fi
+        if [ "$rc" -ge 2 ] || { [ "$rc" = 1 ] && [ "$FAIL_ON_ERROR" = true ]; }; then exit "$rc"; fi
+        exit 0

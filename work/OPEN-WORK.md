@@ -34,6 +34,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-95 itself (step 3, the `publish.yml` job, and step 4) | |
 | 🔴 **Rule promotion — ratify the criterion's numbers** ([W-100](open/W-100-rule-promotion.md); [SR-RULE-AUTHORING](../records/0113_rule-authoring.md) decision 6a). A preview rule becomes `stable` when **(1)** ≥ **3** of its pack's pinned corpus repos hold its files, ≥ **10** files in all; **(2)** no false positive — every finding reviewed by a person, and **0 findings counts as none** (no proof it fires); **(3)** its fixes held level 4 (already enforced); **(4)** ≥ **1** published release as preview. At these values 326 of 620 rules pass today, all through 0 findings; 190 with findings need a review; with "0 findings is not evidence", none passes yet. Source-tool agreement replaces the review once W-99's L11 ruling puts the tools in CI. Say **"ratify 6a as proposed"**, or give the numbers you want. | 2026-10-27 |
 | ↳ **blocks:** W-100 itself (the first batch, its DoD) | |
+| 🔴 **GitHub Action — three calls** ([W-97](open/W-97-github-action.md)): **(1) SARIF route** — keep the code-scanning REST API via `gh` (built; say *"keep gh"*), or ratify `github/codeql-action/upload-sarif` (MIT) as a new row in [L11 §3](../records/0013_LAW-11-dependencies.md#3--the-list) · **(2) the DoD proof** — after the next release tag (`gh release create v0.3.0 …`, RELEASING.md), create a throwaway public repo (`gh repo create arpitarya/codelaw-action-test --public --clone`), add `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, push one `debugger`, and check the annotation and Security → Code scanning; or ask Claude to do it · **(3) Marketplace + `v0`** — accept the Marketplace Developer Agreement (github.com/marketplace/actions → *Publish* on the v0.3.0 release's edit page → tick *Publish this Action to the GitHub Marketplace*); say whether a moving `v0` tag is kept (`git tag -f v0 v0.3.0 && git push -f origin v0` each release) or not | 2026-10-27 |
+| ↳ **blocks:** W-97 itself | |
 
 ---
 
@@ -51,14 +53,14 @@ here. Read that record before changing anything below it.
 
 🔴 **W-95** `arpit` VS Code extension: eight platform `.vsix` built and checked in CI (`scripts/vsix.py`, artifact `vscode`), installs in VS Code; left: Arpit's publisher, namespace, tokens and the upload-tool ruling (inbox), then the `publish.yml` job. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
+🔴 **W-97** `arpit` GitHub Action built (`action.yml`, CI's `action` job, `init --ci github`); left: your three calls in the inbox — SARIF route, the release-tag proof, Marketplace and `v0`. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
+
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack; `tree-sitter-cli` 0.25.10 ratified (D-36, 2026-10-27); left: grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-93** `agent` `codelaw hook --pre` (refuse a write that adds an error, for every agent with a pre-write hook, fail-open) and `codelaw brief` (only what is specific to the repo); records first. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
 🟢 **W-94** `agent` `codelaw migrate eslint|prettier|biome|ruff|stylelint`: translate a config into `codelaw.toml` with a report; accept `eslint-disable`/`noqa` as ignore aliases. Filed by Arpit (Cowork). [detail](open/W-94-codelaw-migrate.md)
 
-
-🟢 **W-97** `agent` A first-party GitHub Action (`uses: arpitarya/codelaw@v…`): install, `check --format github`, optional SARIF upload. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
 🟢 **W-99** `agent` Side-by-side bench against ESLint, Prettier, Biome, oxlint, Ruff on the pinned repos and runner; no speed claim before it. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
