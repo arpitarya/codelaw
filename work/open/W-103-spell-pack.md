@@ -1,0 +1,65 @@
+---
+type: Handoff
+name: W-103
+description: "Arpit, 2026-10-27 (Cowork, voice): build spelling into codelaw as its own rule pack — a known-typo check on by default, a dictionary check opt-in, codelaw's own word data from SCOWL, VarCon and the MIT software terms. Design of record: SR-SPELL."
+item: W-103
+filed: 2026-10-27
+filed_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-27
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: agent
+---
+
+# W-103 — the spell pack: codelaw's own spell checker, better than CSpell
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Vendor SCOWL, VarCon and the software-terms list at a fixed release; record each pin in L11 §3 (D-42–D-44) and the notices in `packs/spell/NOTICE` | licence-clean, auditable sources | ⏳ |
+| 2 | `scripts/spell-data.py` writes the dictionary, the locale table and the generated known-typo list into `packs/spell/data/spell/`; same input, same bytes | codelaw's own word data | ⏳ |
+| 3 | Measure: entries in the generated typo list, and the bytes the data adds to the npm tarball and the PyPI wheel; if JSON is too large, put a compact format to the decider (SR-RULE-PACKS decision 3) | the size question answered with numbers | ⏳ |
+| 4 | The engine side: per-language selection queries, the word splitter, the token skips, the six `native:` rules and their fixes, the `[spell]` config section | the check itself | ⏳ |
+| 5 | The pack: `packs/spell/` with `spell/recommended` and `spell/strict`, rule files with cases, README; L6, SR-RULE-PACKS and SR-PACKAGES amended to eighteen packs | installable as `@codelaw/rules-spell` / `codelaw-rules-spell` | ⏳ |
+| 6 | Measure the speed: three CI `perf` runs on `main` with the pack on; put the budget to the decider by L8's method | the L8 budget | ⏳ |
+
+**Arpit, 2026-10-27 (voice):** *"There is a tool called C-Spell. Research it and tell me if that can be built into CodeLaw. A similar feature, a better feature, would be even better."* Then, ruling the forks: *"Let's go with B."* · *"Approve both."* · *"Approve it."* · *"want it as a separate package."* · *"Go with the recommendation."* · *"go ahead"*. The forks: [the compare doc](../compare/spell-checking.compare.md).
+
+**Model:** Opus: it amends a law (L6's pack count) and the generated typo list's quality is judged by people, not caught by a test; close to Sonnet, because SR-SPELL fixes the rules and their fix classes.
+
+## Goal
+
+Spelling in comments, docs, prose strings, Markdown, keys and declared names, in all nine L3 languages — with unattended fixes for known typos and an opt-in dictionary check — built only from codelaw's own code and the three ratified sources ([SR-SPELL](../../records/0116_spell.md)).
+
+## Definition of done
+
+| DoD | what | state |
+|---|---|---|
+| 1 · data | `packs/spell/data/spell/` is written by `scripts/spell-data.py` (stdlib only) from D-42–D-44 at the pins in L11 §3; a second run changes no byte; `NOTICE` names each source and version | ⏳ |
+| 2 · rules | the six rules of SR-SPELL decision 5, each with its fix class, cases and a `codelaw test` pass; every `manual` fix carried by a skill (L4) | ⏳ |
+| 3 · scope | a fixture repo per L3 language: a typo in a comment, a string, a declared name and a key is reported once; the same word in a URL, a hash, a JSON value that is an id, or at a name's uses is not | ⏳ |
+| 4 · fixes | `codelaw fix` on the fixtures fixes the one-correction known typos in prose and file-local names, and changes nothing exported | ⏳ |
+| 5 · packaging | `@codelaw/rules-spell` and `codelaw-rules-spell` build in CI byte-identical; `init` does not add the pack; a missing pack names both install commands | ⏳ |
+| 6 · measured | the typo list's entry count, the data's bytes per package, and the spell pass's time on the pinned corpus are written into SR-SPELL decision 9; the budget is the decider's ruling | ⏳ |
+| 7 · records | SR-SPELL `built: yes`; L6, SR-RULE-PACKS §1 and decision 4, SR-PACKAGES at eighteen packs, sixteen on npm and eleven on PyPI; README, CHANGELOG, GLOSSARY, `docs/rules/` regenerated | ⏳ |
+
+## Blockers
+
+None for steps 1–5. Step 3 may come back to the decider (a non-JSON data format amends SR-RULE-PACKS decision 3); step 6's budget is his ruling.
+
+## Record affected
+
+[SR-SPELL](../../records/0116_spell.md) (all) · [L6](../../records/0008_LAW-6-python-and-node-packages.md) (the pack count, on the ruling above) · [SR-RULE-PACKS](../../records/0101_rule-packs.md) §1, decisions 4 and 6 · [SR-PACKAGES](../../records/0107_packages.md) · [SR-CONFIG](../../records/0110_config.md) decision 2 (`[spell]`) · [L11 §3](../../records/0013_LAW-11-dependencies.md#3--the-list) (the pins).
+
+## Hazards
+
+- **Never copy `typos`', codespell's or Wikipedia's lists**, not even to compare in a test fixture — SR-SPELL's veto condition greps for them.
+- A generated typo that is a real word in some domain (a surname, a chemical) makes an `auto` fix wrong: keep only variants with one source word that SCOWL's largest list does not hold, and let the corpus run find the rest before any rule is `stable`.
+- Renaming an identifier across files is a refactor: `auto` only for a file-local, unexported name (SR-SPELL decision 5).
+- Data size: SCOWL with every form written out may be several MB as JSON — measure (step 3) before choosing a format.
+- `HashMap` order, Unicode case folding and locale sorting can make output differ by platform (L6: identical output) — sort everything, NFC + simple fold.
+
+## Reference
+
+- [SR-SPELL](../../records/0116_spell.md) · [the compare doc](../compare/spell-checking.compare.md) · [L11 §3](../../records/0013_LAW-11-dependencies.md#3--the-list)
+- SCOWL and VarCon: <http://wordlist.aspell.net/> · software terms: <https://www.npmjs.com/package/@cspell/dict-software-terms>

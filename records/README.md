@@ -143,6 +143,7 @@ Start from `TEMPLATE.md`.
 | [0113](0113_rule-authoring.md) | **SR-RULE-AUTHORING** | Writing rules by hand or with an agent skill; the debug tools; four test levels | accepted | partly |
 | [0114](0114_editor.md) | **SR-EDITOR** | The LSP server in the binary and the thin VS Code extension | accepted | partly |
 | [0115](0115_cli-and-mcp.md) | **SR-CLI-MCP** | The CLI and the MCP server — one engine, two doors, same answers | accepted | partly |
+| [0116](0116_spell.md) | **SR-SPELL** | Spelling as its own rule pack — a known-typo check on by default, a dictionary check opt-in, codelaw's own word data from SCOWL, VarCon and the MIT software terms | accepted | no |
 
 ---
 
