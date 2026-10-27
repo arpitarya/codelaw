@@ -16,8 +16,8 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const HOSTS = {
   vite: { dir: "vite", deps: { vite: "^7" }, plugin: "vite-plugin", bin: ["vite", "--port", "5173", "--strictPort"], url: "http://127.0.0.1:5173/", ws: { port: 5173, protocol: "vite-hmr", match: (m) => m.type === "error" } },
-  webpack: { dir: "webpack", deps: { webpack: "^5", "webpack-cli": "^6", "webpack-dev-server": "^5" }, plugin: "webpack-plugin", bin: ["webpack", "serve", "--port", "8081"], url: "http://127.0.0.1:8081/", ws: { port: 8081, path: "/ws", match: (m) => m.type === "errors" || m.type === "warnings" } },
-  rspack: { dir: "rspack", deps: { "@rspack/core": "^1", "@rspack/cli": "^1" }, plugin: "webpack-plugin", bin: ["rspack", "serve", "--port", "8082"], url: "http://127.0.0.1:8082/", ws: { port: 8082, path: "/ws", match: (m) => m.type === "errors" || m.type === "warnings" } },
+  webpack: { dir: "webpack", deps: { webpack: "^5", "webpack-cli": "^6", "webpack-dev-server": "^5" }, plugin: "webpack-plugin", bin: ["webpack", "serve", "--port", "8081"], url: "http://127.0.0.1:8081/", ws: { port: 8081, path: "/ws", origin: true, match: (m) => m.type === "errors" || m.type === "warnings" } },
+  rspack: { dir: "rspack", deps: { "@rspack/core": "^1", "@rspack/cli": "^1" }, plugin: "webpack-plugin", bin: ["rspack", "serve", "--port", "8082"], url: "http://127.0.0.1:8082/", ws: { port: 8082, path: "/ws", origin: true, match: (m) => m.type === "errors" || m.type === "warnings" } },
   // Next.js under webpack: the compile prints the finding in the terminal; Turbopack has no webpack-plugin API, the plugin's own watcher prints it.
   next: { dir: "next", deps: { next: "^15", react: "^19", "react-dom": "^19" }, plugin: "next", bin: ["next", "dev", "--port", "3000"], url: "http://127.0.0.1:3000/" },
   "next-turbopack": { dir: "next", deps: { next: "^15", react: "^19", "react-dom": "^19" }, plugin: "next", bin: ["next", "dev", "--turbopack", "--port", "3001"], url: "http://127.0.0.1:3001/" },
@@ -87,9 +87,11 @@ try {
   const seen = []; // every websocket message's type, for the timeout's report
   if (host.ws) {
     const u = `ws://127.0.0.1:${host.ws.port}${host.ws.path ?? "/"}`;
-    // A browser sends Origin; webpack-dev-server 5 refuses a socket without a
-    // valid one (Node's WebSocket sends none). Undici takes `headers` here.
-    const init = { protocols: host.ws.protocol ? [host.ws.protocol] : [], headers: { Origin: new URL(host.url).origin } };
+    // webpack-dev-server 5 refuses a socket without a valid Origin, which a
+    // browser sends and Node's WebSocket does not (CI run 40388001095); Vite
+    // refuses one that carries an Origin but no token (run 40390477529), so
+    // only the webpack-dev-server hosts send it. Undici takes `headers` here.
+    const init = { protocols: host.ws.protocol ? [host.ws.protocol] : [], ...(host.ws.origin ? { headers: { Origin: new URL(host.url).origin } } : {}) };
     const ws = new WebSocket(u, init);
     ws.onmessage = async (e) => {
       const text = typeof e.data === "string" ? e.data : await new Response(e.data).text();
