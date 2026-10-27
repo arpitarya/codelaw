@@ -227,6 +227,7 @@ yet is owned by an open `W-nn`.
 | `perf/rivals.toml` | SR-CLI-MCP | decision 10: the side-by-side bench's tools, pins and commands (W-99) |
 | `scripts/bench-rivals.py` | SR-CLI-MCP | decision 10: the side-by-side bench, which runs a rival only when L11 ratifies it (W-99) |
 | `.github/workflows/bench-rivals.yml` | SR-CLI-MCP | decision 10: the side-by-side bench's job, skipped until a rival is ratified (W-99) |
+| `experiments/guidance-vs-check` | W-102 | no decision yet: the guidance-vs-check experiment — its consumer repo, 20 tasks, harness and scorer; it drives an agent, so it sits outside the engine (L5) and is no governing file (SR-WORK-GOVERNANCE) |
 | `packs` | SR-RULE-PACKS | decisions 2, 3, 7 and 8: the seventeen first-party packs' rules, presets and data |
 | `LICENSE` | SR-PACKAGES | decision 10: the licence every package carries |
 | `packaging` | SR-PACKAGES | decisions 3 and 5: the npm launcher and API, the PyPI module and its maturin build |

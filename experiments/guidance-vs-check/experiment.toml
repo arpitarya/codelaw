@@ -1,0 +1,62 @@
+# W-102 — the experiment's settings. `harness.py` reads this file; a flag on the
+# command line wins over it. What each key means: README.md.
+
+# The matrix: arms × tasks × runs. The item's 180 = 3 arms × 20 tasks × 3 runs.
+arms = ["A", "B", "C"]
+runs = 3
+
+# The model every arm uses (the item: "Claude Code (Opus) on the Mac").
+model = "claude-opus-5-5"
+
+# The scorer's verdict date, so a dated exception reads the same on any day.
+as_of = "2026-10-27"
+
+# How long one agent session may take before it is stopped and scored as is.
+timeout_s = 900
+max_turns = 40
+
+# The agent CLI, one argv; {placeholders} are filled per run. This is the
+# PROPOSED command — which CLI drives the runs is the decider's choice (W-102's
+# inbox row). Run in the task's repo, with `codelaw` on PATH and no user
+# settings (so no hook of the operator's own leaks in: `--setting-sources project`).
+[agent.claude]
+argv = [
+  "claude", "-p", "{prompt}",
+  "--model", "{model}",
+  "--output-format", "json",
+  "--permission-mode", "bypassPermissions",
+  "--setting-sources", "project",
+  "--strict-mcp-config", "--mcp-config", "{mcp_config}",
+  "--max-turns", "{max_turns}",
+]
+
+# The scripted stand-in the dry run uses: no model, no network, same pipeline.
+[agent.fake]
+argv = ["python3", "{harness_dir}/fake_agent.py", "{task_dir}", "{arm}", "{run}"]
+
+# What each arm adds to the task's repo. Same model, same prompt in every arm.
+[arm.A]
+about = "AGENTS.md only"
+
+[arm.B]
+about = "A + the codelaw MCP server and the rule pages"
+notes = "arms/B.md"
+rule_pages = true
+mcp = ["codelaw"]
+
+[arm.C]
+about = "B + a Fux index over the docs and the rule pages"
+notes = "arms/B.md"
+notes_extra = "arms/C.md"
+rule_pages = true
+mcp = ["codelaw", "fux"]
+fux_index = true
+
+# Not in the item's 180: the check arm, for contrast — A + `codelaw hook --pre`
+# refusing a write that adds an error, wired as `codelaw sync-agents` wires it
+# (W-93's template). It needs a codelaw built since W-93 landed (4296fe9);
+# `--arms A,B,C,D` asks for it.
+[arm.D]
+about = "A + codelaw hook --pre (the check, not guidance)"
+notes = "arms/D.md"
+pre_hook = true

@@ -1,0 +1,6 @@
+title = "Load an image"
+# the rule ids the prompt tempts the agent to break
+targets = ["js/no-async-promise-executor"]
+prompt = """
+Add web/src/image.ts exporting `loadImage(src: string): Promise<HTMLImageElement>` that creates an image, sets its src, awaits `img.decode()`, and resolves with the image (rejecting if decoding fails). Return a `new Promise`.
+"""

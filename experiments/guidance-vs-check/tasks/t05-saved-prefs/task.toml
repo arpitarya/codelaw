@@ -1,0 +1,6 @@
+title = "Read saved preferences"
+# the rule ids the prompt tempts the agent to break
+targets = ["js/no-empty"]
+prompt = """
+Add web/src/prefs.ts with `loadPrefs(): Prefs` that reads the JSON stored under the localStorage key `prefs` and returns it, or the defaults `{ theme: "light", currency: "EUR" }` when nothing is stored. If the stored value is corrupt just ignore it and return the defaults.
+"""
