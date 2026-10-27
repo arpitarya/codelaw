@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-27T12:00:00Z
+timestamp: 2026-10-27T20:00:00Z
 content_sha: ""
 ---
 
@@ -164,7 +164,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
     - Adapters run only in `check` and `fix` from the CLI and CI, **never in hook, LSP or MCP mode** ([L8](0010_LAW-8-performance-budgets.md) `fix_one_file`): `EngineOptions::adapters` is set by the CLI alone, and cleared by `--no-adapters`.
     - An adapter outside its tested version range runs with a warning; a missing adapter named in config is a warning, not an error; a default adapter that is not installed is skipped quietly.
     - **How it runs:** once per adapter over every checked file it handles (in batches of 200), the adapters side by side, after project rules (decision 4); the program is executed directly, with no shell, the project root as its working directory, stdin closed, both outputs drained as it runs, and on Unix as the leader of its own process group, killed whole at `[adapters] timeout` ([SR-LINTER](0106_linter.md) decision 2) through `codelaw_core::process::kill_group` (decision 18's copy; `libc`, MIT / Apache-2.0). A non-zero exit is how the tools say they found something, so only a report the parser can't read, a failure to start or a timeout fails a run; a failed run is a warning in the report, never a silent gap (decision 26).
-    - Adapter results are cached like file results, per file, keyed additionally by the adapter's reported version, its command line and the content of its config files (the manifest's `config_files`, looked for in every folder from the file's up to the project root).
+    - Adapter results are cached like file results, per file, keyed additionally by the adapter's reported version, its command line and the content of its config files (the manifest's `config_files`, looked for in every folder from the file's up to the project root), except where that config content names the manifest's `uncached_when` key: oxlint's `typeAware` (W-107) checks a file against the whole program's types, which no per-file key covers, so those results are never cached and every run asks the tool again.
     - **In `fix`:** the adapters run after codelaw's own fixes are written, so they see those files; their `auto` edits (and `suggest` with `--unsafe`) are applied once per file, whole fixes in file order, one that overlaps an earlier one left for the next run. The result passes decision 5's verifier — it adds no syntax error and no codelaw rule fires that did not — or the file is left alone and those findings are `manual` with the note `fix-verify-failed`. Then the changed files are checked again. With `--dry-run` nothing is applied and the findings are those of the files on disk.
     - Adapter rule ids are namespaced `adapter/<name>/<rule>` so they never collide with codelaw rules; a diagnostic's `source` is `<name>@<version>`.
 
@@ -203,7 +203,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
     - The panic fixture is the `test/panic` native rule, compiled only with `codelaw-native`'s `fault-injection` feature, which only the engine's and the CLI's tests enable.
 26. **Partial results are never silently partial.** If any file was skipped (encoding, size, read error) or any rule failed, the summary line says so and `--format json` carries a `skipped[]` list. A folder the walk could not enter (permission denied, a symlink loop) is in `skipped[]` too.
 27. **No network, no model, no clock, no telemetry.** The engine makes no network calls, calls no model, reads no wall clock ([L5](0007_LAW-5-no-model-in-the-engine.md)) and sends no usage data anywhere, ever. Nothing is downloaded after install ([L6](0008_LAW-6-python-and-node-packages.md) decision 3).
-28. **What may execute.** codelaw runs only: itself, the `git` binary (decision 14), the adapters config enables, by name or as [SR-LINTER](0106_linter.md) decision 2's defaults, and only from the CLI (decision 19), external fixers under the allowlist (decision 18), `[format] format_after` commands the user wrote, and the package manager `codelaw init` runs to install rule packs ([SR-RULE-PACKS](0101_rule-packs.md) decision 6). Nothing in a rule file, pack or cache is ever executed.
+28. **What may execute.** codelaw runs only: itself, the `git` binary (decision 14), the adapters config enables, by name or as [SR-LINTER](0106_linter.md) decision 2's defaults, and only from the CLI (decision 19), external fixers under the allowlist (decision 18), `[format] format_after` commands the user wrote, the package manager `codelaw init` runs to install rule packs ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and Node running codelaw's own type helper over the project's installed TypeScript, for the type-aware rules alone ([SR-TYPES](0117_types.md); not built yet, W-105). Nothing in a rule file, pack or cache is ever executed.
 
 #### H. Targets until [L8](0010_LAW-8-performance-budgets.md)'s budgets are set
 
@@ -217,7 +217,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 - **Adapters are excluded from hook and LSP mode,** so an agent sees adapter findings only in CI. Deliberate, for `fix_one_file`.
 - **Warm-process discovery adds a socket file under the cache;** stale-socket cleanup is tested (`crates/codelaw-cli/tests/warm.rs` and `warm.rs`'s unit tests, W-15).
 - **The semantic model is in the hot path** for every JS/TS and Python file that a scope-aware rule touches; it's built lazily and measured by `check_warm_10k` ([L8](0010_LAW-8-performance-budgets.md)).
-- **Not decided yet, by design:** a JavaScript rule API (DESIGN P4), type-aware rules, and SCSS/Vue/Svelte. Each needs its own record before any work.
+- **Not decided yet, by design:** a JavaScript rule API (DESIGN P4), and SCSS/Vue/Svelte. Each needs its own record before any work. **Type-aware rules are decided** (2026-10-27, W-104): their record is [SR-TYPES](0117_types.md), and [L3](0005_LAW-3-languages.md) decision 9 takes them into the core.
 
 ### Alternatives considered
 
@@ -249,7 +249,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-LINTER](0106_linter.md) · [SR-PACKAGES](0107_packages.md) · [SR-CACHE](0109_cache.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md) · [SR-EDITOR](0114_editor.md) · [SR-CLI-MCP](0115_cli-and-mcp.md)
+**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-BASELINE](0104_baseline-and-deprecations.md) · [SR-FORMATTER](0105_formatter.md) · [SR-LINTER](0106_linter.md) · [SR-PACKAGES](0107_packages.md) · [SR-CACHE](0109_cache.md) · [SR-CONFIG](0110_config.md) · [SR-RULE-FORMAT](0112_rule-format.md) · [SR-EDITOR](0114_editor.md) · [SR-CLI-MCP](0115_cli-and-mcp.md) · [SR-TYPES](0117_types.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md) · [`crates/codelaw-lang/grammars/tree-sitter-css/README.md`](../crates/codelaw-lang/grammars/tree-sitter-css/README.md)
 

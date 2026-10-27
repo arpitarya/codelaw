@@ -42,12 +42,16 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-93 itself | |
 | 🔴 **Guidance-vs-check experiment — approve running it** ([W-102](open/W-102-guidance-vs-check-experiment.md)). 180 Claude Code sessions (arms A, B, C × 20 tasks × 3 runs) of `claude-opus-5-5`; estimate per session ~250k–450k input tokens (mostly cache reads), ~30k–50k cache writes, ~6k–9k output → **~$86 in all (range ~$45–$170)**, 9–18 hours one at a time; disk a few MB. **1. Name the agent CLI** — proposed: Claude Code 2.1, `claude -p … --setting-sources project --strict-mcp-config` (`experiment.toml` `[agent.claude]`; `--bare` instead if you run on `ANTHROPIC_API_KEY`). **2. Allow `fux` (D-34) in arm C outside CI** — its ratified scope is the CI build of the index packages. **3. Run it** from the main checkout: `python3 experiments/guidance-vs-check/harness.py run --agent claude --out experiments/guidance-vs-check/runs/2026-10-w102` (the same command resumes; `harness.py plan` reprints the estimate; `--arms A,B,C,D` adds the optional check arm, 60 sessions, ~$22). Say **"approve running it"** (and which CLI), or name a cheaper model or fewer runs. | 2026-10-27 |
 | ↳ **blocks:** W-102 itself (the runs, the write-up, step 4's README line); W-35's line on it | |
+| 🔴 **Type-aware rules — two L11 questions** ([W-104](open/W-104-type-aware-records.md); [SR-TYPES](../records/0117_types.md) decision 5 and Consequences; [L11](../records/0013_LAW-11-dependencies.md) §3). **(1) The project's own TypeScript:** codelaw's type helper loads the `typescript` the project already installed (found from the file's folder up to the root, like an adapter's binary) and never installs, downloads or pins one — so it is no dependency of codelaw (L11 decision 2). Say **"confirmed"**, or that it needs a row. **(2) codelaw's own copy for its tests and CI** (W-105's fixtures, W-106's matrix): `typescript` on npm, **Apache-2.0**, the 7.1 line (Beta now, RC 2026-11-10, GA 2026-11-24) plus `typescript@next` in a nightly, reporting-only job; test and CI scope only, installed into fixture folders, never in a package, the engine or a consumer's repo; its exact tree (any platform-binary packages it brings) recorded in the row when W-105 pins it. This one **is** a dependency. Say **"ratify typescript 7.1 for tests and CI"** (a new D-row), or strike it — then W-105's type rules cannot be tested in CI. | 2026-10-27 |
+| ↳ **blocks:** W-104 itself (its close); W-105 cannot land its tests until (2) is ruled | |
+| 🔴 **oxlint type-aware — a live capture** ([W-107](../archive/open/W-107-oxlint-type-aware-gap.md), closed on a fixture built from oxlint's documented JSON). Nothing here installs oxlint (L11), so run it in your own shell, outside the repo: `d=$(mktemp -d) && cp -R crates/codelaw-adapters/tests/fixtures/oxlint-type-aware/. "$d" && cd "$d" && npm init -y >/dev/null && npm add -D oxlint oxlint-tsgolint typescript@7 && printf '{"compilerOptions":{"strict":true,"target":"es2022","module":"nodenext"}}' > tsconfig.json && npx oxlint --format=json src/index.ts > stdout.json; npx oxlint --version` — then hand `stdout.json` and the version to an agent, which swaps it in (`@ROOT@` for the folder) and checks the test still holds. Or say **"skip it"**: the fixture stands. | 2026-10-27 |
+| ↳ **blocks:** nothing else in the queue | |
 
 ---
 
-## Open items (20)
+## Open items (19)
 
-### build (18)
+### build (17)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -67,7 +71,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-93** `arpit` `codelaw hook --pre` and `codelaw brief` built and landed (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: the decider rules `hook_pre`'s budget (inbox), then close. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
-🟢 **W-103** `agent` Spell pack (`@codelaw/rules-spell` / `codelaw-rules-spell`): pack, generated known-typo list (188,151 from SCOWL) and `spell/known-typo` (auto fix, nine languages) landed; left: `known-typo-identifier`, the dictionary, `unknown-word`, `[spell]` config, `suspicious-word`, `locale-variant` (VarCon), `inconsistent-term`, fixtures, corpus, then the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
+🟢 **W-103** `agent` Spell pack: pack, 188,151 generated typos and `spell/known-typo` (auto fix) landed; left: identifier rule, dictionary and `unknown-word`, `[spell]`, the other three rules, fixtures, corpus, L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🔴 **W-100** `arpit` Rule promotion: `scripts/corpus.py promote` reports which preview rules pass, in CI's corpus summary; `--write` refuses until ratified. Left: Arpit's ruling on the criterion (SR-RULE-AUTHORING 6a), then the first batch. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
 
@@ -79,7 +83,6 @@ here. Read that record before changing anything below it.
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
-🟢 **W-107** `agent` Type rules today: prove oxlint's type-aware mode (`oxlint-tsgolint` 7.x, `options.typeAware`) flows through the oxlint adapter; USAGE section. Filed by Arpit (Cowork). [detail](open/W-107-oxlint-type-aware-gap.md)
 
 🟡 **W-105** waits on **W-104** `agent` Type-aware rules: `codelaw-types` Node helper on the project's TypeScript 7.1 API, `type:` clause, warm programs, `ts/type-error`, first rules in `ts` — preview on the 7.1 RC (11-10), stable after GA (11-24). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
@@ -91,7 +94,7 @@ here. Read that record before changing anything below it.
 
 ### record update (1)
 
-🟢 **W-104** `agent` Records for type-aware rules (W-101): amend L3, L5, L6, L8; write SR-TYPES; the `type:` clause; the decider confirms L11 sees no dependency. Filed by Arpit (Cowork). [detail](open/W-104-type-aware-records.md)
+🔴 **W-104** `arpit` Type-aware records landed: L3, L5, L6, L8 amended on W-101's ruling; SR-TYPES (built: no); the `type:` clause; SR-ARCHITECTURE's open line closed. Left: your two L11 answers (inbox), then close. Filed by Arpit (Cowork). [detail](open/W-104-type-aware-records.md)
 
 ### research (0)
 

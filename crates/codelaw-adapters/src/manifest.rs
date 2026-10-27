@@ -4,6 +4,7 @@
 use codelaw_core::Language;
 use semver::VersionReq;
 use serde::Deserialize;
+use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
 /// Every manifest, by file. Adding an adapter is adding a line here and a
@@ -46,10 +47,18 @@ pub struct Manifest {
     /// What turns a tool rule into the id a pack rule's `ported_from:`
     /// names: `ruff/` + `F401`.
     pub ported_prefix: String,
+    /// A tool plugin whose rules `ported_from:` names under another
+    /// plugin: oxlint's `typescript/<rule>` is `typescript-eslint/<rule>`.
+    pub ported_plugins: BTreeMap<String, String>,
     /// The rule docs, `{rule}` replaced, when the output carries no link.
     pub docs: Option<String>,
     /// The tool's own config files: their content enters the cache key.
     pub config_files: Vec<String>,
+    /// A key in those config files that makes the tool read the whole
+    /// program (oxlint's `typeAware`, W-107): when their text names it, a
+    /// file's findings depend on files outside its cache key, so the
+    /// adapter's results are not cached.
+    pub uncached_when: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -65,9 +74,12 @@ struct RawManifest {
     tested: String,
     output: String,
     ported_prefix: String,
+    #[serde(default)]
+    ported_plugins: BTreeMap<String, String>,
     docs: Option<String>,
     #[serde(default)]
     config_files: Vec<String>,
+    uncached_when: Option<String>,
 }
 
 /// Parse one manifest.
@@ -97,8 +109,10 @@ pub fn parse_manifest(file: &str, text: &str) -> Result<Manifest, String> {
         tested,
         output,
         ported_prefix: raw.ported_prefix,
+        ported_plugins: raw.ported_plugins,
         docs: raw.docs,
         config_files: raw.config_files,
+        uncached_when: raw.uncached_when,
     })
 }
 
@@ -120,12 +134,21 @@ pub fn manifest(name: &str) -> Option<&'static Manifest> {
 impl Manifest {
     /// The id a pack rule's `ported_from:` would give this tool rule.
     pub fn ported_id(&self, rule: &str) -> String {
-        format!("{}{rule}", self.ported_prefix)
+        match rule.split_once('/').and_then(|(plugin, name)| Some((self.ported_plugins.get(plugin)?, name))) {
+            Some((plugin, name)) => format!("{}{plugin}/{name}", self.ported_prefix),
+            None => format!("{}{rule}", self.ported_prefix),
+        }
     }
 
     /// The codelaw id of a tool rule (SR-ARCHITECTURE decision 19).
     pub fn rule_id(&self, rule: &str) -> String {
         format!("adapter/{}/{rule}", self.name)
+    }
+
+    /// Whether the config text `config` (the content of `config_files`
+    /// that governs a file) turns on whole-program checking.
+    pub fn uncached(&self, config: &[u8]) -> bool {
+        self.uncached_when.as_deref().is_some_and(|k| config.windows(k.len()).any(|w| w == k.as_bytes()))
     }
 
     pub fn handles(&self, language: Language) -> bool {

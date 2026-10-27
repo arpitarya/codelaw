@@ -287,6 +287,30 @@ modules_convention = "camelCase"     # css-loader's localsConvention: .btn-prima
 
 `css-modules/no-unused-class` reports a class no file reads (in the stylesheet; `codelaw fix --unsafe` deletes the rule), and `css-modules/no-undefined-class` reports `styles.x` where the module has no `.x` (in the JS or TS file). A module read by a computed name (`styles[name]`), spread, or passed to a function is never reported, and neither is one no file imports ([SR-PROJECT-GRAPH](records/0103_project-graph.md) decision 8).
 
+### Type rules today
+
+codelaw's own type-aware rules (`no-floating-promises`, `await-thenable`, the `no-unsafe-*` family …) are not built yet. Until they are, oxlint's type-aware mode gives you them through the oxlint adapter codelaw already runs. Install the tools in your project, not codelaw's:
+
+```bash
+npm add -D oxlint oxlint-tsgolint typescript@7    # tsgolint needs TypeScript 7.0+
+```
+
+and turn type-aware mode on in the root `.oxlintrc.json` (or `options.typeAware` in `oxlint.config.ts`), with the rules you want:
+
+```json
+{
+  "options": { "typeAware": true },
+  "rules": { "typescript/no-floating-promises": "error", "typescript/await-thenable": "warn" }
+}
+```
+
+- **Nothing to set in codelaw:** `codelaw check` and `codelaw fix` run the oxlint in `node_modules/.bin`, which reads that config, so its findings arrive as `adapter/oxlint/typescript/no-floating-promises` with oxlint's severity and position. `--no-adapters` turns them off with the rest.
+- **The fix is yours:** oxlint's JSON report carries no edits, so each finding is `manual`: its steps are oxlint's help line and a link to the rule's page on oxc.rs.
+- **Not cached:** a type rule's verdict on a file depends on the files it imports, so while a config names `typeAware`, every check runs oxlint again instead of reusing the last result.
+- **Not in the hook or editor:** like every adapter, it runs only in `check` and `fix` from the CLI and CI.
+- **Limits are oxlint's:** some legacy `tsconfig.json` options, such as `baseUrl`, are not supported by `tsgolint`.
+- **When codelaw's own type rules ship** (in the `ts` pack, on the project's TypeScript 7.1), each names its typescript-eslint rule in `ported_from:`, so the same finding is shown once, as codelaw's, and you can drop `typeAware` from the oxlint config.
+
 ### Tests for new code
 
 Every new or edited function in JavaScript, TypeScript or Python must have a unit test, and — given a coverage report — at least 60% line coverage. Functions nobody touched are never judged, so a legacy codebase needs no baseline to start. Opt in:

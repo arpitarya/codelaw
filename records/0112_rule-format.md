@@ -10,7 +10,7 @@ feature: "the rule file"
 owns:
   - crates/codelaw-rules
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-27T12:00:00Z
+timestamp: 2026-10-27T20:00:00Z
 content_sha: ""
 ---
 
@@ -48,6 +48,7 @@ One paragraph: what the rule requires.
 
 ```codelaw
 match: …            # scope: file  → an ast-grep rule
+# type: { $X: … }   # beside match:, TypeScript only → a type question (SR-TYPES)
 # graph: …          # scope: project → a graph query (SR-PROJECT-GRAPH)
 # target/assert: …  # structured files → path assertions
 # native: <id>      # first-party packs only → a Rust implementation in the engine
@@ -120,7 +121,7 @@ The decider asked for a record of the rule-file template. The format so far exis
    - `native: <id>` (a Rust implementation in the engine, [SR-ARCHITECTURE](0108_architecture.md) decision 15b; accepted only in first-party packs and in an ejected copy of one of their rules).
 
    Then `message:` (with `$CAPTURE` interpolation) and `fix:` (edit primitives, conditional `when`/`else` branches, or `{ external: "<command>" }`, whose stdin/stdout contract is [SR-ARCHITECTURE](0108_architecture.md) decision 18).
-3a. **What goes with `match:`.** Only beside `match:`: ast-grep's own `constraints:` and `utils:`, and `where:`, the semantic-model predicates.
+3a. **What goes with `match:`.** Only beside `match:`: ast-grep's own `constraints:` and `utils:`, `where:`, the semantic-model predicates, and `type:`, the type questions (decision 3f).
    - **`where:` maps a capture to a predicate.** The key is a capture (`$NAME`) or the matched node itself (`$$MATCH`); a key `match:` doesn't capture is a load error, and so is a list capture (`$$$NAME`), since a predicate is about one node. Only JavaScript, TypeScript and Python have a semantic model, so `where:` in a rule for any other language is a load error rather than a rule that silently matches nothing.
    - **The predicates:** `unused`; `undeclared` (optionally `{ globals: [<name>…], tables: [<data table>…] }`); `shadowed` (optionally `{ builtins: true }`); `reassigned`; `imported-from` (a module, a list of modules, or `{ module, name }`); `write` (assigned to here); `declaration` (declares a name); `redeclared` (declares a name its scope already declared); `binding` (names a symbol declared as one of the given kinds: `var`, `let`, `const`, `function`, `class`, `param`, `import`, `catch-param`, `interface`, `type-alias`, `enum`, `namespace`, `type-param`, `variable`); `builtin` (one of the language's own globals, undeclared in the file); `from_source` (below).
    - **`from_source: { sources: [<path>…], tables: [<data table>…] }`** (or a list of sources; W-53) holds when the captured node is a **request source** — a dotted access path such as `req.query` or `request.args`, matched as a prefix (`req.query.next`, `req.query["next"]`, and a method called on it, `request.args.get("next")`) — or is built from one by `+`, `%`, `||`, `??`, `or`, `?:`, a template literal, an f-string or `"…".format(…)`, or is a local name bound to one **in the same function**: by a declaration, an assignment or a destructuring (`const { next } = req.query`), followed through up to four such bindings, flow-insensitively (any binding in the function counts, wherever it is). A data table for it is a JSON list of paths, or an object whose keys are paths (`data/sources/<framework>.json`); a source that is not a dotted path is a load error.
@@ -148,6 +149,12 @@ The decider asked for a record of the rule-file template. The format so far exis
    - **`fix:`** is a list of steps: `sort-keys` (takes `sorted:`'s argument), `ensure-key: { key?, value }` (gives the target, or the key path below it, that value: written in with any missing parents where absent, replaced where different), `replace: <template>`, `remove` (the target with its key and separator), and `when: <assertion>` with `then:` and/or `else:` steps. The steps run in order, each on the text the one before left, so `[ensure-key, sort-keys]` sorts the key it wrote; a step with nothing to do (a sort already in order, a value already equal) is skipped, and nothing after `remove` may act on the target. The fix is one edit. `external` is not a `target:` fix.
    - **What a fix keeps:** every byte outside its edit; a line item moves with the comment lines directly above it at its indentation; a bracketed container with a comment between its items is not sorted (the comment would be left behind), and the diagnostic is `manual` with the reason in its note.
    - **Verified before it is offered,** beyond decision 5 of [SR-ARCHITECTURE](0108_architecture.md): the file has no more syntax errors than before, the assertion now holds at the target, and the data outside the paths the steps changed is equal (a sort only reorders). A fix that fails any of these is not offered.
+3f. **`type:` — the type questions** (W-104, 2026-10-27; [SR-TYPES](0117_types.md); **not built yet**, W-105). Beside `match:` only, `type:` maps a capture to a question about its TypeScript type, answered by the project's own TypeScript ([L3](0005_LAW-3-languages.md) decision 9). The match holds only when every question holds.
+   - **The key is a capture** (`$NAME`) or `$$MATCH`, as in `where:`; a key `match:` doesn't capture, or a list capture, is a load error.
+   - **The value is a question from [SR-TYPES](0117_types.md) decision 4's fixed vocabulary**, or `not`, `all` and `any` over them; a name outside it is a load error. A rule cannot write its own question: a new one is an amendment of SR-TYPES.
+   - **TypeScript only:** a `type:` rule's `languages:` names only `typescript` and `tsx`; any other is a load error.
+   - **A type rule is still declarative data** (decision 9): its `message:` and `fix:` are this record's, and codelaw's fix engine builds the fix ([L4](0006_LAW-4-every-rule-has-a-fix.md)). It carries `ported_from: [typescript-eslint/<rule>]` when it reimplements one (SR-TYPES decision 10).
+   - **When no type program answers** (no Node, no TypeScript ≥ 7.1, a cold hook): the rule does not run, and the report says so in a note; it never reports a guess (SR-TYPES decisions 6 and 8).
 4. **Body sections, in this order:**
    1. One summary paragraph.
    2. `**Why:**`
@@ -192,6 +199,6 @@ The decider asked for a record of the rule-file template. The format so far exis
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-RULE-AUTHORING](0113_rule-authoring.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-ARCHITECTURE](0108_architecture.md)
+**Records** — [SR-RULE-PACKS](0101_rule-packs.md) · [SR-PROJECT-GRAPH](0103_project-graph.md) · [SR-RULE-AUTHORING](0113_rule-authoring.md) · [SR-AGENT-SURFACES](0102_agent-surfaces.md) · [SR-ARCHITECTURE](0108_architecture.md) · [SR-TYPES](0117_types.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

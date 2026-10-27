@@ -11,7 +11,7 @@ owns:
   - fixtures/perf
   - perf/budgets.toml
 laws: [L0, L3, L5, L8]
-timestamp: 2026-10-27T18:00:00Z
+timestamp: 2026-10-27T20:00:00Z
 content_sha: ""
 ---
 
@@ -23,7 +23,7 @@ content_sha: ""
 
 > **codelaw is a high-performance tool, and its speed is a law.** Every operation it offers has a **time budget**. A budget starts **unset**; the decider sets it from measurements. **Once set, a budget is never exceeded and never loosened.** A change that breaks a budget does not merge. Budgets only ever tighten.
 
-**Ruled by Arpit, 2026-10-18.**
+**Ruled by Arpit, 2026-10-18.** Two operations added and decision 8 written on his ruling of 2026-10-27 (W-101, by voice, R1–R8 of [the proposal](../work/proposals/type-aware-rules.md) §3), which took type-aware TypeScript rules into the engine on the design that names their cost to this law — hook paths skip a cold type program, and `check_types_cold` / `check_types_warm` start `unset` (the proposal's §4 item 4 and §5) — and filed this amendment as W-104. It sets no budget. **Written by an agent on that ruling (W-104).**
 
 **Why it exists.** A linter and formatter run on every save, every commit and every agent edit. If it's slow, people switch it off and agents time out. Speed has to be a constraint that features fit inside, not a property hoped for afterwards.
 
@@ -68,6 +68,8 @@ The decider wants performance to be a key property and accepts that today's numb
    | `mcp_rules_for_path` | one MCP `rules_for_path` call |
    | `hook_pre` | the pre-write gate: `codelaw hook --pre` on one agent `Edit` payload — the file rebuilt in memory, judged against the file on disk, the verdict printed (added 2026-10-27, W-93; [SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 9; design target < 100 ms warm, the class of `fix_one_file`, and Windsurf asks a hook for < 100 ms) |
    | `peak_memory_10k` | peak resident memory during `check_cold_10k` |
+   | `check_types_cold` | `codelaw check` with the type-aware rules on, no warm program: Node started, the project's TypeScript program loaded once, every type question answered (added 2026-10-27, W-104; [SR-TYPES](0117_types.md)) |
+   | `check_types_warm` | the same run through a warm process that already holds the program (decision 8) |
 
 2. **The reference workload.**
    - A deterministic, seeded, generated repo of 10,000 files spanning every [L3](0005_LAW-3-languages.md) language, in `fixtures/perf/`.
@@ -81,6 +83,7 @@ The decider wants performance to be a key property and accepts that today's numb
    - If the reference machine must change, the decider re-measures **every** budget on the new machine in one change, and no budget may get slower relative to the measured baseline.
 6. **Until a budget is set,** the gate reports that operation's p95 on every change without blocking, and the design targets in [SR-ARCHITECTURE](0108_architecture.md) guide the work.
 7. **The gate runs on every change to the engine** once the engine exists. Its mechanism is `W-19`.
+8. **A hook never pays for a cold type program.** `codelaw hook` and `codelaw hook --pre` (`fix_one_file`, `hook_pre`) run the type-aware rules only through a warm process that already holds the project's TypeScript program ([SR-TYPES](0117_types.md)); with none, they skip them and say so in a note. So type rules never count against those two budgets, and their own cost is `check_types_cold` and `check_types_warm`.
 
 #### How L8 is enforced
 
@@ -163,7 +166,8 @@ The decider wants performance to be a key property and accepts that today's numb
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
-- **The gate binds seven of the nine operations** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100) and it waits on the decider.
+- **`check_types_cold` and `check_types_warm` (added 2026-10-27) are `unset`** and not yet in `perf/budgets.toml`: they enter it, `unset`, with the bench that times them and the workload they run on (W-105), and are set by decision 4's method like the rest.
+- **The gate binds seven of the nine operations measured today** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100) and it waits on the decider.
 
 ### Alternatives considered
 
@@ -189,6 +193,6 @@ The decider wants performance to be a key property and accepts that today's numb
 
 *Every source this record cites, gathered in one place. An archived document is never listed here.*
 
-**Records** — [SR-ARCHITECTURE](0108_architecture.md) · [SR-CACHE](0109_cache.md) · [SR-CLI-MCP](0115_cli-and-mcp.md)
+**Records** — [SR-ARCHITECTURE](0108_architecture.md) · [SR-CACHE](0109_cache.md) · [SR-CLI-MCP](0115_cli-and-mcp.md) · [SR-TYPES](0117_types.md)
 
 **Project docs** — [`docs/DESIGN.md`](../docs/DESIGN.md)

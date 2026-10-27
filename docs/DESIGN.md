@@ -248,7 +248,7 @@ fix:
 - codelaw runs these if they're installed and **normalises** their output into one diagnostic stream: oxlint or ESLint, Ruff, `@stencil/eslint-plugin`, taplo or tombi, markdownlint-cli2. Every adapter must pass [L2](../records/0004_LAW-2-foss-dependencies.md) (permissive licence only).
 - Agents then query **one tool** for everything.
 - codelaw-native rules are for *your* conventions. Standard hygiene stays with the specialist tools.
-- Type-aware rules (for example, floating promises) need a type checker. Delegate them to typescript-eslint/oxlint type-aware mode and to pyright/mypy; tree-sitter has no types.
+- Type-aware rules (for example, floating promises) need a type checker; tree-sitter has none. For TypeScript, codelaw asks the project's own TypeScript ≥ 7.1 through its Node helper ([SR-TYPES](../records/0117_types.md); not built yet, W-105), and oxlint's type-aware mode fills the gap until then. Python's stay with pyright/mypy.
 
 ### 3.7 Configuration
 
@@ -368,7 +368,7 @@ Exit codes: `0` clean · `1` violations · `2` config or rule error.
 | Agents ignore guidance | Don't depend on it. Hooks + auto-fix are the guarantee; guidance only reduces churn. |
 | Hook latency annoys users | Single-file mode, cached rule set, no adapters in hook mode, 100 ms budget tested in CI. |
 | Two rules fight (A's fix triggers B) | Multi-pass with a cap of 10. Oscillation detection reports both rule ids. `codelaw test --all` checks the rule set as a whole. |
-| tree-sitter has no types | State it plainly. Delegate type-aware checks to adapters. |
+| tree-sitter has no types | State it plainly. TypeScript: ask the project's own TypeScript ([SR-TYPES](../records/0117_types.md)). Python: delegate to adapters. |
 | Cross-platform binaries are hard to ship | Reuse ast-grep's and Ruff's release pipelines (cargo-dist / maturin / napi-style optionalDependencies). |
 
 ---
