@@ -153,11 +153,17 @@ The decider wants performance to be a key property and accepts that today's numb
 - `hook_pre` costs less than `fix_one_file`: it checks two texts in memory and writes nothing, and like it its time is mostly loading the project.
 - On these numbers decision 4's guard would hold it back (100 < 118.95), as it did `fix_one_file`. `perf/budgets.toml` carries it `unset` with `proposed = 100` (the design target): printed, never compared, until three `perf` runs on `main` give the reference machine's numbers and the decider rules.
 
+**`hook_pre` on the reference machine, 2026-10-27 (W-93).** Decision 4's ruled method on the `perf` job's three `ubuntu-24.04` runs on `main` (image 20261012.334.1), each a `workflow_dispatch` of `ci.yml`: A = run 40456263074 (`4296fe9`), C = 40456826728 and D = 40464780137 (both `9d55072`). The push run 40456463956 skipped `perf` (nothing it times had changed since `4296fe9`), so it gives no number.
+
+| operation | median per run | p95 per run | worst p95 | × 1.5 | design target | budget |
+|---|---|---|---|---|---|---|
+| `hook_pre` | 61.4 / 77.2 / 77.9 ms | 62.4 / 78.3 / 86.2 ms | 86.2 | 129.3 | < 100 ms warm | **unset** — the guard: the target is below 1.5 × the worst p95; put to the decider (leave it unset, as for `fix_one_file`, or 100 ms at 1.16 × headroom) |
+
 ### Consequences
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
-- **The gate binds seven of the nine operations** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset` until decision 4's method is applied to three `perf` runs on `main` and the decider rules.
+- **The gate binds seven of the nine operations** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100) and it waits on the decider.
 
 ### Alternatives considered
 
