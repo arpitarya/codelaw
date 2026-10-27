@@ -8,7 +8,7 @@ timestamp: 2026-10-27T12:40:00+05:30
 
 # Type-aware rules through the project's own TypeScript 7.1
 
-**Ruled 2026-10-27** (the decider, by voice, Cowork) → built by [W-104](../open/W-104-type-aware-records.md) (records), [W-105](../open/W-105-type-aware-engine.md) (helper, engine, rules), [W-106](../open/W-106-typescript-version-watch.md) (version watch), [W-107](../open/W-107-oxlint-type-aware-gap.md) (the gap filler). First parked 2026-10-25 as B-049 (§6); reopened as research W-101 on W-36's R3.
+**Ruled 2026-10-27** (the decider, by voice, Cowork) → built by [W-104](../open/W-104-type-aware-records.md) (records: the design of record is [SR-TYPES](../../records/0117_types.md)), [W-105](../open/W-105-type-aware-engine.md) (helper, engine, rules), [W-106](../open/W-106-typescript-version-watch.md) (version watch), [W-107](../open/W-107-oxlint-type-aware-gap.md) (the gap filler). First parked 2026-10-25 as B-049 (§6); reopened as research W-101 on W-36's R3.
 
 ## 1 · In one line
 
