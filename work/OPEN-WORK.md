@@ -36,6 +36,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-100 itself (the first batch, its DoD) | |
 | 🔴 **GitHub Action — three calls** ([W-97](open/W-97-github-action.md)): **(1) SARIF route** — keep the code-scanning REST API via `gh` (built; say *"keep gh"*), or ratify `github/codeql-action/upload-sarif` (MIT) as a new row in [L11 §3](../records/0013_LAW-11-dependencies.md#3--the-list) · **(2) the DoD proof** — after the next release tag (`gh release create v0.3.0 …`, RELEASING.md), create a throwaway public repo (`gh repo create arpitarya/codelaw-action-test --public --clone`), add `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, push one `debugger`, and check the annotation and Security → Code scanning; or ask Claude to do it · **(3) Marketplace + `v0`** — accept the Marketplace Developer Agreement (github.com/marketplace/actions → *Publish* on the v0.3.0 release's edit page → tick *Publish this Action to the GitHub Marketplace*); say whether a moving `v0` tag is kept (`git tag -f v0 v0.3.0 && git push -f origin v0` each release) or not | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
+| 🔴 **Side-by-side bench — ratify these 5 tools for CI-only bench use** ([W-99](open/W-99-side-by-side-bench.md); [L11](../records/0013_LAW-11-dependencies.md) §3). Installed only by `scripts/bench-rivals.py install` inside `.github/workflows/bench-rivals.yml` (weekly and by hand, a throwaway folder on `ubuntu-24.04`); never in the engine, a package, a test or `ci.yml`. **D-37 ESLint** `eslint@10.13.0` + `@eslint/js@10.0.1` — MIT, 78 packages (54 MIT, 12 Apache-2.0, 6 BSD-2-Clause, 4 ISC, 1 BSD-3-Clause, 1 **BlueOak-1.0.0** = `minimatch`, OSI-approved permissive but not one of L2's named examples) · **D-38 Prettier** `prettier@3.9.10` — MIT, no dependencies · **D-39 Biome** `@biomejs/biome@2.6.3` — MIT OR Apache-2.0, + one platform binary · **D-40 oxlint** `oxlint@1.89.0` — MIT, + one platform binary · **D-41 Ruff** `ruff==0.17.3` — MIT, one wheel, no dependencies. Say **"ratify D-37 to D-41"**, or name the ones to strike. | 2026-10-27 |
+| ↳ **blocks:** W-99 itself (the first real run and step 3, the README's speed claim); W-100's source-tool agreement | |
 
 ---
 
@@ -55,14 +57,13 @@ here. Read that record before changing anything below it.
 
 🔴 **W-97** `arpit` GitHub Action built (`action.yml`, CI's `action` job, `init --ci github`); left: your three calls in the inbox — SARIF route, the release-tag proof, Marketplace and `v0`. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
+🔴 **W-99** `arpit` Side-by-side bench built (`scripts/bench-rivals.py`, `perf/rivals.toml`, `bench-rivals.yml`), skipped until L11 ratifies the rivals; dry run with codelaw alone green. Left: ratify D-37…D-41 (inbox), the first runner run, L8 rows. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
+
 🟢 **W-62** `agent` SCSS built: Biome formats it, 64 `css/*` rules run on `.scss`, `scss` pack; both grammars patched (D-36): Bootstrap's SCSS 233/236 files clean, from 52; left: CSS rules onto trees, pinned SCSS corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-93** `agent` `codelaw hook --pre` and `codelaw brief` built (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: three CI `perf` runs on `main` timing `hook_pre`, then its budget to the decider by L8's method. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
 🟢 **W-94** `agent` `codelaw migrate eslint|prettier|biome|ruff|stylelint`: translate a config into `codelaw.toml` with a report; accept `eslint-disable`/`noqa` as ignore aliases. Filed by Arpit (Cowork). [detail](open/W-94-codelaw-migrate.md)
-
-
-🟢 **W-99** `agent` Side-by-side bench against ESLint, Prettier, Biome, oxlint, Ruff on the pinned repos and runner; no speed claim before it. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
 🔴 **W-100** `arpit` Rule promotion: `scripts/corpus.py promote` reports which preview rules pass, in CI's corpus summary; `--write` refuses until ratified. Left: Arpit's ruling on the criterion (SR-RULE-AUTHORING 6a), then the first batch. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
 
