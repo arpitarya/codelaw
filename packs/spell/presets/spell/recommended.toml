@@ -1,0 +1,4 @@
+description = "known typos in comments, docs, prose strings and Markdown, fixed unattended"
+
+[rules]
+"spell/known-typo" = "warn"

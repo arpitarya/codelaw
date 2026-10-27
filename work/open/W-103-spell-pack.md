@@ -6,7 +6,7 @@ item: W-103
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-27
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5), the first increment"
 ball: agent
 ---
 
@@ -16,11 +16,11 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Vendor SCOWL, VarCon and the software-terms list at a fixed release; record each pin in L11 §3 (D-42–D-44) and the notices in `packs/spell/NOTICE` | licence-clean, auditable sources | ⏳ |
-| 2 | `scripts/spell-data.py` writes the dictionary, the locale table and the generated known-typo list into `packs/spell/data/spell/`; same input, same bytes | codelaw's own word data | ⏳ |
-| 3 | Measure: entries in the generated typo list, and the bytes the data adds to the npm tarball and the PyPI wheel; if JSON is too large, put a compact format to the decider (SR-RULE-PACKS decision 3) | the size question answered with numbers | ⏳ |
-| 4 | The engine side: per-language selection queries, the word splitter, the token skips, the six `native:` rules and their fixes, the `[spell]` config section | the check itself | ⏳ |
-| 5 | The pack: `packs/spell/` with `spell/recommended` and `spell/strict`, rule files with cases, README; L6, SR-RULE-PACKS and SR-PACKAGES amended to eighteen packs | installable as `@codelaw/rules-spell` / `codelaw-rules-spell` | ⏳ |
+| 1 | Vendor SCOWL, VarCon and the software-terms list at a fixed release; record each pin in L11 §3 (D-42–D-44) and the notices in `packs/spell/NOTICE` | licence-clean, auditable sources | ✅ licences read from each source (SCOWL's `Copyright`, VarCon's README, the MIT `LICENSE`): all notice-only or MIT; SCOWL 2020.12.07 and software terms 5.4.8 pinned by SHA-256 in `spell-data.py` and L11 §3, notices in `NOTICE` and `licenses/`; VarCon 2020.12.07 pinned in L11, read when the locale table lands |
+| 2 | `scripts/spell-data.py` writes the dictionary, the locale table and the generated known-typo list into `packs/spell/data/spell/`; same input, same bytes | codelaw's own word data | 🟡 the known-typo list (`typos.json`, `check` proves same bytes); the dictionary and the locale table left |
+| 3 | Measure: entries in the generated typo list, and the bytes the data adds to the npm tarball and the PyPI wheel; if JSON is too large, put a compact format to the decider (SR-RULE-PACKS decision 3) | the size question answered with numbers | 🟡 typo list: 188,151 entries, 3.53 MB JSON, pack 625 KB tgz / 636 KB wheel, +9 ms to load (SR-SPELL decision 9); one JSON string searched in place, so no new format; the dictionary's size left |
+| 4 | The engine side: per-language selection queries, the word splitter, the token skips, the six `native:` rules and their fixes, the `[spell]` config section | the check itself | 🟡 selection (a kind table, SR-SPELL decision 3 *as built*), splitter, skips and `spell/known-typo` built; five rules and `[spell]` left |
+| 5 | The pack: `packs/spell/` with `spell/recommended` and `spell/strict`, rule files with cases, README; L6, SR-RULE-PACKS and SR-PACKAGES amended to eighteen packs | installable as `@codelaw/rules-spell` / `codelaw-rules-spell` | 🟡 the pack, both presets, one rule with cases; L6, SR-RULE-PACKS, SR-PACKAGES, SR-RULE-FORMAT and every count at eighteen; the other rules' files left |
 | 6 | Measure the speed: three CI `perf` runs on `main` with the pack on; put the budget to the decider by L8's method | the L8 budget | ⏳ |
 
 **Arpit, 2026-10-27 (voice):** *"There is a tool called C-Spell. Research it and tell me if that can be built into CodeLaw. A similar feature, a better feature, would be even better."* Then, ruling the forks: *"Let's go with B."* · *"Approve both."* · *"Approve it."* · *"want it as a separate package."* · *"Go with the recommendation."* · *"go ahead"*. The forks: [the compare doc](../compare/spell-checking.compare.md).
@@ -35,13 +35,23 @@ Spelling in comments, docs, prose strings, Markdown, keys and declared names, in
 
 | DoD | what | state |
 |---|---|---|
-| 1 · data | `packs/spell/data/spell/` is written by `scripts/spell-data.py` (stdlib only) from D-42–D-44 at the pins in L11 §3; a second run changes no byte; `NOTICE` names each source and version | ⏳ |
-| 2 · rules | the six rules of SR-SPELL decision 5, each with its fix class, cases and a `codelaw test` pass; every `manual` fix carried by a skill (L4) | ⏳ |
+| 1 · data | `packs/spell/data/spell/` is written by `scripts/spell-data.py` (stdlib only) from D-42–D-44 at the pins in L11 §3; a second run changes no byte; `NOTICE` names each source and version | 🟡 the typo list (`spell-data.py check` passes); dictionary and locale table left |
+| 2 · rules | the six rules of SR-SPELL decision 5, each with its fix class, cases and a `codelaw test` pass; every `manual` fix carried by a skill (L4) | 🟡 `spell/known-typo` (107 `codelaw test` checks); five left |
 | 3 · scope | a fixture repo per L3 language: a typo in a comment, a string, a declared name and a key is reported once; the same word in a URL, a hash, a JSON value that is an id, or at a name's uses is not | ⏳ |
 | 4 · fixes | `codelaw fix` on the fixtures fixes the one-correction known typos in prose and file-local names, and changes nothing exported | ⏳ |
-| 5 · packaging | `@codelaw/rules-spell` and `codelaw-rules-spell` build in CI byte-identical; `init` does not add the pack; a missing pack names both install commands | ⏳ |
-| 6 · measured | the typo list's entry count, the data's bytes per package, and the spell pass's time on the pinned corpus are written into SR-SPELL decision 9; the budget is the decider's ruling | ⏳ |
-| 7 · records | SR-SPELL `built: yes`; L6, SR-RULE-PACKS §1 and decision 4, SR-PACKAGES at eighteen packs, sixteen on npm and eleven on PyPI; README, CHANGELOG, GLOSSARY, `docs/rules/` regenerated | ⏳ |
+| 5 · packaging | `@codelaw/rules-spell` and `codelaw-rules-spell` build in CI byte-identical; `init` does not add the pack; a missing pack names both install commands | 🟡 `build-packs.py --verify` builds both and compares output byte-identical locally; `init` adds no spell pack; the missing-pack message names both installs (`pack.rs` test); CI proves it on the landing commit |
+| 6 · measured | the typo list's entry count, the data's bytes per package, and the spell pass's time on the pinned corpus are written into SR-SPELL decision 9; the budget is the decider's ruling | 🟡 entry count and bytes per package measured (SR-SPELL decision 9); the corpus timing and the budget left |
+| 7 · records | SR-SPELL `built: yes`; L6, SR-RULE-PACKS §1 and decision 4, SR-PACKAGES at eighteen packs, sixteen on npm and eleven on PyPI; README, CHANGELOG, GLOSSARY, `docs/rules/` regenerated | 🟡 all at eighteen; SR-SPELL built: partly |
+
+## Left (exact, after the first increment of 2026-10-27)
+
+1. `spell/known-typo-identifier` — declared names in all nine languages (split at case, `_`, `-`, `.`, digits); `auto` rename only for a file-local, unexported name with every reference in the file; `suggest` naming the other files; `manual` for an exported name, a JSON key or a CSS class used elsewhere; add to `spell/recommended`; a skill for its `manual` fix (L4).
+2. The dictionary: `spell-data.py` writes SCOWL's US + British words (choose the size from measurement) with each word's size class, plus the software terms; measure its bytes and load time; if the pack's load cost is too high, put a split (a second data file read only by `spell/strict`'s rules) or a compact format to the decider.
+3. `spell/unknown-word` (`suggest`: up to three corrections by Damerau-Levenshtein ≤ 2, then size class, then alphabetical; a per-run verdict cache) and the `[spell]` section (`locale`, `words`) in SR-CONFIG decision 2 and the config schema; `[spell] words` also excuses `known-typo`.
+4. `spell/suspicious-word` (`manual`, with its skill), `spell/locale-variant` (VarCon one-to-one pairs into `data/spell/locale.json`, NOTICE and `licenses/` gain VarCon) and `spell/inconsistent-term` (project scope).
+5. DoD 3 and 4: a fixture repo per L3 language and the `codelaw fix` run over it.
+6. The pinned corpus: add `spell` to `scripts/corpus.json`/`corpus.py`, record counts, review the findings for false positives before any rule leaves `preview`; the reopen-trigger's comparison with `typos`' count.
+7. Step 6: three CI `perf` runs on `main` with the pack on, then the budget to the decider (L8).
 
 ## Blockers
 

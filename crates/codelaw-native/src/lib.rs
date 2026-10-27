@@ -53,6 +53,7 @@ mod react_hooks;
 mod tanstack_query;
 mod redux_toolkit;
 mod size_lines;
+mod spell;
 mod regexp;
 mod stencil;
 mod typescript;
@@ -639,6 +640,7 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &data_yaml::NoAmbiguousNumbers,
     &data_yaml::NoDuplicateKeys,
     &data_yaml::NoUndeclaredAlias,
+    &spell::KnownTypo,
 ];
 
 /// Every registered native rule.

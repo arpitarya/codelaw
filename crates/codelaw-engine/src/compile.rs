@@ -116,6 +116,10 @@ pub(crate) fn rule_set_key(rules: &RuleSet, config: &Config) -> Key {
         k.push(r.enabled_by.as_deref().unwrap_or_default());
         k.push(r.shadows.join("\0"));
         k.push(format!("{}{}", r.external_allowed, r.preview_blocked));
+        // The default is copied into the result too: `codelaw test` compiles
+        // a one-rule pack with no default, then again with the rule on, both
+        // under an empty fingerprint.
+        k.push(format!("{:?}", r.default));
     }
     k.key()
 }

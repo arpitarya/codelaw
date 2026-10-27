@@ -1,0 +1,6 @@
+# `codelaw test --corpus` finding counts (SR-RULE-AUTHORING decision 4).
+# Rewrite with --update-snapshot, and review the change.
+# The spell pack is not in the pinned corpus yet (W-103 leaves that step
+# open), so every rule stays `preview` and no count is recorded.
+
+[findings]

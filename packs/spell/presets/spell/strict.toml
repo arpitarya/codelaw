@@ -1,0 +1,4 @@
+extends = ["codelaw:spell/recommended"]
+description = "spell/recommended plus the dictionary check; until its rules land (W-103), the same rules as spell/recommended"
+
+[rules]
