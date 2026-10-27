@@ -11,6 +11,8 @@ never does (L5: codelaw is complete with no Fux).
     fux-index.py assemble --out dist     build every index package into dist/fux-index/
     fux-index.py check dist              the checks on what was assembled
     fux-index.py names                   every name this publishes, `registry name` per line
+    fux-index.py latest [--pypi-json F]  `newer <v>` or `current <v>`: PyPI's fux-engine against FUX_VERSION (W-91)
+    fux-index.py bump <v>                rewrite FUX_VERSION to <v>, the one line a bump changes (W-91)
 
 **Fux is a build-time tool of codelaw's CI only**, pinned at FUX_VERSION so
 the index bytes are reproducible (a Fux release that changes the segment
@@ -50,6 +52,8 @@ MANIFEST = "fux-index.json"
 # What a segment holds (fux's `[plugins.index] segment` globs, SR-PKG-INDEX decision 4).
 SEGMENT_GLOBS = ("index/*.jsonl", "identifiers.toml")
 OUT = "fux-index"
+PYPI_JSON = "https://pypi.org/pypi/fux-engine/json"
+FUX_LINE = re.compile(r'^FUX_VERSION = "([^"]*)"', re.M)
 
 
 def fail(msg: str) -> None:
@@ -300,6 +304,52 @@ def check(out: pathlib.Path) -> None:
           "zero dependencies, licensed, each manifest true to its shards, both registries byte-equal, outside the release set")
 
 
+def release(v: str) -> tuple:
+    """A final release `N(.N)*` as a tuple of ints; anything else (a pre-release,
+    a dev or local version) is refused — the bump job never pins one."""
+    if not re.fullmatch(r"\d+(\.\d+)*", v):
+        fail(f"`{v}` is not a final release (N.N.N); fux-index pins only final releases")
+    t = tuple(int(x) for x in v.split("."))
+    while len(t) > 1 and t[-1] == 0:
+        t = t[:-1]
+    return t
+
+
+def latest(pypi_json) -> None:
+    """Compare fux-engine's latest release with FUX_VERSION and print one line:
+    `newer <v>` when PyPI has a later release, `current <pin>` otherwise. The
+    latest is, in order: $FUX_LATEST (a test, or the workflow's `version`
+    input), the JSON file given, or PyPI's JSON API (one read-only GET)."""
+    forced = os.environ.get("FUX_LATEST", "").strip()
+    want, where = forced, "$FUX_LATEST"
+    if not want:
+        where = "PyPI"
+        if pypi_json:
+            raw = pypi_json.read_text(encoding="utf-8")
+        else:
+            import urllib.request
+            with urllib.request.urlopen(PYPI_JSON, timeout=30) as r:
+                raw = r.read().decode("utf-8")
+        want = json.loads(raw)["info"]["version"]
+    # A forced $FUX_LATEST may also move the pin down (a rollback, or a test of the job).
+    if (release(want) != release(FUX_VERSION)) if forced else (release(want) > release(FUX_VERSION)):
+        print(f"fux-engine {want} ({where}), pinned {FUX_VERSION}: bump", file=sys.stderr)
+        print(f"newer {want}")
+    else:
+        print(f"fux-engine {want} ({where}), pinned {FUX_VERSION}: nothing to do", file=sys.stderr)
+        print(f"current {FUX_VERSION}")
+
+
+def bump(v: str) -> None:
+    release(v)
+    me = pathlib.Path(__file__).resolve()
+    src = me.read_text(encoding="utf-8")
+    if len(FUX_LINE.findall(src)) != 1:
+        fail(f"{me.name}: expected exactly one `FUX_VERSION = \"…\"` line")
+    me.write_text(FUX_LINE.sub(f'FUX_VERSION = "{v}"', src, count=1), encoding="utf-8")
+    print(f"✔ FUX_VERSION {FUX_VERSION} → {v}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -309,11 +359,19 @@ def main() -> None:
     c = sub.add_parser("check")
     c.add_argument("out", type=pathlib.Path)
     sub.add_parser("names")
+    lt = sub.add_parser("latest")
+    lt.add_argument("--pypi-json", type=pathlib.Path, help="PyPI's JSON for fux-engine, read instead of fetching it")
+    b = sub.add_parser("bump")
+    b.add_argument("version")
     args = ap.parse_args()
     if args.cmd == "assemble":
         assemble(args.out, shutil.which(args.fux) or fail(f"{args.fux} is not on PATH"))
     elif args.cmd == "check":
         check(args.out)
+    elif args.cmd == "latest":
+        latest(args.pypi_json)
+    elif args.cmd == "bump":
+        bump(args.version)
     else:
         for n in indexed(package.NPM_PACKS):
             print(f"npm @codelaw/rules-{n}{SUFFIX}")

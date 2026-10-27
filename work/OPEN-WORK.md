@@ -47,7 +47,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack; `tree-sitter-cli` 0.25.10 ratified (D-36, 2026-10-27); left: grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
-🟢 **W-91** `agent` fux-engine always at its latest: a scheduled CI job finds a new release, bumps `FUX_VERSION` and opens a PR; each commit stays pinned and reproducible (D-34, ratified 2026-10-27). Filed by Arpit (Cowork). [detail](open/W-91-fux-auto-bump.md)
+🟢 **W-91** `agent` fux-engine at its latest: `fux-bump.yml` (daily) bumps `FUX_VERSION`, builds, checks and opens or updates one PR, dispatching `ci.yml` on it; the Actions PR setting is on (2026-10-27); left: a live PR and its re-run. Filed by Arpit (Cowork). [detail](open/W-91-fux-auto-bump.md)
 
 🟢 **W-93** `agent` `codelaw hook --pre` (refuse a write that adds an error, for every agent with a pre-write hook, fail-open) and `codelaw brief` (only what is specific to the repo); records first. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
