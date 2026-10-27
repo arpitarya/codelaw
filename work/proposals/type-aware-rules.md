@@ -2,7 +2,7 @@
 type: Proposal
 title: Type-aware rules through typescript-go
 description: "Rules that need TypeScript's types (no-floating-promises, no-unsafe-*, switch-exhaustiveness …) and TypeScript's own errors with its fixes, answered by a typescript-go helper; parked by the decider 2026-10-25."
-status: proposed
+status: graduated
 timestamp: 2026-10-25T16:10:00Z
 ---
 
