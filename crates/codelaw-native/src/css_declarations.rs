@@ -518,7 +518,13 @@ css_rule!(NoInvalidPositionDeclaration, "css/no-invalid-position-declaration", |
                 if containing.contains(&name) || !nesting.contains(&name) {
                     true
                 } else {
-                    sheet.ancestors(i).any(|a| sheet.nodes[a].kind == Kind::Rule || (sheet.nodes[a].kind == Kind::AtRule && containing.contains(&sheet.at_name(a, src))))
+                    // A Sass mixin's body (and an `@include`'s block) lands where it is
+                    // included, so a declaration under one is in a rule (W-62).
+                    sheet.ancestors(i).any(|a| {
+                        sheet.nodes[a].kind == Kind::Rule
+                            || (sheet.nodes[a].kind == Kind::AtRule && containing.contains(&sheet.at_name(a, src)))
+                            || (sheet.scss && matches!(sheet.at_name(a, src).as_str(), "mixin" | "include"))
+                    })
                 }
             }
         };
@@ -778,7 +784,8 @@ css_rule!(CustomPropertyPattern, "css/custom-property-pattern", |sheet, src, ctx
     let pattern = opt_str(ctx, "pattern", "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$");
     let Ok(re) = regex::Regex::new(pattern) else { return };
     let mut report = |s: usize, e: usize, name: &str| {
-        if !re.is_match(name) {
+        // An interpolated name (`--#{$prefix}color`) is known only once Sass runs.
+        if !name.contains("#{") && !re.is_match(name) {
             out.push(finding(s, e, format!("Custom property `--{name}` doesn't match the naming pattern `{pattern}` (kebab-case by default)")));
         }
     };
