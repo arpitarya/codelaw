@@ -828,9 +828,9 @@ def render_rule(ctx, rid, rule):
     install = []
     for p in packs:
         if npm_name(p):
-            install.append("npm install --save-dev {}".format(npm_name(p)))
+            install.append(f"npm install --save-dev {npm_name(p)}")
         if pypi_name(p):
-            install.append("pip install {}".format(pypi_name(p)))
+            install.append(f"pip install {pypi_name(p)}")
     w("**Install the pack** (`codelaw init` does it for the languages it finds):")
     w("")
     w(fence("bash", "\n".join(install)))
