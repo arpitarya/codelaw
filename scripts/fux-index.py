@@ -46,7 +46,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import package  # noqa: E402  the release build's own code (SR-PACKAGES decision 9)
 
 ROOT = package.ROOT
-FUX_VERSION = "5.1.1"  # fux-engine, MIT: the one pin the index bytes depend on
+FUX_VERSION = "5.1.0"  # fux-engine, MIT: the one pin the index bytes depend on
 SUFFIX = "-fux-index"
 MANIFEST = "fux-index.json"
 # What a segment holds (fux's `[plugins.index] segment` globs, SR-PKG-INDEX decision 4).
