@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25: findings inline on PRs without a SARIF upload: 
 item: W-45
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-26
-updated_by: "Arpit (Cowork, Opus 5.5) — docket"
-ball: agent
+updated: 2026-10-27
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: arpit
 ---
 
 # W-45 — CI report formats — GitHub, GitLab, JUnit, Checkstyle
@@ -26,6 +26,8 @@ ball: agent
 
 **Model:** Sonnet — four fixed output schemas with tests against each schema.
 
+**Arpit, 2026-10-27 (voice docket):** *"I did look into the PR, everything looks good."* DoD 2 met; **closed 2026-10-27.** Left as housekeeping (no GitHub write access from that session): close PR #3 and delete `demo/W-45-annotations-v2`.
+
 ## Goal
 
 - `--format github|gitlab|junit|checkstyle` on `check`, `fix` and `format --check`.
@@ -37,7 +39,7 @@ ball: agent
 | DoD | what | state |
 |---|---|---|
 | 1 · | each format validated against its published schema/XSD in a test | ✅ |
-| 2 · | GitHub: a real run on this repo shows annotations on a PR | ⏳ PR open: [#3](https://github.com/arpitarya/codelaw/pull/3), waiting for Arpit's look |
+| 2 · | GitHub: a real run on this repo shows annotations on a PR | ✅ 2026-10-27 — Arpit looked at PR [#3](https://github.com/arpitarya/codelaw/pull/3): *"I did look into the PR, everything looks good."* |
 | 3 · | the same input gives byte-identical output (L5) | ✅ |
 | 4 · | exit codes unchanged | ✅ |
 

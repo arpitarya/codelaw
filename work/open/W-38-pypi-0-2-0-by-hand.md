@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25: the whole PyPI side of 0.2.0 in one item, block
 item: W-38
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
+updated: 2026-10-27
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-38 — PyPI 0.2.0, by hand, over two or three days
@@ -16,9 +16,9 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Upload the six rule-pack wheels by hand from the 0.2.0 `dist` — PyPI creates at most four new projects a day | the six projects exist, owned by Arpit | 🔴 2 of 6: `codelaw-rules-css` and `-data` are live; `html`, `js`, `python`, `react` left |
-| 2 | Add a trusted publisher to each of the six projects | later releases come from CI, with no token | 🔴 Arpit, on pypi.org |
-| 3 | Publish the GitHub Release `v0.2.0` — on the tag W-37 created | CI creates `codelaw` on PyPI through its pending publisher, skips the six packs and everything npm already has, and attaches the checksums | 🔴 Arpit: `gh release create v0.2.0` |
+| 1 | Upload the six rule-pack wheels by hand from the 0.2.0 `dist` — PyPI creates at most four new projects a day | the six projects exist, owned by Arpit | 🔴 2 of 6: `codelaw-rules-css` and `-data` are live; `html`, `js`, `python`, `react` → [W-86](W-86-pypi-day-1.md) (Wed 2026-10-28) |
+| 2 | Add a trusted publisher to each of the six projects | later releases come from CI, with no token | 🔴 2 of 6: `css` and `data` bound 2026-10-27 (`arpitarya/codelaw` · `publish.yml` · `pypi`); the other four → W-86 |
+| 3 | Publish the GitHub Release `v0.2.0` — on the tag W-37 created | CI creates `codelaw` on PyPI through its pending publisher, skips the six packs and everything npm already has, and attaches the checksums | 🔴 → W-86 step 3 (Arpit: `gh release create v0.2.0`) |
 | 4 | Check it as a user: a fresh venv, `pip install codelaw && codelaw --version`, `uvx codelaw --version`, and the install smoke from the registry on the eight platforms | PyPI works for real | ⏳ an agent, after step 3 |
 | 5 | Write it down: an `IMPLEMENTATION.md` row, `RELEASING.md` §One time step 4 marked done, the README's preview note | the docs say PyPI is live | ⏳ an agent, after step 4 |
 
@@ -30,6 +30,8 @@ to publish the PyPI packages."*
 
 **Model:** NONE for steps 1–3 (Arpit's hand on pypi.org and `gh`); Sonnet for
 steps 4–5.
+
+**Arpit, 2026-10-27 (voice docket):** *"create a work item just for publishing four packages a day for PyPI … add the command in the OpenWork file so that I can just copy it and paste it every day."* Steps 1–3 moved to [W-86](W-86-pypi-day-1.md), one day's quota; this item keeps steps 4–5 (an agent) and waits on W-86.
 
 ## What this item absorbed (each archived the same day)
 

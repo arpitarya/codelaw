@@ -27,6 +27,9 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-84-ci-green-on-main.md`](open/W-84-ci-green-on-main.md) | 2026-10-27 | CI's `ci.yml` on `main` (run 40437239647, all green); the guard's baseline in [`records/RULE-SINCE`](../records/RULE-SINCE) |
+| [`W-51-scheduled-autofix-pr.md`](open/W-51-scheduled-autofix-pr.md) | 2026-10-27 (parked) | [`work/BACKLOG.md`](../work/BACKLOG.md) B-053; the workflow `codelaw init --ci github --autofix` writes, [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
+| [`W-45-ci-report-formats.md`](open/W-45-ci-report-formats.md) | 2026-10-27 | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 4 (`--format github`, `gitlab`, `junit`, `checkstyle`); USAGE's CI snippets |
 | [`W-81-commit-main-checkout.md`](open/W-81-commit-main-checkout.md) | 2026-10-27 | the commit itself; the pages are [`docs/rules/`](../docs/rules/README.md), made by `scripts/rule-docs.py` |
 | [`W-58-size-limits.md`](open/W-58-size-limits.md) | 2026-10-27 | the six rule pages in [`packs/js/rules/js/`](../packs/js/rules/js) and [`packs/python/rules/py/`](../packs/python/rules/py) (`max-lines`, `max-lines-per-function`, `max-params`), `crates/codelaw-native/src/size.rs`, [SR-RULE-PACKS](../records/0101_rule-packs.md) (the `size` presets) |
 | [`W-73-configurable-approved-calls.md`](open/W-73-configurable-approved-calls.md) | 2026-10-27 | [SR-RULE-FORMAT](../records/0112_rule-format.md) decisions 2, 3a (`calls:`, `function_calls:`) and 3b; the rule pages of the `sanitizers` and `validators` rules, `js/use-instead`, `py/use-instead` |

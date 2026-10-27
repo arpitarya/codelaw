@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-26: SCSS (.scss) joins codelaw as a CSS dialect: L3
 item: W-62
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-26
-updated_by: "Claude Code (Sonnet 5.5) — built"
-ball: arpit
+updated: 2026-10-27
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: agent
 ---
 
 # W-62 — SCSS in the CSS pack — L3 amended, parsed, formatted, linted
@@ -29,6 +29,8 @@ ball: arpit
 **Arpit, 2026-10-26:** *"Create separate packages for SCSS and CSS modules."* So the dialect itself (parser, formatter, `css/*` rules staying quiet on SCSS) lands in the engine and the `css` pack; the `scss/*` rules ship in their own pack.
 
 **Model:** Opus — it amends a law and moves every CSS rule onto new trees.
+
+**Arpit, 2026-10-27 (voice docket):** *"Ratify it."* — `tree-sitter-cli` 0.25.10 is **D-36** in `DEPENDENCIES.md`, on the terms put to the decider: exact pin, the regenerated `src/` committed (so CI, the engine and users never need the tool), run only when a grammar changes. `work/BLOCKED.json` back to `PROCEED`; W-62 re-balled to agent. *Left* items 1–2 can start.
 
 ## Goal
 
