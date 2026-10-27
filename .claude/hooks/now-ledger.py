@@ -225,7 +225,10 @@ def file_item(ball, lane, title, body, sid):
 
     def bump(m):
         return f"{m.group(1)} ({int(m.group(2) or 0) + 1})\n\n{row}\n\n"
-    text = re.sub(r"^(### (?:\S+ )?build)(?: \((\d+)\))?\n\n", bump, text, count=1, flags=re.M)
+    text, filed = re.subn(r"^(### (?:\S+ )?build)(?: \((\d+)\))?\n\n", bump, text, count=1, flags=re.M)
+    if filed:  # `## Open items (N)` counts every row too (rule 37b)
+        text = re.sub(r"^(## Open items)(?: \((\d+)\))?$",
+                      lambda m: f"{m.group(1)} ({int(m.group(2) or 0) + 1})", text, count=1, flags=re.M)
     if ball == "🔴":
         head = re.search(r"^## Blocked on [^\n]*\n\n(\| what[^\n]*)\n", text, re.M)
         aged = head is not None and "| age |" in head.group(1)
