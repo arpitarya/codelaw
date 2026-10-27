@@ -31,15 +31,13 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (11)
+## Open items (10)
 
-### build (9)
+### build (8)
 
 🔴 **W-38** `arpit` PyPI 0.2.0 by hand over 2–3 days: `css`, `data` live; left the other four packs (four a day), six trusted publishers, then the Release on W-37's tag brings `codelaw`. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
 🔴 **W-34** `arpit` Fux index packages built (L6 decision 12; `scripts/fux-index.py`, fux 5.1.1, CI, `init` prints not installs); left: reserve the 25 names and publish them by hand (npm fifteen, PyPI ten), then teach `publish.yml` to upload `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
-
-🟢 **W-44** `agent` `check --watch` / `fix --watch` built (polling, ruled 2026-10-26); left: DoD 5 on CI's Windows legs and the CI-runner measurements. Filed by Arpit (Cowork). [detail](open/W-44-watch-mode.md)
 
 🟢 **W-45** `agent` CI formats built; PR [#3](https://github.com/arpitarya/codelaw/pull/3) is open; left: Arpit looks at its annotations and says so (DoD 2). Filed by Arpit (Cowork). [detail](open/W-45-ci-report-formats.md)
 
