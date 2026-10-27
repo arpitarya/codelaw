@@ -11,6 +11,7 @@ against this file before an item may be closed
 
 | date | item | what landed | outcome | evidence |
 |---|---|---|---|---|
+| 2026-10-27 | W-85 (closed) | The nine new npm packages live at 0.2.0 (Arpit, by hand); every release and Fux index name trusts `publish.yml` · `npm` (*Pending validation*); `scripts/npm-trust.sh` counts E409 as trusted, carries on past a failure and exits 1 listing it, `--fux-index` adds the 15 Fux index names; RELEASING.md §Every release step 0 re-checks lapsed trust | done; all DoD met | npm dist-tags `latest: 0.2.0`; trust read back in the browser 07:52 IST; stubbed-`npx` test of `npm-trust.sh` |
 | 2026-10-27 | W-84 (closed) | `main` green again after red since 2026-10-26 11:33 UTC: `records/RULE-SINCE` `fedf2f0` → `791b189` (eight pushed commits failed the SR-guard replay — 0219eb1, b88d0cc, a84b15a, 5b4cfff, ed70075, 1edb7ff, 3e02464, 791b189 — each named; eb0e970); `smoke` BusyBox `diff -x` and win32 `--prefer-warm` (175a328) | every job green: 27/27 | CI run 40437239647 on `eb0e970` |
 | 2026-10-27 | W-45 (closed) | Nothing new built: DoD 2 met — Arpit looked at PR #3, whose `w45-annotations-demo` run put `codelaw check --format github`'s 2 errors and 3 warnings inline on `w45-demo/a.js` and `a.py` | done; all DoD met; PR #3 and its branch still to close | PR #3; Arpit, 2026-10-27: *"everything looks good"* |
 | 2026-10-27 | W-51 (parked) | Nothing new landed; the built auto-fix workflow is unchanged; its two unrun DoDs move to BACKLOG B-053 | parked, not done | Arpit, 2026-10-27: *"Put this in the backlog for now."* |

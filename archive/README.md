@@ -27,6 +27,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-85-npm-first-publish.md`](open/W-85-npm-first-publish.md) | 2026-10-27 | [`RELEASING.md`](../RELEASING.md) §One time, by hand and §Every release step 0; [`scripts/npm-trust.sh`](../scripts/npm-trust.sh) |
 | [`W-44-watch-mode.md`](open/W-44-watch-mode.md) | 2026-10-27 | `codelaw check --watch` / `fix --watch`: [SR-ARCHITECTURE](../records/0108_architecture.md) decisions 22 and 22a, [SR-CLI-MCP](../records/0115_cli-and-mcp.md), `crates/codelaw-engine/src/watch.rs`, the smoke's watch step |
 | [`W-71-tests-for-new-code.md`](open/W-71-tests-for-new-code.md) | 2026-10-27 | `graph/untested-function`, `graph/function-coverage`, `.codelawignore` and `codelaw:tests` — their rule pages in [`packs/`](../packs) and USAGE "tests for new code"; `codelaw debug changed-functions` |
 | [`W-70-dev-server-example-apps.md`](open/W-70-dev-server-example-apps.md) | 2026-10-27 | [`examples/dev-servers/`](../examples/dev-servers) and CI's `dev-servers` job; [SR-PACKAGES](../records/0107_packages.md) decision 3a |
