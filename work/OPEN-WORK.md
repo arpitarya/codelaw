@@ -33,9 +33,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (15)
+## Open items (23)
 
-### build (13)
+### build (21)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -53,6 +53,22 @@ here. Read that record before changing anything below it.
 
 🟢 **W-91** `agent` fux-engine always at its latest: a scheduled CI job finds a new release, bumps `FUX_VERSION` and opens a PR; each commit stays pinned and reproducible (D-34, ratified 2026-10-27). Filed by Arpit (Cowork). [detail](open/W-91-fux-auto-bump.md)
 
+🟢 **W-93** `agent` `codelaw hook --pre` (refuse a write that adds an error, for every agent with a pre-write hook, fail-open) and `codelaw brief` (only what is specific to the repo); records first. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
+
+🟢 **W-94** `agent` `codelaw migrate eslint|prettier|biome|ruff|stylelint`: translate a config into `codelaw.toml` with a report; accept `eslint-disable`/`noqa` as ignore aliases. Filed by Arpit (Cowork). [detail](open/W-94-codelaw-migrate.md)
+
+🟢 **W-95** `agent` Publish the VS Code extension on the Marketplace and Open VSX; Arpit creates the publisher and tokens at step 2. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
+
+🟢 **W-96** `agent` Pick `--format agent` automatically when an agent's environment variable is set; an explicit `--format` wins. Filed by Arpit (Cowork). [detail](open/W-96-agent-format-autodetect.md)
+
+🟢 **W-97** `agent` A first-party GitHub Action (`uses: arpitarya/codelaw@v…`): install, `check --format github`, optional SARIF upload. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
+
+🟢 **W-98** `agent` `llms.txt`, `llms-full.txt` and a `rules.json` catalogue generated from `docs/rules/`, checked in CI. Filed by Arpit (Cowork). [detail](open/W-98-llms-txt.md)
+
+🟢 **W-99** `agent` Side-by-side bench against ESLint, Prettier, Biome, oxlint, Ruff on the pinned repos and runner; no speed claim before it. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
+
+🟢 **W-100** `agent` Promote rules from `preview` to `stable` by pinned corpus runs, with a recorded criterion. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
+
 🟡 **W-38** waits on **W-86** `agent` PyPI 0.2.0: `css`, `data` live and trusted; day 1 uploads the other four and publishes the Release; then an agent checks `pip install codelaw` and `uvx codelaw` and writes it down. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
 🟡 **W-34** waits on **W-87** and **W-88** `agent` Fux index packages built; D-34 ratified 2026-10-27 (W-91); npm 15/15 and PyPI 4/10 live; after the publishing items, `publish.yml` uploads `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
@@ -61,16 +77,17 @@ here. Read that record before changing anything below it.
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
-🟡 **W-35** waits on **W-05** `agent` README leads with "your rules, before, while and after the AI writes"; then it drops While's "in design" and restores Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
+🟡 **W-35** waits on **W-93** `agent` README leads with "your rules, before, while and after the AI writes"; then it drops While's "in design" and restores Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
 
-### testing (0)
+### testing (1)
+
+🟢 **W-102** `agent` Experiment: does an agent with Fux and the rule docs still break rules? 3 arms × 20 tasks × 3 runs; decides the README's "rules it can't skip" line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
 ### record update (0)
 
-### research (2)
+### research (1)
 
-🟢 **W-36** `cowork` Research codelaw as the linter and formatter for AI — before, while, after and with no AI — beside ESLint + Prettier, Biome, Ruff, oxlint: gaps, provable claims, who adopts it. Filed by Arpit (Cowork). [detail](open/W-36-position-against-eslint-and-biome.md)
+🟢 **W-101** `cowork` Research: type-aware TypeScript rules reopened (B-049) — oxlint's type-aware linting is stable since 2026-07-22; route, cost, a pick. Filed by Arpit (Cowork). [detail](open/W-101-type-aware-ts-research.md)
 
-🟢 **W-05** `cowork` Research guiding an agent **while** it writes: a `brief` of the rules for a path and construct, and a `hook --pre` check before a write reaches disk; Fux as an optional layer. Filed by Arpit (Cowork). [detail](open/W-05-write-time-guidance.md)
 
 ---

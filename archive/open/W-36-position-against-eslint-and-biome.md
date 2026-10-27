@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-25: research codelaw as the linter and formatter fo
 item: W-36
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
+updated: 2026-10-27
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: cowork
+ball: arpit
 ---
 
 # W-36 — research: codelaw as the linter and formatter for AI, and for everyone without it
@@ -29,6 +29,10 @@ that way as well. I want a work item which can research all these things."*
 
 **Model:** **Cowork**, Opus — a `research` item, never Claude Code
 ([SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md) rule 37a). No code.
+
+**Researched 2026-10-27 (Cowork, Opus 5.5):** steps 1–4 done and step 3a designed — [the proposal](../proposals/linter-for-ai-positioning.md) (sourced incumbent tables, claims kept and dropped, gaps G1–G8, the experiment). Step 5: the decider rules R1–R4 (inbox row filed 2026-10-27).
+
+**Arpit, 2026-10-27 (voice):** *"Yes to all four."* — on W-36's R1 (README fixes), R2 (file gaps G1–G8), R3 (reopen type-aware TS) and R4 (run the with/without-Fux experiment). [Proposal](../proposals/linter-for-ai-positioning.md). **Closed 2026-10-27:** README fixed in the same change (R1); gaps filed as W-94–W-100, type-aware research W-101, the experiment W-102.
 
 ## Already done, and where the rest lives
 
