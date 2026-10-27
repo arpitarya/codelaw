@@ -24,6 +24,24 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — W-101 researched and ruled: type-aware TS rules on the project's own TypeScript 7.1  ·  Cowork (Fable 5.1, then Opus 5.5)
+
+- **Asked:** *"W101. research and propose."* Then a voice walk-through (how it works, what is built, decisions, blockers) and *"go ahead and write all these things."*
+- **Done:** research on oxlint/tsgolint, TypeScript 7.1's preview API, typescript-eslint, Biome, tsrs, Pyrefly and ty; [the proposal](proposals/type-aware-rules.md) rewritten with the rulings, cost and sources; W-101 closed and archived; W-104 (records), W-105 (helper, engine, rules), W-106 (version watch), W-107 (oxlint gap filler) filed. Written in the main checkout, not committed: this Cowork shell cannot run lockmaster.
+- **Decided / left open:** R1–R8 ruled (proposal §3). Left for the decider at W-104: confirm L11 counts the project's own TypeScript as no dependency.
+- **Mistakes:** `git rm --cached` staged W-101's deletion in the shared index; reset at once, nothing else staged.
+- **Next:** land these paths through lockmaster; then an agent takes W-104.
+
+## 2026-10-27 — CSpell researched; the spell pack ruled and filed as W-103  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"There is a tool called C-Spell. Research it and tell me if that can be built into CodeLaw. A similar feature, a better feature, would be even better."* Then a voice walk-through of the forks, and *"go ahead"* to write it up.
+- **Done:** SR-SPELL (0116, accepted, built: no); the compare doc `work/compare/spell-checking.compare.md`; L11 §3 rows D-42 SCOWL, D-43 VarCon, D-44 `@cspell/dict-software-terms`, ratified; W-103 filed; B-054, B-055; glossary terms; registry bumps. Written in the main checkout, not committed: this Cowork shell cannot run lockmaster.
+- **Decided / left open:** ruled — codelaw's own checker, not CSpell; the known-typo list generated from SCOWL, not `typos`' list (*"Let's go with B."*); SCOWL and VarCon (*"Approve both."*); software terms (*"Approve it."*); a separate pack (*"want it as a separate package."*); known-typo on once installed, dictionary opt-in, data in the pack (*"Go with the recommendation."*). Agent's call, flagged: `init` never adds the pack (as with the security packs). Open: the data's size and the pass's speed, measured in W-103.
+- **Mistakes:** none.
+- **Next:** land this change through lockmaster (`lockmaster start W-103 --paths …` from the main checkout), then build W-103 step 1.
+
+---
+
 ## 2026-10-27 — W-96 closed: `--format agent` by itself inside a coding agent  ·  Claude Code (Opus 5.5)
 
 - **Asked:** implement and close W-96 — pick `--format agent` when an agent's variable is set; `--format` wins; CI and a person's terminal are not an agent.
