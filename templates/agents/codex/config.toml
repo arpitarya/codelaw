@@ -2,6 +2,12 @@
 command = "{{command}}"
 args = [{{args}}]
 
+[[hooks.PreToolUse]]
+matcher = "apply_patch|Edit|Write"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "{{cmd}} hook --pre --agent codex"
+
 [[hooks.PostToolUse]]
 matcher = "apply_patch|Edit|Write"
 [[hooks.PostToolUse.hooks]]

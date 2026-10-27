@@ -8,8 +8,7 @@
 //! Exit `2` with the findings on stderr is how Claude Code and Codex feed a
 //! `PostToolUse` hook's output back to the agent; `0` lets the edit stand.
 //!
-//! A pre-write mode (W-05's `hook --pre`) would join as a flag here: it
-//! shares the path discovery and differs only in calling `check_snippet`.
+//! `--pre` is the pre-write mode, the Gate (decision 9): `crate::pre`.
 
 use clap::Args;
 use codelaw_core::Language;
@@ -23,6 +22,18 @@ pub struct HookArgs {
     /// The files the agent edited. When none, they are read from the hook
     /// payload the agent writes on stdin (Claude Code, Codex, Copilot).
     pub paths: Vec<PathBuf>,
+    /// Judge the write the payload on stdin proposes, before it reaches
+    /// disk: refuse it when it adds an error. Fails open.
+    #[arg(long, conflicts_with = "paths")]
+    pub pre: bool,
+    /// With `--pre`: the agent whose payload this is and whose answer to
+    /// print; read off the payload when not given.
+    #[arg(long, value_enum, requires = "pre")]
+    pub agent: Option<crate::pre::PreAgent>,
+    /// With `--pre`: allow the write when no verdict comes within this
+    /// many milliseconds.
+    #[arg(long, default_value_t = 5000, value_name = "MS")]
+    pub timeout_ms: u64,
     /// The profile to judge with; `ci` by default, so an agent gets CI's
     /// verdict (SR-CONFIG decision 10).
     #[arg(long)]
@@ -120,6 +131,9 @@ pub fn hook(args: HookArgs) -> ExitCode {
     let mut payload = String::new();
     if args.paths.is_empty() && !std::io::stdin().is_terminal() {
         let _ = std::io::stdin().read_to_string(&mut payload);
+    }
+    if args.pre {
+        return crate::pre::hook_pre(payload, args.agent, args.profile, args.timeout_ms);
     }
     match run(args.paths, Some(&payload), args.profile) {
         Ok(None) => ExitCode::SUCCESS,

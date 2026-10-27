@@ -13,8 +13,11 @@ pub use ci::{check_checkstyle, check_github, check_gitlab, check_junit, fingerpr
 pub use debug::{config_json, config_text, match_json, match_text, timings_json, timings_text, trace_json, trace_text};
 pub use sarif::{SARIF_SCHEMA, check_sarif};
 
+mod brief;
 mod hook;
 mod query;
+
+pub use brief::{Brief, brief, brief_json, brief_text};
 
 pub use hook::{HOOK_FINDINGS, hook_blocks, hook_text};
 

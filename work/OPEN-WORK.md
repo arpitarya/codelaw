@@ -41,9 +41,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (18)
+## Open items (17)
 
-### build (16)
+### build (15)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -61,7 +61,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-62** `agent` SCSS built: Biome formats it, 64 `css/*` rules run on `.scss`, `scss` pack; both grammars patched (D-36): Bootstrap's SCSS 233/236 files clean, from 52; left: CSS rules onto trees, pinned SCSS corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
-🟢 **W-93** `agent` `codelaw hook --pre` (refuse a write that adds an error, for every agent with a pre-write hook, fail-open) and `codelaw brief` (only what is specific to the repo); records first. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
+🟢 **W-93** `agent` `codelaw hook --pre` and `codelaw brief` built (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: three CI `perf` runs on `main` timing `hook_pre`, then its budget to the decider by L8's method. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
 🟢 **W-94** `agent` `codelaw migrate eslint|prettier|biome|ruff|stylelint`: translate a config into `codelaw.toml` with a report; accept `eslint-disable`/`noqa` as ignore aliases. Filed by Arpit (Cowork). [detail](open/W-94-codelaw-migrate.md)
 
@@ -75,8 +75,6 @@ here. Read that record before changing anything below it.
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
-🟡 **W-35** waits on **W-93** `agent` README leads with "your rules, before, while and after the AI writes"; then it drops While's "in design" and restores Before's "handful". Filed by Arpit (Cowork). [detail](open/W-35-before-while-after-positioning.md)
-
 ### testing (1)
 
 🟢 **W-102** `agent` Experiment: does an agent with Fux and the rule docs still break rules? 3 arms × 20 tasks × 3 runs; decides the README's "rules it can't skip" line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
@@ -86,6 +84,5 @@ here. Read that record before changing anything below it.
 ### research (1)
 
 🟢 **W-101** `cowork` Research: type-aware TypeScript rules reopened (B-049) — oxlint's type-aware linting is stable since 2026-07-22; route, cost, a pick. Filed by Arpit (Cowork). [detail](open/W-101-type-aware-ts-research.md)
-
 
 ---

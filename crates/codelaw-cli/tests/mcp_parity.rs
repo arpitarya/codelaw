@@ -142,7 +142,7 @@ fn parity(name: &str, languages: &[&str]) {
     let sources = tree_of(&root);
     let mut mcp = Mcp::start(&root);
     let tools = mcp.request("tools/list", json!({}));
-    assert_eq!(tools["result"]["tools"].as_array().unwrap().len(), 10);
+    assert_eq!(tools["result"]["tools"].as_array().unwrap().len(), 11);
 
     let checked = mcp.call("check_paths", json!({}));
     assert_eq!(checked, cli(&root, &["check", "--format", "json"]), "{name}: check_paths");
@@ -169,6 +169,11 @@ fn parity(name: &str, languages: &[&str]) {
             mcp.call("rules_for_path", json!({ "path": file })),
             cli(&root, &["rules", "--for", file, "--format", "json"]),
             "{name}: rules_for_path {file}"
+        );
+        assert_eq!(
+            mcp.call("brief_for_task", json!({ "paths": [file] })),
+            cli(&root, &["brief", "--for", file, "--format", "json"]),
+            "{name}: brief_for_task {file}"
         );
         assert_eq!(mcp.call("check_paths", json!({ "paths": [file] })), cli(&root, &["check", file, "--format", "json"]), "{name}: check_paths {file}");
         assert_eq!(

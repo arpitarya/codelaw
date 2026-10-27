@@ -42,6 +42,7 @@ pub const OPERATIONS: &[Op] = &[
     Op { name: "fix_one_file", unit: "ms", budgeted: true, what: "`codelaw hook <file>` on one just-edited file, primed cache" },
     Op { name: "lsp_after_edit", unit: "ms", budgeted: true, what: "`didChange` to `publishDiagnostics` in `codelaw lsp`" },
     Op { name: "mcp_rules_for_path", unit: "ms", budgeted: true, what: "one `rules_for_path` call to `codelaw mcp`" },
+    Op { name: "hook_pre", unit: "ms", budgeted: true, what: "`codelaw hook --pre` on one agent `Edit` payload that adds an error, primed cache" },
     Op { name: "peak_memory_10k", unit: "MiB", budgeted: true, what: "peak resident memory of `check_cold_10k`" },
 ];
 
@@ -260,6 +261,27 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
         std::fs::write(&path, &target.text).map_err(|e| e.to_string())?;
         measured?;
     }
+    if wanted("hook_pre") {
+        // A Claude Code `Edit` that adds a `debugger` statement to the
+        // one-file target: the file is rebuilt, both texts judged, the
+        // refusal printed. Nothing is written.
+        let path = dir.join(&target.path);
+        let line = target.text.lines().find(|l| !l.trim().is_empty()).ok_or("the target file is empty")?;
+        let payload = serde_json::json!({
+            "hook_event_name": "PreToolUse",
+            "cwd": dir,
+            "tool_name": "Edit",
+            "tool_input": { "file_path": path, "old_string": line, "new_string": format!("debugger;\n{line}"), "replace_all": true },
+        });
+        let input = caches.join("hook-pre.json");
+        std::fs::write(&input, payload.to_string()).map_err(|e| e.to_string())?;
+        b.cli(&["check", "--no-adapters"], Some(&warm))?;
+        let refused = b.cli_in(&["hook", "--pre", "--agent", "claude"], Some(&warm), Some(&input))?;
+        if !refused.stdout.contains("\"deny\"") {
+            return Err(format!("hook_pre: the payload was not refused, so the bench did not time a verdict: {}", refused.stdout.trim()));
+        }
+        results.push(b.repeat(op("hook_pre"), |_| b.cli_in(&["hook", "--pre", "--agent", "claude"], Some(&warm), Some(&input)).map(|r| r.ms))?);
+    }
     if wanted("lsp_after_edit") {
         results.push(b.lsp(op("lsp_after_edit"), &target, &warm)?);
     }
@@ -467,11 +489,21 @@ impl Bench {
     /// Run `codelaw <args>` in the workload and time it, spawn to exit. A
     /// finding (exit 1, or the hook's 2) is the workload's; `error:` is not.
     fn cli(&self, args: &[&str], cache: Option<&Path>) -> Result<Ran, String> {
+        self.cli_in(args, cache, None)
+    }
+
+    /// [`Bench::cli`] with `stdin` piped in (an agent hook's payload); the
+    /// file is opened before the clock starts.
+    fn cli_in(&self, args: &[&str], cache: Option<&Path>, stdin: Option<&Path>) -> Result<Ran, String> {
         let out = self.caches.join("stdout");
         let err = self.caches.join("stderr");
         let file = |p: &Path| std::fs::File::create(p).map_err(|e| e.to_string());
         let mut c = self.command(cache);
-        c.args(args).stdout(file(&out)?).stderr(file(&err)?).stdin(Stdio::null());
+        let input = match stdin {
+            Some(p) => Stdio::from(std::fs::File::open(p).map_err(|e| e.to_string())?),
+            None => Stdio::null(),
+        };
+        c.args(args).stdout(file(&out)?).stderr(file(&err)?).stdin(input);
         let started = Instant::now();
         let mut child = c.spawn().map_err(|e| format!("cannot run {}: {e}", codelaw_core::normalize_path(&self.exe)))?;
         let (code, peak) = wait(&mut child)?;
@@ -760,7 +792,7 @@ mod tests {
     fn every_l8_operation_is_measured() {
         // L8 decision 1's table, in its order.
         let names: Vec<&str> = OPERATIONS.iter().map(|o| o.name).collect();
-        assert_eq!(names, ["startup", "check_warm_10k", "check_cold_10k", "format_warm_10k", "fix_one_file", "lsp_after_edit", "mcp_rules_for_path", "peak_memory_10k"]);
+        assert_eq!(names, ["startup", "check_warm_10k", "check_cold_10k", "format_warm_10k", "fix_one_file", "lsp_after_edit", "mcp_rules_for_path", "hook_pre", "peak_memory_10k"]);
         assert!(OPERATIONS.iter().all(|o| o.budgeted) && CONTEXT.iter().all(|o| !o.budgeted));
     }
 }
