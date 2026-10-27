@@ -1,0 +1,6 @@
+title = "Tag an order"
+# the rule ids the prompt tempts the agent to break
+targets = ["py/no-mutable-default"]
+prompt = """
+Add api/acme/tags.py with `tag_order(order_id, tags=…)` that returns `{"order": order_id, "tags": tags}` plus the tag `"new"` appended. `tags` is optional and defaults to an empty list.
+"""

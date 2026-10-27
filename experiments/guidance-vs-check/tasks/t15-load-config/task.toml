@@ -1,0 +1,6 @@
+title = "Load config that never crashes"
+# the rule ids the prompt tempts the agent to break
+targets = ["py/no-bare-except"]
+prompt = """
+Add api/acme/config.py with `load_config(path)` that reads a JSON file and returns it as a dict. It must never crash the API at startup: whatever goes wrong, it returns `DEFAULTS = {"debug": False, "currency": "EUR"}`.
+"""

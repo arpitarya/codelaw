@@ -1,0 +1,6 @@
+title = "Stamp when an order was updated"
+# the rule ids the prompt tempts the agent to break
+targets = ["acme/no-datetime-now"]
+prompt = """
+In api/acme/orders.py, give `Order` an `updated_at` attribute and a `touch()` method that sets it to the current UTC time; call `touch()` at the end of `__init__`.
+"""

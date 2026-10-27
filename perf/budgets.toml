@@ -85,11 +85,8 @@ measured_p95 = 43.0
 
 [operation.hook_pre]
 unit = "ms"
-budget = "unset" # added 2026-10-27 (W-93). Not yet measured on the reference machine; decision 4's method needs three perf runs on main.
-# First numbers, a LOADED developer Mac (load average 16-20, other agents compiling), 3 sessions: p95 70.3 / 51.9 / 79.3 ms;
-# worst 79.3 x 1.5 = 118.95 > target 100 ms warm, so on these numbers the guard would hold it back, as it did fix_one_file
-# (whose p95s in the same sessions were 138.1 / 86.6 / 104.8 ms).
-proposed = 100 # the design target (SR-LAW-8 decision 1's hook_pre row); headroom 1.26 x the worst local p95 — awaiting the decider and the CI runs
+budget = "unset" # HELD BACK by the guard: p95 62.4 / 78.3 / 86.2; worst 86.2 x 1.5 = 129.3 > target 100 ms warm — in the inbox for the decider (W-93, 2026-10-27)
+proposed = 100 # the design target (SR-LAW-8 decision 1's hook_pre row, SR-AGENT-SURFACES decision 9); headroom 1.16 x the worst p95
 
 [operation.peak_memory_10k]
 unit = "MiB"

@@ -38,6 +38,10 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Side-by-side bench — ratify these 5 tools for CI-only bench use** ([W-99](open/W-99-side-by-side-bench.md); [L11](../records/0013_LAW-11-dependencies.md) §3). Installed only by `scripts/bench-rivals.py install` inside `.github/workflows/bench-rivals.yml` (weekly and by hand, a throwaway folder on `ubuntu-24.04`); never in the engine, a package, a test or `ci.yml`. **D-37 ESLint** `eslint@10.13.0` + `@eslint/js@10.0.1` — MIT, 78 packages (54 MIT, 12 Apache-2.0, 6 BSD-2-Clause, 4 ISC, 1 BSD-3-Clause, 1 **BlueOak-1.0.0** = `minimatch`, OSI-approved permissive but not one of L2's named examples) · **D-38 Prettier** `prettier@3.9.10` — MIT, no dependencies · **D-39 Biome** `@biomejs/biome@2.6.3` — MIT OR Apache-2.0, + one platform binary · **D-40 oxlint** `oxlint@1.89.0` — MIT, + one platform binary · **D-41 Ruff** `ruff==0.17.3` — MIT, one wheel, no dependencies. Say **"ratify D-37 to D-41"**, or name the ones to strike. | 2026-10-27 |
 | ↳ **blocks:** W-99 itself (the first real run and step 3, the README's speed claim); W-100's source-tool agreement | |
+| 🔴 **`hook_pre`'s budget — the guard held it back** ([W-93](open/W-93-hook-pre-and-brief.md); [SR-LAW-8](../records/0010_LAW-8-performance-budgets.md) decision 4). Three `perf` runs on `main` (`ubuntu-24.04`): p95 **62.4 / 78.3 / 86.2 ms**; worst 86.2 × 1.5 = **129.3 > the 100 ms target**, so the method leaves it unset and asks you. Say **"leave it unset"** (as you ruled for `fix_one_file`, 2026-10-25), or **"set 100 ms"** (1.16 × headroom over the worst run). | 2026-10-27 | 0 d |
+| ↳ **blocks:** W-93 itself | |
+| 🔴 **Guidance-vs-check experiment — approve running it** ([W-102](open/W-102-guidance-vs-check-experiment.md)). 180 Claude Code sessions (arms A, B, C × 20 tasks × 3 runs) of `claude-opus-5-5`; estimate per session ~250k–450k input tokens (mostly cache reads), ~30k–50k cache writes, ~6k–9k output → **~$86 in all (range ~$45–$170)**, 9–18 hours one at a time; disk a few MB. **1. Name the agent CLI** — proposed: Claude Code 2.1, `claude -p … --setting-sources project --strict-mcp-config` (`experiment.toml` `[agent.claude]`; `--bare` instead if you run on `ANTHROPIC_API_KEY`). **2. Allow `fux` (D-34) in arm C outside CI** — its ratified scope is the CI build of the index packages. **3. Run it** from the main checkout: `python3 experiments/guidance-vs-check/harness.py run --agent claude --out experiments/guidance-vs-check/runs/2026-10-w102` (the same command resumes; `harness.py plan` reprints the estimate; `--arms A,B,C,D` adds the optional check arm, 60 sessions, ~$22). Say **"approve running it"** (and which CLI), or name a cheaper model or fewer runs. | 2026-10-27 |
+| ↳ **blocks:** W-102 itself (the runs, the write-up, step 4's README line); W-35's line on it | |
 
 ---
 
@@ -61,7 +65,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-62** `agent` SCSS built: Biome formats it, 64 `css/*` rules run on `.scss`, `scss` pack; both grammars patched (D-36), Bootstrap's SCSS clean and in the pinned corpus; left: CSS rules onto trees, `&` in no-descending-specificity. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
-🟢 **W-93** `agent` `codelaw hook --pre` and `codelaw brief` built (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: three CI `perf` runs on `main` timing `hook_pre`, then its budget to the decider by L8's method. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
+🔴 **W-93** `arpit` `codelaw hook --pre` and `codelaw brief` built and landed (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: the decider rules `hook_pre`'s budget (inbox), then close. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
 🟢 **W-103** `agent` Spell pack (`@codelaw/rules-spell` / `codelaw-rules-spell`): known-typo check on (auto-fix), dictionary opt-in; own word data from SCOWL, VarCon, software terms (D-42–D-44). SR-SPELL written; build, then measure. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
@@ -83,7 +87,7 @@ here. Read that record before changing anything below it.
 
 ### testing (1)
 
-🟢 **W-102** `agent` Experiment: does an agent with Fux and the rule docs still break rules? 3 arms × 20 tasks × 3 runs; decides the README's "rules it can't skip" line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
+🔴 **W-102** `arpit` Experiment built in `experiments/guidance-vs-check/` (20 tasks, arms A–C, scorer, table; fake-agent dry run 180/180; arm D on `hook --pre`); left: Arpit approves ~$86 of runs and the agent CLI (inbox), then the runs and the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
 ### record update (1)
 

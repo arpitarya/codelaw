@@ -1,0 +1,34 @@
+# The experiment's consumer repo (W-102): the two recommended presets, three
+# custom rules in .codelaw/rules/acme/ and two configured `use-instead` rules.
+preview = true
+extends = ["codelaw:js/recommended", "codelaw:py/recommended"]
+
+[rules]
+"js/no-console" = "error"
+"acme/no-datetime-now" = "error"
+"acme/no-inline-style" = "error"
+"acme/no-sql-fstring" = "error"
+
+[rules."js/use-instead"]
+severity = "error"
+
+[rules."js/use-instead".options.replacements]
+"fetch" = { use = "apiFetch", from = "./lib/http", allow_in = [
+  "web/src/lib/http.ts",
+] }
+
+[rules."py/use-instead"]
+severity = "error"
+
+[rules."py/use-instead".options.replacements]
+"requests.get" = { use = "http_get", from = "acme.http", allow_in = [
+  "api/acme/http.py",
+] }
+"requests.post" = { use = "http_post", from = "acme.http", allow_in = [
+  "api/acme/http.py",
+] }
+
+# The clock is the one place that reads the time.
+[scope.clock]
+files = ["api/acme/clock.py"]
+rules = { "acme/no-datetime-now" = "off" }

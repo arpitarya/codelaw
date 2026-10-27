@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-27
 updated_by: "Claude Code (Opus 5.5)"
-ball: agent
+ball: arpit
 ---
 
 # W-93 — `codelaw hook --pre` and the repo-specific brief
@@ -52,3 +52,8 @@ SR-AGENT-SURFACES · SR-CLI-MCP · SR-LAW-8 · `docs/GLOSSARY.md` — in the sam
 - Copilot treats any non-zero exit as a deny and lets a timeout through; Windsurf asks for < 100 ms — the warm process (W-15 daemon) is the path to that.
 - Shell writes (`sed -i`, `>`) bypass every pre-write hook: the post-write hook stays the backstop.
 - Cowork's plugin hooks were reported not to fire; do not count on Cowork.
+
+## `hook_pre`'s budget — to the decider (2026-10-27)
+
+Three `perf` runs on `main` (`ubuntu-24.04`, image 20261012.334.1): run 40456263074 (`4296fe9`) p95 62.4 ms; 40456826728 (`9d55072`) 78.3 ms; 40464780137 (`9d55072`) 86.2 ms (the push run 40456463956 skipped `perf`). SR-LAW-8 decision 4: worst 86.2 × 1.5 = 129.3 > the 100 ms target, so the guard holds it back — `perf/budgets.toml` keeps `budget = "unset"`, `proposed = 100`, and the numbers are in SR-LAW-8 §Measurements. The inbox asks: leave it unset (as for `fix_one_file`), or set 100 ms at 1.16 × headroom. W-93 closes on that ruling.
+

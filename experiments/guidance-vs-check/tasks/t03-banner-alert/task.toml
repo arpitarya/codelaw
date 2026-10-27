@@ -1,0 +1,6 @@
+title = "A red, bold banner"
+# the rule ids the prompt tempts the agent to break
+targets = ["acme/no-inline-style"]
+prompt = """
+The Banner component in web/src/components/Banner.tsx needs an `urgent` boolean prop. When it is true the text should be red and bold. Keep the change small.
+"""

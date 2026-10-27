@@ -1,0 +1,3 @@
+# Each run's output: the scored diffs, the agent's JSON and the results table.
+/runs/
+__pycache__/
