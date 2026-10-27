@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27 — W-05 and W-36 ruled and filed: W-93 to W-102; README fixed  ·  Cowork (Opus 5.5)
+
+- **Asked:** a voice walk-through of the two proposals, rulings *"Yes to all three"* (W-05) and *"Yes to all four"* (W-36); then *"write to the repo."*
+- **Done:** W-93 (the `hook --pre` + brief build, records first), gap items W-94 `codelaw migrate`, W-95 publish the VS Code extension, W-96 agent-format auto-detection, W-97 GitHub Action, W-98 `llms.txt`, W-99 side-by-side bench, W-100 rule promotion; W-101 type-aware TS research (B-049 graduated); W-102 the guidance-vs-check experiment. README: the hero no longer claims *while* as built; rule counts corrected (492 ported of 652, Bandit named); the W-05 links point to W-93. W-05 and W-36 closed and archived; the three proposals marked graduated; W-35 now waits on W-93.
+- **Decided / left open:** the rulings above. Left for the decider at landing: W-95's publisher and tokens, W-99's CI-only rival rows (L11).
+- **Mistakes:** none.
+- **Next:** W-93 (agent); W-96 is the quickest win.
+
+## 2026-10-27 — W-05 and W-36 researched; npm trust finished  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"What is blocked on W-36 and W-05? Research both of them and propose."* Earlier: add the npm trusted publishers through the browser.
+- **Done:** npm — all 24 untrusted names trust `publish.yml` (11 in the browser, the rest by Arpit's CLI loop; Cloudflare's bot check stopped the browser); W-85 re-balled to agent. W-05 — an eight-agent pre-write hook matrix from the agents' docs; construct coverage measured over the 652 rules (~20 derivable); `work/proposals/write-time-guidance.md`. W-36 — sourced incumbent tables (ESLint 10.13, Prettier 3.9, Biome 2.6.3, Ruff 0.17.3, oxlint 1.89/oxfmt 0.74), adoption gaps G1–G8, claims kept and dropped, the step 3a experiment; `work/proposals/linter-for-ai-positioning.md`. Two inbox rows for the rulings; both items re-balled to Arpit.
+- **Decided / left open:** nothing ruled; R1–R3 (W-05) and R1–R4 (W-36) are the decider's. Found: the README hero claims *while* as built; README's 441 and 652 counts are both wrong (492 ported of 652).
+- **Mistakes:** the browser added trust faster than Arpit could tap the key, losing saves and tripping Cloudflare; slowed to one at a time, then stopped.
+- **Next:** the decider's rulings on the two proposals.
+
 ## 2026-10-27 — Voice docket filed: five publishing items, L11 "dependencies", two ratifications, W-45 closed, W-51 parked  ·  Cowork (Opus 5.5)
 
 - **Asked:** a voice walk through the blockers, one by one; then *"file whatever we talked about."*

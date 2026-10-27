@@ -52,7 +52,6 @@ it, and do not read it top-down as a priority order.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-049 | type-aware rules (typescript-eslint's `*-type-checked` set) and TypeScript's own errors with its fixes, answered by a typescript-go helper; needs L3 and L6 amended. Parked by the decider, 2026-10-25: *"For now, put type aware rules and details in backlog"* | [proposal](proposals/type-aware-rules.md) | the decider reopens it, or TypeScript 7.1 ships its programmatic API |
 | B-051 | `deps refresh` and `data/outdated-dependency` do not read `requirements*.txt`: it is not one of L3's nine languages, so no rule can report on its lines | [L3](../records/0005_LAW-3-languages.md) · `archive/open/W-52-dependency-latest-versions.md` §As built | the decider amends L3, or rules that refresh reads it with findings elsewhere |
 
 ---
