@@ -26,14 +26,14 @@ pub struct InitArgs {
     /// Install git hooks: `pre-commit` (blocks) and `post-commit` (reminds, never blocks); both when none is named. In a repo codelaw already configures, it installs only the hooks (SR-CLI-MCP decision 7).
     #[arg(long, value_delimiter = ',', num_args = 0.., value_name = "HOOKS")]
     git_hooks: Option<Vec<String>>,
-    /// Write a scheduled CI workflow: `github` or `gitlab`; needs `--autofix`. In a repo codelaw already configures, it writes only the workflow (SR-CLI-MCP decision 12).
-    #[arg(long, value_name = "PROVIDER", requires = "autofix")]
+    /// Write a CI workflow. `github` alone: the check workflow, which runs codelaw's GitHub Action at this version (SR-CLI-MCP decision 12a). With `--autofix` (`github` or `gitlab`): the scheduled auto-fix workflow (decision 12). In a repo codelaw already configures, it writes only the workflow.
+    #[arg(long, value_name = "PROVIDER")]
     ci: Option<String>,
     /// How often the CI workflow runs the safe fixes, the formatter and `baseline prune`, and keeps one PR open: `daily` or `weekly`.
     #[arg(long, value_name = "WHEN", requires = "ci")]
     autofix: Option<String>,
-    /// With `--ci`: also apply `suggest` fixes, on a second branch and PR.
-    #[arg(long = "unsafe", requires = "ci")]
+    /// With `--autofix`: also apply `suggest` fixes, on a second branch and PR.
+    #[arg(long = "unsafe", requires = "autofix")]
     unsafe_fixes: bool,
 }
 
@@ -223,13 +223,20 @@ pub fn init(args: InitArgs) -> ExitCode {
         Ok(h) => h,
         Err(e) => return fail(e),
     };
+    // `Some((provider, None))` is the check workflow; with a schedule, the auto-fix one.
     let ci = match (args.ci.as_deref(), args.autofix.as_deref()) {
-        (Some(p), Some(w)) => match (crate::ci::parse_provider(p), crate::ci::parse_schedule(w)) {
+        (Some(p), w) => match (crate::ci::parse_provider(p), w.map(crate::ci::parse_schedule).transpose()) {
             (Ok(p), Ok(w)) => Some((p, w)),
             (Err(e), _) | (_, Err(e)) => return fail(e),
         },
         _ => None,
     };
+    // Refused before anything is written: there is no GitLab check workflow.
+    if let Some((p, None)) = ci
+        && let Err(e) = crate::ci::check_workflow(p, codelaw_core::VERSION)
+    {
+        return fail(e);
+    }
     let forced = match args.registry.as_deref() {
         None => None,
         Some("npm") => Some(Registry::Npm),
@@ -244,7 +251,11 @@ pub fn init(args: InitArgs) -> ExitCode {
     if let Ok(Some(existing)) = codelaw_config::load_file(&root, &mut warnings) {
         if hooks.is_some() || ci.is_some() {
             if let Some((p, w)) = ci {
-                match crate::ci::install(&root, p, w, args.unsafe_fixes) {
+                let written = match w {
+                    Some(w) => crate::ci::install(&root, p, w, args.unsafe_fixes),
+                    None => crate::ci::install_check(&root, p),
+                };
+                match written {
                     Ok(lines) => lines.iter().for_each(|l| println!("{l}")),
                     Err(e) => return fail(e),
                 }
@@ -419,7 +430,11 @@ pub fn init(args: InitArgs) -> ExitCode {
         }
     }
     if let Some((p, w)) = ci {
-        match crate::ci::install(&root, p, w, args.unsafe_fixes) {
+        let written = match w {
+            Some(w) => crate::ci::install(&root, p, w, args.unsafe_fixes),
+            None => crate::ci::install_check(&root, p),
+        };
+        match written {
             Ok(lines) => lines.iter().for_each(|l| println!("{l}")),
             Err(e) => return fail(e),
         }

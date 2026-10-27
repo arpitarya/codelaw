@@ -22,6 +22,8 @@ owns:
   - scripts/law-gate.py
   - scripts/withdraw.sh
   - scripts/npm-trust.sh
+  - action.yml
+  - fixtures/github-action
   - fixtures/skills-consumer
   - .github/workflows
   - RELEASING.md
@@ -195,6 +197,12 @@ The decider asked for a record of what goes into which package, under the naming
     - **A segment is built from `packs/<name>/rules/`** in a scratch repository whose root is the pack's (`fux setup`, `fux ingest --no-fetch`, `fux pack`), so a rule's id is `file:rules/<path>`, a path inside the installed pack and the one Fux reads in place. It is **built twice, in two fresh folders, and the build fails if the two differ.**
     - **Packed with `package.py`'s own builders** (`pack_tarball`, `wheel_for_pack`, which take the `-fux-index` suffix): an npm package holds the segment at its root, a wheel holds it as the import package `codelaw_rules_<name>_fux_index` (no `__init__.py`), each with `LICENSE` and a `README.md`. The manifest's `content` names the pack on the registries it is on.
     - **Output is `dist/fux-index/{npm,pypi,SHA256SUMS}`, never `dist/npm` or `dist/pypi`:** `publish.yml` uploads those two folders whole and its npm preflight demands a trusted publisher for every tarball, so an index package that is not reserved yet would stop the release. `package.py check` does not know them; `scripts/fux-index.py check dist` refuses a wrong name, version or dependency, a manifest that disagrees with its shards or with the pack it indexes, differing npm and PyPI copies, and one in the release set. `ci.yml`'s `package` job runs both and uploads `fux-index/` as its own artifact; `publish.yml` does not touch it until the decider reserves the names (`RELEASING.md`).
+15. **The GitHub Action, `action.yml` at the repository root** (W-97, 2026-10-27; the decider, *"Yes to all four"* on W-36's gap G3). `uses: arpitarya/codelaw@v<version>` is a composite action and a distribution surface, not a package: it installs `codelaw` at an exact version — npm (`npm install --global codelaw@<v>`) or PyPI (`pip install codelaw==<v>` into a venv of its own) — runs `codelaw check --format github`, and with `sarif: true` runs `--format sarif` and uploads it through GitHub's code-scanning REST API (`gh api POST repos/<repo>/code-scanning/sarifs`, gzipped and base64-encoded).
+    - **The release tags are its contract.** Its `version` input defaults to the version of the tag it is used at: `scripts/version.py` writes that default line at every `--set` and `--check` fails when it disagrees, so the tag `v<x>` installs codelaw `<x>`. None moves: a moving major tag (`v0`) is the decider's call (W-97).
+    - **It uses no other action** ([L11](0013_LAW-11-dependencies.md)): the install is npm or pip, the upload is the REST API with `gh`, so `github/codeql-action/upload-sarif`, which L11's list does not hold, is not needed. `crates/codelaw-cli/tests/ci_action.rs` refuses a `uses:` in it.
+    - **Paths:** `working-directory` is the project folder; the Action rewrites each annotation's `file=` and each SARIF `artifactLocation.uri` from that folder to the repository root, which is where GitHub places them. On a pull request it passes the base commit as `--changed-since`, fetching it when the checkout is too shallow for a merge base. Rule packs come from the consumer's own dependencies, installed in a step before it.
+    - **Proven in CI:** `ci.yml`'s `action` job runs it (`uses: ./`) on `fixtures/github-action`, installed from that run's linux wheel, and asserts exit `1` and one SARIF result at `fixtures/github-action/src/app.js`. `init --ci github` writes a workflow that uses it ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 12a).
+    - **Not yet:** the GitHub Marketplace listing (the decider accepts the Marketplace Developer Agreement and ticks *Publish this Action to the GitHub Marketplace* on a release) and a run in a throwaway repository against a released tag, which waits on the first release with `--format github`.
 
 ### Consequences
 

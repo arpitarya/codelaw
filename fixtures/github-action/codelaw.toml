@@ -1,0 +1,4 @@
+extends = []
+
+[rules]
+"fixture/no-debugger" = "error"

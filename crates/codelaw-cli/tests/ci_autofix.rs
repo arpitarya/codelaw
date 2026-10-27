@@ -81,5 +81,6 @@ fn refuses_a_file_that_is_not_ours_and_bad_values() {
     assert_eq!(fs::read_to_string(d.join(".github/workflows/codelaw-autofix.yml")).unwrap(), "name: mine\n");
     assert_eq!(init(&d, &["--ci", "bitbucket", "--autofix", "weekly"]).0, 2);
     assert_eq!(init(&d, &["--ci", "github", "--autofix", "hourly"]).0, 2);
-    assert_eq!(init(&d, &["--ci", "github"]).0, 2, "--ci needs --autofix");
+    assert_eq!(init(&d, &["--ci", "gitlab"]).0, 2, "GitLab has no check workflow: --ci gitlab needs --autofix");
+    assert_eq!(init(&d, &["--ci", "github", "--unsafe"]).0, 2, "--unsafe needs --autofix");
 }

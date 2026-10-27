@@ -5,8 +5,9 @@ The version lives in ONE file: `Cargo.toml` [workspace.package] `version`.
 Every npm and PyPI manifest — the skills package's and its `codelaw-skills.json`
 included (W-77) — is generated from it by `scripts/package.py`; the
 only other copies are the `packs/*/codelaw-pack.toml` files and the editor
-extension's `packaging/vscode/package.json` and `package-lock.json`, which this
-script writes and checks (W-27).
+extension's `packaging/vscode/package.json` and `package-lock.json`, and the
+GitHub Action's default `version` in `action.yml` (W-97: the release tag is the
+Action's contract), which this script writes and checks (W-27).
 
     python3 scripts/version.py                     print the version
     python3 scripts/version.py --set 0.2.0         write it everywhere
@@ -41,6 +42,11 @@ VSCODE_COPIES = [
     (VSCODE / "package.json", re.compile(r'(?m)(^  "version": ")([^"]+)(")')),
     (VSCODE / "package-lock.json", re.compile(r'(?m)(^  "version": ")([^"]+)(")')),
     (VSCODE / "package-lock.json", re.compile(r'(\n    "": \{\n      "name": "[^"]+",\n      "version": ")([^"]+)(")')),
+]
+# The GitHub Action (SR-PACKAGES decision 15, W-97): `uses: arpitarya/codelaw@v<v>`
+# installs codelaw <v> because its `version` input defaults to the tag's version.
+ACTION_COPIES = [
+    (ROOT / "action.yml", re.compile(r"(?m)(^    default: ')([^']+)(' # scripts/version\.py writes this line$)")),
 ]
 
 
@@ -89,12 +95,12 @@ def set_version(v):
     for c in workspace_crates():
         lock = re.sub(r'(\[\[package\]\]\nname = "' + re.escape(c) + r'"\nversion = ")[^"]+(")', lambda m: m.group(1) + v + m.group(2), lock)
     LOCK.write_text(lock, encoding="utf-8")
-    for p, pat in VSCODE_COPIES:
+    for p, pat in VSCODE_COPIES + ACTION_COPIES:
         t = p.read_text(encoding="utf-8")
         if not pat.search(t):
             fail(f"{p.relative_to(ROOT)} has no version line where version.py looks")
         p.write_text(pat.sub(lambda m: m.group(1) + v + m.group(3), t, count=1), encoding="utf-8")
-    print(f"✔ version {v}: Cargo.toml, Cargo.lock, {len(PACKS)} pack manifests and the editor extension")
+    print(f"✔ version {v}: Cargo.toml, Cargo.lock, {len(PACKS)} pack manifests, the editor extension and the GitHub Action")
 
 
 def check(tag=None, binary=None):
@@ -113,7 +119,7 @@ def check(tag=None, binary=None):
             bad.append(f"{p.relative_to(ROOT)}: no min_codelaw")
         elif key(mn.group(1)) > key(v):
             bad.append(f"{p.relative_to(ROOT)}: min_codelaw {mn.group(1)} is newer than the engine {v}")
-    for p, pat in VSCODE_COPIES:
+    for p, pat in VSCODE_COPIES + ACTION_COPIES:
         m = pat.search(p.read_text(encoding="utf-8"))
         got = m.group(2) if m else None
         if got != v:
@@ -129,7 +135,7 @@ def check(tag=None, binary=None):
             bad.append(f"{binary} --version says `{out}`, not `codelaw {v}`")
     if bad:
         fail("the version copies disagree:\n  " + "\n  ".join(bad))
-    print(f"✔ version {v}: Cargo.toml, Cargo.lock, {len(PACKS)} packs, the editor extension" + (", the tag" if tag else "") + (", the binary" if binary else ""))
+    print(f"✔ version {v}: Cargo.toml, Cargo.lock, {len(PACKS)} packs, the editor extension, the GitHub Action" + (", the tag" if tag else "") + (", the binary" if binary else ""))
 
 
 def main():
