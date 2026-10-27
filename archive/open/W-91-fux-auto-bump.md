@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-27
 updated_by: "Claude Code (Opus 5.5)"
-ball: agent
+ball: done
 ---
 
 # W-91 — fux-engine at its latest, every commit still pinned
@@ -17,8 +17,8 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | A scheduled workflow (daily) asks PyPI for `fux-engine`'s latest version and compares it with `FUX_VERSION` in `scripts/fux-index.py` | a new fux is noticed within a day | ✅ 2026-10-27 — `.github/workflows/fux-bump.yml`, `fux-index.py latest` |
-| 2 | On a newer one: bump `FUX_VERSION`, re-run `fux-index.py assemble` + `check`, commit on `deps/fux-<v>`, open or update one PR | the bump arrives as a reviewable change | 🔧 built and rehearsed locally; the Actions setting is on (Arpit, 2026-10-27 08:44 IST); the live PR is next |
-| 3 | The PR's CI builds the indexes with the new fux and checks their digests reproduce | a bump that breaks the index is red, not merged | 🔧 the job dispatches `ci.yml` on the branch; unproven until a live PR |
+| 2 | On a newer one: bump `FUX_VERSION`, re-run `fux-index.py assemble` + `check`, commit on `deps/fux-<v>`, open or update one PR | the bump arrives as a reviewable change | ✅ 2026-10-27 live — run 40443728233 (`-f version=5.1.0`) opened PR #4 on `deps/fux-5.1.0`; run 40443835498 the same: *"already holds this tree — not pushed"*, still one PR |
+| 3 | The PR's CI builds the indexes with the new fux and checks their digests reproduce | a bump that breaks the index is red, not merged | ✅ 2026-10-27 — `ci.yml` dispatched on the branch: run 40443784185 on `eaedb2c`, 27/27 green; PR #4 then closed with its branch (5.1.0 is older than the pin; it existed only to prove the job) |
 | 4 | D-34's row says "unversioned; each commit pins `FUX_VERSION`, bumped by this job" | the record matches | ✅ 2026-10-27 (L11's list, D-34; W-90 moved it from the old root file) |
 
 **Arpit, 2026-10-27 (voice docket):** *"For Fux, what I want is whenever there is a latest version available, we should be using that."* On the trade-off (CI grabbing "latest" would break W-34's reproducible digest): *"Go with the recommendation."* — ratify fux-engine with no fixed version; pin per commit; a scheduled job bumps the pin and opens a PR.
@@ -34,12 +34,7 @@ ball: agent
 
 ## Left
 
-1. **The decider:** turn the setting on (the inbox row has the click path and the one `gh api` command).
-2. **Then an agent proves DoD 2 and 3 live:** `gh workflow run fux-bump.yml -R arpitarya/codelaw -f version=5.1.0` (a real older release, so the build passes) opens one PR and dispatches ci.yml on `deps/fux-5.1.0`; the same command again must update that PR (`updated #n` in the run summary) and open none; check the ci.yml run on the branch is green; then close the PR with `--delete-branch` and close this item.
-
-- The job runs on a schedule and by hand (`workflow_dispatch`); with no new fux it changes nothing and is green.
-- A run against a faked newer version opens one PR; a second run updates that PR rather than opening another.
-- The PR's own CI runs (a PR opened with `GITHUB_TOKEN` triggers no workflows — use a token or `workflow_dispatch` on the branch, and say which).
+Nothing. Closed 2026-10-27: a plain dispatch (run 40443668613) said *"fux-engine 5.1.1 (PyPI), pinned 5.1.1: nothing to do"*; the live PR test is steps 2–3 above.
 
 ## Record affected
 

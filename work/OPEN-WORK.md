@@ -33,9 +33,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (20)
+## Open items (19)
 
-### build (18)
+### build (17)
 
 🔴 **W-86** `arpit` PyPI day 1 (Wed 10-28): upload `codelaw-rules-{html,js,python,react}` 0.2.0, add their trusted publishers, then `gh release create v0.2.0` brings `codelaw` itself. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -46,8 +46,6 @@ here. Read that record before changing anything below it.
 🔴 **W-89** `arpit` PyPI day 4 (Sat 10-31): `codelaw-rules-security-{js,html,python}` 0.2.0, then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-89-pypi-day-4.md)
 
 🟢 **W-62** `agent` SCSS built: L3/L6 amended, Biome formats it, 64 `css/*` rules run on `.scss`, new `scss` pack; `tree-sitter-cli` 0.25.10 ratified (D-36, 2026-10-27); left: grammar patches, CSS rules onto trees, corpus. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
-
-🟢 **W-91** `agent` fux-engine at its latest: `fux-bump.yml` (daily) bumps `FUX_VERSION`, builds, checks and opens or updates one PR, dispatching `ci.yml` on it; the Actions PR setting is on (2026-10-27); left: a live PR and its re-run. Filed by Arpit (Cowork). [detail](open/W-91-fux-auto-bump.md)
 
 🟢 **W-93** `agent` `codelaw hook --pre` (refuse a write that adds an error, for every agent with a pre-write hook, fail-open) and `codelaw brief` (only what is specific to the repo); records first. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
