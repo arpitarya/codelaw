@@ -6,8 +6,8 @@ item: W-104
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5)"
+ball: closed
 ---
 
 # W-104 — Records for type-aware rules
@@ -38,7 +38,7 @@ ball: agent
 ## Left
 
 1. ✅ The decider answered the L11 row (2026-10-27); his words are in SR-TYPES decision 5 and Consequences, and D-45 is in L11 §3 (2026-10-28).
-2. Close: the outcome into `work/IMPLEMENTATION.md`, this file to `archive/open/`, the successor line in `archive/README.md`; then W-105 is 🟢.
+2. ✅ Closed 2026-10-28 (Claude Code): checked SR-TYPES decision 5 and Consequences carry the ruling and D-45 is in L11 §3; the outcome in `work/IMPLEMENTATION.md`, this file in `archive/open/`, the successor line in `archive/README.md`; W-105 is 🟢.
 
 ## Record affected
 

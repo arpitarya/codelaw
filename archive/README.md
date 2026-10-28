@@ -28,6 +28,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-104-type-aware-records.md`](open/W-104-type-aware-records.md) | 2026-10-28 | [SR-TYPES](../records/0117_types.md); L3 decision 9, L5, L6 decision 3, L8 decisions 1 and 8; D-45 in [SR-LAW-11](../records/0013_LAW-11-dependencies.md) §3; the build W-105 |
 | [`W-93-hook-pre-and-brief.md`](open/W-93-hook-pre-and-brief.md) | 2026-10-28 | `hook --pre` and `brief --for` in [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) decision 9 and [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 14; `hook_pre` (unset) in [SR-LAW-8](../records/0010_LAW-8-performance-budgets.md) and `perf/budgets.toml` |
 | [`W-107-oxlint-type-aware-gap.md`](open/W-107-oxlint-type-aware-gap.md) | 2026-10-27 | oxlint type-aware in [SR-LINTER](../records/0106_linter.md) decision 2; not caching it in [SR-ARCHITECTURE](../records/0108_architecture.md) decision 19; USAGE *Type rules today* |
 | [`W-94-codelaw-migrate.md`](open/W-94-codelaw-migrate.md) | 2026-10-27 | `codelaw migrate` in [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 15; `[lint] ignore_aliases` in [SR-LINTER](../records/0106_linter.md) decision 6; USAGE *Coming from another tool* |
