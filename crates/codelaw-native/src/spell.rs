@@ -247,6 +247,163 @@ pub fn suspicion<'d>(word: &str, data: &'d BTreeMap<String, Arc<serde_json::Valu
     dict.suggest_common(&lower).map(Suspicion::Near)
 }
 
+/// `spell/inconsistent-term` (`spell/strict`): one word spelled two ways
+/// across the project — `canceled` in one file, `cancelled` in another.
+/// It needs every file's words at once, so it is a `scope: project` rule
+/// the engine runs on the graph stage (`graph: { terms: inconsistent }`,
+/// SR-PROJECT-GRAPH decision 10); this module gives it the words of one
+/// file ([`term_uses`]) and the verdict over all of them
+/// ([`inconsistent_terms`]).
+///
+/// The two ways are VarCon's one-to-one US and British pairs, from both
+/// locale tables (`organize` and `organise` included, which `en-GB` alone
+/// never reports). Only prose is read, as `spell/locale-variant` reads it.
+pub const INCONSISTENT_TERM: &str = "spell/inconsistent-term";
+
+/// Bumped whenever [`term_uses`] changes: part of its cache key.
+pub const TERMS_VERSION: &str = "spell-terms-1";
+
+/// VarCon's one-to-one pairs, by either spelling: `(US, British)`.
+pub struct TermPairs {
+    pairs: Vec<(String, String)>,
+    by_word: std::collections::HashMap<String, usize>,
+}
+
+impl TermPairs {
+    /// Both tables of the pack's `data/spell/locale.json`: `en-US` maps a
+    /// British spelling to the American one, `en-GB` the other way.
+    pub fn from_data(data: &BTreeMap<String, Arc<serde_json::Value>>) -> Option<Self> {
+        let locale = data.get("spell/locale")?;
+        let mut out = TermPairs { pairs: Vec::new(), by_word: std::collections::HashMap::new() };
+        for (table, us_first) in [("en-US", false), ("en-GB", true)] {
+            let Some(entries) = locale.get(table).and_then(|t| t.as_str()) else { continue };
+            for entry in entries.split(' ') {
+                let Some((from, to)) = entry.split_once(':') else { continue };
+                let (us, gb) = if us_first { (from, to) } else { (to, from) };
+                if from.is_empty() || to.is_empty() || out.by_word.contains_key(us) || out.by_word.contains_key(gb) {
+                    continue;
+                }
+                let i = out.pairs.len();
+                out.pairs.push((us.to_owned(), gb.to_owned()));
+                out.by_word.insert(us.to_owned(), i);
+                out.by_word.insert(gb.to_owned(), i);
+            }
+        }
+        Some(out)
+    }
+
+    /// The pair a lower-case word is one spelling of.
+    fn of(&self, word: &str) -> Option<usize> {
+        self.by_word.get(word).copied()
+    }
+}
+
+/// The words of one file's prose that are a spelling of a pair, as
+/// `(start, end, word as written)`: prose as `spell/known-typo` reads it,
+/// a text that is not English (decision 10) left out.
+pub fn term_uses(language: Language, source: &str, data: &BTreeMap<String, Arc<serde_json::Value>>, pairs: &TermPairs) -> Vec<(usize, usize, String)> {
+    let root = codelaw_lang::parse(language, source);
+    let options = BTreeMap::new();
+    let file = crate::DetachedFile::default();
+    let ctx = NativeContext { source, language, semantic: None, options: &options, data, file: &file };
+    let kinds = KnownTypo.kinds();
+    let mut out = Vec::new();
+    for node in root.root().dfs() {
+        if !kinds.contains(&node.kind().as_ref()) {
+            continue;
+        }
+        let Some((start, scan)) = prose_text(node, &ctx) else { continue };
+        let mut english_text = None;
+        for (at, word) in words(&scan) {
+            if pairs.of(&word.to_ascii_lowercase()).is_none() {
+                continue;
+            }
+            if !*english_text.get_or_insert_with(|| english(&scan, &ctx)) {
+                break;
+            }
+            out.push((start + at, start + at + word.len(), word.to_owned()));
+        }
+    }
+    out
+}
+
+/// One `spell/inconsistent-term` finding: in `files[file]`, at a word the
+/// project spells the other way more often.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TermFinding {
+    pub file: usize,
+    pub start: usize,
+    pub end: usize,
+    pub message: String,
+    /// The spelling the project uses most, in the word's case; `None` for
+    /// a word in mixed case.
+    pub fix: Option<String>,
+}
+
+/// The verdict over every file's [`term_uses`]: for each pair the project
+/// spells both ways, every use of the spelling it uses less, with the
+/// other as the fix — the American one on a tie. A word in `[spell] words`
+/// is not counted. With `[spell] locale` set, nothing: the locale names the
+/// right spelling, and `spell/locale-variant` reports the other.
+pub fn inconsistent_terms(files: &[Vec<(usize, usize, String)>], pairs: &TermPairs, options: &BTreeMap<String, serde_json::Value>) -> Vec<TermFinding> {
+    if options.get("locale").and_then(|v| v.as_str()).is_some_and(|l| !l.is_empty()) {
+        return Vec::new();
+    }
+    let accepted: BTreeSet<String> = options.get("words").and_then(|w| w.as_array()).into_iter().flatten().filter_map(|w| w.as_str()).map(str::to_ascii_lowercase).collect();
+    // Per pair, the uses of the US and the British spelling.
+    let mut counts: BTreeMap<usize, (usize, usize)> = BTreeMap::new();
+    for uses in files {
+        for (_, _, word) in uses {
+            let lower = word.to_ascii_lowercase();
+            if accepted.contains(&lower) {
+                continue;
+            }
+            let Some(p) = pairs.of(&lower) else { continue };
+            let c = counts.entry(p).or_default();
+            if pairs.pairs[p].0 == lower {
+                c.0 += 1;
+            } else {
+                c.1 += 1;
+            }
+        }
+    }
+    let mut out = Vec::new();
+    for (file, uses) in files.iter().enumerate() {
+        for (start, end, word) in uses {
+            let lower = word.to_ascii_lowercase();
+            if accepted.contains(&lower) {
+                continue;
+            }
+            let Some(p) = pairs.of(&lower) else { continue };
+            let (us, gb) = (&pairs.pairs[p].0, &pairs.pairs[p].1);
+            let (n_us, n_gb) = counts[&p];
+            if n_us == 0 || n_gb == 0 {
+                continue;
+            }
+            let (most, n_most, n_this) = if n_gb > n_us { (gb, n_gb, n_us) } else { (us, n_us, n_gb) };
+            if lower == *most {
+                continue;
+            }
+            let shown = same_case(word, most);
+            let times = |n: usize| if n == 1 { "once".to_owned() } else { format!("{n} times") };
+            out.push(TermFinding {
+                file,
+                start: *start,
+                end: *end,
+                message: format!(
+                    "`{word}` is spelled `{}` elsewhere: the project writes `{most}` {} and `{lower}` {}{}",
+                    shown.clone().unwrap_or_else(|| most.clone()),
+                    times(n_most),
+                    times(n_this),
+                    if n_most == n_this { " (on a tie, the American spelling)" } else { "" }
+                ),
+                fix: shown,
+            });
+        }
+    }
+    out
+}
+
 /// Whether a TOML string is an entry of `[spell] words`.
 fn in_spell_words(string: Node<'_>, src: &str) -> bool {
     let Some(array) = string.parent().filter(|p| p.kind() == "array") else { return false };
@@ -1350,4 +1507,41 @@ mod tests {
         assert_eq!(found(Language::Html, "<p>{% blocktranslate %}the adress{% endblocktranslate %}</p>\n"), ["adress"]);
     }
 
+    fn term_data() -> BTreeMap<String, Arc<serde_json::Value>> {
+        let mut data = BTreeMap::new();
+        data.insert("spell/locale".to_owned(), Arc::new(serde_json::json!({ "en-US": "cancelled:canceled colour:color organise:organize", "en-GB": "canceled:cancelled color:colour" })));
+        data
+    }
+
+    #[test]
+    fn term_pairs_join_both_tables() {
+        let pairs = TermPairs::from_data(&term_data()).expect("the locale table");
+        assert_eq!(pairs.pairs, [("canceled".to_owned(), "cancelled".to_owned()), ("color".to_owned(), "colour".to_owned()), ("organize".to_owned(), "organise".to_owned())]);
+        for w in ["canceled", "cancelled", "organize", "organise"] {
+            assert!(pairs.of(w).is_some(), "{w}");
+        }
+        assert!(pairs.of("cancel").is_none());
+    }
+
+    #[test]
+    fn the_spelling_used_less_is_reported_across_files() {
+        let data = term_data();
+        let pairs = TermPairs::from_data(&data).expect("the locale table");
+        let a = term_uses(Language::Javascript, "// The order was canceled, then Canceled again.\nconst id = 1;\n", &data, &pairs);
+        let b = term_uses(Language::Markdown, "The order was cancelled and the colour kept.\n", &data, &pairs);
+        assert_eq!(a.iter().map(|u| u.2.as_str()).collect::<Vec<_>>(), ["canceled", "Canceled"]);
+        let found = inconsistent_terms(&[a.clone(), b.clone()], &pairs, &BTreeMap::new());
+        assert_eq!(found.len(), 1);
+        assert_eq!((found[0].file, found[0].fix.as_deref()), (1, Some("canceled")));
+        assert!(found[0].message.contains("2 times and `cancelled` once"), "{}", found[0].message);
+        // A tie goes to the American spelling.
+        let c = term_uses(Language::Markdown, "Cancelled twice: cancelled.\n", &data, &pairs);
+        let tie = inconsistent_terms(&[a.clone(), c], &pairs, &BTreeMap::new());
+        assert_eq!(tie.iter().map(|f| f.fix.as_deref()).collect::<Vec<_>>(), [Some("Canceled"), Some("canceled")]);
+        // An accepted word is not counted; a locale leaves it to locale-variant.
+        let words: BTreeMap<String, serde_json::Value> = [("words".to_owned(), serde_json::json!(["Cancelled"]))].into();
+        assert!(inconsistent_terms(&[a.clone(), b.clone()], &pairs, &words).is_empty());
+        let locale: BTreeMap<String, serde_json::Value> = [("locale".to_owned(), serde_json::json!("en-US"))].into();
+        assert!(inconsistent_terms(&[a, b], &pairs, &locale).is_empty());
+    }
 }

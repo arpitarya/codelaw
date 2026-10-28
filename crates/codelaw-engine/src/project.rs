@@ -1,14 +1,17 @@
 //! The project stage of `check` (SR-ARCHITECTURE decision 4.4): read
 //! every file of the project root once for its graph facts (cached by
 //! content, SR-PROJECT-GRAPH decision 5), link the graph and run the
-//! `scope: project` rules, then their suppressions.
+//! `scope: project` rules, then their suppressions. `spell/inconsistent-term`
+//! (`graph: { terms: inconsistent }`) runs here too, over every file's
+//! prose: its words are the spell pack's, read per file and cached by
+//! content like the facts (SR-SPELL decision 5).
 
 use crate::compile::{CompiledRule, Matcher};
 use crate::lint::comment_ranges;
 use crate::{EngineError, Project, suppress};
 use codelaw_cache::KeyBuilder;
 use codelaw_core::{Diagnostic, FixClass, Language, LineIndex, Severity, TextEdit};
-use codelaw_graph::{Graph, GraphConfig, GraphInput, Manifest, is_manifest};
+use codelaw_graph::{Graph, GraphConfig, GraphFinding, GraphInput, Manifest, Query, is_manifest};
 use rayon::prelude::*;
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -38,6 +41,13 @@ impl Project {
             .collect()
     }
 
+    /// Whether an active project rule reads every file's prose
+    /// (`graph: { terms: … }`): then the graph's sources carry the text of
+    /// every file, not only of those the graph reads facts from.
+    fn reads_terms(&self) -> bool {
+        self.graph_rules().iter().any(|(_, r)| matches!(&r.matcher, Matcher::Graph(g) if g.query == Query::InconsistentTerms))
+    }
+
     pub(crate) fn graph_config(&self) -> Result<GraphConfig, EngineError> {
         let table = self.config.files.first().and_then(|f| f.raw.graph.as_ref());
         let mut config =
@@ -53,6 +63,7 @@ impl Project {
         let mut out: Vec<Source> = Vec::new();
         let mut dirs: BTreeSet<PathBuf> = BTreeSet::new();
         let root = self.config.root_dir.clone();
+        let terms = self.reads_terms();
         for f in files {
             let mut d = f.abs.parent().map(Path::to_path_buf);
             while let Some(dir) = d {
@@ -63,7 +74,7 @@ impl Project {
             }
             let name = f.abs.file_name().and_then(|n| n.to_str()).unwrap_or_default().to_owned();
             let reported = crate::discover::reported(self, &f.abs, f.language);
-            if !codelaw_graph::reads(f.language) && !is_manifest(&name) {
+            if !terms && !codelaw_graph::reads(f.language) && !is_manifest(&name) {
                 // Other files only exist for resolution.
                 out.push(Source { rel: f.rel, abs: f.abs, language: None, text: String::new(), reported });
                 continue;
@@ -150,7 +161,11 @@ impl Project {
             let Matcher::Graph(g) = &rule.matcher else { continue };
             let languages = &rule.loaded.rule.languages;
             let template = rule.loaded.rule.block.message.clone().unwrap_or_else(|| rule.loaded.rule.title.clone());
-            for f in codelaw_graph::run(g, graph, languages) {
+            let found = match g.query {
+                Query::InconsistentTerms => self.term_findings(rule, sources),
+                _ => codelaw_graph::run(g, graph, languages),
+            };
+            for f in found {
                 if !rule.applies_to_path(&f.file) {
                     continue;
                 }
@@ -209,6 +224,55 @@ impl Project {
             out.extend(diags);
         }
         out
+    }
+
+    /// `spell/inconsistent-term` over the sources in the rule's languages
+    /// and paths: each file's words of the spell pack's pairs, then the
+    /// verdict over all of them (`codelaw_native::spell`). A file `[files]`
+    /// leaves out counts, as it does for the graph; findings are reported
+    /// only in checked files.
+    fn term_findings(&self, rule: &CompiledRule, sources: &[Source]) -> Vec<GraphFinding> {
+        use codelaw_native::spell;
+        let data = &rule.loaded.data;
+        let Some(pairs) = spell::TermPairs::from_data(data) else { return Vec::new() };
+        let mut options = self.config.section_options("spell");
+        if let Some(cfg) = self.rules.effective(&rule.loaded, &[]) {
+            options.extend(cfg.options);
+        }
+        let languages = &rule.loaded.rule.languages;
+        let read: Vec<&Source> = sources.iter().filter(|s| s.language.is_some_and(|l| languages.contains(&l)) && rule.applies_to_path(&s.rel)).collect();
+        let uses: Vec<Vec<(usize, usize, String)>> = self.pool.install(|| read.par_iter().map(|s| self.source_terms(s, data, &pairs)).collect());
+        spell::inconsistent_terms(&uses, &pairs, &options)
+            .into_iter()
+            .map(|f| GraphFinding {
+                file: read[f.file].rel.clone(),
+                span: (f.start, f.end),
+                captures: Vec::new(),
+                edits: f.fix.map(|t| vec![TextEdit::new(f.start, f.end, t)]).unwrap_or_default(),
+                uncertain: None,
+                message: Some(f.message),
+            })
+            .collect()
+    }
+
+    /// One source's words for `spell/inconsistent-term`, from the cache
+    /// when it has them: keyed by the text and the rule set, whose
+    /// fingerprint covers every pack's data tables.
+    fn source_terms(&self, s: &Source, data: &BTreeMap<String, std::sync::Arc<serde_json::Value>>, pairs: &codelaw_native::spell::TermPairs) -> Vec<(usize, usize, String)> {
+        let Some(language) = s.language else { return Vec::new() };
+        let key = KeyBuilder::new("spell-terms")
+            .part(codelaw_native::spell::TERMS_VERSION)
+            .part(language.name())
+            .part(&s.text)
+            .part(codelaw_lang::GRAMMARS_FINGERPRINT)
+            .part(self.rules.fingerprint.0)
+            .key();
+        if let Some(t) = self.cache.get(&key) {
+            return t;
+        }
+        let Ok(t) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| codelaw_native::spell::term_uses(language, &s.text, data, pairs))) else { return Vec::new() };
+        self.cache.put(&key, &t);
+        t
     }
 
     /// Apply project-rule edits (auto, and suggest with `unsafe_fixes`)
