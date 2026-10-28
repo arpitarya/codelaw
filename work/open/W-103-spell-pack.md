@@ -6,7 +6,7 @@ item: W-103
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
-updated_by: "Claude Code (Opus 5.5), the third increment"
+updated_by: "Claude Code (Opus 5.5), the fourth increment"
 ball: agent
 ---
 
@@ -37,19 +37,19 @@ Spelling in comments, docs, prose strings, Markdown, keys and declared names, in
 |---|---|---|
 | 1 · data | `packs/spell/data/spell/` is written by `scripts/spell-data.py` (stdlib only) from D-42–D-44 at the pins in L11 §3; a second run changes no byte; `NOTICE` names each source and version | ✅ all three tables; `spell-data.py check` passes; `NOTICE` names SCOWL, VarCon and the software terms (2026-10-28) |
 | 2 · rules | the six rules of SR-SPELL decision 5, each with its fix class, cases and a `codelaw test` pass; every `manual` fix carried by a skill (L4) | 🟡 `spell/known-typo` (107 `codelaw test` checks), `spell/known-typo-identifier` (48) and `spell/known-typo-key` (28), `spell/unknown-word` (90), `spell/locale-variant` (94), `spell/suspicious-word` (6): 373 checks; `spell/inconsistent-term` left |
-| 3 · scope | a fixture repo per L3 language: a typo in a comment, a string, a declared name and a key is reported once; the same word in a URL, a hash, a JSON value that is an id, or at a name's uses is not | ⏳ |
-| 4 · fixes | `codelaw fix` on the fixtures fixes the one-correction known typos in prose and file-local names, and changes nothing exported | ⏳ |
+| 3 · scope | a fixture repo per L3 language: a typo in a comment, a string, a declared name and a key is reported once; the same word in a URL, a hash, a JSON value that is an id, or at a name's uses is not | ✅ 2026-10-28: `fixtures/spell/repo` (twelve files, nine languages); `crates/codelaw-cli/tests/spell.rs` asserts the 38 findings, each once, and none on a URL, a hash, an id value, a code span, a link target, an HTML class or a name's uses |
+| 4 · fixes | `codelaw fix` on the fixtures fixes the one-correction known typos in prose and file-local names, and changes nothing exported | ✅ 2026-10-28: the same test runs `codelaw fix`: prose and file-local names fixed (29 findings), the 9 left are exported or module-level names, a member, keys, a class and an id, all untouched; a second `fix` changes nothing |
 | 5 · packaging | `@codelaw/rules-spell` and `codelaw-rules-spell` build in CI byte-identical; `init` does not add the pack; a missing pack names both install commands | 🟡 `build-packs.py --verify` builds both and compares output byte-identical locally; `init` adds no spell pack; the missing-pack message names both installs (`pack.rs` test); CI proves it on the landing commit |
 | 6 · measured | the typo list's entry count, the data's bytes per package, and the spell pass's time on the pinned corpus are written into SR-SPELL decision 9; the budget is the decider's ruling | 🟡 entry count and bytes per package measured (SR-SPELL decision 9); the corpus timing and the budget left |
 | 7 · records | SR-SPELL `built: yes`; L6, SR-RULE-PACKS §1 and decision 4, SR-PACKAGES at eighteen packs, sixteen on npm and eleven on PyPI; README, CHANGELOG, GLOSSARY, `docs/rules/` regenerated | 🟡 all at eighteen; SR-SPELL built: partly |
 
-## Left (exact, after the third increment of 2026-10-28)
+## Left (exact, after the fourth increment of 2026-10-28)
 
 1. ✅ 2026-10-28: `spell/known-typo-identifier` (`auto`, JS/JSX/TS/TSX/Python, 48 `codelaw test` checks) and `spell/known-typo-key` (`manual`, JSON/YAML/TOML/CSS/SCSS/HTML, 28 checks), both in `spell/recommended`; one rule per fix class, as SR-SPELL decision 5 *as built* says. Not built: the `suggest` tier naming other files (needs the project graph).
 2. ✅ 2026-10-28: the dictionary — SCOWL to size 60 plus the software terms, 92,758 words, 868 KB, +1 ms to load; no split or new format needed (SR-SPELL decisions 6 and 9 *as built*).
 3. ✅ 2026-10-28: `spell/unknown-word` (`suggest`, in `spell/strict`) and `[spell]` (`locale`, `words`; SR-CONFIG §1 and decision 2, the schema, `config` trace); `[spell] words` excuses every rule but `suspicious-word`.
 4. 🟡 2026-10-28: `spell/suspicious-word` (`manual`, `spell/strict`) and `spell/locale-variant` (`auto`, VarCon's pairs in `locale.json`, NOTICE and `licenses/` gain VarCon) built. **Left:** `spell/inconsistent-term` — it needs every file's words at once, so it is a `scope: project` rule on the graph stage (`crates/codelaw-engine/src/project.rs`, `codelaw-graph`), not a `native:` file rule.
-5. DoD 3 and 4: a fixture repo per L3 language and the `codelaw fix` run over it.
+5. ✅ 2026-10-28: DoD 3 and 4 — `fixtures/spell/repo` and `crates/codelaw-cli/tests/spell.rs`.
 6. The pinned corpus: add `spell` to `scripts/corpus.json`/`corpus.py`, record counts, review the findings for false positives before any rule leaves `preview`; the reopen-trigger's comparison with `typos`' count.
 7. Step 6: three CI `perf` runs on `main` with the pack on, then the budget to the decider (L8).
 

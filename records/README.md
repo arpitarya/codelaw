@@ -234,6 +234,8 @@ yet is owned by an open `W-nn`.
 | `packs/spell` | SR-SPELL | decisions 1, 2, 5 and 6: the spell pack — its presets, rules, generated word data and notices |
 | `crates/codelaw-native/src/spell.rs` | SR-SPELL | decisions 3–5 and 8: the text read, the words and the `spell/*` native rules |
 | `scripts/spell-data.py` | SR-SPELL | decision 6: writes `packs/spell/data/spell/` from the pinned sources (L11 §3 D-42–D-44) |
+| `fixtures/spell` | SR-SPELL | decisions 3–5: one file per L3 language, the typos the rules must report and the words they must not |
+| `crates/codelaw-cli/tests/spell.rs` | SR-SPELL | decisions 3–5: runs that repo through `check` and `fix` (W-103 DoD 3 and 4) |
 | `scripts/spell-typos.txt` | SR-SPELL | decision 6: the known typos added by hand, merged by `spell-data.py` |
 | `LICENSE` | SR-PACKAGES | decision 10: the licence every package carries |
 | `packaging` | SR-PACKAGES | decisions 3 and 5: the npm launcher and API, the PyPI module and its maturin build |

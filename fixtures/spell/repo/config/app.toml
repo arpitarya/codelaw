@@ -1,0 +1,4 @@
+# The adress of the server.
+[server]
+recieve_timeout = 30
+description = "checks the lenght of a name"
