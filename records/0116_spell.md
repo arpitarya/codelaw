@@ -3,7 +3,7 @@ type: Standing Record
 kind: component
 name: SR-SPELL
 title: "SR-SPELL (0116) — spelling as its own rule pack: a known-typo check on by default, a dictionary check opt-in, codelaw's own word data"
-description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, the generated known-typo list, spell/known-typo, spell/known-typo-identifier and spell/known-typo-key; the dictionary, locale, consistency and words rules are not."
+description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, its three generated tables (known typos, the dictionary, the locale pairs), the [spell] section and six rules; spell/inconsistent-term is not."
 status: accepted
 date: 2026-10-27
 feature: "spell checking — the spell pack"
@@ -156,6 +156,18 @@ question its maintainers left open. The forks and the rulings are in
      properties, `$variables`, mixins and functions; HTML `id`s — once per
      distinct name per file. Markdown declares no names. Both are in
      `spell/recommended`.
+   - **As built (W-103, 2026-10-28), the dictionary rules:**
+     `spell/unknown-word` reads the prose `spell/known-typo` reads (not
+     names), skips a word in capitals (an acronym) and a word on the
+     known-typo list, and suggests the nearest dictionary word with the same
+     first letter as its edit — one edit per finding, so the message names
+     up to three and the edit takes the first. `spell/locale-variant` reads
+     the same prose, only while `[spell] locale` is set, and fixes in
+     place; names are not read, so it has no `suggest` tier.
+     `spell/suspicious-word` reports an entry that is a known typo, or no
+     dictionary word but one edit from a word of size class 20 or below.
+     `spell/inconsistent-term` is not built: it needs every file's words at
+     once, a `scope: project` rule the graph stage would have to carry.
 6. **The word data is codelaw's own, built from ratified sources only**
    ([L11](0013_LAW-11-dependencies.md) §3: D-42 SCOWL, D-43 VarCon, D-44
    software terms), and lives in the pack's `data/spell/`, not in the engine
@@ -186,19 +198,43 @@ question its maintainers left open. The forks and the rulings are in
      string holds `typo:fix` pairs sorted by byte, which the rule
      binary-searches in place — still JSON (SR-RULE-PACKS decision 3), with
      no per-entry value to build. The pins are L11 §3's D-42 (SCOWL
-     2020.12.07) and D-44 (software terms 5.4.8); VarCon (D-43) is fetched
-     and checked but not read until the locale table lands.
+     2020.12.07) and D-44 (software terms 5.4.8); VarCon (D-43) is read for
+     the locale table (below).
+   - **As built, the dictionary and the locale table (W-103, 2026-10-28):**
+     `data/spell/words.json` holds SCOWL's English, American, British and
+     British `-ize` lists — words, names, upper-case words, abbreviations
+     and contractions — of size 60 and below (aspell's default `en`),
+     lower-cased, ASCII letters only, a contraction cut at its apostrophe
+     (`doesn't` → `doesn`, as the checker splits it), plus the letters of
+     every software term; each word keeps its smallest size class, and a
+     software term no SCOWL list holds gets class 100. It is one string of
+     words per class, sorted by byte and searched in place: **92,758
+     words**. `data/spell/locale.json` holds two tables of VarCon's
+     one-to-one pairs (a line with one plain `A` and one plain `B`
+     spelling): `en-US` maps a British spelling to the American one, kept
+     when the British spelling is in no American or English SCOWL word
+     list of size 80 or below and the American one in no British or
+     English one; `en-GB` the other way, where the British `-ize` lists
+     count as British, so `organize` is never reported: **12,587 and
+     7,171 pairs**.
    - **Never used:** `typos`' word list, codespell's lists and Wikipedia's
      *Lists of common misspellings* (share-alike), and any GPL, LGPL or MPL
      dictionary.
    - The pack's `NOTICE` names each source, its version and its copyright
      notice.
 7. **Config — the `[spell]` section** of the root config
-   ([SR-CONFIG](0110_config.md) decision 2): `locale` (`en-US`, `en-GB`, or
-   unset), `words` (accepted words, checked by `spell/suspicious-word`). The
+   ([SR-CONFIG](0110_config.md) decision 2): `[spell] locale` (`en-US`,
+   `en-GB`, or unset), `[spell] words` (accepted words, checked by
+   `spell/suspicious-word`). The
    rules receive it as their options (SR-ARCHITECTURE decision 15b). A line is
    excused with the existing `codelaw-ignore spell/<rule>: <reason>`; CSpell's
    `cspell:` comments are not read.
+   - **As built (W-103, 2026-10-28):** the loader refuses a `[spell] locale`
+     other than the two and a `[spell] words` entry that is empty or holds
+     whitespace; `[spell]` is root-only. Words compare case-insensitively
+     and excuse every `spell/*` rule but `spell/suspicious-word`, which
+     reads them where they are written: string entries of `[spell] words`
+     (or a dotted `spell.words`) in the root `codelaw.toml`.
 8. **Deterministic** ([L5](0007_LAW-5-no-model-in-the-engine.md)): no model,
    no network, no clock. Suggestions rank by edit cost (Damerau-Levenshtein,
    at most two edits), then the word's SCOWL frequency class, then alphabetical
@@ -218,6 +254,15 @@ question its maintainers left open. The forks and the rulings are in
      over ten threads, same load). The budget waits for three CI `perf` runs
      on `main` with the pack on, put to the decider by L8's method (W-103
      step 6).
+   - **Measured with the dictionary (W-103, 2026-10-28; not yet a
+     budget):** `words.json` is 868,386 bytes and `locale.json` 489,307
+     (285,570 and 114,680 gzipped); the pack is now a 1,028,518-byte npm
+     tarball and a 1,041,014-byte wheel. A one-file `codelaw check` with
+     the pack on (release build, median of 45, load 7–9) takes 4.5 ms with
+     no data, 7.2 ms with the typo list and 8.2 ms with all three tables:
+     the dictionary and the locale table add about **1 ms**, so no split
+     and no compact format is proposed. Suggestions are cached per thread
+     for the run, keyed by the dictionary and the word.
 10. **English only.** Another language needs a word list under a permissive
     licence and its own ratified row.
 
@@ -264,7 +309,7 @@ question its maintainers left open. The forks and the rulings are in
 **Reopen this decision if:** the spell pack carries word data from a source
 with no ratified row in L11 §3, or from `typos`, codespell or Wikipedia.
 
-**How to check it:** `grep -rIl -i -e 'codespell' -e 'typos-dict' -e 'wikipedia' packs/spell 2>/dev/null` must print nothing, and every source in `packs/spell/NOTICE` is D-42, D-43 or D-44.
+**How to check it:** `grep -rIl -i -e 'codespell' -e 'typos-dict' -e 'wikipedia' --exclude=words.json packs/spell 2>/dev/null` must print nothing (the dictionary, `data/spell/words.json`, holds the English word *wikipedia*, so it is left out of the grep), every source in `packs/spell/NOTICE` is D-42, D-43 or D-44, and `python3 scripts/spell-data.py check` passes: the committed data is what the pinned sources write.
 
 ---
 

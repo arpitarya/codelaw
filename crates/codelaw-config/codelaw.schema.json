@@ -373,6 +373,24 @@
         }
       }
     },
+    "spell": {
+      "x-codelaw-record": "SR-SPELL",
+      "description": "The spell pack's options (SR-SPELL decision 7): the locale whose spellings are right, and the words the project accepts. Read by the `spell/*` rules. Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "locale": {
+          "description": "`en-US` or `en-GB`: `spell/locale-variant` reports the other locale's spellings (`colour` under `en-US`). Unset, both are accepted and `spell/locale-variant` reports nothing.",
+          "enum": ["en-US", "en-GB"]
+        },
+        "words": {
+          "description": "Words the project accepts, compared case-insensitively: never reported by `spell/known-typo`, `spell/known-typo-identifier`, `spell/known-typo-key`, `spell/unknown-word` or `spell/locale-variant`. `spell/suspicious-word` reports an entry that is a known typo.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^\\S+$" },
+          "default": []
+        }
+      }
+    },
     "deps": {
       "x-codelaw-record": "SR-RULE-PACKS",
       "description": "The dependency rules, `data/outdated-dependency` and `data/stale-deps-snapshot`, read against `.codelaw/deps-snapshot.json`, which `codelaw deps refresh` writes (SR-RULE-PACKS decision 15). Root config only.",

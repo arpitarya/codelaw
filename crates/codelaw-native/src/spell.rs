@@ -21,6 +21,7 @@ use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
 use codelaw_semantic::{ScopeKind, SemanticModel, SymbolKind};
+use std::collections::BTreeSet;
 use tree_sitter::Node;
 
 pub struct KnownTypo;
@@ -49,24 +50,19 @@ impl NativeRule for KnownTypo {
             "block_scalar",
         ]
     }
+    fn config_section(&self) -> Option<&'static str> {
+        Some("spell")
+    }
     fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
         let Some(table) = typo_table(ctx) else { return };
-        let n = node.get_inner_node();
-        let Some(kind) = prose_kind(n, ctx.language, ctx.source) else { return };
-        let (start, end) = (n.start_byte(), n.end_byte());
-        let segment = &ctx.source[start..end];
-        let masked;
-        let scan = if kind == Prose::Markdown {
-            masked = mask_markdown(segment);
-            masked.as_str()
-        } else {
-            segment
-        };
-        if kind == Prose::String && !scan.contains(char::is_whitespace) {
-            return;
-        }
-        for (at, word) in words(scan) {
-            let Some(fixes) = lookup(table, &word.to_ascii_lowercase()) else { continue };
+        let Some((start, scan)) = prose_text(node, ctx) else { return };
+        let accepted = accepted_words(ctx);
+        for (at, word) in words(&scan) {
+            let lower = word.to_ascii_lowercase();
+            if accepted.contains(&lower) {
+                continue;
+            }
+            let Some(fixes) = lookup(table, &lower) else { continue };
             let (s, e) = (start + at, start + at + word.len());
             let options: Vec<&str> = fixes.split('|').collect();
             let mut finding = NativeFinding {
@@ -85,6 +81,304 @@ impl NativeRule for KnownTypo {
             out.push(finding);
         }
     }
+}
+
+/// `spell/unknown-word` (`spell/strict`): a word of prose in no word list —
+/// the pack's dictionary (SCOWL and the software terms), the known-typo list
+/// (that word is `spell/known-typo`'s) or `[spell] words`. A word in capitals
+/// is an acronym and is not checked. The fix is a suggestion: the nearest
+/// dictionary word (decision 8); the message names up to three.
+pub struct UnknownWord;
+
+impl NativeRule for UnknownWord {
+    fn id(&self) -> &'static str {
+        "spell/unknown-word"
+    }
+    fn languages(&self) -> &'static [Language] {
+        &Language::ALL
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        KnownTypo.kinds()
+    }
+    fn config_section(&self) -> Option<&'static str> {
+        Some("spell")
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(dict) = Dictionary::of(ctx) else { return };
+        let typos = typo_table(ctx);
+        let Some((start, scan)) = prose_text(node, ctx) else { return };
+        let accepted = accepted_words(ctx);
+        for (at, word) in words(&scan) {
+            if word.bytes().all(|c| c.is_ascii_uppercase()) {
+                continue;
+            }
+            let lower = word.to_ascii_lowercase();
+            if accepted.contains(&lower) || dict.contains(&lower) || typos.is_some_and(|t| lookup(t, &lower).is_some()) {
+                continue;
+            }
+            let (s, e) = (start + at, start + at + word.len());
+            let near = dict.suggest(&lower, 2, 3);
+            let named: Vec<String> = near.iter().map(|w| format!("`{}`", same_case(word, w).unwrap_or_else(|| w.clone()))).collect();
+            let message = if named.is_empty() {
+                format!("`{word}` is in no word list; add it to `[spell] words` if it is right")
+            } else {
+                format!("`{word}` is in no word list: did you mean {}? If it is right, add it to `[spell] words`", named.join(", "))
+            };
+            let edits = near.first().and_then(|w| same_case(word, w)).map(|f| vec![TextEdit::new(s, e, f)]).unwrap_or_default();
+            out.push(NativeFinding { start: s, end: e, message, edits });
+        }
+    }
+}
+
+/// `spell/locale-variant`: under `[spell] locale`, a word of prose spelled
+/// the other locale's way (`colour` under `en-US`), from VarCon's one-to-one
+/// pairs; a pair right in both locales under some meaning is not in the
+/// table (decision 5). Fixed in place, in the word's case.
+pub struct LocaleVariant;
+
+impl NativeRule for LocaleVariant {
+    fn id(&self) -> &'static str {
+        "spell/locale-variant"
+    }
+    fn languages(&self) -> &'static [Language] {
+        &Language::ALL
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        KnownTypo.kinds()
+    }
+    fn config_section(&self) -> Option<&'static str> {
+        Some("spell")
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(locale) = ctx.options.get("locale").and_then(|v| v.as_str()) else { return };
+        let Some(table) = ctx.data.get("spell/locale").and_then(|d| d.get(locale)).and_then(|t| t.as_str()) else { return };
+        let Some((start, scan)) = prose_text(node, ctx) else { return };
+        let accepted = accepted_words(ctx);
+        for (at, word) in words(&scan) {
+            let lower = word.to_ascii_lowercase();
+            if accepted.contains(&lower) {
+                continue;
+            }
+            let Some(fix) = lookup(table, &lower) else { continue };
+            let (s, e) = (start + at, start + at + word.len());
+            let shown = same_case(word, fix);
+            out.push(NativeFinding {
+                start: s,
+                end: e,
+                message: format!("`{word}` is not the {locale} spelling: `{}`", shown.clone().unwrap_or_else(|| fix.to_owned())),
+                edits: shown.map(|f| vec![TextEdit::new(s, e, f)]).unwrap_or_default(),
+            });
+        }
+    }
+}
+
+/// `spell/suspicious-word` (`spell/strict`): an entry of `[spell] words` in
+/// the root `codelaw.toml` that is itself a known typo, or no dictionary
+/// word but one edit from a common one (size class 20 or below) — an
+/// accepted word that hides a misspelling everywhere it appears.
+pub struct SuspiciousWord;
+
+impl NativeRule for SuspiciousWord {
+    fn id(&self) -> &'static str {
+        "spell/suspicious-word"
+    }
+    fn languages(&self) -> &'static [Language] {
+        &[Language::Toml]
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["string"]
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        if ctx.file.path() != "codelaw.toml" {
+            return;
+        }
+        let n = node.get_inner_node();
+        if !in_spell_words(n, ctx.source) {
+            return;
+        }
+        let (start, end) = (n.start_byte() + 1, n.end_byte().saturating_sub(1).max(n.start_byte() + 1));
+        let word = &ctx.source[start..end];
+        let lower = word.to_ascii_lowercase();
+        let message = if let Some(fixes) = typo_table(ctx).and_then(|t| lookup(t, &lower)) {
+            format!("`{word}` in `[spell] words` is a known typo of {}: accepting it hides the typo everywhere", fixes.split('|').map(|f| format!("`{f}`")).collect::<Vec<_>>().join(" or "))
+        } else if let Some(dict) = Dictionary::of(ctx)
+            && !dict.contains(&lower)
+            && let Some(near) = dict.suggest_common(&lower)
+        {
+            format!("`{word}` in `[spell] words` is one edit from the common word `{near}`: accepting it may hide a typo")
+        } else {
+            return;
+        };
+        out.push(NativeFinding { start, end, message, edits: Vec::new() });
+    }
+}
+
+/// Whether a TOML string is an entry of `[spell] words`.
+fn in_spell_words(string: Node<'_>, src: &str) -> bool {
+    let Some(array) = string.parent().filter(|p| p.kind() == "array") else { return false };
+    let Some(pair) = array.parent().filter(|p| p.kind() == "pair") else { return false };
+    let key = |n: Node<'_>| named_children(n).into_iter().next().map(|k| text(k, src).trim_matches('"').to_owned()).unwrap_or_default();
+    match pair.parent() {
+        Some(t) if t.kind() == "table" => key(pair) == "words" && key(t) == "spell",
+        Some(d) if d.kind() == "document" => key(pair) == "spell.words",
+        _ => false,
+    }
+}
+
+/// The text of a prose node (decision 3), Markdown masked, and its offset;
+/// `None` when the node is not prose, or is a string with no whitespace.
+fn prose_text(node: SyntaxNode<'_>, ctx: &NativeContext<'_>) -> Option<(usize, String)> {
+    let n = node.get_inner_node();
+    let kind = prose_kind(n, ctx.language, ctx.source)?;
+    let (start, end) = (n.start_byte(), n.end_byte());
+    let segment = &ctx.source[start..end];
+    let scan = if kind == Prose::Markdown { mask_markdown(segment) } else { segment.to_owned() };
+    if kind == Prose::String && !scan.contains(char::is_whitespace) {
+        return None;
+    }
+    Some((start, scan))
+}
+
+/// `[spell] words`, lower case (decision 7).
+fn accepted_words(ctx: &NativeContext<'_>) -> BTreeSet<String> {
+    ctx.options.get("words").and_then(|w| w.as_array()).into_iter().flatten().filter_map(|w| w.as_str()).map(str::to_ascii_lowercase).collect()
+}
+
+/// The pack's dictionary, `data/spell/words.json`: per SCOWL size class
+/// (`100` for a software term no SCOWL list holds), one string of lower-case
+/// words sorted by byte, searched in place.
+struct Dictionary<'a> {
+    classes: Vec<(u32, &'a str)>,
+}
+
+impl<'a> Dictionary<'a> {
+    fn of(ctx: &'a NativeContext<'_>) -> Option<Self> {
+        let classes = ctx.data.get("spell/words")?.get("classes")?.as_object()?;
+        let mut out: Vec<(u32, &str)> = classes.iter().filter_map(|(k, v)| Some((k.parse().ok()?, v.as_str()?))).collect();
+        out.sort_unstable();
+        Some(Dictionary { classes: out })
+    }
+
+    fn contains(&self, word: &str) -> bool {
+        self.classes.iter().any(|(_, t)| token_at(t, word).is_some())
+    }
+
+    /// Up to `max` words within `limit` edits of `word` (Damerau-Levenshtein,
+    /// adjacent swaps), with the same first letter: by edits, then size
+    /// class, then alphabetical (decision 8).
+    fn suggest(&self, word: &str, limit: usize, max: usize) -> Vec<String> {
+        let key = (self.classes.first().map_or(0, |c| c.1.as_ptr() as usize), self.classes.len(), word.to_owned(), limit);
+        if let Some(hit) = CACHE.with(|c| c.borrow().get(&key).cloned()) {
+            return hit.into_iter().take(max).collect();
+        }
+        let mut found: Vec<(usize, u32, &str)> = Vec::new();
+        let first = &word[..1];
+        for &(class, table) in &self.classes {
+            let (from, to) = prefix_range(table, first);
+            for w in table[from..to].split(' ').filter(|w| !w.is_empty()) {
+                if w.len().abs_diff(word.len()) > limit {
+                    continue;
+                }
+                if let Some(d) = edits_within(word, w, limit) {
+                    found.push((d, class, w));
+                }
+            }
+        }
+        found.sort_unstable();
+        let mut seen = BTreeSet::new();
+        let near: Vec<String> = found.into_iter().filter(|(_, _, w)| seen.insert(*w)).take(3).map(|(_, _, w)| w.to_owned()).collect();
+        CACHE.with(|c| {
+            let mut c = c.borrow_mut();
+            if c.len() > 50_000 {
+                c.clear();
+            }
+            c.insert(key, near.clone());
+        });
+        near.into_iter().take(max).collect()
+    }
+
+    /// The nearest common word (size class 20 or below) one edit away.
+    fn suggest_common(&self, word: &str) -> Option<String> {
+        let common = Dictionary { classes: self.classes.iter().copied().filter(|(c, _)| *c <= 20).collect() };
+        common.suggest(word, 1, 1).into_iter().next()
+    }
+}
+
+/// Suggestions by (dictionary, classes, word, edit limit).
+type SuggestionCache = std::collections::HashMap<(usize, usize, String, usize), Vec<String>>;
+
+thread_local! {
+    /// One verdict per distinct word per thread for the run (decision 9),
+    /// keyed by the dictionary it was computed from.
+    static CACHE: std::cell::RefCell<SuggestionCache> = std::cell::RefCell::new(SuggestionCache::new());
+}
+
+/// The byte offset of the token `word` in a space-separated table of words
+/// sorted by byte.
+fn token_at(table: &str, word: &str) -> Option<usize> {
+    let at = lower_bound(table, word);
+    let end = table[at..].find(' ').map_or(table.len(), |p| at + p);
+    (at < table.len() && &table[at..end] == word).then_some(at)
+}
+
+/// The offset of the first token not below `key`.
+fn lower_bound(table: &str, key: &str) -> usize {
+    let b = table.as_bytes();
+    let (mut lo, mut hi) = (0, b.len());
+    // Invariant: `lo` starts a token (or is the end), every token before
+    // `lo` is below `key`, and no token at or after `hi` is.
+    while lo < hi {
+        let mid = lo + (hi - lo) / 2;
+        let start = b[lo..mid].iter().rposition(|&c| c == b' ').map_or(lo, |p| lo + p + 1);
+        let end = b[start..].iter().position(|&c| c == b' ').map_or(b.len(), |p| start + p);
+        if &table[start..end] < key {
+            lo = (end + 1).min(b.len());
+        } else {
+            hi = start;
+        }
+    }
+    lo
+}
+
+/// The byte range of the tokens starting with `prefix`.
+fn prefix_range(table: &str, prefix: &str) -> (usize, usize) {
+    let from = lower_bound(table, prefix);
+    let mut next = prefix.as_bytes().to_vec();
+    match next.last_mut() {
+        Some(c) if *c < 0x7f => *c += 1,
+        _ => return (from, table.len()),
+    }
+    (from, lower_bound(table, std::str::from_utf8(&next).unwrap_or(prefix)).max(from))
+}
+
+/// The edits between `a` and `b` (optimal string alignment: insert, delete,
+/// replace, swap two neighbours) when at most `limit`, else `None`.
+fn edits_within(a: &str, b: &str, limit: usize) -> Option<usize> {
+    let (a, b) = (a.as_bytes(), b.as_bytes());
+    let (n, m) = (a.len(), b.len());
+    let mut rows = vec![vec![0usize; m + 1]; n + 1];
+    for (i, row) in rows.iter_mut().enumerate() {
+        row[0] = i;
+    }
+    for (j, cell) in rows[0].iter_mut().enumerate() {
+        *cell = j;
+    }
+    for i in 1..=n {
+        let mut best = usize::MAX;
+        for j in 1..=m {
+            let cost = usize::from(a[i - 1] != b[j - 1]);
+            let mut d = (rows[i - 1][j] + 1).min(rows[i][j - 1] + 1).min(rows[i - 1][j - 1] + cost);
+            if i > 1 && j > 1 && a[i - 1] == b[j - 2] && a[i - 2] == b[j - 1] {
+                d = d.min(rows[i - 2][j - 2] + 1);
+            }
+            rows[i][j] = d;
+            best = best.min(d);
+        }
+        if best > limit {
+            return None;
+        }
+    }
+    (rows[n][m] <= limit).then_some(rows[n][m])
 }
 
 /// `spell/known-typo-identifier`: a known typo in a name where it is declared
@@ -121,9 +415,13 @@ impl NativeRule for KnownTypoIdentifier {
     fn needs_semantic(&self) -> bool {
         true
     }
+    fn config_section(&self) -> Option<&'static str> {
+        Some("spell")
+    }
     fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
         let Some(table) = typo_table(ctx) else { return };
         let Some(model) = ctx.semantic else { return };
+        let accepted = accepted_words(ctx);
         let root = node.get_inner_node();
         // The root only: TypeScript's `module M {}` is a `module` too.
         if root.parent().is_some() {
@@ -140,7 +438,7 @@ impl NativeRule for KnownTypoIdentifier {
             if src.get(start..end) != Some(s.name.as_str()) {
                 continue;
             }
-            let typos = name_typos(table, &s.name);
+            let typos = name_typos(table, &s.name, &accepted);
             if typos.is_empty() {
                 continue;
             }
@@ -158,7 +456,7 @@ impl NativeRule for KnownTypoIdentifier {
                 && matches!(name.kind(), "property_identifier" | "private_property_identifier")
             {
                 let word = text(name, src);
-                let typos = name_typos(table, word);
+                let typos = name_typos(table, word, &accepted);
                 if !typos.is_empty() {
                     out.push(name_finding(name.start_byte(), name.end_byte(), word, &typos, Vec::new()));
                 }
@@ -184,12 +482,16 @@ impl NativeRule for KnownTypoKey {
     fn kinds(&self) -> &'static [&'static str] {
         &["document", "stream", "stylesheet"]
     }
+    fn config_section(&self) -> Option<&'static str> {
+        Some("spell")
+    }
     fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
         // The root only: a YAML `stream` holds `document`s.
         if node.get_inner_node().parent().is_some() {
             return;
         }
         let Some(table) = typo_table(ctx) else { return };
+        let accepted = accepted_words(ctx);
         let src = ctx.source;
         let mut seen = std::collections::BTreeSet::new();
         let mut stack = vec![node.get_inner_node()];
@@ -200,7 +502,7 @@ impl NativeRule for KnownTypoKey {
             if !seen.insert(word) {
                 continue;
             }
-            let typos = name_typos(table, word);
+            let typos = name_typos(table, word, &accepted);
             if !typos.is_empty() {
                 out.push(name_finding(start, end, word, &typos, Vec::new()));
             }
@@ -236,8 +538,15 @@ fn declared_key(n: Node<'_>, language: Language, src: &str) -> Option<(usize, us
 type NameTypo<'a, 't> = (usize, &'a str, &'t str);
 
 /// The parts of `name` on the known-typo list.
-fn name_typos<'a, 't>(table: &'t str, name: &'a str) -> Vec<NameTypo<'a, 't>> {
-    name_parts(name).into_iter().filter(|(_, p)| p.len() >= 4).filter_map(|(at, part)| lookup(table, &part.to_ascii_lowercase()).map(|f| (at, part, f))).collect()
+fn name_typos<'a, 't>(table: &'t str, name: &'a str, accepted: &BTreeSet<String>) -> Vec<NameTypo<'a, 't>> {
+    name_parts(name)
+        .into_iter()
+        .filter(|(_, p)| p.len() >= 4)
+        .filter_map(|(at, part)| {
+            let lower = part.to_ascii_lowercase();
+            if accepted.contains(&lower) { None } else { lookup(table, &lower).map(|f| (at, part, f)) }
+        })
+        .collect()
 }
 
 /// The words of an identifier: runs of ASCII letters, split where a lower-
@@ -789,6 +1098,107 @@ mod tests {
         assert_eq!(found(Language::Html, "<p id=\"adress\" class=\"recieve\" title=\"lenght\">x</p>"), ["adress"]);
         let (_, fixed) = run(&KnownTypoKey, Language::Json, "{\"recieve\": 1}");
         assert_eq!(fixed, "{\"recieve\": 1}");
+    }
+
+
+    const WORDS: &[(&str, &str)] = &[("10", "a are color colour the there which"), ("20", "address length receive"), ("60", "lengths lent"), ("100", "debounce")];
+
+    fn ctx_run(rule: &dyn NativeRule, language: Language, path: &str, src: &str, options: serde_json::Value) -> Vec<(String, Vec<String>)> {
+        let root = codelaw_lang::parse(language, src);
+        let mut data = BTreeMap::new();
+        data.insert("spell/typos".to_owned(), Arc::new(serde_json::json!({ "entries": TABLE })));
+        let classes: serde_json::Map<String, serde_json::Value> = WORDS.iter().map(|(k, v)| ((*k).to_owned(), serde_json::json!(v))).collect();
+        data.insert("spell/words".to_owned(), Arc::new(serde_json::json!({ "classes": classes })));
+        data.insert("spell/locale".to_owned(), Arc::new(serde_json::json!({ "en-US": "colour:color", "en-GB": "color:colour" })));
+        let options: BTreeMap<String, serde_json::Value> = options.as_object().cloned().unwrap_or_default().into_iter().collect();
+        let file = crate::DetachedFile::new(path, src);
+        let ctx = NativeContext { source: src, language, semantic: None, options: &options, data: &data, file: &file };
+        let mut out = Vec::new();
+        for node in root.root().dfs() {
+            if rule.kinds().contains(&node.kind().as_ref()) {
+                rule.check(node, &ctx, &mut out);
+            }
+        }
+        out.iter().map(|f| (src[f.start..f.end].to_owned(), f.edits.iter().map(|e| e.text.clone()).collect())).collect()
+    }
+
+    #[test]
+    fn the_dictionary_is_searched_in_place() {
+        let t = "able bake cake cakes dog";
+        for w in t.split(' ') {
+            assert!(token_at(t, w).is_some(), "{w}");
+        }
+        for w in ["", "abl", "cak", "cakess", "zz", "a"] {
+            assert!(token_at(t, w).is_none(), "{w}");
+        }
+        assert_eq!(&t[prefix_range(t, "c").0..prefix_range(t, "c").1], "cake cakes ");
+        assert_eq!(prefix_range(t, "e"), (t.len(), t.len()));
+        assert_eq!(edits_within("lenght", "length", 2), Some(1));
+        assert_eq!(edits_within("adres", "address", 2), Some(2));
+        assert_eq!(edits_within("abc", "xyz", 2), None);
+    }
+
+    #[test]
+    fn unknown_words_are_reported_with_the_nearest_words() {
+        let found = ctx_run(&UnknownWord, Language::Javascript, "a.js", "// the colr and Lenghts debounce THERE lenght zzzzzz\n", serde_json::json!({}));
+        assert_eq!(
+            found,
+            [("colr".into(), vec!["color".into()]), ("Lenghts".into(), vec!["Lengths".into()]), ("zzzzzz".into(), vec![])]
+        );
+        // `[spell] words` accepts a word.
+        assert!(ctx_run(&UnknownWord, Language::Javascript, "a.js", "// colr\n", serde_json::json!({"words": ["Colr"]})).is_empty());
+    }
+
+    #[test]
+    fn the_other_locale_is_reported_only_when_one_is_set() {
+        let src = "# the Colour and the color\n";
+        assert!(ctx_run(&LocaleVariant, Language::Python, "a.py", src, serde_json::json!({})).is_empty());
+        assert_eq!(ctx_run(&LocaleVariant, Language::Python, "a.py", src, serde_json::json!({"locale": "en-US"})), [("Colour".into(), vec!["Color".into()])]);
+        assert_eq!(ctx_run(&LocaleVariant, Language::Python, "a.py", src, serde_json::json!({"locale": "en-GB"})), [("color".into(), vec!["colour".into()])]);
+    }
+
+    #[test]
+    fn an_accepted_word_that_hides_a_typo_is_suspicious() {
+        let src = "[spell]\nwords = [\"recieve\", \"lenghts\", \"debounce\", \"kubectl\"]\n[other]\nwords = [\"recieve\"]\n";
+        let found: Vec<String> = ctx_run(&SuspiciousWord, Language::Toml, "codelaw.toml", src, serde_json::json!({})).into_iter().map(|(w, _)| w).collect();
+        assert_eq!(found, ["recieve"]);
+        let src = "[spell]\nwords = [\"recieve\", \"lenth\"]\n";
+        assert_eq!(ctx_run(&SuspiciousWord, Language::Toml, "codelaw.toml", src, serde_json::json!({})).len(), 2);
+        assert!(ctx_run(&SuspiciousWord, Language::Toml, "pkg/other.toml", src, serde_json::json!({})).is_empty());
+        let dotted = "spell.words = [\"recieve\"]\n";
+        assert_eq!(ctx_run(&SuspiciousWord, Language::Toml, "codelaw.toml", dotted, serde_json::json!({})).len(), 1);
+    }
+
+    #[test]
+    fn accepted_words_excuse_known_typos() {
+        assert!(ctx_run(&KnownTypo, Language::Javascript, "a.js", "// recieve\n", serde_json::json!({"words": ["recieve"]})).is_empty());
+        assert_eq!(ctx_run(&KnownTypo, Language::Javascript, "a.js", "// recieve\n", serde_json::json!({})).len(), 1);
+    }
+
+
+    #[test]
+    fn the_shipped_dictionary_and_locale_tables_are_searchable() {
+        let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/../../packs/spell/data/spell/");
+        let read = |f: &str| -> serde_json::Value { serde_json::from_str(&std::fs::read_to_string(format!("{dir}{f}")).expect("shipped")).expect("JSON") };
+        let words = read("words.json");
+        let mut count = 0;
+        for table in words["classes"].as_object().expect("classes").values() {
+            let table = table.as_str().expect("a string");
+            for w in table.split(' ') {
+                assert_eq!(token_at(table, w).map(|at| &table[at..at + w.len()]), Some(w), "{w}");
+                count += 1;
+            }
+        }
+        assert_eq!(Some(count), words["count"].as_u64().map(|c| c as usize));
+        let locale = read("locale.json");
+        for (name, word, fix) in [("en-US", "colour", "color"), ("en-GB", "color", "colour")] {
+            let table = locale[name].as_str().expect("a table");
+            assert_eq!(lookup(table, word), Some(fix));
+            for e in table.split(' ') {
+                let (w, f) = e.split_once(':').expect("pair");
+                assert_eq!(lookup(table, w), Some(f));
+            }
+        }
     }
 
 }

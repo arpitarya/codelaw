@@ -54,6 +54,12 @@ SOURCES = {
         "url": "https://master.dl.sourceforge.net/project/wordlist/SCOWL/2020.12.07/scowl-2020.12.07.tar.gz?viasf=1",
         "sha256": "5587667caa20c4891390c2d42dbb4d5c4c3f41bee77af1457ece3ba23fb859cc",
     },
+    "varcon": {
+        "version": "2020.12.07",
+        "file": "varcon-2020.12.07.tar.gz",
+        "url": "https://downloads.sourceforge.net/project/wordlist/VarCon/2020.12.07/varcon-2020.12.07.tar.gz",
+        "sha256": "3b0720c5718008f37c02658a83d51d5598dd86531f0a2206d410c854006cb184",
+    },
     "software-terms": {
         "version": "5.4.8",
         "file": "dict-software-terms-5.4.8.tgz",
@@ -69,6 +75,12 @@ KEY_MAX_SIZE = 10         # the size classes whose words get keyboard-neighbour 
 EXCLUDE_MAX_SIZE = 80     # a variant in a SCOWL word list up to this size is a word
 MIN_SOURCE_LEN = 4        # letters in a source word
 MIN_TYPO_LEN = 4          # letters in a typo: the checker skips shorter words
+DICT_MAX_SIZE = 60        # SCOWL size classes in the dictionary (aspell's default `en` size)
+# The SCOWL lists the dictionary and the locale table read: English, US and
+# British (with British -ize) words, names, upper-case words, abbreviations
+# and contractions; Canadian and Australian lists and the variant lists are not.
+DICT_REGIONS = ("english", "american", "british", "british_z")
+DICT_KINDS = ("words", "proper-names", "upper", "abbreviations", "contractions")
 SIZES = (10, 20, 35, 40, 50, 55, 60, 70, 80, 95)
 ROWS = ("qwertyuiop", "asdfghjkl", "zxcvbnm")
 VOWELS = set("aeiou")
@@ -171,6 +183,82 @@ def read_extra():
     return extra
 
 
+def dictionary_words(lists, terms):
+    """{word: size class} — lower case, ASCII letters only; a contraction or
+    possessive gives the letters before its apostrophe (`doesn't` → `doesn`),
+    because the checker splits words there. A word keeps its smallest class;
+    a software term absent from SCOWL gets class 100."""
+    out = {}
+
+    def add(word, size):
+        w = word.lower()
+        if w.isascii() and w.isalpha() and (w not in out or size < out[w]):
+            out[w] = size
+
+    for (category, size), words in lists.items():
+        region, _, kind = category.partition("-")
+        if size > DICT_MAX_SIZE or region not in DICT_REGIONS or kind not in DICT_KINDS:
+            continue
+        for w in words:
+            for part in w.replace("'", " ").split()[:1]:
+                add(part, size)
+    for t in terms:
+        for part in "".join(c if c.isascii() and c.isalpha() else " " for c in t).split():
+            add(part, 100)
+    return out
+
+
+def varcon_pairs(cache, lists):
+    """VarCon's one-to-one US↔British pairs: a line with exactly one plain
+    American (`A`) and one plain British (`B`) spelling, both lower-case
+    ASCII letters, that differ; a pair is kept only when each spelling is
+    in no SCOWL list of the other locale (size 80 or below), so a word that
+    is right in both under another meaning (`check`/`cheque`,
+    `program`/`programme`) is never reported."""
+    with archive(cache, "varcon") as tar:
+        text = tar.extractfile("varcon-2020.12.07/varcon.txt").read().decode("latin-1")
+
+    def words_of(regions):
+        return {w.lower() for (c, size), ws in lists.items() if size <= EXCLUDE_MAX_SIZE and c.partition("-")[0] in regions and c.endswith("-words") for w in ws}
+
+    us_words = words_of(("english", "american"))
+    gb_words = words_of(("english", "british"))
+    gb_z_words = words_of(("english", "british", "british_z"))
+    pairs = []
+    for line in text.splitlines():
+        line = line.split("#", 1)[0].split("|", 1)[0].strip()
+        if not line:
+            continue
+        a = b = None
+        ok = True
+        for entry in line.split("/"):
+            tags, _, word = entry.partition(":")
+            word, tags = word.strip(), tags.split()
+            if "A" in tags:
+                ok = ok and a is None
+                a = word
+            if "B" in tags:
+                ok = ok and b is None
+                b = word
+        if ok and a and b and a != b and all(w.isascii() and w.isalpha() and w.islower() for w in (a, b)):
+            pairs.append((a, b))
+
+    def one_to_one(kept):
+        us_count, gb_count = defaultdict(int), defaultdict(int)
+        for a, b in kept:
+            us_count[a] += 1
+            gb_count[b] += 1
+        return sorted({(a, b) for a, b in kept if us_count[a] == 1 and gb_count[b] == 1})
+
+    # Under en-US a British spelling is reported: it is no American word and
+    # its American twin is no British word. Under en-GB an American spelling
+    # is reported: it is no British word (Oxford -ize spellings included,
+    # so `organize` is never reported) and its British twin no American word.
+    us = one_to_one([(a, b) for a, b in set(pairs) if b not in us_words and a not in gb_words])
+    gb = one_to_one([(a, b) for a, b in set(pairs) if a not in gb_z_words and b not in us_words])
+    return us, gb
+
+
 def build(cache):
     lists = scowl_lists(cache)
     terms = software_terms(cache)
@@ -206,7 +294,30 @@ def build(cache):
         "generated_by": "scripts/spell-data.py",
         "sources": {k: v["version"] for k, v in sorted(SOURCES.items())},
     }
-    return {"typos.json": json.dumps(doc, sort_keys=True, ensure_ascii=True, separators=(",", ":")) + "\n"}
+    words = dictionary_words(lists, terms)
+    classes = defaultdict(list)
+    for w, size in words.items():
+        classes[str(size)].append(w)
+    dictionary = {
+        "classes": {k: " ".join(sorted(v)) for k, v in classes.items()},
+        "count": len(words),
+        "format": 1,
+        "generated_by": "scripts/spell-data.py",
+        "max_size": DICT_MAX_SIZE,
+        "sources": {k: v["version"] for k, v in sorted(SOURCES.items()) if k != "varcon"},
+    }
+    us, gb = varcon_pairs(cache, lists)
+    locale = {
+        "count": len(us) + len(gb),
+        "en-GB": " ".join(f"{a}:{b}" for a, b in gb),
+        "en-US": " ".join(f"{b}:{a}" for a, b in sorted(us, key=lambda p: p[1])),
+        "format": 1,
+        "generated_by": "scripts/spell-data.py",
+        "sources": {k: SOURCES[k]["version"] for k in ("scowl", "varcon")},
+    }
+    doc["sources"] = {k: v["version"] for k, v in sorted(SOURCES.items()) if k != "varcon"}
+    dump = lambda d: json.dumps(d, sort_keys=True, ensure_ascii=True, separators=(",", ":")) + "\n"  # noqa: E731
+    return {"typos.json": dump(doc), "words.json": dump(dictionary), "locale.json": dump(locale)}
 
 
 def main():

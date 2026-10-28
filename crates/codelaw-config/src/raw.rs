@@ -70,6 +70,10 @@ pub struct RawConfig {
     /// SR-PROJECT-GRAPH decision 8 (W-63): CSS Modules. Root config only.
     #[serde(default)]
     pub css: RawCss,
+    /// SR-SPELL decision 7 (W-103): the spell pack's locale and accepted
+    /// words. Root config only.
+    #[serde(default)]
+    pub spell: RawSpell,
     #[serde(default)]
     pub adapters: RawAdapters,
     #[serde(default)]
@@ -277,6 +281,24 @@ pub struct RawCss {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub modules_convention: Option<String>,
 }
+
+/// `[spell]`: the spell pack's options (SR-SPELL decision 7). The `spell/*`
+/// rules read it as their options, so it serialises to the JSON they read.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawSpell {
+    /// `en-US` or `en-GB`: `spell/locale-variant` reports the other
+    /// locale's spellings. Unset, both are accepted.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locale: Option<String>,
+    /// Words the project accepts: never a known typo, an unknown word or a
+    /// locale variant; `spell/suspicious-word` checks each one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub words: Option<Vec<String>>,
+}
+
+/// The values of `[spell] locale`.
+pub const SPELL_LOCALES: &[&str] = &["en-US", "en-GB"];
 
 /// The values of `[css] modules_convention`.
 pub const CSS_MODULES_CONVENTIONS: &[&str] = &["asIs", "camelCase", "camelCaseOnly", "dashes", "dashesOnly"];

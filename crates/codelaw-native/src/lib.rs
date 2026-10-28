@@ -644,6 +644,9 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &spell::KnownTypo,
     &spell::KnownTypoIdentifier,
     &spell::KnownTypoKey,
+    &spell::LocaleVariant,
+    &spell::SuspiciousWord,
+    &spell::UnknownWord,
 ];
 
 /// Every registered native rule.

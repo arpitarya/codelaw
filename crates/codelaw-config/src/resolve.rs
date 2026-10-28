@@ -324,6 +324,15 @@ impl ConfigFile {
                 format!("`[css] modules_convention`: `{c}` is not one of {}", crate::raw::CSS_MODULES_CONVENTIONS.iter().map(|c| format!("`{c}`")).collect::<Vec<_>>().join(", ")),
             ));
         }
+        if let Some(l) = raw.spell.locale.as_deref().filter(|l| !crate::raw::SPELL_LOCALES.contains(l)) {
+            return Err(ConfigError::new(
+                Some(path),
+                format!("`[spell] locale`: `{l}` is not one of {}", crate::raw::SPELL_LOCALES.iter().map(|c| format!("`{c}`")).collect::<Vec<_>>().join(", ")),
+            ));
+        }
+        if let Some(w) = raw.spell.words.iter().flatten().find(|w| w.is_empty() || w.chars().any(char::is_whitespace)) {
+            return Err(ConfigError::new(Some(path), format!("`[spell] words`: `{w}` is not one word")));
+        }
         if let Some(globs) = &raw.css.modules {
             glob_set(globs, &path).map_err(|e| ConfigError::new(Some(path.clone()), format!("`[css] modules`: {}", e.message)))?;
         }
@@ -463,7 +472,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
     "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
-    "[deps]", "[css]", "[coverage]",
+    "[deps]", "[css]", "[coverage]", "[spell]",
 ];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
@@ -483,6 +492,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.deps != Default::default(),
         raw.css != Default::default(),
         raw.coverage.is_some(),
+        raw.spell != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -715,6 +725,7 @@ impl Config {
         let value = match (name, self.root_raw()) {
             ("deps", Some(r)) => serde_json::to_value(&r.deps).ok(),
             ("css", Some(r)) => serde_json::to_value(&r.css).ok(),
+            ("spell", Some(r)) => serde_json::to_value(&r.spell).ok(),
             _ => None,
         };
         match value {
@@ -1075,6 +1086,19 @@ rules = { "js/no-console" = "error" }
         }
         let err = Config::from_toml(PathBuf::from("/x"), "[scope.utils]\nrules = {}\n").unwrap_err();
         assert!(err.message.contains("scope `utils` has no `files`"), "{}", err.message);
+    }
+
+    #[test]
+    fn the_spell_section_is_checked_and_read_as_options() {
+        let c = Config::from_toml(PathBuf::from("/x"), "[spell]\nlocale = \"en-GB\"\nwords = [\"kubectl\"]\n").unwrap();
+        let o = c.section_options("spell");
+        assert_eq!(o.get("locale"), Some(&serde_json::json!("en-GB")));
+        assert_eq!(o.get("words"), Some(&serde_json::json!(["kubectl"])));
+        let err = Config::from_toml(PathBuf::from("/x"), "[spell]\nlocale = \"en-AU\"\n").unwrap_err();
+        assert!(err.to_string().contains("`[spell] locale`: `en-AU` is not one of `en-US`, `en-GB`"), "{err}");
+        let err = Config::from_toml(PathBuf::from("/x"), "[spell]\nwords = [\"two words\"]\n").unwrap_err();
+        assert!(err.to_string().contains("`[spell] words`: `two words` is not one word"), "{err}");
+        assert!(Config::from_toml(PathBuf::from("/x"), "[spell]\nwordz = []\n").is_err());
     }
 
     #[test]
