@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — Open VSX set up; the Marketplace's trusted publishing on  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Set up open VSX. Create the account."*, then *"Go ahead, claim ownership. Do what's necessary."*, then, on the Marketplace, how to publish through CI with trusted publishing.
+- **Done:** Open VSX — Arpit logged in with GitHub, linked his Eclipse account and signed the Publisher Agreement; Claude in Chrome created the namespace `codelaw` (unverified). The Marketplace — Arpit created the Trusted Publishing policy *codelaw publish.yml* (`arpitarya` · `codelaw` · `publish.yml` · `vscode`), Active. W-95 → 🟢 agent (the environment and the OIDC job), W-117 and SR-PACKAGES brought current. Not committed.
+- **Decided / left open:** Open VSX's ownership claim — Option 2 needs Marketplace access (blocked then by a looping-login 500), Option 1 fits after the first Marketplace version; Arpit reported filing the claim by voice, issue number not yet recorded. Whether the deleted 0.2.0 blocks `codelaw.codelaw` — open.
+- **Mistakes:** the voice reply said the Marketplace has no trusted publishing; his screenshot showed it does — corrected in text.
+- **Next:** an agent builds `publish.yml`'s Marketplace job (OIDC → `curl`); Arpit names the claim issue for W-117.
+
 ## 2026-10-29 — Docket (voice): seven blockers ruled; W-116, W-117, W-118, B-062 filed  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"List all the blockers in OpenWork in detail with explanation and examples and recommendation."* — then a voice walk-through of all but PyPI days 2–4, and *"file it."*
