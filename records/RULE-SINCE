@@ -47,4 +47,11 @@
 #   its own line, for crates/codelaw-cli/tests/adapters.rs (SR-CLI-MCP; the
 #   change was a test only). Both are pushed, so they cannot be reworded.
 #   0dfbaae is the newer, so the baseline is that commit.
-0dfbaae30cc56332c8ad5d71798e9fbe8929289e
+# - 2026-10-28: 0dfbaae -> d69b476. One commit since 0dfbaae fails the replay:
+#   d69b476 (W-108), the live oxlint capture — it changed crates/codelaw-adapters
+#   (parse.rs, the fixture, mapping.rs; SR-ARCHITECTURE) and staged SR-LINTER, but
+#   neither SR-ARCHITECTURE nor a `no SR affected` line; lockmaster landed it
+#   anyway (the third such landing; the kit's submit does not stop on the
+#   commit-msg guard). It is pushed, so it cannot be reworded; it is the newest
+#   failing commit, so the baseline is that commit.
+d69b476ed1a4a8bb3aa80af67b3fc96464104b39
