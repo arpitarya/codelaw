@@ -4,7 +4,8 @@ codelaw's spell checker — one of the first-party rule packs
 ([SR-RULE-PACKS](../../records/0101_rule-packs.md)), on npm and PyPI
 (`codelaw-rules-spell`). It reads the prose of every L3 language from the tree
 the engine parsed: comments and docstrings, prose strings, Markdown and HTML
-text, and the string values of JSON, YAML and TOML. It is codelaw's own
+text, the string values of JSON, YAML and TOML, and the names a file
+declares — identifiers, keys, classes and ids. It is codelaw's own
 code and codelaw's own word data, generated from SCOWL
 ([SR-SPELL](../../records/0116_spell.md)); it does not wrap CSpell.
 
@@ -27,8 +28,8 @@ pip install codelaw-rules-spell
 
 | preset | rules | ported from |
 |---|---|---|
-| `spell/recommended` | 1 | codelaw's own: known typos from a list generated from SCOWL, fixed unattended |
-| `spell/strict` | 1 | `spell/recommended`; the dictionary check joins it as it is built (W-103) |
+| `spell/recommended` | 3 | codelaw's own: known typos from a list generated from SCOWL, fixed unattended |
+| `spell/strict` | 3 | `spell/recommended`; the dictionary check joins it as it is built (W-103) |
 
 <!-- /docs-sync:presets -->
 
@@ -39,6 +40,8 @@ pip install codelaw-rules-spell
 | rule | fix | flags |
 |---|---|---|
 | `spell/known-typo` | auto | a word on the known-typo list in a comment, a doc, a prose string or Markdown |
+| `spell/known-typo-identifier` | auto | a known typo in a JS, TS or Python name where it is declared; renamed only when the name is provably file-local |
+| `spell/known-typo-key` | manual | a known typo in a JSON, YAML or TOML key, a CSS or SCSS class, id or custom property, or an HTML `id` |
 
 <!-- /docs-sync:rules -->
 

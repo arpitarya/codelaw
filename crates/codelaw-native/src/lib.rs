@@ -642,6 +642,8 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &data_yaml::NoDuplicateKeys,
     &data_yaml::NoUndeclaredAlias,
     &spell::KnownTypo,
+    &spell::KnownTypoIdentifier,
+    &spell::KnownTypoKey,
 ];
 
 /// Every registered native rule.

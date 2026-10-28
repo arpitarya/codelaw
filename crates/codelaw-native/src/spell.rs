@@ -20,6 +20,7 @@ use crate::util::{named_children, text};
 use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
+use codelaw_semantic::{ScopeKind, SemanticModel, SymbolKind};
 use tree_sitter::Node;
 
 pub struct KnownTypo;
@@ -84,6 +85,320 @@ impl NativeRule for KnownTypo {
             out.push(finding);
         }
     }
+}
+
+/// `spell/known-typo-identifier`: a known typo in a name where it is declared
+/// — a variable, a function, a class, a parameter, a type, a member — in
+/// JavaScript, TypeScript and Python, whose semantic model resolves every
+/// use (decision 5). The name splits at case changes, `_`, `-`, `.` and
+/// digits; each part is looked up as a word.
+///
+/// The fix renames the declaration and every use, and only when that is
+/// safe without reading another file: the name is not exported, not a
+/// module-level name of a script or a Python module (another file may read
+/// it), not a Python parameter (a caller may pass it by keyword), not a
+/// class attribute or member (read through `.`), not in a shorthand
+/// property (`{ recieve }` names a key too), every place the name is
+/// written in the file is a use the model resolved to it, and the new name
+/// is free. Otherwise the finding has no edit and its steps are manual.
+pub struct KnownTypoIdentifier;
+
+const NAME_LANGUAGES: &[Language] = &[Language::Javascript, Language::Jsx, Language::Typescript, Language::Tsx, Language::Python];
+
+/// Members: declared on a class, an interface or a type, read through `.`.
+const MEMBERS: &[&str] = &["method_definition", "field_definition", "public_field_definition", "property_signature", "method_signature", "abstract_method_signature"];
+
+impl NativeRule for KnownTypoIdentifier {
+    fn id(&self) -> &'static str {
+        "spell/known-typo-identifier"
+    }
+    fn languages(&self) -> &'static [Language] {
+        NAME_LANGUAGES
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["program", "module"]
+    }
+    fn needs_semantic(&self) -> bool {
+        true
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        let Some(table) = typo_table(ctx) else { return };
+        let Some(model) = ctx.semantic else { return };
+        let root = node.get_inner_node();
+        // The root only: TypeScript's `module M {}` is a `module` too.
+        if root.parent().is_some() {
+            return;
+        }
+        let src = ctx.source;
+        let python = ctx.language == Language::Python;
+        let mut leaves = None;
+        for (id, s) in model.symbols.iter().enumerate() {
+            if s.kind == SymbolKind::Import {
+                continue;
+            }
+            let Some(&(start, end)) = s.decls.first() else { continue };
+            if src.get(start..end) != Some(s.name.as_str()) {
+                continue;
+            }
+            let typos = name_typos(table, &s.name);
+            if typos.is_empty() {
+                continue;
+            }
+            let leaves = leaves.get_or_insert_with(|| Leaves::of(root, src));
+            let edits = renamed(&s.name, &typos).and_then(|new| rename_edits(model, id, root, src, python, leaves, &new, &typos)).unwrap_or_default();
+            out.push(name_finding(start, end, &s.name, &typos, edits));
+        }
+        if python {
+            return;
+        }
+        let mut stack = vec![root];
+        while let Some(n) = stack.pop() {
+            if MEMBERS.contains(&n.kind())
+                && let Some(name) = n.child_by_field_name("name").or_else(|| n.child_by_field_name("property"))
+                && matches!(name.kind(), "property_identifier" | "private_property_identifier")
+            {
+                let word = text(name, src);
+                let typos = name_typos(table, word);
+                if !typos.is_empty() {
+                    out.push(name_finding(name.start_byte(), name.end_byte(), word, &typos, Vec::new()));
+                }
+            }
+            stack.extend(named_children(n).into_iter().rev());
+        }
+    }
+}
+
+/// `spell/known-typo-key`: a known typo in a name other files read — a JSON,
+/// YAML or TOML key, a CSS or SCSS class, id or custom property, an HTML
+/// `id` — reported once per file where it is declared, never fixed:
+/// renaming it breaks what reads it.
+pub struct KnownTypoKey;
+
+impl NativeRule for KnownTypoKey {
+    fn id(&self) -> &'static str {
+        "spell/known-typo-key"
+    }
+    fn languages(&self) -> &'static [Language] {
+        &[Language::Json, Language::Yaml, Language::Toml, Language::Css, Language::Scss, Language::Html]
+    }
+    fn kinds(&self) -> &'static [&'static str] {
+        &["document", "stream", "stylesheet"]
+    }
+    fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+        // The root only: a YAML `stream` holds `document`s.
+        if node.get_inner_node().parent().is_some() {
+            return;
+        }
+        let Some(table) = typo_table(ctx) else { return };
+        let src = ctx.source;
+        let mut seen = std::collections::BTreeSet::new();
+        let mut stack = vec![node.get_inner_node()];
+        while let Some(n) = stack.pop() {
+            stack.extend(named_children(n).into_iter().rev());
+            let Some((start, end)) = declared_key(n, ctx.language, src) else { continue };
+            let word = &src[start..end];
+            if !seen.insert(word) {
+                continue;
+            }
+            let typos = name_typos(table, word);
+            if !typos.is_empty() {
+                out.push(name_finding(start, end, word, &typos, Vec::new()));
+            }
+        }
+    }
+}
+
+/// The byte range of the name `n` declares, in a language whose names other
+/// files read.
+fn declared_key(n: Node<'_>, language: Language, src: &str) -> Option<(usize, usize)> {
+    use Language::*;
+    let inner = |n: Node<'_>| (n.start_byte() + 1, n.end_byte().saturating_sub(1).max(n.start_byte() + 1));
+    match (language, n.kind()) {
+        (Json, "string_content") => n.parent().filter(|p| is_key(*p)).map(|_| (n.start_byte(), n.end_byte())),
+        (Yaml, "string_scalar") => in_yaml_key(n).then(|| (n.start_byte(), n.end_byte())),
+        (Yaml, "double_quote_scalar" | "single_quote_scalar") => in_yaml_key(n).then(|| inner(n)),
+        (Toml, "bare_key") => Some((n.start_byte(), n.end_byte())),
+        (Toml, "quoted_key") => Some(inner(n)),
+        (Css | Scss, "class_name" | "id_name") => Some((n.start_byte(), n.end_byte())),
+        (Css | Scss, "property_name") => text(n, src).starts_with(['$', '-']).then(|| (n.start_byte(), n.end_byte())),
+        (Scss, "mixin_statement" | "function_statement") => n.child_by_field_name("name").map(|c| (c.start_byte(), c.end_byte())),
+        (Html, "attribute_value") => {
+            let attribute = n.parent().filter(|p| p.kind() == "quoted_attribute_value").and_then(|p| p.parent()).or(n.parent())?;
+            let name = named_children(attribute).into_iter().find(|c| c.kind() == "attribute_name")?;
+            text(name, src).eq_ignore_ascii_case("id").then(|| (n.start_byte(), n.end_byte()))
+        }
+        _ => None,
+    }
+}
+
+/// One part of a name that is a known typo: its offset in the name, the
+/// part, and the list's corrections (`fix` or `fix1|fix2`).
+type NameTypo<'a, 't> = (usize, &'a str, &'t str);
+
+/// The parts of `name` on the known-typo list.
+fn name_typos<'a, 't>(table: &'t str, name: &'a str) -> Vec<NameTypo<'a, 't>> {
+    name_parts(name).into_iter().filter(|(_, p)| p.len() >= 4).filter_map(|(at, part)| lookup(table, &part.to_ascii_lowercase()).map(|f| (at, part, f))).collect()
+}
+
+/// The words of an identifier: runs of ASCII letters, split where a lower-
+/// case letter meets an upper-case one (`recieveAll`) and before the last
+/// capital of a run of capitals followed by a lower-case letter
+/// (`HTTPServer` → `HTTP`, `Server`). `_`, `-`, `.`, digits and anything
+/// else separate.
+fn name_parts(name: &str) -> Vec<(usize, &str)> {
+    let b = name.as_bytes();
+    let mut out = Vec::new();
+    let mut start = None;
+    for i in 0..=b.len() {
+        let letter = i < b.len() && b[i].is_ascii_alphabetic();
+        match (start, letter) {
+            (None, true) => start = Some(i),
+            (Some(s), true) => {
+                let split = (b[i - 1].is_ascii_lowercase() && b[i].is_ascii_uppercase())
+                    || (b[i - 1].is_ascii_uppercase() && b[i].is_ascii_uppercase() && b.get(i + 1).is_some_and(u8::is_ascii_lowercase));
+                if split {
+                    out.push((s, &name[s..i]));
+                    start = Some(i);
+                }
+            }
+            (Some(s), false) => {
+                out.push((s, &name[s..i]));
+                start = None;
+            }
+            (None, false) => {}
+        }
+    }
+    out
+}
+
+/// `name` with every typo replaced by its one correction, in the part's
+/// case; `None` when a part has several corrections or a mixed case.
+fn renamed(name: &str, typos: &[NameTypo<'_, '_>]) -> Option<String> {
+    let mut out = name.to_owned();
+    for &(at, part, fixes) in typos.iter().rev() {
+        if fixes.contains('|') {
+            return None;
+        }
+        out.replace_range(at..at + part.len(), &same_case(part, fixes)?);
+    }
+    Some(out)
+}
+
+fn name_finding(start: usize, end: usize, name: &str, typos: &[NameTypo<'_, '_>], edits: Vec<TextEdit>) -> NativeFinding {
+    let parts: Vec<String> = typos
+        .iter()
+        .map(|&(_, part, fixes)| {
+            let fixes: Vec<String> = fixes.split('|').map(|f| format!("`{}`", same_case(part, f).unwrap_or_else(|| f.to_owned()))).collect();
+            format!("`{part}` (a known typo of {})", fixes.join(" or "))
+        })
+        .collect();
+    NativeFinding { start, end, message: format!("`{name}` holds {}", parts.join(", ")), edits }
+}
+
+/// The identifier-like leaves and the string texts of a file, to prove a
+/// rename reaches every place a name is written.
+struct Leaves {
+    /// Identifier leaves: start offset by text.
+    names: std::collections::BTreeMap<String, Vec<usize>>,
+    /// String contents: (start, end).
+    strings: Vec<(usize, usize)>,
+}
+
+impl Leaves {
+    fn of(root: Node<'_>, src: &str) -> Self {
+        let mut names: std::collections::BTreeMap<String, Vec<usize>> = std::collections::BTreeMap::new();
+        let mut strings = Vec::new();
+        let mut stack = vec![root];
+        while let Some(n) = stack.pop() {
+            let kind = n.kind();
+            if kind.ends_with("identifier") && n.child_count() == 0 {
+                names.entry(text(n, src).to_owned()).or_default().push(n.start_byte());
+            } else if matches!(kind, "string_fragment" | "string_content") {
+                strings.push((n.start_byte(), n.end_byte()));
+            }
+            let mut c = n.walk();
+            stack.extend(n.children(&mut c));
+        }
+        Leaves { names, strings }
+    }
+
+    /// Whether `name` is written in a string as a whole word.
+    fn in_strings(&self, src: &str, name: &str) -> bool {
+        let ident = |c: char| c.is_alphanumeric() || c == '_' || c == '$';
+        self.strings.iter().any(|&(s, e)| {
+            let t = &src[s..e];
+            t.match_indices(name).any(|(i, _)| !t[..i].ends_with(ident) && !t[i + name.len()..].starts_with(ident))
+        })
+    }
+}
+
+/// Words a rename may not produce: a keyword is not a name.
+const KEYWORDS: &[&str] = &[
+    "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "else", "enum", "export", "extends", "false", "finally",
+    "for", "function", "import", "instanceof", "interface", "let", "new", "null", "package", "private", "protected", "public", "return", "static", "super",
+    "switch", "this", "throw", "true", "typeof", "void", "while", "with", "yield", "None", "True", "False", "assert", "async", "def", "elif", "except",
+    "from", "global", "lambda", "nonlocal", "pass", "raise", "while",
+];
+
+/// The edits that rename symbol `id` to `new` across the file, or `None`
+/// when that is not provably safe from this file alone.
+#[allow(clippy::too_many_arguments)]
+fn rename_edits(
+    model: &SemanticModel,
+    id: usize,
+    root: Node<'_>,
+    src: &str,
+    python: bool,
+    leaves: &Leaves,
+    new: &str,
+    typos: &[NameTypo<'_, '_>],
+) -> Option<Vec<TextEdit>> {
+    let s = model.symbol(id);
+    let scope = model.scopes[s.scope].kind;
+    if s.exported || s.implicitly_used || scope == ScopeKind::Class || (python && s.kind == SymbolKind::Param) {
+        return None;
+    }
+    // Another file reads a Python module's names, and a script's globals.
+    if scope == ScopeKind::Module && (python || (model.imports.is_empty() && model.exports.is_empty())) {
+        return None;
+    }
+    if KEYWORDS.contains(&new) || leaves.names.contains_key(new) || leaves.in_strings(src, &s.name) {
+        return None;
+    }
+    let mut ranges: Vec<(usize, usize)> = s.decls.clone();
+    ranges.extend(s.refs.iter().map(|&r| (model.references[r].start, model.references[r].end)));
+    let mut closing = Vec::new();
+    for &(start, end) in &ranges {
+        let n = root.descendant_for_byte_range(start, end)?;
+        if n.start_byte() != start || n.end_byte() != end || n.kind().starts_with("shorthand_property") || crate::util::in_ambient(n) {
+            return None;
+        }
+        // `<Recieve>…</Recieve>`: the model resolves the opening name only.
+        if let Some(open) = n.parent().filter(|p| p.kind() == "jsx_opening_element")
+            && let Some(close) = open.parent().and_then(|e| named_children(e).into_iter().find(|c| c.kind() == "jsx_closing_element"))
+            && let Some(name) = close.child_by_field_name("name")
+        {
+            closing.push((name.start_byte(), name.end_byte()));
+        }
+    }
+    ranges.extend(closing);
+    ranges.sort_unstable();
+    ranges.dedup();
+    if ranges.iter().any(|&(a, b)| src.get(a..b) != Some(s.name.as_str())) {
+        return None;
+    }
+    // Every place the name is written is one of them.
+    let written = leaves.names.get(&s.name).map_or(&[][..], Vec::as_slice);
+    if written.len() != ranges.len() || written.iter().any(|w| ranges.binary_search_by_key(w, |r| r.0).is_err()) {
+        return None;
+    }
+    let mut edits = Vec::new();
+    for &(start, _) in &ranges {
+        for &(at, part, fixes) in typos {
+            edits.push(TextEdit::new(start + at, start + at + part.len(), same_case(part, fixes)?));
+        }
+    }
+    Some(edits)
 }
 
 /// How a node's text is read.
@@ -394,4 +709,86 @@ mod tests {
         // `teh` is three letters, so never checked.
         assert!(check(Language::Javascript, "// teh\n").is_empty());
     }
+
+    /// A rule's findings over `src`, with the semantic model: the reported
+    /// text and the file after its edits.
+    fn run(rule: &dyn NativeRule, language: Language, src: &str) -> (Vec<String>, String) {
+        let root = codelaw_lang::parse(language, src);
+        let model = codelaw_semantic::build(language, &root, src);
+        let mut data = BTreeMap::new();
+        data.insert("spell/typos".to_owned(), Arc::new(serde_json::json!({ "entries": TABLE })));
+        let options = BTreeMap::new();
+        let ctx = NativeContext { source: src, language, semantic: model.as_ref(), options: &options, data: &data, file: &crate::DetachedFile::default() };
+        let mut out = Vec::new();
+        for node in root.root().dfs() {
+            if rule.kinds().contains(&node.kind().as_ref()) {
+                rule.check(node, &ctx, &mut out);
+            }
+        }
+        let mut edits: Vec<TextEdit> = out.iter().flat_map(|f| f.edits.clone()).collect();
+        edits.sort_by_key(|e| std::cmp::Reverse(e.start));
+        let mut fixed = src.to_owned();
+        for e in edits {
+            fixed.replace_range(e.start..e.end, &e.text);
+        }
+        (out.iter().map(|f| src[f.start..f.end].to_owned()).collect(), fixed)
+    }
+
+    #[test]
+    fn names_split_at_case_separators_and_digits() {
+        let parts = |n: &'static str| name_parts(n).into_iter().map(|(_, p)| p).collect::<Vec<_>>();
+        assert_eq!(parts("HTTPServer"), ["HTTP", "Server"]);
+        assert_eq!(parts("recieveAll"), ["recieve", "All"]);
+        assert_eq!(parts("RECIEVE_ALL2x"), ["RECIEVE", "ALL", "x"]);
+        assert_eq!(parts("my-class.name"), ["my", "class", "name"]);
+        assert_eq!(parts("$__x"), ["x"]);
+    }
+
+    #[test]
+    fn a_file_local_name_is_renamed_everywhere() {
+        let src = "export function f() {\n  const recieveAll = 1;\n  return recieveAll + 1;\n}\n";
+        assert_eq!(run(&KnownTypoIdentifier, Language::Javascript, src), (vec!["recieveAll".into()], src.replace("recieveAll", "receiveAll")));
+        let src = "def f():\n    lenght = 2\n    return lenght\n";
+        assert_eq!(run(&KnownTypoIdentifier, Language::Python, src), (vec!["lenght".into()], src.replace("lenght", "length")));
+        let src = "import x from 'x';\nconst Recieve = () => null;\nconst a = <Recieve>hi</Recieve>;\n";
+        assert_eq!(run(&KnownTypoIdentifier, Language::Jsx, src).1, src.replace("Recieve", "Receive"));
+        let src = "import x from 'x';\ntype AdressBook = { a: 1 };\nlet b: AdressBook = x;\n";
+        assert_eq!(run(&KnownTypoIdentifier, Language::Typescript, src).1, src.replace("Adress", "Address"));
+    }
+
+    #[test]
+    fn a_name_another_file_may_read_is_reported_but_not_renamed() {
+        for (language, src) in [
+            (Language::Javascript, "export const recieve = 1;\n"),
+            (Language::Javascript, "const recieve = 1;\n"), // a script's global
+            (Language::Python, "recieve = 1\n"), // a module's name
+            (Language::Python, "def f(lenght):\n    return lenght\n"), // a keyword argument
+            (Language::Python, "class A:\n    lenght = 1\n"),
+            (Language::Javascript, "export function f() {\n  const recieve = 1;\n  return { recieve };\n}\n"), // a key too
+            (Language::Javascript, "export function f(o) {\n  const recieve = 1;\n  return o.recieve + recieve;\n}\n"), // written elsewhere
+            (Language::Javascript, "export function f() {\n  const recieve = 1;\n  const receive = 2;\n  return recieve + receive;\n}\n"), // taken
+            (Language::Javascript, "export function f() {\n  const wich = 1;\n  return wich;\n}\n"), // two corrections
+            (Language::Typescript, "class A {\n  recieve(): void {}\n  lenght = 1;\n}\ninterface B { adress: string }\n"), // members
+        ] {
+            let (found, fixed) = run(&KnownTypoIdentifier, language, src);
+            assert!(!found.is_empty(), "{src}");
+            assert_eq!(fixed, src, "{src}");
+        }
+        // Imports are another module's names; uses are never reported.
+        assert_eq!(run(&KnownTypoIdentifier, Language::Javascript, "import { recieve } from 'x';\nrecieve();\n").0, Vec::<String>::new());
+    }
+
+    #[test]
+    fn keys_classes_and_ids_are_reported_once_where_declared() {
+        let found = |l, s| run(&KnownTypoKey, l, s).0;
+        assert_eq!(found(Language::Json, "{\"recieve\": {\"adress\": \"lenght x\"}, \"b\": [{\"adress\": 1}]}"), ["recieve", "adress"]);
+        assert_eq!(found(Language::Yaml, "recieve:\n  \"adress\": lenght\n"), ["recieve", "adress"]);
+        assert_eq!(found(Language::Toml, "[recieve.adress]\n\"lenght\" = 1\n"), ["recieve", "adress", "lenght"]);
+        assert_eq!(found(Language::Css, ".recieve-all #adress { --lenght-x: 1; color: red; }\n.recieve-all { }\n"), ["recieve-all", "adress", "--lenght-x"]);
+        assert_eq!(found(Language::Scss, "$lenght: 1;\n@mixin adress-x { }\n"), ["$lenght", "adress-x"]);
+        assert_eq!(found(Language::Html, "<p id=\"adress\" class=\"recieve\" title=\"lenght\">x</p>"), ["adress"]);
+        let (_, fixed) = run(&KnownTypoKey, Language::Json, "{\"recieve\": 1}");
+        assert_eq!(fixed, "{\"recieve\": 1}");
+    }
+
 }
