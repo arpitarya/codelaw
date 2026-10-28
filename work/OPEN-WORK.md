@@ -43,9 +43,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (18)
+## Open items (17)
 
-### build (16)
+### build (15)
 
 🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -60,8 +60,6 @@ here. Read that record before changing anything below it.
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
 🔴 **W-109** `arpit` Bitbucket ruling applied: `--format bitbucket` kept; `init --ci bitbucket`, its template and the pipe removed; USAGE shows the step to copy, both switches its variables, a test runs it. Left: the live proof after v0.3.0 (inbox). Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
-
-🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in corpus); CSS/SCSS rules read statements, selectors, values, preludes, media queries, pseudo-class args, keyframe selectors from the tree; left: font lists. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 

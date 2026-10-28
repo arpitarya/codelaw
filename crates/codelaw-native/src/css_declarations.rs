@@ -2,7 +2,7 @@
 //! declaration blocks that hold them.
 
 use crate::css_syntax::{
-    Kind, Sheet, VKind, VNode, css_rule, dimension, finding, fixed, matches_any, non_standard_value, opt_list, opt_str, set, significant, split_commas, standard_property,
+    Kind, Sheet, VKind, VNode, comma_parts, css_rule, dimension, finding, fixed, matches_any, non_standard_value, opt_list, opt_str, set, significant, standard_property,
     table, text, unprefixed, vendor_prefix,
 };
 use crate::util::{unquote, whole_lines};
@@ -321,9 +321,12 @@ css_rule!(DeclarationPropertyValueNoUnknown, "css/declaration-property-value-no-
 });
 
 /// A family name as written, and whether it was quoted; the key compares
-/// unquoted names case-insensitively only when they are keywords.
-fn families(src: &str, r: (usize, usize)) -> Vec<((usize, usize), String, bool)> {
-    split_commas(src, r.0, r.1)
+/// unquoted names case-insensitively only when they are keywords. `r` is the
+/// list's range in the declaration's values `vals` (all of them, or the
+/// families of a `font` shorthand).
+fn families(src: &str, vals: &[VNode], r: (usize, usize)) -> Vec<((usize, usize), String, bool)> {
+    let from = vals.iter().position(|n| n.start >= r.0).unwrap_or(vals.len());
+    comma_parts(&vals[from..], src, r)
         .into_iter()
         .filter(|f| f.1 > f.0)
         .map(|f| {
@@ -379,7 +382,7 @@ css_rule!(FontFamilyNoDuplicateNames, "css/font-family-no-duplicate-names", |she
             },
             _ => continue,
         };
-        let fams = families(src, range);
+        let fams = families(src, &sheet.values(i, src), range);
         let mut seen = BTreeSet::new();
         for (idx, (f, name, quoted)) in fams.iter().enumerate() {
             let key = if !quoted && keywords.contains(&name.to_ascii_lowercase()) { format!("kw:{}", name.to_ascii_lowercase()) } else { format!("name:{name}") };
@@ -419,7 +422,7 @@ css_rule!(FontFamilyNoMissingGenericFamilyKeyword, "css/font-family-no-missing-g
             }
             _ => continue,
         };
-        let fams = families(src, range);
+        let fams = families(src, &sheet.values(i, src), range);
         let Some(last) = fams.last() else { continue };
         if fams.iter().any(|(_, name, quoted)| (!quoted && keywords.contains(&name.to_ascii_lowercase())) || matches_any(&ignore, name)) {
             continue;
@@ -738,7 +741,7 @@ css_rule!(PropertyNoVendorPrefix, "css/property-no-vendor-prefix", |sheet, src, 
         }
         if lower == "-webkit-background-size" {
             // Two-value sizes mean the same prefixed and not (whatwg/compat#28).
-            let safe = split_commas(src, sheet.nodes[i].params.0, sheet.nodes[i].params.1).iter().all(|r| {
+            let safe = comma_parts(&sheet.values(i, src), src, sheet.nodes[i].params).iter().all(|r| {
                 let parts: Vec<&str> = text(src, *r).split_whitespace().collect();
                 parts.len() == 2 || (parts.len() == 1 && parts[0] == "auto")
             });

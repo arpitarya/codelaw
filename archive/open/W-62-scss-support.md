@@ -7,7 +7,7 @@ filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
 updated_by: "Claude Code (Opus 5.5)"
-ball: agent
+ball: done
 ---
 
 # W-62 — SCSS in the CSS pack — L3 amended, parsed, formatted, linted
@@ -17,7 +17,7 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Amend L3: `scss` joins `languages` as a CSS dialect (like `jsx`/`tsx`); `.sass` indented syntax and Less stay out. On the decider's ruling of 2026-10-26 | the law allows it | ✅ 2026-10-26 |
-| 2 | **Parser — B-047, ruled 2026-10-26: own grammar.** Extend codelaw's tree-sitter-css fork for the CSS forms that still give `ERROR`, and take **tree-sitter-scss** (MIT, tree-sitter-grammars) for `.scss`; move the CSS rules off `css_syntax.rs` onto these trees. Biome stays the formatter only | CSS and SCSS rules on real trees, under codelaw's control | ◐ both grammars patched (2026-10-27); every CSS/SCSS rule reads its **statements and style-rule selectors from the tree** (2026-10-27, `css_tree.rs`), **declaration values** (2026-10-28) and **at-rule preludes and media queries** **pseudo-class arguments** and **keyframe selectors** (2026-10-28); font lists still split as text — see *Left* |
+| 2 | **Parser — B-047, ruled 2026-10-26: own grammar.** Extend codelaw's tree-sitter-css fork for the CSS forms that still give `ERROR`, and take **tree-sitter-scss** (MIT, tree-sitter-grammars) for `.scss`; move the CSS rules off `css_syntax.rs` onto these trees. Biome stays the formatter only | CSS and SCSS rules on real trees, under codelaw's control | ✅ both grammars patched (2026-10-27); every CSS/SCSS rule reads its statements, selectors, declaration values, at-rule preludes and media queries, pseudo-class arguments, keyframe selectors and comma lists **from the tree** (2026-10-27/28, `css_tree.rs`); the grammar forms still read as `ERROR` (the file's sheet then comes from the text) moved to **B-056** on close |
 | 3 | Formatter (L7): Biome's SCSS formatter at the pinned revision; `format-parity.py` against Prettier's SCSS on a corpus | SCSS formats like CSS does | ✅ Biome's SCSS source; 98.6 % identical files vs Prettier (212 files) |
 | 4 | Every `css/*` rule declares `languages: [css, scss]` or says why not; cases for `$var`, nesting, `@mixin`/`@include`, `#{}` interpolation, `//` comments, placeholders | no false positives on SCSS | ✅ 64 of 71 declare `scss`; a two-file SCSS corpus with a pinned count per rule |
 | 5 | SCSS rules (below), ported from stylelint-scss with `ported_from:` | SCSS-specific checks | ✅ 15 of 16: `scss/operator-no-unspaced` is a layout rule (SR-FORMATTER decision 3) |
@@ -121,13 +121,22 @@ ball: agent
 - **Checked equal, not assumed:** the harness over the same 827 clean sheets: **61 keyframe blocks with identical selectors**, 0 different, 0 left to the text; `css_tree::tests` compares a sample with a comment, a decimal and a named range. Release builds, all 92 rules: **the same 24 657 corpus and 964 example findings** on main and the branch. Pinned counts unchanged (css 39 785, scss 798); cases css 836, scss 165, css-modules 62 pass.
 - **L8:** alternated (load ~7): single-threaded `check --no-cache`, 15 runs, median 2.476 s main vs 2.370 s branch (min 2.377 vs 2.353); multi-threaded 9 runs 1.122 vs 1.091 s — no cost measurable on a loaded machine.
 
-## Left (honest)
+## Built (2026-10-28, Claude Code) — the rules onto the trees: comma lists
 
-1. **Step 2's rest: the parts of a statement the rules still read as text.** Statements, style-rule selectors, declaration values, at-rule preludes and media queries the selectors in pseudo-class arguments and keyframe selectors come from the tree (above); still read by `css_syntax.rs`'s lexers inside the tree's ranges: a font list split at its commas (`split_commas` in `css/font-family-*` and `-webkit-background-size`). (`css/media-query-no-invalid` and `css/at-rule-prelude-no-invalid` stay on text by design.)
-2. **Grammar forms still read as `ERROR`** (the READMEs list them; such a file's sheet comes from the text): an attribute selector's case flag (`[type="a" i]`, found 2026-10-27), SCSS `@container #{$name} (…)`, a string holding an interpolation with its own quotes, `:not(.a)#{$x}`, an escape after an interpolation; CSS an unquoted `url(data:…;…)` holding `;`, a dotted layer name in `@layer a, b.c` (found 2026-10-28), `@nest`, `@value` (W-63), a backslash-newline in a string. The CSS fork's `upstream/grammar.patch` covers the 2026-10-22 forms only.
-3. **After the corpus:** `stable` for the `scss/*` rules waits on W-100's criterion (no rule is promoted until it is ratified); a CSS Modules corpus is W-63's step. (`css/no-descending-specificity` and `&`: done 2026-10-27, see *Built*.)
-4. **The graph does not read `.scss`:** `graph/no-unused-css-classes` and `css/project` stay CSS-only (W-63 extends the graph for modules).
-5. **Not shipped on purpose:** `scss/operator-no-unspaced` (layout; the formatter's) — the item's table listed it.
+- **A comma list is split at its component values' top-level commas** (`css_syntax::comma_parts`, over `Sheet::values`, so from the tree), each part trimmed of white space and comments: `css/font-family-no-duplicate-names` and `css/font-family-no-missing-generic-family-keyword` (a `font-family` value, or a `font` shorthand's families from its first family on), `css/property-no-vendor-prefix`'s `-webkit-background-size` check, and `css/layer-name-pattern` (since the preludes increment). `css/no-descending-specificity`'s `selectors-within-list` counts the rule's selector list from the tree.
+- **Checked equal, not assumed:** the harness over the same 827 clean sheets: **46 494 declarations split identically** by `comma_parts` and by the text's `split_commas` (142 of them `font`/`font-family`), 0 different. Release builds, all 92 rules: **the same 24 657 corpus and 964 example findings** on main and the branch. Pinned counts unchanged (css 39 785, scss 798); cases css 836, scss 165, css-modules 62 pass.
+- **L8:** alternated (load ~5): single-threaded `check --no-cache`, 15 runs, median 2.344 s main vs 2.344 s branch; all 92 rules 2.666 vs 2.664 s; multi-threaded 9 runs 0.764 vs 0.762 s.
+- **What still reads text, by design** (SR-ARCHITECTURE decision 15b): a sheet whose tree holds an `ERROR`/`MISSING` node or a CSS `//` comment, an interpolated or templated selector, a value whose leaves the text reads across a leaf's edge (7 declarations), the validity of a media query and of an at-rule prelude (`css/media-query-no-invalid`, `css/at-rule-prelude-no-invalid`), and the selectors a rule builds itself (`css/no-descending-specificity`'s resolved nesting).
+
+## Left — moved on close (2026-10-28)
+
+*Left* item 1 is empty; each remaining item went where SR-WORK-BACKLOG puts it, so nothing is lost:
+
+1. ~~Step 2's rest: the parts of a statement the rules still read as text~~ — done (the five *Built* sections of 2026-10-27/28).
+2. **Grammar forms still read as `ERROR`** → **B-056** (`unbuilt`): an attribute selector's case flag (`[type="a" i]`), SCSS `@container #{$name} (…)`, a string holding an interpolation with its own quotes, `:not(.a)#{$x}`, an escape after an interpolation, `@page wide:left` in the SCSS fork, `:nth-child(… of .a, .b)` with a list after `of`; CSS an unquoted `url(data:…;…)` holding `;`, a dotted layer name (`@layer a, b.c`), `@nest`, `@value`, a backslash-newline in a string. The CSS fork's `upstream/grammar.patch` covers the 2026-10-22 forms only.
+3. **`stable` for the `scss/*` rules** → **B-057** (`unbuilt`): W-100's criterion is ratified (SR-RULE-AUTHORING decision 6a) and W-100 closed with the `css` batch; the `scss` corpus has two repos where the criterion asks three. **A CSS Modules corpus** (W-63 carried it here) → **B-058** (`unbuilt`).
+4. **The graph does not read `.scss`** (`graph/no-unused-css-classes`, `css/project` stay CSS-only; SR-PROJECT-GRAPH's measurement says so) → **B-059** (`unbuilt`).
+5. **`scss/operator-no-unspaced` not shipped on purpose** (a layout rule; L7 decision 1, SR-FORMATTER decision 3) → **B-060** (`cost`).
 
 ## Rulings
 

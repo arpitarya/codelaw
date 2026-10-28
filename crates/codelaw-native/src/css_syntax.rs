@@ -7,9 +7,9 @@
 //! arguments and of a keyframe block come from the file's tree-sitter tree
 //! ([`css_tree`](crate::css_tree); SR-ARCHITECTURE decision 15b); this
 //! module's text reader builds the same sheet when the tree holds an error
-//! (the CSS the grammar rejects) and reads what the tree does not give the
-//! rules yet: a font list split at its commas, and selectors a rule builds
-//! itself. The grammar still verifies every fix the rules make
+//! (the CSS the grammar rejects) and reads what the tree cannot give: the
+//! validity of a media query or an at-rule prelude, and selectors a rule
+//! builds itself. The grammar still verifies every fix the rules make
 //! (decision 5).
 //!
 //! It never fails: anything it can't place becomes an `Other` statement,
