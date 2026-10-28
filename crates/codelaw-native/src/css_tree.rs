@@ -15,7 +15,7 @@
 //!
 //! A tree with an `ERROR` or a `MISSING` node is not read: the file's
 //! statements come from the text reader instead, which never fails. That is
-//! the CSS the grammar rejects (W-62's *Left* item 2 lists the forms). So is
+//! the CSS the grammar rejects (BACKLOG's B-056 lists the forms). So is
 //! a CSS tree holding a `//` comment, which the grammar reads and CSS does not
 //! (`css/no-invalid-double-slash-comments` reports the statement it breaks).
 

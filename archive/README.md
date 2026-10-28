@@ -28,6 +28,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-62-scss-support.md`](open/W-62-scss-support.md) | 2026-10-28 | L3 and L7 (SCSS as a CSS dialect); [SR-ARCHITECTURE](../records/0108_architecture.md) decisions 3 and 15b (both grammar forks; the CSS rules on the trees); `crates/codelaw-native/src/css_tree.rs`; [`packs/scss/`](../packs/scss/README.md); BACKLOG B-056–B-060 |
 | [`W-113-project-icon.md`](open/W-113-project-icon.md) | 2026-10-28 | the icon files and their README in `docs/brand/` |
 | [`W-112-spell-words-file-and-learn.md`](open/W-112-spell-words-file-and-learn.md) | 2026-10-28 | [SR-SPELL](../records/0116_spell.md) decisions 1 and 7; [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 1 (`init --no-spell`, `spell learn`); [SR-CONFIG](../records/0110_config.md) (`[spell] words_file`) |
 | [`W-108-oxlint-live-capture.md`](open/W-108-oxlint-live-capture.md) | 2026-10-28 | the capture in `crates/codelaw-adapters/tests/fixtures/oxlint-type-aware/stdout.json`; which label is the span in [SR-LINTER](../records/0106_linter.md) decision 2 |

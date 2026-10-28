@@ -2,7 +2,7 @@
 
 use crate::css_syntax::{
     Complex, Kind, SKind, Sheet, Simple, all_simples, arg_selectors, complex, css_rule, find_of, finding, fixed, line, matches_any, max_specificity, non_standard, normalize_selector,
-    opt_list, opt_str, selector_list, set, skip_comment, split_commas, text, unprefixed, vendor_prefix,
+    opt_list, opt_str, selector_list, set, skip_comment, text, unprefixed, vendor_prefix,
 };
 use codelaw_core::TextEdit;
 use std::collections::{BTreeMap, BTreeSet};
@@ -116,7 +116,7 @@ css_rule!(NoDescendingSpecificity, "css/no-descending-specificity", |sheet, src,
             continue;
         }
         let n = &sheet.nodes[i];
-        if within_list && split_commas(src, n.name.0, n.name.1).len() > 1 {
+        if within_list && sheet.selectors(i, src).len() > 1 {
             continue;
         }
         let map = contexts.entry(sheet.at_rule_context(i)).or_default();
