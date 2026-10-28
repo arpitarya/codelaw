@@ -57,7 +57,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-109** `agent` Bitbucket ruled 10-28: keep only the Code Insights output (`--format bitbucket`), it and SARIF switchable; remove `init --ci bitbucket`, its template and the pipe fork. Then the live proof after v0.3.0. Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
 
-🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
+🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in corpus); CSS/SCSS rules read statements, selectors, values, preludes, media queries from the tree; left: pseudo-class args, keyframe selectors, font lists. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 

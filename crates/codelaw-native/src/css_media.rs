@@ -1,7 +1,7 @@
 //! CSS rules about media queries, with a small reader for their grammar
 //! (Media Queries level 5).
 
-use crate::css_syntax::{Kind, Range, Sheet, css_rule, dimension, finding, fixed, ident_end, matches_any, opt_list, set, skip_comment, skip_string, split_commas, table, text, unprefixed, vendor_prefix};
+use crate::css_syntax::{Feature, Kind, Range, Sheet, css_rule, dimension, finding, fixed, ident_end, matches_any, opt_list, set, skip_comment, skip_string, split_commas, table, text, unprefixed, vendor_prefix};
 use codelaw_core::TextEdit;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -74,17 +74,6 @@ fn matching(src: &str, open: usize, e: usize) -> usize {
         i += 1;
     }
     e
-}
-
-/// A media feature inside parentheses.
-#[derive(Debug, Clone)]
-pub struct Feature {
-    pub whole: Range,
-    pub name: Range,
-    /// `name: value`.
-    pub value: Option<Range>,
-    /// Values of a range form (`width >= 600px`, `1px < width < 2px`).
-    pub range_values: Vec<Range>,
 }
 
 fn word(src: &str, t: &Tok) -> Option<String> {
@@ -302,8 +291,9 @@ fn query(src: &str, r: Range) -> (Result<(), String>, Vec<Feature>, Vec<Range>) 
     (res, q.features, q.types)
 }
 
-/// The media query lists of a sheet: `@media` and `@custom-media` preludes.
-fn media_lists(sheet: &Sheet, src: &str) -> Vec<Range> {
+/// The media query lists of a sheet: `@media` and `@custom-media` preludes,
+/// by statement.
+fn media_lists(sheet: &Sheet, src: &str) -> Vec<(usize, Range)> {
     let mut out = Vec::new();
     for i in sheet.walk() {
         let n = &sheet.nodes[i];
@@ -316,10 +306,10 @@ fn media_lists(sheet: &Sheet, src: &str) -> Vec<Range> {
             continue;
         }
         match sheet.at_name(i, src).as_str() {
-            "media" => out.push(p),
+            "media" => out.push((i, p)),
             "custom-media" => {
                 let e = ident_end(src, p.0);
-                out.push(crate::css_syntax::trim_comments(src, (e, p.1)));
+                out.push((i, crate::css_syntax::trim_comments(src, (e, p.1))));
             }
             _ => {}
         }
@@ -327,8 +317,25 @@ fn media_lists(sheet: &Sheet, src: &str) -> Vec<Range> {
     out
 }
 
+/// Each media query of the sheet: its range, whether it is valid, its
+/// features and its media types. The queries, their features and types come
+/// from the tree when the sheet was read from one (W-62); whether a query is
+/// valid is judged on its text, which the grammar may accept where Media
+/// Queries does not — and an invalid query keeps the features and types the
+/// text read before it stopped.
 fn each_query(sheet: &Sheet, src: &str, f: &mut dyn FnMut(Range, Result<(), String>, Vec<Feature>, Vec<Range>)) {
-    for list in media_lists(sheet, src) {
+    for (i, list) in media_lists(sheet, src) {
+        if let Some(queries) = &sheet.nodes[i].queries {
+            for q in queries {
+                let (res, features, types) = query(src, q.range);
+                if res.is_ok() {
+                    f(q.range, res, q.features.clone(), q.types.clone());
+                } else {
+                    f(q.range, res, features, types);
+                }
+            }
+            continue;
+        }
         for q in split_commas(src, list.0, list.1) {
             if q.0 == q.1 {
                 continue;
