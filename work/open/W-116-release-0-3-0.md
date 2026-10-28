@@ -32,6 +32,8 @@ ball: agent
 - **PyPI, through CI:** `codelaw` (its pending publisher, registered 2026-10-25) and `codelaw-rules-{css,data,html,js,python,react}` (trusted). **Skipped:** `codelaw-rules-{scss,security-js,security-html,security-python,spell}`, `codelaw-skills`, the Fux index projects not yet created — they come by hand (W-87–W-89, W-115), then CI from the next release.
 - **npm:** every name already published and trusted; `@codelaw/rules-spell` is new (W-115).
 
+**Changed 2026-10-29 01:17:** `codelaw` 0.2.0 now goes to PyPI by hand on day 2 (W-87, W-86), with a normal trusted publisher after; v0.3.0's CI uploads it as an existing project, not through the pending publisher.
+
 ## Definition of done
 
 - v0.3.0's `publish.yml` run is green; npm and PyPI show the versions in step 6; W-86 closes (the Release step done), W-38's check runs.

@@ -280,10 +280,10 @@ jobs:
           bad=0
           for f in dist/vscode/*.vsix; do
             # the first version creates the extension (POST); every other file updates it (PUT)
-            code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X PUT -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
+            code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X PUT -H "Authorization: Basic $auth" -H 'Content-Type: application/json' \
                       --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/publishers/codelaw/extensions/codelaw?api-version=7.1-preview.1')"
             if [ "${code:0:1}" != 2 ]; then
-              code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X POST -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
+              code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X POST -H "Authorization: Basic $auth" -H 'Content-Type: application/json' \
                         --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/extensions?api-version=7.1-preview.1')"
             fi
             if [ "${code:0:1}" = 2 ]; then echo "- ✓ $(basename "$f")" | tee -a "$GITHUB_STEP_SUMMARY"

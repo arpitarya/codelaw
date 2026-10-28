@@ -6,8 +6,8 @@ item: W-118
 filed: 2026-10-29
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: cowork
+updated_by: "Arpit (Cowork, Fable 5.1)"
+ball: arpit
 ---
 
 # W-118 — Research: redesign the guidance-vs-check experiment
@@ -16,12 +16,14 @@ ball: cowork
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Why the pilot failed: A = B = C at 2/20, both breaks on tasks whose request asks for the violating code (t02 `console.log`, t04 unused parameters); 18 tasks tempted no arm | the diagnosis, from the pilot's data | ⏳ |
-| 2 | A new design: tasks where the tempting mistake is not requested; a true baseline with no codelaw at all; enough runs to separate a real difference | a run that can answer the question | ⏳ |
-| 3 | Downsides and open questions: cost, how many tasks and runs, how "tempting" is judged without bias, model and CLI versions pinned | what to settle first | ⏳ |
-| 4 | A proposal in `work/proposals/` for the decider; on his ruling, W-102 runs it | the next run, or a reason not to | ⏳ |
+| 1 | Why the pilot failed: A = B = C at 2/20, both breaks on tasks whose request asks for the violating code (t02 `console.log`, t04 unused parameters); 18 tasks tempted no arm | the diagnosis, from the pilot's data | ✅ [proposal](../proposals/guidance-experiment-redesign.md) §2–3 |
+| 2 | A new design: tasks where the tempting mistake is not requested; a true baseline with no codelaw at all; enough runs to separate a real difference | a run that can answer the question | ✅ proposal §4–5 |
+| 3 | Downsides and open questions: cost, how many tasks and runs, how "tempting" is judged without bias, model and CLI versions pinned | what to settle first | ✅ proposal §6–7 |
+| 4 | A proposal in `work/proposals/` for the decider; on his ruling, W-102 runs it | the next run, or a reason not to | ⏳ filed 2026-10-29; R1–R3 in the inbox |
 
 **Arpit, 2026-10-29 (voice docket):** *"Let's post a research document on how do you want to design it again. With the downsides and details on why the current one failed, or the previous one failed, and what needs to be improved in next use case. Or what is something that you need to figure out in the next use case. So probably create a research work item."*
+
+**Researched 2026-10-29 (Cowork, Fable 5.1):** six causes (floor effect, requested violations, the check leaked into every arm, n = 1, a rule 0/60 cannot meet, custom rules under-sampled); seven papers; six arms, two task populations, an agent-run temptation screen, 60 runs per arm from a power table, a pre-registered bound. [Proposal](../proposals/guidance-experiment-redesign.md).
 
 **Model:** Cowork — research (SR-WORK-OPEN-QUEUE rule 37a).
 

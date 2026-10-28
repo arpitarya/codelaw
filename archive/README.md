@@ -28,6 +28,9 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-77-skills-package.md`](open/W-77-skills-package.md) | 2026-10-29 | built (SR-PACKAGES, SR-AGENT-SURFACES); npm live; PyPI `codelaw-skills` → [W-88](../work/open/W-88-pypi-day-3.md) |
+| [`W-34-fux-index-packages.md`](open/W-34-fux-index-packages.md) | 2026-10-29 | built (L6 decision 12, SR-PACKAGES decision 14); npm live; PyPI uploads → [W-87](../work/open/W-87-pypi-day-2.md), [W-88](../work/open/W-88-pypi-day-3.md), [W-89](../work/open/W-89-pypi-day-4.md); `publish.yml` for them → B-063 |
+| [`W-114-session-cleanup.md`](open/W-114-session-cleanup.md) | 2026-10-29 | done — the five worktrees of session 2df06f6d dropped on the decider's ruling; [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) |
 | [`W-111-two-unmerged-worktrees.md`](open/W-111-two-unmerged-worktrees.md) | 2026-10-29 | merged into [W-114](../work/open/W-114-session-cleanup.md) — the keep-or-drop ruling for all five worktrees of session 2df06f6d |
 | [`W-110-session-2df06f6d-cleanup.md`](open/W-110-session-2df06f6d-cleanup.md) | 2026-10-28 | [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md); `.claude/hooks/worktree-cleanup.py` |
 | [`W-109-bitbucket-pipelines.md`](open/W-109-bitbucket-pipelines.md) | 2026-10-28 | `--format bitbucket` in [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decisions 4 and 12b; no pipe, no generated step in [SR-PACKAGES](../records/0107_packages.md) decision 15a; the step in USAGE §Bitbucket Pipelines; the live proof BACKLOG B-061 |
