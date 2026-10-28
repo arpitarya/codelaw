@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-95 — Publish the VS Code extension — Marketplace and Open VSX
@@ -17,8 +17,8 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Package `packaging/vscode` per platform with its bundled binary (or the npm binary lookup); `vsce package` / `ovsx` dry runs in CI | publishable artifacts | ✅ 2026-10-27 — eight `.vsix` built and checked in CI by `scripts/vsix.py`, without `vsce` (see below); no `vsce`/`ovsx` dry run: neither is ratified |
-| 2 | Arpit creates the Marketplace publisher and the Open VSX namespace, and stores the tokens (or a trusted-publishing equivalent) as GitHub secrets in the `vscode` environment | the right to publish | 🔄 2026-10-28: the Marketplace publisher **`codelaw`** created by Arpit; the token is blocked — the Azure DevOps organization asks for an Azure subscription and his card was declined; Open VSX and the `vscode` environment not started |
-| 3 | `publish.yml` publishes the extension on a Release, after the engine | one release, every surface | ⏳ after step 2 — the job is drafted below; it uploads with `curl` (ruled 2026-10-27) |
+| 2 | Arpit creates the Marketplace publisher and the Open VSX namespace, and stores the tokens (or a trusted-publishing equivalent) as GitHub secrets in the `vscode` environment | the right to publish | ✅ 2026-10-29 — publisher `codelaw`; a **Trusted Publishing** policy *codelaw publish.yml* (GitHub Actions · `arpitarya` #2118113 · `codelaw` #1424363292 · `publish.yml` · environment `vscode`), Active — no token, no Azure. Open VSX: W-117 |
+| 3 | `publish.yml` publishes the extension on a Release, after the engine | one release, every surface | ✅ wired 2026-10-29 — `publish.yml` `vscode` job, `curl` uploads (ruled 2026-10-27); Marketplace by trusted publishing, Open VSX once W-117 sets `OVSX_PAT`; the environment `vscode` exists. Proven by the v0.3.0 Release |
 | 4 | README / USAGE: install from the Marketplace; the preview note drops "the editor extension's Marketplace listing comes later" | users can install it | ⏳ after the first listing |
 
 **Arpit, 2026-10-29 (voice docket; written on *"file it."*):** recommended Open VSX now (a GitHub login, no Azure) and the Visual Studio Marketplace by hand on the v0.3.0 release day: *"Yes."* Asked to set Open VSX up in the browser, then: *"That's okay. Let's put it as a work item and we'll work on it."* — [W-117](W-117-open-vsx-setup.md). The Marketplace token and CI automation for it wait for a later ruling (global PATs end 2026-12-01).
@@ -82,6 +82,12 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 - **The Marketplace token is stuck:** creating an Azure DevOps organization through the Azure portal fails for his personal account (*"Selected user account does not exist in tenant 'Microsoft Services'"*); the direct route asks for an Azure subscription, and his SBI card was declined.
 - **The token type is retiring:** Azure DevOps global PATs (*All accessible organizations*, which the Marketplace needs) stop on **2026-12-01** ([Microsoft](https://devblogs.microsoft.com/devops/retirement-of-global-personal-access-tokens-in-azure-devops)); VS Code's docs now point to Entra ID with workload identity federation, which needs an Azure subscription too ([VS Code docs](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)).
 - **He asked to publish by hand for now** (voice, 2026-10-28: *"I want to publish the extension manually for now."*): the publisher page's *New extension → Visual Studio Code* takes a `.vsix`. Open, put to him: a `.vsix` from `main` ships code newer than npm's 0.2.0 (L6), so the first hand upload is best made from the next release's `vscode` artifact; whether the page takes platform-specific `.vsix` files is unverified.
+
+## Progress — 2026-10-29: the Marketplace has trusted publishing
+
+- **The Visual Studio Marketplace now offers Trusted Publishing from GitHub Actions** (publisher page → *Trusted Publishing*). Arpit created the policy **codelaw publish.yml** — owner `arpitarya` (#2118113), repository `codelaw` (#1424363292), workflow `publish.yml`, environment `vscode` — shown **Active**, last used *Never* (his screenshot, 01:03 IST). This replaces the PAT and the Azure DevOps organization: the 2026-12-01 retirement of global PATs no longer touches codelaw.
+- **Arpit, 2026-10-29 (voice):** *"Now, I already published 0.2.0, then I unpublished it and I deleted it. Now, I want the package or VS Code. Visual Studio Code extension to be published through CI/CD pipeline. How do I put it as trusted publishing?"* — the deleted 0.2.0 is not verified: whether `codelaw.codelaw` can be published again after a delete is open until the first CI upload.
+- **Left for an agent:** (1) the GitHub environment `vscode` (`gh api -X PUT repos/arpitarya/codelaw/environments/vscode`, tag rule `v*`, with Arpit's OK — W-117 step 1 is the same environment); (2) `publish.yml`'s job — `id-token: write` in environment `vscode`, the GitHub OIDC token exchanged for a Marketplace token per Microsoft's *Learn more* page, then the eight `.vsix` uploaded with `curl` (no `vsce`, L2/L11); (3) the first release proves it, including the deleted-name question.
 
 ## Left
 

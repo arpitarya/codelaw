@@ -239,6 +239,75 @@ jobs:
           packages-dir: upload/
           skip-existing: true
 
+  vscode:
+    # W-95: the eight .vsix ci.yml built (artifact `vscode`) to the Visual Studio Marketplace (trusted
+    # publishing: no token) and Open VSX (OVSX_PAT, skipped while unset), after the engine. Plain curl:
+    # @vscode/vsce and ovsx are not ratified (L2, L11). continue-on-error: a listing problem never fails,
+    # or withdraws, the engine's release; read the job summary. A version already listed is skipped.
+    needs: [gate, npm]
+    if: github.event_name == 'release'
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write # the OIDC token the Marketplace exchanges for a short-lived credential
+      actions: read
+    environment:
+      name: vscode # tag rule v*; the Marketplace's trusted-publishing policy names this environment
+      url: https://marketplace.visualstudio.com/items?itemName=codelaw.codelaw
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: vscode
+          path: dist/vscode/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: the download is what ci.yml built (SHA256SUMS), at the release version
+        run: |
+          (cd dist/vscode && sha256sum --strict --quiet -c SHA256SUMS)
+          for f in dist/vscode/*.vsix; do
+            case "$f" in *"-${GITHUB_REF_NAME#v}.vsix") ;; *) echo "::error::$f is not ${GITHUB_REF_NAME#v}"; exit 1 ;; esac
+          done
+      - name: Visual Studio Marketplace — GitHub OIDC token → Marketplace credential → one upload per platform
+        run: |
+          idt="$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=marketplace.visualstudio.com" | python3 -c 'import json,sys; print(json.load(sys.stdin)["value"])')"
+          cred="$(curl -fsS -X POST -H "Authorization: FederatedToken $idt" -H 'Content-Type: application/json' -H 'User-Agent: codelaw-publish' \
+                    -d '{"publisherName":"codelaw"}' 'https://marketplace.visualstudio.com/_apis/gallery/token?api-version=7.2-preview.1' \
+                  | python3 -c 'import json,sys; print(json.load(sys.stdin)["credential"])')"
+          echo "::add-mask::$cred"
+          auth="$(printf ':%s' "$cred" | base64 | tr -d '\n')"
+          echo "### Visual Studio Marketplace" >> "$GITHUB_STEP_SUMMARY"
+          bad=0
+          for f in dist/vscode/*.vsix; do
+            # the first version creates the extension (POST); every other file updates it (PUT)
+            code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X PUT -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
+                      --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/publishers/codelaw/extensions/codelaw?api-version=7.1-preview.1')"
+            if [ "${code:0:1}" != 2 ]; then
+              code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X POST -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
+                        --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/extensions?api-version=7.1-preview.1')"
+            fi
+            if [ "${code:0:1}" = 2 ]; then echo "- ✓ $(basename "$f")" | tee -a "$GITHUB_STEP_SUMMARY"
+            elif grep -qi 'already exists' "$RUNNER_TEMP/m.out"; then echo "- ⏭ $(basename "$f") already listed" | tee -a "$GITHUB_STEP_SUMMARY"
+            else echo "- ✗ $(basename "$f") HTTP $code: $(head -c 300 "$RUNNER_TEMP/m.out")" | tee -a "$GITHUB_STEP_SUMMARY"; bad=1; fi
+          done
+          [ "$bad" = 0 ]
+      - name: Open VSX — skipped while OVSX_PAT is not set (W-117)
+        if: always()
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          echo "### Open VSX" >> "$GITHUB_STEP_SUMMARY"
+          [ -n "$OVSX_PAT" ] || { echo "- ⏭ skipped: no OVSX_PAT in the vscode environment (W-117)" | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; }
+          bad=0
+          for f in dist/vscode/*.vsix; do
+            code="$(curl -sS -o "$RUNNER_TEMP/o.out" -w '%{http_code}' -X POST -H "Authorization: Bearer $OVSX_PAT" -H 'Content-Type: application/octet-stream' \
+                      --data-binary "@$f" 'https://open-vsx.org/api/-/publish')"
+            if [ "${code:0:1}" = 2 ]; then echo "- ✓ $(basename "$f")" | tee -a "$GITHUB_STEP_SUMMARY"
+            elif grep -qi 'already published' "$RUNNER_TEMP/o.out"; then echo "- ⏭ $(basename "$f") already listed" | tee -a "$GITHUB_STEP_SUMMARY"
+            else echo "- ✗ $(basename "$f") HTTP $code: $(head -c 300 "$RUNNER_TEMP/o.out")" | tee -a "$GITHUB_STEP_SUMMARY"; bad=1; fi
+          done
+          [ "$bad" = 0 ]
+
   attach:
     # The checksums of what was published, on the GitHub Release itself.
     needs: [gate, npm, pypi]

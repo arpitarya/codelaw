@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 | 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): on the v0.3.0 release ([W-116](open/W-116-release-0-3-0.md)), github.com/marketplace/actions → *Publish* on the release's edit page → accept the Marketplace Developer Agreement → tick *Publish this Action to the GitHub Marketplace*. Ruled 2026-10-27: SARIF stays on `gh`; a moving `v0` tag is kept; Claude runs the throwaway-repo proof after that tag. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — environment, account, token, namespace** ([W-117](open/W-117-open-vsx-setup.md); ruled 2026-10-29: Open VSX now, the Visual Studio Marketplace by hand on release day). **1. Environment** `vscode`, tag rule `v*` like `npm`/`pypi`: `gh api -X PUT repos/arpitarya/codelaw/environments/vscode -F 'deployment_branch_policy[protected_branches]=false' -F 'deployment_branch_policy[custom_branch_policies]=true' && gh api -X POST repos/arpitarya/codelaw/environments/vscode/deployment-branch-policies -f name='v*' -f type=tag`. **4. Open VSX:** <https://open-vsx.org> → *Log in* (GitHub) → avatar → *Settings* → *Log in with Eclipse* (an <https://accounts.eclipse.org> account with your GitHub username in its profile) → sign the *Publisher Agreement* → *Access Tokens* → *Generate New Token* `codelaw-publish`, copy it → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw`; then the namespace: `read -rs T && curl -fsS -X POST -H 'Content-Type: application/json' -d '{"name":"codelaw"}' "https://open-vsx.org/api/-/namespace/create?token=$T"` (optional, the verified badge: *Claim namespace ownership* at <https://github.com/EclipseFdn/open-vsx.org/issues/new/choose>). Or do it with Claude in Chrome in a text session. | 2026-10-29 |
-| ↳ **blocks:** W-117 itself; W-95 waits on it | |
+| ↳ **blocks:** W-117 itself | |
 
 ---
 
@@ -49,7 +49,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-89** `arpit` PyPI day 4 (Sat 10-31): `codelaw-rules-security-{js,html,python}` 0.2.0, then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-89-pypi-day-4.md)
 
-🔴 **W-95** waits on **W-117** `arpit` VS Code extension: publisher `codelaw` created; ruled 10-29 — Open VSX now (W-117), the Marketplace by hand on release day; its token and CI later. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
+🟢 **W-95** `agent` VS Code extension: Marketplace **trusted publishing** policy active 10-29 (`arpitarya` · `codelaw` · `publish.yml` · `vscode`), no token. Left: the `vscode` environment, the `publish.yml` OIDC + `curl` job; Open VSX is W-117. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
