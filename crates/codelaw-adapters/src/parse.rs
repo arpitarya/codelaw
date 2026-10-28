@@ -113,6 +113,8 @@ struct OxDiagnostic {
 
 #[derive(Deserialize)]
 struct OxLabel {
+    #[serde(default)]
+    label: Option<String>,
     span: OxSpan,
 }
 
@@ -140,7 +142,12 @@ fn oxlint(text: &str) -> Result<Parsed, String> {
         .diagnostics
         .into_iter()
         .map(|d| {
-            let span = d.labels.first().map_or(Span::Offsets { start: 0, end: 0, unit: Unit::Byte }, |l| Span::Offsets {
+            // The JSON does not mark the primary label. A type-aware
+            // (tsgolint) diagnostic lists its labelled notes first and its
+            // own span last, with no text (W-108, oxlint 1.90.0), so the
+            // first label without text is the finding's; else the first.
+            let primary = d.labels.iter().find(|l| l.label.as_deref().is_none_or(str::is_empty)).or(d.labels.first());
+            let span = primary.map_or(Span::Offsets { start: 0, end: 0, unit: Unit::Byte }, |l| Span::Offsets {
                 start: l.span.offset,
                 end: l.span.offset + l.span.length,
                 unit: Unit::Byte,

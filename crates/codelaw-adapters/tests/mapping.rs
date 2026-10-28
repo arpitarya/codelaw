@@ -92,33 +92,51 @@ fn oxlint_maps_byte_spans_and_every_finding_is_manual() {
 /// `oxlint-tsgolint` installed beside it) reports through the same
 /// `--format=json`, so its `typescript(<rule>)` findings pass through the
 /// adapter unchanged in kind. `tests/fixtures/oxlint-type-aware/stdout.json`
-/// is built from oxlint's documented JSON shape (its `output_formatter/json.rs`,
-/// and the codes, messages and docs links of its tsgolint snapshots), not
-/// captured from a run: no oxlint is installed here (L11), so the live
-/// capture is the decider's to run, in that folder:
+/// is a live capture (W-108, 2026-10-28): oxlint 1.90.0, oxlint-tsgolint
+/// 7.0.2005, typescript 7.0.2, run outside the repo (L11) in that folder:
 ///
 /// ```text
-/// npm i -D oxlint oxlint-tsgolint typescript@7 && npx oxlint --format=json src/index.ts > stdout.json
+/// npm add -D oxlint oxlint-tsgolint typescript@7 && npx oxlint --format=json src/index.ts > stdout.json
 /// ```
+///
+/// oxlint changes its default rules and help text between versions; a
+/// mismatch with a newer capture is drift to re-capture, not a bug.
 #[test]
 fn oxlint_type_aware_findings_keep_their_typescript_ids() {
     let (text, d) = mapped_from("oxlint", "oxlint-type-aware", "src/index.ts");
-    assert_eq!(d.len(), 2);
+    // 1.90.0's default `correctness` set adds a non-type finding on `await`.
+    assert_eq!(d.iter().map(|x| x.rule.as_str()).collect::<Vec<_>>(), [
+        "adapter/oxlint/unicorn/no-unnecessary-await",
+        "adapter/oxlint/typescript/no-floating-promises",
+        "adapter/oxlint/typescript/await-thenable",
+    ]);
+    let unnecessary = find(&d, "adapter/oxlint/unicorn/no-unnecessary-await");
+    assert_eq!(unnecessary.severity, Severity::Warn);
+    assert_eq!(&text[unnecessary.start_byte..unnecessary.end_byte], "await");
     let floating = find(&d, "adapter/oxlint/typescript/no-floating-promises");
     assert_eq!(floating.severity, Severity::Error);
     assert_eq!((floating.start, floating.end), (at(7, 3), at(7, 9)));
     assert_eq!(&text[floating.start_byte..floating.end_byte], "load()");
+    // Two labels: tsgolint's note "This expression is not Promise-like" on
+    // `42` first, the diagnostic's own span on `await` last and unlabelled.
+    // The adapter takes the unlabelled one (SR-LINTER decision 2).
     let thenable = find(&d, "adapter/oxlint/typescript/await-thenable");
     assert_eq!(thenable.severity, Severity::Warn);
-    assert_eq!(&text[thenable.start_byte..thenable.end_byte], "await 42");
+    assert_eq!((thenable.start, thenable.end), (at(8, 3), at(8, 8)));
+    assert_eq!(&text[thenable.start_byte..thenable.end_byte], "await");
     // oxlint's JSON carries no edits for type rules either: `manual`, with
     // the help line and the rule's docs.
     for x in &d {
         assert_eq!(x.fix, FixClass::Manual);
         assert!(x.edits.is_empty());
-        assert!(x.steps.last().unwrap().contains("https://oxc.rs/docs/guide/usage/linter/rules/typescript/"), "{:?}", x.steps);
+        assert!(x.steps.last().unwrap().contains("https://oxc.rs/docs/guide/usage/linter/rules/"), "{:?}", x.steps);
     }
-    assert_eq!(thenable.steps[0], "Remove unnecessary `await`.");
+    assert!(floating.steps.last().unwrap().contains("/rules/typescript/no-floating-promises"), "{:?}", floating.steps);
+    assert_eq!(
+        thenable.steps[0],
+        "Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it."
+    );
+    assert_eq!(unnecessary.steps[0], "Consider removing the `await`");
     // The `ts` pack names typescript-eslint's rules `typescript-eslint/<rule>`
     // in `ported_from:`, so W-105's rule replaces this finding (shown once);
     // the eslint plugin keeps its own name.
