@@ -287,6 +287,19 @@ modules_convention = "camelCase"     # css-loader's localsConvention: .btn-prima
 
 `css-modules/no-unused-class` reports a class no file reads (in the stylesheet; `codelaw fix --unsafe` deletes the rule), and `css-modules/no-undefined-class` reports `styles.x` where the module has no `.x` (in the JS or TS file). A module read by a computed name (`styles[name]`), spread, or passed to a function is never reported, and neither is one no file imports ([SR-PROJECT-GRAPH](records/0103_project-graph.md) decision 8).
 
+### Spelling
+
+`codelaw init` adds the spell pack (`@codelaw/rules-spell`, `codelaw-rules-spell`) and `codelaw:spell/recommended`, which fixes known typos in comments, docs, prose strings, names and keys; `--no-spell` leaves it out. Its rules are `preview`, so they run once `preview = true` is set. `codelaw:spell/strict` adds the dictionary check, `spell/unknown-word`. The words a project accepts are in two places, merged and compared case-insensitively:
+
+```toml
+[spell]
+words = ["kubectl"]                       # inline
+words_file = ".codelaw/spell/words.txt"   # the default: one word per line, `#` comments
+locale = "en-US"                          # or en-GB; unset accepts both
+```
+
+A missing file at the default path is no error; a `words_file` you set must exist. `init` writes the file and fills it with **`codelaw spell learn`**, which runs `spell/unknown-word` over the project (whatever the config turns on) and adds each word it reports, lower case and sorted, after the lines already there. A word that is a known typo or one edit from a common word is listed for review, never added. A second run adds only new words ([SR-SPELL](records/0116_spell.md)).
+
 ### Type-aware rules
 
 With TypeScript 7.1 or later installed in your project, the `ts` pack's `ts/type-checked` preset asks **your own TypeScript** about types — a Promise nobody awaits, an `await` on a plain value, a value typed `any` called or read from — and reports TypeScript's own errors as `ts/type-error`. They are `preview` until TypeScript 7.1 is GA:
@@ -494,7 +507,7 @@ flowchart LR
 
     Inputs: `version`, `registry` (`npm` or `pypi`), `working-directory` (where `codelaw.toml` is; paths are rewritten to the repository root), `args` (more `check` arguments), `changed-since` (the base commit on a pull request by default; `none` turns it off), `sarif`, `upload-sarif`, `fail-on-error`; outputs `exit-code` and `sarif-file`. Rule packs come from your repository's dependencies, so install them in a step before it ([SR-PACKAGES](records/0107_packages.md) decision 15).
   - **GitLab:** `codelaw check --format gitlab > gl-code-quality-report.json`, then `artifacts: reports: codequality: gl-code-quality-report.json` — the MR widget.
-  - **Bitbucket Pipelines:** `codelaw init --ci bitbucket` writes `bitbucket-pipelines.yml`: one step that installs codelaw at this version, checks every push and pull request, fails the build on an error, and shows each finding on the pull request as a Code Insights annotation (`--format bitbucket`, sent with `curl` through the pipeline's proxy — no token). Switch parts with repository variables: `CODELAW_CODE_INSIGHTS=false` checks only; `CODELAW_SARIF=true` also keeps `codelaw.sarif` as a build artifact; `CODELAW_FAIL_ON_ERROR`, `CODELAW_DIR`, `CODELAW_ARGS`, `CODELAW_CHANGED_SINCE` as the Action's inputs. Code Insights holds 1000 annotations per report; past that the report says how many it left out, errors first ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 12b).
+  - **Bitbucket Pipelines:** `codelaw check --format bitbucket` — the Code Insights report and its annotations, sent with `curl`; [the step to copy](#bitbucket-pipelines) below.
   - **Jenkins, Azure DevOps:** `codelaw check --format junit > codelaw-junit.xml` and publish it as test results.
   - **Jenkins (Warnings Next Generation), SonarQube generic import, Azure DevOps:** `codelaw check --format checkstyle > checkstyle.xml`.
   - `codelaw format --check --format github` (or any of the five) reports the files that would change.
@@ -525,6 +538,89 @@ flowchart LR
   ```
 
   A private npm registry comes from `.npmrc` (`@acme:registry=…` and `//host/:_authToken=${NPM_TOKEN}`, the token read from the environment, never written); a private Python index from `PIP_INDEX_URL` or `[[tool.uv.index]]`. `data/stale-deps-snapshot` says when the snapshot is older than `[deps] max_snapshot_age` (14 days) on the as-of date ([SR-RULE-PACKS](records/0101_rule-packs.md) decision 15).
+
+### Bitbucket Pipelines
+
+Bitbucket has no Actions, and codelaw writes no Bitbucket file: copy this step into `bitbucket-pipelines.yml` at the repository root. It installs codelaw at the version it pins (change `0.3.0` to the one you use; `--format bitbucket` is new in 0.3.0), checks every push and pull request, fails the build on an error, and shows each finding on the pull request as a Code Insights annotation — the report `codelaw` on the commit, sent with `curl` through the pipeline's own proxy, so no token. On a pull request the files it changed count as touched (`--changed-since` its destination branch). Delete `default:` to check pull requests only.
+
+```yaml
+image: node:22
+
+definitions:
+  steps:
+    - step: &codelaw
+        name: codelaw check
+        clone:
+          depth: full
+        script:
+          - export CODELAW_CODE_INSIGHTS="${CODELAW_CODE_INSIGHTS:-true}"
+          - export CODELAW_SARIF="${CODELAW_SARIF:-false}"
+          - export CODELAW_FAIL_ON_ERROR="${CODELAW_FAIL_ON_ERROR:-true}"
+          - export CODELAW_DIR="${CODELAW_DIR:-.}"
+          - if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile; elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile; elif [ -f package-lock.json ]; then npm ci; fi
+          - npm install --global --no-audit --no-fund codelaw@0.3.0
+          - |
+            set -u
+            cd "$CODELAW_DIR"
+            prefix="${CODELAW_DIR#./}"; prefix="${prefix%/}"
+            flags=""
+            ref="${CODELAW_CHANGED_SINCE:-}"
+            dest="${BITBUCKET_PR_DESTINATION_BRANCH:-}"
+            if [ -z "$ref" ] && [ -n "$dest" ]; then
+              git fetch --no-tags --quiet origin "+refs/heads/$dest:refs/remotes/origin/$dest" || true
+              ref="origin/$dest"
+            fi
+            if [ -n "$ref" ] && [ "$ref" != none ]; then
+              if git merge-base HEAD "$ref" > /dev/null 2>&1; then flags="--changed-since $ref"; else echo "codelaw: no merge base with $ref; ran without --changed-since"; fi
+            fi
+            rc=0
+            codelaw check $flags ${CODELAW_ARGS:-} || rc=$?
+            if [ "$CODELAW_SARIF" = true ] && [ "$rc" -lt 2 ]; then
+              src=0
+              codelaw check --format sarif $flags ${CODELAW_ARGS:-} > "$BITBUCKET_CLONE_DIR/codelaw.sarif" || src=$?
+              if [ "$src" -ge 2 ]; then echo "codelaw: the SARIF run exited $src"; exit "$src"; fi
+              echo "codelaw: wrote codelaw.sarif (paths relative to $CODELAW_DIR)"
+            fi
+            if [ "$CODELAW_CODE_INSIGHTS" = true ] && [ "$rc" -lt 2 ]; then
+              insights="$BITBUCKET_CLONE_DIR/codelaw-insights.jsonl"
+              irc=0
+              codelaw check --format bitbucket $flags ${CODELAW_ARGS:-} > "$insights.raw" || irc=$?
+              if [ "$irc" -ge 2 ]; then echo "codelaw: the Code Insights run exited $irc"; exit "$irc"; fi
+              # Bitbucket places an annotation by its path from the repository root.
+              if [ -z "$prefix" ] || [ "$prefix" = . ]; then mv "$insights.raw" "$insights"; else sed "s#\"path\":\"#\"path\":\"$prefix/#g" "$insights.raw" > "$insights"; rm "$insights.raw"; fi
+              api="http://api.bitbucket.org/2.0/repositories/$BITBUCKET_WORKSPACE/$BITBUCKET_REPO_SLUG/commit/$BITBUCKET_COMMIT/reports/codelaw"
+              # Line 1 is the report; each line after it is one batch of at most 100 annotations.
+              curl -s -o /dev/null --proxy http://localhost:29418 --request DELETE "$api" || true
+              head -n 1 "$insights" | curl -sf -o /dev/null --proxy http://localhost:29418 --request PUT "$api" --header "Content-Type: application/json" --data-binary @- || { echo "codelaw: the Code Insights report upload failed"; exit 2; }
+              tail -n +2 "$insights" | while IFS= read -r batch; do
+                printf '%s' "$batch" | curl -sf -o /dev/null --proxy http://localhost:29418 --request POST "$api/annotations" --header "Content-Type: application/json" --data-binary @- || { echo "codelaw: the Code Insights annotation upload failed"; exit 2; }
+              done || exit 2
+              echo "codelaw: uploaded the Code Insights report \`codelaw\` for $BITBUCKET_COMMIT"
+            fi
+            if [ "$rc" -ge 2 ] || { [ "$rc" = 1 ] && [ "$CODELAW_FAIL_ON_ERROR" = true ]; }; then exit "$rc"; fi
+        artifacts:
+          - codelaw.sarif
+
+pipelines:
+  default:
+    - step: *codelaw
+  pull-requests:
+    '**':
+      - step: *codelaw
+```
+
+The switches are the step's `export` lines: edit them there, or set a repository variable of the same name (*Repository settings → Repository variables*), which wins.
+
+| variable | default | what it does |
+|---|---|---|
+| `CODELAW_CODE_INSIGHTS` | `true` | upload the Code Insights report and its annotations; `false` checks only, and the build still fails on an error |
+| `CODELAW_SARIF` | `false` | `true` also writes `codelaw.sarif`, kept as a build artifact |
+| `CODELAW_FAIL_ON_ERROR` | `true` | `false`: the step passes when codelaw finds errors (a usage or config error still fails) |
+| `CODELAW_DIR` | `.` | the project folder, where `codelaw.toml` is; annotation paths are rewritten to the repository root |
+| `CODELAW_ARGS` | — | more `codelaw check` arguments, split on spaces: `--max-warnings 0` |
+| `CODELAW_CHANGED_SINCE` | — | the ref for `--changed-since`; empty: the destination branch on a pull request; `none`: off |
+
+The rule packs come from the repository's own dependencies, so the step installs them first: npm packs land in `node_modules`; install PyPI packs into `.venv/` in that line (`python3 -m venv .venv && .venv/bin/pip install …`). Code Insights holds 1000 annotations per report; past that the report says how many it left out, errors first. codelaw's tests take this block and run its script, so the step shown is the step proven ([SR-CLI-MCP](records/0115_cli-and-mcp.md) decision 12b).
 
 ---
 
@@ -560,6 +656,7 @@ flowchart LR
 | `codelaw debug` | Inspect what the engine sees: `changed-functions` |
 | `codelaw brief` | What is specific to this repo for the files an agent is about to write (SR-CLI-MCP decision 14) |
 | `codelaw migrate` | Translate an ESLint, Prettier, Biome, Ruff or stylelint config into codelaw.toml, with a report of what mapped and what did not (SR-CLI-MCP decision 14) |
+| `codelaw spell` | The spell pack's words file: `learn` adds the words no dictionary knows (SR-SPELL) |
 
 <!-- /docs-sync:commands -->
 

@@ -177,7 +177,7 @@ fn init_writes_only_the_paths_the_consumer_layout_lists() {
     // What `npm install -D @codelaw/rules-…` would put in place: the
     // Python pack is PyPI-only, so this npm repo's init leaves it out.
     assert!(out.contains("note: codelaw-rules-python is published on PyPI only"), "{out}");
-    for pack in ["data", "js", "ts"] {
+    for pack in ["data", "js", "spell", "ts"] {
         copy_dir(&repo_root().join("packs").join(pack), &d.join("node_modules/@codelaw").join(format!("rules-{pack}")));
     }
     let (code, out) = codelaw(&d, &["check"]);
@@ -203,7 +203,7 @@ fn init_writes_only_the_paths_the_consumer_layout_lists() {
         }
     }
     assert!(stray.is_empty(), "init wrote paths SR-CONSUMER-LAYOUT §1 does not list:\n{}", stray.join("\n"));
-    for must in ["codelaw.toml", ".codelaw/rules/README.md"] {
+    for must in ["codelaw.toml", ".codelaw/rules/README.md", ".codelaw/spell/words.txt"] {
         assert!(d.join(must).is_file(), "init did not write {must}");
     }
     assert!(d.join(".codelaw/cache").is_dir(), "check wrote no cache, so decision 3 went unexercised");

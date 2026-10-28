@@ -1,9 +1,10 @@
-//! SR-CLI-MCP decision 12b (W-109) through the binary: `init --ci bitbucket`
-//! writes `bitbucket-pipelines.yml` from its template, and the step's script,
-//! run here with `curl` and `npm` stubbed, checks, fails the build on an
-//! error, sends the Code Insights report and its annotation through the
-//! pipeline proxy, and writes SARIF only when `CODELAW_SARIF` is on. What it
-//! cannot prove is Bitbucket itself: the live run is the decider's (W-109).
+//! SR-CLI-MCP decision 12b (W-109) through the binary: codelaw writes no
+//! Bitbucket file (`init --ci bitbucket` is an unknown value), and the step
+//! USAGE.md shows to copy — its script taken from the doc and run here with
+//! `curl` and `npm` stubbed — checks, fails the build on an error, sends the
+//! Code Insights report and its annotation through the pipeline proxy, and
+//! writes SARIF only when `CODELAW_SARIF` is on. What it cannot prove is
+//! Bitbucket itself: the live run is the decider's (W-109).
 
 use serde_json::Value;
 use std::fs;
@@ -22,39 +23,24 @@ fn temp(name: &str) -> PathBuf {
     fs::canonicalize(d).unwrap()
 }
 
-fn init(cwd: &Path, args: &[&str]) -> (i32, String) {
-    let out = Command::new(env!("CARGO_BIN_EXE_codelaw")).arg("init").args(args).current_dir(cwd).env("NO_COLOR", "1").output().unwrap();
-    (out.status.code().unwrap_or(-1), format!("{}{}", String::from_utf8_lossy(&out.stdout), String::from_utf8_lossy(&out.stderr)))
-}
-
 #[test]
-fn init_writes_the_pipeline_once_and_never_over_a_file_that_is_not_ours() {
+fn init_writes_no_bitbucket_file() {
     let d = temp("init");
     fs::write(d.join("codelaw.toml"), "extends = []\n").unwrap();
-    let (code, out) = init(&d, &["--ci", "bitbucket"]);
-    assert_eq!(code, 0, "{out}");
-    assert!(out.contains("wrote bitbucket-pipelines.yml") && out.contains("CODELAW_SARIF"), "{out}");
-    let text = fs::read_to_string(d.join("bitbucket-pipelines.yml")).unwrap();
-    let template = fs::read_to_string(repo().join("templates/ci/bitbucket/bitbucket-pipelines.yml")).unwrap();
-    assert_eq!(text, template.replace("{{version}}", env!("CARGO_PKG_VERSION")), "the template, its one slot filled");
-    assert!(text.contains(&format!("npm install --global --no-audit --no-fund codelaw@{}", env!("CARGO_PKG_VERSION"))));
-    let (code, out) = init(&d, &["--ci", "bitbucket"]);
-    assert_eq!((code, out.contains("already up to date")), (0, true), "{out}");
+    let out = Command::new(env!("CARGO_BIN_EXE_codelaw")).args(["init", "--ci", "bitbucket"]).current_dir(&d).env("NO_COLOR", "1").output().unwrap();
+    let text = format!("{}{}", String::from_utf8_lossy(&out.stdout), String::from_utf8_lossy(&out.stderr));
+    assert_eq!(out.status.code(), Some(2), "{text}");
+    assert!(text.contains("--ci is `github` or `gitlab`, not `bitbucket`"), "{text}");
+    assert!(!d.join("bitbucket-pipelines.yml").exists());
+    let _ = fs::remove_dir_all(d);
+}
 
-    let mine = temp("mine");
-    fs::write(mine.join("codelaw.toml"), "extends = []\n").unwrap();
-    fs::write(mine.join("bitbucket-pipelines.yml"), "pipelines: {}\n").unwrap();
-    let (code, out) = init(&mine, &["--ci", "bitbucket"]);
-    assert_eq!(code, 2, "{out}");
-    assert!(out.contains("copy the `codelaw` step"), "{out}");
-    assert_eq!(fs::read_to_string(mine.join("bitbucket-pipelines.yml")).unwrap(), "pipelines: {}\n");
-
-    let (code, out) = init(&mine, &["--ci", "bitbucket", "--autofix", "weekly"]);
-    assert_eq!(code, 2, "{out}");
-    assert!(out.contains("no Bitbucket auto-fix"), "{out}");
-    for d in [d, mine] {
-        let _ = fs::remove_dir_all(d);
-    }
+/// The YAML block under USAGE.md's `### Bitbucket Pipelines`.
+fn usage_step() -> String {
+    let usage = fs::read_to_string(repo().join("USAGE.md")).unwrap();
+    let section = &usage[usage.find("\n### Bitbucket Pipelines\n").expect("USAGE.md has a Bitbucket Pipelines section")..];
+    let block = &section[section.find("```yaml\n").unwrap() + 8..];
+    block[..block.find("\n```").unwrap()].to_string()
 }
 
 /// The step's `script:` items, as Bitbucket runs them: one shell, in order.
@@ -104,9 +90,8 @@ fn run_step(name: &str, vars: &[(&str, &str)]) -> (i32, String, Vec<(String, Str
     let log = clone.join(".curl-log");
     fs::create_dir_all(&log).unwrap();
     stub(&bin, "curl", &format!("n=$(ls '{l}' | grep -c 'args$'); printf '%s\\n' \"$*\" > '{l}'/$n.args; case \"$*\" in *'@-'*) cat > '{l}'/$n.body;; esac; exit 0\n", l = log.display()));
-    let template = fs::read_to_string(repo().join("templates/ci/bitbucket/bitbucket-pipelines.yml")).unwrap();
-    let script = step_script(&template.replace("{{version}}", env!("CARGO_PKG_VERSION")));
-    assert!(script.contains("codelaw check --format bitbucket"), "{script}");
+    let script = step_script(&usage_step());
+    assert!(script.contains("npm install --global --no-audit --no-fund codelaw@") && script.contains("codelaw check --format bitbucket"), "{script}");
     let mut cmd = Command::new("bash");
     cmd.arg("-c")
         .arg(&script)

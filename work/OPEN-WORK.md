@@ -34,16 +34,18 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-95 itself (step 3, the `publish.yml` job, and step 4) | |
 | 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): on the next release (v0.3.0), github.com/marketplace/actions → *Publish* on the release's edit page → accept the Marketplace Developer Agreement → tick *Publish this Action to the GitHub Marketplace*. Ruled 2026-10-27: SARIF stays on `gh`; a moving `v0` tag is kept; Claude runs the throwaway-repo proof after that tag. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
-| 🔴 **Bitbucket Pipelines — the pipe fork, then the live proof** ([W-109](open/W-109-bitbucket-pipelines.md)). **1. Pipe or step:** the step is built (`codelaw init --ci bitbucket`, no dependency, no account). Say **"step only"** (recommended), or **"pipe too"** — then a pipe needs (a) an L11 row ratifying its base image (`node:22-slim`, the Docker official image) and (b) a Docker Hub namespace: <https://hub.docker.com> → sign up → *Create organization* `codelaw` (or name yours) → *Account settings → Personal access tokens → Generate* (Read & Write) → `gh secret set DOCKERHUB_TOKEN -R arpitarya/codelaw` and `gh variable set DOCKERHUB_NAMESPACE -R arpitarya/codelaw -b codelaw`. **2. The live proof, after the v0.3.0 release** (0.2.0 has no `--format bitbucket`): bitbucket.org → *Create repository* `codelaw-pipeline-proof` (private) → *Repository settings → Pipelines → Settings → Enable Pipelines*; then `mkdir /tmp/bb-proof && cd /tmp/bb-proof && git init -b main && printf 'export function run() {\n  debugger;\n}\n' > app.js && npx -y codelaw@0.3.0 init --ci bitbucket && git add -A && git commit -m proof && git remote add origin git@bitbucket.org:<workspace>/codelaw-pipeline-proof.git && git push -u origin main && git switch -c pr && git commit --allow-empty -m pr && git push -u origin pr`, open a pull request from `pr`. Expected: the build fails, the PR's *Reports* shows `codelaw` with one annotation on `app.js` line 2; set the repository variable `CODELAW_SARIF=true` and re-run → `codelaw.sarif` under *Artifacts*; set `CODELAW_CODE_INSIGHTS=false` and re-run → still fails, no new report. Paste the pipeline URL to the agent. | 2026-10-28 |
+| 🔴 **Bitbucket — the live proof, after the v0.3.0 release** ([W-109](open/W-109-bitbucket-pipelines.md); 0.2.0 has no `--format bitbucket`). bitbucket.org → *Create repository* `codelaw-pipeline-proof` (private) → *Repository settings → Pipelines → Settings → Enable Pipelines*; then `mkdir /tmp/bb-proof && cd /tmp/bb-proof && git init -b main && printf 'export function run() {\n  debugger;\n}\n' > app.js && npm init -y >/dev/null && npx -y codelaw@0.3.0 init` (it writes `codelaw.toml` and installs the JS pack), paste the YAML block from USAGE.md §Bitbucket Pipelines into `bitbucket-pipelines.yml`, then `git add -A && git commit -m proof && git remote add origin git@bitbucket.org:<workspace>/codelaw-pipeline-proof.git && git push -u origin main && git switch -c pr && git commit --allow-empty -m pr && git push -u origin pr` and open a pull request from `pr`. Expected: the build fails, the PR's *Reports* shows `codelaw` with one annotation on `app.js` line 2; set the repository variable `CODELAW_SARIF=true` and re-run → `codelaw.sarif` under *Artifacts*; set `CODELAW_CODE_INSIGHTS=false` and re-run → still fails, no new report. Paste the pipeline URL to the agent. Also confirm: the two switches stay the step's variables (the agent's reading of *"just have serif and code [insights] configurable"*). | 2026-10-28 |
 | ↳ **blocks:** W-109 itself | |
 | 🔴 **Two leftover worktrees — keep or drop** ([W-111](open/W-111-two-unmerged-worktrees.md); [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) decision 3). `lm/W-90` and `lm/W-96` hold commits `main` lacks, though both items closed and their work is in `main` (`archive/DEPENDENCIES.md`, `agent_env.rs`). Say **"drop both"** (recommended), or name one to keep. | 2026-10-28 |
 | ↳ **blocks:** W-111 itself | |
+| 🔴 **The guidance-vs-check experiment — the full 180** ([W-102](open/W-102-guidance-vs-check-experiment.md)). The pilot ran 2026-10-28: 60 sessions, **$10.47** (the estimate was ~$29), 26 min; A, B and C each broke a targeted rule in 2 of 20 runs, on the same two tasks (t02 `console.log`, t04 unused parameters), where the request itself asks for the violating code; the other 18 tempted no arm. Re-estimated: the full 180 **~$31**, ~80 min; resumed on the pilot's folder, the 120 runs left **~$21**, ~55 min. Say **"run it"** — the agent runs `python3 experiments/guidance-vs-check/harness.py run --agent claude --out experiments/guidance-vs-check/runs/2026-10-w102 --codelaw experiments/guidance-vs-check/runs/2026-10-w102/bin/codelaw` from the main checkout (that folder's `bin/claude` is Claude Code 2.1.310; the installed 2.1.207 cannot run `claude-opus-5-5`). Or say **"redesign first"** (recommended): at a 10 % floor in every arm the 180 will likely not separate A from C — harder tasks, and an arm A without `codelaw` on `PATH`, would. | 2026-10-28 |
+| ↳ **blocks:** W-102 itself (the 180, the write-up, step 4's README line) | |
 
 ---
 
-## Open items (19)
+## Open items (18)
 
-### build (17)
+### build (16)
 
 🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -57,13 +59,11 @@ here. Read that record before changing anything below it.
 
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
-🔴 **W-109** `arpit` Bitbucket Pipelines built: `init --ci bitbucket`, `--format bitbucket` to Code Insights via `curl`, SARIF and the upload each a switch; proven locally. Left: the pipe fork and the live proof after v0.3.0 (inbox). Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
+🔴 **W-109** `arpit` Bitbucket ruling applied: `--format bitbucket` kept; `init --ci bitbucket`, its template and the pipe removed; USAGE shows the step to copy, both switches its variables, a test runs it. Left: the live proof after v0.3.0 (inbox). Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
 
-🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
+🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in corpus); CSS/SCSS rules read statements, selectors, values, preludes, media queries, pseudo-class args, keyframe selectors from the tree; left: font lists. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
-
-🟢 **W-112** `agent` Spell words file `.codelaw/spell/words.txt` (`[spell] words_file`, merged with `[spell] words`); `codelaw init` adds the pack and file (`--no-spell` skips); `codelaw spell learn`. Filed by Arpit (Cowork). [detail](open/W-112-spell-words-file-and-learn.md)
 
 🟢 **W-110** `agent` Clean session 2df06f6d's leftovers on the Mac: five merged worktrees and three `.fux`-only folders, by `worktree-cleanup.py --apply`. Filed by Arpit (Cowork). [detail](open/W-110-session-2df06f6d-cleanup.md)
 
@@ -82,7 +82,7 @@ here. Read that record before changing anything below it.
 
 ### testing (1)
 
-🟢 **W-102** `agent` Experiment approved 10-27: Claude Code CLI, Fux in arm C. Left: the pilot (`--runs 1`, ~$29) on the Mac, then the full 180, the write-up and the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
+🔴 **W-102** `arpit` Pilot run 10-28: 60 sessions, $10.47; A = B = C, 2/20 broke a targeted rule; harness fixed. Left: the 180 or a redesign (inbox), the write-up, the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
 ### record update (1)
 

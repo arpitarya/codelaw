@@ -54,7 +54,7 @@ mod react_hooks;
 mod tanstack_query;
 mod redux_toolkit;
 mod size_lines;
-mod spell;
+pub mod spell;
 mod regexp;
 mod stencil;
 mod typescript;

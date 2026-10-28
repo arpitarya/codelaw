@@ -6,7 +6,7 @@ item: W-112
 filed: 2026-10-28
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -16,12 +16,12 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Records first: SR-SPELL decisions 1 and 7, SR-CLI-MCP (`init --no-spell`, `spell learn`), SR-CONFIG (`[spell] words_file`), the template's row (L10) | the spec before the code | ⏳ |
-| 2 | **A words file:** `.codelaw/spell/words.txt`, one word per line, `#` comments; `[spell] words_file` points at it, and by default it is that path | custom words kept in their own file, next to the rules | ⏳ |
-| 3 | **Both lists count:** the inline `[spell] words` stays and is merged with the file | small projects keep one place; big ones a file | ⏳ |
-| 4 | **A missing file:** silent at the default path; an error when `words_file` is set and the file is not there | no noise by default, no silent typo in a path | ⏳ |
-| 5 | **`codelaw init`** adds the spell pack and writes `.codelaw/spell/words.txt` from a template, then runs `spell learn`; `--no-spell` skips all three | spelling on from day one | ⏳ |
-| 6 | **`codelaw spell learn`** scans the codebase and adds every word no dictionary knows to the words file; likely typos are listed for review, never added | a clean first run without whitelisting real typos | ⏳ |
+| 1 | Records first: SR-SPELL decisions 1 and 7, SR-CLI-MCP (`init --no-spell`, `spell learn`), SR-CONFIG (`[spell] words_file`), the template's row (L10) | the spec before the code | ✅ SR-SPELL 1 and 7 as built (both rulings quoted), SR-CLI-MCP 1, SR-CONFIG 3 and 9, SR-RULE-PACKS 6, SR-CONSUMER-LAYOUT §1 and 8, SR-ARCHITECTURE 15b, L10 decision 3, `templates/README.md` |
+| 2 | **A words file:** `.codelaw/spell/words.txt`, one word per line, `#` comments; `[spell] words_file` points at it, and by default it is that path | custom words kept in their own file, next to the rules | ✅ `codelaw-config` reads it (`read_words_file`, `words_file_words`); in the cache key; schema, `config --print` |
+| 3 | **Both lists count:** the inline `[spell] words` stays and is merged with the file | small projects keep one place; big ones a file | ✅ `section_options("spell")` merges them; `the_spell_words_file_is_merged_with_the_inline_words` |
+| 4 | **A missing file:** silent at the default path; an error when `words_file` is set and the file is not there | no noise by default, no silent typo in a path | ✅ same test, and `learn_appends_new_words_only_and_keeps_every_line` (exit 2 naming the path) |
+| 5 | **`codelaw init`** adds the spell pack and writes `.codelaw/spell/words.txt` from a template, then runs `spell learn`; `--no-spell` skips all three | spelling on from day one | ✅ `templates/init/.codelaw/spell/words.txt`; `init_adds_the_spell_pack_and_fills_the_words_file` (with and without `--no-spell`, byte-identical across runs) |
+| 6 | **`codelaw spell learn`** scans the codebase and adds every word no dictionary knows to the words file; likely typos are listed for review, never added | a clean first run without whitelisting real typos | ✅ `crates/codelaw-cli/src/spell_cmd.rs`, held back by `codelaw_native::spell::suspicion` (`spell/suspicious-word`'s test); a second run adds nothing |
 
 **Arpit, 2026-10-28 (voice):**
 - On custom words: *"I would recommend creating a separate file and giving a path in TOML file for that file. The default should be next to rules directory."* — and, by voice, *"The default should be next to root rules directory. In the consumer application."*
@@ -33,6 +33,8 @@ ball: agent
 **Model:** Opus — records first; it reverses SR-SPELL decision 1's "`codelaw init` never adds it".
 
 ## Definition of done
+
+**Met, 2026-10-28 (Claude Code):** each line below is a test in `crates/codelaw-cli/tests/spell.rs` or `crates/codelaw-config/src/resolve.rs`, named in the step table. One thing the DoD does not cover and the decider should know: the spell rules are `preview` and `init` does not set `preview = true`, so a new project gets the pack and the words file but no spelling findings until it sets `preview = true` or the rules graduate (SR-SPELL decision 1 *as built*).
 
 - In a fixture repo, `codelaw init` adds the spell pack to the config, writes `.codelaw/spell/words.txt` from `templates/` (L10) and fills it by `spell learn`; `codelaw init --no-spell` does none of the three. Both byte-identical across runs.
 - `spell learn` adds a word no dictionary knows, and refuses one that is on the known-typo list or one edit from a common word (the `spell/suspicious-word` test) — those are printed, sorted, for review. A second run adds only new words; existing lines and comments are kept.

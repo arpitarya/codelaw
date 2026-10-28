@@ -1,8 +1,8 @@
 //! CSS rules about selectors.
 
 use crate::css_syntax::{
-    Complex, Kind, SKind, Sheet, Simple, all_simples, complex, css_rule, find_of, finding, fixed, line, matches_any, max_specificity, non_standard, normalize_selector,
-    opt_list, opt_str, selector_list, set, skip_comment, split_commas, takes_selectors, text, unprefixed, vendor_prefix,
+    Complex, Kind, SKind, Sheet, Simple, all_simples, arg_selectors, complex, css_rule, find_of, finding, fixed, line, matches_any, max_specificity, non_standard, normalize_selector,
+    opt_list, opt_str, selector_list, set, skip_comment, split_commas, text, unprefixed, vendor_prefix,
 };
 use codelaw_core::TextEdit;
 use std::collections::{BTreeMap, BTreeSet};
@@ -144,12 +144,12 @@ css_rule!(NestingSelectorNoMissingScopingRoot, "css/nesting-selector-no-missing-
         if rooted {
             continue;
         }
-        let (s, e) = match n.kind {
-            Kind::Rule if !sheet.in_keyframes(i, src) && !non_standard(text(src, n.name)) => n.name,
-            Kind::AtRule if sheet.at_name(i, src) == "scope" => n.params,
+        match n.kind {
+            Kind::Rule if !sheet.in_keyframes(i, src) && !non_standard(text(src, n.name)) => {}
+            Kind::AtRule if sheet.at_name(i, src) == "scope" => {}
             _ => continue,
-        };
-        let list = if n.kind == Kind::Rule { sheet.selectors(i, src) } else { selector_list(src, s, e).into() };
+        }
+        let list = sheet.selectors(i, src);
         let mut simples = Vec::new();
         all_simples(src, &list, &mut simples);
         for x in simples.iter().filter(|x| x.kind == SKind::Nesting) {
@@ -210,13 +210,8 @@ fn each_selector_simple(src: &str, list: &[Complex], f: &mut dyn FnMut(&Complex,
             f(c, s);
             if let Some((a, b)) = s.args {
                 let name = text(src, s.name).to_ascii_lowercase();
-                let name = unprefixed(&name);
-                if takes_selectors(name) {
-                    each_selector_simple(src, &selector_list(src, a, b), f);
-                } else if matches!(name, "nth-child" | "nth-last-child")
-                    && let Some(of) = find_of(src, a, b)
-                {
-                    each_selector_simple(src, &selector_list(src, of, b), f);
+                if let Some(list) = arg_selectors(src, s, unprefixed(&name), a, b) {
+                    each_selector_simple(src, &list, f);
                 }
             }
         }
@@ -231,12 +226,12 @@ css_rule!(SelectorPseudoClassNoUnknown, "css/selector-pseudo-class-no-unknown", 
     for i in sheet.walk() {
         let n = &sheet.nodes[i];
         let is_page = n.kind == Kind::AtRule && sheet.at_name(i, src) == "page";
-        let (s, e) = match n.kind {
-            Kind::Rule if !sheet.in_keyframes(i, src) && !non_standard(text(src, n.name)) => n.name,
-            Kind::AtRule if is_page => n.params,
+        match n.kind {
+            Kind::Rule if !sheet.in_keyframes(i, src) && !non_standard(text(src, n.name)) => {}
+            Kind::AtRule if is_page => {}
             _ => continue,
-        };
-        let list = if n.kind == Kind::Rule { sheet.selectors(i, src) } else { selector_list(src, s, e).into() };
+        }
+        let list = sheet.selectors(i, src);
         each_selector_simple(src, &list, &mut |c, x| {
             if x.kind != SKind::PseudoClass {
                 return;

@@ -375,7 +375,7 @@
     },
     "spell": {
       "x-codelaw-record": "SR-SPELL",
-      "description": "The spell pack's options (SR-SPELL decision 7): the locale whose spellings are right, and the words the project accepts. Read by the `spell/*` rules. Root config only.",
+      "description": "The spell pack's options (SR-SPELL decision 7): the locale whose spellings are right, and the words the project accepts, inline and in a words file. Read by the `spell/*` rules. Root config only.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -388,6 +388,11 @@
           "type": "array",
           "items": { "type": "string", "pattern": "^\\S+$" },
           "default": []
+        },
+        "words_file": {
+          "description": "A file of more accepted words, relative to the config's folder: one word per line, blank lines and lines starting with `#` skipped, merged with `words` and compared the same way. `codelaw spell learn` adds to it and `codelaw init` writes it. Missing at the default path is no error; missing at a path set here is a config error naming it.",
+          "type": "string",
+          "default": ".codelaw/spell/words.txt"
         }
       }
     },

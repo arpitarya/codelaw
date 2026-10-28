@@ -240,6 +240,7 @@ yet is owned by an open `W-nn`.
 | `fixtures/spell` | SR-SPELL | decisions 3–5: one file per L3 language, the typos the rules must report and the words they must not |
 | `crates/codelaw-cli/tests/spell.rs` | SR-SPELL | decisions 3–5: runs that repo through `check` and `fix` (W-103 DoD 3 and 4) |
 | `scripts/spell-typos.txt` | SR-SPELL | decision 6: the known typos added by hand, merged by `spell-data.py` |
+| `crates/codelaw-cli/src/spell_cmd.rs` | SR-SPELL | decision 7: `codelaw spell learn` (W-112) |
 | `LICENSE` | SR-PACKAGES | decision 10: the licence every package carries |
 | `packaging` | SR-PACKAGES | decisions 3 and 5: the npm launcher and API, the PyPI module and its maturin build |
 | `packaging/vscode` | SR-EDITOR | decision 4: the thin VS Code extension (SR-PACKAGES decision 6 is how it ships) |
@@ -272,6 +273,8 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 |---|---|---|
 | `crates/codelaw-rules` | SR-RULE-PACKS | pack layout, resolution, presets and precedence (decisions 3–5, 10–14) are the loader's |
 | `crates/codelaw-cli/src/init.rs` | SR-RULE-PACKS | decision 6 is what `codelaw init` does |
+| `crates/codelaw-cli/src/init.rs` | SR-SPELL | decision 1: `init` adds the spell pack and writes and fills the words file (W-112) |
+| `templates/init/.codelaw/spell` | SR-SPELL | decision 7: the words file's template (W-112) |
 | `crates/codelaw-native/src/deps` | SR-RULE-PACKS | decision 15: the manifests, lockfiles, snapshot and version order the dependency rules read |
 | `crates/codelaw-cli/src/deps_cmd.rs` | SR-RULE-PACKS | decision 15: what `codelaw deps refresh` reads, sends and writes |
 | `crates/codelaw-cli/src/deps_cmd.rs` | SR-LAW-5 | decision 3: the one command that may use the network |
