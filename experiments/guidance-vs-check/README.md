@@ -17,6 +17,14 @@ python3 experiments/guidance-vs-check/harness.py run --agent claude   # the 180 
 - **One command per stage.** `run` builds every repo, runs the agent, scores it and writes
   `runs/<agent>-<time>/RESULTS.md` and `results.json`. Run it again with the same `--out` and it
   resumes: a run with a `score.json` is not run twice. `table <out>` rewrites the table.
+- **The repos are built outside every repository**, in `--work` (default
+  `<tmp>/codelaw-w102/<out's name>`), and only each run's record is kept in `--out`. Inside this
+  checkout `runs/` is git-ignored, and `codelaw check` applies an enclosing repository's ignore
+  files even to a project that is its own git repository — it checked no file there, so every run
+  scored clean; and the agent CLI would read codelaw's own `CLAUDE.md`. The harness refuses a
+  `--work` under a `.git`, `CLAUDE.md`, `AGENTS.md` or `codelaw.toml`, and a prepared repo whose
+  check reads no file. A session the agent CLI failed (`is_error`, a timeout) is counted apart,
+  never in a rate.
 - **Narrow it** with `--arms A,C`, `--tasks t01,t13`, `--runs 1`, `--model`. The `codelaw` used is
   `$CARGO_TARGET_DIR` or `target/` (release, then debug), then `PATH`, or `--codelaw`.
 - **`dry-run` proves the pipeline.** `fake_agent.py` writes each task's scripted solution — arm A
@@ -34,6 +42,7 @@ python3 experiments/guidance-vs-check/harness.py run --agent claude   # the 180 
 | `arms/*.md` | what each arm appends to `AGENTS.md` |
 | `experiment.toml` | the matrix, the model, the timeouts and the agent command |
 | `harness.py` · `fake_agent.py` | the harness and the dry run's agent |
+| `results/<run>/` | the committed table of a real run — `RESULTS.md` and `results.json`, copied from `runs/` (ignored: it holds the diffs and the agent's JSON) |
 
 ## The arms
 
@@ -80,5 +89,9 @@ one-file task, not measurements — the first real runs replace them.
 - **The agent CLI is the decider's choice.** `experiment.toml`'s `[agent.claude]` is the proposed
   command (`claude -p … --setting-sources project --strict-mcp-config`). The operator's
   `~/.claude/CLAUDE.md` may still be read; `--bare` avoids it but needs `ANTHROPIC_API_KEY`.
+- **The CLI's version:** `claude-opus-5-5` needs Claude Code 2.1.280 or newer; 2.1.207 answers
+  every session with an API error (scored apart, never clean). The folder of the `--codelaw` binary
+  is first on every run's `PATH`, so a `claude` linked there is the one the runs use — the pilot
+  linked the VS Code extension's 2.1.310 there rather than update the operator's own CLI.
 - **Fux in arm C** runs the ratified `fux-engine` (D-34) outside CI, a new scope for it — allowed by the decider 2026-10-27 (W-102, *"Approved."*; L11 §3's D-34 row).
 - **Non-determinism:** rates are reported with their run counts, never from one run.

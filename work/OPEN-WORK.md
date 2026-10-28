@@ -36,6 +36,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Two leftover worktrees — keep or drop** ([W-111](open/W-111-two-unmerged-worktrees.md); [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) decision 3). `lm/W-90` and `lm/W-96` hold commits `main` lacks, though both items closed and their work is in `main` (`archive/DEPENDENCIES.md`, `agent_env.rs`). Say **"drop both"** (recommended), or name one to keep. | 2026-10-28 |
 | ↳ **blocks:** W-111 itself | |
+| 🔴 **The guidance-vs-check experiment — the full 180** ([W-102](open/W-102-guidance-vs-check-experiment.md)). The pilot ran 2026-10-28: 60 sessions, **$10.47** (the estimate was ~$29), 26 min; A, B and C each broke a targeted rule in 2 of 20 runs, on the same two tasks (t02 `console.log`, t04 unused parameters), where the request itself asks for the violating code; the other 18 tempted no arm. Re-estimated: the full 180 **~$31**, ~80 min; resumed on the pilot's folder, the 120 runs left **~$21**, ~55 min. Say **"run it"** — the agent runs `python3 experiments/guidance-vs-check/harness.py run --agent claude --out experiments/guidance-vs-check/runs/2026-10-w102 --codelaw experiments/guidance-vs-check/runs/2026-10-w102/bin/codelaw` from the main checkout (that folder's `bin/claude` is Claude Code 2.1.310; the installed 2.1.207 cannot run `claude-opus-5-5`). Or say **"redesign first"** (recommended): at a 10 % floor in every arm the 180 will likely not separate A from C — harder tasks, and an arm A without `codelaw` on `PATH`, would. | 2026-10-28 |
+| ↳ **blocks:** W-102 itself (the 180, the write-up, step 4's README line) | |
 
 ---
 
@@ -78,7 +80,7 @@ here. Read that record before changing anything below it.
 
 ### testing (1)
 
-🟢 **W-102** `agent` Experiment approved 10-27: Claude Code CLI, Fux in arm C. Left: the pilot (`--runs 1`, ~$29) on the Mac, then the full 180, the write-up and the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
+🔴 **W-102** `arpit` Pilot run 10-28: 60 sessions, $10.47; A = B = C, 2/20 broke a targeted rule; harness fixed. Left: the 180 or a redesign (inbox), the write-up, the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
 ### record update (1)
 

@@ -25,6 +25,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import tomllib
 from pathlib import Path
@@ -36,6 +37,7 @@ BASE = HERE / "repo"
 #: Files the agent must not change; restored before scoring, and the run is
 #: marked `tampered` when they differed.
 PROTECTED = ("codelaw.toml", ".codelaw")
+CACHE = ".codelaw/cache/"
 #: What `plan` multiplies by: rough per-session token use of a Claude Code
 #: session on a one-file task (see README.md §Cost). Not a measurement.
 EST = {
@@ -108,7 +110,7 @@ def clean_env(codelaw, out):
 
 
 def install_packs(out):
-    """The two packs, once per output folder: `node_modules/` above every run's
+    """The two packs, once per work folder: `node_modules/` above every run's
     repo (found by walking up) and a site-packages folder (CODELAW_SITE_PACKAGES),
     so the agent's repo holds no copy of them."""
     js = out / "node_modules/@codelaw/rules-js"
@@ -127,11 +129,31 @@ def rule_pages(repo):
     copy_tree(repo / ".codelaw/rules/acme", dst / "acme")
 
 
+def default_work(out):
+    """Where the runs' repos are built: outside every git repository. Inside
+    one — `runs/` is in this checkout — `codelaw check` applies the outer
+    repo's ignore files (`runs/` is ignored, so it checks no file at all) and
+    the agent CLI reads the outer repo's CLAUDE.md, which no arm may have."""
+    return Path(tempfile.gettempdir()) / "codelaw-w102" / out.name
+
+
+def check_work(work):
+    for d in (work, *work.parents):
+        for name in (".git", "CLAUDE.md", "AGENTS.md", "codelaw.toml"):
+            if (d / name).exists():
+                raise SystemExit(f"--work {work} is inside {d}, which has {name}: the runs would read it. Pass a --work outside every repository")
+
+
+def repo_of(cfg, run_dir):
+    """The run's repo: the same arm/task/run path under the work folder."""
+    return cfg["work"] / run_dir.relative_to(cfg["out"]) / "repo"
+
+
 def prepare(cfg, arm, task, run_dir, codelaw, env, fux):
     """Build the run's repo — base, task seed, arm overlay — and commit it, so
     the scorer can tell what the agent changed."""
     a = cfg["arm"][arm]
-    repo = run_dir / "repo"
+    repo = repo_of(cfg, run_dir)
     if repo.exists():
         shutil.rmtree(repo)
     copy_tree(BASE, repo)
@@ -211,11 +233,13 @@ def added_lines(repo):
 def score(cfg, task, run_dir, codelaw, env):
     """New findings = the check after the agent minus the check before, per
     rule, file and severity; deterministic for the same files."""
-    repo = run_dir / "repo"
+    repo = repo_of(cfg, run_dir)
     as_of = cfg["as_of"]
     b = {tuple(k): n for *k, n in json.loads((run_dir / "before.json").read_text(encoding="utf-8"))["counts"]}
-    changed = sh(["git", "status", "--porcelain", "--", *PROTECTED], cwd=repo, check=False).stdout.strip()
-    tampered = bool(changed)
+    changed = sh(["git", "status", "--porcelain", "--untracked-files=all", "--", *PROTECTED], cwd=repo, check=False).stdout.splitlines()
+    # The cache an agent's own `codelaw check` writes is not tampering: codelaw
+    # is on every run's PATH, and the after-check reads no cache (--no-cache).
+    tampered = any(not l[3:].startswith(CACHE) for l in changed)
     if tampered:
         sh(["git", "checkout", "-q", "HEAD", "--", *PROTECTED], cwd=repo, check=False)
         sh(["git", "clean", "-fdq", "--", *PROTECTED], cwd=repo, check=False)
@@ -281,6 +305,8 @@ def run_one(cfg, agent, arm, task, n, out, codelaw, env, fux):
     before, err = check(codelaw, repo, env, cfg["as_of"])
     if before is None:
         raise SystemExit(f"{task['id']}: the check of the prepared repo failed: {err}")
+    if not before["summary"].get("files_checked"):
+        raise SystemExit(f"{task['id']}: the check of the prepared repo checked no file ({repo}): every score would read clean")
     (run_dir / "before.json").write_text(json.dumps(compact(before)) + "\n", encoding="utf-8")
     prompt = task["prompt"].strip()
     (run_dir / "prompt.txt").write_text(prompt + "\n", encoding="utf-8")
@@ -300,7 +326,7 @@ def run_one(cfg, agent, arm, task, n, out, codelaw, env, fux):
     s.update({"arm": arm, "task": task["id"], "run": n, "wall_s": round(time.monotonic() - started, 1)})
     (run_dir / "score.json").write_text(json.dumps(s, indent=2) + "\n", encoding="utf-8")
     if not cfg.get("keep_repos"):
-        shutil.rmtree(repo)
+        shutil.rmtree(repo.parent)
     return s
 
 
@@ -334,7 +360,9 @@ def table(out):
     ]
     summary = {}
     for arm in arms:
-        ss = [s for s in scores if s["arm"] == arm and s.get("valid")]
+        # A session the agent CLI failed (an API error, a timeout) is no evidence
+        # either way: it is counted apart and kept out of every rate.
+        ss = [s for s in scores if s["arm"] == arm and s.get("valid") and not s.get("agent_error")]
         n = len(ss)
         broke = sum(1 for s in ss if s["targets_broken"])
         err = sum(1 for s in ss if s["new_errors"])
@@ -343,15 +371,21 @@ def table(out):
         tout = mean([s["tokens"].get("output_tokens") for s in ss])
         summary[arm] = {"runs": n, "broke_targeted": broke, "any_new_error": err, "targeted_findings": tf,
                         "tampered": sum(1 for s in ss if s["tampered"]), "suppressions": sum(s["suppressions_added"] for s in ss),
-                        "invalid": sum(1 for s in scores if s["arm"] == arm and not s.get("valid"))}
+                        "invalid": sum(1 for s in scores if s["arm"] == arm and not s.get("valid")),
+                        "agent_errors": sum(1 for s in scores if s["arm"] == arm and s.get("valid") and s.get("agent_error")),
+                        "cost_total": round(sum(s.get("cost_usd") or 0 for s in scores if s["arm"] == arm), 2)}
         lines.append(
             f"| {arm} | {meta.get('arms', {}).get(arm, '')} | {n} | {rate(broke, n)} | {rate(err, n)} | {tf} | {summary[arm]['tampered']} | {summary[arm]['suppressions']} | "
             f"{fmt(mean([s['turns'] for s in ss]), '{:.1f}')} | {fmt(tin)} / {fmt(tout)} | {fmt(mean([s['cost_usd'] for s in ss]), '${:.2f}')} |")
+    lines += ["", "Total cost: " + ", ".join(f"{a} ${summary[a]['cost_total']:.2f}" for a in arms) + f" · all ${sum(summary[a]['cost_total'] for a in arms):.2f}."]
+    left_out = {a: (summary[a]["agent_errors"], summary[a]["invalid"]) for a in arms if summary[a]["agent_errors"] or summary[a]["invalid"]}
+    if left_out:
+        lines.append("Left out of the rates: " + ", ".join(f"{a} {e} agent error(s), {i} unscorable" for a, (e, i) in left_out.items()) + ".")
     lines += ["", "## By task — runs that broke a targeted rule", "", "| task | targets | " + " | ".join(arms) + " |", "|---|---|" + "---|" * len(arms)]
     for t in tasks:
         row = [t, ", ".join(f"`{x}`" for x in next(s["targets"] for s in scores if s["task"] == t and s.get("valid")) or [])]
         for arm in arms:
-            ss = [s for s in scores if s["arm"] == arm and s["task"] == t and s.get("valid")]
+            ss = [s for s in scores if s["arm"] == arm and s["task"] == t and s.get("valid") and not s.get("agent_error")]
             row.append(f"{sum(1 for s in ss if s['targets_broken'])}/{len(ss)}" if ss else "—")
         lines.append("| " + " | ".join(row) + " |")
     if "C" in summary:
@@ -408,19 +442,24 @@ def cmd_run(cfg, args, agent, out, expect=None):
     cfg["keep_repos"] = args.keep_repos
     fux = None if args.no_fux else shutil.which("fux")
     out.mkdir(parents=True, exist_ok=True)
-    install_packs(out)
-    env = clean_env(codelaw, out)
+    work = Path(args.work).resolve() if args.work else default_work(out)
+    check_work(work)
+    work.mkdir(parents=True, exist_ok=True)
+    cfg["out"], cfg["work"] = out, work
+    install_packs(work)
+    env = clean_env(codelaw, work)
     version = sh([str(codelaw), "--version"]).stdout.strip()
     meta = {"agent": agent, "model": cfg["model"], "codelaw": version, "started": datetime.datetime.now().isoformat(timespec="seconds"),
             "arms": {a: cfg["arm"][a]["about"] for a in arms}, "runs": runs, "tasks": [t["id"] for t in tasks],
-            "argv": cfg["agent"][agent]["argv"], "fux": fux}
+            "argv": cfg["agent"][agent]["argv"], "fux": fux, "work": str(work)}
     (out / "meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     failures = []
     for arm in arms:
         for task in tasks:
             for n in range(1, runs + 1):
                 s = run_one(cfg, agent, arm, task, n, out, codelaw, env, fux)
-                mark = "broke " + ",".join(s["targets_broken"]) if s.get("targets_broken") else ("invalid" if not s.get("valid") else "clean")
+                mark = ("invalid" if not s.get("valid") else "agent error" if s.get("agent_error")
+                        else "broke " + ",".join(s["targets_broken"]) if s["targets_broken"] else "clean")
                 print(f"{arm} {task['id']} r{n}: {mark}{' (tampered)' if s.get('tampered') else ''}", flush=True)
                 if expect:
                     failures += expect(task, s)
@@ -463,6 +502,7 @@ def main():
             p.add_argument("--out", help="output folder (default: runs/<agent>-<timestamp>)")
             p.add_argument("--codelaw", help="the codelaw binary (default: $CARGO_TARGET_DIR or target/, release then debug, then PATH)")
             p.add_argument("--keep-repos", action="store_true", help="keep each run's repo (default: keep only its diff, to stay small under L9)")
+            p.add_argument("--work", help="where the runs' repos are built, outside every repository (default: <tmp>/codelaw-w102/<out's name>)")
             p.add_argument("--no-fux", action="store_true", help="arm C without its Fux index")
         if name == "run":
             p.add_argument("--agent", required=True, help="a key of [agent.*] in experiment.toml: claude or fake")
@@ -478,7 +518,9 @@ def main():
     else:
         agent = "fake" if args.cmd == "dry-run" else args.agent
         stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        out = Path(args.out) if args.out else HERE / "runs" / f"{agent}-{stamp}"
+        # Absolute: every run's commands run inside its repo, and CODELAW_SITE_PACKAGES
+        # is a path under `out` — relative, the packs are not found there.
+        out = Path(args.out).resolve() if args.out else HERE / "runs" / f"{agent}-{stamp}"
         if args.cmd == "dry-run":
             sys.path.insert(0, str(HERE))
             _, failures = cmd_run(cfg, args, "fake", out, expect=fake_expectation)

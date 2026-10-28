@@ -1,0 +1,1766 @@
+{
+  "meta": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "codelaw": "codelaw 0.2.0",
+    "started": "2026-10-28T08:59:51",
+    "arms": {
+      "A": "AGENTS.md only",
+      "B": "A + the codelaw MCP server and the rule pages",
+      "C": "B + a Fux index over the docs and the rule pages"
+    },
+    "runs": 1,
+    "tasks": [
+      "t01-orders-list",
+      "t02-cart-debug",
+      "t03-banner-alert",
+      "t04-format-price",
+      "t05-saved-prefs",
+      "t06-feature-flags",
+      "t07-qty-input",
+      "t08-refunded-status",
+      "t09-retry",
+      "t10-load-image",
+      "t11-fx-rates",
+      "t12-created-at",
+      "t13-user-by-email",
+      "t14-order-tags",
+      "t15-load-config",
+      "t16-order-not-found",
+      "t17-sort-key",
+      "t18-discount",
+      "t19-summary",
+      "t20-backfill"
+    ],
+    "argv": [
+      "claude",
+      "-p",
+      "{prompt}",
+      "--model",
+      "{model}",
+      "--output-format",
+      "json",
+      "--permission-mode",
+      "bypassPermissions",
+      "--setting-sources",
+      "project",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{mcp_config}",
+      "--max-turns",
+      "{max_turns}"
+    ],
+    "fux": "/Users/arpitarya/.local/bin/fux",
+    "work": "/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/codelaw-w102/2026-10-w102"
+  },
+  "summary": {
+    "A": {
+      "runs": 20,
+      "broke_targeted": 2,
+      "any_new_error": 2,
+      "targeted_findings": 4,
+      "tampered": 20,
+      "suppressions": 0,
+      "invalid": 0,
+      "agent_errors": 0,
+      "cost_total": 2.21
+    },
+    "B": {
+      "runs": 20,
+      "broke_targeted": 2,
+      "any_new_error": 2,
+      "targeted_findings": 4,
+      "tampered": 20,
+      "suppressions": 0,
+      "invalid": 0,
+      "agent_errors": 0,
+      "cost_total": 3.96
+    },
+    "C": {
+      "runs": 20,
+      "broke_targeted": 2,
+      "any_new_error": 2,
+      "targeted_findings": 4,
+      "tampered": 20,
+      "suppressions": 0,
+      "invalid": 0,
+      "agent_errors": 0,
+      "cost_total": 4.3
+    }
+  },
+  "runs": [
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 3,
+      "cost_usd": 0.0969534,
+      "duration_ms": 10072,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48147,
+        "cache_creation_input_tokens": 8585,
+        "output_tokens": 931
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t01-orders-list",
+      "run": 1,
+      "wall_s": 11.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-console"
+      ],
+      "targets_broken": [
+        "js/no-console"
+      ],
+      "new_by_rule": {
+        "js/no-console": {
+          "severity": "error",
+          "count": 2
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.1682034,
+      "duration_ms": 32171,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 153417,
+        "cache_creation_input_tokens": 11502,
+        "output_tokens": 2272
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t02-cart-debug",
+      "run": 1,
+      "wall_s": 33.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 6,
+      "cost_usd": 0.13214920000000002,
+      "duration_ms": 30318,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 106866,
+        "cache_creation_input_tokens": 9476,
+        "output_tokens": 1746
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t03-banner-alert",
+      "run": 1,
+      "wall_s": 32.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-unused-vars"
+      ],
+      "targets_broken": [
+        "js/no-unused-vars"
+      ],
+      "new_by_rule": {
+        "js/no-unused-vars": {
+          "severity": "error",
+          "count": 2
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 6,
+      "cost_usd": 0.146707,
+      "duration_ms": 22138,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 109815,
+        "cache_creation_input_tokens": 10747,
+        "output_tokens": 1936
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t04-format-price",
+      "run": 1,
+      "wall_s": 23.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-empty"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 4,
+      "cost_usd": 0.1078734,
+      "duration_ms": 22106,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67227,
+        "cache_creation_input_tokens": 8657,
+        "output_tokens": 1257
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t05-saved-prefs",
+      "run": 1,
+      "wall_s": 23.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 5,
+      "cost_usd": 0.1204354,
+      "duration_ms": 17139,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 88457,
+        "cache_creation_input_tokens": 9768,
+        "output_tokens": 1228
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t06-feature-flags",
+      "run": 1,
+      "wall_s": 18.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-isnan"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 4,
+      "cost_usd": 0.09897040000000001,
+      "duration_ms": 16439,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67032,
+        "cache_creation_input_tokens": 8339,
+        "output_tokens": 941
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t07-qty-input",
+      "run": 1,
+      "wall_s": 18.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 3,
+      "cost_usd": 0.08902700000000001,
+      "duration_ms": 10933,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47715,
+        "cache_creation_input_tokens": 7880,
+        "output_tokens": 821
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t08-refunded-status",
+      "run": 1,
+      "wall_s": 12.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 4,
+      "cost_usd": 0.102356,
+      "duration_ms": 20086,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67360,
+        "cache_creation_input_tokens": 8539,
+        "output_tokens": 1027
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t09-retry",
+      "run": 1,
+      "wall_s": 21.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 3,
+      "cost_usd": 0.08427979999999999,
+      "duration_ms": 11048,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47939,
+        "cache_creation_input_tokens": 7926,
+        "output_tokens": 563
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t10-load-image",
+      "run": 1,
+      "wall_s": 12.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 4,
+      "cost_usd": 0.0936394,
+      "duration_ms": 15302,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66717,
+        "cache_creation_input_tokens": 8053,
+        "output_tokens": 792
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t11-fx-rates",
+      "run": 1,
+      "wall_s": 16.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 3,
+      "cost_usd": 0.0876866,
+      "duration_ms": 12115,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47733,
+        "cache_creation_input_tokens": 7992,
+        "output_tokens": 709
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t12-created-at",
+      "run": 1,
+      "wall_s": 14.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 4,
+      "cost_usd": 0.095921,
+      "duration_ms": 10537,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67125,
+        "cache_creation_input_tokens": 8453,
+        "output_tokens": 742
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t13-user-by-email",
+      "run": 1,
+      "wall_s": 12.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 4,
+      "cost_usd": 0.09451739999999999,
+      "duration_ms": 14402,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48147,
+        "cache_creation_input_tokens": 8628,
+        "output_tokens": 792
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t14-order-tags",
+      "run": 1,
+      "wall_s": 16.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 6,
+      "cost_usd": 0.18842799999999998,
+      "duration_ms": 21992,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 120580,
+        "cache_creation_input_tokens": 15833,
+        "output_tokens": 1880
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t15-load-config",
+      "run": 1,
+      "wall_s": 23.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 3,
+      "cost_usd": 0.08589,
+      "duration_ms": 12569,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48150,
+        "cache_creation_input_tokens": 8142,
+        "output_tokens": 555
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t16-order-not-found",
+      "run": 1,
+      "wall_s": 13.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 3,
+      "cost_usd": 0.089881,
+      "duration_ms": 12143,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48165,
+        "cache_creation_input_tokens": 8238,
+        "output_tokens": 716
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t17-sort-key",
+      "run": 1,
+      "wall_s": 13.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/none-comparison"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 3,
+      "cost_usd": 0.0861478,
+      "duration_ms": 12840,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47579,
+        "cache_creation_input_tokens": 7746,
+        "output_tokens": 732
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t18-discount",
+      "run": 1,
+      "wall_s": 13.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 5,
+      "cost_usd": 0.104405,
+      "duration_ms": 21565,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66825,
+        "cache_creation_input_tokens": 8841,
+        "output_tokens": 1014
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t19-summary",
+      "run": 1,
+      "wall_s": 22.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 5,
+      "cost_usd": 0.1325548,
+      "duration_ms": 29620,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 90654,
+        "cache_creation_input_tokens": 10703,
+        "output_tokens": 1438
+      },
+      "agent_error": false,
+      "arm": "A",
+      "task": "t20-backfill",
+      "run": 1,
+      "wall_s": 30.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.1614524,
+      "duration_ms": 20063,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 100582,
+        "cache_creation_input_tokens": 14436,
+        "output_tokens": 1290
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t01-orders-list",
+      "run": 1,
+      "wall_s": 21.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-console"
+      ],
+      "targets_broken": [
+        "js/no-console"
+      ],
+      "new_by_rule": {
+        "js/no-console": {
+          "severity": "error",
+          "count": 2
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 6,
+      "cost_usd": 0.15961340000000002,
+      "duration_ms": 26585,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 73847,
+        "cache_creation_input_tokens": 14308,
+        "output_tokens": 1517
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t02-cart-debug",
+      "run": 1,
+      "wall_s": 28.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 13,
+      "cost_usd": 0.18185560000000003,
+      "duration_ms": 23300,
+      "tokens": {
+        "input_tokens": 20,
+        "cache_read_input_tokens": 159518,
+        "cache_creation_input_tokens": 13199,
+        "output_tokens": 2214
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t03-banner-alert",
+      "run": 1,
+      "wall_s": 24.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-unused-vars"
+      ],
+      "targets_broken": [
+        "js/no-unused-vars"
+      ],
+      "new_by_rule": {
+        "js/no-unused-vars": {
+          "severity": "error",
+          "count": 2
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 11,
+      "cost_usd": 0.222945,
+      "duration_ms": 58189,
+      "tokens": {
+        "input_tokens": 20,
+        "cache_read_input_tokens": 192965,
+        "cache_creation_input_tokens": 15539,
+        "output_tokens": 2998
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t04-format-price",
+      "run": 1,
+      "wall_s": 59.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-empty"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 12,
+      "cost_usd": 0.28604799999999997,
+      "duration_ms": 47046,
+      "tokens": {
+        "input_tokens": 20,
+        "cache_read_input_tokens": 222680,
+        "cache_creation_input_tokens": 21989,
+        "output_tokens": 3276
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t05-saved-prefs",
+      "run": 1,
+      "wall_s": 48.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 10,
+      "cost_usd": 0.2358208,
+      "duration_ms": 22056,
+      "tokens": {
+        "input_tokens": 18,
+        "cache_read_input_tokens": 177604,
+        "cache_creation_input_tokens": 19991,
+        "output_tokens": 2015
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t06-feature-flags",
+      "run": 1,
+      "wall_s": 23.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-isnan"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.159363,
+      "duration_ms": 23680,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 114715,
+        "cache_creation_input_tokens": 13018,
+        "output_tokens": 1611
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t07-qty-input",
+      "run": 1,
+      "wall_s": 25.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.15859600000000001,
+      "duration_ms": 17873,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 99660,
+        "cache_creation_input_tokens": 14117,
+        "output_tokens": 1284
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t08-refunded-status",
+      "run": 1,
+      "wall_s": 19.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 9,
+      "cost_usd": 0.2035016,
+      "duration_ms": 27850,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 100428,
+        "cache_creation_input_tokens": 17871,
+        "output_tokens": 2020
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t09-retry",
+      "run": 1,
+      "wall_s": 29.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 9,
+      "cost_usd": 0.2146848,
+      "duration_ms": 22004,
+      "tokens": {
+        "input_tokens": 18,
+        "cache_read_input_tokens": 172684,
+        "cache_creation_input_tokens": 18317,
+        "output_tokens": 1677
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t10-load-image",
+      "run": 1,
+      "wall_s": 23.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 9,
+      "cost_usd": 0.1853726,
+      "duration_ms": 19888,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 121503,
+        "cache_creation_input_tokens": 15597,
+        "output_tokens": 1812
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t11-fx-rates",
+      "run": 1,
+      "wall_s": 21.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 7,
+      "cost_usd": 0.1787476,
+      "duration_ms": 22761,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 78318,
+        "cache_creation_input_tokens": 17513,
+        "output_tokens": 1147
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t12-created-at",
+      "run": 1,
+      "wall_s": 24.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 10,
+      "cost_usd": 0.17069059999999997,
+      "duration_ms": 36614,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 119593,
+        "cache_creation_input_tokens": 13282,
+        "output_tokens": 2023
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t13-user-by-email",
+      "run": 1,
+      "wall_s": 38.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 10,
+      "cost_usd": 0.21165940000000005,
+      "duration_ms": 39379,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 152397,
+        "cache_creation_input_tokens": 17922,
+        "output_tokens": 1887
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t14-order-tags",
+      "run": 1,
+      "wall_s": 40.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 11,
+      "cost_usd": 0.2869476,
+      "duration_ms": 40822,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 171438,
+        "cache_creation_input_tokens": 25957,
+        "output_tokens": 2247
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t15-load-config",
+      "run": 1,
+      "wall_s": 42.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 10,
+      "cost_usd": 0.19436440000000002,
+      "duration_ms": 23489,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 147482,
+        "cache_creation_input_tokens": 15898,
+        "output_tokens": 1881
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t16-order-not-found",
+      "run": 1,
+      "wall_s": 24.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 10,
+      "cost_usd": 0.1841992,
+      "duration_ms": 41298,
+      "tokens": {
+        "input_tokens": 18,
+        "cache_read_input_tokens": 165056,
+        "cache_creation_input_tokens": 14602,
+        "output_tokens": 1715
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t17-sort-key",
+      "run": 1,
+      "wall_s": 42.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/none-comparison"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 6,
+      "cost_usd": 0.167553,
+      "duration_ms": 17906,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 76265,
+        "cache_creation_input_tokens": 16425,
+        "output_tokens": 1043
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t18-discount",
+      "run": 1,
+      "wall_s": 19.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 11,
+      "cost_usd": 0.18346579999999996,
+      "duration_ms": 22921,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 142949,
+        "cache_creation_input_tokens": 13774,
+        "output_tokens": 2231
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t19-summary",
+      "run": 1,
+      "wall_s": 24.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 9,
+      "cost_usd": 0.2125506,
+      "duration_ms": 30053,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 154173,
+        "cache_creation_input_tokens": 17624,
+        "output_tokens": 2033
+      },
+      "agent_error": false,
+      "arm": "B",
+      "task": "t20-backfill",
+      "run": 1,
+      "wall_s": 31.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.18503019999999998,
+      "duration_ms": 19095,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 110851,
+        "cache_creation_input_tokens": 16889,
+        "output_tokens": 1385
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t01-orders-list",
+      "run": 1,
+      "wall_s": 20.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-console"
+      ],
+      "targets_broken": [
+        "js/no-console"
+      ],
+      "new_by_rule": {
+        "js/no-console": {
+          "severity": "error",
+          "count": 2
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 7,
+      "cost_usd": 0.1920994,
+      "duration_ms": 29945,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 109837,
+        "cache_creation_input_tokens": 17438,
+        "output_tokens": 1529
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t02-cart-debug",
+      "run": 1,
+      "wall_s": 31.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 11,
+      "cost_usd": 0.19842359999999995,
+      "duration_ms": 29015,
+      "tokens": {
+        "input_tokens": 20,
+        "cache_read_input_tokens": 181898,
+        "cache_creation_input_tokens": 15528,
+        "output_tokens": 1887
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t03-banner-alert",
+      "run": 1,
+      "wall_s": 30.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-unused-vars"
+      ],
+      "targets_broken": [
+        "js/no-unused-vars"
+      ],
+      "new_by_rule": {
+        "js/no-unused-vars": {
+          "severity": "error",
+          "count": 2
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 10,
+      "cost_usd": 0.288829,
+      "duration_ms": 32878,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 150205,
+        "cache_creation_input_tokens": 24539,
+        "output_tokens": 3121
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t04-format-price",
+      "run": 1,
+      "wall_s": 34.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-empty"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 10,
+      "cost_usd": 0.2800802,
+      "duration_ms": 31829,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 178101,
+        "cache_creation_input_tokens": 24292,
+        "output_tokens": 2503
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t05-saved-prefs",
+      "run": 1,
+      "wall_s": 33.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.20766539999999997,
+      "duration_ms": 22559,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 157247,
+        "cache_creation_input_tokens": 16999,
+        "output_tokens": 2008
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t06-feature-flags",
+      "run": 1,
+      "wall_s": 24.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-isnan"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.18413380000000001,
+      "duration_ms": 18833,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 128829,
+        "cache_creation_input_tokens": 15779,
+        "output_tokens": 1604
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t07-qty-input",
+      "run": 1,
+      "wall_s": 20.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.1784026,
+      "duration_ms": 21205,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 83113,
+        "cache_creation_input_tokens": 16840,
+        "output_tokens": 1351
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t08-refunded-status",
+      "run": 1,
+      "wall_s": 22.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.19725299999999998,
+      "duration_ms": 18795,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 108485,
+        "cache_creation_input_tokens": 17131,
+        "output_tokens": 1923
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t09-retry",
+      "run": 1,
+      "wall_s": 20.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 8,
+      "cost_usd": 0.1991698,
+      "duration_ms": 25009,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 132949,
+        "cache_creation_input_tokens": 17483,
+        "output_tokens": 1633
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t10-load-image",
+      "run": 1,
+      "wall_s": 26.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 11,
+      "cost_usd": 0.23276019999999997,
+      "duration_ms": 45674,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 167641,
+        "cache_creation_input_tokens": 19326,
+        "output_tokens": 2228
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t11-fx-rates",
+      "run": 1,
+      "wall_s": 47.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 6,
+      "cost_usd": 0.14210899999999999,
+      "duration_ms": 12015,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 79225,
+        "cache_creation_input_tokens": 12883,
+        "output_tokens": 1158
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t12-created-at",
+      "run": 1,
+      "wall_s": 13.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 9,
+      "cost_usd": 0.1787494,
+      "duration_ms": 23490,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 107047,
+        "cache_creation_input_tokens": 14949,
+        "output_tokens": 1885
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t13-user-by-email",
+      "run": 1,
+      "wall_s": 25.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 10,
+      "cost_usd": 0.23026600000000003,
+      "duration_ms": 20991,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 160990,
+        "cache_creation_input_tokens": 19638,
+        "output_tokens": 2045
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t14-order-tags",
+      "run": 1,
+      "wall_s": 22.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 11,
+      "cost_usd": 0.31316259999999996,
+      "duration_ms": 48424,
+      "tokens": {
+        "input_tokens": 20,
+        "cache_read_input_tokens": 238813,
+        "cache_creation_input_tokens": 24885,
+        "output_tokens": 3312
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t15-load-config",
+      "run": 1,
+      "wall_s": 49.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 9,
+      "cost_usd": 0.2203622,
+      "duration_ms": 30300,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 166791,
+        "cache_creation_input_tokens": 19360,
+        "output_tokens": 1603
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t16-order-not-found",
+      "run": 1,
+      "wall_s": 31.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 9,
+      "cost_usd": 0.1994882,
+      "duration_ms": 25900,
+      "tokens": {
+        "input_tokens": 16,
+        "cache_read_input_tokens": 156661,
+        "cache_creation_input_tokens": 16774,
+        "output_tokens": 1695
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t17-sort-key",
+      "run": 1,
+      "wall_s": 27.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/none-comparison"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 6,
+      "cost_usd": 0.2015568,
+      "duration_ms": 21232,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 136584,
+        "cache_creation_input_tokens": 19128,
+        "output_tokens": 1058
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t18-discount",
+      "run": 1,
+      "wall_s": 22.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 9,
+      "cost_usd": 0.3040658,
+      "duration_ms": 21670,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 176049,
+        "cache_creation_input_tokens": 28410,
+        "output_tokens": 2076
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t19-summary",
+      "run": 1,
+      "wall_s": 23.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": true,
+      "turns": 6,
+      "cost_usd": 0.1640858,
+      "duration_ms": 23114,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 128189,
+        "cache_creation_input_tokens": 13904,
+        "output_tokens": 1358
+      },
+      "agent_error": false,
+      "arm": "C",
+      "task": "t20-backfill",
+      "run": 1,
+      "wall_s": 24.5
+    }
+  ]
+}
