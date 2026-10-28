@@ -71,7 +71,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-93** `arpit` `codelaw hook --pre` and `codelaw brief` built and landed (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: the decider rules `hook_pre`'s budget (inbox), then close. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
-🟢 **W-103** `agent` Spell pack: three generated tables (188,151 typos, a 92,758-word dictionary, VarCon locale pairs), `[spell]`, six rules landed; left: `spell/inconsistent-term` (project scope), fixtures and the `fix` run, corpus run, L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
+🟢 **W-103** `agent` Spell pack: three generated tables (188,151 typos, a 92,758-word dictionary, VarCon locale pairs), `[spell]`, six rules landed; fixtures and `fix` run pass; left: `spell/inconsistent-term` (project scope), corpus run, L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🔴 **W-100** `arpit` Rule promotion: `scripts/corpus.py promote` reports which preview rules pass, in CI's corpus summary; `--write` refuses until ratified. Left: Arpit's ruling on the criterion (SR-RULE-AUTHORING 6a), then the first batch. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
 

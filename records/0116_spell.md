@@ -12,6 +12,8 @@ owns:
   - crates/codelaw-native/src/spell.rs
   - scripts/spell-data.py
   - scripts/spell-typos.txt
+  - fixtures/spell
+  - crates/codelaw-cli/tests/spell.rs
 laws: [L2, L3, L4, L5, L6, L8, L10, L11]
 timestamp: 2026-10-27T14:00:00Z
 content_sha: ""

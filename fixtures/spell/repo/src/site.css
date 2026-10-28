@@ -1,0 +1,7 @@
+/* The adress card. */
+.adress-card {
+  padding: 1rem;
+}
+.adress-card:hover {
+  color: red;
+}

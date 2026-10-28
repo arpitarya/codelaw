@@ -1,0 +1,5 @@
+{
+  "recieveTimeout": 30,
+  "description": "the adress of the server",
+  "id": "recieve"
+}

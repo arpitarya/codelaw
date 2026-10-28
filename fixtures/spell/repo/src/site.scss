@@ -1,0 +1,5 @@
+// The lenght of a line.
+$line-lenght: 70ch;
+.prose {
+  max-width: $line-lenght;
+}
