@@ -71,7 +71,7 @@ impl FormatEnv {
 /// `CODELAW_FORMAT`, the agent variable, or `default`. `CI` alone never
 /// picks `agent`: it is not one of [`AGENT_VARS`].
 pub fn resolve_format(flag: Option<&str>, env: &FormatEnv) -> Result<(Format, String), String> {
-    const ALL: &str = "text, json, sarif, agent, github, gitlab, junit or checkstyle";
+    const ALL: &str = "text, json, sarif, agent, github, gitlab, junit, checkstyle or bitbucket";
     if let Some(s) = flag {
         return Format::parse(s).map(|f| (f, "--format".to_owned())).ok_or_else(|| format!("unknown --format `{s}` ({ALL})"));
     }

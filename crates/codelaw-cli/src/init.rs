@@ -26,7 +26,7 @@ pub struct InitArgs {
     /// Install git hooks: `pre-commit` (blocks) and `post-commit` (reminds, never blocks); both when none is named. In a repo codelaw already configures, it installs only the hooks (SR-CLI-MCP decision 7).
     #[arg(long, value_delimiter = ',', num_args = 0.., value_name = "HOOKS")]
     git_hooks: Option<Vec<String>>,
-    /// Write a CI workflow. `github` alone: the check workflow, which runs codelaw's GitHub Action at this version (SR-CLI-MCP decision 12a). With `--autofix` (`github` or `gitlab`): the scheduled auto-fix workflow (decision 12). In a repo codelaw already configures, it writes only the workflow.
+    /// Write a CI workflow. `github` alone: the check workflow, which runs codelaw's GitHub Action at this version (SR-CLI-MCP decision 12a). `bitbucket`: `bitbucket-pipelines.yml`, a step that checks and sends the findings to Code Insights, SARIF a switch (decision 12b). With `--autofix` (`github` or `gitlab`): the scheduled auto-fix workflow (decision 12). In a repo codelaw already configures, it writes only the workflow.
     #[arg(long, value_name = "PROVIDER")]
     ci: Option<String>,
     /// How often the CI workflow runs the safe fixes, the formatter and `baseline prune`, and keeps one PR open: `daily` or `weekly`.
@@ -231,10 +231,14 @@ pub fn init(args: InitArgs) -> ExitCode {
         },
         _ => None,
     };
-    // Refused before anything is written: there is no GitLab check workflow.
-    if let Some((p, None)) = ci
-        && let Err(e) = crate::ci::check_workflow(p, codelaw_core::VERSION)
-    {
+    // Refused before anything is written: there is no GitLab check workflow
+    // and no Bitbucket auto-fix one.
+    let refused = match ci {
+        Some((p, None)) => crate::ci::check_workflow(p, codelaw_core::VERSION).err(),
+        Some((p, Some(w))) => crate::ci::workflow(p, w, args.unsafe_fixes, codelaw_core::VERSION).err(),
+        None => None,
+    };
+    if let Some(e) = refused {
         return fail(e);
     }
     let forced = match args.registry.as_deref() {

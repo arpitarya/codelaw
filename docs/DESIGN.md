@@ -330,7 +330,7 @@ codelaw hook --fix --changed <file(s) from hook payload> --format agent
 ## 5. CLI surface
 
 ```
-codelaw check [paths]   [--lang js,ts,python] [--format text|json|sarif|agent|github|gitlab|junit|checkstyle]
+codelaw check [paths]   [--lang js,ts,python] [--format text|json|sarif|agent|github|gitlab|junit|checkstyle|bitbucket]
 codelaw fix   [paths]   [--unsafe] [--dry-run → unified diff]
 codelaw rules [--for <path>] [--format md|json]
 codelaw explain <rule-id>

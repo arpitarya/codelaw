@@ -1,4 +1,4 @@
-//! W-45: `--format github|gitlab|junit|checkstyle` through the binary. GitLab
+//! W-45: `--format github|gitlab|junit|checkstyle` through the binary (W-109 adds `bitbucket` to the shared checks). GitLab
 //! is validated with `boon` against GitLab's own Code Quality schema, JUnit
 //! and Checkstyle with `xmllint --schema` (libxml2) against the JUnit XSD and
 //! a Checkstyle XSD, all vendored in `crates/codelaw-report/tests/`. The
@@ -173,7 +173,7 @@ fn the_same_input_gives_byte_identical_output_and_the_exit_code_is_the_text_run(
     let d = project("same");
     let (text_code, _, _) = codelaw(&d, &["check", "--no-cache"]);
     let (text_fix_code, _, _) = codelaw(&d, &["fix", "--dry-run"]);
-    for format in ["github", "gitlab", "junit", "checkstyle"] {
+    for format in ["github", "gitlab", "junit", "checkstyle", "bitbucket"] {
         let (code, a, _) = codelaw(&d, &["check", "--format", format, "--no-cache"]);
         let (_, b, _) = codelaw(&d, &["check", "--format", format, "--no-cache"]);
         assert_eq!(a, b, "{format} is deterministic");
@@ -193,7 +193,7 @@ fn format_check_reports_unformatted_files_in_the_ci_formats() {
     fs::write(d.join("a.json"), "{\"a\":1,\n\"b\":[1,2]}\n").unwrap();
     let (text_code, _, _) = codelaw(&d, &["format", "--check"]);
     assert_eq!(text_code, 1);
-    for format in ["github", "gitlab", "junit", "checkstyle"] {
+    for format in ["github", "gitlab", "junit", "checkstyle", "bitbucket"] {
         let (code, out, err) = codelaw(&d, &["format", "--check", "--format", format]);
         assert_eq!(code, 1, "{format}: {err}");
         assert!(out.contains("format/unformatted") && out.contains("a.json"), "{format}: {out}");
