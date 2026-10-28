@@ -218,3 +218,107 @@ fn a_hook_uses_a_warm_program_and_never_a_cold_one() {
     assert_eq!(fired, EXPECTED.len() - 1);
     let _ = fs::remove_dir_all(&d);
 }
+
+/// SR-TYPES decision 12, L5 decision 2: `--version --json` names the
+/// engine, the protocol and the tested range, and the project's own
+/// TypeScript when one is installed — `null` when none is.
+#[test]
+fn version_json_names_the_protocol_and_the_project_typescript() {
+    let d = project("version-none", None);
+    let (code, out) = codelaw(&d.join("src"), &["--version", "--json"]);
+    assert_eq!(code, 0, "{out}");
+    let v = json(&out);
+    assert_eq!(v["codelaw"], env!("CARGO_PKG_VERSION"));
+    assert_eq!(v["types"]["protocol"], codelaw_types::PROTOCOL);
+    assert_eq!(v["types"]["tested"], codelaw_types::TESTED);
+    assert_eq!(v["types"]["typescript"], Value::Null, "{out}");
+    // Plain `--version` stays one line (the `startup` budget's command).
+    let (_, plain) = codelaw(&d, &["--version"]);
+    assert_eq!(plain, format!("codelaw {}\n", env!("CARGO_PKG_VERSION")));
+    let _ = fs::remove_dir_all(&d);
+    let Some(ts) = typescript() else { return };
+    let d = project("version", Some(&ts));
+    let (_, out) = codelaw(&d.join("src"), &["--json", "--version"]);
+    let v = json(&out);
+    let t = &v["types"]["typescript"];
+    assert_eq!(t["version"], codelaw_types::package_version(&ts).unwrap(), "{out}");
+    assert_eq!(t["path"], codelaw_core::normalize_path(&d.join("node_modules/typescript")));
+    assert_eq!((t["api"].as_bool(), t["tested"].as_bool()), (Some(true), Some(true)), "{out}");
+    assert!(v["types"]["node"].is_string(), "{out}");
+    let _ = fs::remove_dir_all(&d);
+}
+
+/// The resident memory, in KiB, of `pid` and every process below it (the
+/// type helper is the watch's child): `ps`'s `rss` column, KiB on Linux and
+/// macOS.
+fn tree_rss_kib(pid: u32) -> u64 {
+    let out = Command::new("ps").args(["-A", "-o", "pid=,ppid=,rss="]).output().unwrap();
+    let rows: Vec<(u32, u32, u64)> = String::from_utf8(out.stdout)
+        .unwrap()
+        .lines()
+        .filter_map(|l| {
+            let mut f = l.split_whitespace().map(|x| x.parse::<u64>().ok());
+            Some((f.next()?? as u32, f.next()?? as u32, f.next()??))
+        })
+        .collect();
+    let mut tree = vec![pid];
+    let mut i = 0;
+    while i < tree.len() {
+        let parent = tree[i];
+        tree.extend(rows.iter().filter(|r| r.1 == parent).map(|r| r.0));
+        i += 1;
+    }
+    rows.iter().filter(|r| tree.contains(&r.0)).map(|r| r.2).sum()
+}
+
+/// SR-TYPES decision 2's hazard: a snapshot the helper forgets to dispose
+/// leaks on TypeScript's Go side. A long `--watch` run re-checks the typed
+/// files after every save; past a warm-up, its memory — the watch and the
+/// helper together — must stay flat.
+#[test]
+fn a_long_watch_does_not_grow_with_its_rechecks() {
+    use std::io::BufRead;
+    let Some(ts) = typescript() else { return };
+    let d = project("watch-memory", Some(&ts));
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codelaw"))
+        .args(["check", "--watch", "--no-adapters", "--format", "json", "src"])
+        .current_dir(&d)
+        .env_remove("VIRTUAL_ENV")
+        .env_remove("CODELAW_TYPESCRIPT")
+        .env("CODELAW_CACHE_DIR", d.join(".cache"))
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let mut lines = std::io::BufReader::new(child.stdout.take().unwrap()).lines();
+    let mut run = |want: u64| loop {
+        let line = lines.next().expect("the watch stopped").unwrap();
+        let v: Value = serde_json::from_str(&line).unwrap_or_default();
+        if v["watch"]["run"] == want {
+            assert!(v.get("error").is_none(), "{line}");
+            return v["diagnostics"].as_array().map(|a| a.iter().filter(|x| x["rule"] == "ts/type-error").count());
+        }
+    };
+    assert_eq!(run(1), Some(1));
+    const WARM: u64 = 20;
+    const RUNS: u64 = 100;
+    let mut warm = 0;
+    for i in 1..=RUNS {
+        // Text no run has seen, with its type error each time.
+        fs::write(d.join("src/error.ts"), format!("export const count{i}: number = \"{i}\";\n")).unwrap();
+        assert_eq!(run(i + 1), Some(1), "re-check {i}");
+        if i == WARM {
+            warm = tree_rss_kib(child.id());
+        }
+    }
+    let last = tree_rss_kib(child.id());
+    let _ = child.kill();
+    let _ = child.wait();
+    let _ = fs::remove_dir_all(&d);
+    eprintln!("watch memory: {} KiB after {WARM} re-checks, {} KiB after {RUNS}", warm, last);
+    // Tried on macOS, 2026-10-28: with the helper's old snapshot left
+    // undisposed on each change, these 80 re-checks grew it by a third
+    // (144 → 191 MiB); disposed, by 5 % (139 → 146 MiB).
+    assert!(last <= warm + warm * 3 / 20, "the watch grew from {warm} KiB after {WARM} re-checks to {last} KiB after {RUNS}");
+}

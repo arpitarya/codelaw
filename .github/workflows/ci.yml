@@ -195,7 +195,8 @@ jobs:
     # never compared — is reported in the job summary and fails nothing
     # (decision 6). No verdict is reused: the timing is what is checked.
     # A push or PR that changed nothing it times — the engine, its toolchain,
-    # the packs it loads, perf/, this file — skips it (W-24); the nightly run
+    # the packs it loads, perf/, the TypeScript fixtures/types pins, this
+    # file — skips it (W-24); the nightly run
     # and a manual dispatch always run it.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
     runs-on: ubuntu-24.04 # L8 reference machine (the decider, 2026-10-24); never ubuntu-latest
@@ -210,7 +211,7 @@ jobs:
         run: |
           run=true
           if [ "$REUSE" = true ] && [ -n "$BASE" ] && [ -n "${BASE//0/}" ] && git fetch -q --depth=1 origin "$BASE" 2>/dev/null; then
-            git diff --quiet "$BASE" HEAD -- crates Cargo.toml Cargo.lock rust-toolchain.toml perf packs .github/workflows/ci.yml && run=false
+            git diff --quiet "$BASE" HEAD -- crates Cargo.toml Cargo.lock rust-toolchain.toml perf packs fixtures/types .github/workflows/ci.yml && run=false
           fi
           echo "run=$run" >> "$GITHUB_OUTPUT"
           [ "$run" = true ] || echo "::notice title=perf::skipped — nothing it times changed since ${BASE::8}"
@@ -238,13 +239,22 @@ jobs:
       - name: the three pinned real repos (L8 decision 2; scripts/corpus.json)
         if: steps.changed.outputs.run == 'true'
         run: python3 scripts/corpus.py fetch --dir "$RUNNER_TEMP/corpus" --repo djangoproject.com --repo full-stack-fastapi-template --repo html5-boilerplate
+      # check_types_cold / check_types_warm ask the TypeScript fixtures/types
+      # pins, as the test job does (L11 §3 D-45, CI scope; SR-TYPES, W-105).
+      - if: steps.changed.outputs.run == 'true'
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - if: steps.changed.outputs.run == 'true'
+        working-directory: fixtures/types
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: codelaw bench --budgets perf/budgets.toml
         if: steps.changed.outputs.run == 'true'
         run: |
           code=0
           repos=()
           for r in djangoproject.com full-stack-fastapi-template html5-boilerplate; do repos+=(--repo "$RUNNER_TEMP/corpus/repos/$r"); done
-          target/release/codelaw bench --workload "$RUNNER_TEMP/bench" --packs packs --budgets perf/budgets.toml "${repos[@]}" --output "$RUNNER_TEMP/bench.json" 2>&1 | tee "$RUNNER_TEMP/bench.txt" || code=$?
+          target/release/codelaw bench --workload "$RUNNER_TEMP/bench" --packs packs --budgets perf/budgets.toml "${repos[@]}" --typescript fixtures/types/node_modules/typescript --output "$RUNNER_TEMP/bench.json" 2>&1 | tee "$RUNNER_TEMP/bench.txt" || code=$?
           {
             echo '### perf: L8 operations (each p95 against perf/budgets.toml; an unset budget is reported only)'
             echo '```'

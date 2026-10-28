@@ -39,7 +39,7 @@ pub use lcov::Lcov;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
 pub use debug::MatchReport;
 pub use timings::{PhaseTiming, RuleTiming, TimingReport};
-pub use types::TypesReport;
+pub use types::{FoundTypescript, TypesReport, TypesVersion, types_version};
 pub use watch::{COALESCE, Changes, Rerun, Snapshot, Watch};
 
 use codelaw_cache::DiskCache;

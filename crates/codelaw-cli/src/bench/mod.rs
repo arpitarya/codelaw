@@ -44,6 +44,8 @@ pub const OPERATIONS: &[Op] = &[
     Op { name: "mcp_rules_for_path", unit: "ms", budgeted: true, what: "one `rules_for_path` call to `codelaw mcp`" },
     Op { name: "hook_pre", unit: "ms", budgeted: true, what: "`codelaw hook --pre` on one agent `Edit` payload that adds an error, primed cache" },
     Op { name: "peak_memory_10k", unit: "MiB", budgeted: true, what: "peak resident memory of `check_cold_10k`" },
+    Op { name: "check_types_cold", unit: "ms", budgeted: true, what: "`check` with `ts/type-checked` on the type workload, empty cache, no warm process: Node started, the program loaded once" },
+    Op { name: "check_types_warm", unit: "ms", budgeted: true, what: "the same `check --prefer-warm`, served by the daemon, which holds the program" },
 ];
 
 /// Context rows: not L8 operations, never gated.
@@ -96,6 +98,12 @@ pub struct BenchArgs {
     /// is copied beside the workload with the workload's config and packs.
     #[arg(long = "repo", value_name = "DIR")]
     repos: Vec<PathBuf>,
+    /// The `typescript` package folder (>= 7.1) the type-aware operations
+    /// ask (`check_types_cold`, `check_types_warm`; SR-TYPES): linked into
+    /// their workload as its `node_modules/typescript`. CI passes the one
+    /// `fixtures/types` pins. Without it those two are skipped, with a note.
+    #[arg(long, value_name = "DIR")]
+    typescript: Option<PathBuf>,
 }
 
 /// One operation's samples, after the discarded first run.
@@ -302,6 +310,35 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
         std::fs::write(dir.join(&target.path), &target.text).map_err(|e| e.to_string())?;
         measured?;
     }
+    let mut skipped: Vec<String> = Vec::new();
+    let mut types_workload = Value::Null;
+    if wanted("check_types_cold") || wanted("check_types_warm") {
+        match &args.typescript {
+            None if args.only.iter().any(|o| o.starts_with("check_types_")) => {
+                return Err("check_types_cold and check_types_warm need --typescript <DIR>: a `typescript` >= 7.1 package folder (`npm ci` in fixtures/types installs one)".into());
+            }
+            None => skipped.push("check_types_cold and check_types_warm: no --typescript <DIR> (a `typescript` >= 7.1 package folder; CI passes fixtures/types')".into()),
+            Some(ts) => {
+                let at = dir.with_file_name(format!("{}.types", dir.file_name().and_then(|n| n.to_str()).unwrap_or("workload")));
+                let (digest, files) = workload::write_types(&at, &packs, args.seed, args.files, ts)?;
+                let tb = Bench { exe: b.exe.clone(), dir: std::fs::canonicalize(&at).map_err(|e| e.to_string())?, caches: caches.clone(), runs: args.runs };
+                let mut typescript = String::new();
+                if wanted("check_types_cold") {
+                    typescript = tb.types_answered(&["check", "--no-adapters"], &caches.join("types-check"))?;
+                    results.push(tb.repeat(op("check_types_cold"), |i| {
+                        let cache = caches.join(format!("types-cold-{i}"));
+                        let r = tb.cli(&["check", "--no-adapters"], Some(&cache));
+                        let _ = std::fs::remove_dir_all(&cache);
+                        r.map(|r| r.ms)
+                    })?);
+                }
+                if wanted("check_types_warm") {
+                    results.push(tb.types_warm(op("check_types_warm"), &caches.join("types-warm"), &mut typescript)?);
+                }
+                types_workload = json!({ "files": files, "digest": digest, "typescript": typescript, "path": codelaw_core::normalize_path(&at) });
+            }
+        }
+    }
     let mut repos = Vec::new();
     if wanted("check_cold_repo") || wanted("check_warm_repo") {
         let base = dir.with_file_name(format!("{}.repos", dir.file_name().and_then(|n| n.to_str()).unwrap_or("workload")));
@@ -375,6 +412,8 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
         "warm_runs_served_by_daemon": served_warm,
         "reference_machine": budgets.as_ref().map(|b| b.machine.clone()),
         "repos": repos,
+        "types_workload": types_workload,
+        "skipped": skipped,
         "operations": rows,
     });
     let pretty = serde_json::to_string_pretty(&report).expect("json");
@@ -440,6 +479,13 @@ fn text(r: &Value) -> String {
     }
     if let Some(n) = r["warm_runs_served_by_daemon"].as_u64() {
         s.push_str(&format!("\nwarm runs served by the daemon: {n}\n"));
+    }
+    let t = &r["types_workload"];
+    if let Some(files) = t["files"].as_u64() {
+        s.push_str(&format!("type workload: {files} TypeScript files (digest {}), TypeScript {}\n", t["digest"].as_str().unwrap_or(""), t["typescript"].as_str().unwrap_or("")));
+    }
+    for why in r["skipped"].as_array().into_iter().flatten() {
+        s.push_str(&format!("skipped: {}\n", why.as_str().unwrap_or("")));
     }
     s
 }
@@ -513,6 +559,40 @@ impl Bench {
             return Err(format!("`codelaw {}` exited {code}: {}", args.join(" "), stderr.trim()));
         }
         Ok(Ran { ms, peak_mib: peak.map(|b| b as f64 / (1024.0 * 1024.0)), stdout: std::fs::read_to_string(&out).unwrap_or_default() })
+    }
+
+    /// One `check --format json` run in this workload: the TypeScript that
+    /// answered the type rules. A run whose type rules were skipped, or
+    /// answered with a note, is refused: it would time no type program.
+    fn types_answered(&self, args: &[&str], cache: &Path) -> Result<String, String> {
+        let args: Vec<&str> = args.iter().copied().chain(["--format", "json"]).collect();
+        let r = self.cli(&args, Some(cache))?;
+        let v: Value = serde_json::from_str(&r.stdout).map_err(|e| format!("`codelaw {}` printed no JSON report: {e}", args.join(" ")))?;
+        let notes: Vec<&str> = v["types"]["notes"].as_array().into_iter().flatten().filter_map(Value::as_str).collect();
+        match v["types"]["typescript"].as_array().and_then(|a| a.first()).and_then(Value::as_str) {
+            Some(ts) if notes.is_empty() => Ok(ts.to_owned()),
+            _ => Err(format!("the type rules did not run on the type workload: {}", if notes.is_empty() { "no TypeScript answered".to_owned() } else { notes.join("; ") })),
+        }
+    }
+
+    /// `check --prefer-warm` on the type workload, served by a daemon that
+    /// loaded the program on its first run and keeps it (SR-TYPES decision
+    /// 8). The bench refuses a number the daemon did not serve.
+    fn types_warm(&self, op: &'static Op, cache: &Path, typescript: &mut String) -> Result<Measured, String> {
+        self.daemon("start", cache)?;
+        let measured = (|| {
+            *typescript = self.types_answered(&["check", "--no-adapters", "--prefer-warm"], cache)?;
+            self.repeat(op, |_| self.cli(&["check", "--no-adapters", "--prefer-warm"], Some(cache)).map(|r| r.ms))
+        })();
+        let status = self.cli(&["daemon", "status"], Some(cache));
+        self.daemon("stop", cache)?;
+        let measured = measured?;
+        let served: u64 = status?.stdout.lines().filter(|l| l.starts_with("daemon ")).filter_map(|l| l.split(" served ").nth(1)?.split_whitespace().next()?.parse::<u64>().ok()).sum();
+        let expected = self.runs as u64 + 1;
+        if served < expected {
+            return Err(format!("{}: the daemon served {served} of the {expected} warm runs; a warm number it did not serve is not a warm number", op.name));
+        }
+        Ok(measured)
     }
 
     fn daemon(&self, action: &str, cache: &Path) -> Result<(), String> {
@@ -792,7 +872,10 @@ mod tests {
     fn every_l8_operation_is_measured() {
         // L8 decision 1's table, in its order.
         let names: Vec<&str> = OPERATIONS.iter().map(|o| o.name).collect();
-        assert_eq!(names, ["startup", "check_warm_10k", "check_cold_10k", "format_warm_10k", "fix_one_file", "lsp_after_edit", "mcp_rules_for_path", "hook_pre", "peak_memory_10k"]);
+        assert_eq!(
+            names,
+            ["startup", "check_warm_10k", "check_cold_10k", "format_warm_10k", "fix_one_file", "lsp_after_edit", "mcp_rules_for_path", "hook_pre", "peak_memory_10k", "check_types_cold", "check_types_warm"]
+        );
         assert!(OPERATIONS.iter().all(|o| o.budgeted) && CONTEXT.iter().all(|o| !o.budgeted));
     }
 }

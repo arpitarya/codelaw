@@ -1,7 +1,7 @@
 # L8's performance budgets (SR-LAW-8). The gate is `codelaw bench --budgets
 # perf/budgets.toml`, run by ci.yml's `perf` job.
 #
-# SEVEN OF NINE ARE SET (2026-10-25, W-19; hook_pre added unset 2026-10-27, W-93, and left unset by the decider the same day), by the method the decider ruled
+# SEVEN OF ELEVEN ARE SET (2026-10-25, W-19; hook_pre added unset 2026-10-27, W-93, and left unset by the decider the same day; check_types_cold and check_types_warm added unset 2026-10-28, W-105), by the method the decider ruled
 # (L8 decision 4). A set `budget` fails CI when a p95 goes over it; it is
 # never raised (decision 5). `fix_one_file` stays "unset", reported and not
 # gated: the method's guard held it back and the decider ruled (2026-10-25)
@@ -94,3 +94,22 @@ budget = 72 # p95 47.6 / 48.0 / 46.6; worst 48.0 x 1.5 = 72.0; target 1024
 set_by = "Arpit, method ruled 2026-10-25 (SR-LAW-8 decision 4, W-19)"
 set_on = 2026-10-25
 measured_p95 = 48.0
+
+# check_types_cold / check_types_warm (L8 decision 1, added 2026-10-27, W-104)
+# enter with the bench that times them (W-105, 2026-10-28): `codelaw bench
+# --typescript <dir>` on the type workload (the reference workload's 2,200
+# .ts files as one tsconfig program, `ts/type-checked` only; digest
+# 5341cd61a21e66c7). No design target exists. Each `proposed` is 1.5 x the p95
+# of ONE run on a LOADED developer Mac (load 5-8, macos-aarch64, TypeScript
+# 7.1.0-beta), for reference only: decision 4's method sets them from perf's
+# three ubuntu-24.04 runs on main, by the decider's ruling.
+
+[operation.check_types_cold]
+unit = "ms"
+budget = "unset" # not measured on the reference machine yet
+proposed = 5933 # local p95 3955.1 x 1.5 = 5932.65
+
+[operation.check_types_warm]
+unit = "ms"
+budget = "unset" # not measured on the reference machine yet
+proposed = 4755 # local p95 3169.8 x 1.5 = 4754.7

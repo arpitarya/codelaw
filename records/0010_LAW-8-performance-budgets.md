@@ -87,7 +87,7 @@ The decider wants performance to be a key property and accepts that today's numb
 
 #### How L8 is enforced
 
-- The CI perf gate (`W-19`) over `perf/budgets.toml`: `ci.yml`'s `perf` job runs `codelaw bench --budgets perf/budgets.toml` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 10) on every change to what it times — the engine (`crates/`, `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`), the packs it loads, `perf/` and `ci.yml` itself — and fails when it exits `1` (decision 7). A push touching none of them skips it; the nightly run and a manual dispatch always run it (W-24, 2026-10-24).
+- The CI perf gate (`W-19`) over `perf/budgets.toml`: `ci.yml`'s `perf` job runs `codelaw bench --budgets perf/budgets.toml` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 10) on every change to what it times — the engine (`crates/`, `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`), the packs it loads, `perf/`, the TypeScript `fixtures/types` pins (which `check_types_*` ask; W-105) and `ci.yml` itself — and fails when it exits `1` (decision 7). A push touching none of them skips it; the nightly run and a manual dispatch always run it (W-24, 2026-10-24).
 - Determinism ([L5](0007_LAW-5-no-model-in-the-engine.md)) keeps the measured work identical across runs, so only timing varies.
 
 **How the gate tells a set budget from a proposal (W-19, 2026-10-22).** Each operation is an `[operation.<name>]` table with a `unit` (`ms` or `MiB`) and a `budget`.
@@ -198,8 +198,8 @@ The decider wants performance to be a key property and accepts that today's numb
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
-- **`check_types_cold` and `check_types_warm` (added 2026-10-27) are `unset`** and not yet in `perf/budgets.toml`: they enter it, `unset`, with the bench that times them and the workload they run on (W-105), and are set by decision 4's method like the rest.
-- **The gate binds seven of the nine operations measured today** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100), and the decider, 2026-10-27 (voice docket): leave it unset (W-93).
+- **`check_types_cold` and `check_types_warm` (added 2026-10-27) are `unset`**: they entered `perf/budgets.toml`, `unset`, with the bench that times them on the type workload (W-105, 2026-10-28; [SR-CLI-MCP](0115_cli-and-mcp.md) decision 10), and are set by decision 4's method like the rest once `perf` has run three times on `main`. Their `proposed` values come from one run on a loaded developer Mac and are reference only.
+- **The gate binds seven of the eleven operations measured today** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100), and the decider, 2026-10-27 (voice docket): leave it unset (W-93).
 
 ### Alternatives considered
 
