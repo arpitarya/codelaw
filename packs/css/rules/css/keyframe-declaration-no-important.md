@@ -4,7 +4,7 @@ title: "No `!important` in keyframes"
 languages: [css, scss]
 fix: suggest
 fix_reason: "removing `!important` makes an ignored declaration apply, which changes the animation"
-stability: preview
+stability: stable
 ported_from: [stylelint/keyframe-declaration-no-important]
 since: 0.1.0
 ---

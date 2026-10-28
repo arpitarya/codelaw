@@ -4,7 +4,7 @@ title: "Nesting selectors have a parent"
 languages: [css, scss]
 fix: manual
 fix_reason: "the intended parent selector is the author's call"
-stability: preview
+stability: stable
 ported_from: [stylelint/nesting-selector-no-missing-scoping-root]
 since: 0.1.0
 ---

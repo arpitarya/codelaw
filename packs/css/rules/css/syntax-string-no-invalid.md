@@ -4,7 +4,7 @@ title: "`@property` syntax strings are valid"
 languages: [css, scss]
 fix: manual
 fix_reason: "the intended type is the author's call"
-stability: preview
+stability: stable
 ported_from: [stylelint/syntax-string-no-invalid]
 since: 0.1.0
 ---

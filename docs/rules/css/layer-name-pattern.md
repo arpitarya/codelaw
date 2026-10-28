@@ -12,7 +12,7 @@
 | **Severity when named without one** | `error` |
 | **Options** | `pattern` |
 | **Fix** | `manual` — no automatic fix; the steps are under *How to fix* (renaming must update every use of the layer) |
-| **Stability** | `preview` — runs only with `preview = true` |
+| **Stability** | `stable` |
 | **Since** | 0.1.0 |
 | **Ported from** | `stylelint/layer-name-pattern` |
 
@@ -38,12 +38,10 @@ pip install codelaw-rules-css
 **Then extend a preset that turns it on** — `codelaw:css/standard` sets it to `error`:
 
 ```toml
-preview = true                        # pack rules are preview today
 extends = ["codelaw:css/standard"]
 ```
 
 - **A rule exists only once its pack is loaded** through `extends`; naming it in `[rules]` without that is an unknown rule id (exit 2).
-- **Without `preview = true`** the rule is skipped and codelaw warns that it is preview.
 
 ### Severity
 

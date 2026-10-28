@@ -3,7 +3,7 @@ id: css/at-rule-no-deprecated
 title: "No deprecated at-rules"
 languages: [css, scss]
 fix: auto
-stability: preview
+stability: stable
 options:
   ignoreAtRules: { type: "string[]", default: [], description: "at-rules to accept; `/regex/` for a pattern" }
 ported_from: [stylelint/at-rule-no-deprecated]

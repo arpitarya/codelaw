@@ -4,7 +4,7 @@ title: "Custom properties are read with `var()`"
 languages: [css, scss]
 fix: suggest
 fix_reason: "wrapping in `var()` makes a dropped declaration apply, which changes the page"
-stability: preview
+stability: stable
 ported_from: [stylelint/custom-property-no-missing-var-function]
 since: 0.1.0
 ---

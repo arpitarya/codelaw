@@ -4,7 +4,7 @@ title: "No deprecated media types"
 languages: [css, scss]
 fix: manual
 fix_reason: "the media features that describe the device are the author's call"
-stability: preview
+stability: stable
 options:
   ignoreMediaTypes: { type: "string[]", default: [], description: "media types to accept" }
 ported_from: [stylelint/media-type-no-deprecated]
