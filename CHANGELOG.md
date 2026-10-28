@@ -59,6 +59,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Fixed
 
+- **oxlint's type-aware findings point at the right place (W-108):** a type-aware oxlint finding with a note, such as `typescript/await-thenable`, was put on the note's text (`42`) instead of the finding's own (`await`). Checked against a live oxlint 1.90.0 run.
 - **`scripts/npm-trust.sh` no longer stops at a package npm already trusts (W-85):** an E409 (*"a trusted publisher configuration … already exists"*) counts as trusted; any other failure is listed at the end with exit 1, and `--fux-index` adds the fifteen Fux index packages. RELEASING.md's *Every release* now starts by re-checking trust that npm let lapse.
 - **CI on `main` is green again (W-84):** every `ci.yml` job passes (run 40437239647); the commit guard's replay starts after the last pushed commit that skipped its record, and the release smoke runs on Alpine's BusyBox `diff` and compares Windows' `--prefer-warm` with a fresh check.
 - **CSS and SCSS read the same on Windows, Linux and macOS (W-44):** the grammars' scanners asked the C library what a space is, and Windows' answer includes U+00A0, so on Windows `.menu<U+00A0>.item` in a `.scss` file read as two classes and `css/no-irregular-whitespace` could not see the no-break space (musl builds differed the same way on U+2028 and U+3000). Both grammars now use the same ASCII classes on every platform; cached results are invalidated once.

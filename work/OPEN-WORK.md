@@ -39,7 +39,7 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (21)
+## Open items (20)
 
 ### build (18)
 
@@ -80,11 +80,9 @@ here. Read that record before changing anything below it.
 
 🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
 
-### testing (2)
+### testing (1)
 
 🟢 **W-102** `agent` Experiment approved 10-27: Claude Code CLI, Fux in arm C. Left: the pilot (`--runs 1`, ~$29) on the Mac, then the full 180, the write-up and the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
-
-🟢 **W-108** `agent` oxlint type-aware live capture taken 10-28 (oxlint 1.90.0): it differs from W-107's fixture — a third finding and another span and help; swap it in and fix the adapter test. Filed by Arpit (Cowork). [detail](open/W-108-oxlint-live-capture.md)
 
 ### record update (1)
 

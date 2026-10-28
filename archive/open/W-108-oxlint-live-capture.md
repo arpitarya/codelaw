@@ -6,8 +6,8 @@ item: W-108
 filed: 2026-10-28
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5)"
+ball: closed
 ---
 
 # W-108 — oxlint type-aware: the live capture
@@ -17,8 +17,8 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Run oxlint's type-aware mode on W-107's fixture, in a throwaway folder outside the repo | real output, not output built from the docs | ✅ 2026-10-28 (Cowork, a scratch folder in the Cowork VM) — below |
-| 2 | Put the captured `stdout.json` in `crates/codelaw-adapters/tests/fixtures/oxlint-type-aware/` | the test reads what oxlint prints | ⏳ |
-| 3 | Make `oxlint_type_aware_findings_keep_their_typescript_ids` hold on it — the three differences below | the adapter proven on real output | ⏳ |
+| 2 | Put the captured `stdout.json` in `crates/codelaw-adapters/tests/fixtures/oxlint-type-aware/` | the test reads what oxlint prints | ✅ 2026-10-28 (Claude Code): the capture below, byte for byte |
+| 3 | Make `oxlint_type_aware_findings_keep_their_typescript_ids` hold on it — the three differences below | the adapter proven on real output | ✅ the test asserts the three findings in order, `await-thenable` on `await` (8:3–8:8) and its new help, the unicorn help; one adapter fix (below) |
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"You run it, create a work item for it."* — on W-107's inbox row (run the capture, or "skip it").
 
@@ -50,8 +50,10 @@ ball: agent
 
 ## Definition of done
 
-- The fixture's `stdout.json` is this capture; the mapping test asserts what it holds (the three findings, which label the adapter takes as the primary span, the new help line), and still passes `cargo test -p codelaw-adapters`.
-- If the adapter's choice of span changes, SR-LINTER says which label it takes.
+**Closed 2026-10-28 (Claude Code).** Difference 2 was a real mismatch, not only a stale test: oxlint's JSON marks no primary label, oxc's tsgolint bridge (`crates/oxc_linter/src/tsgolint.rs`) adds the labelled notes first and the diagnostic's own span last, unlabelled and `.primary()`, and the adapter took the first label — `42`, the note. `parse.rs` now takes the first label with no text, else the first; SR-LINTER decision 2 says so. Difference 4 needed nothing (`causes`/`related` were never read). 1.90.0 is inside the tested range `>=1.89.0, <2.0.0`, so the manifest is unchanged. `cargo test -p codelaw-adapters` and `cargo test -p codelaw-cli --test adapters` pass; clippy clean.
+
+- ✅ The fixture's `stdout.json` is this capture; the mapping test asserts what it holds (the three findings, which label the adapter takes as the primary span, the new help line), and still passes `cargo test -p codelaw-adapters`.
+- ✅ If the adapter's choice of span changes, SR-LINTER says which label it takes.
 
 ## Record affected
 

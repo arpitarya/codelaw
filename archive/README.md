@@ -28,6 +28,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-108-oxlint-live-capture.md`](open/W-108-oxlint-live-capture.md) | 2026-10-28 | the capture in `crates/codelaw-adapters/tests/fixtures/oxlint-type-aware/stdout.json`; which label is the span in [SR-LINTER](../records/0106_linter.md) decision 2 |
 | [`W-104-type-aware-records.md`](open/W-104-type-aware-records.md) | 2026-10-28 | [SR-TYPES](../records/0117_types.md); L3 decision 9, L5, L6 decision 3, L8 decisions 1 and 8; D-45 in [SR-LAW-11](../records/0013_LAW-11-dependencies.md) §3; the build W-105 |
 | [`W-93-hook-pre-and-brief.md`](open/W-93-hook-pre-and-brief.md) | 2026-10-28 | `hook --pre` and `brief --for` in [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) decision 9 and [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 14; `hook_pre` (unset) in [SR-LAW-8](../records/0010_LAW-8-performance-budgets.md) and `perf/budgets.toml` |
 | [`W-100-rule-promotion.md`](open/W-100-rule-promotion.md) | 2026-10-28 | the promotion criterion in [SR-RULE-AUTHORING](../records/0113_rule-authoring.md) decision 6a; `scripts/corpus.py promote`; `scripts/corpus.json` `promotion.promoted`; the README FAQ |
