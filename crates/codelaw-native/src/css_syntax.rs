@@ -3,13 +3,13 @@
 //! values, selectors and media queries, every piece with its byte range in the
 //! source. Since W-62 the statements, each rule's selector list, each
 //! declaration's and at-rule's component values, the media queries and the
-//! selectors of an `@page` or `@scope` prelude and inside a pseudo-class's
-//! arguments come from the file's tree-sitter tree
+//! selectors of an `@page` or `@scope` prelude, inside a pseudo-class's
+//! arguments and of a keyframe block come from the file's tree-sitter tree
 //! ([`css_tree`](crate::css_tree); SR-ARCHITECTURE decision 15b); this
 //! module's text reader builds the same sheet when the tree holds an error
 //! (the CSS the grammar rejects) and reads what the tree does not give the
-//! rules yet: keyframe selectors, a font list split at its commas, and
-//! selectors a rule builds itself. The grammar still verifies every fix the rules make
+//! rules yet: a font list split at its commas, and selectors a rule builds
+//! itself. The grammar still verifies every fix the rules make
 //! (decision 5).
 //!
 //! It never fails: anything it can't place becomes an `Other` statement,
@@ -59,6 +59,9 @@ pub struct Node {
     /// `@media` and `@custom-media`: the prelude's media queries, when read
     /// from the tree; see [`MediaQuery`].
     pub queries: Option<Vec<MediaQuery>>,
+    /// A keyframe block (`from, 50% { … }`): its selectors, when read from
+    /// the tree; see [`Sheet::keyframe_selectors`].
+    pub keyframe_selectors: Option<Vec<Range>>,
     /// The statement ends with `;`, at this offset.
     pub semicolon: Option<usize>,
 }
@@ -136,6 +139,17 @@ impl Sheet {
         match &n.values {
             Some(list) => std::borrow::Cow::Borrowed(list),
             None => std::borrow::Cow::Owned(values(src, n.params.0, n.params.1)),
+        }
+    }
+    /// A keyframe block's selectors (`from`, `50%`, `entry 0%`): from the
+    /// tree when the sheet was read from one, otherwise its selector text
+    /// split at its commas (the two agree on every stylesheet the tree reads:
+    /// W-62).
+    pub fn keyframe_selectors(&self, i: usize, src: &str) -> std::borrow::Cow<'_, [Range]> {
+        let n = &self.nodes[i];
+        match &n.keyframe_selectors {
+            Some(list) => std::borrow::Cow::Borrowed(list),
+            None => std::borrow::Cow::Owned(split_commas(src, n.name.0, n.name.1)),
         }
     }
     pub fn decls(&self) -> impl Iterator<Item = usize> + '_ {
@@ -344,7 +358,7 @@ impl Parser<'_> {
     }
 
     fn node(kind: Kind, start: usize, end: usize, parent: Option<usize>) -> Node {
-        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None, queries: None }
+        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None, queries: None, keyframe_selectors: None }
     }
 
     /// Parse statements from `i` until a `}` (returned, not consumed) or the end.
