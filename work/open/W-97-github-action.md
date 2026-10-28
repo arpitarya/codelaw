@@ -20,7 +20,7 @@ ball: arpit
 | 2 | Only ratified actions inside (D-30); pinned by SHA (W-18) | L11 | ✅ 2026-10-27 — it uses **no** action; the SARIF upload is the REST API via `gh` (ruled 2026-10-27: keep `gh`) |
 | 3 | `init --ci github` writes a workflow that uses it; docs in USAGE | adoption | ✅ 2026-10-27 |
 
-**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Okay."* — to all three: (1) keep the SARIF upload on `gh`; (2) Claude runs the throwaway-repo proof after the next release tag; (3) publish to the GitHub Marketplace and keep a moving `v0` tag. Asked whether every CI has `gh` (GitHub-hosted runners do; self-hosted and slim images may not): *"Make sure it works with Bitbucket as well. I don't want any problems with it."* and *"File it as a work item and make it configurable. The serif part."* — filed as [W-109](W-109-bitbucket-pipelines.md).
+**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Okay."* — to all three: (1) keep the SARIF upload on `gh`; (2) Claude runs the throwaway-repo proof after the next release tag; (3) publish to the GitHub Marketplace and keep a moving `v0` tag. Asked whether every CI has `gh` (GitHub-hosted runners do; self-hosted and slim images may not): *"Make sure it works with Bitbucket as well. I don't want any problems with it."* and *"File it as a work item and make it configurable. The serif part."* — filed as [W-109](../../archive/open/W-109-bitbucket-pipelines.md).
 
 **Arpit, 2026-10-27 (voice):** *"Yes to all four."* — on W-36's R1 (README fixes), R2 (file gaps G1–G8), R3 (reopen type-aware TS) and R4 (run the with/without-Fux experiment). [Proposal](../proposals/linter-for-ai-positioning.md).
 
