@@ -11,7 +11,7 @@ owns:
   - fixtures/perf
   - perf/budgets.toml
 laws: [L0, L3, L5, L8]
-timestamp: 2026-10-27T20:00:00Z
+timestamp: 2026-10-28T03:00:00Z
 content_sha: ""
 ---
 
@@ -160,14 +160,14 @@ The decider wants performance to be a key property and accepts that today's numb
 
 | operation | median per run | p95 per run | worst p95 | × 1.5 | design target | budget |
 |---|---|---|---|---|---|---|
-| `hook_pre` | 61.4 / 77.2 / 77.9 ms | 62.4 / 78.3 / 86.2 ms | 86.2 | 129.3 | < 100 ms warm | **unset** — the guard: the target is below 1.5 × the worst p95; put to the decider (leave it unset, as for `fix_one_file`, or 100 ms at 1.16 × headroom) |
+| `hook_pre` | 61.4 / 77.2 / 77.9 ms | 62.4 / 78.3 / 86.2 ms | 86.2 | 129.3 | < 100 ms warm | **unset** — the guard: the target is below 1.5 × the worst p95; the decider, 2026-10-27 (voice docket): leave it unset, as for `fix_one_file` (*"We can go with unset"*, W-93) |
 
 ### Consequences
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
 - **`check_types_cold` and `check_types_warm` (added 2026-10-27) are `unset`** and not yet in `perf/budgets.toml`: they enter it, `unset`, with the bench that times them and the workload they run on (W-105), and are set by decision 4's method like the rest.
-- **The gate binds seven of the nine operations measured today** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100) and it waits on the decider.
+- **The gate binds seven of the nine operations measured today** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100), and the decider, 2026-10-27 (voice docket): leave it unset (W-93).
 
 ### Alternatives considered
 

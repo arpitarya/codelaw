@@ -80,5 +80,5 @@ one-file task, not measurements — the first real runs replace them.
 - **The agent CLI is the decider's choice.** `experiment.toml`'s `[agent.claude]` is the proposed
   command (`claude -p … --setting-sources project --strict-mcp-config`). The operator's
   `~/.claude/CLAUDE.md` may still be read; `--bare` avoids it but needs `ANTHROPIC_API_KEY`.
-- **Fux in arm C** runs the ratified `fux-engine` (D-34) outside CI, a new scope for it.
+- **Fux in arm C** runs the ratified `fux-engine` (D-34) outside CI, a new scope for it — allowed by the decider 2026-10-27 (W-102, *"Approved."*; L11 §3's D-34 row).
 - **Non-determinism:** rates are reported with their run counts, never from one run.

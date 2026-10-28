@@ -4,7 +4,7 @@ title: "Media features have valid values"
 languages: [css, scss]
 fix: manual
 fix_reason: "the intended value is the author's call"
-stability: preview
+stability: stable
 ported_from: [stylelint/media-feature-name-value-no-unknown]
 since: 0.1.0
 ---

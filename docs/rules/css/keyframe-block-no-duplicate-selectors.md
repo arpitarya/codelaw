@@ -12,7 +12,7 @@
 | **Severity when named without one** | `error` |
 | **Options** | none — severity only |
 | **Fix** | `manual` — no automatic fix; the steps are under *How to fix* (which keyframe was meant can't be known from the code) |
-| **Stability** | `preview` — runs only with `preview = true` |
+| **Stability** | `stable` |
 | **Since** | 0.1.0 |
 | **Ported from** | `stylelint/keyframe-block-no-duplicate-selectors` |
 
@@ -38,12 +38,10 @@ pip install codelaw-rules-css
 **Then extend a preset that turns it on** — `codelaw:css/recommended` sets it to `error`:
 
 ```toml
-preview = true                        # pack rules are preview today
 extends = ["codelaw:css/recommended"]
 ```
 
 - **A rule exists only once its pack is loaded** through `extends`; naming it in `[rules]` without that is an unknown rule id (exit 2).
-- **Without `preview = true`** the rule is skipped and codelaw warns that it is preview.
 
 ### Severity
 

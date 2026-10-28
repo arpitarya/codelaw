@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-27 (W-36 gap G2): publish the built VS Code extensi
 item: W-95
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5)"
+updated: 2026-10-28
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
 
@@ -17,9 +17,11 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Package `packaging/vscode` per platform with its bundled binary (or the npm binary lookup); `vsce package` / `ovsx` dry runs in CI | publishable artifacts | ✅ 2026-10-27 — eight `.vsix` built and checked in CI by `scripts/vsix.py`, without `vsce` (see below); no `vsce`/`ovsx` dry run: neither is ratified |
-| 2 | Arpit creates the Marketplace publisher and the Open VSX namespace, and stores the tokens (or a trusted-publishing equivalent) as GitHub secrets in the `vscode` environment | the right to publish | 🔴 Arpit — the inbox row in [OPEN-WORK](../OPEN-WORK.md) has every click and command; with it, the ruling on the upload tool |
-| 3 | `publish.yml` publishes the extension on a Release, after the engine | one release, every surface | ⏳ after step 2 — the job is drafted below |
+| 2 | Arpit creates the Marketplace publisher and the Open VSX namespace, and stores the tokens (or a trusted-publishing equivalent) as GitHub secrets in the `vscode` environment | the right to publish | 🔴 Arpit — the publisher, namespace and tokens (the inbox row has every click); the upload tool ruled 2026-10-27: (a), `curl`, no dependency |
+| 3 | `publish.yml` publishes the extension on a Release, after the engine | one release, every surface | ⏳ after step 2 — the job is drafted below; it uploads with `curl` (ruled 2026-10-27) |
 | 4 | README / USAGE: install from the Marketplace; the preview note drops "the editor extension's Marketplace listing comes later" | users can install it | ⏳ after the first listing |
+
+**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"A. A."* — option (a): `publish.yml` uploads the built `.vsix` files with `curl` to each registry's API. `@vscode/vsce` and `ovsx` are not ratified, and L2 is not amended.
 
 **Arpit, 2026-10-27 (voice):** *"Yes to all four."* — on W-36's R1 (README fixes), R2 (file gaps G1–G8), R3 (reopen type-aware TS) and R4 (run the with/without-Fux experiment). [Proposal](../proposals/linter-for-ai-positioning.md).
 

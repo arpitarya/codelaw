@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-27: build W-05's ruled design — codelaw hook --pr
 item: W-93
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
+updated: 2026-10-28
 updated_by: "Claude Code (Opus 5.5)"
-ball: arpit
+ball: closed
 ---
 
 # W-93 — `codelaw hook --pre` and the repo-specific brief
@@ -22,8 +22,10 @@ ball: arpit
 | 3 | Verdict: new `error` → deny with `--format agent` lines and each fix; new `warning`s → allow + context; `auto` fixes named, never applied through the agent's input; own crash/timeout/unknown payload → **allow**, exit 0, a stderr line | safe to switch on | ✅ deny / allow + context / silent; fail-open on bad payload, config error, panic, timeout (`--timeout-ms`) |
 | 4 | `codelaw init --agents` writes the pre hook beside the post hook; `sync-agents --check` covers it | adoption | ✅ Claude Code `PreToolUse`, Cowork plugin, Codex snippet (`templates/agents/claude/pre-hook-group.json`); Copilot and Kiro wait for a captured payload (SR-AGENT-SURFACES decision 2) |
 | 5 | `codelaw brief --for <paths>` / MCP `brief_for_task(paths)`: the repo's own rules → pack rules whose options the repo sets → rules with open baseline entries or exceptions under the path → the path's `manual` security rules → one line naming how many standard rules remain; `constructs` only for rules that declare `constructs:` | the before moment, short | ✅ `codelaw brief --for` and MCP `brief_for_task` (`crates/codelaw-report/src/brief.rs`); `constructs` not built (no rule declares it) |
-| 6 | `hook_pre` in CI's `perf`; its budget by L8's ruled method | L8 | 🔄 `hook_pre` in `codelaw bench` and so in CI's `perf`; `unset`, `proposed = 100` from a loaded Mac (p95 70.3 / 51.9 / 79.3 ms). Left: the method on three `perf` runs on `main`, then the decider's ruling |
+| 6 | `hook_pre` in CI's `perf`; its budget by L8's ruled method | L8 | ✅ `hook_pre` in CI's `perf`; the method held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100); ruled 2026-10-27: left `unset` — reported, not gated, as `fix_one_file` |
 | 7 | README's *While* row and hero move to ✅; W-35 then closes | the story, true | ✅ README's Before and While rows; W-35 closed |
+
+**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"How about we do it 150 milliseconds?"* — then, told 150 sits above both the 100 ms target and the method's 129.3, and that a set budget is a hard CI gate that only tightens: *"We can go with unset"* (the voice transcript reads "unsit"). `hook_pre` stays `unset`; perf/budgets.toml and SR-LAW-8 say so.
 
 **Arpit, 2026-10-27 (voice):** *"Yes to all three."* — on W-05's R1 (build `hook --pre` for every agent with a pre-write hook, fail-open, deny only new `error`s), R2 (brief by what is specific to this repo) and R3 (the surface kind *Gate* and an L8 budget). [Proposal](../proposals/write-time-guidance.md).
 
@@ -35,12 +37,14 @@ Design, sources and the eight-agent matrix: [`work/proposals/write-time-guidance
 
 **State, 2026-10-27 (Claude Code):** the first three met (`crates/codelaw-cli/tests/hook_pre.rs`: Claude `Write`/`Edit`, Codex `apply_patch` and Gemini `write_file`/`replace` refused with rule, line and fix; a `js/no-console` warning allowed with context; an edit on the already-failing line silent; a malformed payload, a missing file and a broken config allowed with exit 0; the panic and the timeout in `pre::tests`; the brief's own / configured / exceptions / security groups and its count line, byte-identical across runs). The fourth is half met: `hook_pre` is benched in CI's `perf` from this change on, and its budget waits for three runs on `main`.
 
-**Left:** (1) three `perf` runs on `main` that time `hook_pre` (the push run plus two `workflow_dispatch` runs); (2) apply SR-LAW-8 decision 4's method to them in `perf/budgets.toml`, and put the result to the decider as an inbox row; then close.
+**Closed 2026-10-28 (Claude Code):** all four met. The ruling is in place: `perf/budgets.toml` `[operation.hook_pre]` keeps `budget = "unset"` with the decider's ruling on the line; SR-LAW-8 §Measurements' `hook_pre` row and its Consequences line say *unset* and quote *"We can go with unset"*. Nothing left.
 
-- A proposed `Write` and `Edit` that add a `js/no-debugger` error are refused on Claude Code, Codex and Gemini fixtures with the rule, line and fix; one that adds only a warning is allowed with context; one that touches an already-failing line adds no new verdict.
-- A malformed payload, a missing file and an engine panic each allow the write and exit 0.
-- `brief --for src/app.ts` in a fixture with two custom rules, one configured option and one baseline entry lists exactly those, then the security rules, then the count line — byte-identical across runs.
-- `hook_pre` measured in CI; L8 budget set or put to the decider by the ruled method.
+**Left (ruled 2026-10-27: unset):** none — closed 2026-10-28. Was: (1) three `perf` runs on `main` that time `hook_pre` (the push run plus two `workflow_dispatch` runs); (2) apply SR-LAW-8 decision 4's method to them in `perf/budgets.toml`, and put the result to the decider as an inbox row; then close.
+
+- ✅ A proposed `Write` and `Edit` that add a `js/no-debugger` error are refused on Claude Code, Codex and Gemini fixtures with the rule, line and fix; one that adds only a warning is allowed with context; one that touches an already-failing line adds no new verdict.
+- ✅ A malformed payload, a missing file and an engine panic each allow the write and exit 0.
+- ✅ `brief --for src/app.ts` in a fixture with two custom rules, one configured option and one baseline entry lists exactly those, then the security rules, then the count line — byte-identical across runs.
+- ✅ `hook_pre` measured in CI; L8 budget set or put to the decider by the ruled method — put to him 2026-10-27, ruled `unset` (`perf/budgets.toml`, SR-LAW-8 §Measurements).
 
 ## Record affected
 

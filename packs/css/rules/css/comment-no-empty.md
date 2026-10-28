@@ -3,7 +3,7 @@ id: css/comment-no-empty
 title: "No empty comments"
 languages: [css, scss]
 fix: auto
-stability: preview
+stability: stable
 ported_from: [stylelint/comment-no-empty]
 since: 0.1.0
 ---

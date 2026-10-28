@@ -4,7 +4,7 @@ title: "No stylesheet imported twice"
 languages: [css]
 fix: suggest
 fix_reason: "removing the later import moves its rules earlier in the cascade"
-stability: preview
+stability: stable
 ported_from: [stylelint/no-duplicate-at-import-rules]
 since: 0.1.0
 ---

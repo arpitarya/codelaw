@@ -4,7 +4,7 @@ title: "No unknown pseudo-elements"
 languages: [css, scss]
 fix: manual
 fix_reason: "the intended pseudo-element is the author's call"
-stability: preview
+stability: stable
 options:
   ignorePseudoElements: { type: "string[]", default: [], description: "pseudo-elements to accept; `/regex/` for a pattern" }
 ported_from: [stylelint/selector-pseudo-element-no-unknown]

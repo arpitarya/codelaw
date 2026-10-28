@@ -3,7 +3,7 @@ id: css/hue-degree-notation
 title: "Hues are angles"
 languages: [css, scss]
 fix: auto
-stability: preview
+stability: stable
 ported_from: [stylelint/hue-degree-notation]
 since: 0.1.0
 ---

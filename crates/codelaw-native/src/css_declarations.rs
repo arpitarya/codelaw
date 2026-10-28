@@ -3,7 +3,7 @@
 
 use crate::css_syntax::{
     Kind, Sheet, VKind, VNode, css_rule, dimension, finding, fixed, matches_any, non_standard_value, opt_list, opt_str, set, significant, split_commas, standard_property,
-    table, text, unprefixed, values, vendor_prefix,
+    table, text, unprefixed, vendor_prefix,
 };
 use crate::util::{unquote, whole_lines};
 use codelaw_core::TextEdit;
@@ -136,7 +136,7 @@ css_rule!(CustomPropertyNoMissingVarFunction, "css/custom-property-no-missing-va
             continue;
         }
         let r = sheet.nodes[i].params;
-        check(&values(src, r.0, r.1), src, &known, out);
+        check(&sheet.values(i, src), src, &known, out);
     }
 });
 
@@ -208,8 +208,7 @@ css_rule!(DeclarationBlockNoDuplicateProperties, "css/declaration-block-no-dupli
             if consecutive_syntaxes && consecutive {
                 let shape = |d: usize| {
                     let mut v = Vec::new();
-                    let r = sheet.nodes[d].params;
-                    syntax_shape(&values(src, r.0, r.1), src, colors.contains(&lower), &named, &mut v);
+                    syntax_shape(&sheet.values(d, src), src, colors.contains(&lower), &named, &mut v);
                     v
                 };
                 let same_text = value(sheet, prev, src) == value(sheet, i, src);
@@ -271,7 +270,7 @@ css_rule!(DeclarationPropertyValueKeywordNoDeprecated, "css/declaration-property
             continue;
         }
         let r = sheet.nodes[i].params;
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         VNode::walk(&vals, &mut |n| {
             if n.kind == VKind::Func {
                 return !color_fns.contains(&n.name(src).to_ascii_lowercase());
@@ -340,9 +339,8 @@ const SIZE_KEYWORDS: &[&str] = &["xx-small", "x-small", "small", "medium", "larg
 
 /// The font-family part of a `font` shorthand: what follows the size and
 /// optional `/ line-height`.
-fn font_shorthand_families(src: &str, r: (usize, usize)) -> Option<(usize, usize)> {
-    let vals = values(src, r.0, r.1);
-    let sig = significant(&vals);
+fn font_shorthand_families(src: &str, vals: &[VNode], r: (usize, usize)) -> Option<(usize, usize)> {
+    let sig = significant(vals);
     let mut k = None;
     for (idx, n) in sig.iter().enumerate() {
         if n.kind == VKind::Word {
@@ -375,7 +373,7 @@ css_rule!(FontFamilyNoDuplicateNames, "css/font-family-no-duplicate-names", |she
         }
         let range = match p.as_str() {
             "font-family" => r,
-            "font" => match font_shorthand_families(src, r) {
+            "font" => match font_shorthand_families(src, &sheet.values(i, src), r) {
                 Some(f) => f,
                 None => continue,
             },
@@ -414,7 +412,7 @@ css_rule!(FontFamilyNoMissingGenericFamilyKeyword, "css/font-family-no-missing-g
                 if system.contains(&v.to_ascii_lowercase()) {
                     continue;
                 }
-                match font_shorthand_families(src, r) {
+                match font_shorthand_families(src, &sheet.values(i, src), r) {
                     Some(f) => f,
                     None => continue,
                 }
@@ -472,7 +470,7 @@ css_rule!(NamedGridAreasNoInvalid, "css/named-grid-areas-no-invalid", |sheet, sr
             continue;
         }
         let r = sheet.nodes[i].params;
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         let rows = grid_rows(src, &vals);
         if rows.is_empty() {
             continue;
@@ -691,7 +689,7 @@ css_rule!(ShorthandPropertyNoRedundantValues, "css/shorthand-property-no-redunda
         if non_standard_value(v) || v.to_ascii_lowercase().contains("var(") {
             continue;
         }
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         let sig = significant(&vals);
         if base == "border-radius" {
             let slash = sig.iter().position(|n| n.kind == VKind::Div && n.text(src) == "/");
@@ -762,7 +760,7 @@ css_rule!(ValueNoVendorPrefix, "css/value-no-vendor-prefix", |sheet, src, ctx, o
         if !standard_property(p) || !text(src, r).contains('-') {
             continue;
         }
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         VNode::walk(&vals, &mut |n| {
             let (s, e) = match n.kind {
                 VKind::Word => (n.start, n.end),
@@ -800,7 +798,7 @@ css_rule!(CustomPropertyPattern, "css/custom-property-pattern", |sheet, src, ctx
                 // Uses: `var(--name)`.
                 let v = text(src, n.params);
                 if v.contains("var(") {
-                    let vals = values(src, n.params.0, n.params.1);
+                    let vals = sheet.values(i, src);
                     VNode::walk(&vals, &mut |x| {
                         if x.kind == VKind::Func && x.name(src).eq_ignore_ascii_case("var")
                             && let Some(first) = significant(&x.nodes).first()

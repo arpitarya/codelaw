@@ -4,7 +4,7 @@ title: "No unknown at-rules"
 languages: [css]
 fix: manual
 fix_reason: "the intended at-rule is the author's call"
-stability: preview
+stability: stable
 options:
   ignoreAtRules: { type: "string[]", default: [], description: "at-rules to accept, such as a preprocessor's; `/regex/` for a pattern" }
 ported_from: [stylelint/at-rule-no-unknown]

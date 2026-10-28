@@ -1,24 +1,24 @@
 //! CSS rules about how values are written: math operators, colour
 //! notation, zero lengths, number precision.
 
-use crate::css_syntax::{Kind, Sheet, VKind, VNode, css_rule, dimension, fixed, non_standard_value, opt_list, set, significant, text, unprefixed, values};
+use crate::css_syntax::{Kind, Sheet, VKind, VNode, css_rule, dimension, fixed, non_standard_value, opt_list, set, significant, text, unprefixed};
 use codelaw_core::TextEdit;
 use std::collections::BTreeSet;
 
 /// Every declaration value and at-rule prelude, with its property (or `@name`).
-fn value_sites(sheet: &Sheet, src: &str) -> Vec<(String, (usize, usize))> {
+fn value_sites(sheet: &Sheet, src: &str) -> Vec<(String, usize)> {
     sheet
         .walk()
         .into_iter()
         .filter_map(|i| {
             let n = &sheet.nodes[i];
             match n.kind {
-                Kind::Decl => Some((text(src, n.name).to_ascii_lowercase(), n.params)),
-                Kind::AtRule => Some((format!("@{}", sheet.at_name(i, src)), n.params)),
+                Kind::Decl => Some((text(src, n.name).to_ascii_lowercase(), i)),
+                Kind::AtRule => Some((format!("@{}", sheet.at_name(i, src)), i)),
                 _ => None,
             }
         })
-        .filter(|(_, r)| !non_standard_value(text(src, *r)))
+        .filter(|&(_, i)| !non_standard_value(text(src, sheet.nodes[i].params)))
         .collect()
 }
 
@@ -91,7 +91,7 @@ css_rule!(FunctionCalcNoUnspacedOperator, "css/function-calc-no-unspaced-operato
         if non_standard_value(text(src, r)) {
             continue;
         }
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         VNode::walk(&vals, &mut |n| {
             if n.kind == VKind::Func && is_math(n.name(src)) {
                 unspaced_operators(src, n.inner.0, n.inner.1, out);
@@ -169,7 +169,7 @@ css_rule!(AlphaValueNotation, "css/alpha-value-notation", |sheet, src, ctx, out|
         if non_standard_value(text(src, r)) {
             continue;
         }
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         if numbers.contains(&p) {
             // These properties take a number.
             let sig = significant(&vals);
@@ -197,8 +197,8 @@ css_rule!(AlphaValueNotation, "css/alpha-value-notation", |sheet, src, ctx, out|
 });
 
 css_rule!(ColorFunctionAliasNotation, "css/color-function-alias-notation", |sheet, src, ctx, out| {
-    for (_, r) in value_sites(sheet, src) {
-        let vals = values(src, r.0, r.1);
+    for (_, i) in value_sites(sheet, src) {
+        let vals = sheet.values(i, src);
         VNode::walk(&vals, &mut |n| {
             if n.kind == VKind::Func {
                 let name = n.name(src);
@@ -217,8 +217,8 @@ css_rule!(ColorFunctionAliasNotation, "css/color-function-alias-notation", |shee
 
 css_rule!(ColorFunctionNotation, "css/color-function-notation", |sheet, src, ctx, out| {
     let fns: BTreeSet<String> = ["rgb", "rgba", "hsl", "hsla"].iter().map(|s| s.to_string()).collect();
-    for (_, r) in value_sites(sheet, src) {
-        let vals = values(src, r.0, r.1);
+    for (_, i) in value_sites(sheet, src) {
+        let vals = sheet.values(i, src);
         each_color(&vals, src, &fns, &mut |c| {
             if !c.legacy || text(src, c.func.inner).to_ascii_lowercase().contains("var(") {
                 return;
@@ -238,8 +238,8 @@ css_rule!(ColorFunctionNotation, "css/color-function-notation", |sheet, src, ctx
 });
 
 css_rule!(ColorHexLength, "css/color-hex-length", |sheet, src, ctx, out| {
-    for (_, r) in value_sites(sheet, src) {
-        let vals = values(src, r.0, r.1);
+    for (_, i) in value_sites(sheet, src) {
+        let vals = sheet.values(i, src);
         VNode::walk(&vals, &mut |n| {
             if n.kind == VKind::Func && n.name(src).eq_ignore_ascii_case("url") {
                 return false;
@@ -264,8 +264,8 @@ css_rule!(ColorHexLength, "css/color-hex-length", |sheet, src, ctx, out| {
 
 css_rule!(HueDegreeNotation, "css/hue-degree-notation", |sheet, src, ctx, out| {
     let fns = set(ctx.data, "css/functions", "color");
-    for (_, r) in value_sites(sheet, src) {
-        let vals = values(src, r.0, r.1);
+    for (_, i) in value_sites(sheet, src) {
+        let vals = sheet.values(i, src);
         each_color(&vals, src, &fns, &mut |c| {
             let idx = match c.name.as_str() {
                 "hsl" | "hsla" | "hwb" => 0,
@@ -282,8 +282,8 @@ css_rule!(HueDegreeNotation, "css/hue-degree-notation", |sheet, src, ctx, out| {
 
 css_rule!(LightnessNotation, "css/lightness-notation", |sheet, src, ctx, out| {
     let fns = set(ctx.data, "css/functions", "color");
-    for (_, r) in value_sites(sheet, src) {
-        let vals = values(src, r.0, r.1);
+    for (_, i) in value_sites(sheet, src) {
+        let vals = sheet.values(i, src);
         each_color(&vals, src, &fns, &mut |c| {
             let scale = match c.name.as_str() {
                 "oklch" | "oklab" => 100.0,
@@ -305,11 +305,11 @@ css_rule!(LightnessNotation, "css/lightness-notation", |sheet, src, ctx, out| {
 css_rule!(LengthZeroNoUnit, "css/length-zero-no-unit", |sheet, src, ctx, out| {
     let lengths = set(ctx.data, "css/units", "length");
     let ignore_custom = opt_list(ctx, "ignore").iter().any(|x| x == "custom-properties");
-    for (p, r) in value_sites(sheet, src) {
+    for (p, i) in value_sites(sheet, src) {
         if p == "line-height" || p == "flex" || (ignore_custom && p.starts_with("--")) || p.starts_with("@") && !matches!(p.as_str(), "@media" | "@custom-media" | "@container") {
             continue;
         }
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         let mut prev_slash = false;
         let report = |n: &VNode, out: &mut Vec<crate::NativeFinding>| {
             let t = n.text(src);
@@ -323,7 +323,7 @@ css_rule!(LengthZeroNoUnit, "css/length-zero-no-unit", |sheet, src, ctx, out| {
             let keep = num.strip_prefix('.').unwrap_or(num);
             out.push(fixed(n.start, n.end, format!("A zero length needs no unit: write `{keep}`"), vec![TextEdit::new(n.start, n.end, keep)]));
         };
-        for n in &vals {
+        for n in vals.iter() {
             match n.kind {
                 VKind::Div => prev_slash = n.text(src) == "/",
                 VKind::Space | VKind::Comment => {}
@@ -356,11 +356,11 @@ css_rule!(LengthZeroNoUnit, "css/length-zero-no-unit", |sheet, src, ctx, out| {
 css_rule!(NumberMaxPrecision, "css/number-max-precision", |sheet, src, ctx, out| {
     let max = ctx.options.get("precision").and_then(|v| v.as_u64()).unwrap_or(4) as usize;
     let ignore_units = opt_list(ctx, "ignoreUnits");
-    for (p, r) in value_sites(sheet, src) {
+    for (p, i) in value_sites(sheet, src) {
         if p.starts_with('@') && !matches!(p.as_str(), "@media" | "@custom-media" | "@container" | "@supports") {
             continue;
         }
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         VNode::walk(&vals, &mut |n| {
             if n.kind == VKind::Func && n.name(src).eq_ignore_ascii_case("url") {
                 return false;

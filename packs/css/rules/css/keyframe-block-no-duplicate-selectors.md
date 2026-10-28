@@ -4,7 +4,7 @@ title: "No keyframe selector twice in one `@keyframes`"
 languages: [css, scss]
 fix: manual
 fix_reason: "which keyframe was meant can't be known from the code"
-stability: preview
+stability: stable
 ported_from: [stylelint/keyframe-block-no-duplicate-selectors]
 since: 0.1.0
 ---

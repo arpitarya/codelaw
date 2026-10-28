@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-27 (voice docket): PyPI day 3 of 4 — at most four
 item: W-88
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
+updated: 2026-10-28
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
@@ -18,7 +18,9 @@ ball: arpit
 |---|---|---|---|
 | 1 | `twine upload` two 0.2.0 Fux index wheels from `dist/fux-index/pypi/` | `codelaw-rules-security-{html,python}-fux-index` exist | 🔴 Arpit |
 | 2 | `twine upload` `codelaw-skills` and `codelaw-rules-scss` at 0.2.0 — the version npm got (W-85, 2026-10-27) | both names exist | 🔴 Arpit |
-| 3 | A trusted publisher on each of the four | CI can upload them | 🔴 Arpit, or Claude in Chrome |
+| 3 | A trusted publisher on each of the four | CI can upload them | 🔴 Claude in Chrome, once Arpit is logged in to PyPI (ruled 2026-10-27) |
+
+**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Yes."* — on running days 1–4 as filed, with Claude adding the trusted publishers through Chrome.
 
 **Arpit, 2026-10-27 (voice docket):** *"create work items, one work item to publish all NPM packages and then multiple work items, four packages a day but make sure all the packages are accounted in this."* Earlier: *"create a work item just for publishing four packages a day for PyPI … add the command in the OpenWork file so that I can just copy it and paste it every day … don't count today's day"*, and *"Include these SCSS and security packs as well."*
 
