@@ -7,7 +7,7 @@
       "commit": "d086db856be187255b8ec61ef409357393020f32",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE.txt",
-      "packs": ["python", "html", "data", "security-python", "security-html"]
+      "packs": ["python", "html", "data", "security-python", "security-html", "spell"]
     },
     {
       "name": "httpx",
@@ -15,7 +15,7 @@
       "commit": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE.md",
-      "packs": ["python", "css", "data"]
+      "packs": ["python", "css", "data", "spell"]
     },
     {
       "name": "starlette",
@@ -23,7 +23,7 @@
       "commit": "1a3a401c0d33920b7c8b1541fb89784976a41a96",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE.md",
-      "packs": ["python", "css", "security-python"]
+      "packs": ["python", "css", "security-python", "spell"]
     },
     {
       "name": "rich",
@@ -31,7 +31,7 @@
       "commit": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["python"]
+      "packs": ["python", "spell"]
     },
     {
       "name": "zustand",
@@ -39,7 +39,7 @@
       "commit": "382d29c485e67018c06e75ec7235130d0968522c",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "data", "ts", "react", "node"]
+      "packs": ["js", "data", "ts", "react", "node", "spell"]
     },
     {
       "name": "jotai",
@@ -47,7 +47,7 @@
       "commit": "e5971ba44866d070564a0a30187f6976fee0e350",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "ts", "react", "node"]
+      "packs": ["js", "ts", "react", "node", "spell"]
     },
     {
       "name": "full-stack-fastapi-template",
@@ -55,7 +55,7 @@
       "commit": "b1125d8839482cb7bbae603ddc6d0081bf87532e",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "python", "data", "ts", "react", "node", "tanstack-query", "security-python", "security-js", "security-ts"]
+      "packs": ["js", "python", "data", "ts", "react", "node", "tanstack-query", "security-python", "security-js", "security-ts", "spell"]
     },
     {
       "name": "html5-boilerplate",
@@ -63,7 +63,7 @@
       "commit": "b6597338e695dc4a8165c5abcb2bfffa586c3ee5",
       "licence": "MIT",
       "licence_file": "LICENSE.txt",
-      "packs": ["html", "css", "js", "data", "security-js", "security-html"]
+      "packs": ["html", "css", "js", "data", "security-js", "security-html", "spell"]
     },
     {
       "name": "normalize.css",
@@ -71,7 +71,7 @@
       "commit": "fc091cce1534909334c1911709a39c22d406977b",
       "licence": "MIT",
       "licence_file": "LICENSE.md",
-      "packs": ["css"]
+      "packs": ["css", "spell"]
     },
     {
       "name": "bootstrap",
@@ -79,7 +79,7 @@
       "commit": "25aa8cc0b32f0d1a54be575347e6d84b70b1acd7",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["css", "scss"]
+      "packs": ["css", "scss", "spell"]
     },
     {
       "name": "djangoproject.com",
@@ -87,7 +87,7 @@
       "commit": "c78c1306b3135809a109b207ac40a5916ef9f1c0",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE",
-      "packs": ["python", "html", "css", "security-python", "security-html", "scss"]
+      "packs": ["python", "html", "css", "security-python", "security-html", "scss", "spell"]
     },
     {
       "name": "ionic-framework",

@@ -57,12 +57,17 @@ impl NativeRule for KnownTypo {
         let Some(table) = typo_table(ctx) else { return };
         let Some((start, scan)) = prose_text(node, ctx) else { return };
         let accepted = accepted_words(ctx);
+        let mut english_text = None;
         for (at, word) in words(&scan) {
             let lower = word.to_ascii_lowercase();
             if accepted.contains(&lower) {
                 continue;
             }
             let Some(fixes) = lookup(table, &lower) else { continue };
+            // Judged once, and only for a text with a typo in it.
+            if !*english_text.get_or_insert_with(|| english(&scan, ctx)) {
+                return;
+            }
             let (s, e) = (start + at, start + at + word.len());
             let options: Vec<&str> = fixes.split('|').collect();
             let mut finding = NativeFinding {
@@ -108,6 +113,7 @@ impl NativeRule for UnknownWord {
         let typos = typo_table(ctx);
         let Some((start, scan)) = prose_text(node, ctx) else { return };
         let accepted = accepted_words(ctx);
+        let mut english_text = None;
         for (at, word) in words(&scan) {
             if word.bytes().all(|c| c.is_ascii_uppercase()) {
                 continue;
@@ -115,6 +121,9 @@ impl NativeRule for UnknownWord {
             let lower = word.to_ascii_lowercase();
             if accepted.contains(&lower) || dict.contains(&lower) || typos.is_some_and(|t| lookup(t, &lower).is_some()) {
                 continue;
+            }
+            if !*english_text.get_or_insert_with(|| english(&scan, ctx)) {
+                return;
             }
             let (s, e) = (start + at, start + at + word.len());
             let near = dict.suggest(&lower, 2, 3);
@@ -154,12 +163,16 @@ impl NativeRule for LocaleVariant {
         let Some(table) = ctx.data.get("spell/locale").and_then(|d| d.get(locale)).and_then(|t| t.as_str()) else { return };
         let Some((start, scan)) = prose_text(node, ctx) else { return };
         let accepted = accepted_words(ctx);
+        let mut english_text = None;
         for (at, word) in words(&scan) {
             let lower = word.to_ascii_lowercase();
             if accepted.contains(&lower) {
                 continue;
             }
             let Some(fix) = lookup(table, &lower) else { continue };
+            if !*english_text.get_or_insert_with(|| english(&scan, ctx)) {
+                return;
+            }
             let (s, e) = (start + at, start + at + word.len());
             let shown = same_case(word, fix);
             out.push(NativeFinding {
@@ -232,11 +245,32 @@ fn prose_text(node: SyntaxNode<'_>, ctx: &NativeContext<'_>) -> Option<(usize, S
     let kind = prose_kind(n, ctx.language, ctx.source)?;
     let (start, end) = (n.start_byte(), n.end_byte());
     let segment = &ctx.source[start..end];
-    let scan = if kind == Prose::Markdown { mask_markdown(segment) } else { segment.to_owned() };
+    let mut scan = if kind == Prose::Markdown { mask_markdown(segment) } else { segment.to_owned() };
+    if scan.contains("{%") || scan.contains("{{") || scan.contains("{#") {
+        scan = mask_templates(&scan);
+    }
     if kind == Prose::String && !scan.contains(char::is_whitespace) {
         return None;
     }
     Some((start, scan))
+}
+
+/// Whether a text reads as English (decision 10): with three words or more
+/// of four letters, at least half are dictionary words or known typos. Lorem ipsum, a
+/// translated README and a German comment are not checked; their words are
+/// not English typos. Without the dictionary every text counts.
+fn english(scan: &str, ctx: &NativeContext<'_>) -> bool {
+    let Some(dict) = Dictionary::of(ctx) else { return true };
+    let typos = typo_table(ctx);
+    let all = words(scan);
+    let known = all
+        .iter()
+        .filter(|(_, w)| {
+            let w = w.to_ascii_lowercase();
+            dict.contains(&w) || typos.is_some_and(|t| lookup(t, &w).is_some())
+        })
+        .count();
+    all.len() < 3 || known * 2 >= all.len()
 }
 
 /// `[spell] words`, lower case (decision 7).
@@ -435,7 +469,8 @@ impl NativeRule for KnownTypoIdentifier {
                 continue;
             }
             let Some(&(start, end)) = s.decls.first() else { continue };
-            if src.get(start..end) != Some(s.name.as_str()) {
+            // `_element$ownerDocumen`: a name a compiler made.
+            if src.get(start..end) != Some(s.name.as_str()) || s.name.contains('$') {
                 continue;
             }
             let typos = name_typos(table, &s.name, &accepted);
@@ -491,6 +526,9 @@ impl NativeRule for KnownTypoKey {
             return;
         }
         let Some(table) = typo_table(ctx) else { return };
+        if is_lockfile(ctx.file.path()) {
+            return;
+        }
         let accepted = accepted_words(ctx);
         let src = ctx.source;
         let mut seen = std::collections::BTreeSet::new();
@@ -503,11 +541,39 @@ impl NativeRule for KnownTypoKey {
                 continue;
             }
             let typos = name_typos(table, word, &accepted);
-            if !typos.is_empty() {
+            if !typos.is_empty() && !names_a_package(n, src) {
                 out.push(name_finding(start, end, word, &typos, Vec::new()));
             }
         }
     }
+}
+
+/// A lockfile: its keys are package names and versions, never prose.
+fn is_lockfile(path: &str) -> bool {
+    let name = path.rsplit('/').next().unwrap_or(path);
+    name.ends_with(".lock") || name.ends_with("-lock.json") || name.ends_with("-lock.yaml") || name.ends_with("-lock.yml")
+}
+
+/// A key inside a dependency section (`dependencies`, `devDependencies`,
+/// `[tool.poetry.dependencies]`, `packages`, `overrides`, `resolutions`):
+/// a package's name, which its registry spells.
+fn names_a_package(n: Node<'_>, src: &str) -> bool {
+    let mut cur = n.parent();
+    while let Some(p) = cur {
+        let key = match p.kind() {
+            "pair" | "block_mapping_pair" | "flow_pair" => p.child_by_field_name("key").or_else(|| p.named_child(0)),
+            "table" | "table_array_element" => p.named_child(0),
+            _ => None,
+        };
+        if let Some(k) = key {
+            let t = text(k, src).to_ascii_lowercase();
+            if t.contains("dependencies") || ["packages", "overrides", "resolutions"].iter().any(|w| t.trim_matches(['"', '\'']).ends_with(w)) {
+                return true;
+            }
+        }
+        cur = p.parent();
+    }
+    false
 }
 
 /// The byte range of the name `n` declares, in a language whose names other
@@ -818,6 +884,31 @@ fn mask_markdown(s: &str) -> String {
         }
     }
     String::from_utf8(out).expect("only ASCII bytes and whole runs were blanked")
+}
+
+/// Text with template tags — Jinja's and Django's `{% … %}`, `{{ … }}` and
+/// `{# … #}`, Handlebars' and Vue's `{{ … }}` — blanked to spaces, so
+/// offsets stay the same: a tag is code, not prose.
+fn mask_templates(s: &str) -> String {
+    let mut out = s.as_bytes().to_vec();
+    let mut i = 0;
+    while let Some(p) = s[i..].find('{') {
+        let at = i + p;
+        let close = match s.as_bytes().get(at + 1) {
+            Some(b'%') => "%}",
+            Some(b'{') => "}}",
+            Some(b'#') => "#}",
+            _ => {
+                i = at + 1;
+                continue;
+            }
+        };
+        let end = s[at + 2..].find(close).map_or(s.len(), |q| at + 2 + q + 2);
+        out[at..end].iter_mut().for_each(|c| *c = b' ');
+        i = end;
+    }
+    // Only ASCII bytes were blanked, whole tags at a time.
+    String::from_utf8(out).unwrap_or_else(|_| s.to_owned())
 }
 
 /// The words of a text worth checking, with their byte offsets.
@@ -1199,6 +1290,35 @@ mod tests {
                 assert_eq!(lookup(table, w), Some(f));
             }
         }
+    }
+
+
+    #[test]
+    fn text_that_is_not_english_is_not_checked() {
+        // Most words unknown: lorem ipsum, another language.
+        assert!(ctx_run(&KnownTypo, Language::Javascript, "a.js", "// lorem ipsum dolor untill amet\n", serde_json::json!({})).is_empty());
+        assert!(ctx_run(&UnknownWord, Language::Javascript, "a.js", "// lorem ipsum dolor amet\n", serde_json::json!({})).is_empty());
+        // Most words known: checked.
+        assert_eq!(ctx_run(&KnownTypo, Language::Javascript, "a.js", "// there are which untill\n", serde_json::json!({})).len(), 1);
+    }
+
+    #[test]
+    fn lockfiles_and_dependency_keys_name_packages() {
+        assert!(ctx_run(&KnownTypoKey, Language::Json, "package-lock.json", "{\"recieve\": 1}", serde_json::json!({})).is_empty());
+        assert!(ctx_run(&KnownTypoKey, Language::Json, "package.json", "{\"devDependencies\": {\"recieve\": \"1\"}}", serde_json::json!({})).is_empty());
+        assert!(ctx_run(&KnownTypoKey, Language::Toml, "pyproject.toml", "[tool.poetry.dependencies]\nrecieve = \"1\"\n", serde_json::json!({})).is_empty());
+        assert!(ctx_run(&KnownTypoKey, Language::Yaml, "pnpm-lock.yaml", "recieve: 1\n", serde_json::json!({})).is_empty());
+        assert_eq!(ctx_run(&KnownTypoKey, Language::Json, "package.json", "{\"scripts\": {\"recieve\": \"x\"}}", serde_json::json!({})).len(), 1);
+    }
+
+
+    #[test]
+    fn template_tags_are_not_prose() {
+        let src = "a {% endblok %} b {{ untill }} c {# lenght #} d";
+        let masked = mask_templates(src);
+        assert_eq!(masked.len(), src.len());
+        assert_eq!(masked.split_whitespace().collect::<Vec<_>>(), ["a", "b", "c", "d"]);
+        assert_eq!(found(Language::Html, "<p>{% blocktranslate %}the adress{% endblocktranslate %}</p>\n"), ["adress"]);
     }
 
 }

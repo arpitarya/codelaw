@@ -127,6 +127,15 @@ question its maintainers left open. The forks and the rulings are in
      The list is ASCII, so a word with another letter is not looked up; a
      word is fixed in its own case (lower, Capitalised, UPPER), and a word in
      mixed case is reported with no edit.
+   - **As built after the corpus review (W-103, 2026-10-28):** template tags
+     (`{% … %}`, `{{ … }}`, `{# … #}`) are blanked before words are taken;
+     a prose text of three words or more of which fewer than half are
+     dictionary words or known typos is not English (decision 10) and is
+     not read by `spell/known-typo`, `spell/unknown-word` or
+     `spell/locale-variant` — lorem ipsum and translated READMEs gave most
+     of the first run's findings. `spell/known-typo-key` skips lockfiles and
+     the keys of dependency sections (package names); a name holding `$` is
+     a compiler's and is not reported.
 5. **The rules and their fixes** ([L4](0006_LAW-4-every-rule-has-a-fix.md)):
 
    | rule | reports | fix |
@@ -195,7 +204,11 @@ question its maintainers left open. The forks and the rulings are in
      and comes from exactly one source word. SCOWL's size-95 word lists are
      left out of the "is a word" test because they hold the commonest
      misspellings (`untill`, `accomodate`, `enviroment`) among their rare
-     words. Hand entries are `scripts/spell-typos.txt` (empty so far). The
+     words. Hand entries are `scripts/spell-typos.txt`: `typo fix` adds a
+     typo, `!word` drops a generated variant that is no typo (eight, from
+     the corpus review: `axios`, `checkin`, `hsts`, `imag`, `inlines`,
+     `addopts`, `attaches`, `rects`), and a contraction's stem (`aren` of
+     `aren't`) counts as a word. The
      table is `data/spell/typos.json`: one JSON object whose `entries`
      string holds `typo:fix` pairs sorted by byte, which the rule
      binary-searches in place — still JSON (SR-RULE-PACKS decision 3), with
@@ -256,6 +269,29 @@ question its maintainers left open. The forks and the rulings are in
      over ten threads, same load). The budget waits for three CI `perf` runs
      on `main` with the pack on, put to the decider by L8's method (W-103
      step 6).
+   - **The pinned corpus (W-103, 2026-10-28):** `spell` runs on eleven of
+     the fourteen repositories (2,500 files). The first run found 1,010
+     `spell/recommended` findings, almost all false: lorem ipsum (`elit`,
+     `quis`), translated READMEs (`votre`, `diese`), contraction stems
+     (`aren`), package names in lockfiles (`axios`, `unist`) and terms of
+     the trade (`inlines`, `hsts`). After the changes in decisions 4 and 6
+     *as built* the snapshot (`packs/spell/corpus.toml`) holds **125
+     `spell/known-typo`, 3 `spell/known-typo-identifier` and 1
+     `spell/known-typo-key`**, and 8,948 `spell/unknown-word` (opt-in:
+     project names, jargon, the ipsum that is half English). Real typos
+     among them: `ancesors`, `ammended`, `overide`, `defaut`, `prefered`,
+     `demonstation`, `restriced`, `overlow`; most of the rest are short
+     foreign or ipsum texts the English test cannot judge. Every rule stays
+     `preview`. The comparison with `typos`' count (the reopen trigger) is
+     not made: `typos` is not installed here and is not added (L11).
+     **Its time** (release build, ten threads, a copy of the eleven
+     repositories, three runs each, on a machine at load 9 to 15, so the
+     spread is wide): `spell/recommended` costs 6.2 to 10.3 s of rule time
+     summed over threads (`known-typo` about 63%, `known-typo-key` 24%,
+     `known-typo-identifier` 12%) and 3.3 to 6.0 s wall, against 1.0 s for
+     the same tree with no rules; `spell/strict` adds `unknown-word`, 5.7
+     to 9.7 s summed. These are not a budget: three CI `perf` runs are
+     (W-103 step 7).
    - **Measured with the dictionary (W-103, 2026-10-28; not yet a
      budget):** `words.json` is 868,386 bytes and `locale.json` 489,307
      (285,570 and 114,680 gzipped); the pack is now a 1,028,518-byte npm
