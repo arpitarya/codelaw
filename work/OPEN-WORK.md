@@ -39,7 +39,7 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (23)
+## Open items (22)
 
 ### build (19)
 
@@ -69,6 +69,8 @@ here. Read that record before changing anything below it.
 
 🟢 **W-100** `agent` Rule promotion: criterion ratified 10-27 (SR-RULE-AUTHORING 6a, as proposed). Left: `corpus.py promote --write --run <url>` for the first batch, then close. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
 
+🟢 **W-105** `agent` Type-aware rules: `codelaw-types` Node helper on the project's TypeScript 7.1 API, `type:` clause, warm programs, `ts/type-error`, first rules in `ts` — preview on the 7.1 RC (11-10), stable after GA (11-24). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
+
 🟡 **W-38** waits on **W-86** `agent` PyPI 0.2.0: `css`, `data` live and trusted; day 1 uploads the other four and publishes the Release; then an agent checks `pip install codelaw` and `uvx codelaw` and writes it down. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
 🟡 **W-34** waits on **W-87** and **W-88** `agent` Fux index packages built; D-34 ratified 2026-10-27 (W-91); npm 15/15 and PyPI 4/10 live; after the publishing items, `publish.yml` uploads `dist/fux-index/`. Filed by Arpit (Cowork). [detail](open/W-34-fux-index-packages.md)
@@ -78,8 +80,6 @@ here. Read that record before changing anything below it.
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
 
-🟡 **W-105** waits on **W-104** `agent` Type-aware rules: `codelaw-types` Node helper on the project's TypeScript 7.1 API, `type:` clause, warm programs, `ts/type-error`, first rules in `ts` — preview on the 7.1 RC (11-10), stable after GA (11-24). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
-
 🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
 
 ### testing (2)
@@ -88,9 +88,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-108** `agent` oxlint type-aware live capture taken 10-28 (oxlint 1.90.0): it differs from W-107's fixture — a third finding and another span and help; swap it in and fix the adapter test. Filed by Arpit (Cowork). [detail](open/W-108-oxlint-live-capture.md)
 
-### record update (2)
-
-🟢 **W-104** `agent` Type-aware records landed; both L11 answers ruled 10-27 (the project's TypeScript is no dependency; D-45 `typescript` 7.1 for tests and CI). Left: close it. Filed by Arpit (Cowork). [detail](open/W-104-type-aware-records.md)
+### record update (1)
 
 🔴 **W-111** `arpit` Two unmerged worktrees of session 2df06f6d — `lm/W-90`, `lm/W-96` — keep or drop (inbox); both items closed, their work in `main`. Filed by Arpit (Cowork). [detail](open/W-111-two-unmerged-worktrees.md)
 
