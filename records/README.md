@@ -176,6 +176,7 @@ yet is owned by an open `W-nn`.
 | `.claude/hooks/now-ledger.py` | SR-WORK-NOW | decisions 2–5 |
 | `.claude/hooks/block-main.py` | SR-WORK-SESSION | decision 15 — lockmaster's kit: only lockmaster writes to main |
 | `.claude/hooks/claim-guard.py` | SR-WORK-SESSION | decision 15 — lockmaster's kit: a write outside the claim is warned |
+| `.claude/hooks/auto-land.py` | SR-WORK-SESSION | decision 15 — lockmaster's kit: at the end of every turn it lands what a change holds, and picks up Cowork's handoffs |
 | `.claude/hooks/fux-index-hint.sh` | SR-WORK-DOCS | advisory only — the Fux setup's PreToolUse hint to search the committed fux index before grepping; never blocks (W-75) |
 | `lockmaster.toml` | SR-WORK-SESSION | decision 15 — this repo's landing checks and merge drivers |
 | `.claude/hooks/disk-budget.py` | SR-LAW-9 | decision 4 |
