@@ -59,7 +59,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
-🟢 **W-103** `agent` Spell pack: three generated tables (188,151 typos, a 92,758-word dictionary, VarCon locale pairs), `[spell]`, six rules landed; fixtures and `fix` run pass; left: `spell/inconsistent-term` (project scope), corpus run, L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
+🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🟢 **W-112** `agent` Spell words file `.codelaw/spell/words.txt` (`[spell] words_file`, merged with `[spell] words`); `codelaw init` adds the pack and file (`--no-spell` skips); `codelaw spell learn`. Filed by Arpit (Cowork). [detail](open/W-112-spell-words-file-and-learn.md)
 

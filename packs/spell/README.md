@@ -63,6 +63,6 @@ words = ["kubectl", "Acme"] # accepted by every spell/* rule; spell/suspicious-w
 ## The word data
 
 `data/spell/` is written by `scripts/spell-data.py` and committed; the same
-sources write the same bytes: `typos.json` (188,151 generated known typos),
+sources write the same bytes: `typos.json` (188,138 generated known typos),
 `words.json` (92,758 words: SCOWL's US and British English to size 60, and the
 software terms) and `locale.json` (VarCon's one-to-one US and British pairs). Sources and their notices: [`NOTICE`](NOTICE).
