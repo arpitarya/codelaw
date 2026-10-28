@@ -1,7 +1,7 @@
 //! CSS rules about at-rules: their names, preludes and descriptors,
 //! `@import`, `@keyframes` and the names that at-rules define.
 
-use crate::css_syntax::{Kind, Sheet, VKind, comma_parts, css_rule, finding, fixed, matches_any, opt_list, opt_str, set, significant, split_commas, table, text};
+use crate::css_syntax::{Kind, Sheet, VKind, comma_parts, css_rule, finding, fixed, matches_any, opt_list, opt_str, set, significant, table, text};
 use crate::util::whole_lines;
 use codelaw_core::TextEdit;
 use std::collections::{BTreeMap, BTreeSet};
@@ -339,7 +339,7 @@ fn keyframe_selectors(sheet: &Sheet, src: &str) -> Vec<Vec<((usize, usize), Stri
                 .children
                 .iter()
                 .filter(|&&c| sheet.nodes[c].kind == Kind::Rule)
-                .flat_map(|&c| split_commas(src, sheet.nodes[c].name.0, sheet.nodes[c].name.1))
+                .flat_map(|&c| sheet.keyframe_selectors(c, src).into_owned())
                 .map(|r| (r, text(src, r).to_ascii_lowercase()))
                 .collect()
         })
