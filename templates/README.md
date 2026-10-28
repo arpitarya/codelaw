@@ -56,7 +56,6 @@ what consumers receive, edit the template here — the diff is the change.
 | `agents/skills/codelaw-suppress/SKILL.md` | `<agent>/skills/codelaw-suppress/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/skills/codelaw-upgrade/SKILL.md` | `<agent>/skills/codelaw-upgrade/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/skills/codelaw-write/SKILL.md` | `<agent>/skills/codelaw-write/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
-| `ci/bitbucket/bitbucket-pipelines.yml` | bitbucket-pipelines.yml — the check step, `codelaw@<version>` from npm; findings to Code Insights, SARIF a switch | `init --ci bitbucket` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 12b |
 | `ci/github/autofix-suggest-job.yml` | rendered into the slot `suggest_job` of `ci/github/codelaw-autofix.yml` with `--unsafe` | `init --ci <provider> --autofix` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 12 |
 | `ci/github/codelaw-autofix.yml` | .github/workflows/codelaw-autofix.yml | `init --ci <provider> --autofix` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 12 |
 | `ci/github/codelaw.yml` | .github/workflows/codelaw.yml — the check workflow, `uses: arpitarya/codelaw@v<version>` | `init --ci github` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 12a |
@@ -65,6 +64,7 @@ what consumers receive, edit the template here — the diff is the change.
 | `git-hooks/post-commit` | the git hooks folder's `post-commit` | `init --git-hooks` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `git-hooks/pre-commit` | the git hooks folder's `pre-commit` | `init --git-hooks` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `init/.codelaw/rules/README.md` | .codelaw/rules/README.md | `init` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
+| `init/.codelaw/spell/words.txt` | .codelaw/spell/words.txt, before `spell learn` fills it (never overwritten) | `init`, and `spell learn` when the file is missing | [SR-SPELL](../records/0116_spell.md) |
 | `init/codelaw-agents.toml` | the `[agents]` section of `codelaw.toml` | `init --agents` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `init/codelaw.toml` | codelaw.toml | `init` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `init/gitignore` | the line `init` adds to `.gitignore` (the merge stays in code) | `init` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |

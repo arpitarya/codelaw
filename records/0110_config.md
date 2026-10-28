@@ -10,7 +10,7 @@ feature: "configuration"
 owns:
   - crates/codelaw-config
 laws: [L0, L3, L5, L7]
-timestamp: 2026-10-27T12:00:00Z
+timestamp: 2026-10-28T18:00:00Z
 content_sha: ""
 ---
 
@@ -61,7 +61,7 @@ remap = { error = "warn" }
 [deps]        # SR-RULE-PACKS (the dependency rules and their snapshot)
 [css]         # SR-PROJECT-GRAPH (CSS Modules: which stylesheets, and the bundler's class-name mapping)
 [coverage]    # SR-PROJECT-GRAPH (the test rules of new code; [coverage.ignore] is SR-BASELINE's)
-[spell]       # SR-SPELL (the spell pack's locale and accepted words)
+[spell]       # SR-SPELL (the spell pack's locale, accepted words and words file)
 ```
 
 ```mermaid
@@ -125,7 +125,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
    `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11). One preset has no namespace: `codelaw:tests` is the engine's own and turns on the test rules of new code ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9); no pack resolves it.
 
-   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]`, `[deprecation]`, `[exceptions]`, `[deps]`, `[css]`, `[coverage]` and `[spell]` are validated by the loader like `[fix]` and `[lint]`; `[format]`, `[graph]` and `[baseline]` are still read as tables.
+   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]`, `[deprecation]`, `[exceptions]`, `[deps]`, `[css]`, `[coverage]` and `[spell]` are validated by the loader like `[fix]` and `[lint]`; `[format]`, `[graph]` and `[baseline]` are still read as tables. **One key names a file the loader reads:** `[spell] words_file` (default `.codelaw/spell/words.txt`, relative to the root config's folder; W-112, 2026-10-28): its words join `[spell] words`, a set path that is missing is a load error naming it, and a missing default is none ([SR-SPELL](0116_spell.md) decision 7).
 4. **Precedence, last wins:**
    1. Built-in defaults.
    2. `.editorconfig` (formatter keys only).
@@ -147,7 +147,7 @@ Configuration keys were scattered across six records. The decider asked for one 
    - `codelaw init` writes a minimal `codelaw.toml`: `extends` with the `recommended` presets of the rule packs it installs for the languages it detects ([SR-RULE-PACKS](0101_rule-packs.md) decision 6), and nothing else; with `--agents`, also the `[agents]` section naming them ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 6).
    - `codelaw format --import-config` converts Prettier, Ruff or Black configs ([SR-FORMATTER](0105_formatter.md) decision 5).
    - `codelaw migrate eslint|prettier|biome|ruff|stylelint` writes the whole file from another tool's config: `extends`, `[rules]`, a `[scope.<tool>-<n>]` per files group, `[format]` and the tool's ignore alias, with a report of every setting that did not map ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 15). Into an existing `codelaw.toml` it adds only what that file does not set.
-9. **Deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)):** the resolved config is a pure function of the files, environment and flags. Its hash is part of every cache key ([SR-CACHE](0109_cache.md)).
+9. **Deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)):** the resolved config is a pure function of the files, environment and flags. Its hash is part of every cache key ([SR-CACHE](0109_cache.md)), the words of `[spell] words_file` included (W-112).
 10. **Profiles: warn on a laptop, fail in CI.**
     - `[profile.<name>]` holds `rules` and `scope`, the same shapes as the top-level `[rules]` and `[scope.<name>]`; a `[profile.<name>.scope.<scope>]` without `files` takes the files of the scope of that name. Root config only.
     - **Which profile:** `--profile <name>`, else `CODELAW_PROFILE`, else `ci` when `CI` is set and is not `""`, `false` (any case) or `0`, else `local`. A name the config does not define is a usage error (exit 2), except `ci` and `local`, which may be absent and then change nothing.

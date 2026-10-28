@@ -130,8 +130,8 @@ fn expressions(sheet: &Sheet, src: &str) -> Vec<usize> {
     out
 }
 
-/// An expression's range and its component values: a declaration's from the
-/// tree ([`Sheet::values`]), a Sass statement's parameters from the text.
+/// An expression's range and its component values: a declaration's value or
+/// a Sass statement's parameters, from the tree ([`Sheet::values`]).
 type Expression<'a> = ((usize, usize), Cow<'a, [VNode]>);
 
 fn expression_values<'a>(sheet: &'a Sheet, src: &str) -> Vec<Expression<'a>> {
@@ -771,7 +771,7 @@ scss_rule!(FunctionNoUnknown, "scss/function-no-unknown", |sheet, src, ctx, out|
 });
 
 /// Expressions, plus the arguments of `@include` and the defaults of
-/// `@mixin` and `@function` parameters (after the name), read from the text.
+/// `@mixin` and `@function` parameters (after the name).
 fn expressions_and_arguments<'a>(sheet: &'a Sheet, src: &str) -> Vec<Expression<'a>> {
     let mut out = expression_values(sheet, src);
     for (i, _) in sass_statements(sheet, src, &["include", "mixin"]) {
@@ -779,7 +779,32 @@ fn expressions_and_arguments<'a>(sheet: &'a Sheet, src: &str) -> Vec<Expression<
         let p = text(src, n.params);
         let skip = p.find('(').unwrap_or(p.len());
         let r = (n.params.0 + skip, n.params.1);
-        out.push((r, Cow::Owned(css_syntax::values(src, r.0, r.1))));
+        let vals = match after_name(&sheet.values(i, src), src, r) {
+            Some(v) => v,
+            None => css_syntax::values(src, r.0, r.1),
+        };
+        out.push((r, Cow::Owned(vals)));
     }
     out
+}
+
+/// The values of a statement's parameters from `r`, its first `(`, on: the
+/// call the name opens becomes a bare group (`m(…)` read from its `(`).
+/// `None` (the text reads them) when the `(` is not where a value starts or a
+/// call's parenthesis.
+fn after_name(list: &[VNode], src: &str, r: (usize, usize)) -> Option<Vec<VNode>> {
+    let mut out = Vec::new();
+    for v in list {
+        if v.end <= r.0 {
+            continue;
+        }
+        if v.start >= r.0 {
+            out.push(v.clone());
+        } else if v.kind == VKind::Func && v.name.1 == r.0 && src.as_bytes().get(r.0) == Some(&b'(') {
+            out.push(VNode { start: r.0, name: (r.0, r.0), ..v.clone() });
+        } else {
+            return None;
+        }
+    }
+    Some(out)
 }

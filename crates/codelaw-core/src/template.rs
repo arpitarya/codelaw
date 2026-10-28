@@ -29,7 +29,6 @@ macro_rules! t {
 /// `agents/`, the skills package's. `templates/README.md` is the registry of
 /// what each is for; the test in this module keeps the three in step.
 pub const TEMPLATES: &[Template] = &[
-    t!("ci/bitbucket/bitbucket-pipelines.yml"),
     t!("ci/github/autofix-suggest-job.yml"),
     t!("ci/github/codelaw-autofix.yml"),
     t!("ci/github/codelaw.yml"),
@@ -38,6 +37,7 @@ pub const TEMPLATES: &[Template] = &[
     t!("git-hooks/post-commit"),
     t!("git-hooks/pre-commit"),
     t!("init/.codelaw/rules/README.md"),
+    t!("init/.codelaw/spell/words.txt"),
     t!("init/codelaw-agents.toml"),
     t!("init/codelaw.toml"),
     t!("init/gitignore"),
@@ -162,7 +162,6 @@ mod tests {
         ("agents/mcp-server.json", &[("command", "npx"), ("args", "[]")]),
         ("agents/path-scoped-rule.md", &[("id", "a/b"), ("title", "t"), ("fix", "auto")]),
         ("agents/path-scoped.md", &[("language", "Python"), ("cmd", "codelaw"), ("rules", "")]),
-        ("ci/bitbucket/bitbucket-pipelines.yml", &[("version", "0.0.0")]),
         ("ci/github/autofix-suggest-job.yml", &[("version", "0.0.0")]),
         ("ci/github/codelaw-autofix.yml", &[("cron", "17 4 * * *"), ("version", "0.0.0"), ("suggest_job", "")]),
         ("ci/github/codelaw.yml", &[("version", "0.0.0")]),

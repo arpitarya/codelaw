@@ -29,7 +29,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-28T12:00:00Z
+timestamp: 2026-10-28T04:00:00Z
 content_sha: ""
 ---
 
@@ -204,7 +204,7 @@ The decider asked for a record of what goes into which package, under the naming
     - **Proven in CI:** `ci.yml`'s `action` job runs it (`uses: ./`) on `fixtures/github-action`, installed from that run's linux wheel, and asserts exit `1` and one SARIF result at `fixtures/github-action/src/app.js`. `init --ci github` writes a workflow that uses it ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 12a).
     - **Not yet:** the GitHub Marketplace listing (the decider accepts the Marketplace Developer Agreement and ticks *Publish this Action to the GitHub Marketplace* on a release) and a run in a throwaway repository against a released tag, which waits on the first release with `--format github`. Ruled 2026-10-27 (W-97): the Action is listed on the Marketplace, and a moving `v0` tag follows each release.
 
-15a. **Bitbucket Pipelines has no Action: its twin is a step, not a pipe (yet)** (W-109, 2026-10-28). `codelaw init --ci bitbucket` writes a `bitbucket-pipelines.yml` step that installs `codelaw@<version>` from npm in `node:22` and sends findings to Code Insights with `curl` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 12b) — no new dependency. A **pipe** (`pipe.yml`, a `Dockerfile`, an image on a registry) is the decider's fork: its base image is an [L11](0013_LAW-11-dependencies.md) row and publishing it needs a registry namespace and a token. Until he rules, there is no pipe.
+15a. **Bitbucket Pipelines has no Action, and codelaw ships no pipe and no generated step for it** (W-109, ruled 2026-10-28: *"No need to build out that Bitbucket CI itself. Remove that."*). What codelaw ships for Bitbucket is the Code Insights output, `--format bitbucket` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 4); USAGE shows a step to copy that installs `codelaw@<version>` from npm in `node:22` and sends the findings with `curl` (decision 12b) — no new dependency. No **pipe** (`pipe.yml`, a `Dockerfile`, an image on a registry): its base image would be an [L11](0013_LAW-11-dependencies.md) row and publishing it a registry namespace and a token. `init --ci bitbucket` was built, then removed (W-109).
 
 ### Consequences
 
