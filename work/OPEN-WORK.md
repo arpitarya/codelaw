@@ -39,9 +39,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (24)
+## Open items (23)
 
-### build (20)
+### build (19)
 
 🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -58,8 +58,6 @@ here. Read that record before changing anything below it.
 🟢 **W-99** `agent` Side-by-side bench built; D-37…D-41 ratified 10-27. Left: the first `bench-rivals.yml` run on the runner, then L8 context rows and a README claim from them. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
 🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
-
-🟢 **W-93** `agent` `codelaw hook --pre` and `codelaw brief` built and landed; `hook_pre`'s budget ruled 10-27: left unset. Left: close it (IMPLEMENTATION, archive). Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 
 🟢 **W-103** `agent` Spell pack: three generated tables (188,151 typos, a 92,758-word dictionary, VarCon locale pairs), `[spell]`, six rules landed; fixtures and `fix` run pass; left: `spell/inconsistent-term` (project scope), corpus run, L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 

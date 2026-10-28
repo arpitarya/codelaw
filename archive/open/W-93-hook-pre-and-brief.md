@@ -6,8 +6,8 @@ item: W-93
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5)"
+ball: closed
 ---
 
 # W-93 — `codelaw hook --pre` and the repo-specific brief
@@ -37,12 +37,14 @@ Design, sources and the eight-agent matrix: [`work/proposals/write-time-guidance
 
 **State, 2026-10-27 (Claude Code):** the first three met (`crates/codelaw-cli/tests/hook_pre.rs`: Claude `Write`/`Edit`, Codex `apply_patch` and Gemini `write_file`/`replace` refused with rule, line and fix; a `js/no-console` warning allowed with context; an edit on the already-failing line silent; a malformed payload, a missing file and a broken config allowed with exit 0; the panic and the timeout in `pre::tests`; the brief's own / configured / exceptions / security groups and its count line, byte-identical across runs). The fourth is half met: `hook_pre` is benched in CI's `perf` from this change on, and its budget waits for three runs on `main`.
 
-**Left (ruled 2026-10-27: unset):** close the item. Was: (1) three `perf` runs on `main` that time `hook_pre` (the push run plus two `workflow_dispatch` runs); (2) apply SR-LAW-8 decision 4's method to them in `perf/budgets.toml`, and put the result to the decider as an inbox row; then close.
+**Closed 2026-10-28 (Claude Code):** all four met. The ruling is in place: `perf/budgets.toml` `[operation.hook_pre]` keeps `budget = "unset"` with the decider's ruling on the line; SR-LAW-8 §Measurements' `hook_pre` row and its Consequences line say *unset* and quote *"We can go with unset"*. Nothing left.
 
-- A proposed `Write` and `Edit` that add a `js/no-debugger` error are refused on Claude Code, Codex and Gemini fixtures with the rule, line and fix; one that adds only a warning is allowed with context; one that touches an already-failing line adds no new verdict.
-- A malformed payload, a missing file and an engine panic each allow the write and exit 0.
-- `brief --for src/app.ts` in a fixture with two custom rules, one configured option and one baseline entry lists exactly those, then the security rules, then the count line — byte-identical across runs.
-- `hook_pre` measured in CI; L8 budget set or put to the decider by the ruled method.
+**Left (ruled 2026-10-27: unset):** none — closed 2026-10-28. Was: (1) three `perf` runs on `main` that time `hook_pre` (the push run plus two `workflow_dispatch` runs); (2) apply SR-LAW-8 decision 4's method to them in `perf/budgets.toml`, and put the result to the decider as an inbox row; then close.
+
+- ✅ A proposed `Write` and `Edit` that add a `js/no-debugger` error are refused on Claude Code, Codex and Gemini fixtures with the rule, line and fix; one that adds only a warning is allowed with context; one that touches an already-failing line adds no new verdict.
+- ✅ A malformed payload, a missing file and an engine panic each allow the write and exit 0.
+- ✅ `brief --for src/app.ts` in a fixture with two custom rules, one configured option and one baseline entry lists exactly those, then the security rules, then the count line — byte-identical across runs.
+- ✅ `hook_pre` measured in CI; L8 budget set or put to the decider by the ruled method — put to him 2026-10-27, ruled `unset` (`perf/budgets.toml`, SR-LAW-8 §Measurements).
 
 ## Record affected
 
