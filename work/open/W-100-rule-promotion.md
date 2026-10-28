@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-27 (W-36 gap G8): promote rules from preview to sta
 item: W-100
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5)"
-ball: arpit
+updated: 2026-10-28
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: agent
 ---
 
 # W-100 — Promote rules out of `preview` by corpus
@@ -16,9 +16,11 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | The promotion criterion in a record: a rule is `stable` after N pinned corpus repos with zero false positives against its source tool's verdict, and its fix verified | "every rule is preview" stops being an objection | 🔴 proposed as [SR-RULE-AUTHORING](../../records/0113_rule-authoring.md) decision 6a; **the numbers wait on Arpit** (below) |
+| 1 | The promotion criterion in a record: a rule is `stable` after N pinned corpus repos with zero false positives against its source tool's verdict, and its fix verified | "every rule is preview" stops being an objection | ✅ ratified 2026-10-27 as proposed — [SR-RULE-AUTHORING](../../records/0113_rule-authoring.md) decision 6a; `scripts/corpus.json` `promotion.ratified` |
 | 2 | The corpus CI job reports per-rule agreement; a script proposes promotions; the change lands as a diff to `stability:` | promotion is evidence, not opinion | ✅ `scripts/corpus.py promote` (report; `--write --run <url>` flips `stability:` and records the run, refused while unratified); CI's `corpus` job writes the report to its summary. Per-rule agreement *with the source tool* is not built: that tool in CI is an L11 ruling (W-99's) |
-| 3 | First batch promoted; README FAQ updated | users see stable rules | ⏳ FAQ and roadmap row updated; no rule promoted — the criterion is not ratified |
+| 3 | First batch promoted; README FAQ updated | users see stable rules | ⏳ FAQ and roadmap row updated; the first batch is next — `corpus.py promote --write --run <CI run URL>` |
+
+**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Ratify."* — decision 6a as proposed: ≥ 3 corpus repos and ≥ 10 files; no false positive, zero findings counting; the fix held level 4; ≥ 1 release in preview. Put with it: 326 of 620 preview rules pass at these values, all through zero findings, and every rule already carries its own tests.
 
 **Arpit, 2026-10-27 (voice):** *"Yes to all four."* — on W-36's R1 (README fixes), R2 (file gaps G1–G8), R3 (reopen type-aware TS) and R4 (run the with/without-Fux experiment). [Proposal](../proposals/linter-for-ai-positioning.md).
 

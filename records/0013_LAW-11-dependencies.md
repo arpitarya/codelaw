@@ -10,7 +10,7 @@ feature: "dependencies by ratification only"
 owns:
   - crates/codelaw-cli/tests/dependencies.rs
 laws: [L0, L2, L11]
-timestamp: 2026-10-27T18:00:00Z
+timestamp: 2026-10-28T03:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-26 (Cowork): Okay. Create a law, no dependencies. For Rust, for Python, for JavaScript, TypeScript, JSON, CSS, YAML, TOML, HTML, nothing. No dependencies. Create a law. And then tell me what all dependencies do we have. We will ratify them one by one."
 ---
@@ -175,7 +175,25 @@ Copied-in data is a dependency (decision 1). These three are read only by `scrip
 
 | id | unit | what it does | pin | status |
 |---|---|---|---|---|
-| D-34 | **fux-engine** (+ its three dependencies `fux-core`, `fux-reader`, `fux-writer`, at the same version), MIT | builds the optional Fux index packages in CI (`scripts/fux-index.py`, L6 decision 12); never in the engine, a package or a test | **unversioned** — every fux-engine release is ratified; each commit pins one in `FUX_VERSION` (`==5.1.1` today), and a scheduled job bumps it by PR (W-91) | ratified 2026-10-27 — *"whenever there is a latest version available, we should be using that"*; on keeping each commit reproducible, *"Go with the recommendation"* (pinned per commit, bumped by PR) |
+| D-34 | **fux-engine** (+ its three dependencies `fux-core`, `fux-reader`, `fux-writer`, at the same version), MIT | builds the optional Fux index packages in CI (`scripts/fux-index.py`, L6 decision 12); never in the engine, a package or a test | **unversioned** — every fux-engine release is ratified; each commit pins one in `FUX_VERSION` (`==5.1.1` today), and a scheduled job bumps it by PR (W-91) | ratified 2026-10-27 — *"whenever there is a latest version available, we should be using that"*; on keeping each commit reproducible, *"Go with the recommendation"* (pinned per commit, bumped by PR) · 2026-10-27 (W-102): also arm C of the guidance-vs-check experiment, run by hand on the decider's Mac — *"Approved."* |
+
+### CI — the side-by-side bench (W-99)
+
+Installed only by `scripts/bench-rivals.py install` inside `.github/workflows/bench-rivals.yml` (weekly and by hand, a throwaway folder on `ubuntu-24.04`); never in the engine, a package, a test or `ci.yml`. `bench-rivals.py` runs a tool only while its row here is `ratified` at the version in `perf/rivals.toml`. No ledger line: no manifest or lockfile names them.
+
+| id | unit | what it does | pin | licence (L2) | installed tree | status |
+|---|---|---|---|---|---|---|
+| D-37 | **ESLint** (`eslint` + `@eslint/js`, its recommended rules, published by the ESLint project) | the JS linter timed beside `codelaw check` | `eslint@10.13.0`, `@eslint/js@10.0.1` | MIT; tree: 54 MIT, 12 Apache-2.0, 6 BSD-2-Clause, 4 ISC, 1 BSD-3-Clause, **1 BlueOak-1.0.0** (`minimatch@10.2.6`: OSI-approved and permissive, but not one of L2 decision 2's named examples — say so if you rule it out) | 78 packages | ratified 2026-10-27 — *"Ratify."* (the decider, 2026-10-27 (voice docket)), CI-only bench scope |
+| D-38 | **Prettier** | the formatter timed beside `codelaw format --check` | `prettier@3.9.10` | MIT | 1 (no dependencies) | ratified 2026-10-27 — *"Ratify."* (the decider, 2026-10-27 (voice docket)), CI-only bench scope |
+| D-39 | **Biome** (`@biomejs/biome` + its platform binary) | lint and format, timed beside both | `@biomejs/biome@2.6.3` | MIT OR Apache-2.0 (binaries too) | 1 + 1 of 10 optional platform binaries | ratified 2026-10-27 — *"Ratify."* (the decider, 2026-10-27 (voice docket)), CI-only bench scope |
+| D-40 | **oxlint** (+ its platform binary) | the JS/TS linter timed beside `codelaw check` | `oxlint@1.89.0` | MIT (binaries too) | 1 + 1 of 19 optional platform binaries | ratified 2026-10-27 — *"Ratify."* (the decider, 2026-10-27 (voice docket)), CI-only bench scope |
+| D-41 | **Ruff** (the wheel) | Python lint and format, timed beside both | `ruff==0.17.3` | MIT (`license_expression`) | 1 wheel, no dependencies | ratified 2026-10-27 — *"Ratify."* (the decider, 2026-10-27 (voice docket)), CI-only bench scope |
+
+### Tests and CI — TypeScript for the type-aware rules (W-104, W-105)
+
+| id | unit | what it does | pin | status |
+|---|---|---|---|---|
+| D-45 | **typescript** (npm, Apache-2.0) | the TypeScript codelaw's own type-aware tests and CI run against (W-105's fixtures, W-106's matrix); installed into fixture folders only — never in a package, the engine or a consumer's repo. A consumer's project uses its own TypeScript, which is no dependency of codelaw ([SR-TYPES](0117_types.md) decision 5). Separate from D-28, the extension's compiler | the **7.1** line, blocking; `typescript@next` in a nightly, reporting-only job; the exact tree (any platform-binary packages) recorded here when W-105 pins it | ratified 2026-10-27 — *"Yes."* (the decider, 2026-10-27 (voice docket); with *"make sure it is as fast as possible"*) |
 
 ### CI — GitHub Actions (`.github/workflows/`)
 
@@ -184,6 +202,8 @@ Copied-in data is a dependency (decision 1). These three are read only by `scrip
 | D-30 | **GitHub's own actions** — `checkout`, `cache/restore`, `cache/save`, `upload-artifact`, `download-artifact`, `setup-node`, `setup-python`, `attest-build-provenance` | CI plumbing and build provenance; pinned by SHA | ratified 2026-10-26 — *"Ratify."* |
 | D-31 | **Swatinem/rust-cache** | caches Rust builds in CI | ratified 2026-10-26 — *"Ratify."* |
 | D-32 | **pypa/gh-action-pypi-publish** | uploads to PyPI with trusted publishing | ratified 2026-10-26 — *"Ratify."* |
+
+**Not ratified, 2026-10-27 (the decider, 2026-10-27 (voice docket)):** `github/codeql-action/upload-sarif` — the Action uploads SARIF through the REST API with `gh` (W-97, *"Okay."*); `@vscode/vsce` 4.0.0 and `ovsx` 1.3.0 — `publish.yml` uploads the `.vsix` files with `curl` (W-95, *"A. A."*); L2 refuses both as they stand (EPL-2.0; a proprietary `@vscode/vsce-sign`).
 
 ### How it was taken
 

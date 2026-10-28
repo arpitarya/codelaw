@@ -15,7 +15,7 @@ owns:
   - fixtures/spell
   - crates/codelaw-cli/tests/spell.rs
 laws: [L2, L3, L4, L5, L6, L8, L10, L11]
-timestamp: 2026-10-27T14:00:00Z
+timestamp: 2026-10-28T03:10:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-27 (Cowork, voice), on the CSpell research: the typo list — \"Let's go with B.\" (codelaw builds its own from SCOWL); SCOWL and VarCon — \"Approve both.\"; the software-terms dictionary — \"Approve it.\"; packaging — \"want it as a separate package.\"; defaults and where the data lives — \"Go with the recommendation.\"; writing it up — \"go ahead\". W-103."
 ---
@@ -88,6 +88,7 @@ question its maintainers left open. The forks and the rulings are in
    its word data is in the pack (decision 6). `codelaw init` never adds it,
    as it never adds a security pack: a team chooses it
    ([SR-RULE-PACKS](0101_rule-packs.md) decision 6).
+   - **Ruled 2026-10-28, not built (W-112):** `codelaw init` adds the spell pack, writes `.codelaw/spell/words.txt` from a template and fills it with `codelaw spell learn`; `--no-spell` skips all three (the decider: *"Let it be part of code law init itself. No flag, no nothing. Probably we can have a flag as hyphen hyphen no spell if it is not needed."*, then *"Yes."* to the pack). This sentence's "never adds it" holds until W-112 lands.
 2. **Presets.** `spell/recommended` turns on `spell/known-typo` and
    `spell/known-typo-identifier` — on as soon as a project extends it.
    `spell/strict` extends it and adds `spell/unknown-word`,
@@ -237,6 +238,7 @@ question its maintainers left open. The forks and the rulings are in
      and excuse every `spell/*` rule but `spell/suspicious-word`, which
      reads them where they are written: string entries of `[spell] words`
      (or a dotted `spell.words`) in the root `codelaw.toml`.
+   - **Ruled 2026-10-28, not built (W-112):** a words file — `[spell] words_file`, by default `.codelaw/spell/words.txt` beside the rules directory, one word per line, `#` comments — merged with `[spell] words`, which stays (*"It should stay."*); missing at the default path is silent, missing at a set path is an error (*"Sounds right."*).
 8. **Deterministic** ([L5](0007_LAW-5-no-model-in-the-engine.md)): no model,
    no network, no clock. Suggestions rank by edit cost (Damerau-Levenshtein,
    at most two edits), then the word's SCOWL frequency class, then alphabetical

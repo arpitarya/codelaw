@@ -5,9 +5,9 @@ description: "Records first for type-aware rules (W-101, ruled 2026-10-27): amen
 item: W-104
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5)"
-ball: arpit
+updated: 2026-10-28
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: agent
 ---
 
 # W-104 — Records for type-aware rules
@@ -21,7 +21,9 @@ ball: arpit
 | 3 | **L6**: Node at runtime for type rules only; the helper ships inside both engine packages | packaging stated — the law text and decision 3's one runtime exception; the runtime fence's no-Node note | ✅ |
 | 4 | **L8**: hooks skip cold type rules with a note; `check_types_cold` / `check_types_warm` added as `unset` | budgets hold — decision 1's two rows, decision 8; they enter `perf/budgets.toml` with the bench that times them (W-105) | ✅ |
 | 5 | **SR-TYPES** (new): helper, protocol, type-question vocabulary, TS lookup, ≥ 7.1 gate, warm model, tested range, `ts/type-error`, dedupe; SR-ARCHITECTURE's "not decided yet" line points at it; the `type:` clause in SR-RULE-FORMAT | the design of record — [SR-TYPES](../../records/0117_types.md) (0117, accepted, built: no; owns nothing until W-105 adds the helper); SR-RULE-FORMAT decision 3f; SR-ARCHITECTURE's Consequences line and decision 28; DESIGN §3.6 and the risks table | ✅ |
-| 6 | Ask the decider to confirm **L11**: the project's TypeScript is looked up like an adapter's binary, so no dependency | no hidden dependency — asked in OPEN-WORK's inbox, with the second question it raised: codelaw's own CI and tests need a TypeScript 7.1 copy | 🔴 the decider |
+| 6 | Ask the decider to confirm **L11**: the project's TypeScript is looked up like an adapter's binary, so no dependency | no hidden dependency — asked in OPEN-WORK's inbox, with the second question it raised: codelaw's own CI and tests need a TypeScript 7.1 copy | ✅ ruled 2026-10-27 — (1) confirmed: the project's TypeScript is no dependency; (2) ratified: D-45 `typescript` 7.1, tests and CI only |
+
+**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"But make sure it is as fast as possible."* — told the speed is built in (warm type programs, hooks skip cold type checks, both type operations get L8 budgets once W-105 times them) — then *"Yes."* to both: (1) the project's TypeScript is no dependency; (2) ratify `typescript` 7.1 for codelaw's own tests and CI (D-45). Later: *"Yes, all looks good."*
 
 **Arpit, 2026-10-27 (voice), W-101:** rulings R1–R8 in [the proposal](../proposals/type-aware-rules.md) §3 — TypeScript 7.1's own API through the project's installed copy, Node at runtime, rules in the `ts` pack, preview on the 7.1 RC, *"Go with the recommendation"* on version checks.
 
@@ -31,12 +33,12 @@ ball: arpit
 
 - ✅ The four laws amended with the ruling quoted (each names W-101's ruling of 2026-10-27 and quotes its words from [the proposal](../proposals/type-aware-rules.md) §3, R1–R8; L8's change rests on R1–R8 and the proposal's §4–§5, which no single spoken sentence names).
 - ✅ SR-TYPES accepted (built: no); the register row added. **The Ownership table has no SR-TYPES row:** it lists only components that exist (SR-WORK-OWNERSHIP decision 2), and SR-TYPES owns none until W-105 builds the helper.
-- 🔴 L11's question answered by the decider — in the inbox.
+- ✅ L11's questions answered by the decider, 2026-10-27 — written into SR-TYPES decision 5 and L11 §3 (D-45), 2026-10-28.
 
 ## Left
 
-1. **The decider answers the L11 inbox row** (two questions: the project's TypeScript is no dependency; codelaw's own CI/test copy of TypeScript 7.1 is one, and needs a row before W-105 lands it).
-2. Then: write his words into SR-TYPES decision 5 (and, if he ratifies the CI copy, a D-row in L11 §3), and close.
+1. ✅ The decider answered the L11 row (2026-10-27); his words are in SR-TYPES decision 5 and Consequences, and D-45 is in L11 §3 (2026-10-28).
+2. Close: the outcome into `work/IMPLEMENTATION.md`, this file to `archive/open/`, the successor line in `archive/README.md`; then W-105 is 🟢.
 
 ## Record affected
 

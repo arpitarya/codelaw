@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-28 — W-112 filed: the spell words file, init by default, spell learn  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Is there a way to add custom words to spelling? Pack."* — answered (`[spell] words`, built today in W-103) — then by voice the design, and *"file it."*
+- **Done:** W-112 filed with his words; its OPEN-WORK row (🟢 agent, build); SR-SPELL decisions 1 and 7 each carry the ruling as *ruled, not built*; INTERVIEW §1. Not committed: this Cowork shell cannot run lockmaster.
+- **Decided / left open:** ruled — a words file next to the rules directory, path set in TOML; the inline list stays and merges; silent when the default file is missing, an error when a set path is; `.codelaw/spell/words.txt`; `codelaw init` adds the pack and the file and runs `spell learn`, `--no-spell` skips all; `codelaw spell learn` adds unknown words and lists likely typos for review. Agent's proposals he accepted: the path, `words_file`, the review list.
+- **Mistakes:** none.
+- **Next:** an agent takes W-112, records first (it reverses SR-SPELL decision 1).
+
+## 2026-10-28 — Docket: nine rulings written back; PyPI day 1's publishers; W-108–W-111 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Review all the open work blockers, explain them to me one by one with a recommendation"* — then a voice walk-through, one card at a time — then *"write it."*
+- **Done:** OPEN-WORK: six inbox rows ruled and removed, three reworded (PyPI day 1, W-95's accounts, W-97's Marketplace step), W-93's stored "0 d" age cell gone with its row; W-93, W-99, W-100, W-102, W-104 to 🟢. Item files W-86–W-89, W-93, W-95, W-97, W-99, W-100, W-102, W-104 carry the rulings in his words. Records: L11 §3 D-37…D-41 (bench, CI-only) and D-45 (`typescript` 7.1, tests and CI), D-34's arm-C scope, `upload-sarif`/`vsce`/`ovsx` not ratified; SR-RULE-AUTHORING 6a ratified + `scripts/corpus.json` `promotion.ratified`; SR-TYPES decision 5; SR-LAW-8 and `perf/budgets.toml` (`hook_pre` unset); SR-PACKAGES (curl upload, `gh` SARIF, Marketplace + moving `v0`); the experiment README. PyPI day 1: Arpit uploaded the four wheels (08:10 IST); Claude in Chrome added their four trusted publishers; `codelaw`'s pending publisher still listed. The oxlint live capture run in the Cowork VM (oxlint 1.90.0, tsgolint 7.0.2005, typescript 7.0.2), outside the repo. Filed W-108 (the capture: it disagrees with W-107's fixture — a third finding, another span, another help line), W-109 (Bitbucket Pipelines), W-110 (session 2df06f6d's merged worktrees, for the Mac), W-111 (`lm/W-90`, `lm/W-96` keep-or-drop, inbox). `check-open-work-inbox.py` and `check-work-system.py` pass. Written in the main checkout, not committed: this Cowork shell cannot run lockmaster.
+- **Decided / left open:** ruled 2026-10-27 by voice — PyPI as filed (*"Yes."*); W-95 (a) (*"A. A."*); 6a (*"Ratify."*); W-97's three calls (*"Okay."*); D-37…D-41 (*"Ratify."*); `hook_pre` unset (*"We can go with unset"*, after asking for 150 ms); W-102 (*"Approved."*); W-104 both (*"Yes."*); W-107 (*"You run it, create a work item for it."*). Agent's calls, flagged: rulings dated 2026-10-27, the day of the call; the cleanup split into W-110 (🟢) and W-111 (🔴) per SR-WORK-CLEANUP decision 3; the gh-missing error for the Action is offered, not ruled.
+- **Mistakes:** first WebFetch to PyPI and the first device call failed (robots, the Mac offline); the walk-through read GitHub's copy until the Mac came back.
+- **Next:** Arpit runs `gh release create v0.2.0` (the inbox row); then an agent takes W-108.
+
 ## 2026-10-27 — W-107 closed: oxlint type-aware through the adapter  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *Implement and close W-107: prove and document that oxlint's type-aware mode flows through the oxlint adapter, `typescript/*` ids included; a test on a recorded oxlint JSON; the live run a decider ask.*

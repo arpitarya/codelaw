@@ -1,7 +1,7 @@
 # L8's performance budgets (SR-LAW-8). The gate is `codelaw bench --budgets
 # perf/budgets.toml`, run by ci.yml's `perf` job.
 #
-# SEVEN OF NINE ARE SET (2026-10-25, W-19; hook_pre added unset 2026-10-27, W-93), by the method the decider ruled
+# SEVEN OF NINE ARE SET (2026-10-25, W-19; hook_pre added unset 2026-10-27, W-93, and left unset by the decider the same day), by the method the decider ruled
 # (L8 decision 4). A set `budget` fails CI when a p95 goes over it; it is
 # never raised (decision 5). `fix_one_file` stays "unset", reported and not
 # gated: the method's guard held it back and the decider ruled (2026-10-25)
@@ -85,7 +85,7 @@ measured_p95 = 43.0
 
 [operation.hook_pre]
 unit = "ms"
-budget = "unset" # HELD BACK by the guard: p95 62.4 / 78.3 / 86.2; worst 86.2 x 1.5 = 129.3 > target 100 ms warm — in the inbox for the decider (W-93, 2026-10-27)
+budget = "unset" # HELD BACK by the guard: p95 62.4 / 78.3 / 86.2; worst 86.2 x 1.5 = 129.3 > target 100 ms warm — the decider, 2026-10-27: leave it unset, as fix_one_file (W-93)
 proposed = 100 # the design target (SR-LAW-8 decision 1's hook_pre row, SR-AGENT-SURFACES decision 9); headroom 1.16 x the worst p95
 
 [operation.peak_memory_10k]

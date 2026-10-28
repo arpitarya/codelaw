@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-27 (W-36 R4): measure whether an agent with Fux and
 item: W-102
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5)"
-ball: arpit
+updated: 2026-10-28
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: agent
 ---
 
 # W-102 — Experiment — does good guidance make the check unnecessary?
@@ -17,9 +17,11 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | 20 small tasks in a fixture repo with `js/recommended`, `py/recommended`, three custom rules and two configured `use-instead` rules | a fair task set | ✅ built — `experiments/guidance-vs-check/repo/` and `tasks/t01`–`t20` |
-| 2 | Three arms, same model and prompt, 3 runs each (180 runs): (A) AGENTS.md only; (B) + codelaw MCP and the rule pages; (C) + a Fux index | comparable runs | ✅ built (`harness.py run --agent claude`); 🔴 **not run** — Arpit approves the spend and picks the agent CLI (inbox) |
+| 2 | Three arms, same model and prompt, 3 runs each (180 runs): (A) AGENTS.md only; (B) + codelaw MCP and the rule pages; (C) + a Fux index | comparable runs | ✅ built (`harness.py run --agent claude`); approved 2026-10-27 — Claude Code CLI, Fux in arm C, a pilot first; ⏳ not run |
 | 3 | Measure `codelaw check` on each diff (new findings by rule), with `hook` and `hook --pre` off; record tokens and turns | the data | ✅ scorer and table built, proven by `harness.py dry-run`; the data waits on step 2 |
 | 4 | Decide: arm C gives zero new `error`s in all 60 runs → the README's "rules it can't skip" line goes; otherwise it stays with the measured rate | a README line backed by data | ⏳ |
+
+**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"This is in my local, right?"* — yes: on the Mac, from the main checkout, with his Claude Code login, one session at a time (9–18 hours in all; nothing in CI) — then *"Approved."*: (1) the CLI is Claude Code 2.1, `claude -p … --setting-sources project --strict-mcp-config` (`experiment.toml` `[agent.claude]`); (2) `fux` (D-34) runs in arm C outside CI; (3) run it — the pilot first, `harness.py run --agent claude --runs 1 --out experiments/guidance-vs-check/runs/2026-10-w102` (60 sessions, ~$29), then the same `--out` without `--runs` for the full 180 (~$86).
 
 **Arpit, 2026-10-27 (voice):** *"Yes to all four."* — on W-36's R1 (README fixes), R2 (file gaps G1–G8), R3 (reopen type-aware TS) and R4 (run the with/without-Fux experiment). [Proposal](../proposals/linter-for-ai-positioning.md).
 
