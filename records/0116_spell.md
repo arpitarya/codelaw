@@ -16,7 +16,7 @@ owns:
   - crates/codelaw-cli/tests/spell.rs
   - crates/codelaw-cli/src/spell_cmd.rs
 laws: [L2, L3, L4, L5, L6, L8, L10, L11]
-timestamp: 2026-10-28T22:00:00Z
+timestamp: 2026-10-29T00:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-27 (Cowork, voice), on the CSpell research: the typo list — \"Let's go with B.\" (codelaw builds its own from SCOWL); SCOWL and VarCon — \"Approve both.\"; the software-terms dictionary — \"Approve it.\"; packaging — \"want it as a separate package.\"; defaults and where the data lives — \"Go with the recommendation.\"; writing it up — \"go ahead\". W-103."
 ---
@@ -371,6 +371,7 @@ question its maintainers left open. The forks and the rulings are in
      the dictionary and the locale table add about **1 ms**, so no split
      and no compact format is proposed. Suggestions are cached per thread
      for the run, keyed by the dictionary and the word.
+   - **Ruled 2026-10-29 (W-103): its own operation.** The pack is measured as a `spell` operation on the pinned repos with `spell/recommended` on, not inside the shared `perf` workload, so no ruled budget moves; folding it into the shared workload is B-062 (the decider: *"We can, but add an item in the backlog so that we can have a shared benchmark."*).
 10. **English only.** Another language needs a word list under a permissive
     licence and its own ratified row.
 

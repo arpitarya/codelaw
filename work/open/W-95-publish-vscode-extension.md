@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-27 (W-36 gap G2): publish the built VS Code extensi
 item: W-95
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-28
+updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
@@ -17,9 +17,11 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Package `packaging/vscode` per platform with its bundled binary (or the npm binary lookup); `vsce package` / `ovsx` dry runs in CI | publishable artifacts | ✅ 2026-10-27 — eight `.vsix` built and checked in CI by `scripts/vsix.py`, without `vsce` (see below); no `vsce`/`ovsx` dry run: neither is ratified |
-| 2 | Arpit creates the Marketplace publisher and the Open VSX namespace, and stores the tokens (or a trusted-publishing equivalent) as GitHub secrets in the `vscode` environment | the right to publish | 🔴 Arpit — the publisher, namespace and tokens (the inbox row has every click); the upload tool ruled 2026-10-27: (a), `curl`, no dependency |
+| 2 | Arpit creates the Marketplace publisher and the Open VSX namespace, and stores the tokens (or a trusted-publishing equivalent) as GitHub secrets in the `vscode` environment | the right to publish | 🔄 2026-10-28: the Marketplace publisher **`codelaw`** created by Arpit; the token is blocked — the Azure DevOps organization asks for an Azure subscription and his card was declined; Open VSX and the `vscode` environment not started |
 | 3 | `publish.yml` publishes the extension on a Release, after the engine | one release, every surface | ⏳ after step 2 — the job is drafted below; it uploads with `curl` (ruled 2026-10-27) |
 | 4 | README / USAGE: install from the Marketplace; the preview note drops "the editor extension's Marketplace listing comes later" | users can install it | ⏳ after the first listing |
+
+**Arpit, 2026-10-29 (voice docket; written on *"file it."*):** recommended Open VSX now (a GitHub login, no Azure) and the Visual Studio Marketplace by hand on the v0.3.0 release day: *"Yes."* Asked to set Open VSX up in the browser, then: *"That's okay. Let's put it as a work item and we'll work on it."* — [W-117](W-117-open-vsx-setup.md). The Marketplace token and CI automation for it wait for a later ruling (global PATs end 2026-12-01).
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"A. A."* — option (a): `publish.yml` uploads the built `.vsix` files with `curl` to each registry's API. `@vscode/vsce` and `ovsx` are not ratified, and L2 is not amended.
 
@@ -73,6 +75,13 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 ```
 
 `half-published` (in `publish.yml`) would name the extension too; neither registry can unpublish one version by API, so a failed listing is withdrawn by hand (Marketplace *Manage* → Unpublish; Open VSX: an issue at EclipseFdn/open-vsx.org).
+
+## Progress — 2026-10-28 (Arpit, with Cowork)
+
+- **Marketplace publisher `codelaw` created** (marketplace.visualstudio.com/manage/publishers/codelaw), so `codelaw.codelaw` is his.
+- **The Marketplace token is stuck:** creating an Azure DevOps organization through the Azure portal fails for his personal account (*"Selected user account does not exist in tenant 'Microsoft Services'"*); the direct route asks for an Azure subscription, and his SBI card was declined.
+- **The token type is retiring:** Azure DevOps global PATs (*All accessible organizations*, which the Marketplace needs) stop on **2026-12-01** ([Microsoft](https://devblogs.microsoft.com/devops/retirement-of-global-personal-access-tokens-in-azure-devops)); VS Code's docs now point to Entra ID with workload identity federation, which needs an Azure subscription too ([VS Code docs](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)).
+- **He asked to publish by hand for now** (voice, 2026-10-28: *"I want to publish the extension manually for now."*): the publisher page's *New extension → Visual Studio Code* takes a `.vsix`. Open, put to him: a `.vsix` from `main` ships code newer than npm's 0.2.0 (L6), so the first hand upload is best made from the next release's `vscode` artifact; whether the page takes platform-specific `.vsix` files is unverified.
 
 ## Left
 

@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — Docket (voice): seven blockers ruled; W-116, W-117, W-118, B-062 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"List all the blockers in OpenWork in detail with explanation and examples and recommendation."* — then a voice walk-through of all but PyPI days 2–4, and *"file it."*
+- **Done:** OPEN-WORK: six inbox rows ruled and removed (PyPI day 1, W-114, W-95's tokens, W-105, W-102, W-103), one added (W-117, Open VSX); W-114, W-105, W-103 → 🟢; W-86 → 🟡 on W-116; W-95 → 🔴 on W-117; W-102 → 🟡 on W-118. Filed W-116 (release 0.3.0 through CI), W-117 (Open VSX), W-118 (research: redesign the experiment), B-062 (the shared benchmark). Records: SR-TYPES decision 4 (agents may add questions), SR-SPELL decision 9 (its own operation). Rulings in his words in each item. Not committed: this Cowork shell cannot run lockmaster.
+- **Decided / left open:** ruled — 0.3.0 through CI, PyPI only for projects that exist (*"We can skip the one pending for pipe here"*); drop all five worktrees; Open VSX now and the Marketplace by hand on release day; agents add the four type questions, profiling before budgets; redesign before the 180, as a research item; spell measured as its own operation, the shared benchmark backlogged. Agent's reading, flagged in W-86: the v0.2.0 Release is superseded by v0.3.0's. A live Claude Code session (`c6c222e8`, since 00:31) was on W-86's v0.2.0 Release, held by the permission classifier.
+- **Mistakes:** a Python quoting error stopped the first write; nothing had been written.
+- **Next:** an agent takes W-116 (the `publish.yml` skip, the bump); W-114's cleanup on the Mac.
+
+## 2026-10-29 — The queue reconciled: W-111 merged into W-114, W-115 filed, W-95 brought current  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"review the open work document, get all of them updated to the latest, and whatever is the latest status, whatever is done, close them out."*
+- **Done:** every row checked against IMPLEMENTATION, `git log`, PyPI's and npm's registries and GitHub's releases. Nothing open was done: v0.2.0 has no GitHub Release yet (`codelaw` absent from PyPI), PyPI days 2–4's names are absent, W-105/W-103/W-102 wait on their inbox rows. W-111 closed and archived — merged into W-114 (the session-end hook filed the same question for five worktrees); W-114 checked read-only (each worktree's work is on `main` or is `.fux/index` churn) and its inbox row recommends "drop all five". W-95 brought current (publisher `codelaw` created 10-28; the token blocked by Azure; global PATs end 2026-12-01). W-115 filed: the spell pack exists on neither registry and no item held its first publish. NOW: two dead sessions' rows removed (019585aa, c1b83c1f; no commit since 11:38 on 10-28). The uncommitted W-114 row and file the hook left are kept. Not committed: this Cowork shell cannot run lockmaster.
+- **Decided / left open:** agent's calls, flagged — W-111 merged rather than kept beside W-114; W-115 as 🟢 agent prep for the next release. Left in the working tree untouched, from dead sessions: `.claude/hooks/auto-land.py`, `.claude/lockmaster.lock` (lockmaster's kit — `lockmaster doctor` reports them), `packaging/vscode/icon.png`.
+- **Mistakes:** on 2026-10-28 this session told Arpit that pending publishers could create many PyPI projects at once; RELEASING.md step 4 and warehouse #11296 say one pending publisher per repository · workflow · environment, so that plan does not work — said so in the reply.
+- **Next:** Arpit rules W-114 and runs the v0.2.0 Release; PyPI day 2's upload is today.
+
 ## 2026-10-27/28 — the coordinating session: CI green, packages published, every green item run in parallel  ·  Claude Code (Opus 5.5), session 2df06f6d
 
 - **Asked:** *list unpublished packages; first-publish the npm ones; fix CI until it is green; then "implement all the items in green in parallel and close them out", keep going as items turn green; land Cowork's uncommitted edits; "whatever is done merge it to main".*

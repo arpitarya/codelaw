@@ -28,6 +28,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-111-two-unmerged-worktrees.md`](open/W-111-two-unmerged-worktrees.md) | 2026-10-29 | merged into [W-114](../work/open/W-114-session-cleanup.md) — the keep-or-drop ruling for all five worktrees of session 2df06f6d |
 | [`W-110-session-2df06f6d-cleanup.md`](open/W-110-session-2df06f6d-cleanup.md) | 2026-10-28 | [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md); `.claude/hooks/worktree-cleanup.py` |
 | [`W-109-bitbucket-pipelines.md`](open/W-109-bitbucket-pipelines.md) | 2026-10-28 | `--format bitbucket` in [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decisions 4 and 12b; no pipe, no generated step in [SR-PACKAGES](../records/0107_packages.md) decision 15a; the step in USAGE §Bitbucket Pipelines; the live proof BACKLOG B-061 |
 | [`W-62-scss-support.md`](open/W-62-scss-support.md) | 2026-10-28 | L3 and L7 (SCSS as a CSS dialect); [SR-ARCHITECTURE](../records/0108_architecture.md) decisions 3 and 15b (both grammar forks; the CSS rules on the trees); `crates/codelaw-native/src/css_tree.rs`; [`packs/scss/`](../packs/scss/README.md); BACKLOG B-056–B-060 |

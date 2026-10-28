@@ -12,9 +12,11 @@ Rule: [SR-WORK-NOW](../records/0061_WORK-now.md).
 
 | session | surface | started | working on |
 |---|---|---|---|
-| c0826a95-400b-4e9a-9262-b192132cebd0 | Claude Code | 2026-10-27 00:31 | W-79/W-80 cleanup, then the green lanes in parallel (W-71, W-77, W-73, W-44/W-58/W-70 CI, W-51, W-45) |
+| c6c222e8-f10e-4580-9fb4-3581af8b9ba5 | Claude Code | 2026-10-29 00:31 | W-86: v0.2.0 Release step blocked by the permission classifier; waiting on the decider |
+| 59502574-dbd1-4a18-b78a-21ef77e5e64c | Claude Code | 2026-10-29 00:55 |  |
 
 ## Resources this session created
 
 | kind | where | host | session | created |
 |---|---|---|---|---|
+| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/save-20261029-005854` | Arpits-MacBook | 59502574-dbd1-4a18-b78a-21ef77e5e64c | 2026-10-29 |

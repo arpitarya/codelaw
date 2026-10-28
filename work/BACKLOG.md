@@ -49,6 +49,7 @@ it, and do not read it top-down as a priority order.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
+| B-062 | The shared `perf` workload does not load the spell pack: the pack is measured as its own `spell` operation (Arpit, 2026-10-29: *"We can, but add an item in the backlog so that we can have a shared benchmark."*) | [SR-SPELL](../records/0116_spell.md) decision 9 · W-103 | the spell pack in the shared workload, every set budget re-measured and re-ruled by L8's method |
 
 ---
 | B-053 | The scheduled auto-fix PR (`codelaw init --ci github --autofix daily` or `weekly`, GitLab twin) has never run for real: one PR, updated by a second run, and that PR's own CI green are unproven (W-51 DoD 1, 3) | [W-51](../archive/open/W-51-scheduled-autofix-pr.md) (parked by Arpit, 2026-10-27: *"Put this in the backlog for now."*) · [SR-CLI-MCP](../records/0115_cli-and-mcp.md) | one run in a throwaway GitHub repo with fixable findings and a `CODELAW_AUTOFIX_TOKEN` secret |

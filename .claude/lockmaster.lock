@@ -1,6 +1,6 @@
 {
   "files": {
-    ".claude/hooks/auto-land.py": "6dde0564e27224bdd499f8dcaaa3326c9f22ac0a453e7f45203b530165f8131f",
+    ".claude/hooks/auto-land.py": "edea8b8d73d6cf930aa28e8caa13999b02b6c1d2c3dcf5bb50032db2245a20c0",
     ".claude/hooks/block-main.py": "57d209ceeed9292dca00442ea3c6e004348fbd47487def79cb4238c01567fdfb",
     ".claude/hooks/claim-guard.py": "08638d6960bffcfb1f9a3a9c6b36812761cc3339fd22648a95c5e53a755dc5e3",
     ".claude/hooks/disk-budget.py": "56ac3beaf5cbff2e17acae976d45d8eee5be3fedeb7a62507167ccd408d324cc",
@@ -15,7 +15,7 @@
     ".claude/skills/docket/SKILL.md": "bb5a3a52501a78e43bf6da5ca830bd7a875496fc19274a394b66dc3521b4a7e8",
     ".claude/skills/landing/SKILL.md": "23ed61a9054ccfbad24a762b3a261158d074a97218b04196507d632bfbbe8783"
   },
-  "kit": "8a5d2ddd4dbab9ec8e8d645fb3a5f60d8a059dd40ffb776f172ffeb51f0f6b29",
+  "kit": "a3abe1b1f28508114d92fcd81b6fcdd7287dc4004061354c24b444f7c8357af8",
   "settings": [
     "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-open-work-inbox.sh",
     "$CLAUDE_PROJECT_DIR/.claude/hooks/inject-inbox.sh",

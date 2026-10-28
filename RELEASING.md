@@ -116,6 +116,10 @@ trusted; `--fux-index` adds the Fux index packages); `publish.yml` then skips th
 
 After this, no release needs a token, a code or your machine.
 
+**A PyPI project that does not exist yet is skipped, not failed (W-116).** The `pypi` job uploads a wheel only if its project is on PyPI or is `codelaw` (the pending publisher, step 4); every skipped project is named in the job summary. Upload those by hand (W-87–W-89, W-115) — the release after that, CI carries them.
+
+**Cut the Release only on a commit whose `ci.yml` run has finished green on `main`.** `publish.yml`'s gate verifies every file's attestation against the release commit's sha; a Release created on a later commit fails there (v0.2.0's first run, 2026-10-28).
+
 ## The optional Fux index packages (W-34) — built, not yet published
 
 L6 decision 12: each pack that holds rules has a companion `@codelaw/rules-<name>-fux-index` (npm, fifteen today) and `codelaw-rules-<name>-fux-index` (PyPI, ten), which `codelaw init` never installs. `ci.yml`'s `package` job builds them with a pinned fux (`FUX_VERSION` in `scripts/fux-index.py`; `python3 scripts/fux-index.py assemble --out dist`, then `check dist`; `names` prints the twenty-five) into **`dist/fux-index/`** and uploads that folder as the artifact `fux-index`. **They are not in `dist/npm` or `dist/pypi`, so `publish.yml` neither uploads nor trust-checks them.**

@@ -1,5 +1,5 @@
 name = "@codelaw/rules-html"
-version = "0.2.0"
+version = "0.3.0"
 min_codelaw = "0.1.0"
 languages = ["html"]
 presets = ["html/recommended", "html/a11y", "html/document", "html/conventions", "html/security", "html/size"]

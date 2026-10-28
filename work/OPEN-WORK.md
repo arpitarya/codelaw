@@ -22,34 +22,26 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
-| 🔴 **PyPI day 1 — the Release** — the four 0.2.0 uploads landed 2026-10-28 (`codelaw-rules-{html,js,python,react}`). Their trusted publishers added 2026-10-28 (Claude in Chrome). Left: the Release, which brings `codelaw` itself: `awk '/^## 0\.2\.0/{f=1;next} /^## /{f=0} f' CHANGELOG.md > /tmp/v0.2.0-notes.md && gh release create v0.2.0 -R arpitarya/codelaw --verify-tag --title "v0.2.0 — the rule packs, one per ecosystem" --notes-file /tmp/v0.2.0-notes.md` — [W-86](open/W-86-pypi-day-1.md) | 2026-10-27 |
-| ↳ **blocks:** W-86 itself; W-38 waits on it (and W-64 through W-38) | |
 | 🔴 **PyPI day 2 — Thu 2026-10-29** (four Fux index projects, 0.2.0, already in `dist/fux-index/pypi/`): `twine upload --skip-existing dist/fux-index/pypi/codelaw_rules_{react,scss,python,security_js}_fux_index-0.2.0-py3-none-any.whl` — then a trusted publisher on each — [W-87](open/W-87-pypi-day-2.md) | 2026-10-27 |
 | ↳ **blocks:** W-87 itself; W-34 waits on it | |
 | 🔴 **PyPI day 3 — Fri 2026-10-30** (four projects at 0.2.0 — the version npm got: two Fux index wheels in `dist/fux-index/pypi/`, and `codelaw-skills`, `codelaw-rules-scss` from the build you published npm from, copied into `dist/pypi/` first): `twine upload --skip-existing dist/fux-index/pypi/codelaw_rules_security_{html,python}_fux_index-0.2.0-py3-none-any.whl dist/pypi/codelaw_skills-0.2.0-py3-none-any.whl dist/pypi/codelaw_rules_scss-0.2.0-py3-none-any.whl` — then a trusted publisher on each — [W-88](open/W-88-pypi-day-3.md) | 2026-10-27 |
 | ↳ **blocks:** W-88 itself; W-34 and W-77 wait on it | |
 | 🔴 **PyPI day 4 — Sat 2026-10-31** (the three security rule packs at 0.2.0, from the same build, copied into `dist/pypi/` first): `twine upload --skip-existing dist/pypi/codelaw_rules_security_{js,html,python}-0.2.0-py3-none-any.whl` — then a trusted publisher on each — [W-89](open/W-89-pypi-day-4.md) | 2026-10-27 |
 | ↳ **blocks:** W-89 itself | |
-| 🔴 **VS Code extension — publisher, namespace and tokens** ([W-95](open/W-95-publish-vscode-extension.md) step 2; the upload is `curl` from `publish.yml`, no tool — ruled 2026-10-27). **1. Environment** `vscode`, tag rule `v*` like `npm`/`pypi`: `gh api -X PUT repos/arpitarya/codelaw/environments/vscode -F 'deployment_branch_policy[protected_branches]=false' -F 'deployment_branch_policy[custom_branch_policies]=true' && gh api -X POST repos/arpitarya/codelaw/environments/vscode/deployment-branch-policies -f name='v*' -f type=tag`. **2. Marketplace publisher:** <https://marketplace.visualstudio.com/manage> → sign in (Microsoft account) → *Create publisher* → ID **`codelaw`** (it must equal `publisher` in `packaging/vscode/package.json`; if taken, tell the agent the ID you got), name `codelaw`. **3. Marketplace token:** <https://dev.azure.com> (create an organization if asked; any name) → *User settings* (top right) → *Personal access tokens* → *New Token* → name `codelaw-vscode-publish`, Organization **All accessible organizations** (the Marketplace refuses a one-organization PAT; if that option is gone, stop and say so — the alternative is an Entra ID credential, another ruling), expiry 1 year, Scopes *Custom defined* → *Show all scopes* → **Marketplace: Manage** → *Create*, copy it → `gh secret set VSCE_PAT --env vscode -R arpitarya/codelaw` (paste at the prompt). **4. Open VSX:** <https://open-vsx.org> → *Log in* (GitHub) → avatar → *Settings* → *Log in with Eclipse* (an <https://accounts.eclipse.org> account with your GitHub username in its profile) → sign the *Publisher Agreement* → *Access Tokens* → *Generate New Token* `codelaw-publish`, copy it → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw`; then the namespace: `read -rs T && curl -fsS -X POST -H 'Content-Type: application/json' -d '{"name":"codelaw"}' "https://open-vsx.org/api/-/namespace/create?token=$T"` (optional, the verified badge: *Claim namespace ownership* at <https://github.com/EclipseFdn/open-vsx.org/issues/new/choose>). | 2026-10-27 |
-| ↳ **blocks:** W-95 itself (step 3, the `publish.yml` job, and step 4) | |
-| 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): on the next release (v0.3.0), github.com/marketplace/actions → *Publish* on the release's edit page → accept the Marketplace Developer Agreement → tick *Publish this Action to the GitHub Marketplace*. Ruled 2026-10-27: SARIF stays on `gh`; a moving `v0` tag is kept; Claude runs the throwaway-repo proof after that tag. | 2026-10-27 |
+| 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): on the v0.3.0 release ([W-116](open/W-116-release-0-3-0.md)), github.com/marketplace/actions → *Publish* on the release's edit page → accept the Marketplace Developer Agreement → tick *Publish this Action to the GitHub Marketplace*. Ruled 2026-10-27: SARIF stays on `gh`; a moving `v0` tag is kept; Claude runs the throwaway-repo proof after that tag. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
-| 🔴 **Two leftover worktrees — keep or drop** ([W-111](open/W-111-two-unmerged-worktrees.md); [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) decision 3). `lm/W-90` and `lm/W-96` hold commits `main` lacks, though both items closed and their work is in `main` (`archive/DEPENDENCIES.md`, `agent_env.rs`). Say **"drop both"** (recommended), or name one to keep. | 2026-10-28 |
-| ↳ **blocks:** W-111 itself | |
-| 🔴 **Type questions — may an agent extend SR-TYPES decision 4's vocabulary?** ([W-105](open/W-105-type-aware-engine.md) *Left* 1–4). The vocabulary is fixed and *"a new question is an amendment of this record"*; four rules need one each: **(a)** `ts/switch-exhaustiveness-check` — which union members a `switch` leaves out; **(b)** `ts/no-unsafe-argument` and `ts/no-unsafe-assignment` — an `any` value passed or assigned where the target's type is not `any`; **(c)** `no-misused-promises`' `checksVoidReturn` — a Promise-returning function where a `void`-returning callback is expected; **(d)** `ts/await-thenable` — an `unknown` question, so `await` on `unknown` is not reported (typescript-eslint allows it). Say **"agents may add them"** (recommended: each lands as an amendment of decision 4 naming this ruling, with a fixture that fires once and the rule `preview`), or rule (a)–(d) one by one. | 2026-10-28 |
-| ↳ **blocks:** W-105 itself (*Left* 2–4); W-106 waits on W-105 | |
-| 🔴 **The guidance-vs-check experiment — the full 180** ([W-102](open/W-102-guidance-vs-check-experiment.md)). The pilot ran 2026-10-28: 60 sessions, **$10.47** (the estimate was ~$29), 26 min; A, B and C each broke a targeted rule in 2 of 20 runs, on the same two tasks (t02 `console.log`, t04 unused parameters), where the request itself asks for the violating code; the other 18 tempted no arm. Re-estimated: the full 180 **~$31**, ~80 min; resumed on the pilot's folder, the 120 runs left **~$21**, ~55 min. Say **"run it"** — the agent runs `python3 experiments/guidance-vs-check/harness.py run --agent claude --out experiments/guidance-vs-check/runs/2026-10-w102 --codelaw experiments/guidance-vs-check/runs/2026-10-w102/bin/codelaw` from the main checkout (that folder's `bin/claude` is Claude Code 2.1.310; the installed 2.1.207 cannot run `claude-opus-5-5`). Or say **"redesign first"** (recommended): at a 10 % floor in every arm the 180 will likely not separate A from C — harder tasks, and an arm A without `codelaw` on `PATH`, would. | 2026-10-28 |
-| ↳ **blocks:** W-102 itself (the 180, the write-up, step 4's README line) | |
-| 🔴 **The spell pack's L8 measurement — how is the spell pack measured: inside the shared perf workload, or as its own operation?** ([W-103](open/W-103-spell-pack.md) step 6). The `perf` workload (`crates/codelaw-cli/src/bench/workload.rs`, `CONFIG`) does not load the spell pack. **Inside** the shared workload: every set operation's p95 moves against budgets already ruled, and each is re-measured. **Its own operation** (recommended): a `spell` operation on the same pinned repos with `spell/recommended` on, the existing budgets untouched. Say **"inside"** or **"its own operation"**; the agent then wires it, and the budget comes to you from three CI `perf` runs on `main` (L8). Measured so far (a loaded machine, not a budget): `spell/recommended` 6–10 s of rule time summed, 3.3–6.0 s wall on 2,500 files (SR-SPELL decision 9). | 2026-10-28 |
-| ↳ **blocks:** W-103 itself (step 6, DoD 6 and 7) | |
+| 🔴 **Open VSX — environment, account, token, namespace** ([W-117](open/W-117-open-vsx-setup.md); ruled 2026-10-29: Open VSX now, the Visual Studio Marketplace by hand on release day). **1. Environment** `vscode`, tag rule `v*` like `npm`/`pypi`: `gh api -X PUT repos/arpitarya/codelaw/environments/vscode -F 'deployment_branch_policy[protected_branches]=false' -F 'deployment_branch_policy[custom_branch_policies]=true' && gh api -X POST repos/arpitarya/codelaw/environments/vscode/deployment-branch-policies -f name='v*' -f type=tag`. **4. Open VSX:** <https://open-vsx.org> → *Log in* (GitHub) → avatar → *Settings* → *Log in with Eclipse* (an <https://accounts.eclipse.org> account with your GitHub username in its profile) → sign the *Publisher Agreement* → *Access Tokens* → *Generate New Token* `codelaw-publish`, copy it → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw`; then the namespace: `read -rs T && curl -fsS -X POST -H 'Content-Type: application/json' -d '{"name":"codelaw"}' "https://open-vsx.org/api/-/namespace/create?token=$T"` (optional, the verified badge: *Claim namespace ownership* at <https://github.com/EclipseFdn/open-vsx.org/issues/new/choose>). Or do it with Claude in Chrome in a text session. | 2026-10-29 |
+| ↳ **blocks:** W-117 itself; W-95 waits on it | |
 
 ---
 
-## Open items (15)
+## Open items (19)
 
-### build (13)
+### build (17)
 
-🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
+🟢 **W-114** `agent` Five worktrees of session 2df06f6d: ruled 10-29 "drop all five" — a Claude Code session on the Mac runs the item's commands (`--force`, `-D`). Filed by now-ledger.py (Claude Code). [detail](open/W-114-session-cleanup.md)
+
+🟡 **W-86** waits on **W-116** `arpit` PyPI day 1: the four uploads and trusted publishers landed 10-28; the Release is now v0.3.0's (ruled 10-29), which creates `codelaw` on PyPI. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
 🔴 **W-87** `arpit` PyPI day 2 (Thu 10-29): the `react`, `scss`, `python` and `security-js` Fux index projects (0.2.0), then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-87-pypi-day-2.md)
 
@@ -57,13 +49,13 @@ here. Read that record before changing anything below it.
 
 🔴 **W-89** `arpit` PyPI day 4 (Sat 10-31): `codelaw-rules-security-{js,html,python}` 0.2.0, then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-89-pypi-day-4.md)
 
-🔴 **W-95** `arpit` VS Code extension: eight `.vsix` built and checked in CI; upload ruled 10-27: `curl` from `publish.yml`, no tool. Left: Arpit's publisher, namespace and tokens (inbox), then the `publish.yml` job. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
+🔴 **W-95** waits on **W-117** `arpit` VS Code extension: publisher `codelaw` created; ruled 10-29 — Open VSX now (W-117), the Marketplace by hand on release day; its token and CI later. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
-🔴 **W-105** `arpit` Type-aware rules, five `ts/type-checked` rules, `--version --json`, the `check_types_*` bench and the watch memory test landed 10-28. Left: may agents add type questions (inbox), budgets after three `perf` runs, corpus counts, the RC (11-10). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
+🟢 **W-105** `agent` Type-aware rules: five landed; ruled 10-29 — agents add the four type questions (SR-TYPES decision 4), the rules as previews; profile the slowest before budgets; corpus counts; the RC (11-10). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
-🔴 **W-103** `arpit` Spell pack: data, `[spell]`, all seven rules (`spell/inconsistent-term` on the graph stage, 10-28), fixtures, corpus reviewed; left: how L8 measures the pack (inbox), then its budget; the `typos` comparison needs L11. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
+🟢 **W-103** `agent` Spell pack: seven rules, fixtures, corpus done; ruled 10-29 — measure it as its own `spell` operation (B-062: the shared benchmark later), then its L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🟡 **W-38** waits on **W-86** `agent` PyPI 0.2.0: `css`, `data` live and trusted; day 1 uploads the other four and publishes the Release; then an agent checks `pip install codelaw` and `uvx codelaw` and writes it down. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
@@ -73,17 +65,22 @@ here. Read that record before changing anything below it.
 
 🟡 **W-64** waits on **W-38** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
+🟢 **W-116** `agent` Release 0.3.0 through CI (ruled 10-29): `publish.yml` skips PyPI projects that do not exist yet; bump, green CI, then Arpit's `gh release create v0.3.0`; npm everything, PyPI `codelaw` and six packs. Filed by Arpit (Cowork). [detail](open/W-116-release-0-3-0.md)
+
+🔴 **W-117** `arpit` Open VSX: the `vscode` environment, an Eclipse-linked login, the token and the `codelaw` namespace (inbox); then the `publish.yml` upload. Filed by Arpit (Cowork). [detail](open/W-117-open-vsx-setup.md)
+
+🟢 **W-115** `agent` The spell pack's first publish: `@codelaw/rules-spell` and `codelaw-rules-spell` exist on neither registry; at the next release, take them from `dist` and put the by-hand commands in the inbox. Filed by Arpit (Cowork). [detail](open/W-115-spell-pack-first-publish.md)
 
 🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
 
 ### testing (1)
 
-🔴 **W-102** `arpit` Pilot run 10-28: 60 sessions, $10.47; A = B = C, 2/20 broke a targeted rule; harness fixed. Left: the 180 or a redesign (inbox), the write-up, the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
+🟡 **W-102** waits on **W-118** `agent` Pilot run 10-28: 60 sessions, $10.47; A = B = C at 2/20. Ruled 10-29: redesign first (W-118's research), then the run, the write-up and the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
-### record update (1)
+### record update (0)
 
-🔴 **W-111** `arpit` Two unmerged worktrees of session 2df06f6d — `lm/W-90`, `lm/W-96` — keep or drop (inbox); both items closed, their work in `main`. Filed by Arpit (Cowork). [detail](open/W-111-two-unmerged-worktrees.md)
+### research (1)
 
-### research (0)
+🟢 **W-118** `cowork` Research: why W-102's pilot could not separate the arms, a redesign (unrequested temptations, a no-codelaw baseline), its downsides and open questions — a proposal for the decider. Filed by Arpit (Cowork). [detail](open/W-118-guidance-experiment-redesign.md)
 
 ---

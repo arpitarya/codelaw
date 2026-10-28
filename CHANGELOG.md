@@ -4,6 +4,8 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+## 0.3.0 — 2026-10-29
+
 ### Added
 
 - **`codelaw --version --json` (W-105):** prints codelaw's version and what decides a type-aware verdict where you run it — the type helper's protocol, the TypeScript range codelaw is tested on, and the TypeScript and Node a `check` there would use (`null` when none is found). `codelaw bench --typescript <dir>` also times the type-aware rules cold and warm (`check_types_cold`, `check_types_warm`), reported and not yet budgeted.
@@ -75,6 +77,8 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 ### Changed
 
 - **Housekeeping (W-110):** the build session's leftover worktrees and `.fux`-only folders were removed on the Mac; nothing in the engine or the packages changed.
+- **Housekeeping (W-111):** two unmerged worktrees were checked and folded into W-114; no code changed.
+- **Release pipeline (W-116):** the PyPI job uploads only wheels whose project already exists on PyPI (or `codelaw`, created by its pending publisher) and names the rest in the job summary, instead of failing the release.
 - **The first stable rules (W-100):** 42 `css` rules are `stable` — they now run without `preview = true` once `codelaw:css/recommended` (or a preset naming them) is extended. Each passed the ratified promotion criterion (SR-RULE-AUTHORING decision 6a: at least 3 pinned corpus repositories and 10 files, no false positive, its fix held level 4, one release in preview) on [CI run 40622778075](https://github.com/arpitarya/codelaw/actions/runs/40622778075), recorded per rule in `scripts/corpus.json`. Their pages under [`docs/rules/css/`](docs/rules/css/) say `stable`. The other 30 `css` rules, and every other pack, stay `preview`. A user-visible change of stability: the next release is a minor one (SR-RULE-PACKS decision 9).
 - **The dependency list lives in L11 (W-90):** the root dependency file is archived (`archive/DEPENDENCIES.md`); every unit, its status and the ledger the check reads are now §3 of `records/0013_LAW-11-dependencies.md`, the law renamed "dependencies".
 - **Type-aware TypeScript rules decided, not yet built (W-101):** they will run on your project's own TypeScript (7.1 or newer) through a small Node helper, in the `ts` pack — `no-floating-promises`, `no-misused-promises`, `await-thenable`, the `no-unsafe-*` family and `switch-exhaustiveness-check` first — as `preview` from TypeScript 7.1's release candidate. Until then, oxlint's type-aware mode works through codelaw's oxlint adapter. The research is `work/proposals/type-aware-rules.md`.
