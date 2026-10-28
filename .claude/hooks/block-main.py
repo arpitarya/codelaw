@@ -165,6 +165,7 @@ def main():
             "(SR-ARCHITECTURE decision 12). "
             "Work on a change instead: `lockmaster start <W-nn> --paths <path>…`, edit in its "
             "worktree, then `lockmaster submit -m \"…\"` — it lands on main for you. "
+            "Edits already made in main's checkout land with `lockmaster save -m \"…\" <path>…`. "
             "The decider can still commit to main by hand from a terminal.").format(why)}}))
     return 0
 
