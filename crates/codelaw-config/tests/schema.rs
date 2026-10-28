@@ -138,6 +138,9 @@ fn every_key_is_defined_in_exactly_one_record() {
     }
 }
 
+/// Extensions of the files records name in backticks.
+const FILE_EXTENSIONS: &[&str] = &["rs", "py", "md", "toml", "json", "js", "ts", "yml", "yaml", "sh", "txt"];
+
 #[test]
 fn every_record_defined_key_is_in_the_schema() {
     let s = schema();
@@ -147,6 +150,10 @@ fn every_record_defined_key_is_in_the_schema() {
         for c in re.captures_iter(&text) {
             let section = c.get(1).or(c.get(2)).unwrap().as_str();
             let key = &c[3];
+            // A file name (`spell.rs`), not a key.
+            if c.get(2).is_some() && text[c.get(0).unwrap().end()..].starts_with('`') && FILE_EXTENSIONS.contains(&key) {
+                continue;
+            }
             if let Some(v) = validated_sections.get(&section.to_owned()) {
                 assert!(props(v).contains_key(key), "{name} defines `[{section}] {key}`, which codelaw.schema.json does not have");
             }
