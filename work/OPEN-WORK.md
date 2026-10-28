@@ -34,6 +34,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-95 itself (step 3, the `publish.yml` job, and step 4) | |
 | 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): on the next release (v0.3.0), github.com/marketplace/actions → *Publish* on the release's edit page → accept the Marketplace Developer Agreement → tick *Publish this Action to the GitHub Marketplace*. Ruled 2026-10-27: SARIF stays on `gh`; a moving `v0` tag is kept; Claude runs the throwaway-repo proof after that tag. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
+| 🔴 **Bitbucket Pipelines — the pipe fork, then the live proof** ([W-109](open/W-109-bitbucket-pipelines.md)). **1. Pipe or step:** the step is built (`codelaw init --ci bitbucket`, no dependency, no account). Say **"step only"** (recommended), or **"pipe too"** — then a pipe needs (a) an L11 row ratifying its base image (`node:22-slim`, the Docker official image) and (b) a Docker Hub namespace: <https://hub.docker.com> → sign up → *Create organization* `codelaw` (or name yours) → *Account settings → Personal access tokens → Generate* (Read & Write) → `gh secret set DOCKERHUB_TOKEN -R arpitarya/codelaw` and `gh variable set DOCKERHUB_NAMESPACE -R arpitarya/codelaw -b codelaw`. **2. The live proof, after the v0.3.0 release** (0.2.0 has no `--format bitbucket`): bitbucket.org → *Create repository* `codelaw-pipeline-proof` (private) → *Repository settings → Pipelines → Settings → Enable Pipelines*; then `mkdir /tmp/bb-proof && cd /tmp/bb-proof && git init -b main && printf 'export function run() {\n  debugger;\n}\n' > app.js && npx -y codelaw@0.3.0 init --ci bitbucket && git add -A && git commit -m proof && git remote add origin git@bitbucket.org:<workspace>/codelaw-pipeline-proof.git && git push -u origin main && git switch -c pr && git commit --allow-empty -m pr && git push -u origin pr`, open a pull request from `pr`. Expected: the build fails, the PR's *Reports* shows `codelaw` with one annotation on `app.js` line 2; set the repository variable `CODELAW_SARIF=true` and re-run → `codelaw.sarif` under *Artifacts*; set `CODELAW_CODE_INSIGHTS=false` and re-run → still fails, no new report. Paste the pipeline URL to the agent. | 2026-10-28 |
+| ↳ **blocks:** W-109 itself | |
 | 🔴 **Two leftover worktrees — keep or drop** ([W-111](open/W-111-two-unmerged-worktrees.md); [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) decision 3). `lm/W-90` and `lm/W-96` hold commits `main` lacks, though both items closed and their work is in `main` (`archive/DEPENDENCIES.md`, `agent_env.rs`). Say **"drop both"** (recommended), or name one to keep. | 2026-10-28 |
 | ↳ **blocks:** W-111 itself | |
 
@@ -55,6 +57,8 @@ here. Read that record before changing anything below it.
 
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
+🔴 **W-109** `arpit` Bitbucket Pipelines built: `init --ci bitbucket`, `--format bitbucket` to Code Insights via `curl`, SARIF and the upload each a switch; proven locally. Left: the pipe fork and the live proof after v0.3.0 (inbox). Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
+
 🟢 **W-99** `agent` Side-by-side bench built; D-37…D-41 ratified 10-27. Left: the first `bench-rivals.yml` run on the runner, then L8 context rows and a README claim from them. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
 🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
@@ -62,8 +66,6 @@ here. Read that record before changing anything below it.
 🟢 **W-103** `agent` Spell pack: three generated tables (188,151 typos, a 92,758-word dictionary, VarCon locale pairs), `[spell]`, six rules landed; fixtures and `fix` run pass; left: `spell/inconsistent-term` (project scope), corpus run, L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🟢 **W-112** `agent` Spell words file `.codelaw/spell/words.txt` (`[spell] words_file`, merged with `[spell] words`); `codelaw init` adds the pack and file (`--no-spell` skips); `codelaw spell learn`. Filed by Arpit (Cowork). [detail](open/W-112-spell-words-file-and-learn.md)
-
-🟢 **W-109** `agent` Bitbucket Pipelines: a codelaw pipe and `codelaw init --ci bitbucket`, findings to Code Insights, the SARIF output configurable. Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
 
 🟢 **W-110** `agent` Clean session 2df06f6d's leftovers on the Mac: five merged worktrees and three `.fux`-only folders, by `worktree-cleanup.py --apply`. Filed by Arpit (Cowork). [detail](open/W-110-session-2df06f6d-cleanup.md)
 

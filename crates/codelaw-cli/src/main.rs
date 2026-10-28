@@ -167,7 +167,7 @@ struct CheckArgs {
     paths: Vec<PathBuf>,
     #[command(flatten)]
     common: Common,
-    /// text, json, sarif, agent, github, gitlab, junit or checkstyle; by
+    /// text, json, sarif, agent, github, gitlab, junit, checkstyle or bitbucket; by
     /// default `CODELAW_FORMAT`, else `agent` inside a coding agent, else `text`.
     #[arg(long)]
     format: Option<String>,
@@ -197,7 +197,7 @@ struct FixArgs {
     /// Show each pass of the fix loop: what was offered, applied or refused, and why.
     #[arg(long)]
     trace: bool,
-    /// text, json, sarif, agent, github, gitlab, junit or checkstyle; by
+    /// text, json, sarif, agent, github, gitlab, junit, checkstyle or bitbucket; by
     /// default `CODELAW_FORMAT`, else `agent` inside a coding agent, else `text`.
     #[arg(long)]
     format: Option<String>,
@@ -357,7 +357,7 @@ pub fn load(paths: &[PathBuf], options: EngineOptions) -> Result<Project, Engine
 }
 
 pub fn format(s: &str) -> Result<Format, String> {
-    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif, agent, github, gitlab, junit or checkstyle)"))
+    Format::parse(s).ok_or_else(|| format!("unknown --format `{s}` (text, json, sarif, agent, github, gitlab, junit, checkstyle or bitbucket)"))
 }
 
 /// `check`'s and `fix`'s format: `--format`, else what the environment
@@ -398,7 +398,7 @@ fn check(args: CheckArgs, ctx: &Ctx) -> Output {
     out
 }
 
-/// What a CI platform reads (SR-CLI-MCP decision 4). Only the four CI
+/// What a CI platform reads (SR-CLI-MCP decision 4). Only the five CI
 /// formats come here.
 pub fn ci_output(fmt: Format, report: &codelaw_engine::CheckReport) -> String {
     match fmt {
@@ -406,6 +406,7 @@ pub fn ci_output(fmt: Format, report: &codelaw_engine::CheckReport) -> String {
         Format::Gitlab => json_line(&codelaw_report::check_gitlab(report)),
         Format::Junit => codelaw_report::check_junit(report),
         Format::Checkstyle => codelaw_report::check_checkstyle(report),
+        Format::Bitbucket => codelaw_report::check_bitbucket(report),
         other => unreachable!("{other:?} is not a CI format"),
     }
 }

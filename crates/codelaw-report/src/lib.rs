@@ -9,7 +9,7 @@ pub mod exceptions;
 mod sarif;
 
 pub use agent_env::{AGENT_VARS, FormatEnv, resolve_format};
-pub use ci::{check_checkstyle, check_github, check_gitlab, check_junit, fingerprints};
+pub use ci::{check_bitbucket, check_checkstyle, check_github, check_gitlab, check_junit, fingerprints};
 pub use debug::{config_json, config_text, match_json, match_text, timings_json, timings_text, trace_json, trace_text};
 pub use sarif::{SARIF_SCHEMA, check_sarif};
 
@@ -45,6 +45,7 @@ pub enum Format {
     Gitlab,
     Junit,
     Checkstyle,
+    Bitbucket,
 }
 
 impl Format {
@@ -58,6 +59,7 @@ impl Format {
             "gitlab" => Format::Gitlab,
             "junit" => Format::Junit,
             "checkstyle" => Format::Checkstyle,
+            "bitbucket" => Format::Bitbucket,
             _ => return None,
         })
     }
@@ -73,6 +75,7 @@ impl Format {
             Format::Gitlab => "gitlab",
             Format::Junit => "junit",
             Format::Checkstyle => "checkstyle",
+            Format::Bitbucket => "bitbucket",
         }
     }
 }
