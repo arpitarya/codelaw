@@ -28,3 +28,5 @@ work/.NOW.md.tmp
 
 # lockmaster kit — runtime state its hooks write (lockmaster W-09)
 .claude/.disk-approved
+
+.DS_store

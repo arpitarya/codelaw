@@ -2,6 +2,7 @@
 # Rewrite with --update-snapshot, and review the change.
 
 [findings]
+"spell/inconsistent-term" = 107
 "spell/known-typo" = 125
 "spell/known-typo-identifier" = 3
 "spell/known-typo-key" = 1

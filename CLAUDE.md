@@ -30,6 +30,13 @@ lockmaster submit -m "W-nn: …"           # commit the claimed paths and land t
 lockmaster queue · status · doctor
 ```
 
+**Nothing waits for `submit`:** the kit's `auto-land.py` lands a session's
+change at the end of every turn (the change stays open, its worktree follows
+`main`) and lands what Cowork handed over. **From Cowork, never commit:**
+`lockmaster save -m "W-nn: …" <path> …` lands the edits, or hands them to the
+next Claude Code session. The [`landing`](.claude/skills/landing/SKILL.md)
+skill has the rest.
+
 The hooks pinned in `.claude/lockmaster.lock` are lockmaster's kit: change them
 in `~/my_programs/lockmaster/kit/`, then `lockmaster install .` — an edit made
 here is reported by `lockmaster doctor` and overwritten by the next install.

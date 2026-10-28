@@ -29,7 +29,7 @@ pip install codelaw-rules-spell
 | preset | rules | ported from |
 |---|---|---|
 | `spell/recommended` | 3 | codelaw's own: known typos from a list generated from SCOWL, fixed unattended |
-| `spell/strict` | 5 | `spell/recommended` plus the dictionary check and the `[spell] words` check |
+| `spell/strict` | 6 | `spell/recommended` plus the dictionary check, one spelling per word across the project and the `[spell] words` check |
 
 <!-- /docs-sync:presets -->
 
@@ -44,6 +44,7 @@ pip install codelaw-rules-spell
 | `spell/known-typo-key` | manual | a known typo in a JSON, YAML or TOML key, a CSS or SCSS class, id or custom property, or an HTML `id` |
 | `spell/unknown-word` | suggest | a word of prose in no word list; the nearest dictionary word as the edit, up to three named (`spell/strict`) |
 | `spell/locale-variant` | auto | the other locale's spelling (`colour` under `en-US`), while `[spell] locale` is set (in no preset) |
+| `spell/inconsistent-term` | suggest | one word spelled two ways across the project (`canceled` / `cancelled`); the spelling the project uses most as the edit (`spell/strict`, a project rule) |
 | `spell/suspicious-word` | manual | a `[spell] words` entry that is a known typo or one edit from a common word (`spell/strict`) |
 
 <!-- /docs-sync:rules -->

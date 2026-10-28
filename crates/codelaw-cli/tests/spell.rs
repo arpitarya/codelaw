@@ -7,6 +7,10 @@
 //! `check` reports each typo once, where it is written or declared; `fix`
 //! corrects the prose and the file-local names, leaves every exported name,
 //! key, class and id as it is, and a second `fix` changes nothing.
+//!
+//! Under `spell/strict`, `spell/inconsistent-term` counts the fixture's
+//! `canceled`/`cancelled` and `colour`/`color` across files, cached and
+//! uncached, under `fix --unsafe` and under `check --watch`.
 
 use serde_json::Value;
 use std::fs;
@@ -230,4 +234,99 @@ fn learn_appends_new_words_only_and_keeps_every_line() {
     assert_eq!(code, 2, "{out}");
     assert!(out.contains("`[spell] words_file`") && out.contains("spelling.txt"), "{out}");
     let _ = fs::remove_dir_all(&dir);
+}
+
+/// The fixture under `spell/strict`, only `spell/inconsistent-term` run.
+fn strict(name: &str) -> PathBuf {
+    let dir = repo(name);
+    fs::write(dir.join("codelaw.toml"), "extends = [\"codelaw:spell/strict\"]\npreview = true\n").unwrap();
+    dir
+}
+
+/// `file:line` of each `spell/inconsistent-term` finding of a run's JSON.
+fn terms(out: &str) -> Vec<String> {
+    let v: Value = serde_json::from_str(out).unwrap_or_else(|e| panic!("{e}: {out}"));
+    let mut got: Vec<String> = v["diagnostics"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|d| d["rule"] == "spell/inconsistent-term")
+        .map(|d| format!("{}:{}", d["file"].as_str().unwrap(), d["range"]["start"]["line"]))
+        .collect();
+    got.sort();
+    got
+}
+
+const TERMS: &[&str] = &["--rule", "spell/inconsistent-term", "--format", "json"];
+
+/// W-103: `canceled` three times (Markdown, YAML) against `cancelled` once
+/// (a JavaScript comment), `colour` twice against `color` once: the spelling
+/// the project writes less is reported, in whichever file it is, and
+/// `fix --unsafe` writes the other.
+#[test]
+fn inconsistent_term_reports_the_spelling_the_project_writes_less() {
+    let dir = strict("terms");
+    let check = |cache: bool| {
+        let mut args = vec!["check"];
+        args.extend(TERMS);
+        if !cache {
+            args.push("--no-cache");
+        }
+        terms(&codelaw(&dir, &args).1)
+    };
+    assert_eq!(check(false), ["config/orders.yaml:1", "src/orders.js:1"]);
+    // Cached words give the same verdict, cold and warm.
+    let cache = dir.join(".codelaw/cache");
+    let _ = fs::remove_dir_all(&cache);
+    assert_eq!(check(true), check(false));
+    assert_eq!(check(true), check(false));
+    // An edit to one file moves the verdict in another: the cache is by content.
+    fs::write(dir.join("docs/orders.md"), "# Orders\n\nAn order is cancelled when the buyer leaves. A cancelled order is kept for a week, and its colour stays on the board.\n").unwrap();
+    assert_eq!(check(true), ["config/orders.yaml:1", "config/orders.yaml:1"]);
+    assert_eq!(check(true), check(false));
+    // `suggest`: only `--unsafe` applies it, and then nothing is left.
+    let mut args = vec!["fix", "--no-cache", "--rule", "spell/inconsistent-term"];
+    codelaw(&dir, &args);
+    assert_eq!(fs::read_to_string(dir.join("config/orders.yaml")).unwrap(), "summary: Every canceled order keeps the color it had\n");
+    args.push("--unsafe");
+    codelaw(&dir, &args);
+    assert_eq!(fs::read_to_string(dir.join("config/orders.yaml")).unwrap(), "summary: Every cancelled order keeps the colour it had\n");
+    assert_eq!(check(false), Vec::<String>::new());
+    let _ = fs::remove_dir_all(&dir);
+}
+
+/// W-103: `check --watch` re-reads a saved file's words and runs the rule
+/// over every file again, as it does for the graph's facts.
+#[test]
+fn inconsistent_term_follows_a_save_under_watch() {
+    use std::io::{BufRead, BufReader};
+    let dir = strict("watch");
+    let mut args = vec!["check", "--watch", "--no-adapters"];
+    args.extend(TERMS);
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codelaw"))
+        .args(&args)
+        .current_dir(&dir)
+        .env_remove("VIRTUAL_ENV")
+        .env("CODELAW_CACHE_DIR", dir.with_extension("cache"))
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let (tx, rx) = std::sync::mpsc::channel();
+    let out = child.stdout.take().unwrap();
+    std::thread::spawn(move || {
+        for l in BufReader::new(out).lines().map_while(Result::ok) {
+            if tx.send(l).is_err() {
+                break;
+            }
+        }
+    });
+    let next = || rx.recv_timeout(std::time::Duration::from_secs(30)).expect("the watch printed nothing in 30 s");
+    assert_eq!(terms(&next()), ["config/orders.yaml:1", "src/orders.js:1"]);
+    fs::write(dir.join("src/orders.js"), "// The canceled orders are listed by colour.\nexport const orders = [];\n").unwrap();
+    assert_eq!(terms(&next()), ["config/orders.yaml:1"], "the save fixed `cancelled`; `color` is still the minority");
+    let _ = child.kill();
+    let _ = child.wait();
+    let _ = fs::remove_dir_all(&dir);
+    let _ = fs::remove_dir_all(dir.with_extension("cache"));
 }

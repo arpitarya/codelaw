@@ -1,6 +1,7 @@
 extends = ["codelaw:spell/recommended"]
-description = "spell/recommended plus the dictionary check: every word of prose in a word list, and no accepted word that hides a typo"
+description = "spell/recommended plus the dictionary check: every word of prose in a word list, one spelling of each word across the project, and no accepted word that hides a typo"
 
 [rules]
+"spell/inconsistent-term" = "warn"
 "spell/unknown-word" = "warn"
 "spell/suspicious-word" = "warn"
