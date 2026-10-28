@@ -61,7 +61,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-109** `arpit` Bitbucket ruling applied: `--format bitbucket` kept; `init --ci bitbucket`, its template and the pipe removed; USAGE shows the step to copy, both switches its variables, a test runs it. Left: the live proof after v0.3.0 (inbox). Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
 
-🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in corpus); CSS/SCSS rules read statements, selectors, values, preludes, media queries, pseudo-class args from the tree; left: keyframe selectors, font lists. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
+🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in corpus); CSS/SCSS rules read statements, selectors, values, preludes, media queries, pseudo-class args, keyframe selectors from the tree; left: font lists. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 

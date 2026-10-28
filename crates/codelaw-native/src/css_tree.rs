@@ -7,11 +7,11 @@
 //! the selector lists in its pseudo-classes' arguments); each
 //! declaration's value and each at-rule's prelude as component values (words,
 //! strings, functions and their arguments, `,` `/` `:`); the media queries of
-//! `@media` and `@custom-media`; and the selectors of an `@page` or `@scope`
-//! prelude. The ranges a rule reads are the ones
-//! [`css_syntax`](crate::css_syntax) has always given (a selector trimmed up
-//! to its `{`, a value without its annotation), so a rule's findings do not
-//! depend on which reader built its sheet.
+//! `@media` and `@custom-media`; the selectors of an `@page` or `@scope`
+//! prelude; and each keyframe block's selectors. The ranges a rule reads are
+//! the ones [`css_syntax`](crate::css_syntax) has always given (a selector
+//! trimmed up to its `{`, a value without its annotation), so a rule's
+//! findings do not depend on which reader built its sheet.
 //!
 //! A tree with an `ERROR` or a `MISSING` node is not read: the file's
 //! statements come from the text reader instead, which never fails. That is
@@ -84,6 +84,22 @@ fn semicolon_of(kinds: Kinds, n: TsNode<'_>) -> Option<usize> {
     (kd(kinds, &last) == ";").then(|| last.start_byte())
 }
 
+/// The selectors of a keyframe block (`kids`, its children; `open`, its
+/// `{`): each part between the commas, without its comments.
+fn keyframe_selectors(kinds: Kinds, kids: &[TsNode<'_>], open: usize) -> Vec<(usize, usize)> {
+    let mut out = Vec::new();
+    let mut part: Option<(usize, usize)> = None;
+    for k in kids.iter().take_while(|k| k.start_byte() < open) {
+        match kd(kinds, k) {
+            "," => out.push(part.take().unwrap_or((k.start_byte(), k.start_byte()))),
+            "comment" | "js_comment" => {}
+            _ => part = Some(part.map_or((k.start_byte(), k.end_byte()), |p| (p.0, k.end_byte()))),
+        }
+    }
+    out.push(part.unwrap_or((open, open)));
+    out
+}
+
 /// Whether a rule prelude opens an ICSS block (`:export`, `:import("x")`).
 fn icss_block(prelude: &str) -> bool {
     let t = prelude.trim();
@@ -97,7 +113,7 @@ impl<'t> Builder<'_, 't> {
     }
 
     fn node(kind: Kind, start: usize, end: usize, parent: Option<usize>) -> Node {
-        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None, queries: None }
+        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None, queries: None, keyframe_selectors: None }
     }
 
     /// The statements directly inside `container` (the stylesheet or a block).
@@ -132,6 +148,9 @@ impl<'t> Builder<'_, 't> {
                 // kind for, so they keep their text reading.
                 if kd(kinds, &c) == "rule_set" && !non_standard(&src[n.name.0..n.name.1]) {
                     n.selectors = kids.iter().copied().find(|k| kd(kinds, k) == "selectors").map(|k| selectors(k, src, &mut self.w));
+                }
+                if kd(kinds, &c) == "keyframe_block" {
+                    n.keyframe_selectors = Some(keyframe_selectors(kinds, &kids, open));
                 }
                 let id = self.push(n);
                 list.push(id);
@@ -786,6 +805,10 @@ mod tests {
                 let k = tree.walk().iter().position(|&w| w == i).unwrap();
                 a[k] = b[k].clone();
             }
+            // Each keyframe block's selectors with a text reading.
+            if let Some(k) = &n.keyframe_selectors {
+                assert_eq!(k, &crate::css_syntax::split_commas(&view, n.name.0, n.name.1));
+            }
             // And each declaration's (and at-rule's) component values with a
             // text reading.
             if let Some(v) = &n.values {
@@ -818,6 +841,7 @@ mod tests {
             false,
         );
         agree(Language::Css, ":export { a: b }\n.a { composes: b; c: d }\n", true);
+        agree(Language::Css, "@keyframes k { from, /* c */ 50% { a: b } entry 0%, to { a: c } 12.5% { a: d } }\n", false);
         agree(Language::Css, "a:not(.a, #b > c):is(d e)::slotted(span) { x: y }\nli:nth-child(2n + 1 of .a):where(.c) { x: y }\n:host(.x):has(> img) { x: y }\n:global(.g) .l, :local(.m) { x: y }\n", true);
         agree(
             Language::Scss,
