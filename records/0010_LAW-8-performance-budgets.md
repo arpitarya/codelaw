@@ -162,6 +162,38 @@ The decider wants performance to be a key property and accepts that today's numb
 |---|---|---|---|---|---|---|
 | `hook_pre` | 61.4 / 77.2 / 77.9 ms | 62.4 / 78.3 / 86.2 ms | 86.2 | 129.3 | < 100 ms warm | **unset** — the guard: the target is below 1.5 × the worst p95; the decider, 2026-10-27 (voice docket): leave it unset, as for `fix_one_file` (*"We can go with unset"*, W-93) |
 
+**Beside the rivals, 2026-10-28 (W-99). Context rows, not L8 operations: no budget, never gated.** `bench-rivals.yml` run 40625881325 on `main` `7b839af`: `ubuntu-24.04` (image 20261023.334.3, 4 CPUs), release build, `scripts/bench-rivals.py` with the tools and rule sets in `perf/rivals.toml` (ESLint 10.13.0 with `@eslint/js` recommended, Prettier 3.9.10 defaults, Biome 2.6.3 recommended, oxlint 1.89.0 default, Ruff 0.17.3 default — L11 D-37…D-41). 10 runs per row, first discarded; spawn to exit. Each cell is the **median ms, cold / warm** (warm = a primed cache in its own process; Biome and oxlint have no cache, so cold only); codelaw is scoped with `--lang` to the rival's languages. The p95s, ranges and exit codes are in the run's `bench-rivals` artifact (`results.json`, `results.md`).
+
+| repo (files) | op | rival | rival | codelaw, same languages |
+|---|---|---|---|---|
+| djangoproject.com (674) | lint | ESLint | 1,201.6 / 381.2 | 450.2 / 75.6 |
+| | lint | Biome | 249.9 | 460.8 / 75.9 |
+| | lint | oxlint | 52.0 | 446.4 / 75.9 |
+| | lint | Ruff | 53.5 / 46.5 | 639.0 / 79.0 |
+| | format | Prettier | 3,190.6 / 3,068.0 | 1,492.3 / 1,646.1 |
+| | format | Biome | 215.8 | 1,190.2 / 1,196.2 |
+| | format | Ruff | 30.6 / 9.1 | 108.2 / 107.8 |
+| full-stack-fastapi-template (246) | lint | ESLint | 288.0 / 261.3 | 68.8 / 68.7 |
+| | lint | Biome | 147.7 | 157.5 / 71.9 |
+| | lint | oxlint | 55.2 | 157.9 / 71.5 |
+| | lint | Ruff | 12.3 / 12.0 | 99.4 / 71.0 |
+| | format | Prettier | 2,521.0 / 2,395.9 | 1,112.2 / 1,101.0 |
+| | format | Biome | 127.9 | 293.4 / 293.1 |
+| | format | Ruff | 11.8 / 9.2 | 85.5 / 85.0 |
+| html5-boilerplate (77) | lint | ESLint | 317.2 / 228.5 | 75.0 / 69.0 |
+| | lint | Biome | 72.6 | 163.2 / 68.8 |
+| | lint | oxlint | 48.1 | 74.0 / 68.8 |
+| | lint | Ruff | 6.2 / 6.2 | 68.2 / 67.8 |
+| | format | Prettier | 1,076.8 / 601.5 | 287.2 / 289.4 |
+| | format | Biome | 119.5 | 268.2 / 269.1 |
+| | format | Ruff | 7.8 / 6.8 | 68.3 / 68.1 |
+
+- **Against the JavaScript tools codelaw is faster:** 2.7–4.2 × ESLint cold and 3.3–5.0 × warm; 2.1–3.7 × Prettier cold and 1.9–2.2 × warm (`format --check`).
+- **Against the Rust tools it is slower, cold:** Biome lints 1.1–2.2 × and formats 2.2–5.5 × faster; oxlint lints 1.5–8.6 × faster; Ruff lints 8–12 × and formats 3.5–8.8 × faster. Warm, codelaw's lint (69–79 ms) is under Biome's every-run time on all three repos and 1.3–1.5 × oxlint's.
+- **codelaw's floor is about 68 ms** on every warm row and every small one: loading the project, the packs and the rule set, not checking files (as `fix_one_file`, above). Ruff's is 6 ms.
+- **`format --check` gains nothing from a warm cache** (cold and warm within noise on every repo), as the W-99 dry run suggested: the formatter does not consult the cache outside the daemon.
+- **The work differs:** each tool runs its own recommended preset, and codelaw's presets hold more rules than `@eslint/js` recommended, oxlint's correctness category or Ruff's default `E4, E7, E9, F`; Prettier exits 2 on djangoproject.com (files it cannot parse — Django templates) and is timed as it ran.
+
 ### Consequences
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.

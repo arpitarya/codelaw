@@ -8,9 +8,9 @@
 # NO RIVAL MAY RUN UNTIL ITS L11 ROW IS RATIFIED. Each [tool.<name>] names
 # its row in L11's list (records/0013_LAW-11-dependencies.md §3, `l11`).
 # The script reads that list and refuses to install or run a tool whose row
-# is missing, is not `ratified …`, or does not name this `version`. The rows
-# are proposed in work/open/W-99-side-by-side-bench.md; none is in §3 yet, so
-# today only codelaw runs (the dry run) and bench-rivals.yml skips.
+# is missing, is not `ratified …`, or does not name this `version`. All five
+# were ratified 2026-10-27 (D-37…D-41); the first run's numbers are in L8
+# §Measurements (records/0010_LAW-8-performance-budgets.md).
 #
 # Placeholders in a command: {bin} the tool's installed bin folder, {cache}
 # the cache folder of this run (cold: new and empty; warm: primed). A tool
