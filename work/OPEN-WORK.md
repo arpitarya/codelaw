@@ -39,9 +39,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (21)
+## Open items (20)
 
-### build (19)
+### build (18)
 
 🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -66,8 +66,6 @@ here. Read that record before changing anything below it.
 🟢 **W-109** `agent` Bitbucket Pipelines: a codelaw pipe and `codelaw init --ci bitbucket`, findings to Code Insights, the SARIF output configurable. Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
 
 🟢 **W-110** `agent` Clean session 2df06f6d's leftovers on the Mac: five merged worktrees and three `.fux`-only folders, by `worktree-cleanup.py --apply`. Filed by Arpit (Cowork). [detail](open/W-110-session-2df06f6d-cleanup.md)
-
-🟢 **W-100** `agent` Rule promotion: criterion ratified 10-27 (SR-RULE-AUTHORING 6a, as proposed). Left: `corpus.py promote --write --run <url>` for the first batch, then close. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
 
 🟢 **W-105** `agent` Type-aware rules: `codelaw-types` Node helper on the project's TypeScript 7.1 API, `type:` clause, warm programs, `ts/type-error`, first rules in `ts` — preview on the 7.1 RC (11-10), stable after GA (11-24). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 

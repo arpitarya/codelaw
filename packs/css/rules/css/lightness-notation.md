@@ -3,7 +3,7 @@ id: css/lightness-notation
 title: "Lightness is a percentage"
 languages: [css, scss]
 fix: auto
-stability: preview
+stability: stable
 ported_from: [stylelint/lightness-notation]
 since: 0.1.0
 ---

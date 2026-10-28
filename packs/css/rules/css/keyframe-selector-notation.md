@@ -3,7 +3,7 @@ id: css/keyframe-selector-notation
 title: "Percentages for keyframe selectors"
 languages: [css, scss]
 fix: auto
-stability: preview
+stability: stable
 ported_from: [stylelint/keyframe-selector-notation]
 since: 0.1.0
 ---

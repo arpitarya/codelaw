@@ -4,7 +4,7 @@ title: "No `//` comments"
 languages: [css]
 fix: manual
 fix_reason: "turning it into a comment changes what applies"
-stability: preview
+stability: stable
 ported_from: [stylelint/no-invalid-double-slash-comments]
 since: 0.1.0
 ---

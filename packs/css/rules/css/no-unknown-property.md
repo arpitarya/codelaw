@@ -4,7 +4,7 @@ title: "No unknown properties"
 languages: [css, scss]
 fix: suggest
 fix_reason: "the closest known name is a guess at what was meant"
-stability: preview
+stability: stable
 options:
   ignoreProperties: { type: "string[]", default: [], description: "properties to accept; `/regex/` for a pattern" }
   checkPrefixed: { type: "boolean", default: false, description: "also check vendor-prefixed properties" }

@@ -4,7 +4,7 @@ title: "Spaces around `+` and `-` in math functions"
 languages: [css, scss]
 fix: suggest
 fix_reason: "the fix makes an invalid, dropped declaration apply, which changes the page"
-stability: preview
+stability: stable
 ported_from: [stylelint/function-calc-no-unspaced-operator]
 since: 0.1.0
 ---
