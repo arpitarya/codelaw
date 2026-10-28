@@ -97,6 +97,8 @@ flowchart LR
 
    - **npm may go first.** **Ruled by Arpit, 2026-10-25:** *"All codelaw npm packages are published. The PyPI packages will take 2 to 3 days because there is a limit of 4 packages per day to be published by hand … Everything else related to npm, let's go ahead and build it out, even have the pipelines start working and start publishing those packages."* A release may reach npm first, by a run of `publish.yml` by hand on the release's `v*` tag, which publishes npm only; the GitHub Release on **the same tag** later runs both registries and skips every version already published. One tag, one commit, one `dist`, so both registries still carry the same binary (decision 2) — "together" means the same release, not the same hour. A run that fails part-way is withdrawn as above, for what that run published.
 
+   - **PyPI uploads only what exists.** **Ruled by Arpit, 2026-10-29 (W-116):** *"We can skip the one pending for PyPI."* PyPI's first upload of a project is by hand ([RELEASING.md](../RELEASING.md)), except `codelaw`, whose *pending* publisher lets CI create it. So the release job uploads a wheel only when its project already exists on PyPI or is `codelaw`, and names every project it skipped in the job summary; a skipped project is not a failed publish. npm has no such skip: a name npm does not trust stops the release before either registry is written.
+
    The version number lives in one file, and every manifest (the engine's and each pack's, on both registries) is generated from it.
 
 10. **Package names.**

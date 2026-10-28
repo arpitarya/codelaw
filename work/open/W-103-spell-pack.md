@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-27 (Cowork, voice): build spelling into codelaw as 
 item: W-103
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-28
-updated_by: "Claude Code (Opus 5.5), the sixth increment: spell/inconsistent-term"
-ball: arpit
+updated: 2026-10-29
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: agent
 ---
 
 # W-103 — the spell pack: codelaw's own spell checker, better than CSpell
@@ -22,6 +22,8 @@ ball: arpit
 | 4 | The engine side: per-language selection queries, the word splitter, the token skips, the six `native:` rules and their fixes, the `[spell]` config section | the check itself | ✅ selection, splitter, skips, `[spell]` and six `native:` rules (2026-10-28); `spell/inconsistent-term` a `scope: project` rule on the graph stage, `graph: { terms: inconsistent }` (SR-PROJECT-GRAPH decision 10, 2026-10-28) |
 | 5 | The pack: `packs/spell/` with `spell/recommended` and `spell/strict`, rule files with cases, README; L6, SR-RULE-PACKS and SR-PACKAGES amended to eighteen packs | installable as `@codelaw/rules-spell` / `codelaw-rules-spell` | ✅ the pack, both presets, seven rules with cases; L6, SR-RULE-PACKS, SR-PACKAGES, SR-RULE-FORMAT and every count at eighteen (2026-10-28) |
 | 6 | Measure the speed: three CI `perf` runs on `main` with the pack on; put the budget to the decider by L8's method | the L8 budget | ⏳ |
+
+**Arpit, 2026-10-29 (voice docket; written on *"file it."*):** recommended measuring the pack as its own `spell` operation so the ruled budgets do not move: *"We can, but add an item in the backlog so that we can have a shared benchmark."* — its own operation now; B-062 holds the shared benchmark.
 
 **Arpit, 2026-10-27 (voice):** *"There is a tool called C-Spell. Research it and tell me if that can be built into CodeLaw. A similar feature, a better feature, would be even better."* Then, ruling the forks: *"Let's go with B."* · *"Approve both."* · *"Approve it."* · *"want it as a separate package."* · *"Go with the recommendation."* · *"go ahead"*. The forks: [the compare doc](../compare/spell-checking.compare.md).
 

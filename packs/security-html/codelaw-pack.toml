@@ -1,5 +1,5 @@
 name = "@codelaw/rules-security-html"
-version = "0.2.0"
+version = "0.3.0"
 min_codelaw = "0.2.0"
 languages = ["html"]
 presets = ["sec-html/recommended", "sec-html/strict"]

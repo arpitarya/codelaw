@@ -7,9 +7,11 @@ Claude Code does.
                              so `lockmaster start` records whose change it is;
                              land waiting handoffs in the background
     edit   PostToolUse       note each file this session writes in main's checkout
-    stop   Stop              land this session's open changes now (they stay open);
-                             land the handoffs; tell the agent, once, about
-                             a landing held back or edits left in main's checkout
+    stop   Stop              say what earlier landings did; tell the agent, once,
+                             about a landing held back, a handoff that did not
+                             land, or edits left in main's checkout; then land
+                             this session's open changes (they stay open) and
+                             the handoffs, in the background
     end    SessionEnd        land and clean up this session's changes, in the
                              background (the session is going away)
 
@@ -24,6 +26,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -160,15 +163,16 @@ def edit(sid, hook):
 
 
 def stop(sid, hook):
+    """Report what earlier landings did, then land in the background: a
+    landing runs the repository's checks and rebuilds, which can take minutes
+    (fux), so a turn never waits on it. `LOCKMASTER_FOREGROUND=1` lands first
+    and reports at once (the tests)."""
     src, mods = load()
     if mods is None:
         return None
     land, Repo = mods
     cwd = hook.get("cwd") or str(ROOT)
-    lines, said = [], []
-
-    def out(text):
-        lines.append(text)
+    said, lines = [], []
 
     def step(fn):
         """Each step on its own: one failing never skips the others."""
@@ -178,19 +182,38 @@ def stop(sid, hook):
             print("auto-land.py stop: {}".format(e), file=sys.stderr)
             return None
 
-    step(lambda: land.sync(Repo(cwd), session=sid, cwd=cwd, out=out))
-    for item, outcome, note in step(lambda: land.pickup(Repo(cwd), out=out)) or []:
-        if outcome == "red" and note:
+    foreground = os.environ.get("LOCKMASTER_FOREGROUND") == "1"
+    if foreground:
+        step(lambda: land.sync(Repo(cwd), session=sid, cwd=cwd, out=lines.append))
+        step(lambda: land.pickup(Repo(cwd), out=lines.append))
+    repo = step(lambda: Repo(cwd))
+    if repo is None:
+        return None
+    notes = read_notes(repo, sid) if sid else {"edits": []}
+    since = notes.get("last_stop", 0)
+    landed = []
+    for c in step(repo.changes) or []:
+        if (c.get("landed_at") or 0) > since and land._mine(c, sid, cwd):
+            landed.append("landed {} as {}".format(c["item"], (c.get("landed") or "")[:10]))
+    told = notes.setdefault("told_handoffs", {})
+    for h in step(lambda: land.handoffs(repo)) or []:
+        if h.get("reason") and told.get(h["item"]) != h.get("tried"):
+            told[h["item"]] = h.get("tried")
             said.append("Edits handed over from Cowork ({}) did not land:\n{}\nFix them where they are, in "
-                        "main's checkout; the end of the next turn tries again with them.".format(item, note))
-    for item, reason in step(lambda: land.held_reports(Repo(cwd), session=sid, cwd=cwd)) or []:
-        said.append("lockmaster could not land {} at the end of this turn:\n{}\nFix it in its worktree; it "
+                        "main's checkout; the end of the next turn tries again with them.".format(
+                            h["item"], h["reason"]))
+    for item, reason in step(lambda: land.held_reports(repo, session=sid, cwd=cwd)) or []:
+        said.append("lockmaster could not land {} at the end of a turn:\n{}\nFix it in its worktree; it "
                     "lands at the end of the next turn. Nothing on main changed.".format(item, reason))
     if sid:
-        reminder = step(lambda: checkout_reminder(land, Repo(cwd), sid, src))
+        notes["last_stop"] = time.time()
+        write_notes(repo, sid, notes)
+        reminder = step(lambda: checkout_reminder(land, repo, sid, src))
         if reminder:
             said.append(reminder)
-    landed = [l for l in lines if l.startswith("landed ") or l.startswith("handoff ") or l.startswith("finished ")]
+    if not foreground:
+        args = ["sync", "--pickup", "--cwd", cwd] + (["--session", sid] if sid else [])
+        step(lambda: detach(src, args, cwd))
     result = {}
     if landed:
         result["systemMessage"] = "lockmaster: " + "; ".join(landed)

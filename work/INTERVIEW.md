@@ -116,6 +116,10 @@ checkout.
 
 ## 2 · In flight, and the immediate next step
 
+**Ruled 2026-10-29 (Cowork, voice):** the next release is **0.3.0 through CI** (W-116) — npm everything, PyPI only `codelaw` and the six packs that exist; it replaces W-86's v0.2.0 Release. W-114: drop all five worktrees. W-95: Open VSX now (W-117), the Marketplace by hand on release day. W-105: agents add the four type questions (SR-TYPES decision 4), profile before budgets. W-102: redesign first (W-118, research). W-103: spell measured as its own operation (B-062 for the shared benchmark). The inbox holds only PyPI days 2–4, W-97's Marketplace tick and W-117.
+
+**Reconciled 2026-10-29 (Cowork):** nothing open was done. The v0.2.0 GitHub Release is still not created (`codelaw` absent from PyPI); PyPI day 2 is today. W-111 merged into W-114 (drop all five recommended); W-115 filed (the spell pack's first publish); W-95's Marketplace token is blocked by Azure, and global PATs end 2026-12-01. PyPI's pending publishers cannot create many projects at once — one per repository · workflow · environment.
+
 **In flight 2026-10-28 (Cowork):** PyPI day 1 — uploads and trusted publishers done 2026-10-28; Arpit runs `gh release create v0.2.0` (the inbox row). **Next for an agent (🟢):** W-108's fixture and test, W-104 and W-93 to close, W-100's first batch, W-110 on the Mac; W-102's pilot on the Mac. The inbox: PyPI days 1–4, W-95's accounts, W-97's Marketplace step, W-111.
 
 **W-101 ruled 2026-10-27 (voice, Cowork):** type-aware TS rules run on the **project's own TypeScript ≥ 7.1** through a small Node helper (`codelaw-types`), not a Go helper or a pinned TS; rules go in the existing `ts` pack; no new LSP; Node at runtime for type rules; preview on the 7.1 RC (2026-11-10), stable after GA (2026-11-24); oxlint's type-aware mode covers the gap (W-107). Records first (W-104: L3, L5, L6, L8, SR-TYPES), then W-105, then the version watch W-106. [Proposal](proposals/type-aware-rules.md).

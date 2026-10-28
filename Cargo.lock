@@ -928,7 +928,7 @@ checksum = "1c133bc6a41be0d194c306b5506d15e6feeea7b1d6604bd3f8310dfb2ca96486"
 
 [[package]]
 name = "codelaw-adapters"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-config",
  "codelaw-core",
@@ -940,7 +940,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-agents"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "clap",
  "codelaw-config",
@@ -953,7 +953,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-baseline"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-core",
  "globset",
@@ -962,7 +962,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-cache"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "blake3",
  "codelaw-core",
@@ -972,7 +972,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-cli"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "blake3",
  "boon",
@@ -1008,7 +1008,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-config"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "boon",
  "codelaw-cache",
@@ -1023,7 +1023,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-core"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "libc",
  "serde",
@@ -1032,7 +1032,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-engine"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-adapters",
  "codelaw-baseline",
@@ -1058,7 +1058,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-fix"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-cache",
  "codelaw-core",
@@ -1073,7 +1073,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-format"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "biome_css_formatter",
  "biome_css_parser",
@@ -1102,7 +1102,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-graph"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-core",
  "codelaw-lang",
@@ -1116,7 +1116,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-lang"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "ast-grep-core",
  "ast-grep-language",
@@ -1129,7 +1129,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-lsp"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-config",
  "codelaw-core",
@@ -1143,7 +1143,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-match"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "ast-grep-config",
  "ast-grep-core",
@@ -1160,7 +1160,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-mcp"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-core",
  "codelaw-engine",
@@ -1171,7 +1171,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-native"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-core",
  "codelaw-lang",
@@ -1188,7 +1188,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-report"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "blake3",
  "codelaw-config",
@@ -1205,7 +1205,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-rules"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-cache",
  "codelaw-config",
@@ -1220,7 +1220,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-semantic"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-core",
  "codelaw-lang",
@@ -1229,7 +1229,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-test"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-cache",
  "codelaw-config",
@@ -1246,7 +1246,7 @@ dependencies = [
 
 [[package]]
 name = "codelaw-types"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "codelaw-core",
  "semver",

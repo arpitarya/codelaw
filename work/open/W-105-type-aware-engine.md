@@ -5,9 +5,9 @@ description: "Build type-aware TS rules (W-101): the codelaw-types Node helper o
 item: W-105
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-28
-updated_by: "Claude Code (Opus 5.5), W-105 second landing (--version --json, the check_types_* bench, the long-watch memory test)"
-ball: arpit
+updated: 2026-10-29
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: agent
 ---
 
 # W-105 — Type-aware rules: helper, engine, first rules
@@ -23,6 +23,8 @@ ball: arpit
 | 5 | First rules in `packs/ts`, `preview`, `ported_from` set: `no-floating-promises`, `no-misused-promises`, `await-thenable`, the `no-unsafe-*` family, `switch-exhaustiveness-check`; fixtures | the important ones | 🟡 2026-10-28 — `ts/type-checked`: `no-floating-promises`, `await-thenable`, `no-unsafe-call`, `no-unsafe-member-access`, `no-unsafe-return`, `type-error`, each passing `codelaw test` under 7.1.0-beta; `fixtures/types` fires each once and an oxlint port is shown once. `no-misused-promises`' condition check is TS2801 (`ts/type-error`), so not built (SR-TYPES decision 10) · ⏳ see *Left* |
 | 6 | **Release as preview on the 7.1 RC (2026-11-10)**; measure `check_types_*` on CI | early release | 🟡 2026-10-28 — `codelaw bench --typescript <dir>` times `check_types_cold` / `check_types_warm` on the type workload (the reference workload's 2,200 `.ts` files, one `tsconfig.json`, `ts/type-checked` only; digest `5341cd61a21e66c7`), the `perf` job installs `fixtures/types`' TypeScript and passes it, and both are `unset` in `perf/budgets.toml` with a `proposed` from one loaded-Mac run (cold p95 3955 ms, warm 3170 ms) · ⏳ the RC is not out (today 2026-10-28) |
 | 7 | After 7.1 GA (2026-11-24): re-run on GA, then the rules go to promotion (W-100's criterion); port the rest of the list | stable | ⏳ |
+
+**Arpit, 2026-10-29 (voice docket; written on *"file it."*):** asked whether agents may extend SR-TYPES decision 4's vocabulary for the four rules (exhaustive `switch`, `any` into a typed target, a promise where a `void` callback is expected, `await` on `unknown`): *"Add it."* Then, recommended to build the four as previews and to profile the slowest type rule before any budget is put to him (he said on W-104 *"make sure it is as fast as possible"*): *"Let's go ahead and build it out."*
 
 ### Left (exact)
 

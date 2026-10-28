@@ -217,9 +217,26 @@ jobs:
           echo "$SUMS  dist/SHA256SUMS" | sha256sum --strict --quiet -c
           (cd dist && sha256sum --strict --quiet -c SHA256SUMS)
           [ "$(find dist/npm dist/pypi -type f | wc -l)" = "$(wc -l < dist/SHA256SUMS)" ] || { echo "::error::dist holds a file SHA256SUMS does not list"; exit 1; }
+      - id: exists
+        name: only wheels whose PyPI project exists, or is codelaw (its pending publisher creates it); the rest are named, not failed (L6 decision 9)
+        run: |
+          mkdir -p upload
+          {
+            echo "### PyPI"
+            for w in dist/pypi/*.whl; do
+              proj="$(basename "$w" | cut -d- -f1 | tr '_' '-')"
+              code="$(curl -s -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/$proj/json")"
+              if [ "$code" = 200 ] || [ "$proj" = codelaw ]; then
+                cp "$w" upload/; echo "- ✓ upload \`$proj\`"
+              else
+                echo "- ⏭ skipped \`$proj\` — not on PyPI yet (HTTP $code); its first upload is by hand"
+              fi
+            done
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          [ -n "$(ls upload)" ] || { echo "::error::no wheel to upload"; exit 1; }
       - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
-          packages-dir: dist/pypi/
+          packages-dir: upload/
           skip-existing: true
 
   attach:

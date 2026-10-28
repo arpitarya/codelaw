@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-27 (voice docket): PyPI day 1 of 4 — at most four
 item: W-86
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-28
+updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
@@ -19,6 +19,8 @@ ball: arpit
 | 1 | `twine upload` the four 0.2.0 wheels already in `dist/pypi/` (built from the v0.2.0 tag, byte-identical to CI's) | `codelaw-rules-{html,js,python,react}` exist | ✅ 2026-10-28 — Arpit uploaded the four (`twine`; pypi.org lists each at 0.2.0) |
 | 2 | A trusted publisher on each of the four | CI can upload them | ✅ 2026-10-28 — Claude in Chrome added all four (`arpitarya` · `codelaw` · `publish.yml` · `pypi`); `codelaw`'s pending publisher still listed |
 | 3 | Publish the GitHub Release `v0.2.0` on W-37's tag (`08b7158`, CI green there) | CI creates `codelaw` on PyPI through its pending publisher, skips everything already uploaded, attaches the checksums | 🔴 Arpit |
+
+**Arpit, 2026-10-29 (voice docket; written on *"file it."*):** offered this item's last step, the v0.2.0 Release: *"Let's do this. Let's publish version 0.3.0 for all the packages through CI/CD pipeline."* — told PyPI can take only the projects that exist: *"We can skip the one pending for pipe here. The ones for NPM, it is being built and it should be ready. In few minutes."* Read as: the Release is v0.3.0's ([W-116](W-116-release-0-3-0.md)), which creates `codelaw` on PyPI through its pending publisher; this item closes when it lands. **Flagged:** a Claude Code session (`c6c222e8`, 00:31) was on this item's v0.2.0 Release, held by the permission classifier.
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Yes."* — on running days 1–4 as filed, with Claude adding the trusted publishers through Chrome.
 
