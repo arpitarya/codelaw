@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-28 — W-109 built: Bitbucket Pipelines, Code Insights, SARIF a switch  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Implement work item W-109 in codelaw: Bitbucket Pipelines"* (coordinator, from Arpit's voice ruling of 2026-10-27).
+- **Done:** `--format bitbucket` (SR-CLI-MCP decision 4), `codelaw init --ci bitbucket` from `templates/ci/bitbucket/bitbucket-pipelines.yml` (decision 12b), SR-PACKAGES 15a, USAGE; `ci_bitbucket.rs` runs the step's own script with `curl`/`npm` stubbed; the report and annotation shape checked against Bitbucket's published swagger.
+- **Decided / left open:** a step, not a pipe — a pipe's base image is an L11 row and its registry an account, so that fork is the decider's (inbox); the live proof waits on v0.3.0, since 0.2.0 has no `--format bitbucket`. W-109 stays open, 🔴 `arpit`.
+- **Mistakes:** the first `curl` stub numbered its log by every file, not every call; fixed before the test was believed.
+- **Next:** the decider answers the pipe fork; after v0.3.0, the throwaway-repo run in the inbox row.
+
 ## 2026-10-28 — W-112 filed: the spell words file, init by default, spell learn  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"Is there a way to add custom words to spelling? Pack."* — answered (`[spell] words`, built today in W-103) — then by voice the design, and *"file it."*

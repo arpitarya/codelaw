@@ -1,4 +1,4 @@
-//! `codelaw format [--check] [--diff] [--format text|json|github|gitlab|junit|checkstyle] [--import-config] <paths>`
+//! `codelaw format [--check] [--diff] [--format text|json|github|gitlab|junit|checkstyle|bitbucket] [--import-config] <paths>`
 //! (SR-FORMATTER decision 1; SR-CLI-MCP decisions 3 and 4).
 
 use crate::{Common, Ctx, Output, engine_options_in, json_line, load, timings, with_timings};
@@ -22,7 +22,7 @@ pub struct FormatArgs {
     /// Change nothing; print what formatting would change, as a unified diff.
     #[arg(long)]
     diff: bool,
-    /// text or json (the shape of the npm and Python `format`), or a CI format: github, gitlab, junit or checkstyle.
+    /// text or json (the shape of the npm and Python `format`), or a CI format: github, gitlab, junit, checkstyle or bitbucket.
     #[arg(long, default_value = "text")]
     format: String,
     /// Read `.prettierrc*`, `[tool.ruff]`/`[tool.ruff.format]` and
@@ -199,8 +199,8 @@ impl FormatArgs {
 
 pub fn format(args: FormatArgs, ctx: &Ctx) -> Output {
     let fmt = match crate::format(&args.format) {
-        Ok(f @ (Format::Text | Format::Json | Format::Github | Format::Gitlab | Format::Junit | Format::Checkstyle)) => f,
-        Ok(_) => return Output::fail(format!("`format` takes --format text, json, github, gitlab, junit or checkstyle, not `{}`", args.format)),
+        Ok(f @ (Format::Text | Format::Json | Format::Github | Format::Gitlab | Format::Junit | Format::Checkstyle | Format::Bitbucket)) => f,
+        Ok(_) => return Output::fail(format!("`format` takes --format text, json, github, gitlab, junit, checkstyle or bitbucket, not `{}`", args.format)),
         Err(e) => return Output::fail(e),
     };
     if args.diff && !matches!(fmt, Format::Text) {
