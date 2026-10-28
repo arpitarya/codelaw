@@ -39,6 +39,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the earlier W-109 rescope edit failed on a stale match — the file had changed under it (an agent built W-109 at 09:02); nothing was written then.
 - **Next:** a Claude Code session takes W-109's removal, records first.
 
+## 2026-10-28 — the project icon, one colour  ·  Claude Code (claude-opus-5-5)
+
+- **Asked:** *read the documentation and create an icon that I can use in different places; put it in the repository* — then *2–3 options*, *A*, *only the one-colour version*, *land it*.
+- **Done:** three directions on a design canvas (checked brackets, a rule file, § between brackets); Arpit picked A, one colour only. `docs/brand/`: `codelaw-mono.svg` (Ink `#182133`), `codelaw-mono-white.svg`, both at 16–512 px in `png/`, and a README (W-113).
+- **Decided / left open:** Arpit: option A, one colour, no full-colour tile. Left open: whether `packaging/vscode/icon.png` (the old colour placeholder) becomes the one-colour mark.
+- **Mistakes:** I first wrote a full-colour tile too; removed on Arpit's word before landing.
+- **Next:** Arpit's call on the VS Code icon.
+
 ## 2026-10-28 — W-109 built: Bitbucket Pipelines, Code Insights, SARIF a switch  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Implement work item W-109 in codelaw: Bitbucket Pipelines"* (coordinator, from Arpit's voice ruling of 2026-10-27).
