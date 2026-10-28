@@ -6,8 +6,8 @@ item: W-109
 filed: 2026-10-28
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
-updated_by: "Claude Code (Opus 5.5), W-109 ruling applied"
-ball: arpit
+updated_by: "Claude Code (Opus 5.5), 2026-10-28: closed on the decider's ruling, the live proof to BACKLOG B-061"
+ball: closed
 ---
 
 # W-109 — Bitbucket Pipelines
@@ -42,7 +42,13 @@ Why: W-97's Action covers GitHub only; Bitbucket Pipelines has no Actions and re
 - **Proven locally** (`crates/codelaw-cli/tests/usage_bitbucket.rs`, was `ci_bitbucket.rs`): the YAML block under USAGE's `### Bitbucket Pipelines`, its script run with `curl` and `npm` stubbed, on a project with one `debugger` — exit 1, the report `FAILED` and its one annotation (`proj/src/app.js:2`, `HIGH`) through the proxy, no SARIF; with `CODELAW_SARIF=true` and the upload off: one SARIF result, no `curl`, still exit 1; `CODELAW_FAIL_ON_ERROR=false`: exit 0. And `init --ci bitbucket` exits 2 (`--ci is \`github\` or \`gitlab\``) and writes nothing.
 - **Removed (the ruling, 2026-10-28):** `codelaw init --ci bitbucket` (its branch in `crates/codelaw-cli/src/ci.rs`, the refusal in `init.rs`), `templates/ci/bitbucket/bitbucket-pipelines.yml`, its `templates/README.md` row and `template.rs` registry and fixture entries, the init test; SR-CLI-MCP 12b, SR-PACKAGES 15a and SR-LAW-10 decision 3's example rewritten.
 
-## Left (ruled 2026-10-28)
+## Closed (2026-10-28)
+
+**Arpit, 2026-10-28:** *"close where only you're left"* — every agent step is done; the only step left is the decider's live proof, so the item closes and that proof moves to [BACKLOG](../../work/BACKLOG.md) **B-061**, reopened after the v0.3.0 release.
+
+Evidence: commits `2422496` (`--format bitbucket` and the first step) and `ab040e8` (the ruling applied: `init --ci bitbucket` removed, USAGE §Bitbucket Pipelines the step to copy); the test `crates/codelaw-cli/tests/usage_bitbucket.rs` runs USAGE's block.
+
+## Left (ruled 2026-10-28) — moved to BACKLOG B-061
 
 1. **The live proof (Arpit, after v0.3.0):** the DoD's throwaway Bitbucket repo, from USAGE's step; an inbox row once v0.3.0 is out (0.2.0 has no `--format bitbucket`).
 2. **The switches' reading (Arpit, to confirm):** they stay the step's variables, a repository variable overriding each — the agent's reading of *"just have serif and code [insights] configurable"*; say so if it needs a codelaw-side switch instead.
