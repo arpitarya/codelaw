@@ -67,7 +67,7 @@ fn label(key: &str, v: &Value) -> String {
 impl Explainer {
     pub fn new(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<Value>>) -> Result<Explainer, String> {
         let full = compile(rule, grammar, data)?;
-        let BlockKind::Match { rule: matcher, constraints, utils, predicates } = &rule.block.kind else {
+        let BlockKind::Match { rule: matcher, constraints, utils, predicates, .. } = &rule.block.kind else {
             return Err("not a `match:` rule".into());
         };
         let mut parts: Vec<(String, Value)> = Vec::new();

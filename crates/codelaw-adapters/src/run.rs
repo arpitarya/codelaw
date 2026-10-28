@@ -21,13 +21,19 @@ fn candidates(binary: &str) -> Vec<String> {
 /// `.venv/bin` (`Scripts` on Windows), then `PATH`. `None` when it is not
 /// installed.
 pub fn locate(manifest: &Manifest, root: &Path, path_env: Option<&std::ffi::OsStr>) -> Option<PathBuf> {
+    locate_program(&manifest.binary, root, path_env)
+}
+
+/// A program by name, looked for where an adapter's is ([`locate`]): Node
+/// for the type helper is found this way (SR-TYPES decision 5).
+pub fn locate_program(binary: &str, root: &Path, path_env: Option<&std::ffi::OsStr>) -> Option<PathBuf> {
     let venv = if cfg!(windows) { "Scripts" } else { "bin" };
     let mut dirs = vec![root.join("node_modules").join(".bin"), root.join(".venv").join(venv)];
     if let Some(p) = path_env {
         dirs.extend(std::env::split_paths(p));
     }
     for dir in dirs {
-        for name in candidates(&manifest.binary) {
+        for name in candidates(binary) {
             let file = dir.join(&name);
             if is_program(&file) {
                 return Some(file);

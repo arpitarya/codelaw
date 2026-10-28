@@ -183,6 +183,12 @@ pub fn check_json(report: &CheckReport) -> Value {
     if let Some(n) = &report.new_code {
         v["new_code"] = json!({ "change_set": n.change_set, "coverage": n.coverage });
     }
+    // Only when a type rule had a file to check (SR-TYPES decisions 6 and
+    // 12): the TypeScript that answered and the helper's protocol, or why
+    // the type rules were skipped.
+    if let Some(t) = &report.types {
+        v["types"] = json!({ "protocol": t.protocol, "typescript": t.typescript, "notes": t.notes });
+    }
     v
 }
 
@@ -264,6 +270,14 @@ fn summary_line(report: &CheckReport, paint: &Paint, fixed: Option<usize>) -> St
     }
     if report.internal_errors() > 0 {
         parts.push(format!("{} failed", plural(report.internal_errors(), "rule run", "rule runs")));
+    }
+    // The TypeScript the type rules asked, and every gap (SR-TYPES
+    // decisions 6 and 12).
+    if let Some(t) = &report.types {
+        if !t.typescript.is_empty() {
+            parts.push(format!("TypeScript {}", t.typescript.join(", ")));
+        }
+        parts.extend(t.notes.iter().cloned());
     }
     let head = if c.errors > 0 { paint.wrap("31;1", "✖") } else { paint.wrap("32;1", "✔") };
     format!("{head} {}", parts.join(" · "))
@@ -396,6 +410,10 @@ pub fn check_agent_with(report: &CheckReport, labels: &Labels) -> String {
     for s in &report.skipped {
         out.push_str(&format!("{} skipped: {}\n", s.file, s.reason));
     }
+    // Type rules that did not run are never a silent gap (SR-TYPES decision 6).
+    for n in report.types.iter().flat_map(|t| &t.notes) {
+        out.push_str(&format!("{n}\n"));
+    }
     let c = counts(&report.diagnostics);
     out.push_str(&format!("{} errors, {} warnings, {} infos\n", c.errors, c.warnings, c.infos));
     out
@@ -447,6 +465,7 @@ mod tests {
             warnings: vec![],
             as_of: None,
             new_code: None,
+            types: None,
             ..Default::default()
         };
         let v = check_json(&r);
@@ -476,6 +495,7 @@ mod tests {
             warnings: vec![],
             as_of: None,
             new_code: None,
+            types: None,
             ..Default::default()
         };
         let t = check_text(&r, false);

@@ -10,7 +10,7 @@ feature: "the rule file"
 owns:
   - crates/codelaw-rules
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-27T20:00:00Z
+timestamp: 2026-10-28T12:00:00Z
 content_sha: ""
 ---
 
@@ -149,9 +149,9 @@ The decider asked for a record of the rule-file template. The format so far exis
    - **`fix:`** is a list of steps: `sort-keys` (takes `sorted:`'s argument), `ensure-key: { key?, value }` (gives the target, or the key path below it, that value: written in with any missing parents where absent, replaced where different), `replace: <template>`, `remove` (the target with its key and separator), and `when: <assertion>` with `then:` and/or `else:` steps. The steps run in order, each on the text the one before left, so `[ensure-key, sort-keys]` sorts the key it wrote; a step with nothing to do (a sort already in order, a value already equal) is skipped, and nothing after `remove` may act on the target. The fix is one edit. `external` is not a `target:` fix.
    - **What a fix keeps:** every byte outside its edit; a line item moves with the comment lines directly above it at its indentation; a bracketed container with a comment between its items is not sorted (the comment would be left behind), and the diagnostic is `manual` with the reason in its note.
    - **Verified before it is offered,** beyond decision 5 of [SR-ARCHITECTURE](0108_architecture.md): the file has no more syntax errors than before, the assertion now holds at the target, and the data outside the paths the steps changed is equal (a sort only reorders). A fix that fails any of these is not offered.
-3f. **`type:` — the type questions** (W-104, 2026-10-27; [SR-TYPES](0117_types.md); **not built yet**, W-105). Beside `match:` only, `type:` maps a capture to a question about its TypeScript type, answered by the project's own TypeScript ([L3](0005_LAW-3-languages.md) decision 9). The match holds only when every question holds.
-   - **The key is a capture** (`$NAME`) or `$$MATCH`, as in `where:`; a key `match:` doesn't capture, or a list capture, is a load error.
-   - **The value is a question from [SR-TYPES](0117_types.md) decision 4's fixed vocabulary**, or `not`, `all` and `any` over them; a name outside it is a load error. A rule cannot write its own question: a new one is an amendment of SR-TYPES.
+3f. **`type:` — the type questions** (W-104, 2026-10-27; [SR-TYPES](0117_types.md); built by W-105, 2026-10-28: `crates/codelaw-match/src/types.rs`, the loader's checks in `crates/codelaw-rules`). Beside `match:` only, `type:` maps a capture to a question about its TypeScript type, answered by the project's own TypeScript ([L3](0005_LAW-3-languages.md) decision 9). The match holds only when every question holds.
+   - **The key is a capture** (`$NAME`) or `$$MATCH`, as in `where:`; a key `match:` doesn't capture, or a list capture, is a load error. A clause on a capture the matched branch of an `any:` did not bind is skipped, as `calls:` is: that branch has no node to ask about.
+   - **The value is a question from [SR-TYPES](0117_types.md) decision 4's fixed vocabulary**, or `not`, `all` and `any` over them (a list means `all`); a name outside it is a load error. A rule cannot write its own question: a new one is an amendment of SR-TYPES.
    - **TypeScript only:** a `type:` rule's `languages:` names only `typescript` and `tsx`; any other is a load error.
    - **A type rule is still declarative data** (decision 9): its `message:` and `fix:` are this record's, and codelaw's fix engine builds the fix ([L4](0006_LAW-4-every-rule-has-a-fix.md)). It carries `ported_from: [typescript-eslint/<rule>]` when it reimplements one (SR-TYPES decision 10).
    - **When no type program answers** (no Node, no TypeScript ≥ 7.1, a cold hook): the rule does not run, and the report says so in a note; it never reports a guess (SR-TYPES decisions 6 and 8).

@@ -31,6 +31,7 @@ codelaw-lsp = { path = "crates/codelaw-lsp" }
 codelaw-mcp = { path = "crates/codelaw-mcp" }
 codelaw-agents = { path = "crates/codelaw-agents" }
 codelaw-format = { path = "crates/codelaw-format" }
+codelaw-types = { path = "crates/codelaw-types" }
 
 # Grammars and matcher: pinned (SR-ARCHITECTURE decision 3). All MIT.
 ast-grep-core = { version = "=0.51.0", features = ["tree-sitter"] }

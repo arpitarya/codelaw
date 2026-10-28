@@ -300,9 +300,28 @@ locale = "en-US"                          # or en-GB; unset accepts both
 
 A missing file at the default path is no error; a `words_file` you set must exist. `init` writes the file and fills it with **`codelaw spell learn`**, which runs `spell/unknown-word` over the project (whatever the config turns on) and adds each word it reports, lower case and sorted, after the lines already there. A word that is a known typo or one edit from a common word is listed for review, never added. A second run adds only new words ([SR-SPELL](records/0116_spell.md)).
 
-### Type rules today
+### Type-aware rules
 
-codelaw's own type-aware rules (`no-floating-promises`, `await-thenable`, the `no-unsafe-*` family …) are not built yet. Until they are, oxlint's type-aware mode gives you them through the oxlint adapter codelaw already runs. Install the tools in your project, not codelaw's:
+With TypeScript 7.1 or later installed in your project, the `ts` pack's `ts/type-checked` preset asks **your own TypeScript** about types — a Promise nobody awaits, an `await` on a plain value, a value typed `any` called or read from — and reports TypeScript's own errors as `ts/type-error`. They are `preview` until TypeScript 7.1 is GA:
+
+```toml
+# codelaw.toml
+extends = ["codelaw:ts/recommended", "codelaw:ts/type-checked"]
+preview = true
+```
+
+- **What it needs:** Node on `PATH` and `typescript` ≥ 7.1 in `node_modules`, from the file's folder up to the project root — the copy your project compiles with; codelaw installs none. It reads your `tsconfig.json`.
+- **When it can't:** without Node, or with no TypeScript or an older one, the type rules are skipped, every other rule runs, and the summary line and `--format json`'s `types.notes` say why.
+- **Reproducible:** the summary line and `--format json`'s `types` name the TypeScript version that answered.
+- **Not cached:** a file a type rule checks depends on the files it imports, so it is checked again on every run.
+- **Hooks never wait:** `codelaw hook` and `hook --pre` use a type program only when a warm process (`codelaw daemon start`) already holds one; otherwise they skip the type rules with a note. `--watch`, the daemon and the editor keep the program loaded.
+- **Shown once:** each rule names its typescript-eslint rule in `ported_from:`, so the same finding from oxlint's type-aware mode (below) is shown once, as codelaw's.
+
+The rest of typescript-eslint's type-checked rules are not built yet ([`packs/ts`](packs/ts/README.md#type-checked-rules)).
+
+### Type rules today, through oxlint
+
+oxlint's type-aware mode gives you typescript-eslint's type-checked rules codelaw has not built yet, through the oxlint adapter codelaw already runs. Install the tools in your project, not codelaw's:
 
 ```bash
 npm add -D oxlint oxlint-tsgolint typescript@7    # tsgolint needs TypeScript 7.0+
@@ -322,7 +341,7 @@ and turn type-aware mode on in the root `.oxlintrc.json` (or `options.typeAware`
 - **Not cached:** a type rule's verdict on a file depends on the files it imports, so while a config names `typeAware`, every check runs oxlint again instead of reusing the last result.
 - **Not in the hook or editor:** like every adapter, it runs only in `check` and `fix` from the CLI and CI.
 - **Limits are oxlint's:** some legacy `tsconfig.json` options, such as `baseUrl`, are not supported by `tsgolint`.
-- **When codelaw's own type rules ship** (in the `ts` pack, on the project's TypeScript 7.1), each names its typescript-eslint rule in `ported_from:`, so the same finding is shown once, as codelaw's, and you can drop `typeAware` from the oxlint config.
+- **Where codelaw has the rule** (`ts/type-checked`, above), it names its typescript-eslint rule in `ported_from:`, so the same finding is shown once, as codelaw's.
 
 ### Tests for new code
 

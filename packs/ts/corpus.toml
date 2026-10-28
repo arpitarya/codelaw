@@ -23,3 +23,11 @@
 "ts/prefer-namespace-keyword" = 0
 "ts/triple-slash-reference" = 0
 "ts/type-only-imports" = 797
+# The type rules (SR-TYPES) count 0: the corpus job has no TypeScript ≥ 7.1,
+# so they do not run there (decision 6) — W-105's left list.
+"ts/await-thenable" = 0
+"ts/no-floating-promises" = 0
+"ts/no-unsafe-call" = 0
+"ts/no-unsafe-member-access" = 0
+"ts/no-unsafe-return" = 0
+"ts/type-error" = 0

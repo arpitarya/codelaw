@@ -2,7 +2,7 @@
 
 # Rule reference
 
-**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 657 rules in 18 packs, plus the engine's 23 own rules.
+**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 663 rules in 18 packs, plus the engine's 23 own rules.
 
 ## Configuring any rule — the forms
 
@@ -36,7 +36,7 @@ remap = { error = "warn" }
 | Pack | npm | PyPI | Rules | With options |
 |---|---|---|---|---|
 | [js](#js) | `@codelaw/rules-js` | `codelaw-rules-js` | 77 | 8 |
-| [ts](#ts) | `@codelaw/rules-ts` | — | 21 | 1 |
+| [ts](#ts) | `@codelaw/rules-ts` | — | 27 | 1 |
 | [react](#react) | `@codelaw/rules-react` | `codelaw-rules-react` | 32 | 1 |
 | [node](#node) | `@codelaw/rules-node` | — | 10 | 0 |
 | [stencil](#stencil) | `@codelaw/rules-stencil` | — | 18 | 3 |
@@ -141,30 +141,36 @@ Presets: `codelaw:js/recommended` · `codelaw:js/typescript` · `codelaw:js/conv
 
 ## ts
 
-Presets: `codelaw:ts/recommended` · `codelaw:ts/conventions`.
+Presets: `codelaw:ts/recommended` · `codelaw:ts/conventions` · `codelaw:ts/type-checked`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
+| [`ts/await-thenable`](ts/await-thenable.md) | `await` only what can be awaited | `suggest` | — | `ts/type-checked` |
 | [`ts/ban-ts-comment`](ts/ban-ts-comment.md) | No @ts-ignore or @ts-nocheck; @ts-expect-error says why | `manual` | — | `ts/recommended` |
 | [`ts/no-array-constructor`](ts/no-array-constructor.md) | No Array constructor with several arguments | `auto` | — | `ts/recommended` |
 | [`ts/no-duplicate-enum-values`](ts/no-duplicate-enum-values.md) | No two enum members share a value | `manual` | — | `ts/recommended` |
 | [`ts/no-empty-object-type`](ts/no-empty-object-type.md) | No empty interfaces or {} types | `manual` | — | `ts/recommended` |
 | [`ts/no-explicit-any`](ts/no-explicit-any.md) | No explicit any | `suggest` | — | `ts/recommended` |
 | [`ts/no-extra-non-null-assertion`](ts/no-extra-non-null-assertion.md) | No repeated non-null assertions | `auto` | — | `ts/recommended` |
+| [`ts/no-floating-promises`](ts/no-floating-promises.md) | A Promise is awaited, returned or handled | `suggest` | — | `ts/type-checked` |
 | [`ts/no-misused-new`](ts/no-misused-new.md) | No constructors declared in interfaces, and no `new` methods in classes | `manual` | — | `ts/recommended` |
 | [`ts/no-namespace`](ts/no-namespace.md) | No TypeScript namespaces | `manual` | — | `ts/recommended` |
 | [`ts/no-non-null-asserted-optional-chain`](ts/no-non-null-asserted-optional-chain.md) | No non-null assertion after an optional chain | `suggest` | — | `ts/recommended` |
 | [`ts/no-require-imports`](ts/no-require-imports.md) | No require() calls | `manual` | — | `ts/recommended` |
 | [`ts/no-this-alias`](ts/no-this-alias.md) | No aliasing this to a variable | `manual` | — | `ts/recommended` |
 | [`ts/no-unnecessary-type-constraint`](ts/no-unnecessary-type-constraint.md) | No extends any or extends unknown on a type parameter | `suggest` | — | `ts/recommended` |
+| [`ts/no-unsafe-call`](ts/no-unsafe-call.md) | No call of a value typed `any` | `manual` | — | `ts/type-checked` |
 | [`ts/no-unsafe-declaration-merging`](ts/no-unsafe-declaration-merging.md) | No interface that merges with a class of the same name | `manual` | — | `ts/recommended` |
 | [`ts/no-unsafe-function-type`](ts/no-unsafe-function-type.md) | No Function type | `manual` | — | `ts/recommended` |
+| [`ts/no-unsafe-member-access`](ts/no-unsafe-member-access.md) | No member access on a value typed `any` | `manual` | — | `ts/type-checked` |
+| [`ts/no-unsafe-return`](ts/no-unsafe-return.md) | No `return` of a value typed `any` | `manual` | — | `ts/type-checked` |
 | [`ts/no-unused-expressions`](ts/no-unused-expressions.md) | No expression statements that do nothing | `manual` | — | `ts/recommended` |
 | [`ts/no-unused-vars`](ts/no-unused-vars.md) | Every declared name is used | `manual` | `vars`, `args`, `caughtErrors`, `ignoreRestSiblings`, `varsIgnorePattern`, `argsIgnorePattern`, `caughtErrorsIgnorePattern`, `destructuredArrayIgnorePattern` | `ts/recommended` |
 | [`ts/no-wrapper-object-types`](ts/no-wrapper-object-types.md) | Primitive types, not wrapper object types | `auto` | — | `ts/recommended` |
 | [`ts/prefer-as-const`](ts/prefer-as-const.md) | as const instead of repeating a literal as its type | `auto` | — | `ts/recommended` |
 | [`ts/prefer-namespace-keyword`](ts/prefer-namespace-keyword.md) | namespace, not module, for a TypeScript namespace | `auto` | — | `ts/recommended` |
 | [`ts/triple-slash-reference`](ts/triple-slash-reference.md) | No /// <reference path> directives | `manual` | — | `ts/recommended` |
+| [`ts/type-error`](ts/type-error.md) | TypeScript's own errors | `manual` | — | `ts/type-checked` |
 | [`ts/type-only-imports`](ts/type-only-imports.md) | Names used only as types are imported with type | `suggest` | — | `ts/conventions` |
 
 ## react

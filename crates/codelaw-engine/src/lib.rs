@@ -21,6 +21,7 @@ mod query;
 mod project;
 pub mod suppress;
 mod timings;
+mod types;
 mod watch;
 
 pub use changed_functions::{ChangedFile, ChangedFunction, ChangedFunctions};
@@ -38,6 +39,7 @@ pub use lcov::Lcov;
 pub use query::{RuleRow, RuleWhy, WhyForFile, severity_name};
 pub use debug::MatchReport;
 pub use timings::{PhaseTiming, RuleTiming, TimingReport};
+pub use types::TypesReport;
 pub use watch::{COALESCE, Changes, Rerun, Snapshot, Watch};
 
 use codelaw_cache::DiskCache;
@@ -99,6 +101,14 @@ pub struct EngineOptions {
     /// A surface's own default profile, which takes the place of the `CI`
     /// check: `("ci", "codelaw hook")`, `("ci", "MCP")`, `("local", "LSP")`.
     pub profile_surface: Option<(&'static str, &'static str)>,
+    /// Never load a cold type program: `codelaw hook` and `hook --pre`
+    /// use a warm one or skip the type rules (L8 decision 8, SR-TYPES
+    /// decision 8).
+    pub no_cold_types: bool,
+    /// `CODELAW_TYPESCRIPT`: the `typescript` package to ask when none is
+    /// installed from a file's folder up to the root (codelaw's own tests
+    /// and its rule tester; SR-TYPES decision 5).
+    pub typescript_env: Option<String>,
 }
 
 impl EngineOptions {
@@ -113,6 +123,7 @@ impl EngineOptions {
             as_of_env: var("CODELAW_AS_OF"),
             profile_env: var("CODELAW_PROFILE"),
             ci_env: var("CI"),
+            typescript_env: var("CODELAW_TYPESCRIPT"),
             ..Default::default()
         }
     }
@@ -174,6 +185,9 @@ pub struct CheckReport {
     /// The `new code:` and `coverage:` lines, when the test rules of new
     /// code ran (W-71; SR-CLI-MCP).
     pub new_code: Option<NewCodeHeader>,
+    /// The TypeScript that answered the type rules, or why they were
+    /// skipped, when one had a file to check (SR-TYPES decisions 6 and 12).
+    pub types: Option<TypesReport>,
 }
 
 impl CheckReport {
@@ -221,6 +235,8 @@ pub struct Project {
     /// `[lint] ignore_aliases` (SR-LINTER decision 6): the tools whose
     /// line suppressions count, and `ported_from:` id → codelaw ids.
     pub(crate) aliases: Option<Aliases>,
+    /// The type helpers and what the report says of them (SR-TYPES).
+    pub(crate) types: types::Types,
 }
 
 /// The other tools' suppressions a project reads, and the ids they map to.
@@ -269,7 +285,7 @@ impl Project {
             options.site_packages_env.as_deref(),
             options.virtual_env.as_deref(),
         );
-        let known = |id: &str| codelaw_native::lookup(id).is_some();
+        let known = |id: &str| codelaw_native::lookup(id).is_some() || id == codelaw_types::TYPE_ERROR_NATIVE;
         let rules = RuleSet::load(&config, &LoadOptions { search, known_native: &known }).map_err(EngineError::Load)?;
         Project::from_parts(config, rules, options)
     }
@@ -332,6 +348,7 @@ impl Project {
             as_of: std::sync::OnceLock::new(),
             touched: std::sync::OnceLock::new(),
             aliases,
+            types: types::Types::default(),
         })
     }
 

@@ -103,6 +103,7 @@ The decider asked for a record of what goes into which package, under the naming
    | engines | `codelaw-graph` | [SR-PROJECT-GRAPH](0103_project-graph.md) |
    | engines | `codelaw-baseline` | the baseline files, what each finding becomes under them, the ratchet and the deprecations registry ([SR-BASELINE](0104_baseline-and-deprecations.md)); it reads no clock and runs no `git`: `codelaw-engine` hands it the as-of date and the change set, and runs `graph/no-deprecated-usage` on the graph |
    | engines | `codelaw-adapters` | optional external linters run as programs: manifests, runner, output mapping ([SR-LINTER](0106_linter.md) decision 2); `codelaw-engine` runs them |
+   | engines | `codelaw-types` | the `codelaw-types` Node helper, its protocol, and the project's TypeScript found ([SR-TYPES](0117_types.md)); `codelaw-engine` asks it |
    | orchestration | `codelaw-engine` | the check, fix and format pipelines |
    | orchestration | `codelaw-report` | text, JSON, SARIF and agent output; exit codes |
    | orchestration | `codelaw-test` | the rule tester and `codelaw bench` ([SR-RULE-AUTHORING](0113_rule-authoring.md), [L8](0010_LAW-8-performance-budgets.md)) |

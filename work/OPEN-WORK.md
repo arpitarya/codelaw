@@ -65,7 +65,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-110** `agent` Clean session 2df06f6d's leftovers on the Mac: five merged worktrees and three `.fux`-only folders, by `worktree-cleanup.py --apply`. Filed by Arpit (Cowork). [detail](open/W-110-session-2df06f6d-cleanup.md)
 
-🟢 **W-105** `agent` Type-aware rules: `codelaw-types` Node helper on the project's TypeScript 7.1 API, `type:` clause, warm programs, `ts/type-error`, first rules in `ts` — preview on the 7.1 RC (11-10), stable after GA (11-24). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
+🟢 **W-105** `agent` Type-aware rules: helper (protocol 1), `type:` clause, `ts/type-error`, warm helpers and five `ts/type-checked` rules landed 2026-10-28 on 7.1.0-beta; left: new type questions, `--version --json`, the bench, the RC release. Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
 🟡 **W-38** waits on **W-86** `agent` PyPI 0.2.0: `css`, `data` live and trusted; day 1 uploads the other four and publishes the Release; then an agent checks `pip install codelaw` and `uvx codelaw` and writes it down. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
