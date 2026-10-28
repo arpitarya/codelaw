@@ -1,6 +1,7 @@
 {
   "files": {
-    ".claude/hooks/block-main.py": "d770a5aa497998e6c4973b4f26a14c2d1967a9c9da87e6aec733e34db6e9ca12",
+    ".claude/hooks/auto-land.py": "6dde0564e27224bdd499f8dcaaa3326c9f22ac0a453e7f45203b530165f8131f",
+    ".claude/hooks/block-main.py": "57d209ceeed9292dca00442ea3c6e004348fbd47487def79cb4238c01567fdfb",
     ".claude/hooks/claim-guard.py": "08638d6960bffcfb1f9a3a9c6b36812761cc3339fd22648a95c5e53a755dc5e3",
     ".claude/hooks/disk-budget.py": "56ac3beaf5cbff2e17acae976d45d8eee5be3fedeb7a62507167ccd408d324cc",
     ".claude/hooks/guard-open-work-inbox.sh": "2100bea49ebe037c7c0b35cedef6c4a2f5e8189c4ea3e7d76e7292e44737d10c",
@@ -11,9 +12,10 @@
     ".claude/hooks/session-lock.sh": "febe0bec484001ae2a10f0133da2e830a1ecbe161a6509a2646bd1ce0a2283f8",
     ".claude/hooks/stop-if-blocked.sh": "18f8fdbe8ca93dfc2008a4f73ac7cd04ef6bc780ae8899b680ee3f4fa1281c45",
     ".claude/hooks/worktree-cleanup.py": "cdaeb8a416068f21d32ebc3b6e860bd62710729b91a78fdcc4a0b1388ef55c40",
-    ".claude/skills/docket/SKILL.md": "bb5a3a52501a78e43bf6da5ca830bd7a875496fc19274a394b66dc3521b4a7e8"
+    ".claude/skills/docket/SKILL.md": "bb5a3a52501a78e43bf6da5ca830bd7a875496fc19274a394b66dc3521b4a7e8",
+    ".claude/skills/landing/SKILL.md": "23ed61a9054ccfbad24a762b3a261158d074a97218b04196507d632bfbbe8783"
   },
-  "kit": "64637f798c9c67f99cbc2aba682b9a55b37dabe283a601c42a7b723b0218faa0",
+  "kit": "8a5d2ddd4dbab9ec8e8d645fb3a5f60d8a059dd40ffb776f172ffeb51f0f6b29",
   "settings": [
     "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-open-work-inbox.sh",
     "$CLAUDE_PROJECT_DIR/.claude/hooks/inject-inbox.sh",
@@ -21,6 +23,10 @@
     "$CLAUDE_PROJECT_DIR/.claude/hooks/require-progress.sh",
     "$CLAUDE_PROJECT_DIR/.claude/hooks/session-lock.sh",
     "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-if-blocked.sh",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/auto-land.py\" edit",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/auto-land.py\" end",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/auto-land.py\" start",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/auto-land.py\" stop",
     "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-main.py\"",
     "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/claim-guard.py\"",
     "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py\" post",
