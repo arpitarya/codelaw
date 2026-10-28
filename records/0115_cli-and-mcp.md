@@ -17,11 +17,7 @@ owns:
   - scripts/bench-rivals.py
   - .github/workflows/bench-rivals.yml
 laws: [L0, L3, L4, L5, L7, L8]
-<<<<<<< HEAD
 timestamp: 2026-10-28T18:00:00Z
-=======
-timestamp: 2026-10-28T04:00:00Z
->>>>>>> main
 content_sha: ""
 ---
 
