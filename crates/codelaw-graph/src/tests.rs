@@ -479,3 +479,16 @@ fn test_files_and_what_they_reach() {
     assert!(g.test_reaches("app/m.py", "f", true));
     assert!(!g.test_reaches("app/m.py", "g", true), "a string is not identity");
 }
+
+#[test]
+fn terms_query_compiles_and_is_the_engines_to_run() {
+    let rule = compile(&serde_json::json!({"terms": "inconsistent"}), None).unwrap();
+    assert_eq!(rule.query, crate::Query::InconsistentTerms);
+    let graph = Graph::build(Vec::new(), &[], GraphConfig::default());
+    assert!(crate::run(&rule, &graph, &[Language::Markdown]).is_empty());
+    assert!(compile(&serde_json::json!({"terms": "unused"}), None).unwrap_err().contains("`inconsistent`"));
+    let respell = serde_json::json!({"do": ["respell"]});
+    assert!(compile(&serde_json::json!({"terms": "inconsistent"}), Some(&respell)).is_ok());
+    assert!(compile(&serde_json::json!({"terms": "inconsistent"}), Some(&serde_json::json!({"do": ["remove-rule"]}))).is_err());
+    assert!(compile(&serde_json::json!({"class": {"defined_in": "css"}}), Some(&respell)).is_err());
+}

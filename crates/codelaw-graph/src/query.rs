@@ -24,6 +24,10 @@ pub enum Query {
     /// `import: { form: [...], resolves | declared | published: false }`:
     /// the `node/` import rules.
     Imports { forms: Vec<SpecForm>, check: ImportCheck },
+    /// `terms: inconsistent`: one word spelled two ways across the project
+    /// (`spell/inconsistent-term`, SR-SPELL). Its words are the spell
+    /// pack's, so the engine runs it, over every file's prose.
+    InconsistentTerms,
 }
 
 /// What a `graph: import:` query reports.
@@ -43,6 +47,8 @@ pub enum Primitive {
     StripExportKeyword,
     RemoveDeclaration,
     RemoveRule,
+    /// `spell/inconsistent-term`: write the spelling the project uses most.
+    Respell,
 }
 
 /// A `fix:` of `when`/`else` branches over `local_references`.
@@ -77,7 +83,8 @@ fn primitives(v: Option<&Value>) -> Result<Vec<Primitive>, String> {
             "strip-export-keyword" => Ok(Primitive::StripExportKeyword),
             "remove-declaration" => Ok(Primitive::RemoveDeclaration),
             "remove-rule" => Ok(Primitive::RemoveRule),
-            other => Err(format!("unknown graph fix primitive `{other}` (strip-export-keyword, remove-declaration, remove-rule)")),
+            "respell" => Ok(Primitive::Respell),
+            other => Err(format!("unknown graph fix primitive `{other}` (strip-export-keyword, remove-declaration, remove-rule, respell)")),
         })
         .collect()
 }
@@ -91,7 +98,7 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         Some(other) => return Err(format!("`certainty_from: {other}` must be `module.dynamic`")),
     };
     for k in g.keys() {
-        if !["symbol", "unless", "when", "class", "deprecated", "import", "module", "certainty_from"].contains(&k.as_str()) {
+        if !["symbol", "unless", "when", "class", "deprecated", "import", "module", "terms", "certainty_from"].contains(&k.as_str()) {
             return Err(format!("unknown `graph:` key `{k}`"));
         }
     }
@@ -138,6 +145,11 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
             Some("undefined") => Query::UndefinedModuleClasses,
             _ => return Err("`graph: module:` takes `classes: unused` or `classes: undefined`".into()),
         }
+    } else if let Some(terms) = g.get("terms") {
+        if terms.as_str() != Some("inconsistent") {
+            return Err("`graph: terms:` takes `inconsistent`".into());
+        }
+        Query::InconsistentTerms
     } else if g.get("deprecated").is_some() {
         Query::DeprecatedUsage
     } else if let Some(imp) = g.get("import") {
@@ -168,7 +180,7 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         };
         Query::Imports { forms, check }
     } else {
-        return Err("`graph:` names no query (`symbol:`, `class:`, `module:`, `import:` or `deprecated:`)".into());
+        return Err("`graph:` names no query (`symbol:`, `class:`, `module:`, `import:`, `terms:` or `deprecated:`)".into());
     };
     let mut gf = GraphFix::default();
     match fix {
@@ -193,6 +205,15 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
             gf.when_local = gf.otherwise.clone();
         }
         Some(other) => return Err(format!("unsupported graph `fix:` {other}")),
+    }
+    // `respell` is the terms query's fix, and its only one.
+    let mut used = gf.when_local.iter().chain(&gf.otherwise);
+    if query == Query::InconsistentTerms {
+        if used.any(|p| *p != Primitive::Respell) {
+            return Err("a `graph: terms:` rule's fix is `do: [respell]`".into());
+        }
+    } else if used.any(|p| *p == Primitive::Respell) {
+        return Err("`respell` is the fix of a `graph: terms:` rule only".into());
     }
     Ok(GraphRule { query, fix: gf, certainty_from_dynamic })
 }
@@ -352,7 +373,7 @@ fn fix_edits(fix: &GraphFix, d: &Decl, python_all: bool) -> Vec<TextEdit> {
                     return vec![TextEdit::delete(a, b)];
                 }
             }
-            Primitive::RemoveRule => {}
+            Primitive::RemoveRule | Primitive::Respell => {}
         }
     }
     Vec::new()
@@ -366,6 +387,9 @@ pub fn run(rule: &GraphRule, graph: &Graph, languages: &[Language]) -> Vec<Graph
         // The engine runs `graph/no-deprecated-usage` itself, with the
         // registry and the baseline (SR-BASELINE; the `deprecated` module).
         Query::DeprecatedUsage => Vec::new(),
+        // The engine runs `spell/inconsistent-term` itself, with the spell
+        // pack's word data (SR-SPELL; `codelaw_native::spell`).
+        Query::InconsistentTerms => Vec::new(),
         Query::Imports { forms, check } => imports(graph, languages, forms, *check),
         Query::UnusedModuleClasses => unused_module_classes(rule, graph, languages),
         Query::UndefinedModuleClasses => undefined_module_classes(graph, languages),

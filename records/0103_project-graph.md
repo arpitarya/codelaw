@@ -13,7 +13,7 @@ owns:
   - crates/codelaw-cli/tests/css_modules.rs
   - crates/codelaw-cli/tests/tests_for_new_code.rs
 laws: [L0, L2, L3, L4, L5, L6]
-timestamp: 2026-10-27T12:00:00Z
+timestamp: 2026-10-28T22:00:00Z
 content_sha: ""
 ---
 
@@ -260,6 +260,14 @@ packages/legacy/src/plugins.py:14:1  info  graph/no-unused-exports  `register` l
 - **Opt-in** ([L8](0010_LAW-8-performance-budgets.md)): `extends = ["codelaw:tests"]` — the engine's own preset, not in any `recommended` ([SR-RULE-PACKS](0101_rule-packs.md) decision 3) — or a `[coverage]` table, or a rule named in `[rules]` (which turns on that one). Off, no graph is built for them and nothing here runs.
 - **The header** (`text` and `agent`, and `new_code` in JSON): `new code: 3 new, 1 edited functions since <base>` and, when the coverage rule runs, `coverage: <report> (N files)` ([SR-CLI-MCP](0115_cli-and-mcp.md)).
 - **The test:** `crates/codelaw-cli/tests/tests_for_new_code.rs` on real git repos — JS/TS with a renamed barrel re-export and an unexported helper, Python with a class, an alias and a `mock.patch` string, `--changed-since`, `--staged`, the agent hook, no change set and `on_no_change_set = "all"`, lcov with absolute and relative `SF:`, `min`, `mode = "patch"`, `require_report`, three kinds of stale report; and `crates/codelaw-graph/src/tests.rs` for what a test reaches.
+
+#### 10. Words across the project: `graph: { terms: inconsistent }`
+
+*W-103, 2026-10-28: SR-SPELL's `spell/inconsistent-term` needs every file's words at once, so it is a project rule; the decider ruled the rule and its fix class in SR-SPELL decision 5.*
+
+- **The query:** `graph: { terms: inconsistent }`, with `fix: { do: [respell] }` — the primitive only this query takes, and the only one it takes. `codelaw_graph::run` gives it nothing: like `graph/no-deprecated-usage`, the engine runs it (`crates/codelaw-engine/src/project.rs`), because its words are the spell pack's data, not the graph's facts.
+- **What it reads:** while the rule is on, the project stage's sources carry the text of every file in its languages, the files `[files]` or `languages` leave out included, so they count; findings are reported only in files `check` would check, after `codelaw-ignore`, as for every project rule.
+- **Cached and incremental (decision 5):** a file's words are read once, through `codelaw_native::spell::term_uses`, and cached by its text, its language, the grammars and the rule set's fingerprint (which covers every pack's data table); a watch re-reads a saved file's and runs the rule over every file again.
 
 ### Consequences
 

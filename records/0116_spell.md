@@ -3,7 +3,7 @@ type: Standing Record
 kind: component
 name: SR-SPELL
 title: "SR-SPELL (0116) — spelling as its own rule pack: a known-typo check on by default, a dictionary check opt-in, codelaw's own word data"
-description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, its three generated tables (known typos, the dictionary, the locale pairs), the [spell] section and six rules; spell/inconsistent-term is not. W-112: the words file, codelaw init adding the pack, codelaw spell learn."
+description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, its three generated tables (known typos, the dictionary, the locale pairs), the [spell] section and all seven rules, spell/inconsistent-term a project rule on the graph stage; the budget is not set. W-112: the words file, codelaw init adding the pack, codelaw spell learn."
 status: accepted
 date: 2026-10-27
 feature: "spell checking — the spell pack"
@@ -16,7 +16,7 @@ owns:
   - crates/codelaw-cli/tests/spell.rs
   - crates/codelaw-cli/src/spell_cmd.rs
 laws: [L2, L3, L4, L5, L6, L8, L10, L11]
-timestamp: 2026-10-28T18:00:00Z
+timestamp: 2026-10-28T22:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-27 (Cowork, voice), on the CSpell research: the typo list — \"Let's go with B.\" (codelaw builds its own from SCOWL); SCOWL and VarCon — \"Approve both.\"; the software-terms dictionary — \"Approve it.\"; packaging — \"want it as a separate package.\"; defaults and where the data lives — \"Go with the recommendation.\"; writing it up — \"go ahead\". W-103."
 ---
@@ -196,8 +196,23 @@ question its maintainers left open. The forks and the rulings are in
      place; names are not read, so it has no `suggest` tier.
      `spell/suspicious-word` reports an entry that is a known typo, or no
      dictionary word but one edit from a word of size class 20 or below.
-     `spell/inconsistent-term` is not built: it needs every file's words at
-     once, a `scope: project` rule the graph stage would have to carry.
+   - **As built (W-103, 2026-10-28), `spell/inconsistent-term`:** it needs
+     every file's words at once, so it is a `scope: project` rule, not a
+     `native:` one: `graph: { terms: inconsistent }` with the fix
+     `do: [respell]` ([SR-PROJECT-GRAPH](0103_project-graph.md) decision
+     10), which the engine runs on the graph stage. The two ways are
+     VarCon's one-to-one pairs from both of `locale.json`'s tables, so the
+     British `-ise` and the Oxford `-ize` are two ways too. It reads the
+     prose `spell/locale-variant` reads (names are an API, and not read) in
+     every file of the project, those `[files]` leaves out included, and
+     reports each use of the spelling the project writes less, in any file
+     it checks; the fix (`suggest`, applied with `--unsafe`) writes the
+     other in the word's case, the American one on a tie. Each form counts
+     on its own (`canceled` is not compared with `cancelling`); a word in
+     `[spell] words` is not counted; with `[spell] locale` set it reports
+     nothing, the locale's spelling being `spell/locale-variant`'s. A file's
+     words are read once and cached by its content and the rule set
+     (`codelaw_native::spell::term_uses`); a watch re-reads a saved file's.
 6. **The word data is codelaw's own, built from ratified sources only**
    ([L11](0013_LAW-11-dependencies.md) §3: D-42 SCOWL, D-43 VarCon, D-44
    software terms), and lives in the pack's `data/spell/`, not in the engine
@@ -331,6 +346,14 @@ question its maintainers left open. The forks and the rulings are in
      foreign or ipsum texts the English test cannot judge. Every rule stays
      `preview`. The comparison with `typos`' count (the reopen trigger) is
      not made: `typos` is not installed here and is not added (L11).
+     `spell/inconsistent-term` (2026-10-28) gives **107**: the corpus runs
+     a project rule over its eleven repositories as one project, so one
+     repository's spelling counts against another's. Run per repository it
+     gives 61, in five of the eleven, reviewed: real mixes
+     (`behaviour` 26 times and `behavior` 15 in httpx, `colour` against
+     `color` in rich, `initialisation`, `customise`, `normalised`), with
+     six in Django's generated migrations, where `Rouble` is part of a
+     currency's name, and two in a JSON data file of rich's.
      **Its time** (release build, ten threads, a copy of the eleven
      repositories, three runs each, on a machine at load 9 to 15, so the
      spread is wide): `spell/recommended` costs 6.2 to 10.3 s of rule time
