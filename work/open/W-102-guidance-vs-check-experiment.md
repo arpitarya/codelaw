@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+ball: arpit
 ---
 
 # W-102 — Experiment — does good guidance make the check unnecessary?

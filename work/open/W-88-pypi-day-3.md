@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-27 (voice docket): PyPI day 3 of 4 — at most four
 item: W-88
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-28
+updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
@@ -33,6 +33,8 @@ twine upload --skip-existing dist/fux-index/pypi/codelaw_rules_security_{html,py
 # the 0.2.0 wheels of the build npm was published from (2026-10-27), copied into dist/pypi/ first
 twine upload --skip-existing dist/pypi/codelaw_skills-0.2.0-py3-none-any.whl dist/pypi/codelaw_rules_scss-0.2.0-py3-none-any.whl
 ```
+
+**Merged 2026-10-29:** this day carries W-34's `security-html`, `security-python` Fux index uploads and W-77's `codelaw-skills` (both closed 2026-10-29).
 
 ## Trusted publisher, per project
 

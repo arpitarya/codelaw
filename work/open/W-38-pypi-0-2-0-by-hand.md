@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-25: the whole PyPI side of 0.2.0 in one item, block
 item: W-38
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
+updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
@@ -16,9 +16,9 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Upload the six rule-pack wheels by hand from the 0.2.0 `dist` — PyPI creates at most four new projects a day | the six projects exist, owned by Arpit | 🔴 2 of 6: `codelaw-rules-css` and `-data` are live; `html`, `js`, `python`, `react` → [W-86](W-86-pypi-day-1.md) (Wed 2026-10-28) |
-| 2 | Add a trusted publisher to each of the six projects | later releases come from CI, with no token | 🔴 2 of 6: `css` and `data` bound 2026-10-27 (`arpitarya/codelaw` · `publish.yml` · `pypi`); the other four → W-86 |
-| 3 | Publish the GitHub Release `v0.2.0` — on the tag W-37 created | CI creates `codelaw` on PyPI through its pending publisher, skips the six packs and everything npm already has, and attaches the checksums | 🔴 → W-86 step 3 (Arpit: `gh release create v0.2.0`) |
+| 1 | Upload the six rule-pack wheels by hand from the 0.2.0 `dist` — PyPI creates at most four new projects a day | the six projects exist, owned by Arpit | ✅ 6 of 6 live at 0.2.0 — `css`, `data` (10-25), `html`, `js`, `python`, `react` (W-86, 2026-10-28) |
+| 2 | Add a trusted publisher to each of the six projects | later releases come from CI, with no token | ✅ 6 of 6 trust `arpitarya/codelaw` · `publish.yml` · `pypi` (checked 2026-10-29) |
+| 3 | Publish the GitHub Release `v0.2.0` — on the tag W-37 created | CI creates `codelaw` on PyPI through its pending publisher, skips the six packs and everything npm already has, and attaches the checksums | 🔄 the v0.2.0 Release failed at `publish.yml`'s gate (2026-10-29, nothing written); `codelaw` now comes with v0.3.0 → [W-116](W-116-release-0-3-0.md) |
 | 4 | Check it as a user: a fresh venv, `pip install codelaw && codelaw --version`, `uvx codelaw --version`, and the install smoke from the registry on the eight platforms | PyPI works for real | ⏳ an agent, after step 3 |
 | 5 | Write it down: an `IMPLEMENTATION.md` row, `RELEASING.md` §One time step 4 marked done, the README's preview note | the docs say PyPI is live | ⏳ an agent, after step 4 |
 

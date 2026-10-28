@@ -18,7 +18,7 @@ ball: arpit
 |---|---|---|---|
 | 1 | `twine upload` the four 0.2.0 wheels already in `dist/pypi/` (built from the v0.2.0 tag, byte-identical to CI's) | `codelaw-rules-{html,js,python,react}` exist | ✅ 2026-10-28 — Arpit uploaded the four (`twine`; pypi.org lists each at 0.2.0) |
 | 2 | A trusted publisher on each of the four | CI can upload them | ✅ 2026-10-28 — Claude in Chrome added all four (`arpitarya` · `codelaw` · `publish.yml` · `pypi`); `codelaw`'s pending publisher still listed |
-| 3 | Publish the GitHub Release `v0.2.0` on W-37's tag (`08b7158`, CI green there) | CI creates `codelaw` on PyPI through its pending publisher, skips everything already uploaded, attaches the checksums | 🔴 Arpit |
+| 3 | Publish the GitHub Release `v0.2.0` on W-37's tag (`08b7158`, CI green there) | CI creates `codelaw` on PyPI through its pending publisher, skips everything already uploaded, attaches the checksums | 🔴 moved to day 2 (2026-10-29): `codelaw` by hand from the v0.2.0 tag's CI `dist` — [W-87](W-87-pypi-day-2.md); the failed v0.2.0 Release (00:33) published nothing |
 
 **Arpit, 2026-10-29 (voice docket; written on *"file it."*):** offered this item's last step, the v0.2.0 Release: *"Let's do this. Let's publish version 0.3.0 for all the packages through CI/CD pipeline."* — told PyPI can take only the projects that exist: *"We can skip the one pending for pipe here. The ones for NPM, it is being built and it should be ready. In few minutes."* Read as: the Release is v0.3.0's ([W-116](W-116-release-0-3-0.md)), which creates `codelaw` on PyPI through its pending publisher; this item closes when it lands. **Flagged:** a Claude Code session (`c6c222e8`, 00:31) was on this item's v0.2.0 Release, held by the permission classifier.
 
@@ -27,6 +27,10 @@ ball: arpit
 **Arpit, 2026-10-27 (voice docket):** *"create work items, one work item to publish all NPM packages and then multiple work items, four packages a day but make sure all the packages are accounted in this."* Earlier: *"create a work item just for publishing four packages a day for PyPI … add the command in the OpenWork file so that I can just copy it and paste it every day … don't count today's day"*, and *"Include these SCSS and security packs as well."*
 
 **The Release needs only this day.** v0.2.0's `dist` holds `codelaw` and six PyPI packs (`css`, `data`, `html`, `js`, `python`, `react`) — after step 2 all six have publishers, and `codelaw`'s pending publisher (registered 2026-10-25, still listed 2026-10-27) creates it. Days 2–4 are not in v0.2.0's `dist`. The tag's commit `08b7158` had a green `ci.yml` (run 40194930874), so the red `main` (W-84) does not stop this Release. The `dist` artifact lives 30 days from 2026-10-25.
+
+**Found 2026-10-29 (Cowork):** the v0.2.0 Release exists (no assets) and its `publish` run failed at the gate step, before any registry was written; nothing is half-published. v0.3.0 (W-116) brings `codelaw` instead; the v0.2.0 Release can stay, or be deleted by hand — it publishes nothing.
+
+**Arpit, 2026-10-29 (text):** *"getting code law in itself into PyPy. I'm talking about W86. Is it part of PyPy Day 2? If not, make it a part of PyPy Day 2. Or can you go ahead and mark it as pending release? If you do, mark it as pending trusted publisher and then I push it from my local. Will that work for W86?"* — yes: `codelaw` 0.2.0 goes up by hand on **day 2** ([W-87](W-87-pypi-day-2.md)), from the v0.2.0 tag's CI `dist`; then its trusted publisher. This item closes when `codelaw` is on PyPI and trusted; v0.3.0 (W-116) no longer has to create it.
 
 ## The command (repo root, on the Mac, not before Wed 2026-10-28)
 

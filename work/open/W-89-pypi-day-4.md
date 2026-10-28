@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-27 (voice docket): PyPI day 4 of 4 — at most four
 item: W-89
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-28
+updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
@@ -16,7 +16,7 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | `twine upload` the three security packs at 0.2.0 — the version npm got (W-85, 2026-10-27) | `codelaw-rules-security-{js,html,python}` exist | 🔴 Arpit |
+| 1 | `twine upload` the three security packs at 0.2.0 — the version npm got (W-85, 2026-10-27) | `codelaw-rules-security-{js,html,python}` exist, and `codelaw-rules-security-js-fux-index` (moved from day 2, 2026-10-29) | 🔴 Arpit |
 | 2 | A trusted publisher on each | CI can upload them | 🔴 Claude in Chrome, once Arpit is logged in to PyPI (ruled 2026-10-27) |
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Yes."* — on running days 1–4 as filed, with Claude adding the trusted publishers through Chrome.
@@ -29,8 +29,11 @@ ball: arpit
 
 ```bash
 # the 0.2.0 wheels of the build npm was published from (2026-10-27), copied into dist/pypi/ first
-twine upload --skip-existing dist/pypi/codelaw_rules_security_{js,html,python}-0.2.0-py3-none-any.whl
+twine upload --skip-existing dist/pypi/codelaw_rules_security_{js,html,python}-0.2.0-py3-none-any.whl \
+  dist/fux-index/pypi/codelaw_rules_security_js_fux_index-0.2.0-py3-none-any.whl
 ```
+
+**Merged 2026-10-29:** this day carries W-34's `security-js` Fux index upload (W-34 closed 2026-10-29).
 
 ## Trusted publisher, per project
 

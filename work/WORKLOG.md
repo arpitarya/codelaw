@@ -24,6 +24,30 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — W-34 and W-77 closed into the PyPI days; B-063 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"W34 can be archived and it can be merged with PyPy day 2, day 3, day 4 items. W77, the npm package is published, the PyPy package merge it with PyPy day 2, day 3, day 4 or create a new one day 5."*
+- **Done:** W-34 and W-77 archived (IMPLEMENTATION rows, archive README successors); their PyPI uploads named in W-87, W-88, W-89; the inbox's blocks sub-rows cleaned. `publish.yml` uploading the Fux index packages — W-34's only remaining agent step — moved to BACKLOG B-063 rather than lost. `codelaw-skills` checked: not on PyPI (404), already in day 3, so no day 5.
+- **Decided / left open:** his ruling, applied. Not committed.
+- **Mistakes:** none.
+- **Next:** day 2's upload.
+
+## 2026-10-29 — `codelaw` itself joins PyPI day 2  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"getting code law in itself into PyPy … make it a part of PyPy Day 2 … mark it as pending trusted publisher and then I push it from my local. Will that work for W86?"*
+- **Done:** day 2 (W-87) now uploads `codelaw` 0.2.0 by hand — its eight platform wheels from the v0.2.0 tag's CI `dist` (run 40194930874, kept to 2026-11-24), checked by SHA256SUMS and law-gate — with the `react`, `scss`, `python` Fux index wheels; `security-js`'s index moved to day 4 (W-89) to stay at four new projects. W-86 → 🔴 on W-87; W-116 noted. Not committed.
+- **Decided / left open:** his ask, applied. `codelaw`'s pending publisher stays registered; it neither reserves the name nor blocks his upload; a normal trusted publisher replaces it after the upload.
+- **Mistakes:** none.
+- **Next:** Arpit runs day 2's command; Claude adds the four trusted publishers.
+
+## 2026-10-29 — The queue reconciled again: W-114 closed; W-86, W-95, W-116, W-117, W-38 brought current  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"review all the open work items. Are all of them up to date?"*
+- **Done:** checked against `git log`, worktrees, GitHub (releases, runs, environments, issue search) and the registries. W-114 closed and archived (the five worktrees and branches are gone). W-86: the v0.2.0 Release was created 00:33 and its `publish` run 40750812279 failed at the gate — nothing published. W-95 → 🟡 on W-116 (environment `vscode` exists, the job landed). W-116: bump/CHANGELOG/PyPI skip landed; left green CI and the Release. W-117 and its inbox row: what is done, the claim (no issue found) and the token left. W-38's row. Not committed: written beside a live session (59502574) whose staged edits are untouched.
+- **Decided / left open:** none ruled. NOW's row for `c6c222e8` still says it waits on the v0.2.0 Release, which has since run — that session's to update.
+- **Mistakes:** none.
+- **Next:** CI green on `main`, then Arpit's v0.3.0 Release; the Open VSX claim and token.
+
 ## 2026-10-29 — Open VSX set up; the Marketplace's trusted publishing on  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"Set up open VSX. Create the account."*, then *"Go ahead, claim ownership. Do what's necessary."*, then, on the Marketplace, how to publish through CI with trusted publishing.

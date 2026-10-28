@@ -89,6 +89,8 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 - **Arpit, 2026-10-29 (voice):** *"Now, I already published 0.2.0, then I unpublished it and I deleted it. Now, I want the package or VS Code. Visual Studio Code extension to be published through CI/CD pipeline. How do I put it as trusted publishing?"* — the deleted 0.2.0 is not verified: whether `codelaw.codelaw` can be published again after a delete is open until the first CI upload.
 - **Left for an agent:** (1) the GitHub environment `vscode` (`gh api -X PUT repos/arpitarya/codelaw/environments/vscode`, tag rule `v*`, with Arpit's OK — W-117 step 1 is the same environment); (2) `publish.yml`'s job — `id-token: write` in environment `vscode`, the GitHub OIDC token exchanged for a Marketplace token per Microsoft's *Learn more* page, then the eight `.vsix` uploaded with `curl` (no `vsce`, L2/L11); (3) the first release proves it, including the deleted-name question.
 
+**Found 2026-10-29 01:15 (Cowork):** the GitHub environment `vscode` exists (with `npm`, `pypi`); the `publish.yml` `vscode` job landed (`815f327`). Left: the first release run (W-116) proves the Marketplace upload and the deleted-0.2.0 question; Open VSX waits on `OVSX_PAT` (W-117); README/USAGE step 4.
+
 ## Left
 
 1. **The decider (step 2, the inbox row):** the GitHub environment `vscode` with a `v*` tag rule; the Marketplace publisher `codelaw` and a PAT → secret `VSCE_PAT`; the Open VSX account, Eclipse publisher agreement, a token → secret `OVSX_PAT`, and the namespace `codelaw`; **and the ruling: (a) own `curl` uploads, no dependency (recommended), or (b) amend L2 and ratify `@vscode/vsce` 4.0.0 and `ovsx` 1.3.0, CI-only.**

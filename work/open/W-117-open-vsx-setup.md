@@ -16,7 +16,7 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | GitHub environment `vscode`, tag rule `v*` (as `npm`, `pypi`) | a place for the token that only release tags reach | 🔴 Arpit (or Claude in Chrome, with his OK) |
+| 1 | GitHub environment `vscode`, tag rule `v*` (as `npm`, `pypi`) | a place for the token that only release tags reach | ✅ 2026-10-29 — the environment `vscode` exists |
 | 2 | open-vsx.org → log in with GitHub → link an Eclipse account → sign the Publisher Agreement | the right to publish | ✅ 2026-10-29 — logged in; agreement signed |
 | 3 | An access token `codelaw-publish` → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` | CI can upload | 🔴 Arpit — the token is his to handle |
 | 4 | Create the namespace `codelaw`; claim its ownership (a public GitHub issue) — required for trusted publishing | `codelaw.codelaw` on Open VSX | 🔄 created 2026-10-29; ⏳ the ownership claim |
@@ -35,6 +35,8 @@ ball: arpit
 - **Open VSX has trusted publishing (OIDC)** — *Settings → Trusted Publishers*, per namespace: owner, repository, workflow file, optional environment ([wiki](https://github.com/eclipse-openvsx/openvsx/wiki/Trusted-Publishing)). The workflow sends its GitHub OIDC token to `POST /api/-/trusted-publishing/token` and gets a token scoped to one extension for minutes. **So CI needs no `OVSX_PAT`** — the same model as npm and PyPI here.
 - **Its limits:** namespace *ownership* and the signed agreement first; the extension must already have **one version published with an access token**; one trusted publisher per extension. The wiki documents only `ovsx publish --trusted-publishing` (not ratified, L2 refuses it); the exchange's request body is not documented there — read from the registry's source before `curl` replaces it.
 - **So the plan changes:** a token is needed once — to create the namespace and upload the first version by hand (at v0.3.0, with the Marketplace upload) — then a trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`), and `publish.yml` uses OIDC from the next release; the token can then be revoked.
+
+**State, 2026-10-29 01:15 (Cowork):** environment ✅, login and agreement ✅, namespace ✅ (unverified). Left: (1) the ownership claim — no issue titled *codelaw* found on `EclipseFdn/open-vsx.org` (GitHub search, 01:15); (2) one access token → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` for the first upload, which `publish.yml`'s `vscode` job uses; (3) after it, the trusted publisher and the token revoked.
 
 ## The commands (from W-95's inbox row)
 
