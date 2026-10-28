@@ -3,7 +3,7 @@ id: css/import-notation
 title: "`@import` with `url()`"
 languages: [css]
 fix: auto
-stability: preview
+stability: stable
 ported_from: [stylelint/import-notation]
 since: 0.1.0
 ---

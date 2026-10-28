@@ -17,7 +17,7 @@
 
 ## What it checks
 
-A name other files read holds a word on the pack's list of known typos: a JSON, YAML or TOML key, a CSS or SCSS class, id, custom property, `$variable`, mixin or function, or an HTML `id`. The name is split at case changes, `_`, `-`, `.` and digits, and each part of four letters or more is looked up. Each distinct name is reported once per file, where it is first declared.
+A name other files read holds a word on the pack's list of known typos: a JSON, YAML or TOML key, a CSS or SCSS class, id, custom property, `$variable`, mixin or function, or an HTML `id`. The name is split at case changes, `_`, `-`, `.` and digits, and each part of four letters or more is looked up. Each distinct name is reported once per file, where it is first declared. Lockfiles (`*.lock`, `*-lock.json`, `*-lock.yaml`) and the keys of a dependency section (`dependencies`, `devDependencies`, `[tool.poetry.dependencies]`, `packages`, `overrides`, `resolutions`) are package names their registries spell, and are not read.
 
 **Why:** a misspelled key or class is copied into every file that reads it, and `grep receive` never finds it. It is cheapest to fix before it has readers, and it is never safe to fix in one file alone.
 

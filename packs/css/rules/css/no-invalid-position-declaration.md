@@ -4,7 +4,7 @@ title: "Declarations sit inside rules"
 languages: [css, scss]
 fix: manual
 fix_reason: "the selector it was meant for is the author's call"
-stability: preview
+stability: stable
 ported_from: [stylelint/no-invalid-position-declaration]
 since: 0.1.0
 ---

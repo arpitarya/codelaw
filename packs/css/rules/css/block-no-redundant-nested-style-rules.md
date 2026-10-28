@@ -4,7 +4,7 @@ title: "No `& { \u2026 }` wrapper"
 languages: [css, scss]
 fix: suggest
 fix_reason: "declarations moved out of the wrapper change place relative to the nested rules around it"
-stability: preview
+stability: stable
 ported_from: [stylelint/block-no-redundant-nested-style-rules]
 since: 0.1.0
 ---

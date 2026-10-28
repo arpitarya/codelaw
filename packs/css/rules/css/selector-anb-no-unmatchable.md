@@ -4,7 +4,7 @@ title: "No An+B selector that matches nothing"
 languages: [css, scss]
 fix: manual
 fix_reason: "the intended position is the author's call"
-stability: preview
+stability: stable
 ported_from: [stylelint/selector-anb-no-unmatchable]
 since: 0.1.0
 ---

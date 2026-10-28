@@ -8,7 +8,7 @@ stability: preview
 since: 0.3.0
 ---
 
-A word in a comment, a docstring, a prose string, Markdown text, HTML text or an HTML `alt`, `title`, `aria-label` or `placeholder`, or a string value of JSON, YAML or TOML is in no word list: not in the pack's dictionary (SCOWL's US and British English up to size 60, with every form written out, plus the software terms), not on the known-typo list (`spell/known-typo` reports those) and not in `[spell] words`. A word in capitals is an acronym and is not checked; so are words shorter than four letters and every token `spell/known-typo` skips (URLs, paths, identifiers, hashes).
+A word in a comment, a docstring, a prose string, Markdown text, HTML text or an HTML `alt`, `title`, `aria-label` or `placeholder`, or a string value of JSON, YAML or TOML is in no word list: not in the pack's dictionary (SCOWL's US and British English up to size 60, with every form written out, plus the software terms), not on the known-typo list (`spell/known-typo` reports those) and not in `[spell] words`. A word in capitals is an acronym and is not checked; so are words shorter than four letters and every token `spell/known-typo` skips (URLs, paths, identifiers, hashes, template tags); a text that is not English, as `spell/known-typo` judges it, is not checked.
 
 **Why:** the known-typo list catches the misspellings codelaw can predict; the dictionary catches the rest (`seperately`, `responce`). It is in `spell/strict`, not `spell/recommended`, because code is full of real words no dictionary holds.
 

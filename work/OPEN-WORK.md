@@ -41,9 +41,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (22)
+## Open items (20)
 
-### build (19)
+### build (18)
 
 🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -63,13 +63,11 @@ here. Read that record before changing anything below it.
 
 🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
-🟢 **W-103** `agent` Spell pack: three generated tables (188,151 typos, a 92,758-word dictionary, VarCon locale pairs), `[spell]`, six rules landed; fixtures and `fix` run pass; left: `spell/inconsistent-term` (project scope), corpus run, L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
+🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🟢 **W-112** `agent` Spell words file `.codelaw/spell/words.txt` (`[spell] words_file`, merged with `[spell] words`); `codelaw init` adds the pack and file (`--no-spell` skips); `codelaw spell learn`. Filed by Arpit (Cowork). [detail](open/W-112-spell-words-file-and-learn.md)
 
 🟢 **W-110** `agent` Clean session 2df06f6d's leftovers on the Mac: five merged worktrees and three `.fux`-only folders, by `worktree-cleanup.py --apply`. Filed by Arpit (Cowork). [detail](open/W-110-session-2df06f6d-cleanup.md)
-
-🟢 **W-100** `agent` Rule promotion: criterion ratified 10-27 (SR-RULE-AUTHORING 6a, as proposed). Left: `corpus.py promote --write --run <url>` for the first batch, then close. Filed by Arpit (Cowork). [detail](open/W-100-rule-promotion.md)
 
 🟢 **W-105** `agent` Type-aware rules: `codelaw-types` Node helper on the project's TypeScript 7.1 API, `type:` clause, warm programs, `ts/type-error`, first rules in `ts` — preview on the 7.1 RC (11-10), stable after GA (11-24). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
@@ -84,11 +82,9 @@ here. Read that record before changing anything below it.
 
 🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
 
-### testing (2)
+### testing (1)
 
 🟢 **W-102** `agent` Experiment approved 10-27: Claude Code CLI, Fux in arm C. Left: the pilot (`--runs 1`, ~$29) on the Mac, then the full 180, the write-up and the README line. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
-
-🟢 **W-108** `agent` oxlint type-aware live capture taken 10-28 (oxlint 1.90.0): it differs from W-107's fixture — a third finding and another span and help; swap it in and fix the adapter test. Filed by Arpit (Cowork). [detail](open/W-108-oxlint-live-capture.md)
 
 ### record update (1)
 

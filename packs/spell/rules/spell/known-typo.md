@@ -11,7 +11,7 @@ A word in a comment, a docstring, a prose string, Markdown text, HTML text or an
 
 **Why:** a typo in a message, a doc or a comment reads as carelessness and hides from search (`grep receive` misses `recieve`). The list holds only words that are no English word and come from exactly one common word, so the fix is safe to run unattended.
 
-A string is read only when it holds whitespace and no interpolation; keys are names, not prose. URLs, email addresses, paths, dotted names, hashes, UUIDs, base64, code and identifiers (`snake_case`, `camelCase`, letters and digits mixed) are skipped, as is any word shorter than four letters.
+A string is read only when it holds whitespace and no interpolation; keys are names, not prose. URLs, email addresses, paths, dotted names, hashes, UUIDs, base64, code and identifiers (`snake_case`, `camelCase`, letters and digits mixed) are skipped, as is any word shorter than four letters. Template tags (`{% … %}`, `{{ … }}`, `{# … #}`) are code, not prose. A text of three words or more of which fewer than half are English words or known typos — lorem ipsum, a translated README, a comment in another language — is not checked: its words are not English typos.
 
 ```codelaw
 native: spell/known-typo

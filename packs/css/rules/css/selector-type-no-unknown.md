@@ -4,7 +4,7 @@ title: "No unknown type selectors"
 languages: [css, scss]
 fix: manual
 fix_reason: "the intended element is the author's call"
-stability: preview
+stability: stable
 options:
   ignore: { type: "string[]", default: ["custom-elements"], description: "`custom-elements` allows hyphenated names; `default-namespace` skips un-namespaced types" }
   ignoreTypes: { type: "string[]", default: [], description: "type selectors to accept; `/regex/` for a pattern" }

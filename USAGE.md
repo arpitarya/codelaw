@@ -38,7 +38,7 @@ codelaw check
 ```
 
 - **`init` detects your languages** and writes the matching `recommended` presets into `codelaw.toml`.
-- **Every rule is `preview` in 0.1.0**, so `preview = true` is needed until rules are promoted to stable.
+- **Most rules are still `preview`**, so `preview = true` is needed to run them; 42 `css` rules are `stable` since the first promotion (W-100) and run without it.
 - **Step 3 is temporary.** codelaw only reads the linked folders, so it works in any repo, Python-only included, and neither Node nor Python is run. `CODELAW_SITE_PACKAGES` is where codelaw looks for the PyPI packs, as an activated `.venv` would tell it. Add `node_modules/` and `.codelaw-packs/` to `.gitignore`.
 
 ### After the first release

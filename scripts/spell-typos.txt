@@ -7,3 +7,14 @@
 # Every entry is written here by a person, from a typo seen in real text.
 # Never copy an entry from `typos`, codespell or Wikipedia's lists of common
 # misspellings (SR-SPELL decision 6 and its veto condition).
+#   !word                a generated variant that is no typo: dropped
+#
+# Not typos, found by the pinned-corpus review of 2026-10-28 (W-103):
+!axios     # an HTTP client's name
+!checkin   # a version-control term
+!hsts      # HTTP Strict Transport Security
+!imag      # Python's complex `.imag`
+!inlines   # Django's ModelAdmin.inlines
+!addopts   # pytest's ini option
+!attaches  # English, missing from SCOWL's lists
+!rects     # rectangles: `getClientRects`, `rects`

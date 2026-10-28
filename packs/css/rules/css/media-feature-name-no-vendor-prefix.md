@@ -4,7 +4,7 @@ title: "No vendor-prefixed media features"
 languages: [css, scss]
 fix: manual
 fix_reason: "the value needs converting to a `dppx` resolution"
-stability: preview
+stability: stable
 ported_from: [stylelint/media-feature-name-no-vendor-prefix]
 since: 0.1.0
 ---

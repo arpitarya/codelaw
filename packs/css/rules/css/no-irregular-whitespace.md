@@ -4,7 +4,7 @@ title: "No irregular whitespace"
 languages: [css, scss]
 fix: suggest
 fix_reason: "replacing it changes which elements the selector matches"
-stability: preview
+stability: stable
 ported_from: [stylelint/no-irregular-whitespace]
 since: 0.1.0
 ---

@@ -167,20 +167,28 @@ def variants(word, keys, nb):
 
 
 def read_extra():
-    """scripts/spell-typos.txt: `typo fix[,fix…]` per line, `#` comments."""
-    extra = {}
+    """scripts/spell-typos.txt: `typo fix[,fix…]` per line adds a typo;
+    `!word` says a generated variant is no typo (a name, a term of the
+    trade, an attribute) and drops it; `#` starts a comment."""
+    extra, not_typos = {}, set()
     if not EXTRA.exists():
-        return extra
+        return extra, not_typos
     for n, line in enumerate(EXTRA.read_text(encoding="utf-8").splitlines(), 1):
         line = line.split("#", 1)[0].strip()
         if not line:
+            continue
+        if line.startswith("!"):
+            word = line[1:].strip()
+            if not word.isascii() or not word.isalpha() or not word.islower():
+                sys.exit(f"{EXTRA}:{n}: expected `!word` in lowercase ASCII letters")
+            not_typos.add(word)
             continue
         typo, _, fixes = line.partition(" ")
         fixes = [f.strip() for f in fixes.split(",") if f.strip()]
         if not typo.isascii() or not typo.isalpha() or not typo.islower() or not fixes:
             sys.exit(f"{EXTRA}:{n}: expected `typo fix[,fix…]` in lowercase ASCII letters")
         extra[typo] = fixes
-    return extra
+    return extra, not_typos
 
 
 def dictionary_words(lists, terms):
@@ -267,6 +275,9 @@ def build(cache):
     # (`untill`, `wierd`, `accomodate`) among their rare words.
     known = {w.lower() for (category, size), words in lists.items() if size <= EXCLUDE_MAX_SIZE or not category.endswith("-words") for w in words}
     known.update(t.lower() for t in terms)
+    # The checker splits a word at an apostrophe, so a contraction's stem
+    # (`aren` of `aren't`) is written in every English text.
+    known.update(w.split("'", 1)[0].lower() for (category, _), words in lists.items() if category.endswith("-contractions") for w in words)
 
     def common(max_size):
         out = set()
@@ -282,9 +293,10 @@ def build(cache):
         for v in variants(word, word in keyed, nb):
             if len(v) >= MIN_TYPO_LEN and v not in known:
                 sources[v].add(word)
-    table = {typo: [next(iter(src))] for typo, src in sources.items() if len(src) == 1}
+    extra, not_typos = read_extra()
+    table = {typo: [next(iter(src))] for typo, src in sources.items() if len(src) == 1 and typo not in not_typos}
     generated = len(table)
-    table.update(read_extra())
+    table.update(extra)
     entries = " ".join(f"{t}:{'|'.join(table[t])}" for t in sorted(table))
     doc = {
         "count": len(table),

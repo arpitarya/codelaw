@@ -3,7 +3,7 @@ id: css/no-empty-block
 title: "No empty blocks"
 languages: [css, scss]
 fix: auto
-stability: preview
+stability: stable
 ported_from: [stylelint/block-no-empty]
 since: 0.1.0
 ---
