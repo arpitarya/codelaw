@@ -233,6 +233,9 @@ pub enum BlockKind {
         constraints: Option<serde_json::Value>,
         utils: Option<serde_json::Value>,
         predicates: Option<serde_json::Value>,
+        /// `type:`, the type questions (decision 3f; SR-TYPES); boxed, as
+        /// few rules have one.
+        types: Option<Box<serde_json::Value>>,
     },
     Graph(serde_json::Value),
     Target { target: serde_json::Value, assert: serde_json::Value },
@@ -422,7 +425,7 @@ fn yaml_value(text: &str) -> Result<serde_json::Value, String> {
     yaml::<serde_json::Value>(text).map_err(|e| e.to_string())
 }
 
-const BLOCK_KEYS: &[&str] = &["match", "constraints", "utils", "where", "graph", "target", "assert", "native", "message", "fix"];
+const BLOCK_KEYS: &[&str] = &["match", "constraints", "utils", "where", "type", "graph", "target", "assert", "native", "message", "fix"];
 
 fn parse_block(code: &str) -> Result<Block, String> {
     let value = yaml_value(code)?;
@@ -446,7 +449,13 @@ fn parse_block(code: &str) -> Result<Block, String> {
     }
     let get = |k: &str| map.get(k).cloned();
     let kind = match forms[0] {
-        "match" => BlockKind::Match { rule: get("match").unwrap(), constraints: get("constraints"), utils: get("utils"), predicates: get("where") },
+        "match" => BlockKind::Match {
+            rule: get("match").unwrap(),
+            constraints: get("constraints"),
+            utils: get("utils"),
+            predicates: get("where"),
+            types: get("type").map(Box::new),
+        },
         "graph" => BlockKind::Graph(get("graph").unwrap()),
         "target" => BlockKind::Target {
             target: get("target").unwrap(),
@@ -457,7 +466,7 @@ fn parse_block(code: &str) -> Result<Block, String> {
         ),
     };
     if !matches!(kind, BlockKind::Match { .. }) {
-        for k in ["constraints", "utils", "where"] {
+        for k in ["constraints", "utils", "where", "type"] {
             if map.contains_key(k) {
                 return Err(format!("`{k}:` only goes with `match:`"));
             }
@@ -797,6 +806,12 @@ pub fn parse_rule(path: &Path, text: &str, expected_id: Option<&str>) -> Result<
     if matches!(block.kind, BlockKind::Graph(_)) && scope != Scope::Project {
         err(&mut errors, 2, "a `graph:` block needs `scope: project`".into());
     }
+    // Decision 3f: only TypeScript has types to ask about.
+    if matches!(block.kind, BlockKind::Match { types: Some(_), .. })
+        && let Some(other) = languages.iter().find(|l| !matches!(l, Language::Typescript | Language::Tsx))
+    {
+        err(&mut errors, 2, format!("a `type:` rule names only `typescript` and `tsx` in `languages:`, not `{}`", other.name()));
+    }
     if block.fix.is_some() && fix == Some(FixClass::Manual) {
         err(&mut errors, block_line, "a `manual` rule has no `fix:` in its codelaw block; its fix is `## How to fix`".into());
     }
@@ -1062,6 +1077,19 @@ let a: number = 1;
         assert_eq!(r.block.message.as_deref(), Some("n"));
         let e = errors(&GOOD.replace("message: \"Use let instead of var\"", "message: [1]"));
         assert_eq!(e, vec!["`message:` must be a string".to_string()], "one error, not a second about a missing block");
+    }
+
+    #[test]
+    fn a_type_clause_goes_with_match_and_typescript_only() {
+        let typed = GOOD.replace("message: \"Use let", "type:\n  $$MATCH: any\nmessage: \"Use let");
+        let e = errors(&typed);
+        assert!(e.iter().any(|m| m.contains("names only `typescript` and `tsx`")), "{e:?}");
+        let ts_only = typed.replace("languages: [javascript, typescript]", "languages: [typescript]");
+        let ts_only = ts_only.replace("### JavaScript\n\n#### Don't\n\n```js\nvar a = 1;\n```\n\n#### Do\n\n```js\nlet a = 1;\n```\n\n", "");
+        let r = parse_rule(Path::new("acme/no-var.md"), &ts_only, Some("acme/no-var")).unwrap();
+        assert!(matches!(&r.block.kind, BlockKind::Match { types: Some(_), .. }));
+        let native = "native: x\ntype:\n  $$MATCH: any\nmessage: m";
+        assert_eq!(parse_block(native).unwrap_err(), "`type:` only goes with `match:`");
     }
 
     #[test]

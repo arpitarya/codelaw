@@ -92,8 +92,11 @@ fn project_for(loaded: &LoadedRule, keep_globs: bool, options: &std::collections
     let fingerprint = if options.is_empty() { Key([0; 32]) } else { codelaw_cache::hash_bytes(format!("{}{}", loaded.rule.id, serde_json::to_string(options).unwrap_or_default()).as_bytes()) };
     let rules = RuleSet { rules: vec![lr], packs: Vec::new(), warnings: Vec::new(), preset_scopes: Vec::new(), fingerprint };
     let config = Config::defaults(PathBuf::from("/codelaw-test"));
-    Project::from_parts(config, rules, EngineOptions { no_cache: true, threads: Some(1), ..Default::default() })
-        .expect("a single loaded rule compiles: it already passed load")
+    // A type rule's examples are answered by the TypeScript
+    // `CODELAW_TYPESCRIPT` names, with Node from `PATH` (SR-TYPES).
+    let env = EngineOptions::from_env();
+    let options = EngineOptions { no_cache: true, threads: Some(1), typescript_env: env.typescript_env, path_env: env.path_env, ..Default::default() };
+    Project::from_parts(config, rules, options).expect("a single loaded rule compiles: it already passed load")
 }
 
 struct Tester<'a> {
@@ -139,6 +142,24 @@ impl<'a> Tester<'a> {
         } else {
             &self.plain
         }
+    }
+
+    /// A type rule needs a type program: without one it cannot fire, which
+    /// says nothing about the rule (SR-TYPES decision 6). Says so, as a
+    /// warning, and whether that is the case.
+    fn no_type_program(&mut self, level: Level) -> bool {
+        let rule = &self.loaded.rule;
+        let why = match rule.languages.first() {
+            Some(l) if self.plain.compiled.iter().any(|c| c.typed) => self.plain.types_unavailable(&format!("example.{}", l.extension()), *l),
+            _ => None,
+        };
+        let Some(why) = why else { return false };
+        self.report.warnings.push(Failure {
+            level,
+            at: level.name().into(),
+            message: format!("not checked: {why}; set `CODELAW_TYPESCRIPT` to a `typescript` ≥ 7.1 package folder"),
+        });
+        true
     }
 
     fn fail(&mut self, level: Level, at: String, message: String) {
@@ -450,6 +471,9 @@ pub fn test_rule(loaded: &LoadedRule, case: Option<&str>) -> RuleReport {
             t.fail(Level::Invariants, "frontmatter".into(), format!("unknown invariant `{inv}` (one of {})", RULE_INVARIANTS.join(", ")));
         }
     }
+    if t.no_type_program(Level::Examples) {
+        return t.report;
+    }
     if case.is_none() {
         t.examples();
     }
@@ -495,6 +519,9 @@ pub fn corpus_rule(loaded: &LoadedRule, files: &[(String, Language, String)]) ->
             t.fail(Level::Corpus, "the corpus".into(), "two runs disagree".into());
         }
         return CorpusReport { findings: first.len(), report: t.report };
+    }
+    if t.no_type_program(Level::Corpus) {
+        return CorpusReport { findings: 0, report: t.report };
     }
     let fixable = loaded.rule.fix != FixClass::Manual;
     let mut findings = 0;

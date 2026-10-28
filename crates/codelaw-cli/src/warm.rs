@@ -236,6 +236,10 @@ mod unix {
             "as_of": env.as_of_env,
             "profile": env.profile_env,
             "ci": env.ci_env,
+            // Where the type helper finds Node and TypeScript (SR-TYPES
+            // decision 5): the client's, not the warm process's.
+            "path": env.path_env.as_ref().map(|p| p.to_string_lossy().into_owned()),
+            "typescript": env.typescript_env,
         })
     }
 
@@ -264,6 +268,8 @@ mod unix {
             as_of_env: s("as_of"),
             profile_env: s("profile"),
             ci_env: s("ci"),
+            path_env: s("path").map(std::ffi::OsString::from),
+            typescript_env: s("typescript"),
             ..Default::default()
         }
     }

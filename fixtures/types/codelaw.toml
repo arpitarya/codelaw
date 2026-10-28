@@ -1,0 +1,3 @@
+# SR-TYPES: the type-checked rules, answered by this folder's own TypeScript.
+extends = ["codelaw:ts/type-checked"]
+preview = true

@@ -392,7 +392,8 @@ pub fn judge(files: &[Rebuilt], profile: Option<String>) -> Result<Verdict, Stri
     let files: Vec<(PathBuf, &Rebuilt)> = files.iter().filter(|f| Language::from_path(&f.path).is_some()).map(|f| (real(&f.path), f)).collect();
     let Some((first, _)) = files.first() else { return Ok(Verdict::default()) };
     let touched: Vec<PathBuf> = files.iter().map(|(p, _)| p.clone()).collect();
-    let options = EngineOptions { touched_paths: touched, profile, profile_surface: Some(("ci", "codelaw hook --pre")), ..EngineOptions::from_env() };
+    // A hook never waits for a cold type program (L8 decision 8).
+    let options = EngineOptions { touched_paths: touched, profile, profile_surface: Some(("ci", "codelaw hook --pre")), no_cold_types: true, ..EngineOptions::from_env() };
     let project = Project::load(&existing_dir(first), options).map_err(|e| e.to_string())?;
     let mut verdict = Verdict::default();
     for (path, f) in &files {

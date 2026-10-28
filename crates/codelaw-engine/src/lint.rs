@@ -213,6 +213,11 @@ impl Project {
             Ok(f) => f,
             Err(skipped) => return (skipped, Vec::new()),
         };
+        // A file a type rule checks depends on files outside its key (its
+        // imports, the `tsconfig.json` chain): while a type program answers,
+        // it is not cached; when none can, the reason is in the key
+        // (SR-TYPES decision 12).
+        let types = self.typed_rule_applies(entry).then(|| self.types_available(entry));
         let key = KeyBuilder::new("file+asked")
             .part(&entry.rel)
             .part(if file.bom { "bom" } else { "" })
@@ -228,9 +233,15 @@ impl Project {
             .part(format!("{:?}{:?}", self.options.languages, self.options.rules))
             // A dated `codelaw-ignore` is judged on the as-of date.
             .part(self.exception_key(&file.text))
+            .part(match &types {
+                Some(Err(why)) => why.as_str(),
+                _ => "",
+            })
             .key();
+        let cacheable = !matches!(types, Some(Ok(_)));
         // A result that read other files holds only while their answers do.
-        let cached = self.cache.get::<CachedFile>(&key).filter(|c| crate::files::still_holds(self.root(), &c.asked, &|| self.as_of_text()));
+        let cached = if cacheable { self.cache.get::<CachedFile>(&key) } else { None };
+        let cached = cached.filter(|c| crate::files::still_holds(self.root(), &c.asked, &|| self.as_of_text()));
         if let Some(t) = &self.timings {
             t.cache(cached.is_some());
         }
@@ -239,7 +250,7 @@ impl Project {
             None => {
                 let mut out = lint_text(self, entry, &file.text, &RunMode::check().with_bom(file.bom));
                 out.diagnostics.extend(crate::format::check_diagnostic(self, entry, &file.text));
-                if !out.diagnostics.iter().any(|d| d.rule == "codelaw/internal-error") {
+                if cacheable && !out.diagnostics.iter().any(|d| d.rule == "codelaw/internal-error") {
                     self.cache.put(&key, &CachedFile { diagnostics: out.diagnostics.clone(), asked: out.asked.clone() });
                 }
                 (out.diagnostics, out.asked)
@@ -249,6 +260,24 @@ impl Project {
             shift_for_bom(&mut diagnostics);
         }
         (FileResult { diagnostics, skipped: None }, asked)
+    }
+}
+
+impl Project {
+    /// Whether a rule that asks the project's TypeScript runs on `entry`.
+    pub(crate) fn typed_rule_applies(&self, entry: &FileEntry) -> bool {
+        if !matches!(entry.language, Language::Typescript | Language::Tsx) || !self.compiled.iter().any(|r| r.typed) {
+            return false;
+        }
+        let layers = self.config.layers_for(&entry.abs);
+        let only = self.options.rules.as_ref();
+        self.compiled.iter().any(|r| {
+            r.typed
+                && r.applies_to_language(entry.language)
+                && r.applies_to_path(&entry.rel)
+                && only.is_none_or(|o| o.iter().any(|id| id == r.id()))
+                && self.rules.effective(&r.loaded, &layers).is_some_and(|c| c.severity.is_some())
+        })
     }
 }
 
@@ -415,8 +444,11 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
     let file = ProjectFile::new(&entry.rel, text, mode.bom, project.root(), mode.tree).with_as_of(&as_of);
     let mut findings: Vec<Finding> = Vec::new();
     let mut comments: Vec<(usize, usize)> = Vec::new();
+    // Type rules no program answered: they did not run (SR-TYPES decision 6).
+    let mut not_run: BTreeSet<usize> = BTreeSet::new();
     for unit in &units {
-        let unit_findings = run_unit(project, entry, unit, mode, &file);
+        let (unit_findings, skipped) = run_unit(project, entry, unit, mode, &file);
+        not_run.extend(skipped);
         // A region's offsets map back to the host; nothing inside a hole
         // (a template's `${…}`) does, and no edit may reach into one.
         let span = |s: usize, e: usize| match &unit.region {
@@ -455,7 +487,8 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
     // A rule that failed did not run, so a suppression of it is not unused.
     let failed: BTreeSet<&str> =
         findings.iter().filter(|f| f.note.as_deref() == Some(INTERNAL_ERROR)).map(|f| project.compiled[f.rule].id()).collect();
-    let ran: Vec<(usize, &CompiledRule, RuleConfig)> = active.iter().filter(|(_, r, _)| !failed.contains(r.id())).cloned().collect();
+    let ran: Vec<(usize, &CompiledRule, RuleConfig)> =
+        active.iter().filter(|(i, r, _)| !failed.contains(r.id()) && !not_run.contains(i)).cloned().collect();
     for f in findings {
         let rule = &project.compiled[f.rule];
         if f.note.as_deref() == Some(INTERNAL_ERROR) {
@@ -656,9 +689,9 @@ fn panic_message(p: &(dyn std::any::Any + Send)) -> String {
 
 /// Walk one unit once, dispatching each node to the rules whose kinds
 /// match (decision 15); a rule that panics is isolated (decision 25).
-fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMode<'_>, file: &ProjectFile<'_>) -> Vec<Finding> {
+fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMode<'_>, file: &ProjectFile<'_>) -> (Vec<Finding>, Vec<usize>) {
     if unit.rules.is_empty() {
-        return Vec::new();
+        return (Vec::new(), Vec::new());
     }
     let grammar = unit.grammar;
     let n = unit.rules.len();
@@ -756,13 +789,14 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                         failed[slot] = Some(panic_message(p.as_ref()));
                     }
                 }
-                Matcher::Graph(_) | Matcher::Target(_) | Matcher::Unsupported(_) => {}
+                Matcher::Graph(_) | Matcher::Target(_) | Matcher::TypeErrors | Matcher::Unsupported(_) => {}
             }
             if let (Some(t), Some(s)) = (timings, started) {
                 t.rule(*index, s);
             }
         }
     }
+    let (type_errors, not_run) = ask_types(project, entry, unit, &mut matches, &mut failed);
 
     let mut out = Vec::new();
     // The data tree, built once for every `target:` rule of the unit; a
@@ -882,11 +916,92 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     out.push(Finding { rule: *index, start: f.start, end: f.end, message: text, edits, note, data: None, severity: None });
                 }
             }
+            Matcher::TypeErrors => {
+                for d in type_errors.iter().flatten() {
+                    // TypeScript's warnings stay warnings; its errors take
+                    // the rule's severity.
+                    let severity = (d.category == "warning").then_some(Severity::Warn);
+                    out.push(Finding { rule: *index, start: d.start, end: d.end, message: format!("TS{}: {}", d.code, d.message), edits: None, note: None, data: None, severity });
+                }
+            }
             Matcher::Unsupported(_) => {}
         }
         if let (Some(t), Some(s)) = (timings, started) {
             t.rule(*index, s);
         }
     }
-    out
+    (out, not_run)
+}
+
+/// The type questions of a unit (SR-TYPES), asked once after matching: a
+/// type rule's matches are kept only where every answer holds, and
+/// `ts/type-error` gets TypeScript's diagnostics. Where no program can
+/// answer (a region, no TypeScript ≥ 7.1, no Node, a hook with no warm
+/// program), the type rules do not run, and their indexes come back.
+fn ask_types(
+    project: &Project,
+    entry: &FileEntry,
+    unit: &Unit<'_>,
+    matches: &mut [Vec<Match>],
+    failed: &mut [Option<String>],
+) -> (Option<Vec<codelaw_types::TsDiagnostic>>, Vec<usize>) {
+    let typed: Vec<usize> = (0..unit.rules.len()).filter(|s| unit.rules[*s].1.typed && failed[*s].is_none()).collect();
+    if typed.is_empty() {
+        return (None, Vec::new());
+    }
+    let skip = |matches: &mut [Vec<Match>]| {
+        for s in &typed {
+            matches[*s].clear();
+        }
+        (None, typed.iter().map(|s| unit.rules[*s].0).collect())
+    };
+    // Only a TypeScript file's own text has a program: never a region.
+    if unit.region.is_some() || !matches!(unit.language, Language::Typescript | Language::Tsx) {
+        return skip(matches);
+    }
+    let grammar = unit.grammar;
+    let mut questions: Vec<codelaw_types::Question> = Vec::new();
+    for s in &typed {
+        if let Some(cm) = unit.rules[*s].1.compiled_match(grammar) {
+            for m in &matches[*s] {
+                questions.extend(cm.type_questions(m).into_iter().map(|(start, end, question)| codelaw_types::Question { start, end, question }));
+            }
+        }
+    }
+    questions.sort();
+    questions.dedup();
+    let wants_errors = typed.iter().any(|s| matches!(unit.rules[*s].1.matcher, Matcher::TypeErrors));
+    if questions.is_empty() && !wants_errors {
+        // Nothing to ask: no program is loaded, but a gap is still noted.
+        return match project.types_available(entry) {
+            Ok(_) => (None, Vec::new()),
+            Err(_) => skip(matches),
+        };
+    }
+    let helper = match project.types_helper(entry) {
+        Ok(h) => h,
+        Err(_) => return skip(matches),
+    };
+    let asked = helper.lock().unwrap_or_else(|e| e.into_inner()).check(&entry.abs, &unit.text, &questions, wants_errors);
+    let answers = match asked {
+        Ok(a) => a,
+        Err(e) => {
+            // A helper that fails on a file fails its type rules there
+            // (decision 25); the other rules still run.
+            for s in &typed {
+                failed[*s] = Some(format!("the type helper failed: {e}"));
+            }
+            return (None, Vec::new());
+        }
+    };
+    let answer = |start: usize, end: usize, question: &'static str| -> Option<bool> {
+        let q = codelaw_types::Question { start, end, question };
+        questions.binary_search(&q).ok().and_then(|i| answers.answers[i])
+    };
+    for s in &typed {
+        if let Some(cm) = unit.rules[*s].1.compiled_match(grammar) {
+            matches[*s].retain(|m| cm.types_hold(m, &answer));
+        }
+    }
+    (wants_errors.then_some(answers.diagnostics), Vec::new())
 }

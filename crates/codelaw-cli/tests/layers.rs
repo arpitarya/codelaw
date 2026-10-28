@@ -19,6 +19,7 @@ const LAYERS: &[(&str, &[&str])] = &[
             "codelaw-graph",
             "codelaw-baseline",
             "codelaw-adapters",
+            "codelaw-types",
         ],
     ),
     ("orchestration", &["codelaw-engine", "codelaw-report", "codelaw-test"]),

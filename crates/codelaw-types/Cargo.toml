@@ -1,0 +1,12 @@
+[package]
+name = "codelaw-types"
+description = "Type-aware TypeScript: the codelaw-types Node helper, its protocol and the project's TypeScript found (SR-TYPES)"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+codelaw-core.workspace = true
+semver.workspace = true
+serde.workspace = true
+serde_json.workspace = true

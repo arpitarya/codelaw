@@ -144,7 +144,7 @@ Start from `TEMPLATE.md`.
 | [0114](0114_editor.md) | **SR-EDITOR** | The LSP server in the binary and the thin VS Code extension | accepted | partly |
 | [0115](0115_cli-and-mcp.md) | **SR-CLI-MCP** | The CLI and the MCP server — one engine, two doors, same answers | accepted | partly |
 | [0116](0116_spell.md) | **SR-SPELL** | Spelling as its own rule pack — a known-typo check on by default, a dictionary check opt-in, codelaw's own word data from SCOWL, VarCon and the MIT software terms | accepted | partly |
-| [0117](0117_types.md) | **SR-TYPES** | Type-aware TypeScript rules — the project's own TypeScript ≥ 7.1, asked through codelaw's Node helper a fixed vocabulary of type questions; `ts/type-error`; preview until 7.1 is GA | accepted | no |
+| [0117](0117_types.md) | **SR-TYPES** | Type-aware TypeScript rules — the project's own TypeScript ≥ 7.1, asked through codelaw's Node helper a fixed vocabulary of type questions; `ts/type-error`; preview until 7.1 is GA | accepted | partly |
 
 ---
 
@@ -188,6 +188,7 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-semantic` | SR-ARCHITECTURE | decision 15a |
 | `crates/codelaw-match` | SR-LINTER | decision 2: file-scope `match:` rules |
 | `crates/codelaw-adapters` | SR-LINTER | decision 2: the adapters' manifests, runner and output mapping |
+| `crates/codelaw-types` | SR-TYPES | decisions 2–7: the `codelaw-types` Node helper, its protocol and the project's TypeScript found (W-105) |
 | `crates/codelaw-baseline` | SR-BASELINE | decisions 1, 2, 5, 6 and 9: the baseline files, what a finding becomes under them, the ratchet, the deprecations registry and the dated-exception timeline |
 | `crates/codelaw-native` | SR-ARCHITECTURE | decision 15b |
 | `crates/codelaw-fix` | SR-ARCHITECTURE | decisions 5 and 18: the apply loop, verifier and external fixers |
@@ -210,6 +211,8 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-cli/tests/network_fence.rs` | SR-LAW-5 | how L5 is enforced: the network fence (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/consumer_layout.rs` | SR-CONSUMER-LAYOUT | the veto's `init` check against §1's tree (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/promotion.rs` | SR-RULE-AUTHORING | decisions 4 and 6: level 4 and the `stable` gate (a different decision from the CLI's) |
+| `crates/codelaw-cli/tests/types.rs` | SR-TYPES | decisions 6, 8, 10 and 12: the type rules on `fixtures/types` through the binary, the dedupe with oxlint, the skip note and the warm-only hook (a different decision from the CLI's) |
+| `fixtures/types` | SR-TYPES | the repo the type rules are checked on, and the TypeScript it pins (L11 §3 D-45) |
 | `scripts/docs-sync.py` | SR-WORK-REGISTRY | its Consequences: `README.md`'s, `USAGE.md`'s and `CHANGELOG.md`'s triggers, checked in CI (W-26) |
 | `scripts/rule-docs.py` | SR-WORK-REGISTRY | `docs/rules/`, one page per rule generated from the rule files, presets and cases, and `llms.txt`, `docs/rules/llms-full.txt` and `docs/rules/rules.json` for agents (W-98); `--check` in CI |
 | `scripts/corpus.py` | SR-RULE-AUTHORING | decision 4: fetches the pinned corpus and runs level 4 per pack (W-20) |
