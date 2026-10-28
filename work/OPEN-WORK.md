@@ -36,6 +36,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Two leftover worktrees — keep or drop** ([W-111](open/W-111-two-unmerged-worktrees.md); [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) decision 3). `lm/W-90` and `lm/W-96` hold commits `main` lacks, though both items closed and their work is in `main` (`archive/DEPENDENCIES.md`, `agent_env.rs`). Say **"drop both"** (recommended), or name one to keep. | 2026-10-28 |
 | ↳ **blocks:** W-111 itself | |
+| 🔴 **Type questions — may an agent extend SR-TYPES decision 4's vocabulary?** ([W-105](open/W-105-type-aware-engine.md) *Left* 1–4). The vocabulary is fixed and *"a new question is an amendment of this record"*; four rules need one each: **(a)** `ts/switch-exhaustiveness-check` — which union members a `switch` leaves out; **(b)** `ts/no-unsafe-argument` and `ts/no-unsafe-assignment` — an `any` value passed or assigned where the target's type is not `any`; **(c)** `no-misused-promises`' `checksVoidReturn` — a Promise-returning function where a `void`-returning callback is expected; **(d)** `ts/await-thenable` — an `unknown` question, so `await` on `unknown` is not reported (typescript-eslint allows it). Say **"agents may add them"** (recommended: each lands as an amendment of decision 4 naming this ruling, with a fixture that fires once and the rule `preview`), or rule (a)–(d) one by one. | 2026-10-28 |
+| ↳ **blocks:** W-105 itself (*Left* 2–4); W-106 waits on W-105 | |
 | 🔴 **The guidance-vs-check experiment — the full 180** ([W-102](open/W-102-guidance-vs-check-experiment.md)). The pilot ran 2026-10-28: 60 sessions, **$10.47** (the estimate was ~$29), 26 min; A, B and C each broke a targeted rule in 2 of 20 runs, on the same two tasks (t02 `console.log`, t04 unused parameters), where the request itself asks for the violating code; the other 18 tempted no arm. Re-estimated: the full 180 **~$31**, ~80 min; resumed on the pilot's folder, the 120 runs left **~$21**, ~55 min. Say **"run it"** — the agent runs `python3 experiments/guidance-vs-check/harness.py run --agent claude --out experiments/guidance-vs-check/runs/2026-10-w102 --codelaw experiments/guidance-vs-check/runs/2026-10-w102/bin/codelaw` from the main checkout (that folder's `bin/claude` is Claude Code 2.1.310; the installed 2.1.207 cannot run `claude-opus-5-5`). Or say **"redesign first"** (recommended): at a 10 % floor in every arm the 180 will likely not separate A from C — harder tasks, and an arm A without `codelaw` on `PATH`, would. | 2026-10-28 |
 | ↳ **blocks:** W-102 itself (the 180, the write-up, step 4's README line) | |
 
@@ -57,11 +59,11 @@ here. Read that record before changing anything below it.
 
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
+🔴 **W-105** `arpit` Type-aware rules, five `ts/type-checked` rules, `--version --json`, the `check_types_*` bench and the watch memory test landed 10-28. Left: may agents add type questions (inbox), budgets after three `perf` runs, corpus counts, the RC (11-10). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
+
 🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🟢 **W-110** `agent` Clean session 2df06f6d's leftovers on the Mac: five merged worktrees and three `.fux`-only folders, by `worktree-cleanup.py --apply`. Filed by Arpit (Cowork). [detail](open/W-110-session-2df06f6d-cleanup.md)
-
-🟢 **W-105** `agent` Type-aware rules: helper (protocol 1), `type:` clause, `ts/type-error`, warm helpers and five `ts/type-checked` rules landed 2026-10-28 on 7.1.0-beta; left: new type questions, `--version --json`, the bench, the RC release. Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
 🟡 **W-38** waits on **W-86** `agent` PyPI 0.2.0: `css`, `data` live and trusted; day 1 uploads the other four and publishes the Release; then an agent checks `pip install codelaw` and `uvx codelaw` and writes it down. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 

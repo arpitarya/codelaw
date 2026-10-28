@@ -9,7 +9,7 @@
 //! - **Hooks** (`codelaw hook`, `hook --pre`) never start one: they use a
 //!   warm helper or skip the type rules with a note (L8 decision 8).
 
-use crate::Project;
+use crate::{EngineOptions, Project};
 use crate::discover::FileEntry;
 use codelaw_types::Helper;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
@@ -83,19 +83,61 @@ impl Types {
     }
 }
 
+/// The `typescript` package that governs `dir`: from it up to `root`, else
+/// the one `CODELAW_TYPESCRIPT` names (decision 5).
+fn typescript_in(dir: &Path, root: &Path, env: Option<&str>) -> Option<PathBuf> {
+    codelaw_types::find_typescript(dir, root).or_else(|| env.map(PathBuf::from).filter(|p| p.join("package.json").is_file()))
+}
+
+/// What `codelaw --version --json` names about the type rules from a
+/// folder (SR-TYPES decision 12, L5 decision 2): the protocol, the tested
+/// range, and the TypeScript and Node a `check` there would use. Nothing is
+/// started: the TypeScript's version is its `package.json`'s.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TypesVersion {
+    pub protocol: u32,
+    /// The TypeScript versions the fixtures pass on (decision 7).
+    pub tested: &'static str,
+    pub typescript: Option<FoundTypescript>,
+    pub node: Option<PathBuf>,
+}
+
+/// The project's TypeScript, as `--version --json` names it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FoundTypescript {
+    pub version: String,
+    /// The `typescript` package folder.
+    pub path: PathBuf,
+    /// 7.1 or later: the type rules can run (decision 6).
+    pub api: bool,
+    /// Inside [`codelaw_types::TESTED`] (decision 7).
+    pub tested: bool,
+}
+
+/// [`TypesVersion`] for the project that governs `start`: its TypeScript
+/// found from `start` up to the project root, as for a file there.
+pub fn types_version(start: &Path, options: &EngineOptions) -> TypesVersion {
+    let start = std::fs::canonicalize(start).unwrap_or_else(|_| start.to_path_buf());
+    let root = codelaw_config::find_config(&start).map(|c| c.root_dir).unwrap_or_else(|_| start.clone());
+    let typescript = typescript_in(&start, &root, options.typescript_env.as_deref()).map(|path| {
+        let version = codelaw_types::package_version(&path).unwrap_or_default();
+        FoundTypescript { api: codelaw_types::has_api(&version), tested: codelaw_types::tested(&version), version, path }
+    });
+    TypesVersion {
+        protocol: codelaw_types::PROTOCOL,
+        tested: codelaw_types::TESTED,
+        typescript,
+        node: codelaw_adapters::locate_program("node", &root, options.path_env.as_deref()),
+    }
+}
+
 impl Project {
     /// The `typescript` package that governs a file: from its folder up to
     /// the project root, else `CODELAW_TYPESCRIPT` (decision 5).
     fn typescript_for(&self, entry: &FileEntry) -> Option<PathBuf> {
         let dir = entry.abs.parent().unwrap_or(self.root()).to_path_buf();
         let mut found = self.types.found.lock().unwrap_or_else(|e| e.into_inner());
-        found
-            .entry(dir.clone())
-            .or_insert_with(|| {
-                codelaw_types::find_typescript(&dir, self.root())
-                    .or_else(|| self.options.typescript_env.as_ref().map(PathBuf::from).filter(|p| p.join("package.json").is_file()))
-            })
-            .clone()
+        found.entry(dir.clone()).or_insert_with(|| typescript_in(&dir, self.root(), self.options.typescript_env.as_deref())).clone()
     }
 
     fn node(&self) -> Option<&PathBuf> {

@@ -151,8 +151,14 @@ pub fn generate(seed: u64, files: usize) -> Vec<File> {
 /// in a report, and tells a reused folder from a stale one. The packs are
 /// not in it: they are the repo's own at the commit measured.
 pub fn digest(files: &[File]) -> String {
+    digest_with(&[CONFIG], files)
+}
+
+fn digest_with(configs: &[&str], files: &[File]) -> String {
     let mut h = blake3::Hasher::new();
-    h.update(CONFIG.as_bytes());
+    for c in configs {
+        h.update(c.as_bytes());
+    }
     for f in files {
         h.update(f.path.as_bytes());
         h.update(&[0]);
@@ -243,6 +249,54 @@ pub fn write_repo(src: &Path, dir: &Path, packs: &Path) -> Result<usize, String>
         copy_dir(&packs.join(pack.short), &dir.join(install_path(pack))).map_err(io)?;
     }
     Ok(files)
+}
+
+/// The type-aware operations' config (`check_types_cold`,
+/// `check_types_warm`; SR-TYPES): the `ts` pack's `type-checked` preset
+/// alone, so what is timed is the type rules and their program.
+pub const TYPES_CONFIG: &str = "preview = true\nextends = [\"codelaw:ts/type-checked\"]\n";
+
+/// The type workload's `tsconfig.json`: one strict program over every file.
+pub const TSCONFIG: &str = "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"target\": \"es2022\",\n    \"module\": \"esnext\",\n    \"moduleResolution\": \"bundler\",\n    \"lib\": [\"es2022\"],\n    \"noEmit\": true\n  },\n  \"include\": [\"packages\"]\n}\n";
+
+/// The type workload's files: the reference workload's `.ts` files (its
+/// `packages/ts` tree, 2,200 of the 10,000), which import their siblings.
+/// `.tsx` is left out: it would need React's types installed.
+pub fn types_files(seed: u64, files: usize) -> Vec<File> {
+    generate(seed, files).into_iter().filter(|f| f.path.ends_with(".ts")).collect()
+}
+
+/// Write the type workload into `dir` (replacing what a run before wrote):
+/// [`types_files`], [`TSCONFIG`], [`TYPES_CONFIG`], the `ts` pack, and
+/// `node_modules/typescript` linked to `typescript` — the package the
+/// project would compile with (SR-TYPES decision 5). Returns its digest and
+/// file count.
+pub fn write_types(dir: &Path, packs: &Path, seed: u64, files: usize, typescript: &Path) -> Result<(String, usize), String> {
+    let io = |e: std::io::Error| format!("cannot write the type workload in {}: {e}", codelaw_core::normalize_path(dir));
+    if !typescript.join("package.json").is_file() {
+        return Err(format!("--typescript {}: not a `typescript` package folder (no package.json)", codelaw_core::normalize_path(typescript)));
+    }
+    let typescript = std::fs::canonicalize(typescript).map_err(io)?;
+    let set = types_files(seed, files);
+    if dir.exists() {
+        std::fs::remove_dir_all(dir).map_err(io)?;
+    }
+    for f in &set {
+        let path = dir.join(&f.path);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(io)?;
+        }
+        std::fs::write(&path, &f.text).map_err(io)?;
+    }
+    std::fs::write(dir.join("codelaw.toml"), TYPES_CONFIG).map_err(io)?;
+    std::fs::write(dir.join("tsconfig.json"), TSCONFIG).map_err(io)?;
+    let ts_pack = codelaw_rules::FIRST_PARTY_PACKS.iter().find(|p| p.short == "ts").expect("the ts pack");
+    copy_dir(&packs.join(ts_pack.short), &dir.join(install_path(ts_pack))).map_err(io)?;
+    #[cfg(unix)]
+    std::os::unix::fs::symlink(&typescript, dir.join("node_modules/typescript")).map_err(io)?;
+    #[cfg(not(unix))]
+    copy_dir(&typescript, &dir.join("node_modules/typescript")).map_err(io)?;
+    Ok((digest_with(&[TYPES_CONFIG, TSCONFIG], &set), set.len()))
 }
 
 fn copy_repo(from: &Path, to: &Path) -> std::io::Result<usize> {
@@ -545,5 +599,13 @@ mod tests {
         let set = generate(SEED, FILES);
         assert_eq!(set.len(), FILES);
         assert_eq!(digest(&set), REFERENCE_DIGEST, "the reference workload changed: every L8 budget must be re-measured on it");
+    }
+
+    #[test]
+    fn the_type_workload_is_the_reference_workloads_ts_files() {
+        let set = types_files(SEED, FILES);
+        assert_eq!(set.len(), 2200);
+        assert!(set.iter().all(|f| f.path.starts_with("packages/ts/") && f.path.ends_with(".ts")));
+        assert_eq!(digest_with(&[TYPES_CONFIG, TSCONFIG], &set), "5341cd61a21e66c7", "the type workload changed: check_types_* must be re-measured on it");
     }
 }

@@ -312,7 +312,7 @@ preview = true
 
 - **What it needs:** Node on `PATH` and `typescript` ≥ 7.1 in `node_modules`, from the file's folder up to the project root — the copy your project compiles with; codelaw installs none. It reads your `tsconfig.json`.
 - **When it can't:** without Node, or with no TypeScript or an older one, the type rules are skipped, every other rule runs, and the summary line and `--format json`'s `types.notes` say why.
-- **Reproducible:** the summary line and `--format json`'s `types` name the TypeScript version that answered.
+- **Reproducible:** the summary line and `--format json`'s `types` name the TypeScript version that answered. `codelaw --version --json`, run in your project, names codelaw's version, the type helper's protocol and tested TypeScript range, and the TypeScript and Node a `check` there would use (`null` when not found).
 - **Not cached:** a file a type rule checks depends on the files it imports, so it is checked again on every run.
 - **Hooks never wait:** `codelaw hook` and `hook --pre` use a type program only when a warm process (`codelaw daemon start`) already holds one; otherwise they skip the type rules with a note. `--watch`, the daemon and the editor keep the program loaded.
 - **Shown once:** each rule names its typescript-eslint rule in `ported_from:`, so the same finding from oxlint's type-aware mode (below) is shown once, as codelaw's.
@@ -652,7 +652,7 @@ The rule packs come from the repository's own dependencies, so the step installs
 | `codelaw daemon start\|stop\|status` | An opt-in warm process that `--prefer-warm` runs use; the output is the same |
 | `codelaw deps refresh` | Read npm and the Python index for every dependency the manifests name and write `.codelaw/deps-snapshot.json`, which `data/outdated-dependency` reads offline; the only command that uses the network. `--as-of` sets the `fetched` day |
 | `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
-| `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set ([L8](records/0010_LAW-8-performance-budgets.md)) |
+| `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set; `--typescript <dir>` (a `typescript` ≥ 7.1 package) adds the type-aware `check_types_cold` / `check_types_warm` ([L8](records/0010_LAW-8-performance-budgets.md)) |
 | `codelaw debug` | Inspect what the engine sees: `changed-functions` |
 | `codelaw brief` | What is specific to this repo for the files an agent is about to write (SR-CLI-MCP decision 14) |
 | `codelaw migrate` | Translate an ESLint, Prettier, Biome, Ruff or stylelint config into codelaw.toml, with a report of what mapped and what did not (SR-CLI-MCP decision 14) |

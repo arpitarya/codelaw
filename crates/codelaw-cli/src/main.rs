@@ -591,7 +591,34 @@ fn cache(action: CacheAction) -> ExitCode {
     }
 }
 
+/// `codelaw --version --json` (SR-CLI-MCP decision 1, SR-TYPES decision
+/// 12, L5 decision 2): the engine's version and what decides a type-aware
+/// verdict here — the type helper's protocol, the tested range, and the
+/// project's TypeScript and Node, when found. Plain `--version` stays
+/// clap's one line, the `startup` budget's command (L8).
+fn version_json() -> String {
+    let t = codelaw_engine::types_version(Path::new("."), &EngineOptions::from_env());
+    let path = |p: &Path| codelaw_core::normalize_path(p);
+    json_line(&serde_json::json!({
+        "schema_version": codelaw_report::SCHEMA_VERSION,
+        "codelaw": env!("CARGO_PKG_VERSION"),
+        "types": {
+            "protocol": t.protocol,
+            "tested": t.tested,
+            "typescript": t.typescript.map(|ts| serde_json::json!({ "version": ts.version, "path": path(&ts.path), "api": ts.api, "tested": ts.tested })),
+            "node": t.node.as_deref().map(path),
+        },
+    }))
+}
+
 fn main() -> ExitCode {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if let [a, b] = args.as_slice()
+        && [a, b].iter().any(|x| *x == "--version" || *x == "-V")
+        && [a, b].iter().any(|x| *x == "--json")
+    {
+        return Output { stdout: version_json(), ..Default::default() }.emit();
+    }
     let cli = Cli::parse();
     match cli.command {
         Command::Check(a) if a.watch => watch_cmd::check(a),
