@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-27/28 — the coordinating session: CI green, packages published, every green item run in parallel  ·  Claude Code (Opus 5.5), session 2df06f6d
+
+- **Asked:** *list unpublished packages; first-publish the npm ones; fix CI until it is green; then "implement all the items in green in parallel and close them out", keep going as items turn green; land Cowork's uncommitted edits; "whatever is done merge it to main".*
+- **Done:** CI red → green (`records/RULE-SINCE` 791b189, 0dfbaae, d69b476 — each named; schema test c410174); the nine npm packages built locally for Arpit's first publish; Cowork's main-checkout edits landed byte for byte (f669b92, 163d33b, d91b093 and more); agents closed W-62, W-84, W-85, W-90, W-91, W-93, W-94, W-96, W-98, W-99, W-100, W-104, W-107, W-108, W-109, W-110, W-112, and built W-95, W-97, W-102 (pilot $10.47), W-103, W-105 to their decider steps; lockmaster W-11's kit handoff landed (7128514) with auto-land.py's ownership row.
+- **Decided / left open:** Arpit's standing approvals — land Cowork's main-checkout edits; move RULE-SINCE past a guard-refused commit (both in memory). Open for him: W-86–W-89, W-95, W-97, W-102, W-103 (L8 measurement), W-105 (type questions), W-111.
+- **Mistakes:** lockmaster's `submit` landed guard-refused commits three times and once a merge with conflict markers (W-112, fixed 8e5f9b9) — agents now run the guard before submit; two landing merges carry the message "x" (c410174, d91b093) from a careless `-m x`; zsh word-splitting broke three commands before they ran (nothing changed); the disk check misreads from a worktree; agents shared one cargo target, so tests saw stale builds — `touch` before building.
+- **Next:** file the lockmaster kit bugs (guard bypass, conflict-marker merge, `save`'s claim, disk check in worktrees) and the `discover.rs` nested-repo ignore bug as items.
+
+---
+
 ## 2026-10-28 — W-109's ruling applied: `init --ci bitbucket` removed, the step documented  ·  Claude Code (Opus 5.5)
 
 - **Asked:** apply the decider's 2026-10-28 W-109 ruling (coordinator): keep `--format bitbucket`, remove `init --ci bitbucket`, USAGE shows the step to copy with its two switches, a test proves the documented step.
