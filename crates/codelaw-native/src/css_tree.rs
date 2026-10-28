@@ -3,9 +3,11 @@
 //! (decision 3) read modern CSS and Sass, so the `css/*` and `scss/*` rules
 //! take their rules, at-rules, declarations and comments from the tree: which
 //! node is a statement, where its block opens and closes, where its colon,
-//! its `!` annotation and its `;` are; each style rule's selector list; and
-//! each declaration's component values (words, strings, functions and their
-//! arguments, `,` `/` `:`). The ranges a rule reads are the ones
+//! its `!` annotation and its `;` are; each style rule's selector list; each
+//! declaration's value and each at-rule's prelude as component values (words,
+//! strings, functions and their arguments, `,` `/` `:`); the media queries of
+//! `@media` and `@custom-media`; and the selectors of an `@page` or `@scope`
+//! prelude. The ranges a rule reads are the ones
 //! [`css_syntax`](crate::css_syntax) has always given (a selector trimmed up
 //! to its `{`, a value without its annotation), so a rule's findings do not
 //! depend on which reader built its sheet.
@@ -94,7 +96,7 @@ impl<'t> Builder<'_, 't> {
     }
 
     fn node(kind: Kind, start: usize, end: usize, parent: Option<usize>) -> Node {
-        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None }
+        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None, queries: None }
     }
 
     /// The statements directly inside `container` (the stylesheet or a block).
@@ -171,6 +173,13 @@ impl<'t> Builder<'_, 't> {
         if block.is_none() {
             n.semicolon = semicolon_of(kinds, c);
             n.end = trim(src, start, n.semicolon.unwrap_or(end)).1;
+        }
+        n.values = values(c, n.params, src, &mut self.w);
+        if !sass && matches!(lower.as_str(), "media" | "custom-media") {
+            n.queries = Some(queries(c, n.params, src, lower == "custom-media", &mut self.w));
+        }
+        if !sass && matches!(lower.as_str(), "page" | "scope") {
+            n.selectors = Some(prelude_selectors(&kids, src, &mut self.w));
         }
         let id = self.push(n);
         list.push(id);
@@ -405,6 +414,110 @@ fn pieces_of<'t>(n: TsNode<'t>, src: &str, out: &mut Vec<Piece>, w: &mut Walk<'t
     }
 }
 
+/// The selectors of an `@page` prelude (`:first`, `wide:left`) or an
+/// `@scope` prelude (the selectors in its parentheses), one complex selector
+/// each.
+fn prelude_selectors<'t>(kids: &[TsNode<'t>], src: &str, w: &mut Walk<'t>) -> Vec<Complex> {
+    let kinds = w.kinds;
+    let mut out = Vec::new();
+    for k in kids {
+        match kd(kinds, k) {
+            "page_selector" => {
+                let mut parts = Vec::new();
+                for p in children(*k, &mut w.cur) {
+                    let (s, e) = (p.start_byte(), p.end_byte());
+                    match kd(kinds, &p) {
+                        "tag_name" => parts.push(Simple { kind: SKind::Type, start: s, end: e, name: (s, e), args: None }),
+                        "class_name" => parts.push(Simple { kind: SKind::PseudoClass, start: s - 1, end: e, name: (s, e), args: None }),
+                        _ => {}
+                    }
+                }
+                let (start, end) = (k.start_byte(), k.end_byte());
+                out.push(Complex { start, end, compounds: vec![Compound { start, end, parts }], combinators: Vec::new(), leading: None });
+            }
+            "at_keyword" | "block" | "(" | ")" | "to" | "," | ";" => {}
+            _ if k.is_named() && !comment(kinds, *k) => out.push(complex(*k, src, w)),
+            _ => {}
+        }
+    }
+    out
+}
+
+// ---------------------------------------------------------------------
+// Media queries
+
+use crate::css_syntax::{Feature, MediaQuery};
+
+/// The media queries of an `@media` or `@custom-media` prelude `r` (for
+/// `@custom-media`, after its `--name`): the query nodes between the commas.
+fn queries<'t>(at: TsNode<'t>, r: (usize, usize), src: &str, custom: bool, w: &mut Walk<'t>) -> Vec<MediaQuery> {
+    let kinds = w.kinds;
+    let mut groups: Vec<Vec<TsNode<'t>>> = vec![Vec::new()];
+    let mut name = custom;
+    for k in children(at, &mut w.cur) {
+        if k.start_byte() < r.0 || k.end_byte() > r.1 || comment(kinds, k) {
+            continue;
+        }
+        match kd(kinds, &k) {
+            "," => groups.push(Vec::new()),
+            _ if name => name = false,
+            _ if k.is_named() => groups.last_mut().expect("one group at least").push(k),
+            _ => {}
+        }
+    }
+    let mut out = Vec::new();
+    for g in groups {
+        let (Some(first), Some(last)) = (g.first(), g.last()) else { continue };
+        let mut q = MediaQuery { range: (first.start_byte(), last.end_byte()), types: Vec::new(), features: Vec::new() };
+        for n in g {
+            query_parts(n, src, false, &mut q, w);
+        }
+        out.push(q);
+    }
+    out
+}
+
+/// The media types (a keyword outside parentheses) and the features of a
+/// query node.
+fn query_parts<'t>(n: TsNode<'t>, src: &str, in_parens: bool, q: &mut MediaQuery, w: &mut Walk<'t>) {
+    let kinds = w.kinds;
+    let range = |k: &TsNode<'_>| (k.start_byte(), k.end_byte());
+    match kd(kinds, &n) {
+        "keyword_query" if !in_parens => q.types.push(range(&n)),
+        "unary_query" | "binary_query" => {
+            for k in children(n, &mut w.cur).into_iter().filter(|k| k.is_named() && !comment(kinds, *k)) {
+                query_parts(k, src, in_parens, q, w);
+            }
+        }
+        "parenthesized_query" => {
+            let inner: Vec<_> = children(n, &mut w.cur).into_iter().filter(|k| k.is_named() && !comment(kinds, *k)).collect();
+            match inner.as_slice() {
+                [k] if kd(kinds, k) == "keyword_query" => q.features.push(Feature { whole: range(&n), name: range(k), value: None, range_values: Vec::new() }),
+                _ => {
+                    for k in inner {
+                        query_parts(k, src, true, q, w);
+                    }
+                }
+            }
+        }
+        "feature_query" => {
+            let kids = children(n, &mut w.cur);
+            let name = kids.iter().find(|k| kd(kinds, k) == "feature_name").map_or((n.start_byte(), n.start_byte()), range);
+            let colon = kids.iter().find(|k| kd(kinds, k) == ":").map_or(name.1, |k| k.end_byte());
+            let close = kids.last().filter(|k| kd(kinds, k) == ")").map_or(n.end_byte(), |k| k.start_byte());
+            let value = crate::css_syntax::trim_comments(src, (colon, close));
+            q.features.push(Feature { whole: range(&n), name, value: Some(value), range_values: Vec::new() });
+        }
+        "range_query" => {
+            let kids = children(n, &mut w.cur);
+            let name = kids.iter().find(|k| kd(kinds, k) == "feature_name").map_or((n.start_byte(), n.start_byte()), range);
+            let range_values = kids.iter().filter(|k| k.is_named() && !comment(kinds, **k) && kd(kinds, k) != "feature_name").map(range).collect();
+            q.features.push(Feature { whole: range(&n), name, value: None, range_values });
+        }
+        _ => {}
+    }
+}
+
 // ---------------------------------------------------------------------
 // Component values
 
@@ -620,11 +733,15 @@ mod tests {
         // text reading of the same selector.
         for (i, n) in tree.nodes.iter().enumerate() {
             if let Some(l) = &n.selectors {
-                assert_eq!(format!("{l:?}"), format!("{:?}", selector_list(&view, n.name.0, n.name.1)));
+                // (An `@page` or `@scope` prelude's: `prelude_selectors_are_the_trees`.)
+                if n.kind == crate::css_syntax::Kind::Rule {
+                    assert_eq!(format!("{l:?}"), format!("{:?}", selector_list(&view, n.name.0, n.name.1)));
+                }
                 let k = tree.walk().iter().position(|&w| w == i).unwrap();
                 a[k] = b[k].clone();
             }
-            // And each declaration's component values with a text reading.
+            // And each declaration's (and at-rule's) component values with a
+            // text reading.
             if let Some(v) = &n.values {
                 assert_eq!(format!("{v:?}"), format!("{:?}", crate::css_syntax::values(&view, n.params.0, n.params.1)), "{}", &view[n.params.0..n.params.1]);
             }
@@ -655,6 +772,53 @@ mod tests {
             false,
         );
         agree(Language::Css, ":export { a: b }\n.a { composes: b; c: d }\n", true);
+        agree(
+            Language::Scss,
+            "@include foo(1px, $b: 2) using ($x) { a: b }\n@mixin m($a: 1px / 2, $b...) { a: b }\n@if $a == 1 { a { b: c } } @else if $b / 2 > 1 { d { e: f } }\n@function f($x) { @return math.div($x, 2); }\n@each $k, $v in $map { .a { b: c } }\n@media (min-width: 1px) and (aspect-ratio: 16/9) { a { b: c } }\n",
+            false,
+        );
+    }
+
+    #[test]
+    fn prelude_selectors_are_the_trees() {
+        let src = "@page :first { a: b }\n@page wide:left, :blank:right { a: b }\n@scope (.a > &) to (.b) { c { d: e } }\n";
+        let root = codelaw_lang::parse(Language::Css, src);
+        let tree = super::sheet(root.root().get_inner_node(), src, false, false).expect("a clean tree");
+        let simples: Vec<Vec<String>> = tree
+            .walk()
+            .into_iter()
+            .filter_map(|i| tree.nodes[i].selectors.as_ref().filter(|_| tree.nodes[i].kind == crate::css_syntax::Kind::AtRule))
+            .map(|l| l.iter().flat_map(|c| c.simples()).map(|s| format!("{:?} {}", s.kind, &src[s.start..s.end])).collect())
+            .collect();
+        assert_eq!(simples, [vec!["PseudoClass :first"], vec!["Type wide", "PseudoClass :left", "PseudoClass :blank", "PseudoClass :right"], vec!["Class .a", "Nesting &", "Class .b"]]);
+    }
+
+    #[test]
+    fn media_queries_are_the_trees() {
+        let src = "@media screen and (min-width: 1px), not print, (400px < height <= 700px), ((color) or (hover)) { a { b: c } }\n@custom-media --small (max-width: 30em);\n";
+        let root = codelaw_lang::parse(Language::Css, src);
+        let tree = super::sheet(root.root().get_inner_node(), src, false, false).expect("a clean tree");
+        let t = |r: (usize, usize)| &src[r.0..r.1];
+        let qs: Vec<String> = tree
+            .walk()
+            .into_iter()
+            .filter_map(|i| tree.nodes[i].queries.as_ref())
+            .flatten()
+            .map(|q| {
+                let f: Vec<String> = q.features.iter().map(|f| format!("{} {:?} {:?}", t(f.name), f.value.map(t), f.range_values.iter().map(|r| t(*r)).collect::<Vec<_>>())).collect();
+                format!("{} | {:?} | {f:?}", t(q.range), q.types.iter().map(|r| t(*r)).collect::<Vec<_>>())
+            })
+            .collect();
+        assert_eq!(
+            qs,
+            [
+                "screen and (min-width: 1px) | [\"screen\"] | [\"min-width Some(\\\"1px\\\") []\"]",
+                "not print | [\"print\"] | []",
+                "(400px < height <= 700px) | [] | [\"height None [\\\"400px\\\", \\\"700px\\\"]\"]",
+                "((color) or (hover)) | [] | [\"color None []\", \"hover None []\"]",
+                "(max-width: 30em) | [] | [\"max-width Some(\\\"30em\\\") []\"]",
+            ]
+        );
     }
 
     #[test]

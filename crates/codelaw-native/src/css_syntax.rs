@@ -1,13 +1,15 @@
 //! The CSS model the `css/*`, `css-modules/*` and `scss/*` native rules
 //! read: statements (rules, at-rules, declarations, comments), component
 //! values, selectors and media queries, every piece with its byte range in the
-//! source. Since W-62 the statements, each rule's selector list and each
-//! declaration's component values come from the file's tree-sitter tree
-//! ([`css_tree`](crate::css_tree); SR-ARCHITECTURE decision 15b); this
-//! module's text reader builds the same sheet when the tree holds an error
-//! (the CSS the grammar rejects) and reads what the tree does not give the
-//! rules yet: at-rule preludes and media queries, the selectors inside a
-//! pseudo-class's arguments, and selectors a rule builds itself. The grammar still verifies every fix the rules make
+//! source. Since W-62 the statements, each rule's selector list, each
+//! declaration's and at-rule's component values, the media queries and the
+//! selectors of an `@page` or `@scope` prelude come from the file's
+//! tree-sitter tree ([`css_tree`](crate::css_tree); SR-ARCHITECTURE decision
+//! 15b); this module's text reader builds the same sheet when the tree holds
+//! an error (the CSS the grammar rejects) and reads what the tree does not
+//! give the rules yet: the selectors inside a pseudo-class's arguments,
+//! keyframe selectors, a font list split at its commas, and selectors a rule
+//! builds itself. The grammar still verifies every fix the rules make
 //! (decision 5).
 //!
 //! It never fails: anything it can't place becomes an `Other` statement,
@@ -46,12 +48,17 @@ pub struct Node {
     pub important: Option<Range>,
     /// The `{` and the `}` (or the end of the source when unclosed).
     pub block: Option<Range>,
-    /// Rule: its selector list, when read from the tree
+    /// Rule: its selector list; `@page` and `@scope`: their prelude's
+    /// selectors. When read from the tree
     /// ([`css_tree::selectors`](crate::css_tree::selectors)); see [`Sheet::selectors`].
     pub selectors: Option<Vec<Complex>>,
-    /// Declaration: its value's component values, when read from the tree
-    /// ([`css_tree`](crate::css_tree)); see [`Sheet::values`].
+    /// Declaration: its value's component values; at-rule (Sass's included):
+    /// its prelude's. When read from the tree ([`css_tree`](crate::css_tree));
+    /// see [`Sheet::values`].
     pub values: Option<Vec<VNode>>,
+    /// `@media` and `@custom-media`: the prelude's media queries, when read
+    /// from the tree; see [`MediaQuery`].
+    pub queries: Option<Vec<MediaQuery>>,
     /// The statement ends with `;`, at this offset.
     pub semicolon: Option<usize>,
 }
@@ -107,19 +114,23 @@ impl Sheet {
         go(self, &self.top, &mut out);
         out
     }
-    /// A rule's selector list: from the tree when the sheet was read from
-    /// one, otherwise read from its text (the two agree on every stylesheet
-    /// the tree reads: W-62).
+    /// A rule's selector list, or the selectors of an `@page` or `@scope`
+    /// prelude: from the tree when the sheet was read from one, otherwise
+    /// read from its text (the two agree on every stylesheet the tree reads:
+    /// W-62; a prelude's text reading also holds its parentheses and `to`,
+    /// which no rule reads).
     pub fn selectors(&self, i: usize, src: &str) -> std::borrow::Cow<'_, [Complex]> {
         let n = &self.nodes[i];
+        let r = if n.kind == Kind::AtRule { n.params } else { n.name };
         match &n.selectors {
             Some(list) => std::borrow::Cow::Borrowed(list),
-            None => std::borrow::Cow::Owned(selector_list(src, n.name.0, n.name.1)),
+            None => std::borrow::Cow::Owned(selector_list(src, r.0, r.1)),
         }
     }
-    /// A statement's component values: a declaration's value from the tree
-    /// when the sheet was read from one, otherwise its `params` read from the
-    /// text (the two agree on every stylesheet the tree reads: W-62).
+    /// A statement's component values: a declaration's value or an at-rule's
+    /// prelude from the tree when the sheet was read from one, otherwise its
+    /// `params` read from the text (the two agree on every stylesheet the
+    /// tree reads: W-62).
     pub fn values(&self, i: usize, src: &str) -> std::borrow::Cow<'_, [VNode]> {
         let n = &self.nodes[i];
         match &n.values {
@@ -333,7 +344,7 @@ impl Parser<'_> {
     }
 
     fn node(kind: Kind, start: usize, end: usize, parent: Option<usize>) -> Node {
-        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None }
+        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None, queries: None }
     }
 
     /// Parse statements from `i` until a `}` (returned, not consumed) or the end.
@@ -750,6 +761,24 @@ fn func(src: &str, i: &mut usize, end: usize, start: usize, open: usize) -> VNod
     VNode { kind: VKind::Func, start, end: *i, name: (start, open), inner: (inner_start, inner_end), nodes }
 }
 
+/// The parts of the values `list` between its top-level commas, each trimmed
+/// of white space and comments (an empty part is empty where its comma is),
+/// as [`split_commas`] reads them from the text of `r`, the range the values
+/// cover.
+pub fn comma_parts(list: &[VNode], src: &str, r: Range) -> Vec<Range> {
+    let mut out = Vec::new();
+    let mut part: Option<Range> = None;
+    for n in list {
+        match n.kind {
+            VKind::Div if n.text(src) == "," => out.push(part.take().unwrap_or((n.start, n.start))),
+            VKind::Space | VKind::Comment => {}
+            _ => part = Some(part.map_or((n.start, n.end), |p| (p.0, n.end))),
+        }
+    }
+    out.push(part.unwrap_or((r.1, r.1)));
+    out
+}
+
 /// The non-space, non-comment nodes of a list.
 pub fn significant(list: &[VNode]) -> Vec<&VNode> {
     list.iter().filter(|n| !matches!(n.kind, VKind::Space | VKind::Comment)).collect()
@@ -795,6 +824,30 @@ pub fn dimension(word: &str) -> Option<(&str, &str)> {
     } else {
         None
     }
+}
+
+// ---------------------------------------------------------------------
+// Media queries
+
+/// One media query of an `@media` or `@custom-media` prelude: its range
+/// (between the commas, trimmed), its media types and its features. The text
+/// reader is `css_media`'s, which also judges whether a query is valid.
+#[derive(Clone, Debug, PartialEq)]
+pub struct MediaQuery {
+    pub range: Range,
+    pub types: Vec<Range>,
+    pub features: Vec<Feature>,
+}
+
+/// A media feature inside parentheses.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Feature {
+    pub whole: Range,
+    pub name: Range,
+    /// `name: value`.
+    pub value: Option<Range>,
+    /// Values of a range form (`width >= 600px`, `1px < width < 2px`).
+    pub range_values: Vec<Range>,
 }
 
 // ---------------------------------------------------------------------

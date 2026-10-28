@@ -57,7 +57,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-99** `agent` Side-by-side bench built; D-37…D-41 ratified 10-27. Left: the first `bench-rivals.yml` run on the runner, then L8 context rows and a README claim from them. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
-🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
+🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in corpus); CSS/SCSS rules read statements, selectors, values, preludes, media queries from the tree; left: pseudo-class args, keyframe selectors, font lists. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 

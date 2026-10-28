@@ -1,7 +1,7 @@
 //! CSS rules about at-rules: their names, preludes and descriptors,
 //! `@import`, `@keyframes` and the names that at-rules define.
 
-use crate::css_syntax::{Kind, Sheet, VKind, css_rule, finding, fixed, matches_any, opt_list, opt_str, set, significant, split_commas, table, text, values};
+use crate::css_syntax::{Kind, Sheet, VKind, comma_parts, css_rule, finding, fixed, matches_any, opt_list, opt_str, set, significant, split_commas, table, text};
 use crate::util::whole_lines;
 use codelaw_core::TextEdit;
 use std::collections::{BTreeMap, BTreeSet};
@@ -229,8 +229,9 @@ css_rule!(AtRulePreludeNoInvalid, "css/at-rule-prelude-no-invalid", |sheet, src,
 });
 
 /// An `@import`'s URL and the rest of its prelude, normalised.
-fn import_key(src: &str, r: (usize, usize)) -> Option<(String, String)> {
-    let vals = values(src, r.0, r.1);
+fn import_key(sheet: &Sheet, i: usize, src: &str) -> Option<(String, String)> {
+    let r = sheet.nodes[i].params;
+    let vals = sheet.values(i, src);
     let sig = significant(&vals);
     let first = sig.first()?;
     let url = match first.kind {
@@ -255,7 +256,7 @@ css_rule!(NoDuplicateAtImportRules, "css/no-duplicate-at-import-rules", |sheet, 
             continue;
         }
         let n = &sheet.nodes[i];
-        let Some((url, rest)) = import_key(src, n.params) else { continue };
+        let Some((url, rest)) = import_key(sheet, i, src) else { continue };
         let conditions: Vec<String> = if rest.is_empty() { Vec::new() } else { rest.split(',').map(str::to_owned).collect() };
         let prior = seen.get(&url);
         let dup = match prior {
@@ -319,8 +320,7 @@ css_rule!(ImportNotation, "css/import-notation", |sheet, src, ctx, out| {
         if sheet.at_name(i, src) != "import" {
             continue;
         }
-        let r = sheet.nodes[i].params;
-        let vals = values(src, r.0, r.1);
+        let vals = sheet.values(i, src);
         if let Some(first) = significant(&vals).first()
             && first.kind == VKind::Str
         {
@@ -407,8 +407,8 @@ css_rule!(KeyframesNamePattern, "css/keyframes-name-pattern", |sheet, src, ctx, 
 
 css_rule!(LayerNamePattern, "css/layer-name-pattern", |sheet, src, ctx, out| {
     let Some((re, pattern)) = kebab(ctx, "^([a-z][a-z0-9]*)([.-][a-z0-9]+)*$") else { return };
-    let check = |s: usize, e: usize, out: &mut Vec<crate::NativeFinding>| {
-        for r in split_commas(src, s, e) {
+    let check = |names: Vec<(usize, usize)>, out: &mut Vec<crate::NativeFinding>| {
+        for r in names {
             let name = text(src, r);
             if !name.is_empty() && !re.is_match(name) {
                 out.push(finding(r.0, r.1, format!("Layer name `{name}` doesn't match the naming pattern `{pattern}` (kebab-case by default)")));
@@ -418,12 +418,12 @@ css_rule!(LayerNamePattern, "css/layer-name-pattern", |sheet, src, ctx, out| {
     for i in at_rules(sheet) {
         let r = sheet.nodes[i].params;
         match sheet.at_name(i, src).as_str() {
-            "layer" => check(r.0, r.1, out),
+            "layer" => check(comma_parts(&sheet.values(i, src), src, r), out),
             "import" => {
-                let vals = values(src, r.0, r.1);
+                let vals = sheet.values(i, src);
                 for v in significant(&vals) {
                     if v.kind == VKind::Func && v.name(src).eq_ignore_ascii_case("layer") {
-                        check(v.inner.0, v.inner.1, out);
+                        check(comma_parts(&v.nodes, src, v.inner), out);
                     }
                 }
             }
@@ -459,7 +459,7 @@ css_rule!(ContainerNamePattern, "css/container-name-pattern", |sheet, src, ctx, 
                 }
             }
             Kind::AtRule if sheet.at_name(i, src) == "container" => {
-                let vals = values(src, n.params.0, n.params.1);
+                let vals = sheet.values(i, src);
                 if let Some(first) = significant(&vals).first()
                     && first.kind == VKind::Word
                 {
@@ -478,7 +478,10 @@ css_rule!(CustomMediaPattern, "css/custom-media-pattern", |sheet, src, ctx, out|
             continue;
         }
         let r = sheet.nodes[i].params;
-        let e = crate::css_syntax::ident_end(src, r.0);
+        let vals = sheet.values(i, src);
+        // The name: the prelude's first word.
+        let Some(first) = vals.first().filter(|v| v.kind == VKind::Word) else { continue };
+        let e = first.end;
         let Some(name) = src[r.0..e].strip_prefix("--") else { continue };
         if !re.is_match(name) {
             out.push(finding(r.0, e, format!("Custom media `--{name}` doesn't match the naming pattern `{pattern}` (kebab-case by default)")));

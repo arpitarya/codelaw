@@ -144,12 +144,12 @@ css_rule!(NestingSelectorNoMissingScopingRoot, "css/nesting-selector-no-missing-
         if rooted {
             continue;
         }
-        let (s, e) = match n.kind {
-            Kind::Rule if !sheet.in_keyframes(i, src) && !non_standard(text(src, n.name)) => n.name,
-            Kind::AtRule if sheet.at_name(i, src) == "scope" => n.params,
+        match n.kind {
+            Kind::Rule if !sheet.in_keyframes(i, src) && !non_standard(text(src, n.name)) => {}
+            Kind::AtRule if sheet.at_name(i, src) == "scope" => {}
             _ => continue,
-        };
-        let list = if n.kind == Kind::Rule { sheet.selectors(i, src) } else { selector_list(src, s, e).into() };
+        }
+        let list = sheet.selectors(i, src);
         let mut simples = Vec::new();
         all_simples(src, &list, &mut simples);
         for x in simples.iter().filter(|x| x.kind == SKind::Nesting) {
@@ -231,12 +231,12 @@ css_rule!(SelectorPseudoClassNoUnknown, "css/selector-pseudo-class-no-unknown", 
     for i in sheet.walk() {
         let n = &sheet.nodes[i];
         let is_page = n.kind == Kind::AtRule && sheet.at_name(i, src) == "page";
-        let (s, e) = match n.kind {
-            Kind::Rule if !sheet.in_keyframes(i, src) && !non_standard(text(src, n.name)) => n.name,
-            Kind::AtRule if is_page => n.params,
+        match n.kind {
+            Kind::Rule if !sheet.in_keyframes(i, src) && !non_standard(text(src, n.name)) => {}
+            Kind::AtRule if is_page => {}
             _ => continue,
-        };
-        let list = if n.kind == Kind::Rule { sheet.selectors(i, src) } else { selector_list(src, s, e).into() };
+        }
+        let list = sheet.selectors(i, src);
         each_selector_simple(src, &list, &mut |c, x| {
             if x.kind != SKind::PseudoClass {
                 return;
