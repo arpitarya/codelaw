@@ -143,3 +143,91 @@ fn fix_corrects_prose_and_file_local_names_and_nothing_exported() {
     assert_eq!(before, after);
     let _ = fs::remove_dir_all(&dir);
 }
+
+/// W-112: a repo `init` has not seen, with the packs it will want already
+/// in place (`init --no-install` then finds them): prose with two unknown
+/// words and one that is one edit from a common word.
+fn fresh(name: &str) -> PathBuf {
+    let root = repo_root();
+    let dir = std::env::temp_dir().join(format!("codelaw-spell-init-{name}-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(dir.join("node_modules/@codelaw")).unwrap();
+    fs::create_dir_all(dir.join("docs")).unwrap();
+    fs::write(dir.join("package.json"), "{\"name\": \"x\"}\n").unwrap();
+    fs::write(dir.join("docs/notes.md"), "# Notes\n\nWe deploy the service with kubectl and the frobnicator each morning before lunch.\nThe servise answers every request from the client before noon.\n").unwrap();
+    #[cfg(unix)]
+    for pack in ["data", "spell"] {
+        std::os::unix::fs::symlink(root.join("packs").join(pack), dir.join("node_modules/@codelaw").join(format!("rules-{pack}"))).unwrap();
+    }
+    dir
+}
+
+const TEMPLATE: &str = include_str!("../../../templates/init/.codelaw/spell/words.txt");
+
+#[test]
+fn init_adds_the_spell_pack_and_fills_the_words_file() {
+    let a = fresh("a");
+    let (code, out) = codelaw(&a, &["init", "--no-install"]);
+    assert_eq!(code, 0, "{out}");
+    let config = fs::read_to_string(a.join("codelaw.toml")).unwrap();
+    assert!(config.contains("\"codelaw:spell/recommended\""), "{config}");
+    assert!(out.contains("npm install -D @codelaw/rules-data @codelaw/rules-spell"), "{out}");
+    let words = fs::read_to_string(a.join(".codelaw/spell/words.txt")).unwrap();
+    // `codelaw` is from the rules folder's README, which init wrote.
+    assert_eq!(words, format!("{TEMPLATE}codelaw\nfrobnicator\nkubectl\n"), "the template, then the learned words, sorted");
+    assert!(out.contains("1 likely typos were not added") && out.contains("  servise: one edit from the common word `service`"), "{out}");
+    assert!(out.contains("added 3 words to .codelaw/spell/words.txt:\n  codelaw\n  frobnicator\n  kubectl\n"), "{out}");
+    // The learned words excuse the dictionary check.
+    fs::write(a.join("codelaw.toml"), config.replace("codelaw:spell/recommended", "codelaw:spell/strict") + "preview = true\n").unwrap();
+    let (_, out) = codelaw(&a, &["check", "--rule", "spell/unknown-word", "--no-cache"]);
+    assert!(out.contains("servise") && !out.contains("kubectl") && !out.contains("frobnicator"), "{out}");
+
+    // The same repo gives the same bytes.
+    let b = fresh("b");
+    let (code, out) = codelaw(&b, &["init", "--no-install"]);
+    assert_eq!(code, 0, "{out}");
+    assert_eq!(fs::read(b.join(".codelaw/spell/words.txt")).unwrap(), words.as_bytes());
+    assert_eq!(fs::read_to_string(b.join("codelaw.toml")).unwrap(), config);
+
+    // --no-spell: no pack, no file, no learn.
+    let c = fresh("c");
+    let (code, out) = codelaw(&c, &["init", "--no-install", "--no-spell"]);
+    assert_eq!(code, 0, "{out}");
+    assert!(!fs::read_to_string(c.join("codelaw.toml")).unwrap().contains("spell"));
+    assert!(!out.contains("rules-spell") && !out.contains("words"), "{out}");
+    assert!(!c.join(".codelaw/spell").exists());
+    let d = fresh("d");
+    assert_eq!(codelaw(&d, &["init", "--no-install", "--no-spell"]).1, out, "byte-identical across runs");
+    for dir in [a, b, c, d] {
+        let _ = fs::remove_dir_all(dir);
+    }
+}
+
+#[test]
+fn learn_appends_new_words_only_and_keeps_every_line() {
+    let dir = fresh("learn");
+    fs::write(dir.join("codelaw.toml"), "extends = [\"codelaw:md/recommended\"]\n").unwrap();
+    fs::create_dir_all(dir.join(".codelaw/spell")).unwrap();
+    let mine = "# our words\nKubectl\n\n# the rest\n";
+    fs::write(dir.join(".codelaw/spell/words.txt"), mine).unwrap();
+    let (code, out) = codelaw(&dir, &["spell", "learn"]);
+    assert_eq!(code, 0, "{out}");
+    assert_eq!(fs::read_to_string(dir.join(".codelaw/spell/words.txt")).unwrap(), format!("{mine}frobnicator\n"), "kubectl was already accepted");
+    assert!(out.contains("servise"), "{out}");
+    // A second run adds nothing and changes no byte.
+    let (code, out) = codelaw(&dir, &["spell", "learn"]);
+    assert_eq!(code, 0, "{out}");
+    assert!(out.contains("no new words; .codelaw/spell/words.txt is up to date"), "{out}");
+    assert_eq!(fs::read_to_string(dir.join(".codelaw/spell/words.txt")).unwrap(), format!("{mine}frobnicator\n"));
+    // A new word is added after the others.
+    fs::write(dir.join("docs/more.md"), "# More\n\nThe gizmotron writes a short summary when the build finishes.\n").unwrap();
+    let (_, out) = codelaw(&dir, &["spell", "learn"]);
+    assert!(out.contains("added 1 word to .codelaw/spell/words.txt:\n  gizmotron\n"), "{out}");
+    assert_eq!(fs::read_to_string(dir.join(".codelaw/spell/words.txt")).unwrap(), format!("{mine}frobnicator\ngizmotron\n"));
+    // A `words_file` the config sets must be there.
+    fs::write(dir.join("codelaw.toml"), "[spell]\nwords_file = \"spelling.txt\"\n").unwrap();
+    let (code, out) = codelaw(&dir, &["spell", "learn"]);
+    assert_eq!(code, 2, "{out}");
+    assert!(out.contains("`[spell] words_file`") && out.contains("spelling.txt"), "{out}");
+    let _ = fs::remove_dir_all(&dir);
+}

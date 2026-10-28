@@ -65,6 +65,7 @@ what consumers receive, edit the template here — the diff is the change.
 | `git-hooks/post-commit` | the git hooks folder's `post-commit` | `init --git-hooks` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `git-hooks/pre-commit` | the git hooks folder's `pre-commit` | `init --git-hooks` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `init/.codelaw/rules/README.md` | .codelaw/rules/README.md | `init` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
+| `init/.codelaw/spell/words.txt` | .codelaw/spell/words.txt, before `spell learn` fills it (never overwritten) | `init`, and `spell learn` when the file is missing | [SR-SPELL](../records/0116_spell.md) |
 | `init/codelaw-agents.toml` | the `[agents]` section of `codelaw.toml` | `init --agents` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `init/codelaw.toml` | codelaw.toml | `init` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |
 | `init/gitignore` | the line `init` adds to `.gitignore` (the merge stays in code) | `init` | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) |

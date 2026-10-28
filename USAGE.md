@@ -287,6 +287,19 @@ modules_convention = "camelCase"     # css-loader's localsConvention: .btn-prima
 
 `css-modules/no-unused-class` reports a class no file reads (in the stylesheet; `codelaw fix --unsafe` deletes the rule), and `css-modules/no-undefined-class` reports `styles.x` where the module has no `.x` (in the JS or TS file). A module read by a computed name (`styles[name]`), spread, or passed to a function is never reported, and neither is one no file imports ([SR-PROJECT-GRAPH](records/0103_project-graph.md) decision 8).
 
+### Spelling
+
+`codelaw init` adds the spell pack (`@codelaw/rules-spell`, `codelaw-rules-spell`) and `codelaw:spell/recommended`, which fixes known typos in comments, docs, prose strings, names and keys; `--no-spell` leaves it out. Its rules are `preview`, so they run once `preview = true` is set. `codelaw:spell/strict` adds the dictionary check, `spell/unknown-word`. The words a project accepts are in two places, merged and compared case-insensitively:
+
+```toml
+[spell]
+words = ["kubectl"]                       # inline
+words_file = ".codelaw/spell/words.txt"   # the default: one word per line, `#` comments
+locale = "en-US"                          # or en-GB; unset accepts both
+```
+
+A missing file at the default path is no error; a `words_file` you set must exist. `init` writes the file and fills it with **`codelaw spell learn`**, which runs `spell/unknown-word` over the project (whatever the config turns on) and adds each word it reports, lower case and sorted, after the lines already there. A word that is a known typo or one edit from a common word is listed for review, never added. A second run adds only new words ([SR-SPELL](records/0116_spell.md)).
+
 ### Type rules today
 
 codelaw's own type-aware rules (`no-floating-promises`, `await-thenable`, the `no-unsafe-*` family …) are not built yet. Until they are, oxlint's type-aware mode gives you them through the oxlint adapter codelaw already runs. Install the tools in your project, not codelaw's:
@@ -541,6 +554,7 @@ flowchart LR
 | `codelaw debug` | Inspect what the engine sees: `changed-functions` |
 | `codelaw brief` | What is specific to this repo for the files an agent is about to write (SR-CLI-MCP decision 14) |
 | `codelaw migrate` | Translate an ESLint, Prettier, Biome, Ruff or stylelint config into codelaw.toml, with a report of what mapped and what did not (SR-CLI-MCP decision 14) |
+| `codelaw spell` | The spell pack's words file: `learn` adds the words no dictionary knows (SR-SPELL) |
 
 <!-- /docs-sync:commands -->
 

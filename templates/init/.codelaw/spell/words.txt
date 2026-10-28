@@ -1,0 +1,5 @@
+# Words this project accepts: the spell pack never reports them (SR-SPELL).
+# One word per line, compared case-insensitively; lines starting with # are
+# comments. `codelaw spell learn` adds every word no dictionary knows and
+# lists the likely typos it left out for you to review. `[spell] words_file`
+# in codelaw.toml moves this file; `[spell] words` lists more words inline.

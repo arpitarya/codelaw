@@ -3,7 +3,7 @@ type: Standing Record
 kind: component
 name: SR-SPELL
 title: "SR-SPELL (0116) — spelling as its own rule pack: a known-typo check on by default, a dictionary check opt-in, codelaw's own word data"
-description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, its three generated tables (known typos, the dictionary, the locale pairs), the [spell] section and six rules; spell/inconsistent-term is not."
+description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, its three generated tables (known typos, the dictionary, the locale pairs), the [spell] section and six rules; spell/inconsistent-term is not. W-112: the words file, codelaw init adding the pack, codelaw spell learn."
 status: accepted
 date: 2026-10-27
 feature: "spell checking — the spell pack"
@@ -14,8 +14,9 @@ owns:
   - scripts/spell-typos.txt
   - fixtures/spell
   - crates/codelaw-cli/tests/spell.rs
+  - crates/codelaw-cli/src/spell_cmd.rs
 laws: [L2, L3, L4, L5, L6, L8, L10, L11]
-timestamp: 2026-10-28T03:10:00Z
+timestamp: 2026-10-28T18:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-27 (Cowork, voice), on the CSpell research: the typo list — \"Let's go with B.\" (codelaw builds its own from SCOWL); SCOWL and VarCon — \"Approve both.\"; the software-terms dictionary — \"Approve it.\"; packaging — \"want it as a separate package.\"; defaults and where the data lives — \"Go with the recommendation.\"; writing it up — \"go ahead\". W-103."
 ---
@@ -85,10 +86,27 @@ question its maintainers left open. The forks and the rulings are in
    registries: `@codelaw/rules-spell` on npm and `codelaw-rules-spell` on PyPI
    (the decider: *"want it as a separate package"*). Its matchers are `native:`
    rules in the engine ([SR-ARCHITECTURE](0108_architecture.md) decision 15b);
-   its word data is in the pack (decision 6). `codelaw init` never adds it,
-   as it never adds a security pack: a team chooses it
-   ([SR-RULE-PACKS](0101_rule-packs.md) decision 6).
-   - **Ruled 2026-10-28, not built (W-112):** `codelaw init` adds the spell pack, writes `.codelaw/spell/words.txt` from a template and fills it with `codelaw spell learn`; `--no-spell` skips all three (the decider: *"Let it be part of code law init itself. No flag, no nothing. Probably we can have a flag as hyphen hyphen no spell if it is not needed."*, then *"Yes."* to the pack). This sentence's "never adds it" holds until W-112 lands.
+   its word data is in the pack (decision 6). **`codelaw init` adds it**
+   (reversed 2026-10-28, W-112; until then it never did, as it never adds a
+   security pack): it adds the pack and `codelaw:spell/recommended`, writes
+   `.codelaw/spell/words.txt` from `templates/init/.codelaw/spell/words.txt`
+   ([L10](0012_LAW-10-consumer-templates.md)) and fills it with
+   `codelaw spell learn`; `--no-spell` skips all three. The decider,
+   2026-10-28 (voice): *"Let it be part of code law init itself. No flag, no
+   nothing. Probably we can have a flag as hyphen hyphen no spell if it is
+   not needed."* — and, asked whether `init` should also add the spell pack,
+   with `--no-spell` skipping both: *"Yes."*
+   - **As built (W-112, 2026-10-28):** the pack is wanted in every repo, on
+     both registries, so it is never left out with a `note:`. The words file
+     is written only when it is not there, and never overwritten. `spell
+     learn` runs after the install commands; when a pack the config extends
+     is not installed yet (`--no-install`), `init` prints one `note:` saying
+     to run `codelaw spell learn` once the packs are in place, and does not
+     fail. The pack's rules are `preview` (decision 9), so with `init`'s
+     config, which does not set `preview = true`, the pack is installed and
+     extended but runs nothing until `preview = true` or its rules graduate.
+     `codelaw`, the word in the rules folder's README `init` writes, is
+     learned on every first run.
 2. **Presets.** `spell/recommended` turns on `spell/known-typo` and
    `spell/known-typo-identifier` — on as soon as a project extends it.
    `spell/strict` extends it and adds `spell/unknown-word`,
@@ -251,7 +269,34 @@ question its maintainers left open. The forks and the rulings are in
      and excuse every `spell/*` rule but `spell/suspicious-word`, which
      reads them where they are written: string entries of `[spell] words`
      (or a dotted `spell.words`) in the root `codelaw.toml`.
-   - **Ruled 2026-10-28, not built (W-112):** a words file — `[spell] words_file`, by default `.codelaw/spell/words.txt` beside the rules directory, one word per line, `#` comments — merged with `[spell] words`, which stays (*"It should stay."*); missing at the default path is silent, missing at a set path is an error (*"Sounds right."*).
+   - **A words file (W-112, 2026-10-28):** `[spell] words_file`, by default
+     `.codelaw/spell/words.txt` beside the rules folder, relative to the root
+     config's folder — the decider: *"I would recommend creating a separate
+     file and giving a path in TOML file for that file. The default should be
+     next to rules directory."* One word per line; blank lines and lines
+     starting with `#` are skipped; a line holding whitespace inside is a
+     config error naming the file and line. It is merged with `[spell]
+     words`, which stays (*"It should stay."*): an entry in either excuses a
+     word as `[spell] words` does. Missing at the default path is silent;
+     missing at a set path is a config error naming it (*"Sounds right."*).
+     The loader reads it, so its words are part of every cache key, and
+     `config --print` shows `spell.words_file` with its source.
+     `spell/suspicious-word` reads only `codelaw.toml`; the file's words are
+     checked when `spell learn` adds them (below).
+   - **`codelaw spell learn` (W-112, 2026-10-28):** the decider, *"I want a
+     CLI command which can identify all the spellings within the code base
+     and put it in the words.txt file as default."*, then *"Code law spell
+     learn."* It runs `spell/unknown-word` over the project whatever the
+     config turns on — the pack loaded (`codelaw:spell/recommended` when the
+     config extends no spell preset), preview allowed, the rule on, nothing
+     else run, no cache — and takes each word it reports, lower case. A word
+     `spell/suspicious-word` would report (a known typo, or no dictionary
+     word but one edit from a word of size class 20 or below) is not added:
+     it is printed, sorted, with why, before the count. The rest are appended,
+     sorted, after the lines already in the file, which are never changed or
+     reordered; a missing file starts from the template. A second run adds
+     only words that are new since. Every other rule's word (`known-typo`,
+     names, keys) is not read: `spell/unknown-word` reads prose only.
 8. **Deterministic** ([L5](0007_LAW-5-no-model-in-the-engine.md)): no model,
    no network, no clock. Suggestions rank by edit cost (Damerau-Levenshtein,
    at most two edits), then the word's SCOWL frequency class, then alphabetical

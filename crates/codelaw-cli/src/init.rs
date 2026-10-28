@@ -3,6 +3,8 @@
 //! packs with the package manager the repo already uses, and write the
 //! config, the rules folder and the `.gitignore` line; with `--agents`, the
 //! `[agents] targets` and the agent files (SR-AGENT-SURFACES decision 2).
+//! The spell pack too, with its words file filled by `spell learn`, unless
+//! `--no-spell` (SR-SPELL decision 1, W-112).
 
 use crate::fail;
 use clap::Args;
@@ -35,6 +37,9 @@ pub struct InitArgs {
     /// With `--autofix`: also apply `suggest` fixes, on a second branch and PR.
     #[arg(long = "unsafe", requires = "autofix")]
     unsafe_fixes: bool,
+    /// Leave the spell pack out: no `codelaw:spell/recommended`, no `.codelaw/spell/words.txt`, no `spell learn` (SR-SPELL decision 1).
+    #[arg(long)]
+    no_spell: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -143,6 +148,7 @@ fn presets(packs: &BTreeSet<&str>, languages: &BTreeSet<Language>) -> Vec<String
             "scss" => out.push("codelaw:scss/recommended".into()),
             "css-modules" => out.push("codelaw:css-modules/recommended".into()),
             "python" => out.push("codelaw:py/recommended".into()),
+            "spell" => out.push("codelaw:spell/recommended".into()),
             "data" => {
                 out.push("codelaw:data/recommended".into());
                 if languages.contains(&Language::Markdown) {
@@ -289,6 +295,10 @@ pub fn init(args: InitArgs) -> ExitCode {
     if has_css_modules(&root) {
         wanted.insert("css-modules");
     }
+    // Spelling from day one, on both registries (SR-SPELL decision 1).
+    if !args.no_spell {
+        wanted.insert("spell");
+    }
     let has_npm = package_json.is_some();
     let has_pypi = root.join("pyproject.toml").is_file();
 
@@ -368,9 +378,19 @@ pub fn init(args: InitArgs) -> ExitCode {
         Err(e) => return fail(e),
     };
     let rules_dir = root.join(".codelaw").join("rules");
+    // The words file is never overwritten: `spell learn` only appends to it.
+    let words_file = root.join(codelaw_config::SPELL_WORDS_FILE);
+    let spell = packs.contains("spell");
     let written = std::fs::write(root.join("codelaw.toml"), &config)
         .and_then(|_| std::fs::create_dir_all(&rules_dir))
         .and_then(|_| std::fs::write(rules_dir.join("README.md"), template::text("init/.codelaw/rules/README.md")))
+        .and_then(|_| {
+            if !spell || words_file.exists() {
+                return Ok(());
+            }
+            std::fs::create_dir_all(words_file.parent().expect("a folder"))?;
+            std::fs::write(&words_file, template::text("init/.codelaw/spell/words.txt"))
+        })
         .and_then(|_| {
             let gi = root.join(".gitignore");
             let current = std::fs::read_to_string(&gi).unwrap_or_default();
@@ -387,7 +407,7 @@ pub fn init(args: InitArgs) -> ExitCode {
     }
     let langs: Vec<&str> = languages.iter().map(|l| l.name()).collect();
     println!("languages: {}", if langs.is_empty() { "none found".into() } else { langs.join(", ") });
-    println!("wrote codelaw.toml, .codelaw/rules/README.md and the .gitignore line");
+    println!("wrote codelaw.toml, .codelaw/rules/README.md{} and the .gitignore line", if spell { ", .codelaw/spell/words.txt" } else { "" });
     for s in &skipped {
         println!("note: {s}");
     }
@@ -420,6 +440,16 @@ pub fn init(args: InitArgs) -> ExitCode {
     }
     for line in fux_index_note(&root, &by_registry) {
         println!("{line}");
+    }
+    // Once the pack is in place: fill the words file (SR-SPELL decision 1).
+    if spell {
+        match crate::spell_cmd::learn(&root) {
+            Ok(learned) => learned.lines().iter().for_each(|l| println!("{l}")),
+            Err(e) => println!(
+                "note: the words file was not filled ({}); run `codelaw spell learn` once the packs are installed",
+                e.lines().next().unwrap_or_default().replace(&format!("{}/", codelaw_core::normalize_path(&root)), "")
+            ),
+        }
     }
     // After the packs, so the per-language instructions list their rules.
     if !targets.is_empty() {

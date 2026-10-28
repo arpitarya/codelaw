@@ -39,9 +39,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (19)
+## Open items (18)
 
-### build (17)
+### build (16)
 
 🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -60,8 +60,6 @@ here. Read that record before changing anything below it.
 🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-103** `agent` Spell pack: typo list, dictionary, locale pairs, `[spell]`, six rules, fixtures and the corpus run (reviewed, all `preview`) landed; left: `spell/inconsistent-term` (project scope), the L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
-
-🟢 **W-112** `agent` Spell words file `.codelaw/spell/words.txt` (`[spell] words_file`, merged with `[spell] words`); `codelaw init` adds the pack and file (`--no-spell` skips); `codelaw spell learn`. Filed by Arpit (Cowork). [detail](open/W-112-spell-words-file-and-learn.md)
 
 🟢 **W-110** `agent` Clean session 2df06f6d's leftovers on the Mac: five merged worktrees and three `.fux`-only folders, by `worktree-cleanup.py --apply`. Filed by Arpit (Cowork). [detail](open/W-110-session-2df06f6d-cleanup.md)
 

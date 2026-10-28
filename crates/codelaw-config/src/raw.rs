@@ -295,7 +295,17 @@ pub struct RawSpell {
     /// locale variant; `spell/suspicious-word` checks each one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub words: Option<Vec<String>>,
+    /// More accepted words, one per line, `#` comments, merged with
+    /// `words`; by default [`SPELL_WORDS_FILE`], relative to the config's
+    /// folder (W-112). Not a rule option: the loader reads the file.
+    #[serde(skip_serializing)]
+    pub words_file: Option<String>,
 }
+
+/// Where `[spell] words_file` points when it is not set: beside the rules
+/// folder. A missing file there is no error; a missing file the config
+/// names is.
+pub const SPELL_WORDS_FILE: &str = ".codelaw/spell/words.txt";
 
 /// The values of `[spell] locale`.
 pub const SPELL_LOCALES: &[&str] = &["en-US", "en-GB"];
