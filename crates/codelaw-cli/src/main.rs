@@ -16,6 +16,7 @@ mod init;
 mod match_cmd;
 mod migrate;
 mod rules_cmd;
+mod spell_cmd;
 mod tree;
 mod warm;
 mod watch_cmd;
@@ -63,6 +64,11 @@ enum Command {
     NewRule(rules_cmd::NewRuleArgs),
     /// Set codelaw up in this repo: config, rule packs, folders.
     Init(init::InitArgs),
+    /// The spell pack's words file: `learn` adds the words no dictionary knows (SR-SPELL).
+    Spell {
+        #[command(subcommand)]
+        action: spell_cmd::SpellAction,
+    },
     /// Translate an ESLint, Prettier, Biome, Ruff or stylelint config into
     /// codelaw.toml, with a report of what mapped and what did not (SR-CLI-MCP decision 15).
     Migrate(migrate::MigrateArgs),
@@ -601,6 +607,7 @@ fn main() -> ExitCode {
         Command::Match(a) => match_cmd::run(a),
         Command::NewRule(a) => rules_cmd::new_rule(a),
         Command::Init(a) => init::init(a),
+        Command::Spell { action } => spell_cmd::spell(action),
         Command::Migrate(a) => migrate::migrate(a),
         Command::Lsp { .. } => {
             // A warm process for `--prefer-warm` runs for as long as the

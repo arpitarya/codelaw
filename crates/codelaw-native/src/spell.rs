@@ -21,7 +21,8 @@ use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
 use codelaw_semantic::{ScopeKind, SemanticModel, SymbolKind};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
+use std::sync::Arc;
 use tree_sitter::Node;
 
 pub struct KnownTypo;
@@ -211,19 +212,39 @@ impl NativeRule for SuspiciousWord {
         }
         let (start, end) = (n.start_byte() + 1, n.end_byte().saturating_sub(1).max(n.start_byte() + 1));
         let word = &ctx.source[start..end];
-        let lower = word.to_ascii_lowercase();
-        let message = if let Some(fixes) = typo_table(ctx).and_then(|t| lookup(t, &lower)) {
-            format!("`{word}` in `[spell] words` is a known typo of {}: accepting it hides the typo everywhere", fixes.split('|').map(|f| format!("`{f}`")).collect::<Vec<_>>().join(" or "))
-        } else if let Some(dict) = Dictionary::of(ctx)
-            && !dict.contains(&lower)
-            && let Some(near) = dict.suggest_common(&lower)
-        {
-            format!("`{word}` in `[spell] words` is one edit from the common word `{near}`: accepting it may hide a typo")
-        } else {
-            return;
+        let message = match suspicion(word, ctx.data) {
+            Some(Suspicion::Typo(fixes)) => {
+                format!("`{word}` in `[spell] words` is a known typo of {}: accepting it hides the typo everywhere", fixes.split('|').map(|f| format!("`{f}`")).collect::<Vec<_>>().join(" or "))
+            }
+            Some(Suspicion::Near(near)) => format!("`{word}` in `[spell] words` is one edit from the common word `{near}`: accepting it may hide a typo"),
+            None => return,
         };
         out.push(NativeFinding { start, end, message, edits: Vec::new() });
     }
+}
+
+/// Why a word should not be accepted: `spell/suspicious-word`'s test.
+pub enum Suspicion<'a> {
+    /// A known typo; its corrections, `|`-separated.
+    Typo(&'a str),
+    /// No dictionary word, but one edit from this common one.
+    Near(String),
+}
+
+/// `spell/suspicious-word`'s test of one word against the pack's tables:
+/// a known typo, or no dictionary word but one edit from a word of size
+/// class 20 or below. `codelaw spell learn` holds such a word for review
+/// instead of accepting it (W-112).
+pub fn suspicion<'d>(word: &str, data: &'d BTreeMap<String, Arc<serde_json::Value>>) -> Option<Suspicion<'d>> {
+    let lower = word.to_ascii_lowercase();
+    if let Some(fixes) = typo_table_in(data).and_then(|t| lookup(t, &lower)) {
+        return Some(Suspicion::Typo(fixes));
+    }
+    let dict = Dictionary::from_data(data)?;
+    if dict.contains(&lower) {
+        return None;
+    }
+    dict.suggest_common(&lower).map(Suspicion::Near)
 }
 
 /// Whether a TOML string is an entry of `[spell] words`.
@@ -287,7 +308,11 @@ struct Dictionary<'a> {
 
 impl<'a> Dictionary<'a> {
     fn of(ctx: &'a NativeContext<'_>) -> Option<Self> {
-        let classes = ctx.data.get("spell/words")?.get("classes")?.as_object()?;
+        Self::from_data(ctx.data)
+    }
+
+    fn from_data(data: &'a BTreeMap<String, Arc<serde_json::Value>>) -> Option<Self> {
+        let classes = data.get("spell/words")?.get("classes")?.as_object()?;
         let mut out: Vec<(u32, &str)> = classes.iter().filter_map(|(k, v)| Some((k.parse().ok()?, v.as_str()?))).collect();
         out.sort_unstable();
         Some(Dictionary { classes: out })
@@ -993,7 +1018,11 @@ fn same_case(word: &str, fix: &str) -> Option<String> {
 
 /// The `entries` string of the pack's typo table.
 fn typo_table<'a>(ctx: &'a NativeContext<'_>) -> Option<&'a str> {
-    ctx.data.get("spell/typos")?.get("entries")?.as_str()
+    typo_table_in(ctx.data)
+}
+
+fn typo_table_in(data: &BTreeMap<String, Arc<serde_json::Value>>) -> Option<&str> {
+    data.get("spell/typos")?.get("entries")?.as_str()
 }
 
 /// The corrections of `word` in a table of space-separated `typo:fix`

@@ -49,6 +49,9 @@ pub struct ConfigFile {
     pub(crate) alias_profiles: BTreeSet<String>,
     /// Deprecated spellings this file uses: one warning each.
     pub deprecations: Vec<String>,
+    /// The words of `[spell] words_file` (or of the default file, when it
+    /// is there), in file order: SR-SPELL decision 7, W-112.
+    pub spell_file_words: Vec<String>,
 }
 
 /// Where a scope's settings are listed by `codelaw config --scopes`.
@@ -333,6 +336,7 @@ impl ConfigFile {
         if let Some(w) = raw.spell.words.iter().flatten().find(|w| w.is_empty() || w.chars().any(char::is_whitespace)) {
             return Err(ConfigError::new(Some(path), format!("`[spell] words`: `{w}` is not one word")));
         }
+        let spell_file_words = read_words_file(&path, &dir, raw.spell.words_file.as_deref())?;
         if let Some(globs) = &raw.css.modules {
             glob_set(globs, &path).map_err(|e| ConfigError::new(Some(path.clone()), format!("`[css] modules`: {}", e.message)))?;
         }
@@ -352,6 +356,7 @@ impl ConfigFile {
             profiles,
             alias_profiles,
             deprecations,
+            spell_file_words,
         })
     }
 
@@ -379,6 +384,38 @@ impl ConfigFile {
     pub(crate) fn relative<'p>(&self, file: &'p Path) -> Option<&'p Path> {
         file.strip_prefix(&self.dir).ok()
     }
+}
+
+/// The words of a `[spell] words_file` text: one per line, blank lines and
+/// lines starting with `#` skipped; a line holding whitespace inside is an
+/// error naming its line (W-112).
+pub fn words_file_words(text: &str) -> Result<Vec<String>, String> {
+    let mut out = Vec::new();
+    for (i, line) in text.lines().enumerate() {
+        let w = line.trim();
+        if w.is_empty() || w.starts_with('#') {
+            continue;
+        }
+        if w.chars().any(char::is_whitespace) {
+            return Err(format!("line {}: `{w}` is not one word", i + 1));
+        }
+        out.push(w.to_owned());
+    }
+    Ok(out)
+}
+
+/// Read `[spell] words_file`, relative to the config's folder: missing at
+/// the default path is no error, missing at a path the config sets is
+/// (SR-SPELL decision 7).
+fn read_words_file(config: &Path, dir: &Path, set: Option<&str>) -> Result<Vec<String>, ConfigError> {
+    let file = dir.join(set.unwrap_or(crate::raw::SPELL_WORDS_FILE));
+    let shown = codelaw_core::normalize_path(&file);
+    let text = match fs::read_to_string(&file) {
+        Ok(t) => t,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound && set.is_none() => return Ok(Vec::new()),
+        Err(e) => return Err(ConfigError::new(Some(config.to_path_buf()), format!("`[spell] words_file`: {shown}: {e}"))),
+    };
+    words_file_words(&text).map_err(|e| ConfigError::new(Some(config.to_path_buf()), format!("`[spell] words_file`: {shown}: {e}")))
 }
 
 /// Load the config home of one folder, if it has one. A folder with more
@@ -632,6 +669,12 @@ impl Config {
         self.files.first().map(|f| f.dir.as_path()).unwrap_or(&self.root_dir)
     }
 
+    /// Where `[spell] words_file` points: the default path when unset.
+    pub fn spell_words_file(&self) -> PathBuf {
+        let rel = self.root_raw().and_then(|r| r.spell.words_file.clone()).unwrap_or_else(|| crate::raw::SPELL_WORDS_FILE.into());
+        self.config_dir().join(rel)
+    }
+
     pub fn rules_dir(&self) -> PathBuf {
         let rel = self.root_raw().and_then(|r| r.rules_dir.clone()).unwrap_or_else(|| ".codelaw/rules".into());
         self.config_dir().join(rel)
@@ -725,7 +768,15 @@ impl Config {
         let value = match (name, self.root_raw()) {
             ("deps", Some(r)) => serde_json::to_value(&r.deps).ok(),
             ("css", Some(r)) => serde_json::to_value(&r.css).ok(),
-            ("spell", Some(r)) => serde_json::to_value(&r.spell).ok(),
+            // `[spell] words` and the words file are one list (W-112).
+            ("spell", Some(r)) => serde_json::to_value(&r.spell).ok().map(|mut v| {
+                let file = self.files.first().map(|f| f.spell_file_words.as_slice()).unwrap_or_default();
+                if !file.is_empty() {
+                    let words: Vec<&String> = r.spell.words.iter().flatten().chain(file).collect();
+                    v["words"] = serde_json::json!(words);
+                }
+                v
+            }),
             _ => None,
         };
         match value {
@@ -864,6 +915,10 @@ impl Config {
         for f in &self.files {
             k.push(codelaw_core::normalize_path(f.path.strip_prefix(&self.root_dir).unwrap_or(&f.path)));
             k.push(&f.text);
+            // The words file is config the text does not hold.
+            if !f.spell_file_words.is_empty() {
+                k.push(f.spell_file_words.join("\n"));
+            }
         }
         // Scopes a preset ships are not in the config text.
         for f in self.files.iter().take(1) {
@@ -1099,6 +1154,37 @@ rules = { "js/no-console" = "error" }
         let err = Config::from_toml(PathBuf::from("/x"), "[spell]\nwords = [\"two words\"]\n").unwrap_err();
         assert!(err.to_string().contains("`[spell] words`: `two words` is not one word"), "{err}");
         assert!(Config::from_toml(PathBuf::from("/x"), "[spell]\nwordz = []\n").is_err());
+    }
+
+    /// W-112: the words file is merged with `[spell] words`; missing at the
+    /// default path is silent, missing at a set path is an error naming it.
+    #[test]
+    fn the_spell_words_file_is_merged_with_the_inline_words() {
+        let d = temp("spell-words-file");
+        let at = |s: &str| Config::from_toml(d.clone(), s);
+        // No file at the default path: no error, the inline words only.
+        let c = at("[spell]\nwords = [\"kubectl\"]\n").unwrap();
+        assert_eq!(c.section_options("spell").get("words"), Some(&serde_json::json!(["kubectl"])));
+        assert_eq!(c.spell_words_file(), d.join(".codelaw/spell/words.txt"));
+        let before = c.fingerprint();
+        fs::create_dir_all(d.join(".codelaw/spell")).unwrap();
+        fs::write(d.join(".codelaw/spell/words.txt"), "# accepted words\n\nnginx\n  Kubelet  \n").unwrap();
+        let c = at("[spell]\nwords = [\"kubectl\"]\n").unwrap();
+        assert_eq!(c.section_options("spell").get("words"), Some(&serde_json::json!(["kubectl", "nginx", "Kubelet"])));
+        assert_ne!(c.fingerprint(), before, "the words file is part of every cache key");
+        // The file alone, with no `[spell]` section.
+        assert_eq!(at("").unwrap().section_options("spell").get("words"), Some(&serde_json::json!(["nginx", "Kubelet"])));
+        // A set path is read relative to the config's folder, and must be there.
+        fs::write(d.join("words.txt"), "terraform\n").unwrap();
+        let c = at("[spell]\nwords_file = \"words.txt\"\n").unwrap();
+        assert_eq!(c.section_options("spell").get("words"), Some(&serde_json::json!(["terraform"])));
+        assert!(!c.section_options("spell").contains_key("words_file"), "not a rule option");
+        let err = at("[spell]\nwords_file = \"missing.txt\"\n").unwrap_err();
+        assert!(err.to_string().contains("`[spell] words_file`: ") && err.to_string().contains("missing.txt"), "{err}");
+        fs::write(d.join("words.txt"), "ok\ntwo words\n").unwrap();
+        let err = at("[spell]\nwords_file = \"words.txt\"\n").unwrap_err();
+        assert!(err.to_string().contains("line 2: `two words` is not one word"), "{err}");
+        let _ = fs::remove_dir_all(&d);
     }
 
     #[test]

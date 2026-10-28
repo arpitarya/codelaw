@@ -12,7 +12,7 @@ owns:
   - fixtures/react-no-context
   - crates/codelaw-cli/tests/react_no_context.rs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-27T14:00:00Z
+timestamp: 2026-10-28T18:00:00Z
 content_sha: ""
 ---
 
@@ -175,7 +175,7 @@ The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the
    - Each pack's manifest declares `min_codelaw`. An engine older than that refuses the pack, with an error naming the upgrade.
    - `codelaw rules --why <id>` and the JSON output name the pack and version each rule came from.
 6. **`codelaw init` installs what it detects.**
-   - **Languages to packs:** JS/JSX → `js`; TS/TSX → `js` and `ts`; HTML → `html`; CSS → `css`; SCSS → `scss` and `css` (also `sass`, `sass-embedded` or `node-sass` in `package.json`; W-62); a `*.module.css` or `*.module.scss` file → `css-modules`, which is npm only (W-63); Python → `python`; JSON/YAML/TOML/Markdown → `data`. With JS or TS, `react` when `package.json` depends on `react`, `stencil` when it depends on `@stencil/core`, `tanstack-query` when it depends on `@tanstack/react-query` or `react-query`, and `redux-toolkit` when it depends on `@reduxjs/toolkit` or `redux`. `node`, the four security packs and `spell` are never added by `init`: a security pack or the spell checker is chosen, not detected.
+   - **Languages to packs:** JS/JSX → `js`; TS/TSX → `js` and `ts`; HTML → `html`; CSS → `css`; SCSS → `scss` and `css` (also `sass`, `sass-embedded` or `node-sass` in `package.json`; W-62); a `*.module.css` or `*.module.scss` file → `css-modules`, which is npm only (W-63); Python → `python`; JSON/YAML/TOML/Markdown → `data`. With JS or TS, `react` when `package.json` depends on `react`, `stencil` when it depends on `@stencil/core`, `tanstack-query` when it depends on `@tanstack/react-query` or `react-query`, and `redux-toolkit` when it depends on `@reduxjs/toolkit` or `redux`. Every repo gets `spell` (with `codelaw:spell/recommended`), unless `--no-spell` ([SR-SPELL](0116_spell.md) decision 1; reversed by the decider 2026-10-28, W-112: *"Let it be part of code law init itself."*). `node` and the four security packs are never added by `init`: a security pack is chosen, not detected.
    - **How it installs:** it adds those packs as dev dependencies with the package manager the repo already uses: npm, pnpm, yarn or bun for a `package.json` repo; uv, pip or poetry for a `pyproject.toml` repo. A repo with both uses both — `rules-python` from PyPI, the other packs from npm — unless `--registry npm|pypi` picks one.
    - **A pack the chosen registry does not publish** (§1) comes from the other registry when the repo uses that one too, or uses neither; otherwise — and always under `--registry` — it is left out, its presets are not written, and `init` prints a `note:` naming the registry it is on. An npm repo with a few Python files gets no `codelaw:py/recommended` until `codelaw-rules-python` is installed from PyPI.
    - **What it writes** (its text is `templates/init/`, [L10](0012_LAW-10-consumer-templates.md)): `extends` with each installed pack's `recommended` presets, and `js/typescript` when the repo has TypeScript ([SR-CONFIG](0110_config.md) decision 8).

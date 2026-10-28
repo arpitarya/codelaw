@@ -38,6 +38,7 @@ pub const TEMPLATES: &[Template] = &[
     t!("git-hooks/post-commit"),
     t!("git-hooks/pre-commit"),
     t!("init/.codelaw/rules/README.md"),
+    t!("init/.codelaw/spell/words.txt"),
     t!("init/codelaw-agents.toml"),
     t!("init/codelaw.toml"),
     t!("init/gitignore"),
