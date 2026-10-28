@@ -57,7 +57,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-99** `agent` Side-by-side bench built; D-37…D-41 ratified 10-27. Left: the first `bench-rivals.yml` run on the runner, then L8 context rows and a README claim from them. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
-🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements and selectors from the tree; left: values, preludes, pseudo-class arguments. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
+🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🟢 **W-93** `agent` `codelaw hook --pre` and `codelaw brief` built and landed; `hook_pre`'s budget ruled 10-27: left unset. Left: close it (IMPLEMENTATION, archive). Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 

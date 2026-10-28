@@ -97,7 +97,7 @@ css_rule!(AtRuleDescriptorValueNoUnknown, "css/at-rule-descriptor-value-no-unkno
             continue;
         }
         let Some(allowed) = keywords.get(&format!("{at}/{name}")).and_then(|x| x.as_array()) else { continue };
-        let vals = values(src, n.params.0, n.params.1);
+        let vals = sheet.values(i, src);
         let sig = significant(&vals);
         // `system: fixed 3`, `font-style: oblique 10deg`: the keyword comes first.
         let Some(first) = sig.first() else { continue };
@@ -450,9 +450,10 @@ css_rule!(ContainerNamePattern, "css/container-name-pattern", |sheet, src, ctx, 
                     continue;
                 }
                 let end = if p == "container" { src[n.params.0..n.params.1].find('/').map_or(n.params.1, |o| n.params.0 + o) } else { n.params.1 };
-                let vals = values(src, n.params.0, end);
+                // The names: the words before a `/` (`container: a b / size`).
+                let vals = sheet.values(i, src);
                 for v in significant(&vals) {
-                    if v.kind == VKind::Word {
+                    if v.kind == VKind::Word && v.end <= end {
                         report(v.start, v.end, out);
                     }
                 }
