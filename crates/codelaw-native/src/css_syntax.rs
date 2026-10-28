@@ -3,13 +3,13 @@
 //! values, selectors and media queries, every piece with its byte range in the
 //! source. Since W-62 the statements, each rule's selector list, each
 //! declaration's and at-rule's component values, the media queries and the
-//! selectors of an `@page` or `@scope` prelude come from the file's
-//! tree-sitter tree ([`css_tree`](crate::css_tree); SR-ARCHITECTURE decision
-//! 15b); this module's text reader builds the same sheet when the tree holds
-//! an error (the CSS the grammar rejects) and reads what the tree does not
-//! give the rules yet: the selectors inside a pseudo-class's arguments,
-//! keyframe selectors, a font list split at its commas, and selectors a rule
-//! builds itself. The grammar still verifies every fix the rules make
+//! selectors of an `@page` or `@scope` prelude and inside a pseudo-class's
+//! arguments come from the file's tree-sitter tree
+//! ([`css_tree`](crate::css_tree); SR-ARCHITECTURE decision 15b); this
+//! module's text reader builds the same sheet when the tree holds an error
+//! (the CSS the grammar rejects) and reads what the tree does not give the
+//! rules yet: keyframe selectors, a font list split at its commas, and
+//! selectors a rule builds itself. The grammar still verifies every fix the rules make
 //! (decision 5).
 //!
 //! It never fails: anything it can't place becomes an `Other` statement,
@@ -875,6 +875,9 @@ pub struct Simple {
     pub name: Range,
     /// Inside the parentheses of a functional pseudo-class or element.
     pub args: Option<Range>,
+    /// The selector list in those arguments (`:not(.a, .b)`, `:nth-child(2n
+    /// of .a)` after its `of`), when read from the tree; see [`arg_selectors`].
+    pub inner: Option<Vec<Complex>>,
 }
 
 #[derive(Clone, Debug)]
@@ -963,14 +966,14 @@ pub fn complex(src: &str, start: usize, end: usize) -> Complex {
             b'.' | b'#' => {
                 let e = ident_end(src, i + 1).min(end);
                 i = e.max(i + 1);
-                Simple { kind: if c == b'.' { SKind::Class } else { SKind::Id }, start: s, end: i, name: (s + 1, e), args: None }
+                Simple { kind: if c == b'.' { SKind::Class } else { SKind::Id }, start: s, end: i, name: (s + 1, e), args: None, inner: None }
             }
             b'[' => {
                 let (close, _) = scan(src, i + 1, end, b"]", false);
                 i = (close + 1).min(end);
                 let inner = trim(src, s + 1, close);
                 let ne = ident_end(src, inner.0).min(close);
-                Simple { kind: SKind::Attribute, start: s, end: i, name: (inner.0, ne), args: Some(inner) }
+                Simple { kind: SKind::Attribute, start: s, end: i, name: (inner.0, ne), args: Some(inner), inner: None }
             }
             b':' => {
                 let element = b.get(i + 1) == Some(&b':');
@@ -986,12 +989,12 @@ pub fn complex(src: &str, start: usize, end: usize) -> Complex {
                 if i == s + 1 {
                     i += 1;
                 }
-                Simple { kind: if element { SKind::PseudoElement } else { SKind::PseudoClass }, start: s, end: i, name: (ns, e), args }
+                Simple { kind: if element { SKind::PseudoElement } else { SKind::PseudoClass }, start: s, end: i, name: (ns, e), args, inner: None }
             }
             b'&' => {
                 // Sass's parent suffix (`&-wide`, `&__item`) is part of the nesting selector.
                 i = ident_end(src, i + 1).min(end);
-                Simple { kind: SKind::Nesting, start: s, end: i, name: (s, i), args: None }
+                Simple { kind: SKind::Nesting, start: s, end: i, name: (s, i), args: None, inner: None }
             }
             b'*' => {
                 i += 1;
@@ -1000,7 +1003,7 @@ pub fn complex(src: &str, start: usize, end: usize) -> Complex {
                     let star = b.get(i + 1) == Some(&b'*');
                     i = if star { i + 2 } else { e };
                     if !star {
-                        let s2 = Simple { kind: SKind::Type, start: s, end: i, name: (s, i), args: None };
+                        let s2 = Simple { kind: SKind::Type, start: s, end: i, name: (s, i), args: None, inner: None };
                         cur.get_or_insert(Compound { start: s, end: i, parts: Vec::new() }).parts.push(s2);
                         if let Some(c) = cur.as_mut() {
                             c.end = i;
@@ -1008,14 +1011,14 @@ pub fn complex(src: &str, start: usize, end: usize) -> Complex {
                         continue;
                     }
                 }
-                Simple { kind: SKind::Universal, start: s, end: i, name: (s, i), args: None }
+                Simple { kind: SKind::Universal, start: s, end: i, name: (s, i), args: None, inner: None }
             }
             _ if is_ident_byte(c) || c == b'\\' || c == b'|' => {
                 let mut e = ident_end(src, i).min(end);
                 if e < end && b[e] == b'|' && b.get(e + 1) != Some(&b'|') {
                     if b.get(e + 1) == Some(&b'*') {
                         i = e + 2;
-                        let s2 = Simple { kind: SKind::Universal, start: s, end: i, name: (s, i), args: None };
+                        let s2 = Simple { kind: SKind::Universal, start: s, end: i, name: (s, i), args: None, inner: None };
                         cur.get_or_insert(Compound { start: s, end: i, parts: Vec::new() }).parts.push(s2);
                         if let Some(c) = cur.as_mut() {
                             c.end = i;
@@ -1025,11 +1028,11 @@ pub fn complex(src: &str, start: usize, end: usize) -> Complex {
                     e = ident_end(src, e + 1).min(end);
                 }
                 i = e.max(i + 1);
-                Simple { kind: SKind::Type, start: s, end: i, name: (s, i), args: None }
+                Simple { kind: SKind::Type, start: s, end: i, name: (s, i), args: None, inner: None }
             }
             _ => {
                 i += src[i..].chars().next().map_or(1, char::len_utf8);
-                Simple { kind: SKind::Other, start: s, end: i, name: (s, i), args: None }
+                Simple { kind: SKind::Other, start: s, end: i, name: (s, i), args: None, inner: None }
             }
         };
         let comp = cur.get_or_insert(Compound { start: s, end: i, parts: Vec::new() });
@@ -1045,22 +1048,36 @@ pub fn complex(src: &str, start: usize, end: usize) -> Complex {
 pub fn all_simples(src: &str, list: &[Complex], out: &mut Vec<Simple>) {
     for c in list {
         for s in c.simples() {
-            out.push(s.clone());
+            // The list is flat: each argument's simple selectors follow it.
+            out.push(Simple { inner: None, ..*s });
             if let Some((a, b)) = s.args
                 && matches!(s.kind, SKind::PseudoClass | SKind::PseudoElement)
             {
                 let name = text(src, s.name).to_ascii_lowercase();
                 let name = unprefixed(&name);
-                if takes_selectors(name) {
-                    all_simples(src, &selector_list(src, a, b), out);
-                } else if matches!(name, "nth-child" | "nth-last-child")
-                    && let Some(of) = find_of(src, a, b)
-                {
-                    all_simples(src, &selector_list(src, of, b), out);
+                if let Some(list) = arg_selectors(src, s, name, a, b) {
+                    all_simples(src, &list, out);
                 }
             }
         }
     }
+}
+
+/// The selector list in the arguments `a..b` of the pseudo-class or element
+/// `s` named `name` (lowercased, unprefixed): all of them for `:not()`,
+/// `:is()` and the others that take selectors, what follows ` of ` for
+/// `:nth-child()` and `:nth-last-child()`. From the tree when the selector
+/// was read from one (W-62), otherwise read from the text.
+pub fn arg_selectors<'a>(src: &str, s: &'a Simple, name: &str, a: usize, b: usize) -> Option<std::borrow::Cow<'a, [Complex]>> {
+    let nth = matches!(name, "nth-child" | "nth-last-child");
+    if !takes_selectors(name) && !nth {
+        return None;
+    }
+    if let Some(list) = &s.inner {
+        return Some(std::borrow::Cow::Borrowed(list));
+    }
+    let from = if nth { find_of(src, a, b)? } else { a };
+    Some(std::borrow::Cow::Owned(selector_list(src, from, b)))
 }
 
 /// Pseudo-classes and elements whose argument is a selector list.
@@ -1155,11 +1172,13 @@ pub fn specificity(src: &str, c: &Complex, nesting: (u32, u32, u32)) -> (u32, u3
                     t.2 += 1;
                 } else if name == "where" {
                 } else if let (true, Some((a, b))) = (matches!(name.as_str(), "is" | "not" | "has" | "matches" | "any"), s.args) {
-                    add(&mut t, max_specificity(src, &selector_list(src, a, b), nesting));
+                    if let Some(list) = arg_selectors(src, s, &name, a, b) {
+                        add(&mut t, max_specificity(src, &list, nesting));
+                    }
                 } else if let (true, Some((a, b))) = (matches!(name.as_str(), "nth-child" | "nth-last-child"), s.args) {
                     t.1 += 1;
-                    if let Some(of) = find_of(src, a, b) {
-                        add(&mut t, max_specificity(src, &selector_list(src, of, b), nesting));
+                    if let Some(list) = arg_selectors(src, s, &name, a, b) {
+                        add(&mut t, max_specificity(src, &list, nesting));
                     }
                 } else {
                     t.1 += 1;

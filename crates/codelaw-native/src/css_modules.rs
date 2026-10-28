@@ -82,8 +82,9 @@ fn classes_of(src: &str, c: &Complex, out: &mut Vec<Local>, named: &mut Vec<Stri
                         ("global", None) => global = true,
                         ("local", None) => global = false,
                         ("local", Some((a, b))) | ("not" | "is" | "where" | "has", Some((a, b))) if !global => {
-                            for inner in selector_list(src, a, b) {
-                                classes_of(src, &inner, out, &mut Vec::new(), None, incomplete);
+                            let list = s.inner.as_deref().map_or_else(|| selector_list(src, a, b).into(), std::borrow::Cow::Borrowed);
+                            for inner in list.iter() {
+                                classes_of(src, inner, out, &mut Vec::new(), None, incomplete);
                             }
                         }
                         _ => {}
