@@ -41,9 +41,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (20)
+## Open items (19)
 
-### build (18)
+### build (17)
 
 🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -58,8 +58,6 @@ here. Read that record before changing anything below it.
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
 🔴 **W-109** `arpit` Bitbucket Pipelines built: `init --ci bitbucket`, `--format bitbucket` to Code Insights via `curl`, SARIF and the upload each a switch; proven locally. Left: the pipe fork and the live proof after v0.3.0 (inbox). Filed by Arpit (Cowork). [detail](open/W-109-bitbucket-pipelines.md)
-
-🟢 **W-99** `agent` Side-by-side bench built; D-37…D-41 ratified 10-27. Left: the first `bench-rivals.yml` run on the runner, then L8 context rows and a README claim from them. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
 🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements, selectors and values from the tree; left: preludes, pseudo-class arguments, keyframe selectors. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 

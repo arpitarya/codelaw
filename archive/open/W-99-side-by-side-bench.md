@@ -6,8 +6,8 @@ item: W-99
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5)"
+ball: closed
 ---
 
 # W-99 — A side-by-side benchmark before any speed claim
@@ -17,8 +17,8 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Name each rival at an exact version as a CI-only bench tool, one row each in L11's list (§3 of `records/0013_LAW-11-dependencies.md`) (L11 — the decider ratifies each row by name when it lands) | the tools may be installed in CI | ✅ ratified 2026-10-27 — D-37…D-41 in L11 §3, *CI — the side-by-side bench (W-99)* |
-| 2 | A `bench-rivals` CI job (manual and weekly): the three pinned corpus repos, the same runner image, same day; equivalent rule sets (recommended presets), lint and format separately, cold and warm | numbers a reader can reproduce | ✅ built, skipped until step 1 (`scripts/bench-rivals.py`, `perf/rivals.toml`, `.github/workflows/bench-rivals.yml`); dry run with codelaw alone ✅ · ⏳ the first real run |
-| 3 | Results in L8 §Measurements as context rows; the README states a claim only from these, with the date and machine | an honest claim | ⏳ |
+| 2 | A `bench-rivals` CI job (manual and weekly): the three pinned corpus repos, the same runner image, same day; equivalent rule sets (recommended presets), lint and format separately, cold and warm | numbers a reader can reproduce | ✅ built, skipped until step 1 (`scripts/bench-rivals.py`, `perf/rivals.toml`, `.github/workflows/bench-rivals.yml`); dry run with codelaw alone ✅ · ✅ the first real run, 2026-10-28: `bench-rivals.yml` run 40625881325 on `main` `7b839af`, all six tools, every row, no command needed a fix |
+| 3 | Results in L8 §Measurements as context rows; the README states a claim only from these, with the date and machine | an honest claim | ✅ 2026-10-28 — L8 §Measurements *Beside the rivals*; README FAQ *Is it faster than ESLint and Prettier?*, with the date and the runner |
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Ratify."* — D-37 ESLint, D-38 Prettier, D-39 Biome, D-40 oxlint, D-41 Ruff, at the pins below, CI-only bench scope; BlueOak-1.0.0 (`minimatch`) in ESLint's tree included.
 
@@ -51,14 +51,16 @@ On ratification, these rows go into §3 under a new heading **"CI — the side-b
 
 ## Left
 
-1. 🔴 **Arpit:** ratify D-37…D-41 by name (the inbox row), or strike any.
-2. Paste the ratified rows into L11 §3 with the decider's words (an agent, in the ruling's change), and decide with the ruling whether the bench tools get ledger lines (`dependencies.rs` reads workflows' install lines; these installs are in the script, so the script's own L11 check is what guards them today).
-3. `gh workflow run bench-rivals.yml` — the first real run; fix whatever a rival's command needs on the runner (ESLint's config resolution, Prettier's exit 2 on unparsable files are kept, not hidden).
-4. Step 3: the runner's results into L8 §Measurements as context rows; the README states a claim only from them, with date and machine.
+Nothing. Closed 2026-10-28.
+
+1. ✅ D-37…D-41 ratified 2026-10-27 and in L11 §3 (*CI — the side-by-side bench (W-99)*), each `ratified` at the table's pin; `bench-rivals.py plan` reads all five as `ratified`, `gate` says `run=true`.
+2. Ledger lines for the bench tools: not added. The ruling did not ask for them; `dependencies.rs` reads workflows' install lines, these installs are in `bench-rivals.py`, and the script's own L11 check (refuses a row that is absent, not `ratified` or at another version) is what guards them. Reopen only if the decider wants them in the ledger.
+3. ✅ `gh workflow run bench-rivals.yml` → run 40625881325 (2026-10-28, `ubuntu-24.04` image 20261023.334.3, 4 CPUs): green first time, every tool's numbers on all three repos; the artifact `bench-rivals` holds `results.json`, `results.md`, `installed.json`. ESLint's config resolved as written; Prettier exits 2 on djangoproject.com (Django templates it cannot parse), kept and shown.
+4. ✅ L8 §Measurements *Beside the rivals, 2026-10-28 (W-99)*: median cold / warm per repo for every rival and codelaw scoped to its languages, as context rows, never gated; the README's FAQ states the claim from them. What they say: codelaw is 2.7–4.2 × ESLint cold (3.3–5.0 × warm) and 2.1–3.7 × Prettier cold; Biome, oxlint and Ruff are faster than codelaw cold; codelaw's floor is about 68 ms (loading, not checking); `format --check` gains nothing from a warm cache outside the daemon (the dry run's observation, confirmed on the runner).
 
 ## Definition of done
 
-- One CI run produces a table per repo: tool, version, rule set, cold and warm p50/p95; the README cites it or says nothing.
+- ✅ One CI run produces a table per repo: tool, version, rule set, cold and warm p50/p95 — run 40625881325's `results.md` (in the job summary and the artifact); the README cites it — FAQ, with the date and the machine.
 
 ## Record affected
 

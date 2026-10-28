@@ -384,6 +384,9 @@ The design for each item is a record in [`records/`](records/README.md); the ope
 **How is codelaw different from ESLint and Prettier, or Biome?**
 It does the same jobs — lint, fix, format — for nine languages from one binary and one config. The difference is the rule: a Markdown file your team writes without a plugin, that always carries a fix, and that an AI agent can ask for before it writes.
 
+**Is it faster than ESLint and Prettier?**
+Measured on 2026-10-28 on GitHub's `ubuntu-24.04` runner (4 CPUs), on three pinned real repos, each tool with its own recommended preset: codelaw lints JavaScript 2.7–4.2 × faster than ESLint 10.13 (3.3–5.0 × with both caches warm) and checks formatting 2.1–3.7 × faster than Prettier 3.9. Biome, oxlint and Ruff are faster than codelaw on their own languages. Every number, and how the work differs, is in [SR-LAW-8 §Measurements](records/0010_LAW-8-performance-budgets.md); `bench-rivals.yml` re-measures weekly.
+
 **Does it work without AI?**
 Yes, completely. The CLI, the editor extension, pre-commit and CI need no agent at all. Agents are one more caller of the same engine.
 
