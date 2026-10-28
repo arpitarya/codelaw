@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-28 — W-109 ruled down to the Code Insights output  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"codelaw init --ci bitbucket no need to build this part, but do build out the configurable insights part."* — found W-109 already built and landed (incl. `init --ci bitbucket`); by voice: remove the generator, keep the Code Insights output, SARIF and Insights configurable, the live proof kept; *"file it."*
+- **Done:** OPEN-WORK: the pipe-fork inbox row removed (ruled: no pipe), W-109 re-balled 🟢 agent for the removal; W-109's file (view, ruling, Left, records line); SR-CLI-MCP 12b and SR-PACKAGES 15a carry the ruling as *to be removed*. No code changed here: the removal lands through lockmaster.
+- **Decided / left open:** ruled — no `init --ci bitbucket`, no template, no pipe; `--format bitbucket` stays with the two switches. Agent's reading, flagged in the item: the switches stay as the USAGE snippet's variables; *"Perfect."* read as keeping the live proof.
+- **Mistakes:** the earlier W-109 rescope edit failed on a stale match — the file had changed under it (an agent built W-109 at 09:02); nothing was written then.
+- **Next:** a Claude Code session takes W-109's removal, records first.
+
 ## 2026-10-28 — W-109 built: Bitbucket Pipelines, Code Insights, SARIF a switch  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Implement work item W-109 in codelaw: Bitbucket Pipelines"* (coordinator, from Arpit's voice ruling of 2026-10-27).
