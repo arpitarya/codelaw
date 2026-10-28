@@ -45,9 +45,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (16)
+## Open items (15)
 
-### build (14)
+### build (13)
 
 🔴 **W-86** `arpit` PyPI day 1: the four 0.2.0 uploads and their trusted publishers landed 10-28; left: `gh release create v0.2.0` (inbox), which brings `codelaw` itself. Filed by Arpit (Cowork). [detail](open/W-86-pypi-day-1.md)
 
@@ -64,8 +64,6 @@ here. Read that record before changing anything below it.
 🔴 **W-105** `arpit` Type-aware rules, five `ts/type-checked` rules, `--version --json`, the `check_types_*` bench and the watch memory test landed 10-28. Left: may agents add type questions (inbox), budgets after three `perf` runs, corpus counts, the RC (11-10). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
 🔴 **W-103** `arpit` Spell pack: data, `[spell]`, all seven rules (`spell/inconsistent-term` on the graph stage, 10-28), fixtures, corpus reviewed; left: how L8 measures the pack (inbox), then its budget; the `typos` comparison needs L11. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
-
-🟢 **W-110** `agent` Clean session 2df06f6d's leftovers on the Mac: five merged worktrees and three `.fux`-only folders, by `worktree-cleanup.py --apply`. Filed by Arpit (Cowork). [detail](open/W-110-session-2df06f6d-cleanup.md)
 
 🟡 **W-38** waits on **W-86** `agent` PyPI 0.2.0: `css`, `data` live and trusted; day 1 uploads the other four and publishes the Release; then an agent checks `pip install codelaw` and `uvx codelaw` and writes it down. Filed by Arpit (Cowork). [detail](open/W-38-pypi-0-2-0-by-hand.md)
 
