@@ -5,12 +5,17 @@
 //! the rules here look at.
 //!
 //! Every rule reads the *view* — the source with `//` comments blanked, the
-//! same length — and edits its offsets, which are the source's.
+//! same length — and edits its offsets, which are the source's. The value
+//! rules (`scss/no-slash-division`, `scss/no-global-function-names`,
+//! `scss/function-no-unknown`) find calls and `/` in the component values: a
+//! declaration's from the tree, a Sass statement's parameters (`@if`,
+//! `@return`, `@include` arguments) still from the text.
 
-use crate::css_syntax::{self, Kind, Sheet, finding, fixed, opt_list, opt_str, scss_line_comments, skip_comment, skip_interpolation, skip_string, text};
+use crate::css_syntax::{self, Kind, Sheet, VKind, VNode, finding, fixed, opt_list, opt_str, scss_line_comments, skip_comment, skip_interpolation, skip_string, text};
 use crate::{NativeContext, NativeFinding, NativeRule};
 use codelaw_core::{Language, TextEdit};
 use codelaw_lang::SyntaxNode;
+use std::borrow::Cow;
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Declare an SCSS native rule: it runs once per stylesheet, on its root.
@@ -104,26 +109,33 @@ fn is_word(b: u8) -> bool {
     b.is_ascii_alphanumeric() || b == b'-' || b == b'_' || b >= 0x80
 }
 
-/// The ranges of a Sass statement's value text where an expression may
-/// appear: declaration values, and the parameters of the control-flow and
-/// `@return` statements.
-fn expressions(sheet: &Sheet, src: &str) -> Vec<(usize, usize)> {
+/// The statements where a Sass expression may appear: declarations, and the
+/// control-flow and `@return` statements, by their value text's range.
+fn expressions(sheet: &Sheet, src: &str) -> Vec<usize> {
     let mut out = Vec::new();
     for i in sheet.walk() {
         let n = &sheet.nodes[i];
         match n.kind {
-            Kind::Decl if !text(src, n.name).starts_with("--") => out.push(n.params),
+            Kind::Decl if !text(src, n.name).starts_with("--") => out.push(i),
             Kind::Other => {
                 if let Some(name) = sass_name(sheet, i, src)
                     && matches!(name.as_str(), "return" | "if" | "else" | "while" | "each" | "for" | "debug" | "warn" | "error")
                 {
-                    out.push(n.params);
+                    out.push(i);
                 }
             }
             _ => {}
         }
     }
     out
+}
+
+/// An expression's range and its component values: a declaration's from the
+/// tree ([`Sheet::values`]), a Sass statement's parameters from the text.
+type Expression<'a> = ((usize, usize), Cow<'a, [VNode]>);
+
+fn expression_values<'a>(sheet: &'a Sheet, src: &str) -> Vec<Expression<'a>> {
+    expressions(sheet, src).into_iter().map(|i| (sheet.nodes[i].params, sheet.values(i, src))).collect()
 }
 
 /// Where a new `@use "sass:…";` goes: after the leading `@charset`,
@@ -525,30 +537,27 @@ const MOVED: &[(&str, &str, &str, bool)] = &[
     ("adjust-hue", "color", "adjust", false),
 ];
 
-/// Every `name(` call in masked expression text: (name start, name end).
-fn calls(m: &str, from: usize, to: usize) -> Vec<(usize, usize)> {
-    let b = m.as_bytes();
+/// Every call in a list of component values, in source order: the range of
+/// its name's last word (`get` in `map.get(`, `fn` in `#{fn(`), when that
+/// word is a function name — not a variable's (`$f(`), a module member's
+/// (`.f(`), an at-rule's or a placeholder's, nor a number. `from` is where
+/// the expression starts.
+fn calls(list: &[VNode], src: &str, from: usize) -> Vec<(usize, usize)> {
+    let b = src.as_bytes();
     let mut out = Vec::new();
-    let mut i = from;
-    while i < to {
-        if b[i] == b'#' && b.get(i + 1) == Some(&b'{') {
-            // The inside of an interpolation is still an expression.
-            i += 2;
-            continue;
-        }
-        if is_word(b[i]) && !b[i].is_ascii_digit() && (i == from || !(is_word(b[i - 1]) || matches!(b[i - 1], b'$' | b'.' | b'@' | b'%'))) {
-            let mut j = i;
-            while j < to && is_word(b[j]) {
-                j += 1;
+    VNode::walk(list, &mut |n| {
+        if n.kind == VKind::Func {
+            let (s0, e) = n.name;
+            let mut s = e;
+            while s > s0 && is_word(b[s - 1]) {
+                s -= 1;
             }
-            if b.get(j) == Some(&b'(') {
-                out.push((i, j));
+            if s < e && !b[s].is_ascii_digit() && (s == from || !(is_word(b[s - 1]) || matches!(b[s - 1], b'$' | b'.' | b'@' | b'%'))) {
+                out.push((s, e));
             }
-            i = j;
-            continue;
         }
-        i += 1;
-    }
+        true
+    });
     out
 }
 
@@ -562,11 +571,10 @@ fn defined_functions(sheet: &Sheet, src: &str) -> BTreeSet<String> {
 }
 
 scss_rule!(NoGlobalFunctionNames, "scss/no-global-function-names", |sheet, src, ctx, out| {
-    let m = masked(src);
     let own = defined_functions(sheet, src);
     let mut first_for: BTreeSet<&str> = BTreeSet::new();
-    for (from, to) in expressions_and_arguments(sheet, src) {
-        for (s, e) in calls(&m, from, to) {
+    for ((from, _), vals) in expressions_and_arguments(sheet, src) {
+        for (s, e) in calls(&vals, src, from) {
             let name = &src[s..e];
             let lower = name.to_ascii_lowercase();
             if own.contains(&lower) {
@@ -592,56 +600,81 @@ scss_rule!(NoSlashDivision, "scss/no-slash-division", |sheet, src, ctx, out| {
     let m = masked(src);
     let b = m.as_bytes();
     let mut math_needed = BTreeSet::new();
-    for (from, to) in expressions(sheet, src) {
-        // Parentheses that are not a function call group an expression;
-        // calc-like functions and `url()` read `/` as CSS.
-        let mut stack: Vec<bool> = Vec::new(); // true: a Sass expression group
-        let mut i = from;
-        while i < to {
-            match b[i] {
-                b'#' if b.get(i + 1) == Some(&b'{') => {
-                    i = skip_interpolation(b, i).min(to);
-                    continue;
-                }
-                b'(' => {
-                    let mut k = i;
-                    while k > from && (is_word(b[k - 1]) || b[k - 1] == b'.') {
-                        k -= 1;
-                    }
-                    let callee = &m[k..i];
-                    let parent_ok = stack.iter().all(|g| *g);
-                    stack.push(parent_ok && (callee.is_empty() || is_sass_call(callee)));
-                }
-                b')' => {
-                    stack.pop();
-                }
-                b'/' if i > from && b.get(i + 1) != Some(&b'/') && b[i - 1] != b'/' => {
-                    let in_expression = stack.last().copied().unwrap_or(false);
-                    let (ls, le) = operand_before(&m, from, i);
-                    let (rs, re_) = operand_after(&m, i + 1, to);
-                    let variable = m[ls..le].contains('$') || m[rs..re_].contains('$');
-                    let numeric = |t: &str| t.bytes().next().is_some_and(|c| c.is_ascii_digit() || c == b'.' || c == b'$' || c == b'(' || c == b'-' || c == b'+');
-                    let math_context = in_expression && numeric(&m[ls..le]) && numeric(&m[rs..re_]);
-                    if (variable && stack.iter().all(|g| *g)) || math_context {
-                        let simple = ls < le && rs < re_ && !m[..ls].trim_end().ends_with(['/', '*']) && !m[re_..].trim_start().starts_with(['/', '*']);
-                        let mut edits = Vec::new();
-                        if simple && (variable || math_context) {
-                            edits.push(TextEdit::new(ls, re_, format!("math.div({}, {})", &src[ls..le], &src[rs..re_])));
-                            if let Some(u) = use_edit(sheet, src, "math")
-                                && math_needed.insert(())
-                            {
-                                edits.push(u);
-                            }
-                        }
-                        out.push(fixed(i, i + 1, "`/` as division is deprecated in Dart Sass; use `math.div()` with `@use \"sass:math\"`", edits));
-                    }
-                }
-                _ => {}
+    for ((from, to), vals) in expression_values(sheet, src) {
+        // Each `/` of the expression and the groups around it: `true` for a
+        // Sass expression group (parentheses that are not a call, or a call
+        // that evaluates its arguments as Sass); calc-like functions and
+        // `url()` read `/` as CSS. An interpolation is skipped whole.
+        let interpolations = interpolations(b, from, to);
+        let inside = |at: usize| interpolations.iter().any(|&(s, e)| s <= at && at < e);
+        let mut slashes = Vec::new();
+        slash_groups(&vals, src, &inside, &mut Vec::new(), &mut slashes);
+        for (i, stack) in slashes {
+            if !(i > from && b.get(i + 1) != Some(&b'/') && b[i - 1] != b'/') {
+                continue;
             }
-            i += 1;
+            let in_expression = stack.last().copied().unwrap_or(false);
+            let (ls, le) = operand_before(&m, from, i);
+            let (rs, re_) = operand_after(&m, i + 1, to);
+            let variable = m[ls..le].contains('$') || m[rs..re_].contains('$');
+            let numeric = |t: &str| t.bytes().next().is_some_and(|c| c.is_ascii_digit() || c == b'.' || c == b'$' || c == b'(' || c == b'-' || c == b'+');
+            let math_context = in_expression && numeric(&m[ls..le]) && numeric(&m[rs..re_]);
+            if (variable && stack.iter().all(|g| *g)) || math_context {
+                let simple = ls < le && rs < re_ && !m[..ls].trim_end().ends_with(['/', '*']) && !m[re_..].trim_start().starts_with(['/', '*']);
+                let mut edits = Vec::new();
+                if simple && (variable || math_context) {
+                    edits.push(TextEdit::new(ls, re_, format!("math.div({}, {})", &src[ls..le], &src[rs..re_])));
+                    if let Some(u) = use_edit(sheet, src, "math")
+                        && math_needed.insert(())
+                    {
+                        edits.push(u);
+                    }
+                }
+                out.push(fixed(i, i + 1, "`/` as division is deprecated in Dart Sass; use `math.div()` with `@use \"sass:math\"`", edits));
+            }
         }
     }
 });
+
+/// The `#{…}` interpolations of masked expression text in `from..to`.
+fn interpolations(b: &[u8], from: usize, to: usize) -> Vec<(usize, usize)> {
+    let mut out = Vec::new();
+    let mut i = from;
+    while i < to {
+        if b[i] == b'#' && b.get(i + 1) == Some(&b'{') {
+            let e = skip_interpolation(b, i).min(to);
+            out.push((i, e));
+            i = e;
+        } else {
+            i += 1;
+        }
+    }
+    out
+}
+
+/// Every `/` of a list of component values outside an interpolation, with
+/// the groups it sits in, outermost first (`true`: a Sass expression group).
+fn slash_groups(list: &[VNode], src: &str, inside: &dyn Fn(usize) -> bool, stack: &mut Vec<bool>, out: &mut Vec<(usize, Vec<bool>)>) {
+    let b = src.as_bytes();
+    for n in list {
+        match n.kind {
+            VKind::Div if b[n.start] == b'/' && !inside(n.start) => out.push((n.start, stack.clone())),
+            VKind::Func if !inside(n.name.1) => {
+                // The callee: the word (dots included) before the `(`.
+                let mut k = n.name.1;
+                while k > n.name.0 && (is_word(b[k - 1]) || b[k - 1] == b'.') {
+                    k -= 1;
+                }
+                let callee = &src[k..n.name.1];
+                let parent_ok = stack.iter().all(|g| *g);
+                stack.push(parent_ok && (callee.is_empty() || is_sass_call(callee)));
+                slash_groups(&n.nodes, src, inside, stack, out);
+                stack.pop();
+            }
+            _ => {}
+        }
+    }
+}
 
 /// Whether `callee` is a call that evaluates its arguments as Sass.
 fn is_sass_call(callee: &str) -> bool {
@@ -720,9 +753,8 @@ scss_rule!(FunctionNoUnknown, "scss/function-no-unknown", |sheet, src, ctx, out|
     }
     known.extend(defined_functions(sheet, src));
     let ignore = opt_list(ctx, "ignoreFunctions");
-    let m = masked(src);
-    for (from, to) in expressions_and_arguments(sheet, src) {
-        for (s, e) in calls(&m, from, to) {
+    for ((from, _), vals) in expressions_and_arguments(sheet, src) {
+        for (s, e) in calls(&vals, src, from) {
             let name = &src[s..e];
             let lower = name.to_ascii_lowercase();
             let bare = css_syntax::unprefixed(&lower);
@@ -738,15 +770,16 @@ scss_rule!(FunctionNoUnknown, "scss/function-no-unknown", |sheet, src, ctx, out|
     }
 });
 
-/// Expression ranges, plus the arguments of `@include` and the defaults of
-/// `@mixin` and `@function` parameters (after the name).
-fn expressions_and_arguments(sheet: &Sheet, src: &str) -> Vec<(usize, usize)> {
-    let mut out = expressions(sheet, src);
+/// Expressions, plus the arguments of `@include` and the defaults of
+/// `@mixin` and `@function` parameters (after the name), read from the text.
+fn expressions_and_arguments<'a>(sheet: &'a Sheet, src: &str) -> Vec<Expression<'a>> {
+    let mut out = expression_values(sheet, src);
     for (i, _) in sass_statements(sheet, src, &["include", "mixin"]) {
         let n = &sheet.nodes[i];
         let p = text(src, n.params);
         let skip = p.find('(').unwrap_or(p.len());
-        out.push((n.params.0 + skip, n.params.1));
+        let r = (n.params.0 + skip, n.params.1);
+        out.push((r, Cow::Owned(css_syntax::values(src, r.0, r.1))));
     }
     out
 }

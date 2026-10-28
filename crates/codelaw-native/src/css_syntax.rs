@@ -1,13 +1,13 @@
 //! The CSS model the `css/*`, `css-modules/*` and `scss/*` native rules
 //! read: statements (rules, at-rules, declarations, comments), component
 //! values, selectors and media queries, every piece with its byte range in the
-//! source. Since W-62 the statements and each rule's selector list come from
-//! the file's tree-sitter tree ([`css_tree`](crate::css_tree); SR-ARCHITECTURE
-//! decision 15b); this module's text reader builds the same sheet when the
-//! tree holds an error (the CSS the grammar rejects) and reads what the tree
-//! does not give the rules yet: component values, at-rule preludes and media
-//! queries, the selectors inside a pseudo-class's arguments, and selectors a
-//! rule builds itself. The grammar still verifies every fix the rules make
+//! source. Since W-62 the statements, each rule's selector list and each
+//! declaration's component values come from the file's tree-sitter tree
+//! ([`css_tree`](crate::css_tree); SR-ARCHITECTURE decision 15b); this
+//! module's text reader builds the same sheet when the tree holds an error
+//! (the CSS the grammar rejects) and reads what the tree does not give the
+//! rules yet: at-rule preludes and media queries, the selectors inside a
+//! pseudo-class's arguments, and selectors a rule builds itself. The grammar still verifies every fix the rules make
 //! (decision 5).
 //!
 //! It never fails: anything it can't place becomes an `Other` statement,
@@ -49,6 +49,9 @@ pub struct Node {
     /// Rule: its selector list, when read from the tree
     /// ([`css_tree::selectors`](crate::css_tree::selectors)); see [`Sheet::selectors`].
     pub selectors: Option<Vec<Complex>>,
+    /// Declaration: its value's component values, when read from the tree
+    /// ([`css_tree`](crate::css_tree)); see [`Sheet::values`].
+    pub values: Option<Vec<VNode>>,
     /// The statement ends with `;`, at this offset.
     pub semicolon: Option<usize>,
 }
@@ -112,6 +115,16 @@ impl Sheet {
         match &n.selectors {
             Some(list) => std::borrow::Cow::Borrowed(list),
             None => std::borrow::Cow::Owned(selector_list(src, n.name.0, n.name.1)),
+        }
+    }
+    /// A statement's component values: a declaration's value from the tree
+    /// when the sheet was read from one, otherwise its `params` read from the
+    /// text (the two agree on every stylesheet the tree reads: W-62).
+    pub fn values(&self, i: usize, src: &str) -> std::borrow::Cow<'_, [VNode]> {
+        let n = &self.nodes[i];
+        match &n.values {
+            Some(list) => std::borrow::Cow::Borrowed(list),
+            None => std::borrow::Cow::Owned(values(src, n.params.0, n.params.1)),
         }
     }
     pub fn decls(&self) -> impl Iterator<Item = usize> + '_ {
@@ -320,7 +333,7 @@ impl Parser<'_> {
     }
 
     fn node(kind: Kind, start: usize, end: usize, parent: Option<usize>) -> Node {
-        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None }
+        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None }
     }
 
     /// Parse statements from `i` until a `}` (returned, not consumed) or the end.

@@ -3,7 +3,9 @@
 //! (decision 3) read modern CSS and Sass, so the `css/*` and `scss/*` rules
 //! take their rules, at-rules, declarations and comments from the tree: which
 //! node is a statement, where its block opens and closes, where its colon,
-//! its `!` annotation and its `;` are. The ranges a rule reads are the ones
+//! its `!` annotation and its `;` are; each style rule's selector list; and
+//! each declaration's component values (words, strings, functions and their
+//! arguments, `,` `/` `:`). The ranges a rule reads are the ones
 //! [`css_syntax`](crate::css_syntax) has always given (a selector trimmed up
 //! to its `{`, a value without its annotation), so a rule's findings do not
 //! depend on which reader built its sheet.
@@ -92,7 +94,7 @@ impl<'t> Builder<'_, 't> {
     }
 
     fn node(kind: Kind, start: usize, end: usize, parent: Option<usize>) -> Node {
-        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None }
+        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None, values: None }
     }
 
     /// The statements directly inside `container` (the stylesheet or a block).
@@ -230,6 +232,9 @@ impl<'t> Builder<'_, 't> {
         }
         n.end = trim(src, start, stop).1;
         n.semicolon = semicolon;
+        if n.kind == Kind::Decl {
+            n.values = values(c, n.params, src, &mut self.w);
+        }
         list.push(self.push(n));
     }
 
@@ -400,6 +405,190 @@ fn pieces_of<'t>(n: TsNode<'t>, src: &str, out: &mut Vec<Piece>, w: &mut Walk<'t
     }
 }
 
+// ---------------------------------------------------------------------
+// Component values
+
+use crate::css_syntax::{VKind, VNode};
+
+/// A token of a value, from the tree's leaves.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Tok {
+    Word,
+    Str,
+    Comment,
+    /// `,`, `/` or `:`.
+    Div,
+    Open,
+    Close,
+}
+
+/// Nodes whose text is one token of the value, whatever the grammar nests
+/// inside them (a number's unit, a string's quotes and escapes).
+fn atomic(kind: &str) -> bool {
+    matches!(kind, "string_value" | "integer_value" | "float_value" | "color_value" | "plain_value" | "comment")
+}
+
+/// The component values of a declaration's value `r`, as the text reader's
+/// [`values`](crate::css_syntax::values) gives them, from the declaration's
+/// tree: its tokens are the tree's leaves, its functions and groups the
+/// tree's `(`…`)`. A leaf the grammar reads as one token where CSS sees more
+/// (`px/2px`, `progid:DX`) is divided at its `,`, `/` and `:`, as CSS divides
+/// it. `None` (the text reads it) when a leaf holds what the text would read
+/// across the leaf's edge — a quote, a parenthesis, a space, a trailing
+/// escape — or when the leaves leave a gap that is not white space.
+fn values<'t>(decl: TsNode<'t>, r: (usize, usize), src: &str, w: &mut Walk<'t>) -> Option<Vec<VNode>> {
+    let mut toks = Vec::new();
+    leaves(decl, r, src, w, &mut toks)?;
+    let b = src.as_bytes();
+    let mut at = r.0;
+    for &(_, s, e) in &toks {
+        if !b[at..s].iter().all(u8::is_ascii_whitespace) {
+            return None;
+        }
+        at = e;
+    }
+    if !b[at..r.1].iter().all(u8::is_ascii_whitespace) {
+        return None;
+    }
+    let mut k = 0;
+    let out = build(&toks, &mut k, r, src, false)?;
+    (k == toks.len()).then_some(out)
+}
+
+/// The tokens of `n` inside `r`, in source order.
+fn leaves<'t>(n: TsNode<'t>, r: (usize, usize), src: &str, w: &mut Walk<'t>, out: &mut Vec<(Tok, usize, usize)>) -> Option<()> {
+    let (s, e) = (n.start_byte(), n.end_byte());
+    if e <= r.0 || s >= r.1 {
+        return Some(());
+    }
+    let kind = kd(w.kinds, &n);
+    if kind == "js_comment" {
+        // Blanked in the view an SCSS rule reads: white space.
+        return Some(());
+    }
+    if n.child_count() > 0 && !atomic(kind) {
+        for c in children(n, &mut w.cur) {
+            leaves(c, r, src, w, out)?;
+        }
+        return Some(());
+    }
+    if s < r.0 || e > r.1 {
+        return None;
+    }
+    match kind {
+        // A string the grammar reads past its closing quote (a `/*` inside
+        // it read as a comment): the text reads it.
+        "string_value" if crate::css_syntax::skip_string(src.as_bytes(), s) != e => return None,
+        "string_value" => out.push((Tok::Str, s, e)),
+        "comment" => out.push((Tok::Comment, s, e)),
+        "(" if e == s + 1 => out.push((Tok::Open, s, e)),
+        ")" if e == s + 1 => out.push((Tok::Close, s, e)),
+        _ => {
+            // Divide the leaf as the text divides a word.
+            let b = src.as_bytes();
+            let mut i = s;
+            let mut word = s;
+            while i < e {
+                match b[i] {
+                    b'\\' if i + 1 < e => i += 2,
+                    b'\\' => return None,
+                    b',' | b'/' | b':' => {
+                        if word < i {
+                            out.push((Tok::Word, word, i));
+                        }
+                        out.push((Tok::Div, i, i + 1));
+                        i += 1;
+                        word = i;
+                    }
+                    c if c.is_ascii_whitespace() || matches!(c, b'"' | b'\'' | b'(' | b')') => return None,
+                    _ => i += 1,
+                }
+            }
+            if word < e {
+                out.push((Tok::Word, word, e));
+            }
+        }
+    }
+    Some(())
+}
+
+/// The component values of `toks[*k..]`, up to a `)` when `in_func`: the
+/// text reader's grouping, over the tree's tokens. Touching words are one
+/// word; a word touching a `(` names the function it opens. `None` when an
+/// unquoted `url(` ends inside a token.
+fn build(toks: &[(Tok, usize, usize)], k: &mut usize, r: (usize, usize), src: &str, in_func: bool) -> Option<Vec<VNode>> {
+    let leaf = |kind, s, e| VNode { kind, start: s, end: e, name: (s, s), inner: (s, s), nodes: Vec::new() };
+    let mut out: Vec<VNode> = Vec::new();
+    let mut at = r.0;
+    // The last node is a word the next touching word extends.
+    let mut open_word = false;
+    while let Some(&(t, s, e)) = toks.get(*k) {
+        if s > at {
+            out.push(leaf(VKind::Space, at, s));
+            open_word = false;
+        }
+        match t {
+            Tok::Word if open_word => out.last_mut()?.end = e,
+            Tok::Word => {
+                out.push(leaf(VKind::Word, s, e));
+                open_word = true;
+            }
+            Tok::Str => out.push(leaf(VKind::Str, s, e)),
+            Tok::Comment => out.push(leaf(VKind::Comment, s, e)),
+            Tok::Div => out.push(leaf(VKind::Div, s, e)),
+            Tok::Close if in_func => return Some(out),
+            Tok::Close => out.push(leaf(VKind::Word, s, e)),
+            Tok::Open => {
+                let start = if open_word { out.pop()?.start } else { s };
+                *k += 1;
+                out.push(func(toks, k, r, src, start, s)?);
+                open_word = false;
+                at = out.last()?.end;
+                continue;
+            }
+        }
+        if t != Tok::Word {
+            open_word = false;
+        }
+        at = e;
+        *k += 1;
+    }
+    if at < r.1 && src.as_bytes()[at..r.1].iter().all(u8::is_ascii_whitespace) {
+        out.push(leaf(VKind::Space, at, r.1));
+    }
+    Some(out)
+}
+
+/// A function or a group, its `(` at `open` already read.
+fn func(toks: &[(Tok, usize, usize)], k: &mut usize, r: (usize, usize), src: &str, start: usize, open: usize) -> Option<VNode> {
+    let inner_start = open + 1;
+    let (nodes, mut inner_end);
+    if src[start..open].eq_ignore_ascii_case("url") && !src[inner_start..r.1].trim_start().starts_with(['"', '\'']) {
+        // An unquoted URL is one word, to its first `)`.
+        let close = src[inner_start..r.1].find(')').map_or(r.1, |o| inner_start + o);
+        while let Some(&(_, _, e)) = toks.get(*k).filter(|t| t.1 < close) {
+            if e > close {
+                return None;
+            }
+            *k += 1;
+        }
+        nodes = vec![VNode { kind: VKind::Word, start: inner_start, end: close, name: (inner_start, inner_start), inner: (inner_start, inner_start), nodes: Vec::new() }];
+        inner_end = close;
+    } else {
+        nodes = build(toks, k, (inner_start, r.1), src, true)?;
+        inner_end = r.1;
+    }
+    let mut end = inner_end;
+    if let Some(&(Tok::Close, s, _)) = toks.get(*k)
+        && (s == inner_end || inner_end == r.1)
+    {
+        inner_end = s;
+        end = s + 1;
+        *k += 1;
+    }
+    Some(VNode { kind: VKind::Func, start, end, name: (start, open), inner: (inner_start, inner_end), nodes })
+}
+
 #[cfg(test)]
 mod tests {
     use crate::css_syntax::{Sheet, parse_with, rule_source, selector_list};
@@ -435,6 +624,10 @@ mod tests {
                 let k = tree.walk().iter().position(|&w| w == i).unwrap();
                 a[k] = b[k].clone();
             }
+            // And each declaration's component values with a text reading.
+            if let Some(v) = &n.values {
+                assert_eq!(format!("{v:?}"), format!("{:?}", crate::css_syntax::values(&view, n.params.0, n.params.1)), "{}", &view[n.params.0..n.params.1]);
+            }
         }
         assert_eq!(a, b);
     }
@@ -451,7 +644,28 @@ mod tests {
             "@use \"sass:map\";\n$x: 1px !default;\n// note\n.p { &:not(.q) { &::after { x: y } } font: { family: z; } @include m(1) { top: 0; } &-wide { a: b } }\n@mixin m($a) { b: $a; }\n@if $a { a { b: c } } @else if $b { d { e: f } } @else { g { h: i } }\n.u { margin: -$x; width: calc(100% - #{$x}) }\n.a-#{$x} { b: c }\n",
             false,
         );
+        agree(
+            Language::Css,
+            ".v { font: 12px/1.5 \"A B\", serif; background: url( x.png ) no-repeat, url(\"y\"); width: calc(100% - (2 * 3px)); filter: progid:DX.a(x=1); color: rgb(0 0 0 / 50%) /* c */; grid-area: a/b; margin: -1px+2px }\n",
+            false,
+        );
+        agree(
+            Language::Scss,
+            ".v { a: map.get($m, k) math.div($a, 2) #{$a + $b}-x (a: b, c: d) $a / 2 -$x; b: calc(100% - #{$x}) if(sass($c): 1; else: 2); }\n$y: (k: 1px) !default;\n",
+            false,
+        );
         agree(Language::Css, ":export { a: b }\n.a { composes: b; c: d }\n", true);
+    }
+
+    #[test]
+    fn a_value_the_tree_misreads_is_read_from_the_text() {
+        // The grammar reads a `/*` inside a string as a comment.
+        let src = ".a { b: #{\"/* x\"} c #{\"*/\"}; d: e }";
+        let root = codelaw_lang::parse(Language::Scss, src);
+        let view = rule_source(src, true);
+        let tree = super::sheet(root.root().get_inner_node(), &view, true, false).expect("a clean tree");
+        let decls: Vec<_> = tree.decls().map(|i| tree.nodes[i].values.is_some()).collect();
+        assert_eq!(decls, [false, true]);
     }
 
     #[test]
