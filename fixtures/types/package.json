@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "W-105: the TypeScript codelaw's type-aware tests run against (L11 §3 D-45; test and CI scope only). `npm ci` here installs it.",
+  "devDependencies": {
+    "typescript": "7.1.0-beta"
+  }
+}

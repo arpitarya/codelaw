@@ -27,6 +27,9 @@ pub enum Matcher {
     /// `target:` + `assert:` on the data tree of a JSON, YAML or TOML file
     /// (SR-RULE-FORMAT decision 3e); it runs once per file, not per node.
     Target(CompiledTarget),
+    /// `ts/type-error`: TypeScript's own diagnostics, which the type
+    /// helper answers per file (SR-TYPES decision 9).
+    TypeErrors,
     /// A form this version cannot run yet; the reason is warned once.
     Unsupported(&'static str),
 }
@@ -38,6 +41,9 @@ pub struct CompiledRule {
     /// A `target:` rule's fix steps.
     pub data_fix: Option<Vec<DataStep>>,
     pub needs_semantic: bool,
+    /// Asks the project's TypeScript: a `type:` clause, or `ts/type-error`
+    /// (SR-TYPES).
+    pub typed: bool,
     files: Option<GlobSet>,
     exclude: GlobSet,
 }
@@ -66,6 +72,8 @@ impl CompiledRule {
             Matcher::Graph(_) => None,
             // Dispatched to no node: the unit runs it on its data tree.
             Matcher::Target(_) => matches!(grammar, Grammar::Json | Grammar::Yaml | Grammar::Toml).then_some(Some(Vec::new())),
+            // Dispatched to no node: the unit asks the type helper once.
+            Matcher::TypeErrors => matches!(grammar, Grammar::TypeScript | Grammar::Tsx).then_some(Some(Vec::new())),
             Matcher::Unsupported(_) => None,
         }
     }
@@ -193,6 +201,14 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
                 per.sort_by_key(|(g, _)| *g);
                 Matcher::Match(per)
             }
+            BlockKind::Native(id) if id == codelaw_types::TYPE_ERROR_NATIVE => {
+                for l in &rule.languages {
+                    if !matches!(l, Language::Typescript | Language::Tsx) {
+                        fail(format!("`native: {id}` reports TypeScript's own errors, for typescript and tsx, not {l}"));
+                    }
+                }
+                Matcher::TypeErrors
+            }
             BlockKind::Native(id) => match codelaw_native::lookup(id) {
                 Some(n) => {
                     for l in &rule.languages {
@@ -263,9 +279,14 @@ pub fn compile_all(rules: &RuleSet, _config: &Config) -> Result<(Vec<CompiledRul
         let needs_semantic = match &matcher {
             Matcher::Match(per) => per.iter().any(|(_, m)| m.needs_semantic()),
             Matcher::Native(n) => n.needs_semantic(),
-            Matcher::Graph(_) | Matcher::Target(_) | Matcher::Unsupported(_) => false,
+            Matcher::Graph(_) | Matcher::Target(_) | Matcher::TypeErrors | Matcher::Unsupported(_) => false,
         } || matches!(&fix, Some(FixSpec::Steps(s)) if s.iter().any(|p| matches!(p, codelaw_fix::Primitive::RenameSymbolLocal { .. })));
-        out.push(CompiledRule { loaded: loaded.clone(), matcher, fix, data_fix, needs_semantic, files, exclude });
+        let typed = match &matcher {
+            Matcher::Match(per) => per.iter().any(|(_, m)| m.has_types()),
+            Matcher::TypeErrors => true,
+            _ => false,
+        };
+        out.push(CompiledRule { loaded: loaded.clone(), matcher, fix, data_fix, needs_semantic, typed, files, exclude });
     }
     // One message per problem, not one per language that shares a grammar.
     errors.dedup_by(|a, b| a.message == b.message && a.file == b.file);

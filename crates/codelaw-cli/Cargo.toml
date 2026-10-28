@@ -51,3 +51,5 @@ toml.workspace = true
 # The panic fixture of SR-ARCHITECTURE decision 25 (test builds only).
 codelaw-native = { workspace = true, features = ["fault-injection"] }
 boon.workspace = true
+# The type helper's protocol version and the fixture TypeScript's version (tests/types.rs).
+codelaw-types.workspace = true

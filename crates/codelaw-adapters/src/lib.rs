@@ -16,7 +16,7 @@ mod run;
 pub use manifest::{Manifest, Output, manifest, manifests, parse_manifest};
 pub use parse::{Finding, Parsed, RawEdit, Span, parse};
 pub use position::Unit;
-pub use run::{locate, parse_version, stderr_tail, version};
+pub use run::{locate, locate_program, parse_version, stderr_tail, version};
 
 use semver::Version;
 use std::collections::BTreeMap;

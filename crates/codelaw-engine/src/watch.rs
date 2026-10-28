@@ -126,6 +126,7 @@ impl Project {
         dedup_diagnostics(&mut report.diagnostics);
         skipped.sort();
         report.skipped = skipped;
+        report.types = self.types.report();
         (report, deprecated, ran)
     }
 
@@ -470,8 +471,19 @@ impl Watch {
                 return self.full();
             }
         }
+        // A warm type program re-reads the changed files, and every file a
+        // type rule checks is checked again: its answers can depend on any
+        // of them (SR-TYPES decision 8).
+        let typescript_changed = rels.iter().any(|r| matches!(Language::from_path(Path::new(r)), Some(Language::Typescript | Language::Tsx)));
+        if typescript_changed {
+            project.types_changed(&rels.iter().map(|r| root.join(r)).collect::<Vec<_>>());
+        }
         let redo: Vec<usize> = (0..parts.files.len())
-            .filter(|&i| changed.contains(parts.files[i].rel.as_str()) || (!parts.asked[i].is_empty() && !still_holds(&root, &parts.asked[i], &|| project.as_of_text())))
+            .filter(|&i| {
+                changed.contains(parts.files[i].rel.as_str())
+                    || (!parts.asked[i].is_empty() && !still_holds(&root, &parts.asked[i], &|| project.as_of_text()))
+                    || (typescript_changed && project.typed_rule_applies(&parts.files[i]))
+            })
             .collect();
         let files = &parts.files;
         let fresh: Vec<(FileResult, Vec<Asked>)> = project.pool.install(|| redo.par_iter().map(|&i| project.check_file_asked(&files[i])).collect());

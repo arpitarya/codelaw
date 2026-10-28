@@ -12,7 +12,7 @@ owns:
   - fixtures/react-no-context
   - crates/codelaw-cli/tests/react_no_context.rs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-27T14:00:00Z
+timestamp: 2026-10-28T12:00:00Z
 content_sha: ""
 ---
 
@@ -62,7 +62,7 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 |---|---|---|---|---|
 | engine | `codelaw` | `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics, the formatter's `format/unformatted` and `format/failed`, and `graph/no-deprecated-usage` | — |
 | `js` | `@codelaw/rules-js` | `codelaw-rules-js` | JS, JSX; its core rules also run on TS and TSX | `js/recommended`, `js/typescript`, `js/conventions`, `js/project`, `js/size` · *later:* `js/strict` |
-| `ts` | `@codelaw/rules-ts` | — | TS, TSX | `ts/recommended`, `ts/conventions` |
+| `ts` | `@codelaw/rules-ts` | — | TS, TSX | `ts/recommended`, `ts/conventions`, `ts/type-checked` (the type-aware rules, [SR-TYPES](0117_types.md)) |
 | `react` | `@codelaw/rules-react` | `codelaw-rules-react` | JSX, TSX, and React in JS and TS | `react/recommended`, `react/conventions` |
 | `node` | `@codelaw/rules-node` | — | JS, JSX, TS, TSX run on Node.js | `node/recommended` |
 | `stencil` | `@codelaw/rules-stencil` | — | TS, TSX Stencil components | `stencil/recommended`, `stencil/conventions` |

@@ -116,7 +116,8 @@ pub fn run(paths: Vec<PathBuf>, payload: Option<&str>, profile: Option<String>) 
     // in one gets the verdict CI would give it (SR-BASELINE decision 8).
     // The `ci` profile unless `--profile` or `CODELAW_PROFILE` says
     // otherwise: an agent never leaves behind what CI would fail.
-    let options = EngineOptions { touched_paths: paths.clone(), profile, profile_surface: Some(("ci", "codelaw hook")), ..EngineOptions::from_env() };
+    // A hook never waits for a cold type program (L8 decision 8).
+    let options = EngineOptions { touched_paths: paths.clone(), profile, profile_surface: Some(("ci", "codelaw hook")), no_cold_types: true, ..EngineOptions::from_env() };
     let mut project = Project::load(&start, options).map_err(|e| e.to_string())?;
     // `auto` only, written: L4 decision 8. `suggest` goes back as a diff.
     let report = project.fix(&paths, &FixOptions { unsafe_fixes: false, dry_run: false, trace: false }).map_err(|e| e.to_string())?;

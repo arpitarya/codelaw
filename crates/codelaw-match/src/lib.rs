@@ -20,10 +20,12 @@ mod predicate;
 pub mod schema;
 pub mod source;
 pub mod target;
+mod types;
 
 pub use explain::{ClauseResult, Explainer, NodeExplanation};
 pub use predicate::{Predicate, Subject, parse_predicates};
 pub use target::{CompiledTarget, Pred, Slot, TargetFinding, compile_target};
+pub use types::{TypeExpr, parse_types};
 
 use ast_grep_config::{DeserializeEnv, RuleCore, SerializableRuleCore};
 use ast_grep_core::Matcher;
@@ -68,6 +70,9 @@ impl Match {
 pub struct CompiledMatch {
     core: RuleCore,
     predicates: Vec<(String, Predicate)>,
+    /// `type:` (SR-RULE-FORMAT decision 3f): answered after matching, by
+    /// the engine's type helper.
+    types: Vec<(String, TypeExpr)>,
 }
 
 pub(crate) fn captured(n: &SyntaxNode<'_>) -> Captured {
@@ -177,10 +182,23 @@ pub(crate) fn rule_core(
 /// Compile a rule's `match:` block for one grammar. `data` is the rule's
 /// pack's tables, for predicates that name one.
 pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<serde_json::Value>>) -> Result<CompiledMatch, String> {
-    let BlockKind::Match { rule: matcher, constraints, utils, predicates } = &rule.block.kind else {
+    let BlockKind::Match { rule: matcher, constraints, utils, predicates, types } = &rule.block.kind else {
         return Err("not a `match:` rule".into());
     };
     let core = rule_core(matcher, constraints.as_ref(), utils.as_ref(), grammar)?;
+    let types = match types {
+        Some(t) => parse_types(t)?,
+        None => Vec::new(),
+    };
+    for (var, _) in &types {
+        let name = var.trim_start_matches('$');
+        if var != MATCH_KEY && !core.defined_vars().contains(name) {
+            return Err(format!("`type:` names `{var}`, which `match:` does not capture"));
+        }
+        if var != MATCH_KEY && (var.starts_with("$$$") || mentions_multi(matcher, name)) {
+            return Err(format!("`type:` names `{var}`, but `$$${name}` captures a list of nodes; a type question is about one node (`$NAME`)"));
+        }
+    }
     let predicates = match predicates {
         Some(p) => parse_predicates(p, data, &rule.options)?,
         None => Vec::new(),
@@ -200,7 +218,7 @@ pub fn compile(rule: &RuleFile, grammar: Grammar, data: &BTreeMap<String, Arc<se
             return Err(format!("`where:` names `{var}`, but `$$${name}` captures a list of nodes; a predicate applies to one node (`$NAME`)"));
         }
     }
-    Ok(CompiledMatch { core, predicates })
+    Ok(CompiledMatch { core, predicates, types })
 }
 
 impl CompiledMatch {
@@ -212,6 +230,22 @@ impl CompiledMatch {
 
     pub fn needs_semantic(&self) -> bool {
         !self.predicates.is_empty()
+    }
+
+    /// Whether the rule asks type questions: its matches hold only once
+    /// they are answered ([`CompiledMatch::type_questions`]).
+    pub fn has_types(&self) -> bool {
+        !self.types.is_empty()
+    }
+
+    /// The type questions a match asks: `(start, end, question)`.
+    pub fn type_questions(&self, m: &Match) -> Vec<(usize, usize, &'static str)> {
+        types::questions_of(&self.types, m)
+    }
+
+    /// Whether a match's type clauses hold, given the answers.
+    pub fn types_hold(&self, m: &Match, answer: &dyn Fn(usize, usize, &'static str) -> Option<bool>) -> bool {
+        types::types_hold(&self.types, m, answer)
     }
 
     /// Match one node.

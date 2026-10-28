@@ -10,7 +10,7 @@ feature: "dependencies by ratification only"
 owns:
   - crates/codelaw-cli/tests/dependencies.rs
 laws: [L0, L2, L11]
-timestamp: 2026-10-28T03:00:00Z
+timestamp: 2026-10-28T12:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-26 (Cowork): Okay. Create a law, no dependencies. For Rust, for Python, for JavaScript, TypeScript, JSON, CSS, YAML, TOML, HTML, nothing. No dependencies. Create a law. And then tell me what all dependencies do we have. We will ratify them one by one."
 ---
@@ -193,7 +193,7 @@ Installed only by `scripts/bench-rivals.py install` inside `.github/workflows/be
 
 | id | unit | what it does | pin | status |
 |---|---|---|---|---|
-| D-45 | **typescript** (npm, Apache-2.0) | the TypeScript codelaw's own type-aware tests and CI run against (W-105's fixtures, W-106's matrix); installed into fixture folders only — never in a package, the engine or a consumer's repo. A consumer's project uses its own TypeScript, which is no dependency of codelaw ([SR-TYPES](0117_types.md) decision 5). Separate from D-28, the extension's compiler | the **7.1** line, blocking; `typescript@next` in a nightly, reporting-only job; the exact tree (any platform-binary packages) recorded here when W-105 pins it | ratified 2026-10-27 — *"Yes."* (the decider, 2026-10-27 (voice docket); with *"make sure it is as fast as possible"*) |
+| D-45 | **typescript** (npm, Apache-2.0) | the TypeScript codelaw's own type-aware tests and CI run against (W-105's fixtures, W-106's matrix); installed into fixture folders only — never in a package, the engine or a consumer's repo. A consumer's project uses its own TypeScript, which is no dependency of codelaw ([SR-TYPES](0117_types.md) decision 5). Separate from D-28, the extension's compiler | the **7.1** line, blocking; `typescript@next` in a nightly, reporting-only job. **Pinned by W-105 (2026-10-28)** in `fixtures/types/package-lock.json`: `typescript@7.1.0-beta` (no dependencies of its own) and its 21 optional platform-binary packages `@typescript/typescript-<platform>@7.1.0-beta`, of which npm installs the one for the machine (≈ 33 MB) — nothing else. Installed by `npm ci` in `fixtures/types` (ci.yml); moves to the RC and GA by W-105 step 6 and W-106 | ratified 2026-10-27 — *"Yes."* (the decider, 2026-10-27 (voice docket); with *"make sure it is as fast as possible"*) |
 
 ### CI — GitHub Actions (`.github/workflows/`)
 

@@ -994,6 +994,7 @@ dependencies = [
  "codelaw-report",
  "codelaw-rules",
  "codelaw-test",
+ "codelaw-types",
  "ignore",
  "libc",
  "semver",
@@ -1046,6 +1047,7 @@ dependencies = [
  "codelaw-native",
  "codelaw-rules",
  "codelaw-semantic",
+ "codelaw-types",
  "globset",
  "ignore",
  "rayon",
@@ -1145,10 +1147,12 @@ version = "0.2.0"
 dependencies = [
  "ast-grep-config",
  "ast-grep-core",
+ "codelaw-config",
  "codelaw-core",
  "codelaw-lang",
  "codelaw-rules",
  "codelaw-semantic",
+ "codelaw-types",
  "regex",
  "serde_json",
  "tree-sitter",
@@ -1238,6 +1242,16 @@ dependencies = [
  "ignore",
  "serde_json",
  "toml",
+]
+
+[[package]]
+name = "codelaw-types"
+version = "0.2.0"
+dependencies = [
+ "codelaw-core",
+ "semver",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

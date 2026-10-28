@@ -95,11 +95,24 @@ jobs:
         uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           cache-on-failure: true
+      # The TypeScript the type-aware tests run against: fixtures/types pins
+      # it (L11 §3 D-45, test and CI scope only; SR-TYPES, W-105).
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - if: steps.verdict.outputs.cache-hit != 'true'
+        working-directory: fixtures/types
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: cargo test --workspace --locked
         env:
           # the L5 network fence fails here instead of skipping (SR-LAW-5)
           CODELAW_REQUIRE_NETWORK_FENCE: '1'
+          # the type-aware tests fail here instead of skipping, and every
+          # type rule's examples are checked against that TypeScript
+          CODELAW_TYPES_REQUIRED: '1'
+          CODELAW_TYPESCRIPT: ${{ github.workspace }}/fixtures/types/node_modules/typescript
       - if: steps.verdict.outputs.cache-hit != 'true'
         run: mkdir -p .verdict && echo "${{ github.sha }}" > .verdict/sha
       - if: steps.verdict.outputs.cache-hit != 'true'
