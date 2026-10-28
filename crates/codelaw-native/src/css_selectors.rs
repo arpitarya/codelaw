@@ -1,8 +1,8 @@
 //! CSS rules about selectors.
 
 use crate::css_syntax::{
-    Complex, Kind, SKind, Sheet, Simple, all_simples, complex, css_rule, find_of, finding, fixed, line, matches_any, max_specificity, non_standard, normalize_selector,
-    opt_list, opt_str, selector_list, set, skip_comment, split_commas, takes_selectors, text, unprefixed, vendor_prefix,
+    Complex, Kind, SKind, Sheet, Simple, all_simples, arg_selectors, complex, css_rule, find_of, finding, fixed, line, matches_any, max_specificity, non_standard, normalize_selector,
+    opt_list, opt_str, selector_list, set, skip_comment, split_commas, text, unprefixed, vendor_prefix,
 };
 use codelaw_core::TextEdit;
 use std::collections::{BTreeMap, BTreeSet};
@@ -210,13 +210,8 @@ fn each_selector_simple(src: &str, list: &[Complex], f: &mut dyn FnMut(&Complex,
             f(c, s);
             if let Some((a, b)) = s.args {
                 let name = text(src, s.name).to_ascii_lowercase();
-                let name = unprefixed(&name);
-                if takes_selectors(name) {
-                    each_selector_simple(src, &selector_list(src, a, b), f);
-                } else if matches!(name, "nth-child" | "nth-last-child")
-                    && let Some(of) = find_of(src, a, b)
-                {
-                    each_selector_simple(src, &selector_list(src, of, b), f);
+                if let Some(list) = arg_selectors(src, s, unprefixed(&name), a, b) {
+                    each_selector_simple(src, &list, f);
                 }
             }
         }

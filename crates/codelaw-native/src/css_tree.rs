@@ -3,7 +3,8 @@
 //! (decision 3) read modern CSS and Sass, so the `css/*` and `scss/*` rules
 //! take their rules, at-rules, declarations and comments from the tree: which
 //! node is a statement, where its block opens and closes, where its colon,
-//! its `!` annotation and its `;` are; each style rule's selector list; each
+//! its `!` annotation and its `;` are; each style rule's selector list (with
+//! the selector lists in its pseudo-classes' arguments); each
 //! declaration's value and each at-rule's prelude as component values (words,
 //! strings, functions and their arguments, `,` `/` `:`); the media queries of
 //! `@media` and `@custom-media`; and the selectors of an `@page` or `@scope`
@@ -318,13 +319,34 @@ fn comment(kinds: Kinds, n: TsNode<'_>) -> bool {
 }
 
 fn simple(kind: SKind, start: usize, end: usize, name: (usize, usize), args: Option<(usize, usize)>) -> Piece {
-    Piece::Simple(Simple { kind, start, end, name, args })
+    Piece::Simple(Simple { kind, start, end, name, args, inner: None })
 }
 
 /// The inside of an `arguments` node's parentheses.
 fn args_of<'t>(kinds: Kinds, kids: &[TsNode<'t>]) -> Option<(usize, usize)> {
     let a = kids.iter().copied().find(|c| kd(kinds, c) == "arguments")?;
     Some((a.start_byte() + 1, a.end_byte().saturating_sub(1).max(a.start_byte() + 1)))
+}
+
+/// The selector list in a pseudo-class's or element's `arguments` (`kids`
+/// are its children), for the names whose argument is one (and CSS Modules'
+/// `:global()` and `:local()`); for `:nth-child()` and `:nth-last-child()`,
+/// the selectors after its `of`.
+fn arg_list<'t>(kids: &[TsNode<'t>], name: &str, src: &str, w: &mut Walk<'t>) -> Option<Vec<Complex>> {
+    let kinds = w.kinds;
+    let lower = name.to_ascii_lowercase();
+    let name = crate::css_syntax::unprefixed(&lower);
+    let nth = matches!(name, "nth-child" | "nth-last-child");
+    if !(crate::css_syntax::takes_selectors(name) || nth || matches!(name, "global" | "local")) {
+        return None;
+    }
+    let args = kids.iter().copied().find(|c| kd(kinds, c) == "arguments")?;
+    let mut list = children(args, &mut w.cur);
+    if nth {
+        let of = list.iter().position(|k| kd(kinds, k) == "of")?;
+        list.drain(..=of);
+    }
+    Some(list.into_iter().filter(|k| k.is_named() && !comment(kinds, *k)).map(|k| complex(k, src, w)).collect())
 }
 
 fn pieces_of<'t>(n: TsNode<'t>, src: &str, out: &mut Vec<Piece>, w: &mut Walk<'t>) {
@@ -381,7 +403,9 @@ fn pieces_of<'t>(n: TsNode<'t>, src: &str, out: &mut Vec<Piece>, w: &mut Walk<'t
             let s = left(out, w);
             let element = kd(kinds, &n) == "pseudo_element_selector";
             let name = kids.iter().find(|k| k.start_byte() > s && matches!(kd(kinds, k), "class_name" | "tag_name")).map_or((s, s), |k| (k.start_byte(), k.end_byte()));
-            out.push(simple(if element { SKind::PseudoElement } else { SKind::PseudoClass }, s, end, name, args_of(kinds, &kids)));
+            let inner = arg_list(&kids, &src[name.0..name.1], src, w);
+            let kind = if element { SKind::PseudoElement } else { SKind::PseudoClass };
+            out.push(Piece::Simple(Simple { kind, start: s, end, name, args: args_of(kinds, &kids), inner }));
         }
         "attribute_selector" => {
             let s = left(out, w);
@@ -427,8 +451,8 @@ fn prelude_selectors<'t>(kids: &[TsNode<'t>], src: &str, w: &mut Walk<'t>) -> Ve
                 for p in children(*k, &mut w.cur) {
                     let (s, e) = (p.start_byte(), p.end_byte());
                     match kd(kinds, &p) {
-                        "tag_name" => parts.push(Simple { kind: SKind::Type, start: s, end: e, name: (s, e), args: None }),
-                        "class_name" => parts.push(Simple { kind: SKind::PseudoClass, start: s - 1, end: e, name: (s, e), args: None }),
+                        "tag_name" => parts.push(Simple { kind: SKind::Type, start: s, end: e, name: (s, e), args: None, inner: None }),
+                        "class_name" => parts.push(Simple { kind: SKind::PseudoClass, start: s - 1, end: e, name: (s, e), args: None, inner: None }),
                         _ => {}
                     }
                 }
@@ -720,6 +744,28 @@ mod tests {
             .collect()
     }
 
+    /// A selector list without the argument lists the tree adds to its
+    /// pseudo-classes, each checked against a text reading of its arguments.
+    fn plain(src: &str, list: &[crate::css_syntax::Complex]) -> Vec<crate::css_syntax::Complex> {
+        let mut list = list.to_vec();
+        for c in &mut list {
+            for comp in &mut c.compounds {
+                for x in &mut comp.parts {
+                    if let (Some(inner), Some((a, b))) = (x.inner.take(), x.args) {
+                        let lower = src[x.name.0..x.name.1].to_ascii_lowercase();
+                        let name = crate::css_syntax::unprefixed(&lower);
+                        let text = match name {
+                            "global" | "local" => selector_list(src, a, b),
+                            _ => crate::css_syntax::arg_selectors(src, x, name, a, b).expect("an argument list").into_owned(),
+                        };
+                        assert_eq!(format!("{:?}", plain(src, &inner)), format!("{text:?}"), "{}", &src[a..b]);
+                    }
+                }
+            }
+        }
+        list
+    }
+
     /// The tree's sheet, which must read like the text's.
     fn agree(language: Language, src: &str, module: bool) {
         let scss = language == Language::Scss;
@@ -735,7 +781,7 @@ mod tests {
             if let Some(l) = &n.selectors {
                 // (An `@page` or `@scope` prelude's: `prelude_selectors_are_the_trees`.)
                 if n.kind == crate::css_syntax::Kind::Rule {
-                    assert_eq!(format!("{l:?}"), format!("{:?}", selector_list(&view, n.name.0, n.name.1)));
+                    assert_eq!(format!("{:?}", plain(&view, l)), format!("{:?}", selector_list(&view, n.name.0, n.name.1)));
                 }
                 let k = tree.walk().iter().position(|&w| w == i).unwrap();
                 a[k] = b[k].clone();
@@ -772,6 +818,7 @@ mod tests {
             false,
         );
         agree(Language::Css, ":export { a: b }\n.a { composes: b; c: d }\n", true);
+        agree(Language::Css, "a:not(.a, #b > c):is(d e)::slotted(span) { x: y }\nli:nth-child(2n + 1 of .a):where(.c) { x: y }\n:host(.x):has(> img) { x: y }\n:global(.g) .l, :local(.m) { x: y }\n", true);
         agree(
             Language::Scss,
             "@include foo(1px, $b: 2) using ($x) { a: b }\n@mixin m($a: 1px / 2, $b...) { a: b }\n@if $a == 1 { a { b: c } } @else if $b / 2 > 1 { d { e: f } }\n@function f($x) { @return math.div($x, 2); }\n@each $k, $v in $map { .a { b: c } }\n@media (min-width: 1px) and (aspect-ratio: 16/9) { a { b: c } }\n",
