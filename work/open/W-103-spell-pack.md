@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-27 (Cowork, voice): build spelling into codelaw as 
 item: W-103
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5), the first increment"
+updated: 2026-10-28
+updated_by: "Claude Code (Opus 5.5), the second increment"
 ball: agent
 ---
 
@@ -36,7 +36,7 @@ Spelling in comments, docs, prose strings, Markdown, keys and declared names, in
 | DoD | what | state |
 |---|---|---|
 | 1 · data | `packs/spell/data/spell/` is written by `scripts/spell-data.py` (stdlib only) from D-42–D-44 at the pins in L11 §3; a second run changes no byte; `NOTICE` names each source and version | 🟡 the typo list (`spell-data.py check` passes); dictionary and locale table left |
-| 2 · rules | the six rules of SR-SPELL decision 5, each with its fix class, cases and a `codelaw test` pass; every `manual` fix carried by a skill (L4) | 🟡 `spell/known-typo` (107 `codelaw test` checks); five left |
+| 2 · rules | the six rules of SR-SPELL decision 5, each with its fix class, cases and a `codelaw test` pass; every `manual` fix carried by a skill (L4) | 🟡 `spell/known-typo` (107 `codelaw test` checks), `spell/known-typo-identifier` (48) and `spell/known-typo-key` (28); `unknown-word`, `locale-variant`, `inconsistent-term`, `suspicious-word` left |
 | 3 · scope | a fixture repo per L3 language: a typo in a comment, a string, a declared name and a key is reported once; the same word in a URL, a hash, a JSON value that is an id, or at a name's uses is not | ⏳ |
 | 4 · fixes | `codelaw fix` on the fixtures fixes the one-correction known typos in prose and file-local names, and changes nothing exported | ⏳ |
 | 5 · packaging | `@codelaw/rules-spell` and `codelaw-rules-spell` build in CI byte-identical; `init` does not add the pack; a missing pack names both install commands | 🟡 `build-packs.py --verify` builds both and compares output byte-identical locally; `init` adds no spell pack; the missing-pack message names both installs (`pack.rs` test); CI proves it on the landing commit |
@@ -45,7 +45,7 @@ Spelling in comments, docs, prose strings, Markdown, keys and declared names, in
 
 ## Left (exact, after the first increment of 2026-10-27)
 
-1. `spell/known-typo-identifier` — declared names in all nine languages (split at case, `_`, `-`, `.`, digits); `auto` rename only for a file-local, unexported name with every reference in the file; `suggest` naming the other files; `manual` for an exported name, a JSON key or a CSS class used elsewhere; add to `spell/recommended`; a skill for its `manual` fix (L4).
+1. ✅ 2026-10-28: `spell/known-typo-identifier` (`auto`, JS/JSX/TS/TSX/Python, 48 `codelaw test` checks) and `spell/known-typo-key` (`manual`, JSON/YAML/TOML/CSS/SCSS/HTML, 28 checks), both in `spell/recommended`; one rule per fix class, as SR-SPELL decision 5 *as built* says. Not built: the `suggest` tier naming other files (needs the project graph).
 2. The dictionary: `spell-data.py` writes SCOWL's US + British words (choose the size from measurement) with each word's size class, plus the software terms; measure its bytes and load time; if the pack's load cost is too high, put a split (a second data file read only by `spell/strict`'s rules) or a compact format to the decider.
 3. `spell/unknown-word` (`suggest`: up to three corrections by Damerau-Levenshtein ≤ 2, then size class, then alphabetical; a per-run verdict cache) and the `[spell]` section (`locale`, `words`) in SR-CONFIG decision 2 and the config schema; `[spell] words` also excuses `known-typo`.
 4. `spell/suspicious-word` (`manual`, with its skill), `spell/locale-variant` (VarCon one-to-one pairs into `data/spell/locale.json`, NOTICE and `licenses/` gain VarCon) and `spell/inconsistent-term` (project scope).

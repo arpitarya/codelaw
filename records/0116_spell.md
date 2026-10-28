@@ -3,7 +3,7 @@ type: Standing Record
 kind: component
 name: SR-SPELL
 title: "SR-SPELL (0116) — spelling as its own rule pack: a known-typo check on by default, a dictionary check opt-in, codelaw's own word data"
-description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, the generated known-typo list and spell/known-typo with its auto fix; the identifier, dictionary, locale, consistency and words rules are not."
+description: "The spell pack (@codelaw/rules-spell, codelaw-rules-spell): what text it reads, its rules and their fix classes, where its word data comes from and lives, its config and its budget. Partly built (W-103): the pack, the generated known-typo list, spell/known-typo, spell/known-typo-identifier and spell/known-typo-key; the dictionary, locale, consistency and words rules are not."
 status: accepted
 date: 2026-10-27
 feature: "spell checking — the spell pack"
@@ -137,6 +137,25 @@ question its maintainers left open. The forks and the rulings are in
    | `spell/suspicious-word` | a `[spell] words` entry that is on the known-typo list, or one edit from a common word | `manual` |
 
    Each `manual` fix is carried by a skill, as L4 requires.
+   - **As built (W-103, 2026-10-28):** a rule declares one fix class and
+     an `auto` rule's every `Don't` example must fix to its `Do` (L4
+     decision 7, SR-RULE-FORMAT decision 5), so the names are two rules.
+     `spell/known-typo-identifier` (`auto`) covers JavaScript, JSX,
+     TypeScript, TSX and Python, where the semantic model resolves every
+     use: it renames the declaration and every use only when the name is
+     not exported, not a module-level name of a script or a Python module,
+     not a Python parameter (keyword arguments), not a class attribute or
+     member, not a shorthand property, the new name is free and not a
+     keyword, and every identifier and string in the file that spells the
+     name is one of those uses; any other finding carries no edit and is
+     reported `manual` with the rule's steps. There is no `suggest` tier
+     naming the other files: that needs the project graph. Imports are not
+     reported. `spell/known-typo-key` (`manual`, with `## How to fix`
+     served by `codelaw-fix`, L4 decision 10) covers what other files read:
+     JSON, YAML and TOML keys; CSS and SCSS classes, ids, custom
+     properties, `$variables`, mixins and functions; HTML `id`s — once per
+     distinct name per file. Markdown declares no names. Both are in
+     `spell/recommended`.
 6. **The word data is codelaw's own, built from ratified sources only**
    ([L11](0013_LAW-11-dependencies.md) §3: D-42 SCOWL, D-43 VarCon, D-44
    software terms), and lives in the pack's `data/spell/`, not in the engine

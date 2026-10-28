@@ -1,4 +1,6 @@
-description = "known typos in comments, docs, prose strings and Markdown, fixed unattended"
+description = "known typos in comments, docs, prose strings, Markdown, names, keys and classes; fixed unattended where that is safe"
 
 [rules]
 "spell/known-typo" = "warn"
+"spell/known-typo-identifier" = "warn"
+"spell/known-typo-key" = "warn"

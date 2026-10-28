@@ -2,7 +2,7 @@
 
 # Rule reference
 
-**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 652 rules in 18 packs, plus the engine's 23 own rules.
+**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 654 rules in 18 packs, plus the engine's 23 own rules.
 
 ## Configuring any rule — the forms
 
@@ -50,7 +50,7 @@ remap = { error = "warn" }
 | [security-js](#security-js) | `@codelaw/rules-security-js` | `codelaw-rules-security-js` | 66 | 4 |
 | [security-ts](#security-ts) | `@codelaw/rules-security-ts` | — | 16 | 3 |
 | [security-html](#security-html) | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | 19 | 1 |
-| [spell](#spell) | `@codelaw/rules-spell` | `codelaw-rules-spell` | 1 | 0 |
+| [spell](#spell) | `@codelaw/rules-spell` | `codelaw-rules-spell` | 3 | 0 |
 | [python](#python) | — | `codelaw-rules-python` | 103 | 10 |
 | [security-python](#security-python) | — | `codelaw-rules-security-python` | 61 | 0 |
 | [engine](engine.md) | in `codelaw` | in `codelaw` | 23 | 0 |
@@ -655,6 +655,8 @@ Presets: `codelaw:spell/recommended` · `codelaw:spell/strict`.
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
 | [`spell/known-typo`](spell/known-typo.md) | No known typos in comments, docs and prose | `auto` | — | `spell/recommended`, `spell/strict` |
+| [`spell/known-typo-identifier`](spell/known-typo-identifier.md) | No known typos in the names a file declares | `auto` | — | `spell/recommended`, `spell/strict` |
+| [`spell/known-typo-key`](spell/known-typo-key.md) | No known typos in keys, classes and ids | `manual` | — | `spell/recommended`, `spell/strict` |
 
 ## python
 
