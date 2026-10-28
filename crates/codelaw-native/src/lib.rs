@@ -17,6 +17,7 @@ mod css_misc;
 mod css_modules;
 mod css_selectors;
 mod css_syntax;
+mod css_tree;
 mod css_values;
 mod scss_rules;
 mod data_json;

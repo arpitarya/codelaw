@@ -21,11 +21,10 @@ fn parent_rule(sheet: &Sheet, i: usize) -> Option<usize> {
 /// A rule's selectors with nesting resolved against its parents, as
 /// normalised text, paired with the complex selector each comes from.
 fn resolved(sheet: &Sheet, i: usize, src: &str) -> Vec<(String, Complex)> {
-    let n = &sheet.nodes[i];
-    let own = selector_list(src, n.name.0, n.name.1);
+    let own = sheet.selectors(i, src);
     let parents: Option<Vec<String>> = parent_rule(sheet, i).map(|p| resolved(sheet, p, src).into_iter().map(|x| x.0).collect());
     let mut out = Vec::new();
-    for c in own {
+    for c in own.iter().cloned() {
         let t = normalize_selector(text(src, (c.start, c.end)));
         match &parents {
             None => out.push((t, c)),
@@ -50,10 +49,10 @@ css_rule!(NoDuplicateSelector, "css/no-duplicate-selector", |sheet, src, ctx, ou
     let mut contexts: BTreeMap<Option<usize>, BTreeMap<String, usize>> = BTreeMap::new();
     for i in style_rules(sheet, src) {
         let n = &sheet.nodes[i];
-        let list = selector_list(src, n.name.0, n.name.1);
+        let list = sheet.selectors(i, src);
         // The same selector twice in one list.
         let mut in_list = BTreeSet::new();
-        for c in &list {
+        for c in list.iter() {
             let t = normalize_selector(text(src, (c.start, c.end)));
             if !in_list.insert(t.clone()) {
                 out.push(finding(c.start, c.end, format!("`{t}` appears twice in this selector list")));
@@ -125,12 +124,15 @@ css_rule!(NoDescendingSpecificity, "css/no-descending-specificity", |sheet, src,
             let Some(r) = reference(&res, &pseudo_elements) else { continue };
             let list = selector_list(&res, 0, res.len());
             let spec = max_specificity(&res, &list, (0, 0, 0));
+            // Nested selectors are named as they resolve (`&::after` under
+            // `.btn` is `.btn::after`), so the two the finding compares are plain.
             let own = normalize_selector(text(src, (c.start, c.end)));
+            let shown = if own == res { format!("`{own}`") } else { format!("`{own}` (`{res}`)") };
             let prior = map.entry(r).or_default();
             if let Some((_, sel, at)) = prior.iter().find(|p| p.0 > spec) {
-                out.push(finding(c.start, c.end, format!("`{own}` comes after `{sel}` (line {}), which is more specific; put the less specific selector first", line(src, *at))));
+                out.push(finding(c.start, c.end, format!("{shown} comes after `{sel}` (line {}), which is more specific; put the less specific selector first", line(src, *at))));
             }
-            prior.push((spec, own, n.start));
+            prior.push((spec, res, n.start));
         }
     }
 });
@@ -147,8 +149,9 @@ css_rule!(NestingSelectorNoMissingScopingRoot, "css/nesting-selector-no-missing-
             Kind::AtRule if sheet.at_name(i, src) == "scope" => n.params,
             _ => continue,
         };
+        let list = if n.kind == Kind::Rule { sheet.selectors(i, src) } else { selector_list(src, s, e).into() };
         let mut simples = Vec::new();
-        all_simples(src, &selector_list(src, s, e), &mut simples);
+        all_simples(src, &list, &mut simples);
         for x in simples.iter().filter(|x| x.kind == SKind::Nesting) {
             out.push(finding(x.start, x.end, "`&` has no parent rule to stand for here"));
         }
@@ -180,7 +183,7 @@ css_rule!(SelectorAnbNoUnmatchable, "css/selector-anb-no-unmatchable", |sheet, s
     for i in style_rules(sheet, src) {
         let n = &sheet.nodes[i];
         let mut simples = Vec::new();
-        all_simples(src, &selector_list(src, n.name.0, n.name.1), &mut simples);
+        all_simples(src, &sheet.selectors(i, src), &mut simples);
         for x in simples {
             let name = text(src, x.name).to_ascii_lowercase();
             if x.kind != SKind::PseudoClass || !matches!(name.as_str(), "nth-child" | "nth-last-child" | "nth-of-type" | "nth-last-of-type" | "nth-col" | "nth-last-col") {
@@ -233,7 +236,7 @@ css_rule!(SelectorPseudoClassNoUnknown, "css/selector-pseudo-class-no-unknown", 
             Kind::AtRule if is_page => n.params,
             _ => continue,
         };
-        let list = selector_list(src, s, e);
+        let list = if n.kind == Kind::Rule { sheet.selectors(i, src) } else { selector_list(src, s, e).into() };
         each_selector_simple(src, &list, &mut |c, x| {
             if x.kind != SKind::PseudoClass {
                 return;
@@ -275,7 +278,7 @@ css_rule!(SelectorPseudoElementNoUnknown, "css/selector-pseudo-element-no-unknow
     let ignore = opt_list(ctx, "ignorePseudoElements");
     for i in style_rules(sheet, src) {
         let n = &sheet.nodes[i];
-        let list = selector_list(src, n.name.0, n.name.1);
+        let list = sheet.selectors(i, src);
         each_selector_simple(src, &list, &mut |_, x| {
             let raw = text(src, x.name);
             if x.kind == SKind::PseudoElement && vendor_prefix(raw).is_none() && !elements.contains(&raw.to_ascii_lowercase()) && !matches_any(&ignore, raw) {
@@ -304,7 +307,7 @@ css_rule!(SelectorTypeNoUnknown, "css/selector-type-no-unknown", |sheet, src, ct
     for i in style_rules(sheet, src) {
         let n = &sheet.nodes[i];
         let mut simples = Vec::new();
-        all_simples(src, &selector_list(src, n.name.0, n.name.1), &mut simples);
+        all_simples(src, &sheet.selectors(i, src), &mut simples);
         for x in simples.iter().filter(|x| x.kind == SKind::Type) {
             let raw = text(src, x.name);
             let (ns, local) = match raw.rfind('|') {
@@ -386,9 +389,8 @@ fn pattern_rule(sheet: &Sheet, src: &str, ctx: &crate::NativeContext<'_>, kind: 
     let what = if kind == SKind::Class { "Class" } else { "Id" };
     let sigil = if kind == SKind::Class { "." } else { "#" };
     for i in style_rules(sheet, src) {
-        let n = &sheet.nodes[i];
         let mut simples = Vec::new();
-        all_simples(src, &selector_list(src, n.name.0, n.name.1), &mut simples);
+        all_simples(src, &sheet.selectors(i, src), &mut simples);
         for x in simples.iter().filter(|x| x.kind == kind) {
             let name = text(src, x.name);
             if !name.is_empty() && !re.is_match(name) {
@@ -411,7 +413,7 @@ css_rule!(SelectorNoVendorPrefix, "css/selector-no-vendor-prefix", |sheet, src, 
     let ignore = opt_list(ctx, "ignoreSelectors");
     for i in style_rules(sheet, src) {
         let n = &sheet.nodes[i];
-        let list = selector_list(src, n.name.0, n.name.1);
+        let list = sheet.selectors(i, src);
         each_selector_simple(src, &list, &mut |_, x| {
             if !matches!(x.kind, SKind::PseudoClass | SKind::PseudoElement) {
                 return;
@@ -430,7 +432,7 @@ css_rule!(SelectorNoVendorPrefix, "css/selector-no-vendor-prefix", |sheet, src, 
 css_rule!(SelectorNotNotation, "css/selector-not-notation", |sheet, src, ctx, out| {
     for i in style_rules(sheet, src) {
         let n = &sheet.nodes[i];
-        let list = selector_list(src, n.name.0, n.name.1);
+        let list = sheet.selectors(i, src);
         each_selector_simple(src, &list, &mut |c, x| {
             let is_not = |s: &Simple| s.kind == SKind::PseudoClass && text(src, s.name).eq_ignore_ascii_case("not") && s.args.is_some();
             if !is_not(x) {
@@ -461,7 +463,7 @@ css_rule!(SelectorNotNotation, "css/selector-not-notation", |sheet, src, ctx, ou
 css_rule!(SelectorPseudoElementColonNotation, "css/selector-pseudo-element-colon-notation", |sheet, src, ctx, out| {
     for i in style_rules(sheet, src) {
         let n = &sheet.nodes[i];
-        let list = selector_list(src, n.name.0, n.name.1);
+        let list = sheet.selectors(i, src);
         each_selector_simple(src, &list, &mut |_, x| {
             let name = text(src, x.name);
             if x.kind == SKind::PseudoClass && LEGACY_ELEMENTS.contains(&name.to_ascii_lowercase().as_str()) {

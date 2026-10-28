@@ -67,7 +67,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-99** `arpit` Side-by-side bench built (`scripts/bench-rivals.py`, `perf/rivals.toml`, `bench-rivals.yml`), skipped until L11 ratifies the rivals; dry run with codelaw alone green. Left: ratify D-37…D-41 (inbox), the first runner run, L8 rows. Filed by Arpit (Cowork). [detail](open/W-99-side-by-side-bench.md)
 
-🟢 **W-62** `agent` SCSS built: Biome formats it, 64 `css/*` rules run on `.scss`, `scss` pack; both grammars patched (D-36), Bootstrap's SCSS clean and in the pinned corpus; left: CSS rules onto trees, `&` in no-descending-specificity. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
+🟢 **W-62** `agent` SCSS built (Biome formats it, `scss` pack, both grammars patched, Bootstrap in the corpus); CSS/SCSS rules read statements and selectors from the tree; left: values, preludes, pseudo-class arguments. Filed by Arpit (Cowork). [detail](open/W-62-scss-support.md)
 
 🔴 **W-93** `arpit` `codelaw hook --pre` and `codelaw brief` built and landed (records, code, tests, the Claude/Cowork/Codex pre-write hooks, README and USAGE); left: the decider rules `hook_pre`'s budget (inbox), then close. Filed by Arpit (Cowork). [detail](open/W-93-hook-pre-and-brief.md)
 

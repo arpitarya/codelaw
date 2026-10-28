@@ -41,9 +41,9 @@ fn local_classes(sheet: &Sheet, src: &str) -> (Vec<Local>, bool) {
         }
         let parent = sheet.ancestors(i).find(|&a| sheet.nodes[a].kind == Kind::Rule);
         let parent_class = parent.and_then(|p| single.get(&p).cloned());
-        let list = selector_list(src, n.name.0, n.name.1);
+        let list = sheet.selectors(i, src);
         let mut named = Vec::new();
-        for c in &list {
+        for c in list.iter() {
             classes_of(src, c, &mut out, &mut named, parent_class.clone(), &mut incomplete);
         }
         if list.len() == 1 && named.len() == 1 {
@@ -122,7 +122,7 @@ macro_rules! module_rule {
                 let scss = $ctx.language == Language::Scss;
                 let view = if scss { crate::css_syntax::scss_view($ctx.source) } else { $ctx.source.to_owned() };
                 let $src: &str = &view;
-                let sheet_rc = crate::css_syntax::sheet_for($ctx.source, scss, true);
+                let sheet_rc = crate::css_syntax::sheet_for(Some(node.get_inner_node()), $ctx.source, scss, true);
                 let $sheet: &Sheet = &sheet_rc;
                 $body
             }
@@ -231,7 +231,7 @@ module_rule!(ComposesValid, "css-modules/composes-valid", |sheet, src, ctx, out|
             Some(p) if sheet.nodes[p].kind != Kind::Rule => Some("it is inside an at-rule".to_owned()),
             Some(p) if sheet.nodes[p].parent.is_some() => Some("it is inside a nested rule".to_owned()),
             Some(p) => {
-                let list = selector_list(src, sheet.nodes[p].name.0, sheet.nodes[p].name.1);
+                let list = sheet.selectors(p, src);
                 let single = list.len() == 1 && list[0].compounds.len() == 1 && list[0].compounds[0].parts.len() == 1 && list[0].compounds[0].parts[0].kind == SKind::Class;
                 (!single).then(|| "its selector is not a single class".to_owned())
             }
@@ -272,7 +272,9 @@ module_rule!(ComposesValid, "css-modules/composes-valid", |sheet, src, ctx, out|
                 };
                 let other_scss = path.to_ascii_lowercase().ends_with(".scss");
                 let other_view = if other_scss { crate::css_syntax::scss_view(&other) } else { other.clone() };
-                let other_sheet = crate::css_syntax::parse_with(&other, other_scss, true);
+                let other_tree = codelaw_lang::parse(if other_scss { Language::Scss } else { Language::Css }, &other);
+                let other_sheet = crate::css_tree::sheet(other_tree.root().get_inner_node(), &other_view, other_scss, true)
+                    .unwrap_or_else(|| crate::css_syntax::parse_with(&other, other_scss, true));
                 let (classes, incomplete) = local_classes(&other_sheet, &other_view);
                 if incomplete {
                     continue;

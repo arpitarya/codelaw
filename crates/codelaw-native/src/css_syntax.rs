@@ -1,12 +1,14 @@
-//! A small CSS reader for the `css/*` native rules. tree-sitter-css drops
-//! to ERROR nodes on parts of modern CSS (custom properties holding
-//! blocks, `@custom-media` names, `supports()` imports; codelaw's fork
-//! reads range media features, `layer()` imports and `50.5%` keyframe
-//! selectors, SR-ARCHITECTURE decision 3), so the CSS rules read the
-//! stylesheet's text themselves: statements (rules, at-rules,
-//! declarations, comments), component values, selectors and media
-//! queries, every piece with its byte range in the source. The grammar
-//! still verifies every fix they make (SR-ARCHITECTURE decision 5).
+//! The CSS model the `css/*`, `css-modules/*` and `scss/*` native rules
+//! read: statements (rules, at-rules, declarations, comments), component
+//! values, selectors and media queries, every piece with its byte range in the
+//! source. Since W-62 the statements and each rule's selector list come from
+//! the file's tree-sitter tree ([`css_tree`](crate::css_tree); SR-ARCHITECTURE
+//! decision 15b); this module's text reader builds the same sheet when the
+//! tree holds an error (the CSS the grammar rejects) and reads what the tree
+//! does not give the rules yet: component values, at-rule preludes and media
+//! queries, the selectors inside a pseudo-class's arguments, and selectors a
+//! rule builds itself. The grammar still verifies every fix the rules make
+//! (decision 5).
 //!
 //! It never fails: anything it can't place becomes an `Other` statement,
 //! and the rules skip what they don't recognise.
@@ -44,6 +46,9 @@ pub struct Node {
     pub important: Option<Range>,
     /// The `{` and the `}` (or the end of the source when unclosed).
     pub block: Option<Range>,
+    /// Rule: its selector list, when read from the tree
+    /// ([`css_tree::selectors`](crate::css_tree::selectors)); see [`Sheet::selectors`].
+    pub selectors: Option<Vec<Complex>>,
     /// The statement ends with `;`, at this offset.
     pub semicolon: Option<usize>,
 }
@@ -98,6 +103,16 @@ impl Sheet {
         }
         go(self, &self.top, &mut out);
         out
+    }
+    /// A rule's selector list: from the tree when the sheet was read from
+    /// one, otherwise read from its text (the two agree on every stylesheet
+    /// the tree reads: W-62).
+    pub fn selectors(&self, i: usize, src: &str) -> std::borrow::Cow<'_, [Complex]> {
+        let n = &self.nodes[i];
+        match &n.selectors {
+            Some(list) => std::borrow::Cow::Borrowed(list),
+            None => std::borrow::Cow::Owned(selector_list(src, n.name.0, n.name.1)),
+        }
     }
     pub fn decls(&self) -> impl Iterator<Item = usize> + '_ {
         self.walk().into_iter().filter(|&i| self.nodes[i].kind == Kind::Decl)
@@ -237,7 +252,7 @@ fn scan(src: &str, mut i: usize, end: usize, stops: &[u8], braces: bool) -> (usi
     (end.min(b.len()), 0)
 }
 
-fn trim(src: &str, start: usize, end: usize) -> Range {
+pub fn trim(src: &str, start: usize, end: usize) -> Range {
     let s = &src[start..end];
     let lead = s.len() - s.trim_start().len();
     let t = s.trim();
@@ -305,7 +320,7 @@ impl Parser<'_> {
     }
 
     fn node(kind: Kind, start: usize, end: usize, parent: Option<usize>) -> Node {
-        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None }
+        Node { kind, start, end, parent, children: Vec::new(), name: (start, start), params: (start, start), important: None, block: None, semicolon: None, selectors: None }
     }
 
     /// Parse statements from `i` until a `}` (returned, not consumed) or the end.
@@ -507,8 +522,8 @@ pub fn scss_view(src: &str) -> String {
     String::from_utf8(out).expect("blanking whole comments keeps UTF-8")
 }
 
-/// The last parse: source, (module, scss) flags, sheet.
-type CachedSheet = (String, (bool, bool), Rc<Sheet>);
+/// The last parse: source, (scss, module, from the tree) flags, sheet.
+type CachedSheet = (String, (bool, bool, bool), Rc<Sheet>);
 
 thread_local! {
     static CACHE: RefCell<Option<CachedSheet>> = const { RefCell::new(None) };
@@ -551,19 +566,27 @@ pub fn keep_line_comments(source: &str, out: &mut [crate::NativeFinding], from: 
     }
 }
 
-/// The parsed sheet of a source (`scss`: read as SCSS); each file is parsed
-/// once, however many CSS rules run on it.
-pub fn sheet_for(src: &str, scss: bool, module: bool) -> Rc<Sheet> {
+/// The sheet of a source (`scss`: read as SCSS), built from its tree `root`
+/// ([`css_tree`](crate::css_tree)) or, when the tree holds an error or no
+/// tree is given, from its text. Each file is read once, however many CSS
+/// rules run on it. On a tree without an error the two readings are the same
+/// sheet (W-62 checked it on every stylesheet of the pinned corpus), so the
+/// rules that exist to report CSS the grammar rejects
+/// (`css/media-query-no-invalid`, `css/at-rule-prelude-no-invalid`) read the
+/// tree's statements too; what they judge, the prelude, they read as text.
+pub fn sheet_for(root: Option<tree_sitter::Node<'_>>, src: &str, scss: bool, module: bool) -> Rc<Sheet> {
+    let key = (scss, module, root.is_some());
     CACHE.with(|c| {
         let mut c = c.borrow_mut();
         if let Some((s, k, sheet)) = c.as_ref()
-            && *k == (scss, module)
+            && *k == key
             && s == src
         {
             return sheet.clone();
         }
-        let sheet = Rc::new(parse_with(src, scss, module));
-        *c = Some((src.to_owned(), (scss, module), sheet.clone()));
+        let from_tree = root.and_then(|r| crate::css_tree::sheet(r, &rule_source(src, scss), scss, module));
+        let sheet = Rc::new(from_tree.unwrap_or_else(|| parse_with(src, scss, module)));
+        *c = Some((src.to_owned(), key, sheet.clone()));
         sheet
     })
 }
@@ -1129,9 +1152,9 @@ macro_rules! css_rule {
                 &[codelaw_core::Language::Css, codelaw_core::Language::Scss]
             }
             fn kinds(&self) -> &'static [&'static str] {
-                // The root is an `ERROR` node when the grammar cannot recover
-                // (tree-sitter-scss does not read all of modern Sass): the
-                // rules read the text, so they still run, once, on the root.
+                // The root is an `ERROR` node when the grammar cannot recover:
+                // the rules then read the statements from the text, so they
+                // still run, once, on the root.
                 &["stylesheet", "ERROR"]
             }
             /// `[css]`'s `modules` globs name the CSS Modules (W-63).
@@ -1146,7 +1169,7 @@ macro_rules! css_rule {
                 let scss = $ctx.language == codelaw_core::Language::Scss;
                 let view = $crate::css_syntax::rule_source($ctx.source, scss);
                 let $src: &str = &view;
-                let sheet_rc = $crate::css_syntax::sheet_for($ctx.source, scss, $crate::css_syntax::is_module($ctx));
+                let sheet_rc = $crate::css_syntax::sheet_for(Some(node.get_inner_node()), $ctx.source, scss, $crate::css_syntax::is_module($ctx));
                 let $sheet: &$crate::css_syntax::Sheet = &sheet_rc;
                 let from = $out.len();
                 // A closure, so a rule's early `return` still reaches the check below.

@@ -27,7 +27,7 @@ macro_rules! scss_rule {
             }
             fn kinds(&self) -> &'static [&'static str] {
                 // `ERROR` is the root when tree-sitter-scss cannot recover: the
-                // rules read the text, so they run once, on the root.
+                // statements then come from the text, so the rules run once, on the root.
                 &["stylesheet", "ERROR"]
             }
             /// `[css] modules` names the CSS Modules, which the SCSS rules read as modules.
@@ -41,7 +41,7 @@ macro_rules! scss_rule {
                 }
                 let view = css_syntax::scss_view($ctx.source);
                 let $src: &str = &view;
-                let sheet_rc = css_syntax::sheet_for($ctx.source, true, css_syntax::is_module($ctx));
+                let sheet_rc = css_syntax::sheet_for(Some(node.get_inner_node()), $ctx.source, true, css_syntax::is_module($ctx));
                 let $sheet: &Sheet = &sheet_rc;
                 $body
             }
