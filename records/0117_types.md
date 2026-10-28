@@ -9,7 +9,7 @@ date: 2026-10-27
 feature: "type-aware TypeScript rules"
 owns: []
 laws: [L0, L2, L3, L4, L5, L6, L8, L11]
-timestamp: 2026-10-27T20:00:00Z
+timestamp: 2026-10-28T03:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-27 (W-101, by voice), rulings R1–R8 of work/proposals/type-aware-rules.md §3: TypeScript 7.1's own API — \"wouldn't it be a good idea to go with TypeScript one since it's already close?\" · \"It does.\"; reported once — \"I'm good on the second one.\"; no new LSP; Node at runtime — \"using Node at runtime makes sense. Let's go with it.\"; the ts pack — \"the rules go in TS pack, the existing one.\"; the project's copy — \"go with the copy that project already uses … based on different version, there could be different rules.\"; preview early — \"we can go ahead and do a release earlier as well, and … say it is a preview.\"; version checks — \"Go with the recommendation.\" W-104."
 ---
@@ -72,7 +72,7 @@ flowchart LR
    | `never` | is `never` |
 
    The table's names are the contract; W-105 settles each question's exact options here when it builds them. A new question is an amendment of this record, never a rule's own code.
-5. **Finding Node and TypeScript.** Node is found as an adapter's binary is ([SR-ARCHITECTURE](0108_architecture.md) decision 19's lookup: `PATH`). TypeScript is the `typescript` package resolved **from the file's folder up to the project root** (`node_modules/typescript`), the copy the project compiles with. **codelaw never installs, downloads or pins a TypeScript** ([L11](0013_LAW-11-dependencies.md) decision 2 reads it as no dependency, like an adapter's binary — put to the decider for confirmation at W-104).
+5. **Finding Node and TypeScript.** Node is found as an adapter's binary is ([SR-ARCHITECTURE](0108_architecture.md) decision 19's lookup: `PATH`). TypeScript is the `typescript` package resolved **from the file's folder up to the project root** (`node_modules/typescript`), the copy the project compiles with. **codelaw never installs, downloads or pins a TypeScript** ([L11](0013_LAW-11-dependencies.md) decision 2 reads it as no dependency, like an adapter's binary — confirmed by the decider, 2026-10-27 (voice docket), W-104: *"Yes."*, with *"make sure it is as fast as possible"*).
 6. **TypeScript ≥ 7.1, or the rules are skipped.** An older TypeScript, none, or no Node: every type rule is skipped, and the summary line and `--format json`'s notes say which and why ([SR-ARCHITECTURE](0108_architecture.md) decision 26) — never a silent gap, never a guess. Every other rule runs.
 7. **A tested range, as adapters have.** codelaw names the TypeScript versions its fixtures pass on; outside that range the type rules run with a warning. Keeping the range current — a CI matrix with the latest 7.1 blocking and `typescript@next` nightly and reporting only, and a scheduled job that opens a PR widening it or an issue when fixtures break — is W-106's.
 8. **The warm model ([L8](0010_LAW-8-performance-budgets.md)).** `check` and CI load the program once per run (`check_types_cold`). The daemon, the LSP and `--watch` keep it warm and update it on change (`snapshot.update`; `check_types_warm`). `codelaw hook` and `hook --pre` use a warm program or skip the type rules with a note (L8 decision 8). **No new LSP:** the helper is a backend behind codelaw's own LSP, the CLI, the daemon and the hooks; the editor's `tsserver` is never used — it is absent in CI, pre-commit and hooks.
@@ -85,7 +85,7 @@ flowchart LR
 
 - **Nothing is built:** the helper, the `type:` clause's loader, the warm programs, `ts/type-error` and the first rules (`no-floating-promises`, `no-misused-promises`, `await-thenable`, the `no-unsafe-*` family, `switch-exhaustiveness-check`) are W-105; the version watch is W-106. This record owns no component until W-105 adds one, and then the register's Ownership table gives it a row.
 - **TypeScript 7.1's API is a preview** and can change between versions; decision 7's tested range and W-106 are the answer. 7.1 GA (2026-11-24) gates only the move from preview to stable.
-- **codelaw's own tests and CI need a TypeScript 7.1 to run against** (W-105's fixtures, W-106's matrix). The project's TypeScript is no dependency of codelaw (decision 5), but a copy codelaw's own CI installs is one, in test and CI scope, and needs its own row in [L11](0013_LAW-11-dependencies.md) §3 before W-105 lands it — put to the decider with W-104.
+- **codelaw's own tests and CI need a TypeScript 7.1 to run against** (W-105's fixtures, W-106's matrix). The project's TypeScript is no dependency of codelaw (decision 5), but a copy codelaw's own CI installs is one, in test and CI scope, and has its own row in [L11](0013_LAW-11-dependencies.md) §3: **D-45**, ratified 2026-10-27 (W-104, *"Yes."*); its exact tree is recorded there when W-105 pins it.
 - **Until then, oxlint's type-aware mode** fills the gap through the oxlint adapter (W-107).
 
 ### Alternatives considered

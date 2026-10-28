@@ -5,8 +5,8 @@ description: "Arpit, 2026-10-27 (W-36 gap G3): a first-party GitHub Action for c
 item: W-97
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-27
-updated_by: "Claude Code (Opus 5.5)"
+updated: 2026-10-28
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
 
@@ -17,8 +17,10 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | `action.yml` (composite) at this repo's root: install codelaw at a pinned version (npm or PyPI), run `check --format github`, optionally `--format sarif` + upload to code scanning, with `--changed-since` on pull requests | `uses: arpitarya/codelaw@v0.x` in one line | ✅ 2026-10-27 |
-| 2 | Only ratified actions inside (D-30); pinned by SHA (W-18) | L11 | ✅ 2026-10-27 — it uses **no** action; the SARIF upload is the REST API via `gh` (the decider confirms the route) |
+| 2 | Only ratified actions inside (D-30); pinned by SHA (W-18) | L11 | ✅ 2026-10-27 — it uses **no** action; the SARIF upload is the REST API via `gh` (ruled 2026-10-27: keep `gh`) |
 | 3 | `init --ci github` writes a workflow that uses it; docs in USAGE | adoption | ✅ 2026-10-27 |
+
+**Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Okay."* — to all three: (1) keep the SARIF upload on `gh`; (2) Claude runs the throwaway-repo proof after the next release tag; (3) publish to the GitHub Marketplace and keep a moving `v0` tag. Asked whether every CI has `gh` (GitHub-hosted runners do; self-hosted and slim images may not): *"Make sure it works with Bitbucket as well. I don't want any problems with it."* and *"File it as a work item and make it configurable. The serif part."* — filed as [W-109](W-109-bitbucket-pipelines.md).
 
 **Arpit, 2026-10-27 (voice):** *"Yes to all four."* — on W-36's R1 (README fixes), R2 (file gaps G1–G8), R3 (reopen type-aware TS) and R4 (run the with/without-Fux experiment). [Proposal](../proposals/linter-for-ai-positioning.md).
 
@@ -37,11 +39,12 @@ Why: Biome (`setup-biome`) and Ruff (`ruff-action`) ship one ([proposal](../prop
 - **`init --ci github`** (no `--autofix`) writes `.github/workflows/codelaw.yml` from `templates/ci/github/codelaw.yml` (SR-CLI-MCP decision 12a); `--ci gitlab` alone is refused.
 - Records: SR-PACKAGES decision 15, SR-CLI-MCP 12a; USAGE, RELEASING, CHANGELOG.
 
-## Left — the decider (inbox row)
+## Left (ruled 2026-10-27)
 
-1. **SARIF route:** keep the REST API via `gh` (built), or ratify `github/codeql-action/upload-sarif` in L11 §3.
-2. **The DoD proof:** after the next release tag, a throwaway repo running the Action with `sarif: true` — annotations and a code-scanning upload.
-3. **Marketplace + `v0`:** accept the Marketplace Developer Agreement and tick *Publish this Action* on the release; say whether a moving `v0` tag is kept.
+1. **Arpit:** on the v0.3.0 release, accept the Marketplace Developer Agreement and tick *Publish this Action to the GitHub Marketplace* (the inbox row).
+2. **Agent, after the v0.3.0 tag:** the DoD proof — `gh repo create arpitarya/codelaw-action-test --public --clone`, `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, one `debugger`, then the annotation and Security → Code scanning checked.
+3. **Agent, each release:** `git tag -f v0 v<x> && git push -f origin v0` (RELEASING.md).
+4. **Offered, not ruled:** a clear error when `upload-sarif` is on and `gh` is absent (a self-hosted runner or slim image) — the plain check-and-annotate path needs no `gh`.
 
 ## Record affected
 
