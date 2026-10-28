@@ -4,7 +4,7 @@ title: "No unknown `!` annotations"
 languages: [css, scss]
 fix: manual
 fix_reason: "the intended annotation is the author's call"
-stability: preview
+stability: stable
 options:
   ignoreAnnotations: { type: "string[]", default: [], description: "annotations to accept; `/regex/` for a pattern" }
 ported_from: [stylelint/annotation-no-unknown]

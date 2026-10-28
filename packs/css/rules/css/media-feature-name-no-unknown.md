@@ -4,7 +4,7 @@ title: "No unknown media features"
 languages: [css, scss]
 fix: manual
 fix_reason: "the intended feature is the author's call"
-stability: preview
+stability: stable
 options:
   ignoreMediaFeatureNames: { type: "string[]", default: [], description: "features to accept; `/regex/` for a pattern" }
 ported_from: [stylelint/media-feature-name-no-unknown]

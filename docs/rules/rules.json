@@ -333,7 +333,7 @@
    "fix": "manual",
    "fix_reason": "the intended annotation is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -387,7 +387,7 @@
    "fix": "manual",
    "fix_reason": "whether to remove or move the declaration is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -436,7 +436,7 @@
    "fix": "manual",
    "fix_reason": "the intended value is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -484,7 +484,7 @@
    "fix": "auto",
    "fix_reason": null,
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -535,7 +535,7 @@
    "fix": "manual",
    "fix_reason": "the intended at-rule is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -642,7 +642,7 @@
    "fix": "manual",
    "fix_reason": "the intended prelude is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -698,7 +698,7 @@
    "fix": "suggest",
    "fix_reason": "declarations moved out of the wrapper change place relative to the nested rules around it",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -882,7 +882,7 @@
    "fix": "auto",
    "fix_reason": null,
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -928,7 +928,7 @@
    "fix": "manual",
    "fix_reason": "renaming must update every use of the name",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -983,7 +983,7 @@
    "fix": "manual",
    "fix_reason": "renaming must update every use of the name",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1038,7 +1038,7 @@
    "fix": "suggest",
    "fix_reason": "wrapping in `var()` makes a dropped declaration apply, which changes the page",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1139,7 +1139,7 @@
    "fix": "manual",
    "fix_reason": "which value should win can't be known from the code",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1543,7 +1543,7 @@
    "fix": "suggest",
    "fix_reason": "the fix makes an invalid, dropped declaration apply, which changes the page",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1589,7 +1589,7 @@
    "fix": "auto",
    "fix_reason": null,
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1634,7 +1634,7 @@
    "fix": "auto",
    "fix_reason": null,
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1680,7 +1680,7 @@
    "fix": "manual",
    "fix_reason": "which keyframe was meant can't be known from the code",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1728,7 +1728,7 @@
    "fix": "suggest",
    "fix_reason": "removing `!important` makes an ignored declaration apply, which changes the animation",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1774,7 +1774,7 @@
    "fix": "auto",
    "fix_reason": null,
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1820,7 +1820,7 @@
    "fix": "manual",
    "fix_reason": "renaming must update every `animation` that uses the name",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1875,7 +1875,7 @@
    "fix": "manual",
    "fix_reason": "renaming must update every use of the layer",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -1984,7 +1984,7 @@
    "fix": "auto",
    "fix_reason": null,
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2100,7 +2100,7 @@
    "fix": "manual",
    "fix_reason": "the intended feature is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2154,7 +2154,7 @@
    "fix": "manual",
    "fix_reason": "the value needs converting to a `dppx` resolution",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2202,7 +2202,7 @@
    "fix": "manual",
    "fix_reason": "the intended value is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2295,7 +2295,7 @@
    "fix": "manual",
    "fix_reason": "the intended query is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2349,7 +2349,7 @@
    "fix": "manual",
    "fix_reason": "the media features that describe the device are the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2403,7 +2403,7 @@
    "fix": "manual",
    "fix_reason": "the intended layout is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2452,7 +2452,7 @@
    "fix": "manual",
    "fix_reason": "the intended parent selector is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2554,7 +2554,7 @@
    "fix": "suggest",
    "fix_reason": "removing the later import moves its rules earlier in the cascade",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2649,7 +2649,7 @@
    "fix": "auto",
    "fix_reason": null,
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2790,7 +2790,7 @@
    "fix": "manual",
    "fix_reason": "turning it into a comment changes what applies",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2837,7 +2837,7 @@
    "fix": "manual",
    "fix_reason": "moving the import makes its rules apply, which changes the page",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2891,7 +2891,7 @@
    "fix": "manual",
    "fix_reason": "the selector it was meant for is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2939,7 +2939,7 @@
    "fix": "suggest",
    "fix_reason": "replacing it changes which elements the selector matches",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -2985,7 +2985,7 @@
    "fix": "suggest",
    "fix_reason": "the closest known name is a guess at what was meant",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -3203,7 +3203,7 @@
    "fix": "manual",
    "fix_reason": "the intended position is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -3306,7 +3306,7 @@
    "fix": "manual",
    "fix_reason": "renaming must update the markup and scripts that use the id",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -3459,7 +3459,7 @@
    "fix": "manual",
    "fix_reason": "the intended pseudo-class is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -3559,7 +3559,7 @@
    "fix": "manual",
    "fix_reason": "the intended pseudo-element is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -3613,7 +3613,7 @@
    "fix": "manual",
    "fix_reason": "the intended element is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -3720,7 +3720,7 @@
    "fix": "manual",
    "fix_reason": "whether the line break was meant is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [
@@ -3777,7 +3777,7 @@
    "fix": "manual",
    "fix_reason": "the intended type is the author's call",
    "severity": "error",
-   "stability": "preview",
+   "stability": "stable",
    "since": "0.1.0",
    "scope": "file",
    "presets": [

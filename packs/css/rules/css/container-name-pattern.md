@@ -4,7 +4,7 @@ title: "Container names are kebab-case"
 languages: [css, scss]
 fix: manual
 fix_reason: "renaming must update every use of the name"
-stability: preview
+stability: stable
 options:
   pattern: { type: "string", default: "^(--)?([a-z][a-z0-9]*)(-[a-z0-9]+)*$", description: "a regular expression names must match" }
 ported_from: [stylelint/container-name-pattern]

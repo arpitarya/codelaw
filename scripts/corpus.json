@@ -124,6 +124,175 @@
       "min_releases_in_preview": 1
     },
     "reviewed": {},
-    "promoted": {}
+    "promoted": {
+      "css/annotation-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/at-rule-descriptor-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/at-rule-descriptor-value-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/at-rule-no-deprecated": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/at-rule-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/at-rule-prelude-no-invalid": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/block-no-redundant-nested-style-rules": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/comment-no-empty": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/container-name-pattern": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/custom-media-pattern": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/custom-property-no-missing-var-function": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/declaration-block-no-duplicate-custom-properties": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/function-calc-no-unspaced-operator": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/hue-degree-notation": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/import-notation": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/keyframe-block-no-duplicate-selectors": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/keyframe-declaration-no-important": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/keyframe-selector-notation": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/keyframes-name-pattern": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/layer-name-pattern": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/lightness-notation": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/media-feature-name-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/media-feature-name-no-vendor-prefix": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/media-feature-name-value-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/media-query-no-invalid": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/media-type-no-deprecated": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/named-grid-areas-no-invalid": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/nesting-selector-no-missing-scoping-root": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/no-duplicate-at-import-rules": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/no-empty-block": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/no-invalid-double-slash-comments": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/no-invalid-position-at-import-rule": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/no-invalid-position-declaration": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/no-irregular-whitespace": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/no-unknown-property": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/selector-anb-no-unmatchable": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/selector-id-pattern": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/selector-pseudo-class-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/selector-pseudo-element-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/selector-type-no-unknown": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/string-no-newline": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      },
+      "css/syntax-string-no-invalid": {
+        "on": "2026-10-28",
+        "run": "https://github.com/arpitarya/codelaw/actions/runs/40622778075"
+      }
+    }
   }
 }
