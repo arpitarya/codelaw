@@ -7,7 +7,7 @@ filed: 2026-10-28
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-28
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+ball: closed
 ---
 
 # W-110 — Clean session 2df06f6d's leftovers
@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Remove the five worktrees whose branch is in `main` (W-62, W-93, W-94, W-103, W-104) with `worktree-cleanup.py --apply` | disk back, no stale branches | ⏳ — a Claude Code session on the Mac (a Cowork session cannot clean, SR-WORK-CLEANUP decision 11) |
-| 2 | Remove `.claude/worktrees/W-{58,82,85}` — three folders holding only a `.fux` index, no git worktree | the last ~9 MB | ⏳ |
-| 3 | Check no codelaw, cargo or rust-analyzer process from a dead session still runs | no memory held | ⏳ |
-| 4 | Drop `work/NOW.md`'s resource rows for what was removed | NOW shows only what is live | ⏳ |
+| 1 | Remove the five worktrees whose branch is in `main` (W-62, W-93, W-94, W-103, W-104) with `worktree-cleanup.py --apply` | disk back, no stale branches | ✅ 2026-10-28 — `worktree-cleanup.py --apply` removed 13 worktrees whose branch is in `main` (W-62, W-93, W-94, W-103, W-104 among them, after discarding only their `.fux/index` re-index churn); kept W-90, W-96 (W-111) and W-109-ruling, W-112 (HEAD a merge commit not in `main`; their content is on `main`) |
+| 2 | Remove `.claude/worktrees/W-{58,82,85}` — three folders holding only a `.fux` index, no git worktree | the last ~9 MB | ✅ 2026-10-28 — removed `W-58`, `W-82`, `W-85` and five more `.fux`-only folders (W-103, W-109-close, W-113, W-97-link, fix-schema-1028) |
+| 3 | Check no codelaw, cargo or rust-analyzer process from a dead session still runs | no memory held | ✅ 2026-10-28 — one stray `codelaw check --watch` (a W-103 test, 18 min old) stopped; the rest are VS Code's rust-analyzer |
+| 4 | Drop `work/NOW.md`'s resource rows for what was removed | NOW shows only what is live | ✅ 2026-10-28 — NOW.md lists only the four worktrees still live |
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** on `NOW.md`'s stale session row: *"It's not running on my Mac, but make sure uh, no session is active. If active meaning there shouldn't be any working trees left or extra memory that is being consumed. Make sure that it gets cleaned up."*
 
