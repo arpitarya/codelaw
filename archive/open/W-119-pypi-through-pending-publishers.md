@@ -6,7 +6,7 @@ item: W-119
 filed: 2026-10-29
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
-updated_by: "Claude Code (Opus 5.5)"
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
 
@@ -17,9 +17,9 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Records first, then `publish.yml`: a run by hand that publishes **one named PyPI project** from a release's build, through its pending publisher | CI can create a new project without a release | ✅ 2026-10-29 — `only=pypi-new`, from `main`; `pypi` admits `main` |
-| 2 | The loop, per project (§The loop): Claude in Chrome — or Arpit — registers the pending publisher (`arpitarya/codelaw` · `publish.yml` · `pypi`) → Claude gives the command → Arpit runs it → CI creates the project → the pending publisher becomes its trusted publisher → the next | all ten created today, no limit | ⏳ Arpit + Claude — next: `codelaw-rules-scss` |
+| 2 | The loop, per project (§The loop): Claude in Chrome — or Arpit — registers the pending publisher (`arpitarya/codelaw` · `publish.yml` · `pypi`) → Claude gives the command → Arpit runs it → CI creates the project → the pending publisher becomes its trusted publisher → the next | all ten created today, no limit | ✅ 2026-10-29 10:29–11:24 — ten runs of `only=pypi-new`, each after Claude in Chrome registered that project's pending publisher; every project created at 0.3.0 by CI, none against the daily limit |
 | 3 | npm, separately: `@codelaw/rules-spell-fux-index`'s first version by hand (`npm publish`), then `scripts/npm-trust.sh --fux-index` | the one npm name missing | ✅ 2026-10-29 10:14 — `@codelaw/rules-spell-fux-index@0.3.0` published by Arpit from v0.3.0's CI `fux-index` artifact (run 40756572636); trust created (`arpitarya/codelaw` · `publish.yml` · `npm`, id `23e01fe0-…`); `npm view` answered 404 at 10:20, `0.3.0` at 10:22 |
-| 4 | Check: each of the ten shows a version and a trusted publisher | done | ⏳ |
+| 4 | Check: each of the ten shows a version and a trusted publisher | done | ✅ 2026-10-29 11:25 — PyPI 24 of 24 names exist and trust `arpitarya/codelaw` · `publish.yml` · `pypi`, no pending publisher left; npm 45 of 45 exist |
 
 **Arpit, 2026-10-29 (voice):** asked whether pending publishers plus his own uploads could beat the limit; told a `twine` upload counts however the project is registered, and only a project **CI** creates through a personal pending publisher is not rate-limited (warehouse `oidc/views.py`: `ratelimited=pending_publisher.organization_id is not None`), one pending publisher per repository · workflow · environment at a time. Then: *"Okay, here is what you do. Let's do one by one. Um, one package in pending state, then you give me the command. Then another package in pending state, then you give me the command. I'll execute the command manually, and once I give it to you, you enter the next to pending state. Let's do that."* — the command each time being a workflow run, not `twine` — and *"That's all right. Let's go by that approach. Uh, let's create a work item remove all the existing publishing work items and we'll go with this approach."* Agreed: W-88, W-89 and W-115 close into this; the npm spell index stays a separate step: *"Yes, it does."*
 
@@ -61,6 +61,8 @@ Order: the table above, top to bottom. For each name:
 - **Which files.** The six packs and skills are in the v0.3.0 run's `dist` (SHA256SUMS, the gate's attestation check); the four Fux index wheels are in its `fux-index` artifact, which `publish.yml` does not read yet (B-063) — read it here, or leave those four to `twine` within the daily limit.
 - **The skip rule.** Today's `exists` step uploads a wheel only if its project exists or is `codelaw`; the run by hand uploads exactly the named project, and refuses a name with no pending publisher.
 - **One at a time.** PyPI keeps one pending publisher per repository · workflow · environment; the next is registered only after the last run created its project.
+
+**Done 2026-10-29 (Arpit and Cowork):** in order — `codelaw-rules-scss`, `codelaw-skills`, `codelaw-rules-security-js`, `-security-html`, `-spell`, `-security-python`, then the Fux index projects `security-js`, `security-html`, `security-python`, `spell` — each a pending publisher registered, `gh workflow run publish.yml --ref main -f only=pypi-new -f release=v0.3.0 -f project=<name>` run by Arpit, and the project checked (version, trusted publisher, pending slot free) before the next. The rate limit never answered: CI-created projects through a personal pending publisher are not counted. Closed.
 
 ## Definition of done
 

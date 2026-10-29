@@ -28,16 +28,14 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-117 itself | |
 | 🔴 **Guidance-vs-check redesign — three rulings** ([W-118](open/W-118-guidance-experiment-redesign.md) → [proposal](proposals/guidance-experiment-redesign.md)): **R1** the design — six arms (a no-codelaw arm 0, guidance-only A, the pilot's A as A+, B, C, and `hook --pre` as D), tasks screened by running arm 0 (keep ≥ 40% at 5 runs), 12 tasks × 5 runs = 60 per arm; **R2** the README rule — the line stays unless arm C's upper 95% bound is below a bound you set (2% needs 0/150; 5% needs 0/60), or rate-only; **R3** the budget — ~$85 and ~3 h (screen ~$22 + run ~$60), screen gated separately or not. Open questions §7. | 2026-10-29 |
 | ↳ **blocks:** W-118 itself; W-102 waits on it | |
-| 🔴 **PyPI — the next new project, through CI** ([W-119](open/W-119-pypi-through-pending-publishers.md) §The loop; 0 of 10). Next: **`codelaw-rules-scss`**. **1.** <https://pypi.org/manage/account/publishing/> → pending publisher: project `codelaw-rules-scss`, owner `arpitarya`, repo `codelaw`, workflow `publish.yml`, environment `pypi`. **2.** `gh workflow run publish.yml -R arpitarya/codelaw --ref main -f only=pypi-new -f release=v0.3.0 -f project=codelaw-rules-scss`. **3.** Say **"done"** — an agent checks it and names the next. | 2026-10-29 |
-| ↳ **blocks:** W-119 itself | |
 
 ---
 
 ## Open items (10)
 
-### build (8)
+### build (9)
 
-🔴 **W-119** `arpit` The ten missing PyPI projects through CI, one pending publisher at a time: `publish.yml -f only=pypi-new` built (2026-10-29); left per project the pending publisher and the run (inbox), 0 of 10. npm's spell index done 10-29. Filed by Arpit (Cowork). [detail](open/W-119-pypi-through-pending-publishers.md)
+🟢 **W-125** `agent` Revert `publish.yml`'s `only=pypi-new` and the `main` rule on the `pypi` environment, records and RELEASING.md with them — Arpit ruled it temporary (10-29 10:31); W-119 is done. Filed by Claude Code. [detail](open/W-125-revert-pypi-new.md)
 
 🟢 **W-95** `agent` VS Code extension: ruled 10-29 — `vsce` and `ovsx` allowed for publishing and checking it only (L2 decision 8, D-46, D-47). Left: move `publish.yml`'s job to them, the check command, pins; Open VSX needs W-117's token. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
