@@ -10,6 +10,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Changed
 
+- **A faster pipeline (W-126):** CI checks each rule pack's corpus in its own job on the binary it ships, builds the Fux index packages beside the release set, and installs npm and PyPI side by side in the install smoke; a release verifies, trust-checks and uploads eight packages at a time, npm's order kept (binaries, packs, `codelaw`, skills). Nothing that was checked is dropped.
 - **The VS Code extension is `codelaw.codelaw-vscode` (W-95):** the Marketplace keeps the name `codelaw` reserved since an early listing was removed, so the extension is published under the name `codelaw-vscode`. Its commands and settings are still `codelaw.*`.
 - **Housekeeping (W-120, W-121, W-122, W-123, W-124):** ten leftover worktrees were checked against `main` and removed; the one unlanded ruling in them is W-125. No code changed.
 - **Release pipeline (W-119):** `publish.yml` run by hand from `main` with `-f only=pypi-new -f release=<tag> -f project=<name>` creates one new PyPI project from that release's checked build, through the project's pending publisher — no token and no daily limit; the `pypi` environment now admits `main` for it.

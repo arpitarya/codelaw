@@ -100,11 +100,24 @@ update-notifier=false
 EOF
 npm_config_userconfig="$(native "$work/npmrc")"
 export npm_config_userconfig
-# publishing caches each tarball by its digest: a cache of its own, so every install downloads from the index
-for t in "$dist"/npm/*.tgz; do npm publish "$t" --access public --loglevel=error --cache "$(native "$work/npm-publish-cache")" >/dev/null; done
-UV_NO_CONFIG=1 "$tbin/uv" publish -q --publish-url "$url/legacy/" --username staging --password staging --trusted-publishing never "$dist"/pypi/*.whl
+# Every tarball and the wheels at once (W-126: one by one was most of a minute on
+# Windows); the index takes one upload at a time under its lock. Publishing caches
+# each tarball by its digest: caches of their own, so every install downloads from the index.
+pids=()
+i=0
+for t in "$dist"/npm/*.tgz; do
+  i=$((i + 1))
+  npm publish "$t" --access public --loglevel=error --cache "$(native "$work/npm-publish-cache/$i")" >/dev/null &
+  pids+=("$!")
+done
+UV_NO_CONFIG=1 "$tbin/uv" publish -q --publish-url "$url/legacy/" --username staging --password staging --trusted-publishing never "$dist"/pypi/*.whl &
+pids+=("$!")
+for p in "${pids[@]}"; do wait "$p"; done # a failed upload fails the smoke
 
-# ── npm ──
+# The npm side and the PyPI side install and check at the same time (W-126): each
+# writes only its own folder and files, and the compare below waits for both.
+# An asynchronous command keeps -e and does not run the EXIT trap.
+npm_side() {
 project "$work/npm"
 (cd "$work/npm" && cp package.json package.json.orig &&
   npm i --no-audit --no-fund --no-package-lock --no-save --loglevel=error codelaw @codelaw/rules-data @codelaw/skills &&
@@ -118,21 +131,37 @@ else
 fi
 
 (cd "$work/npm" && node --input-type=module -e 'import { check } from "codelaw"; process.stdout.write(JSON.stringify(check([], { noCache: true }).summary))' >"$work/api-npm.json")
+}
 
-# ── PyPI ──
+pypi_side() {
 project "$work/pypi"
 "$py" -m venv "$work/venv"
 "$vbin/python" -m pip install -q --isolated --no-cache-dir --disable-pip-version-check --index-url "$url/simple/" ${pre:+--pre} codelaw codelaw-rules-data codelaw-skills
 (cd "$work/pypi" && fenced "$(bare_path pypi)" VIRTUAL_ENV="$(native "$work/venv")" "$vbin/codelaw" check --format json --no-cache >"$work/pypi.json") || [ $? = 1 ]
 # the Python API, through the same binary
 (cd "$work/pypi" && "$vbin/python" -c 'import codelaw, json, sys; sys.stdout.write(json.dumps(codelaw.check(no_cache=True)["summary"], separators=(",", ":")))' >"$work/api-pypi.json")
+}
 
-# ── one-shot runs: npx, then uvx, fetch codelaw from the staging index into caches of their own ──
+# ── npm and PyPI, side by side ──
+npm_side &
+npm_pid=$!
+pypi_side &
+pypi_pid=$!
+wait "$npm_pid"
+wait "$pypi_pid"
+
+# ── one-shot runs: npx and uvx, side by side, fetch codelaw from the staging index into caches of their own ──
 mkdir -p "$work/once"
 v_npm="$(cd "$work/npm" && node "$(native "$work/npm/node_modules/codelaw/bin/codelaw.js")" --version)"
-v_npx="$(cd "$work/once" && npm_config_cache="$(native "$work/npx-cache")" npx --yes --loglevel=error codelaw --version)"
-v_uvx="$(cd "$work/once" && UV_NO_CONFIG=1 UV_PYTHON_DOWNLOADS=never "$tbin/uvx" -q --isolated --cache-dir "$(native "$work/uv-cache")" \
-  --python "$(native "$tbin/python")" --default-index "$url/simple/" ${pre:+--prerelease=allow} codelaw --version)"
+(cd "$work/once" && npm_config_cache="$(native "$work/npx-cache")" npx --yes --loglevel=error codelaw --version >"$work/v_npx") &
+npx_pid=$!
+(cd "$work/once" && UV_NO_CONFIG=1 UV_PYTHON_DOWNLOADS=never "$tbin/uvx" -q --isolated --cache-dir "$(native "$work/uv-cache")" \
+  --python "$(native "$tbin/python")" --default-index "$url/simple/" ${pre:+--prerelease=allow} codelaw --version >"$work/v_uvx") &
+uvx_pid=$!
+wait "$npx_pid"
+wait "$uvx_pid"
+v_npx="$(cat "$work/v_npx")"
+v_uvx="$(cat "$work/v_uvx")"
 [ "$v_npm" = "codelaw $version" ] && [ "$v_npx" = "$v_npm" ] && [ "$v_uvx" = "$v_npm" ] ||
   { echo "✗ --version: npm '$v_npm', npx '$v_npx', uvx '$v_uvx'; expected 'codelaw $version'" >&2; exit 1; }
 # every install downloaded from the index: 4 tarballs for npm, 2 for npx; 3 wheels for pip, 1 for uvx

@@ -6,7 +6,7 @@ item: W-126
 filed: 2026-10-29
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Cut `ci.yml`'s critical path: Windows-ARM64 build and smoke, `package`'s Fux step, `test` | a source-change CI run near 5 min (11 min today) | ⏳ agent |
-| 2 | Take `corpus` off the critical path: one job per pack (matrix), reusing the release binary the build jobs made | a pack-change run near 5 min (16 min today) | ⏳ agent |
-| 3 | Cut `publish.yml`: verify attestations, trust and uploads in parallel, keeping npm's order (binaries → packs → `codelaw` last) | a release in ~3 min (9 min today) | ⏳ agent |
-| 4 | Measure again on three runs of each kind; record the times beside L8's (context, not budgets) | proof, not hope | ⏳ |
+| 1 | Cut `ci.yml`'s critical path: Windows-ARM64 build and smoke, `package`'s Fux step, `test` | a source-change CI run near 5 min (11 min today) | 🟡 built: Fux job, smoke; build and `test` left (below) |
+| 2 | Take `corpus` off the critical path: one job per pack (matrix), reusing the release binary the build jobs made | a pack-change run near 5 min (16 min today) | ✅ built, not yet measured |
+| 3 | Cut `publish.yml`: verify attestations, trust and uploads in parallel, keeping npm's order (binaries → packs → `codelaw` last) | a release in ~3 min (9 min today) | ✅ built; the next release measures it |
+| 4 | Measure again on three runs of each kind; record the times beside L8's (context, not budgets) | proof, not hope | ⏳ needs `main` pushed |
 | 5 | The rulings below, if a step needs one | — | 🔴 only if asked |
 
 **Arpit, 2026-10-29 (voice):** *"I want the most optimized CI/CD pipeline. Can it be done under five minutes?"* — told publishing likely can, the eight Rust builds are the hard part — *"Yes, I want the overall, the whole CI/CD pipeline from start to end to be faster."* — then, in text, *"Research and file it."* Earlier the same call: *"We'll stick with it"* on keeping eight platform `.vsix` builds.
@@ -45,6 +45,15 @@ Recent cached runs on `main` take 4m51–6m30. Other long steps: `test` 2m49–3
 4. **`package`**: the Fux index packages in their own job beside it (they are not in `dist`), so `smoke` starts ~45 s sooner.
 5. **Builds when Rust changes** (win32-arm64 6m28): check the cache key reuses dependencies across commits (`Swatinem/rust-cache`, D-31); a thinner release profile for CI only if it does not change the shipped binary — it must not (L6 identical output).
 6. **`test`** (2m49–3m46): split the workspace across two or three jobs by crate.
+
+## Built, 2026-10-29 (Claude Code)
+
+- **`corpus`** → `corpus-packs` (reads `scripts/corpus.py`'s `PACKS`, runs the manifest self-test) · `corpus <pack>` ×16 (needs `build`; `build linux-x64-gnu`'s binary from its artifact; `fetch --pack`, `run --pack`, `promote --pack`; a verdict per pack) · `corpus` (green only when all sixteen are, so the job name the gate and readers know stays). v0.3.0's run: packs 2–146 s each, python slowest, fetch of all 14 repos 22 s, so a pack-change run is bounded by `build` (~1.5 min cached) + ~3 min. No corpus checkout cache: the repo's Actions cache is at 10.19 GB of its 10 GB and evicting; dropping `corpus`'s 654 MB rust-cache frees room for the build caches.
+- **`fux-index`** its own job, from the start, with no `needs` (it reads `packs/` only; 14 s locally); `package` loses ~40 s. Checked locally: `assemble` + `check` on a `dist` holding only `fux-index/`.
+- **`smoke`**: a sparse checkout (`scripts`, `fixtures/l3`, `fixtures/skills-consumer` — all `smoke.sh` reads); in `smoke.sh` every tarball and the wheels are published at once (the staging index serialises writes under its lock), the npm side and the PyPI side install and check at the same time, and `npx` / `uvx` run side by side. The byte-equal comparison is unchanged, in the same script — two jobs per platform would have needed the outputs carried between jobs.
+- **`publish.yml`**: the gate verifies attestations eight at a time; `trust` checks eight packages at a time; `npm` uploads eight at a time *within* a tier, tiers in order (stub-tested: a failure in a tier stops the next); `vscode` needs `trust`, not `npm`.
+- **Not changed, and why:** the **builds** — win32-arm64's 6m28 is 1m36 restoring an 897 MB rust-cache (66 s of it untar) and 3m52 compiling with `lto = "thin"`, `codegen-units = 1`; a thinner profile changes the shipped binary (L6), so the cache size is the lever, and it is being evicted (10.19 / 10 GB). **`test`** (≤ 3m46) is not on the critical path once `corpus` is split, so it was not split.
+- **Expected:** cached CI ~4–5 min (smoke win32-arm64 the tail); Rust change ~9–10 min (build win32-arm64 → package → smoke); pack change ~5 min; release ~4 min. Step 4 measures.
 
 ## What cannot be bought
 
