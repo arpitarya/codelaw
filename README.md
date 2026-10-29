@@ -9,7 +9,7 @@
 JavaScript · TypeScript · React · Stencil · Python · JSON · YAML · TOML · Markdown · CSS · HTML
 
 ![status: preview](https://img.shields.io/badge/status-preview-orange)
-![version 0.2.0](https://img.shields.io/badge/version-0.2.0-blue)
+![version 0.3.0](https://img.shields.io/badge/version-0.3.0-blue)
 ![rules: 665](https://img.shields.io/badge/rules-665-informational)
 ![languages: 9](https://img.shields.io/badge/languages-9-informational)
 ![licence: MIT](https://img.shields.io/badge/licence-MIT-green)
@@ -74,7 +74,7 @@ Every door gets the same answer, because they all call the same engine.
 ---
 
 > [!IMPORTANT]
-> **codelaw is a preview.** 0.2.0 is on npm — the engine, the eight platform binaries and all ten npm packs below; on PyPI, `codelaw` and the six packs are up (0.3.0 is the latest; the security packs follow). The linter, the fixer, the formatter, the MCP server, the language server and all eighteen rule packs work today if you build from source. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
+> **codelaw is a preview.** 0.3.0 is on npm and PyPI — the engine, the eight platform binaries and every rule pack below, sixteen on npm and eleven on PyPI. The linter, the fixer, the formatter, the MCP server, the language server and all eighteen rule packs work today. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
 
 ---
 
@@ -322,7 +322,7 @@ $ codelaw test acme/no-console-log
 
 **Three steps: install, `codelaw init`, `codelaw check`.**
 
-- **Install.** Until 0.2.0 is on both registries, the full rule set is built from source; the [usage guide](USAGE.md#install) has the exact commands.
+- **Install.** codelaw 0.3.0 and its packs are on npm and PyPI; the [usage guide](USAGE.md#install) has the exact commands.
 - **`codelaw init`** detects your languages and writes `codelaw.toml` with the matching presets.
 - **`codelaw check`** reports every finding with its fix; **`codelaw fix`** applies the safe ones and formats.
 - **With an AI agent:** `codelaw init --agents claude,codex,copilot,kiro,cowork` installs the skills package — `@codelaw/skills` (npm) or `codelaw-skills` (PyPI), at codelaw's exact version — and writes the hooks and instruction files from it ([usage guide](USAGE.md#with-ai-agents)).
@@ -347,7 +347,7 @@ $ codelaw test acme/no-console-log
 
 - you need **type-aware** rules, such as floating promises or `no-unsafe-*`. tree-sitter has no type information, so these stay with typescript-eslint, pyright or mypy;
 - you need **byte-for-byte Prettier output** for HTML or Markdown. codelaw's formatter matches Prettier on every JS, TS and JSON file measured, but on only 62 % of HTML files and 42 % of Markdown files ([SR-FORMATTER](records/0105_formatter.md));
-- you need a **stable, published** tool in production CI. 0.1.0 is a preview.
+- you need a **stable, published** tool in production CI. 0.3.0 is a preview.
 
 ---
 
@@ -362,8 +362,8 @@ $ codelaw test acme/no-console-log
 | ✅ | Eighteen rule packs: 665 rules | [SR-RULE-PACKS](records/0101_rule-packs.md) | built, `preview` |
 | ✅ | `--format agent`, `--format json` and `--format sarif`; `--timings` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | Watch mode: `check --watch` and `fix --watch` re-check on every save | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
-| ✅ | npm package (`npx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0 published from CI with provenance, ten packs |
-| ✅ | PyPI package (`uvx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | `codelaw` and six packs live, trusted; checked from a fresh venv and `uvx` (W-38) |
+| ✅ | npm package (`npx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.3.0 published from CI with provenance, sixteen packs |
+| ✅ | PyPI package (`uvx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.3.0: `codelaw` and eleven packs live, trusted; checked from a fresh venv and `uvx` (W-38) |
 | ✅ | Formatter (`codelaw format`, and the last step of `fix`): Prettier-style JS/TS/JSON, Black-style Python | [SR-FORMATTER](records/0105_formatter.md) | built |
 | ✅ | MCP server (`codelaw mcp`) | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | Language server (`codelaw lsp`): diagnostics, quick fixes, formatting | [SR-EDITOR](records/0114_editor.md) | built; the VS Code extension is built, not published |

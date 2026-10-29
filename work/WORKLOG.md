@@ -24,6 +24,16 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — The 0.3.0 `.vsix` files for a Marketplace upload by hand; docs at 0.3.0  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"generate the visx extension so that I can manually upload to VS Code marketplace. Make sure all the versions within the repo are at 0.3.0."*
+- **Done:** `scripts/version.py --check` green at 0.3.0 (Cargo, 18 packs, the extension, the Action). The eight `.vsix` taken from v0.3.0's own `ci.yml` run (40756572636, artifact `vscode`) — `packaging/vscode` is unchanged since the tag — into `dist/vscode/`; `vsix.py check --release` and `SHA256SUMS` pass; the `darwin-arm64` one's binary says `codelaw 0.3.0`. README (badge, preview note, install, roadmap rows), USAGE and `.pre-commit-hooks.yaml` moved off 0.2.0/0.1.0; `since:`, `min_codelaw` and test data left — they are not the current version.
+- **Decided / left open:** none.
+- **Mistakes:** none.
+- **Next:** Arpit uploads the `.vsix` files on the Marketplace (W-95 step 4 follows the listing).
+
+---
+
 ## 2026-10-29 — OPEN-WORK gains a `reporting and benchmarks` group  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"In open work file, create a section for reporting and benchmarks. And reallocate the work items respectively."*
