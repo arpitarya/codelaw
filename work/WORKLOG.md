@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-133 built and closed: rules from review comments  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Implement it and then close those out. Keep merging everything to main."* — W-133, one of six items run in parallel.
+- **Done:** the skill `codelaw-rules-from-reviews` (four platform adapters to one comment shape, cluster, propose with evidence, author, `preview` + baseline, approval at every step, `codelaw: rule` fast-track) in the skills package with its trigger evals; `[reviews]` in the config schema and loader; SR-AGENT-SURFACES decision 10, SR-RULE-AUTHORING decision 2, SR-CONFIG; W-133 closed and archived. Landed through lockmaster as `W-133`.
+- **Decided / left open:** `[reviews]` in `codelaw.toml`, validated at load and read by no engine code, over a separate `.codelaw/reviews.toml` nothing would check; a repeat is a distinct merged PR; `window` is `<n>d|w|m|y`; `url` needs `platform`. `window = "6m"` stays the agent's default.
+- **Mistakes:** a shared `target/` let another worktree's `codelaw-rules` build stand in for this one's (a stale `KNOWN_SKILLS`); touching the file rebuilt it.
+- **Next:** none for W-133; the skill ships with the next release.
+
 ## 2026-10-30 — W-137 filed: the extension's look  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"I want CodeLaw extension … to be a bit more beautiful on how it highlights the to-do or whether a package published or not. … give me 2 to 3 images."*

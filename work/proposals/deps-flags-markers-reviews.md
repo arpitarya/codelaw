@@ -14,7 +14,7 @@ timestamp: 2026-10-30T00:15:00+05:30
 [W-130](../open/W-130-feature-flag-expiry.md) ·
 [W-131](../open/W-131-todo-and-skipped-test-markers.md) ·
 [W-132](../open/W-132-complexity-and-codeowners.md) ·
-[W-133](../open/W-133-rules-from-review-comments.md).
+[W-133](../../archive/open/W-133-rules-from-review-comments.md).
 This file is the design until each item writes its record; the record then wins.
 
 *"Everything that we talked about looks good."* · *"We build everything in single shot."* · *"file it."*

@@ -82,6 +82,11 @@ pub struct RawConfig {
     pub daemon: RawDaemon,
     #[serde(default)]
     pub lsp: RawLsp,
+    /// SR-AGENT-SURFACES decision 10 (W-133): the thresholds and platform
+    /// of the `codelaw-rules-from-reviews` skill. Validated here; nothing
+    /// in the engine reads it. Root config only.
+    #[serde(default)]
+    pub reviews: RawReviews,
 }
 
 /// A rule's severity, or its severity and options.
@@ -456,6 +461,31 @@ pub struct RawAgents {
     pub command: Option<String>,
 }
 
+/// `[reviews]`: SR-AGENT-SURFACES decision 10 (W-133). The skill
+/// `codelaw-rules-from-reviews` reads it; the engine only validates it,
+/// so a typo fails the load (SR-CONFIG decision 5) and nothing fetches
+/// (L5).
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawReviews {
+    pub platform: Option<String>,
+    pub url: Option<String>,
+    pub min_repeats: Option<u32>,
+    pub min_reviewers: Option<u32>,
+    pub window: Option<String>,
+}
+
+/// The values of `[reviews] platform`.
+pub const REVIEW_PLATFORMS: &[&str] = &["github", "gitlab", "bitbucket", "bitbucket-datacenter", "azure"];
+
+/// `[reviews] window`: a whole number and a unit, `d`, `w`, `m` (months)
+/// or `y` — `"6m"`, `"90d"`.
+pub fn is_review_window(s: &str) -> bool {
+    let Some(unit) = s.chars().last() else { return false };
+    let n = &s[..s.len() - unit.len_utf8()];
+    matches!(unit, 'd' | 'w' | 'm' | 'y') && !n.is_empty() && !n.starts_with('0') && n.chars().all(|c| c.is_ascii_digit())
+}
+
 /// `[markdown]`: L3 decision 8.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -540,5 +570,15 @@ mod tests {
         assert_eq!(parse_size("512MB"), Some(512_000_000));
         assert_eq!(parse_size("12"), Some(12));
         assert_eq!(parse_size("1 parsec"), None);
+    }
+
+    #[test]
+    fn review_windows() {
+        for ok in ["6m", "90d", "2w", "1y", "12m"] {
+            assert!(is_review_window(ok), "{ok}");
+        }
+        for bad in ["", "m", "0m", "06m", "6", "6 months", "6h", "-6m"] {
+            assert!(!is_review_window(bad), "{bad}");
+        }
     }
 }

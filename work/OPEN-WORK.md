@@ -29,9 +29,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (19)
+## Open items (18)
 
-### build (16)
+### build (15)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -57,7 +57,6 @@ here. Read that record before changing anything below it.
 
 🟢 **W-132** `agent` Complexity, nesting and React component limits; CODEOWNERS coverage. Filed by Arpit (Cowork). [detail](open/W-132-complexity-and-codeowners.md)
 
-🟢 **W-133** `agent` Skill: repeated review comments → proposed rules (GitHub, GitLab, Bitbucket, Azure DevOps; ≥ 3 repeats, ≥ 1 reviewer, 6 months — all configurable), approved step by step, landed as previews. Filed by Arpit (Cowork). [detail](open/W-133-rules-from-review-comments.md)
 
 🟡 **W-134** waits on **W-128** `arpit` PyPI pending trusted publishers for `codelaw-rules-deps` and its Fux index — Claude fills the form in Chrome, Arpit submits; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
 

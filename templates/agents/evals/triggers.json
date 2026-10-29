@@ -168,6 +168,20 @@
         "Migrate from ESLint",
         "Fix the new lint errors"
       ]
+    },
+    "codelaw-rules-from-reviews": {
+      "should": [
+        "Turn our PR review comments into codelaw rules",
+        "What do reviewers keep telling us on merged pull requests?",
+        "Mine the last six months of GitLab merge request reviews for conventions",
+        "A reviewer wrote 'codelaw: rule' on my PR, pick it up"
+      ],
+      "should_not": [
+        "Review this diff against our rules",
+        "Make a rule that forbids importing lodash directly",
+        "Reply to the review comments on my PR",
+        "Summarise the comments on PR 42"
+      ]
     }
   }
 }

@@ -336,6 +336,7 @@ impl ConfigFile {
         if let Some(w) = raw.spell.words.iter().flatten().find(|w| w.is_empty() || w.chars().any(char::is_whitespace)) {
             return Err(ConfigError::new(Some(path), format!("`[spell] words`: `{w}` is not one word")));
         }
+        check_reviews(&raw.reviews, &path)?;
         let spell_file_words = read_words_file(&path, &dir, raw.spell.words_file.as_deref())?;
         if let Some(globs) = &raw.css.modules {
             glob_set(globs, &path).map_err(|e| ConfigError::new(Some(path.clone()), format!("`[css] modules`: {}", e.message)))?;
@@ -384,6 +385,32 @@ impl ConfigFile {
     pub(crate) fn relative<'p>(&self, file: &'p Path) -> Option<&'p Path> {
         file.strip_prefix(&self.dir).ok()
     }
+}
+
+/// `[reviews]` (SR-AGENT-SURFACES decision 10): the values the skill
+/// would otherwise misread, refused at load.
+fn check_reviews(r: &crate::raw::RawReviews, path: &Path) -> Result<(), ConfigError> {
+    let err = |m: String| Err(ConfigError::new(Some(path.to_path_buf()), m));
+    if let Some(p) = r.platform.as_deref().filter(|p| !crate::raw::REVIEW_PLATFORMS.contains(p)) {
+        return err(format!("`[reviews] platform`: `{p}` is not one of {}", crate::raw::REVIEW_PLATFORMS.iter().map(|c| format!("`{c}`")).collect::<Vec<_>>().join(", ")));
+    }
+    if let Some(u) = &r.url {
+        if !(u.starts_with("https://") || u.starts_with("http://")) || u.len() <= "https://".len() || u.chars().any(char::is_whitespace) {
+            return err(format!("`[reviews] url`: `{u}` is not an http(s) URL"));
+        }
+        if r.platform.is_none() {
+            return err("`[reviews] url` needs `[reviews] platform`: a self-hosted URL does not say which platform it is".into());
+        }
+    }
+    for (key, v) in [("min_repeats", r.min_repeats), ("min_reviewers", r.min_reviewers)] {
+        if v == Some(0) {
+            return err(format!("`[reviews] {key}`: 0 is not allowed; the least is 1"));
+        }
+    }
+    if let Some(w) = r.window.as_deref().filter(|w| !crate::raw::is_review_window(w)) {
+        return err(format!("`[reviews] window`: `{w}` is not a window; write e.g. \"6m\", \"90d\", \"2w\" or \"1y\""));
+    }
+    Ok(())
 }
 
 /// The words of a `[spell] words_file` text: one per line, blank lines and
@@ -509,7 +536,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
     "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
-    "[deps]", "[css]", "[coverage]", "[spell]",
+    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]",
 ];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
@@ -530,6 +557,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.css != Default::default(),
         raw.coverage.is_some(),
         raw.spell != Default::default(),
+        raw.reviews != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }

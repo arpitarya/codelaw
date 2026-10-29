@@ -208,6 +208,12 @@ tree_cache = 64
 tagged_templates = true
 [markdown]
 lint_code_blocks = true
+[reviews]
+platform = "gitlab"
+url = "https://gitlab.example.com"
+min_repeats = 3
+min_reviewers = 1
+window = "6m"
 [format]
 line_width = 100
 "#;
@@ -241,6 +247,10 @@ line_width = 100
         ("an unknown profile key", json!({ "profiles": { "ci": { "rule": {} } } })),
         ("a bad profile severity", json!({ "profile": { "ci": { "rules": { "a/b": "eror" } } } })),
         ("a bad deprecated profile severity", json!({ "profiles": { "ci": { "rules": { "a/b": "eror" } } } })),
+        ("an unknown review platform", json!({ "reviews": { "platform": "gitea" } })),
+        ("a review url without a platform", json!({ "reviews": { "url": "https://git.example.com" } })),
+        ("zero review repeats", json!({ "reviews": { "min_repeats": 0 } })),
+        ("a review window in words", json!({ "reviews": { "window": "6 months" } })),
     ] {
         assert!(schemas.validate(&bad, idx).is_err(), "the schema accepts {what}");
         assert!(Config::from_toml(PathBuf::from("/x"), &toml::to_string(&bad).unwrap()).is_err(), "the loader accepts {what}");

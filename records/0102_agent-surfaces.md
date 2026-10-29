@@ -22,7 +22,7 @@ content_sha: ""
 
 **Scope.** This record covers the **whole agent-facing set**: skills, steering, rules and instruction files, AGENTS.md / CLAUDE.md, custom agents, agent hooks and MCP registration.
 
-**The decision in one line.** codelaw ships **12 skills** written once in the open **Agent Skills** format (`SKILL.md`). `codelaw sync-agents` copies them into each agent's skills folder and generates every other agent file from the rules. Nothing agent-facing is ever hand-edited in a consumer repo. **Since 2026-10-27 (W-77) every one of those files ships in its own package, `@codelaw/skills` on npm and `codelaw-skills` on PyPI, at the engine's exact version; the codelaw binary carries none of them (decision 8).**
+**The decision in one line.** codelaw ships **13 skills** written once in the open **Agent Skills** format (`SKILL.md`). `codelaw sync-agents` copies them into each agent's skills folder and generates every other agent file from the rules. Nothing agent-facing is ever hand-edited in a consumer repo. **Since 2026-10-27 (W-77) every one of those files ships in its own package, `@codelaw/skills` on npm and `codelaw-skills` on PyPI, at the engine's exact version; the codelaw binary carries none of them (decision 8).**
 
 **Four kinds of surface, four jobs** (the fourth, *Gate*, since 2026-10-27, W-93):
 
@@ -199,6 +199,31 @@ Each agent reads a different set of files from a different place. Maintaining th
 - **A guardrail, not a boundary.** A shell write (`sed -i`, `>`) passes no pre-write hook; the post-write hook (decision 6) stays the backstop.
 - **Speed.** [L8](0010_LAW-8-performance-budgets.md)'s `hook_pre`.
 
+#### 10. Rules from review comments: `codelaw-rules-from-reviews`
+
+**Asked by Arpit, 2026-10-29 (Cowork, voice; W-133):** platforms — *"All of them."* · *"Repeats three times or more. Reviewers, it could be one person as well. And I want both of those to be configurable. Window, I also want that to be configurable."* Written by an agent in the change that built it (2026-10-30); the design is [the proposal](../work/proposals/deps-flags-markers-reviews.md) §7.
+
+- **A skill, never engine code.** It reads merged pull requests' review comments, finds the points reviewers keep making, and proposes each one as a rule or as guidance. The judgement is the agent's, outside the engine ([L5](0007_LAW-5-no-model-in-the-engine.md)). **No `codelaw` command fetches anything** (L5 decision 3 stands): the agent runs the platform's own CLI; the engine never does.
+- **Every platform, one adapter each**, all emitting one shape — comment, file, line, diff hunk, reviewer, PR link, date:
+  - GitHub (github.com and Enterprise Server) through `gh`; GitLab (gitlab.com and self-managed) through `glab`; Bitbucket Cloud and Bitbucket Data Center through their REST APIs with `curl`; Azure DevOps (Services and Server) through `az repos` and `az devops invoke`.
+  - **The platform is detected from the git remote's host.** A self-hosted instance whose host says nothing is named with `[reviews] platform` (`github`, `gitlab`, `bitbucket`, `bitbucket-datacenter`, `azure`) and `[reviews] url`, its base URL; `url` without `platform` is a load error.
+  - **Credentials stay in the platform's CLI login or the environment** (`GH_TOKEN`, `GITLAB_TOKEN`, `BITBUCKET_TOKEN`, `AZURE_DEVOPS_EXT_PAT`, …), referenced by name. codelaw stores none, and the skill never writes a token into a file, the config, a script or the chat.
+  - The collected comments live in a temporary folder outside the repository and are deleted when the run ends.
+- **The thresholds**, each configurable, root config only:
+  - `[reviews] min_repeats` — how many merged pull requests must carry the same point; **3** by default. Several comments making the point in one pull request count once.
+  - `[reviews] min_reviewers` — how many different reviewers must have made it; **1** by default, so one reviewer's repeated point counts.
+  - `[reviews] window` — how far back merged pull requests are read: a whole number and `d`, `w`, `m` (months) or `y`; **`"6m"`** by default (the agent's choice; the decider named no value).
+  - Bots and the pull request's own author are not reviewers.
+- **`[reviews]` lives in the root config** (decided 2026-10-30, W-133). [SR-CONFIG](0110_config.md) decision 5 refuses an unknown key, so the section is in the schema and validated at load — an unknown platform, a URL that is not http(s), a threshold of 0 or a window the skill cannot read stops the run (exit 2) — and no engine code reads it further. The alternative, a `.codelaw/reviews.toml` of its own, was rejected: a second config file the loader never checks lets a typo silently change the thresholds, the failure decision 5 exists to prevent. `codelaw config --print` shows the values with their defaults.
+- **The steps — the decider approves each one; nothing turns on by itself:**
+  1. **Collect** merged pull requests in the window and their review comments, through the adapter.
+  2. **Cluster** what reviewers keep repeating; keep the clusters that meet both thresholds.
+  3. **Propose** each with its evidence — the count, the reviewers, links, sample diff hunks — graded **can be a rule** (an exact check codelaw can express: a matcher, a project rule, a config setting or an existing rule switched on) or **guidance only** (needs judgement; proposed as a line for the team's own part of `CLAUDE.md` / `AGENTS.md`, never inside a generated file).
+  4. **Author** each approved rule through the rule-authoring flow ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 2) from the real diffs, until `codelaw test` is green.
+  5. **Land it as `preview`** with today's violations frozen by `codelaw baseline add --rule <id>` ([SR-BASELINE](0104_baseline-and-deprecations.md)), so new code obeys from day one.
+- **The fast track.** A review comment carrying `codelaw: rule` on a line of its own puts its point into the next run's proposals whatever the thresholds; every approval step still applies.
+- **Read-only on the platform.** The skill posts, resolves and approves nothing there.
+
 ### The skill catalogue
 
 **P1** ships with the MCP server. **P2** follows once rules can be authored outside the codelaw repo. **P3** comes later.
@@ -217,6 +242,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 | **P3** | `codelaw-suppress` | "this violation is intended", "ignore this rule here" | Picks the narrowest suppression (inline with reason → per-glob override), refuses a blanket disable, and records the reason | Code / config |
 | **P3** | `codelaw-pack` | "share our rules across repos", "publish a rule pack" | Scaffolds a pack ([SR-RULE-PACKS](0101_rule-packs.md)) with its manifest, versioning, tests, and npm/PyPI publish config | Pack folder |
 | **P3** | `codelaw-upgrade` | "upgrade codelaw", a new version is available | Reads the changelog, runs the new rules in preview, and fixes or adopts them deliberately | Config + code |
+| **P3** | `codelaw-rules-from-reviews` | "turn our review comments into rules", "what do reviewers keep saying" | Reads merged pull requests' review comments on any platform through its CLI, clusters the repeated points, proposes each as a rule or guidance with evidence, and builds the approved ones as `preview` rules with a baseline — the decider approving every step (decision 10) | `.codelaw/rules/`, baseline |
 
 **Custom agent: `codelaw-rule-author`.** A subagent version of `codelaw-author-rule`. Rule authoring is iterative (inspect the tree → write → test → repeat) and floods the context with syntax trees, so it runs in its own context and returns only the finished rule and the test result.
 

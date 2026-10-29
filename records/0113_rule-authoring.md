@@ -69,6 +69,7 @@ The decider asked that rules can be written manually or by an AI agent with a sk
      6. Add edge cases.
      7. Run `codelaw test` until green.
    - The agent proposes; the test runner decides; a human merges. An agent never marks its own rule as passing ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 6).
+   - **From review comments** (W-133, 2026-10-30). The `codelaw-rules-from-reviews` skill ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 10) hands each rule the decider approved to this loop, with the review evidence as its input: the reviewers' point, restated as one sentence, is the convention; the diff hunks they commented on are the first Don't examples, and the code as merged after the comment, where it changed, the first Do. The loop is unchanged: `codelaw test` green, `stability: preview`, then today's violations frozen with `codelaw baseline add --rule <id>` so only new code must obey. The rule file's `**Why:**` may link the pull requests; it names no reviewer.
 3. **Debuggable.** Every tool is available both in the CLI and over MCP:
 
    | Question | Command |
