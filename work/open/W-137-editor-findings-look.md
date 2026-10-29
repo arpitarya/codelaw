@@ -6,7 +6,7 @@ item: W-137
 filed: 2026-10-30
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -16,7 +16,7 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | The server sends structured data with each finding, and adds inlay hints and CodeLens | every LSP editor gets hints, the hover card and the summary line | ⏳ |
+| 1 | The server sends structured data with each finding, and adds inlay hints and CodeLens | every LSP editor gets hints, the hover card and the summary line | ✅ 2026-10-30 |
 | 2 | The extension draws gutter icons, row tints, end-of-line badges and TODO/ticket/date chips | the status of every line at a glance | ⏳ |
 | 3 | The extension adds a codelaw sidebar (Dependencies, Deadlines, Tests, Ownership, scan banner) | one list of everything to act on | ⏳ |
 | 4 | Status bar counts and coloured tab names | the totals always visible | ⏳ |
@@ -45,8 +45,8 @@ Build board D. The split:
 
 | DoD | what | state |
 |---|---|---|
-| 1 · data | each LSP diagnostic carries `data`: rule, grade, fix class, safe/latest version, advisory list, due date — one documented shape | ⏳ |
-| 2 · server | `inlayHintProvider`, `codeLensProvider`; the hover card's sections as markdown | ⏳ |
+| 1 · data | each LSP diagnostic carries `data`: rule, grade, fix class, safe/latest version, advisory list, due date — one documented shape | ✅ (2026-10-30) — `crates/codelaw-lsp/src/card.rs`, SR-EDITOR decision 8 |
+| 2 · server | `inlayHintProvider`, `codeLensProvider`; the hover card's sections as markdown | ✅ (2026-10-30) — plus `codelaw.applyFixes` behind the lens |
 | 3 · decorations | icons per kind (vulnerable, deprecated, outdated, clean, due, expired, flag, focused/skipped test, runtime); badges; chips in TODO/SKIP comments; colours as `contributes.colors` so light and high-contrast themes work | ⏳ |
 | 4 · sidebar | tree view `codelaw`: Dependencies (Vulnerable, Deprecated, Licence denied, Outdated, Runtime mismatch), Deadlines (Expired, Due soon, Missing ticket), Tests, Ownership; the incomplete-scan banner with Refresh / turn the source off | ⏳ |
 | 5 · status bar and tabs | counts (vulnerable, outdated, expired · due); a warning item while the scan is incomplete; `FileDecorationProvider` colours and counts | ⏳ |

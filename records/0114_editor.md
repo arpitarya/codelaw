@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-lsp
   - packaging/vscode
 laws: [L0, L3, L5, L6, L7, L8]
-timestamp: 2026-10-30T12:00:00Z
+timestamp: 2026-10-30T18:00:00Z
 content_sha: ""
 ---
 
@@ -64,7 +64,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - **Code actions:** `quickfix` for `auto` and `suggest` fixes (`auto` preferred), plus `source.fixAll.codelaw` (the text `codelaw fix` would write, as one edit) and `source.organizeImports` where a rule provides it.
    - **Formatting:** document and range ([SR-FORMATTER](0105_formatter.md)). Document formatting is built: the whole document comes back as one `TextEdit` holding what `codelaw format` would write, with no edits when it is already formatted. When the text cannot be formatted the request returns nothing, and `format/failed` is among the document's diagnostics. Range formatting is built: `documentRangeFormattingProvider` is advertised, and the edits are the selection's lines of that same formatting, as [SR-FORMATTER](0105_formatter.md) decision 8 says.
    - **The same findings as `check`:** an editor's unsaved text gets `format/unformatted` as `check` gives it for the file on disk.
-   - **Hover:** on a diagnostic.
+   - **Hover:** on a diagnostic: the card of decision 8.
    - **Workspace diagnostics:** for project rules.
    - **Watched files:** config, rules and baseline changes reload live; so does a saved `.editorconfig`, the base layer of the format options ([SR-FORMATTER](0105_formatter.md) decision 5).
 2. **Incremental.**
@@ -97,6 +97,11 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - **At `info`:** the extension and VS Code versions, OS and architecture, workspace folders, every binary candidate with its verdict, the one chosen, and the server's version; per project the config and root it loaded and its rule count; per file the project that checks it, or why it gets nothing (no covered language, excluded or outside `include`, enabled languages, a config or project that does not load), each **once per file per reload**; every reload and what caused it. **At `debug`:** one line per check (file, language, rule count, diagnostics, milliseconds) and a request that returned nothing.
    - **Failures are always logged** (`error`): a request (method, file, error), a config or project that does not load (also shown once as a popup), `client.start()` rejecting, the server's exit (code, signal, last stderr lines), *Explain rule* with no binary.
    - **Never source text, never environment variables:** paths, rule ids, counts and timings only. *Copy debug info* puts the versions, binary and its source, the candidates, workspace folders, settings and the last 200 log lines on the clipboard.
+8. **How a finding looks (W-137, ruled by the decider 2026-10-30; the design of record is [`docs/design/editor/`](../docs/design/editor/README.md)).** The server names each finding; it judges nothing new.
+   - **One `data` shape** on every published diagnostic (`crates/codelaw-lsp/src/card.rs`): `fix`, `source`, `rule`, `kind`, `view`, `title`, `badge`, and when known `grade`, `package`, `version`, `safe`, `latest`, `advisories`, `more`, `due`, `days`, `ticket`, `tag`, `flag`, `owner`, `baseline`, `fixable`, and `facts` (the rule's own `data`, verbatim). `kind` is one of `vulnerable`, `deprecated`, `licence`, `outdated`, `runtime`, `scan`, `expired`, `due`, `ticket`, `flag`, `flag-expired`, `focused`, `skipped`, `complexity`, `ownership`, `security`, `code`; `view` is `manifest` (any finding in `package.json`, `pyproject.toml`, their lockfiles, `.nvmrc`, `.node-version`, `.python-version`, `.tool-versions`), `marker` (TODO/FIXME/HACK/SKIP comments, skipped tests) or `code`. The facts come from the rule's `data` first, then from its message's words; a rule the mapping does not know is `code`, so a new rule never breaks the editor. `baseline` is the project's baseline holding the finding; `days` counts from the as-of date (never the clock).
+   - **The hover card** (board K): a plain title, the severity (a vulnerability's grade) and fix chips (`one-click fix`, `needs your call`, `baseline`), one sentence on why (the finding's own words for a fact-bearing kind, the rule's Why for code), an example — the fix's line before → after, the facts as rows (safe version, latest, ticket, due, owner) or the rule's first Don't/Do — and a meta line (rule id, CWE, new or in the baseline, fix class). Portable markdown; the VS Code extension adds the icon and the action links.
+   - **Inlay hints:** at the end of each line holding a `manifest` or `marker` finding, its badge (the most severe first); `latest` beside a dependency no finding is on whose requirement names the latest version in the committed `.codelaw/deps-snapshot.json` (read, never written). Never on `code` findings.
+   - **CodeLens, manifests only:** a summary over the first finding's line (`codelaw · 2 vulnerable · 1 deprecated · 2 outdated · 2 up to date`; the summary's command is empty) and the bulk fixes `Fix vulnerable (n)` and `Update minor and patch (n)`, which run `codelaw.applyFixes [uri, kinds, grades]` (`executeCommandProvider`): every `auto`/`suggest` fix of those kinds as one `workspace/applyEdit` the editor applies — overlapping edits after the first wait for the next run.
 
 ### Consequences
 

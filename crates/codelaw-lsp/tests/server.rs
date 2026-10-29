@@ -82,6 +82,9 @@ impl Client {
         // SR-EDITOR decision 1: whole-document and range formatting.
         assert_eq!(init["capabilities"]["documentFormattingProvider"], true);
         assert_eq!(init["capabilities"]["documentRangeFormattingProvider"], true);
+        // W-137: inlay hints, CodeLens and the bulk-fix command.
+        assert_eq!(init["capabilities"]["inlayHintProvider"], true);
+        assert_eq!(init["capabilities"]["executeCommandProvider"]["commands"], json!(["codelaw.applyFixes"]));
         c.notify("initialized", json!({}));
         c
     }
@@ -347,4 +350,45 @@ fn the_server_has_no_write_path() {
             assert!(!text.contains(banned), "{} contains `{banned}`", e.path().display());
         }
     }
+}
+
+/// W-137, SR-EDITOR decision 8: every diagnostic carries the one `data`
+/// shape; the card is the hover; a manifest gets "latest" on a clean
+/// dependency and its summary lens; ordinary code gets neither.
+#[test]
+fn findings_carry_data_and_manifests_get_hints_and_lenses() {
+    let root = repo("look");
+    fs::create_dir_all(root.join(".codelaw")).unwrap();
+    fs::write(root.join(".codelaw/deps-snapshot.json"), r#"{ "fetched": "2026-10-29", "packages": { "npm:react": { "latest": "19.2.0" } } }"#).unwrap();
+    let manifest = "{\n  \"name\": \"x\",\n  \"dependencies\": {\n    \"react\": \"^19.2.0\"\n  }\n}\n";
+    fs::write(root.join("package.json"), manifest).unwrap();
+    let before = snapshot(&root);
+    let mut c = Client::start(&root);
+    let js = uri(&root.join("src/a.js"));
+    let text = fs::read_to_string(root.join("src/a.js")).unwrap();
+    let published = c.open(&js, "javascript", &text);
+    let d = &published["diagnostics"][0];
+    assert_eq!(d["data"]["rule"], "fixture/js-eqeqeq", "{d}");
+    assert_eq!(d["data"]["kind"], "code");
+    assert_eq!(d["data"]["view"], "code");
+    assert!(d["data"]["title"].is_string() && d["data"]["badge"].is_string(), "{d}");
+    let all = json!({ "start": { "line": 0, "character": 0 }, "end": { "line": 99, "character": 0 } });
+    assert_eq!(c.request("textDocument/inlayHint", json!({ "textDocument": { "uri": js }, "range": all })), json!([]));
+    assert_eq!(c.request("textDocument/codeLens", json!({ "textDocument": { "uri": js } })), json!([]));
+    let start = d["range"]["start"].clone();
+    let hover = c.request("textDocument/hover", json!({ "textDocument": { "uri": js }, "position": start }));
+    let card = hover["contents"]["value"].as_str().unwrap();
+    assert!(card.starts_with("**") && card.contains("`fixture/js-eqeqeq` · new · fix:"), "{card}");
+
+    let pj = uri(&root.join("package.json"));
+    c.open(&pj, "json", manifest);
+    let hints = c.request("textDocument/inlayHint", json!({ "textDocument": { "uri": pj }, "range": all }));
+    assert_eq!(hints[0]["label"], "latest", "{hints}");
+    assert_eq!(hints[0]["position"]["line"], 3);
+    assert_eq!(hints[0]["data"]["kind"], "clean");
+    let lenses = c.request("textDocument/codeLens", json!({ "textDocument": { "uri": pj } }));
+    assert_eq!(lenses[0]["command"]["title"], "codelaw · 1 up to date", "{lenses}");
+    assert_eq!(snapshot(&root), before, "the language server wrote to disk");
+    c.shutdown();
+    let _ = fs::remove_dir_all(&root);
 }
