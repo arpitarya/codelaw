@@ -26,6 +26,8 @@ Found 2026-10-29 (Cowork, reconciling the queue): `npm view @codelaw/rules-spell
 
 **Model:** Haiku.
 
+**Closed 2026-10-29 — merged into [W-119](../../work/open/W-119-pypi-through-pending-publishers.md) (Arpit, voice):** *"That's all right. Let's go by that approach. Uh, let's create a work item remove all the existing publishing work items and we'll go with this approach."* Its PyPI projects are created through CI, one pending publisher at a time, instead of by `twine` within the four-a-day limit.
+
 ## Definition of done
 
 - `@codelaw/rules-spell` on npm and `codelaw-rules-spell` on PyPI at the release's version, each trusting `arpitarya/codelaw` · `publish.yml` · its environment.

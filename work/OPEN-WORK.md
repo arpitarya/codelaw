@@ -22,10 +22,6 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
-| 🔴 **PyPI day 3 — Fri 2026-10-30** (four projects at 0.2.0 — the version npm got: two Fux index wheels in `dist/fux-index/pypi/`, and `codelaw-skills`, `codelaw-rules-scss` from the build you published npm from, copied into `dist/pypi/` first): `twine upload --skip-existing dist/fux-index/pypi/codelaw_rules_security_{html,python}_fux_index-0.2.0-py3-none-any.whl dist/pypi/codelaw_skills-0.2.0-py3-none-any.whl dist/pypi/codelaw_rules_scss-0.2.0-py3-none-any.whl` — then a trusted publisher on each — [W-88](open/W-88-pypi-day-3.md) | 2026-10-27 |
-| ↳ **blocks:** W-88 itself | |
-| 🔴 **PyPI day 4 — Sat 2026-10-31** (the three security rule packs at 0.2.0, from the same build, copied into `dist/pypi/` first, and `security-js`'s Fux index, moved from day 2): `twine upload --skip-existing dist/pypi/codelaw_rules_security_{js,html,python}-0.2.0-py3-none-any.whl dist/fux-index/pypi/codelaw_rules_security_js_fux_index-0.2.0-py3-none-any.whl` — then a trusted publisher on each — [W-89](open/W-89-pypi-day-4.md) | 2026-10-27 |
-| ↳ **blocks:** W-89 itself | |
 | 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): **v0.3.0 is out (2026-10-29)** — <https://github.com/arpitarya/codelaw/releases/edit/v0.3.0> → tick *Publish this Action to the GitHub Marketplace* → accept the Marketplace Developer Agreement → *Update release*. Ruled 2026-10-27: SARIF stays on `gh`; a moving `v0` tag; Claude then runs the throwaway-repo proof. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **VS Code extension — run its job once** ([W-95](open/W-95-publish-vscode-extension.md)): v0.3.0's Marketplace upload was refused (content type, now fixed on `main`). Publishes `codelaw.codelaw` 0.3.0 to the Marketplace: `gh workflow run publish.yml -R arpitarya/codelaw --ref main -f only=vscode`. Say **"run it"** and an agent runs it and checks the listing. | 2026-10-29 |
@@ -37,13 +33,11 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (12)
+## Open items (10)
 
-### build (10)
+### build (8)
 
-🔴 **W-88** `arpit` PyPI day 3 (Fri 10-30): `security-html`, `security-python` Fux index, `codelaw-skills` and `codelaw-rules-scss`, all 0.2.0; then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-88-pypi-day-3.md)
-
-🔴 **W-89** `arpit` PyPI day 4 (Sat 10-31): `codelaw-rules-security-{js,html,python}` and `security-js`'s Fux index (0.2.0), then their trusted publishers. Command in the inbox. Filed by Arpit (Cowork). [detail](open/W-89-pypi-day-4.md)
+🟢 **W-119** `agent` The ten missing PyPI projects through CI, one pending publisher at a time (no daily limit): `publish.yml` gains a one-project run; then Claude registers, Arpit runs, per project; npm's spell index by hand. Filed by Arpit (Cowork). [detail](open/W-119-pypi-through-pending-publishers.md)
 
 🔴 **W-95** `arpit` VS Code extension: v0.3.0 reached the Marketplace by trusted publishing, the upload refused (content type, fixed on `main`). Left: run the extension's job alone (inbox); Open VSX needs W-117's token. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
@@ -56,8 +50,6 @@ here. Read that record before changing anything below it.
 🟢 **W-64** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
 🔴 **W-117** `arpit` Open VSX: environment, login, agreement and namespace done 10-29. Left: the ownership claim (no issue found yet) and one token as `OVSX_PAT` (inbox); then the trusted publisher. Filed by Arpit (Cowork). [detail](open/W-117-open-vsx-setup.md)
-
-🟢 **W-115** `agent` The spell pack's first publish: npm `@codelaw/rules-spell` 0.2.0 live and trusted 10-29; left: PyPI `codelaw-rules-spell` and `@codelaw/rules-spell-fux-index`, by hand at the next release. Filed by Arpit (Cowork). [detail](open/W-115-spell-pack-first-publish.md)
 
 🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
 
