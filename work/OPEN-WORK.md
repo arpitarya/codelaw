@@ -29,9 +29,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (18)
+## Open items (19)
 
-### build (15)
+### build (16)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -62,6 +62,8 @@ here. Read that record before changing anything below it.
 🟡 **W-134** waits on **W-128** `arpit` PyPI pending trusted publishers for `codelaw-rules-deps` and its Fux index — Claude fills the form in Chrome, Arpit submits; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
 
 🟡 **W-135** waits on **W-128** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
+
+🟢 **W-137** `agent` The extension's look (board D, picked 10-30): inline badges, gutter icons, TODO chips, hover cards on manifests, a codelaw sidebar, status-bar counts; ordinary source files squiggles only, with a designed hover card (board H, ruled 10-30). Filed by Arpit (Cowork). [detail](open/W-137-editor-findings-look.md)
 
 ### testing (0)
 

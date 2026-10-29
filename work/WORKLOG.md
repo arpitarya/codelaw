@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-137 filed: the extension's look  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"I want CodeLaw extension … to be a bit more beautiful on how it highlights the to-do or whether a package published or not. … give me 2 to 3 images."*
+- **Done:** a Design canvas (A native, B lens, C command center; D the combination picked), W-137 filed with board D as the design of record.
+- **Decided / left open:** Arpit picked B's inline look for manifests, tests and TODOs, C's sidebar and status bar, A's hover on `package.json` and `pyproject.toml`; *"file it."* Left out unasked: C's pop-up notification. Open: the look for ordinary source files (designs E–G, being drawn).
+- **Mistakes:** none.
+- **Next:** Arpit picks among E–G.
+
 ## 2026-10-30 — Inbox walked by voice: Q-A, deps names, Action name, Open VSX, W-118  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"What are the decisions waiting on me?"* — one by one — then *"file it."*
