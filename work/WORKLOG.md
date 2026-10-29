@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — W-119 step 1: `publish.yml` creates one new PyPI project from `main`  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement w119"*.
+- **Done:** landed Cowork's W-119 filing first (582e56d; docs-sync wanted a CHANGELOG line for W-88/W-89/W-115, added; lockmaster missed staged deletions, worked around by unstaging). Then `publish.yml`'s `only=pypi-new` (`release`, `project` inputs): the gate on the tag's commit with the tag's scripts, `trust`/`npm` skipped, one wheel uploaded through its pending publisher, `-fux-index` names from the `fux-index` artifact. Records (L6 decision 9, SR-PACKAGES decision 11), RELEASING.md, W-119's loop. `pypi` environment: branch rule `main` added.
+- **Decided / left open:** Arpit ruled *"Admit main in pypi"*. Open: the `fux-index` artifact is not attested, so those four wheels rest on the verified run id and their `SHA256SUMS`; B-063 (releases do not upload `dist/fux-index/`) stands, so after W-119 the four index projects stay at 0.3.0 until it is built.
+- **Mistakes:** none.
+- **Next:** Arpit registers `codelaw-rules-scss`'s pending publisher and runs the command in the inbox; the first run tests the mode.
+
 ## 2026-10-29 — W-119 filed: PyPI through pending publishers; W-88, W-89, W-115 closed into it  ·  Cowork (Opus 5.5)
 
 - **Asked:** by voice, how to publish more than four new PyPI projects a day; then *"file it."*
