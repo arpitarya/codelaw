@@ -118,13 +118,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ steps.rel.outputs.sha }}
+        # Eight files at a time (W-126: one by one took three minutes); xargs
+        # fails the step when any one verification fails.
         run: |
-          for f in dist/npm/* dist/pypi/*; do
-            gh attestation verify "$f" --repo "$GITHUB_REPOSITORY" \
+          verify() {
+            gh attestation verify "$1" --repo "$GITHUB_REPOSITORY" \
               --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
               --source-ref refs/heads/main --source-digest "$SHA" >/dev/null
-            echo "✓ $f"
-          done
+            echo "✓ $1"
+          }
+          export -f verify
+          printf '%s\n' dist/npm/* dist/pypi/* | xargs -P 8 -I{} bash -eo pipefail -c 'verify "$1"' _ {}
           echo "sums=$(sha256sum dist/SHA256SUMS | cut -c1-64)" >> "$GITHUB_OUTPUT"
       - name: the engine has its formatter, MCP server and LSP — L7 and L6 decision 3 forbid releasing without them
         run: python3 scripts/law-gate.py dist
@@ -158,18 +162,21 @@ jobs:
       - name: npm trusts this workflow for every package, before anything is published
         # The same OIDC exchange `npm publish` makes, per package: a package npm does
         # not trust would otherwise fail mid-loop and leave the release half on npm.
+        # Eight packages at a time (W-126); xargs exits non-zero when any one fails.
         run: |
-          bad=0
-          for t in ./dist/npm/*.tgz; do
-            read -r name ver < <(tar -xzOf "$t" package/package.json | node -e 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); console.log(p.name, p.version)')
-            npm view "$name@$ver" version >/dev/null 2>&1 && { echo "✓ $name@$ver is already on npm"; continue; }
+          trusted() {
+            local name ver idt code
+            read -r name ver < <(tar -xzOf "$1" package/package.json | node -e 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); console.log(p.name, p.version)')
+            npm view "$name@$ver" version >/dev/null 2>&1 && { echo "✓ $name@$ver is already on npm"; return 0; }
             idt="$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org" | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).value')"
-            code="$(curl -sS -o "$RUNNER_TEMP/oidc.json" -w '%{http_code}' -X POST -H "Authorization: Bearer $idt" \
+            code="$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H "Authorization: Bearer $idt" \
                     "https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/${name/\//%2f}")"
             if [ "${code:0:1}" = 2 ]; then echo "✓ $name trusts publish.yml"; else
-              echo "::error::$name — npm refused the OIDC exchange (HTTP $code)"; bad=1; fi
-          done
-          rm -f "$RUNNER_TEMP/oidc.json"
+              echo "::error::$name — npm refused the OIDC exchange (HTTP $code)"; return 1; fi
+          }
+          export -f trusted
+          bad=0
+          printf '%s\n' ./dist/npm/*.tgz | xargs -P 8 -I{} bash -eo pipefail -c 'trusted "$1"' _ {} || bad=1
           [ "$bad" = 0 ] || { echo "::error::Nothing was published. Run scripts/npm-trust.sh once (RELEASING.md), then re-run this workflow."; exit 1; }
 
   npm:
@@ -209,6 +216,8 @@ jobs:
         # failure before it leaves the previous codelaw as `latest`, intact.
         # @codelaw/skills depends on codelaw at its exact version (W-77), so it
         # goes after codelaw, never before the engine it needs.
+        # Each tier uploads eight at a time and the next starts only when every
+        # one of it is on npm (W-126): parallel within a tier, never across tiers.
         # The dist-tag, one for the whole release:
         #   a pre-release (a version with "-")          → `next`, never `latest`
         #   older than codelaw's current `latest` (a backport, 0.1.5 after 0.2.0)
@@ -225,13 +234,21 @@ jobs:
                else tag=latest; fi ;;
           esac
           echo "dist-tag: $tag (codelaw's latest is ${cur:-none})"
-          for t in ./dist/npm/codelaw-cli-*.tgz ./dist/npm/codelaw-rules-*.tgz ./dist/npm/codelaw-[0-9]*.tgz ./dist/npm/codelaw-skills-*.tgz; do
-            id="$(tar -xzOf "$t" package/package.json | node -p 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); p.name + "@" + p.version')"
-            [ "${id##*@}" = "$v" ] || { echo "::error::$id is not the release version $v"; exit 1; }  # the version after the LAST @
-            if npm view "$id" version >/dev/null 2>&1; then echo "✓ $id is already on npm"; continue; fi
+          one() {
+            local id
+            id="$(tar -xzOf "$1" package/package.json | node -p 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); p.name + "@" + p.version')"
+            [ "${id##*@}" = "$v" ] || { echo "::error::$id is not the release version $v"; return 1; }  # the version after the LAST @
+            if npm view "$id" version >/dev/null 2>&1; then echo "✓ $id is already on npm"; return 0; fi
             echo "→ $id ($tag)"
-            npm publish "$t" --tag "$tag" --provenance --access public
-          done
+            npm publish "$1" --tag "$tag" --provenance --access public
+          }
+          export -f one
+          export v tag
+          tier() { printf '%s\n' "$@" | xargs -P 8 -I{} bash -eo pipefail -c 'one "$1"' _ {}; }
+          tier ./dist/npm/codelaw-cli-*.tgz
+          tier ./dist/npm/codelaw-rules-*.tgz
+          tier ./dist/npm/codelaw-[0-9]*.tgz
+          tier ./dist/npm/codelaw-skills-*.tgz
 
   pypi:
     # A Release uploads every wheel whose project exists; a run by hand with
@@ -317,11 +334,12 @@ jobs:
 
   vscode:
     # W-95: the eight .vsix ci.yml built (artifact `vscode`) to the Visual Studio Marketplace (trusted
-    # publishing: no token) and Open VSX (OVSX_PAT, skipped while unset), after the engine. Plain curl:
+    # publishing: no token) and Open VSX (OVSX_PAT, skipped while unset), once npm trusts the workflow —
+    # beside the npm and PyPI uploads, not after them: each .vsix carries its own binary (W-126). Plain curl:
     # @vscode/vsce and ovsx are not ratified (L2, L11). continue-on-error: a listing problem never fails,
     # or withdraws, the engine's release; read the job summary. A version already listed is skipped.
-    needs: [gate, npm]
-    if: ${{ !cancelled() && needs.gate.result == 'success' && (github.event_name == 'release' && needs.npm.result == 'success' || inputs.only == 'vscode') }}
+    needs: [gate, trust]
+    if: ${{ !cancelled() && needs.gate.result == 'success' && (github.event_name == 'release' && needs.trust.result == 'success' || inputs.only == 'vscode') }}
     continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 10

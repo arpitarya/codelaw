@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — W-126 built: corpus per pack, Fux apart, smoke and publish in parallel  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement W126"*.
+- **Done:** Cowork's W-126 filing landed first (357e634). `ci.yml`: `corpus` split into a job per pack on `build linux-x64-gnu`'s binary with a `corpus` roll-up; `fux-index` its own job with no `needs`; `smoke` sparse checkout. `smoke.sh`: every upload at once, npm and PyPI sides and npx/uvx side by side. `publish.yml`: attestation checks, npm trust checks and npm uploads eight at a time, tiers still in order; `vscode` starts after `trust`. SR-PACKAGES decisions 11 and 14, RELEASING.md, CHANGELOG. Measured first from the API: per-pack corpus times (python 146 s the slowest), win32-arm64's build (1m36 cache restore, 3m52 compile), the Actions cache at 10.19 / 10 GB.
+- **Decided / left open:** builds and `test` not changed — the profile is the shipped binary's (L6), and `test` is off the critical path once `corpus` is split. `main` is 17 ahead of `origin`; pushing (which step 4 needs) is the decider's go.
+- **Mistakes:** none.
+- **Next:** push `main`; measure three CI runs of each kind and the next release (step 4).
+
 ## 2026-10-29 — W-126 filed: a five-minute pipeline, measured first  ·  Cowork (Opus 5.5)
 
 - **Asked:** by voice, the whole CI/CD pipeline under five minutes; then *"Research and file it."*
