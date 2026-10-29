@@ -127,7 +127,7 @@ fn the_card_has_chips_why_example_and_meta() {
     d.edits = vec![TextEdit::new(0, 7, "except Exception:")];
     let v = data_of(&d, "a.py", None);
     assert_eq!(v["fixable"], true);
-    let c = card(&d, &v, None, Some(Language::Python), Some(("    except:", "    except Exception:".into())));
+    let c = card(&d, &v, None, Some(Language::Python), Some(("    except:".into(), "    except Exception:".into())));
     assert!(c.starts_with("**py/no-bare-except** &nbsp; `warn` `one-click fix`"), "{c}");
     assert!(c.contains("except:\n```\n→\n```python\nexcept Exception:"), "{c}");
     assert!(c.ends_with("`py/no-bare-except` · new · fix: `auto`"), "{c}");

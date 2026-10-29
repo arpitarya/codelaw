@@ -23,7 +23,9 @@
 //! SR-ARCHITECTURE decision 21 is registered by the `codelaw lsp` command,
 //! not here: this crate never writes a file.
 
+pub mod card;
 pub mod format;
+pub mod lens;
 pub mod position;
 pub mod uri;
 
@@ -34,12 +36,13 @@ use lsp_types::notification::{
     DidChangeConfiguration, DidChangeTextDocument, DidChangeWatchedFiles, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument, LogMessage, Notification as _,
     PublishDiagnostics, ShowMessage,
 };
-use lsp_types::request::{CodeActionRequest, Formatting, HoverRequest, RangeFormatting, Request as _};
+use lsp_types::request::{ApplyWorkspaceEdit, CodeActionRequest, CodeLensRequest, ExecuteCommand, Formatting, HoverRequest, InlayHintRequest, RangeFormatting, Request as _};
 use lsp_types::{
-    CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams, CodeActionProviderCapability, DiagnosticRelatedInformation,
+    ApplyWorkspaceEditParams, CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams, CodeActionProviderCapability, DiagnosticRelatedInformation,
     DiagnosticSeverity, DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
     DocumentFormattingParams, DocumentRangeFormattingParams, Hover, HoverContents, HoverParams, HoverProviderCapability, Location, LogMessageParams, MarkupContent, MarkupKind, MessageType,
     NumberOrString, OneOf, PositionEncodingKind, PublishDiagnosticsParams, Range, ServerCapabilities, ServerInfo, ShowMessageParams,
+    CodeLens, CodeLensOptions, CodeLensParams, ExecuteCommandOptions, ExecuteCommandParams, InlayHint, InlayHintParams,
     TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions, TextDocumentSyncSaveOptions, TextEdit, Uri, WorkspaceEdit,
 };
 use position::Utf16Index;
@@ -111,6 +114,11 @@ pub fn capabilities() -> ServerCapabilities {
             ..Default::default()
         })),
         hover_provider: Some(HoverProviderCapability::Simple(true)),
+        // W-137: a manifest's or a marker's badge, "latest" on a clean
+        // dependency, a manifest's summary and its bulk fixes.
+        inlay_hint_provider: Some(OneOf::Left(true)),
+        code_lens_provider: Some(CodeLensOptions { resolve_provider: Some(false) }),
+        execute_command_provider: Some(ExecuteCommandOptions { commands: vec![lens::APPLY_FIXES.to_owned()], ..Default::default() }),
         document_formatting_provider: format::AVAILABLE.then_some(OneOf::Left(true)),
         document_range_formatting_provider: format::AVAILABLE.then_some(OneOf::Left(true)),
         ..Default::default()
@@ -236,6 +244,8 @@ struct Server<'c> {
     /// own `check_text_config` (SR-EDITOR decision 2, SR-ARCHITECTURE
     /// decision 15d). A text file's diagnostics are all of these, at once.
     copies: HashMap<String, BTreeMap<String, Vec<lsp_types::Diagnostic>>>,
+    /// Requests the server has sent the editor (`workspace/applyEdit`).
+    sent: u32,
 }
 
 impl<'c> Server<'c> {
@@ -249,6 +259,7 @@ impl<'c> Server<'c> {
             level: LogLevel::Info,
             said: HashSet::new(),
             copies: HashMap::new(),
+            sent: 0,
         }
     }
 
@@ -519,7 +530,7 @@ impl<'c> Server<'c> {
             .into_iter()
             .partition(|d| target.as_ref().is_some_and(|(_, e)| e.rel != d.file) && codelaw_core::is_text_config(&d.file));
         let copies = project.map(|p| copies_by_uri(p.root(), &copies)).unwrap_or_default();
-        let lsp = to_lsp(doc, target.as_ref().map(|t| &t.1), project.map(Project::root), &diagnostics);
+        let lsp = to_lsp(doc, target.as_ref().map(|t| &t.1), project, &diagnostics);
         let params = PublishDiagnosticsParams { uri: doc.uri.clone(), diagnostics: lsp, version: Some(doc.version) };
         let summary = format!(
             "check {}: {} rule(s), {} diagnostic(s), {} ms",
@@ -603,6 +614,15 @@ impl<'c> Server<'c> {
         let result = match req.method.as_str() {
             CodeActionRequest::METHOD => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.code_actions(p))),
             HoverRequest::METHOD => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.hover(p))),
+            InlayHintRequest::METHOD => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.inlay_hints(p))),
+            CodeLensRequest::METHOD => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.code_lenses(p))),
+            ExecuteCommand::METHOD => match serde_json::from_value(req.params) {
+                Ok(p) => {
+                    self.execute_command(p)?;
+                    Ok(Ok(serde_json::Value::Null))
+                }
+                Err(e) => Err(e),
+            },
             Formatting::METHOD if format::AVAILABLE => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.formatting(p))),
             RangeFormatting::METHOD if format::AVAILABLE => serde_json::from_value(req.params).map(|p| serde_json::to_value(self.range_formatting(p))),
             m => {
@@ -691,10 +711,20 @@ impl<'c> Server<'c> {
         let idx = Utf16Index::new(&doc.text);
         let offset = idx.offset(at.position).saturating_sub(doc.body().1);
         let project = self.project_of(doc).map(|(p, _)| p);
+        let language = doc.target.as_ref().map(|(_, e)| e.language);
+        let body = doc.body().0;
         let mut seen = BTreeMap::new();
-        for d in doc.diagnostics.iter().filter(|d| doc.target.as_ref().is_some_and(|(_, e)| e.rel == d.file)) {
+        for d in doc.diagnostics.iter().filter(|d| owns(doc, d)) {
             if d.start_byte <= offset && offset <= d.end_byte {
-                seen.entry(d.rule.clone()).or_insert_with(|| explain(project, d));
+                // The card (W-137): title and chips, why, the example, meta.
+                seen.entry(d.rule.clone()).or_insert_with(|| {
+                    let data = match project {
+                        Some(p) => data_in(p, d),
+                        None => card::data(&card::Facts { diagnostic: d, rel: &d.file, baseline: false, as_of: None, rule: None }),
+                    };
+                    let rule = project.and_then(|p| p.rules.get(&d.rule)).map(|r| &*r.rule);
+                    card::card(d, &data, rule, language, fix_preview(body, d))
+                });
             }
         }
         if seen.is_empty() {
@@ -702,6 +732,91 @@ impl<'c> Server<'c> {
         }
         let value = seen.into_values().collect::<Vec<_>>().join("\n\n---\n\n");
         Some(Hover { contents: HoverContents::Markup(MarkupContent { kind: MarkupKind::Markdown, value }), range: None })
+    }
+
+    /// Each own diagnostic of a document: its range in the editor and its
+    /// `data` (W-137).
+    fn shown<'a>(&'a self, doc: &'a Doc) -> Vec<(Range, serde_json::Value, &'a Diagnostic)> {
+        let idx = Utf16Index::new(&doc.text);
+        let shift = doc.body().1;
+        let project = self.project_of(doc).map(|(p, _)| p);
+        doc.diagnostics
+            .iter()
+            .filter(|d| owns(doc, d))
+            .map(|d| {
+                let data = match project {
+                    Some(p) => data_in(p, d),
+                    None => card::data(&card::Facts { diagnostic: d, rel: &d.file, baseline: false, as_of: None, rule: None }),
+                };
+                (idx.range(d.start_byte + shift, d.end_byte + shift), data, d)
+            })
+            .collect()
+    }
+
+    /// The clean dependencies of a manifest document, from the committed
+    /// snapshot (read, never written).
+    fn clean(&self, doc: &Doc, shown: &[(Range, serde_json::Value, &Diagnostic)]) -> Vec<lens::Clean> {
+        let Some((project, entry)) = self.project_of(doc) else { return vec![] };
+        if !card::is_manifest(&entry.rel) {
+            return vec![];
+        }
+        let Ok(snapshot) = std::fs::read_to_string(project.root().join(".codelaw/deps-snapshot.json")) else { return vec![] };
+        let flagged: Vec<u32> = shown.iter().map(|(r, ..)| r.start.line).collect();
+        lens::clean_dependencies(&entry.rel, &doc.text, &snapshot, &flagged)
+    }
+
+    fn inlay_hints(&self, p: InlayHintParams) -> Vec<InlayHint> {
+        let Some(doc) = self.docs.get(p.text_document.uri.as_str()) else { return vec![] };
+        let shown = self.shown(doc);
+        let clean = self.clean(doc, &shown);
+        let list: Vec<lens::Shown<'_>> = shown.iter().map(|(range, data, d)| lens::Shown { range: *range, data, message: &d.message }).collect();
+        lens::inlay_hints(&doc.text, &list, &clean, p.range)
+    }
+
+    fn code_lenses(&self, p: CodeLensParams) -> Vec<CodeLens> {
+        let Some(doc) = self.docs.get(p.text_document.uri.as_str()) else { return vec![] };
+        let Some(rel) = doc.target.as_ref().map(|(_, e)| e.rel.as_str()).or(doc.text_config.as_deref()) else { return vec![] };
+        let shown = self.shown(doc);
+        let clean = self.clean(doc, &shown).len();
+        let list: Vec<lens::Shown<'_>> = shown.iter().map(|(range, data, d)| lens::Shown { range: *range, data, message: &d.message }).collect();
+        lens::code_lenses(rel, doc.uri.as_str(), &list, clean)
+    }
+
+    /// `codelaw.applyFixes [uri, kinds, grades]`: every fix of those kinds
+    /// in the file, as one `workspace/applyEdit` the editor applies (the
+    /// server still writes nothing). Overlapping fixes after the first are
+    /// left for the next run.
+    fn execute_command(&mut self, p: ExecuteCommandParams) -> Result<(), Error> {
+        if p.command != lens::APPLY_FIXES {
+            return self.log_at(LogLevel::Warn, format!("command `{}` is not one codelaw lsp runs", p.command));
+        }
+        let arg = |i: usize| p.arguments.get(i).cloned().unwrap_or_default();
+        let strings = |v: serde_json::Value| -> Vec<String> { v.as_array().into_iter().flatten().filter_map(|s| s.as_str().map(str::to_owned)).collect() };
+        let (uri_key, kinds, grades) = (arg(0).as_str().unwrap_or_default().to_owned(), strings(arg(1)), strings(arg(2)));
+        let Some(doc) = self.docs.get(&uri_key) else { return Ok(()) };
+        let idx = Utf16Index::new(&doc.text);
+        let shift = doc.body().1;
+        let mut edits: Vec<&codelaw_core::TextEdit> =
+            self.shown(doc).into_iter().filter(|(_, data, _)| lens::wanted(data, &kinds, &grades)).flat_map(|(_, _, d)| d.edits.iter()).collect();
+        edits.sort_by_key(|e| (e.start, e.end));
+        let mut kept: Vec<TextEdit> = Vec::new();
+        let mut last_end = 0;
+        for e in edits {
+            if !kept.is_empty() && e.start < last_end {
+                continue;
+            }
+            last_end = e.end;
+            kept.push(TextEdit { range: idx.range(e.start + shift, e.end + shift), new_text: e.text.clone() });
+        }
+        if kept.is_empty() {
+            return Ok(());
+        }
+        let n = kept.len();
+        let params = ApplyWorkspaceEditParams { label: Some(format!("codelaw: {} fix(es)", n)), edit: workspace_edit(&doc.uri, kept) };
+        self.sent += 1;
+        let id = lsp_server::RequestId::from(format!("codelaw-apply-{}", self.sent));
+        self.log_at(LogLevel::Info, format!("applyFixes {}: {n} edit(s) of {}", uri_key, kinds.join(", ")))?;
+        self.send(Request::new(id, ApplyWorkspaceEdit::METHOD.to_owned(), params))
     }
 
     /// The whole document, formatted, as one edit.
@@ -737,14 +852,18 @@ impl<'c> Server<'c> {
 /// The engine's diagnostics as LSP's. A diagnostic of another file
 /// (`codelaw/no-rules` names the config) is shown at the top of this
 /// one and points at where it belongs.
-fn to_lsp(doc: &Doc, entry: Option<&FileEntry>, root: Option<&Path>, diagnostics: &[Diagnostic]) -> Vec<lsp_types::Diagnostic> {
+fn to_lsp(doc: &Doc, entry: Option<&FileEntry>, project: Option<&Project>, diagnostics: &[Diagnostic]) -> Vec<lsp_types::Diagnostic> {
     let idx = Utf16Index::new(&doc.text);
     let shift = doc.body().1;
+    let root = project.map(Project::root);
     diagnostics
         .iter()
         .map(|d| {
             let own = entry.is_some_and(|e| e.rel == d.file);
             let mut out = lsp_diagnostic(d, if own { idx.range(d.start_byte + shift, d.end_byte + shift) } else { Range::default() });
+            if let Some(p) = project {
+                out.data = Some(data_in(p, d));
+            }
             if !own && let Some(root) = root {
                 let path = root.join(&d.file);
                 let line = d.start.line.saturating_sub(1);
@@ -803,6 +922,15 @@ fn copies_by_uri(root: &Path, copies: &[Diagnostic]) -> BTreeMap<String, Vec<lsp
     out
 }
 
+/// Whether a diagnostic is the document's own: of its file, or a copy in
+/// the plain-text config file it is (SR-EDITOR decision 2a).
+fn owns(doc: &Doc, d: &Diagnostic) -> bool {
+    match &doc.target {
+        Some((_, e)) => e.rel == d.file,
+        None => doc.text_config.as_deref() == Some(d.file.as_str()),
+    }
+}
+
 fn lsp_diagnostic(d: &Diagnostic, range: Range) -> lsp_types::Diagnostic {
     lsp_types::Diagnostic {
         range,
@@ -814,7 +942,9 @@ fn lsp_diagnostic(d: &Diagnostic, range: Range) -> lsp_types::Diagnostic {
         code: Some(NumberOrString::String(d.rule.clone())),
         source: Some("codelaw".into()),
         message: d.message.clone(),
-        data: Some(serde_json::json!({ "fix": d.fix.name(), "source": d.source })),
+        // The one `data` shape (W-137, SR-EDITOR decision 8); `to_lsp` adds
+        // what only the project knows: the baseline and the as-of date.
+        data: Some(card::data(&card::Facts { diagnostic: d, rel: &d.file, baseline: false, as_of: None, rule: None })),
         ..Default::default()
     }
 }
@@ -823,26 +953,33 @@ fn workspace_edit(uri: &Uri, edits: Vec<TextEdit>) -> WorkspaceEdit {
     WorkspaceEdit { changes: Some(HashMap::from([(uri.clone(), edits)])), ..Default::default() }
 }
 
-/// A rule's hover text: its title, summary, Why and fix (SR-EDITOR
-/// decision 1, from the rule file of SR-RULE-FORMAT).
-fn explain(project: Option<&Project>, d: &Diagnostic) -> String {
-    let mut s = format!("**{}**", d.rule);
-    if let Some(r) = project.and_then(|p| p.rules.get(&d.rule)) {
-        let r = &r.rule;
-        s.push_str(&format!(" — {}\n\n{}", r.title, r.summary));
-        if !r.why.is_empty() {
-            s.push_str(&format!("\n\n**Why:** {}", r.why));
-        }
-    } else if let Some(e) = codelaw_rules::engine_rule(&d.rule) {
-        s.push_str(&format!(" — {}", e.title));
+/// A diagnostic's `data` with what its project knows: whether the baseline
+/// holds it, the as-of date a due date is counted from, its rule file.
+fn data_in(project: &Project, d: &Diagnostic) -> serde_json::Value {
+    let baseline = project.baselines.rules.get(&d.rule).is_some_and(|b| b.find(&d.file, None).is_some_and(|e| e.count > 0));
+    let as_of = project.as_of().date.map(codelaw_engine::Date::days);
+    let rule = project.rules.get(&d.rule).map(|r| &*r.rule);
+    card::data(&card::Facts { diagnostic: d, rel: &d.file, baseline, as_of, rule })
+}
+
+/// The line a fix changes, before and after, when every edit of it lies on
+/// the diagnostic's own line: the card's "before → after".
+fn fix_preview(body: &str, d: &Diagnostic) -> Option<(String, String)> {
+    if d.fix == FixClass::Manual || d.edits.is_empty() || d.start_byte > body.len() {
+        return None;
     }
-    s.push_str(&format!("\n\nfix: `{}`", d.fix));
-    if d.fix == FixClass::Manual && !d.steps.is_empty() {
-        for (i, step) in d.steps.iter().enumerate() {
-            s.push_str(&format!("\n{}. {step}", i + 1));
-        }
+    let start = body[..d.start_byte].rfind('\n').map_or(0, |i| i + 1);
+    let end = body[d.start_byte..].find('\n').map_or(body.len(), |i| d.start_byte + i);
+    if d.edits.iter().any(|e| e.start < start || e.end > end || e.start > e.end) {
+        return None;
     }
-    s
+    let mut after = body[start..end].to_owned();
+    let mut edits: Vec<_> = d.edits.iter().collect();
+    edits.sort_by_key(|e| std::cmp::Reverse(e.start));
+    for e in edits {
+        after.replace_range(e.start - start..e.end - start, &e.text);
+    }
+    Some((body[start..end].to_owned(), after))
 }
 
 // The server's own unit tests write a fixture repo, so they live outside

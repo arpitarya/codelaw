@@ -400,7 +400,7 @@ fn sentence(text: &str) -> &str {
 /// after, the rule's Don't/Do, or the facts as rows; a meta line. Portable
 /// markdown: an editor with no extension shows it as it is, and the VS Code
 /// extension adds an icon and the action links.
-pub fn card(d: &Diagnostic, data: &Value, rule: Option<&RuleFile>, language: Option<Language>, line: Option<(&str, String)>) -> String {
+pub fn card(d: &Diagnostic, data: &Value, rule: Option<&RuleFile>, language: Option<Language>, line: Option<(String, String)>) -> String {
     let o = data.as_object().cloned().unwrap_or_default();
     let kind = s(&o, "kind").unwrap_or("code");
     let sev = match d.severity {
