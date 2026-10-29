@@ -1,0 +1,6 @@
+description = "TODO comments with a ticket (and a date when asked), no focused tests, skipped tests with a reason and an expiry; opt in (SR-CONFIG decision 11a)"
+
+[rules]
+"js/todo-marker" = "error"
+"js/no-focused-tests" = "error"
+"js/skipped-test" = "error"

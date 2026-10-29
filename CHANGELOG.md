@@ -8,6 +8,8 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 - **Rules from review comments (W-133):** the skill `codelaw-rules-from-reviews` reads merged pull requests' review comments on GitHub, GitLab, Bitbucket (Cloud and Data Center) or Azure DevOps through their own CLIs, finds the points reviewers repeat, and — with your approval at each step — builds them as `preview` rules with a baseline. Its settings are `[reviews]` in `codelaw.toml` (`min_repeats = 3`, `min_reviewers = 1`, `window = "6m"`, `platform`, `url`); codelaw itself fetches nothing.
 
+- **TODOs with a ticket and a date, tests that stay on (W-131):** opt-in presets `codelaw:js/markers`, `py/markers`, `css/markers`, `scss/markers`, `html/markers` and `data/markers`. `*/todo-marker` (JS, TS, Python, CSS, SCSS, HTML, YAML, TOML, Markdown) wants `TODO(ABC-123, 2027-01-31): text` — a ticket by default, a date if `[todo] require_date`, and a written date is an error from the as-of date on, a warning `warn_days` before; `js/no-focused-tests` forbids `.only`, `fit`, `fdescribe` (fix: drop the focus); `js/skipped-test` and `py/skipped-test` want a reason and an expiry (`[tests.skip]`) from the framework's argument or a `SKIP(ABC-123, 2027-01-31): reason` comment above
+
 ### Changed
 
 - **GitHub Action (W-97):** its Marketplace name is `codelaw check` (the name `codelaw` is taken) and its description is under the Marketplace's 125 characters; `uses: arpitarya/codelaw@v0` is unchanged.

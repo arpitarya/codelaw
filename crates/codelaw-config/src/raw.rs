@@ -74,6 +74,13 @@ pub struct RawConfig {
     /// words. Root config only.
     #[serde(default)]
     pub spell: RawSpell,
+    /// SR-CONFIG decision 11a (W-131): the `*/todo-marker` rules' tags, ticket
+    /// and date. Root config only.
+    #[serde(default)]
+    pub todo: RawTodo,
+    /// SR-CONFIG decision 11a (W-131): `[tests.skip]`. Root config only.
+    #[serde(default)]
+    pub tests: RawTests,
     #[serde(default)]
     pub adapters: RawAdapters,
     #[serde(default)]
@@ -306,6 +313,63 @@ pub struct RawSpell {
     #[serde(skip_serializing)]
     pub words_file: Option<String>,
 }
+
+/// `[todo]`: what a TODO-style comment must carry (SR-CONFIG decision 11a,
+/// W-131). The `*/todo-marker` rules read it as their options, so it
+/// serialises to the JSON they read.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawTodo {
+    /// The words that open a marker; `["TODO", "FIXME", "HACK"]` by default.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+    /// A ticket is required; `true` by default.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_ticket: Option<bool>,
+    /// A date is required; `false` by default. A date that is written is
+    /// enforced either way.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_date: Option<bool>,
+    /// A regular expression a whole ticket must match.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ticket_pattern: Option<String>,
+    /// How many days before its date a marker is warned about; 14 by default.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warn_days: Option<u32>,
+}
+
+/// `[tests]`: the tables about tests (SR-CONFIG decision 11a, W-131).
+#[derive(Debug, Default, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawTests {
+    #[serde(default)]
+    pub skip: RawTestsSkip,
+}
+
+/// `[tests.skip]`: what a skipped test must carry. The `*/skipped-test`
+/// rules read it as their options.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawTestsSkip {
+    /// A reason is required; `true` by default.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_reason: Option<bool>,
+    /// A `SKIP(…, date)` expiry is required; `true` by default.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_expiry: Option<bool>,
+    /// A ticket is required; `false` by default.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_ticket: Option<bool>,
+    /// A regular expression a whole ticket must match.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ticket_pattern: Option<String>,
+    /// How many days before its expiry a skip is warned about; 14 by default.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warn_days: Option<u32>,
+}
+
+/// The ticket pattern when `ticket_pattern` is not set (`ABC-123`).
+pub const DEFAULT_TICKET_PATTERN: &str = "[A-Z][A-Z0-9]+-\\d+";
 
 /// Where `[spell] words_file` points when it is not set: beside the rules
 /// folder. A missing file there is no error; a missing file the config

@@ -39,6 +39,8 @@ mod js_ast;
 mod js_console;
 mod size;
 mod literals;
+mod markers;
+mod test_markers;
 mod no_undef;
 mod no_unreachable;
 mod node;
@@ -269,8 +271,28 @@ static PY_USE_INSTEAD: use_instead::UseInstead = use_instead::UseInstead { id: "
 static CSS_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::css("css/max-lines");
 static HTML_MAX_LINES: size_lines::MaxLines = size_lines::MaxLines::html("html/max-lines");
 
+static TODO_JS: markers::TodoMarker = markers::TodoMarker { id: "js/todo-marker", languages: &[Language::Javascript, Language::Jsx, Language::Typescript, Language::Tsx], source: markers::Source::Tree };
+static TODO_PY: markers::TodoMarker = markers::TodoMarker { id: "py/todo-marker", languages: &[Language::Python], source: markers::Source::Tree };
+static TODO_CSS: markers::TodoMarker = markers::TodoMarker { id: "css/todo-marker", languages: &[Language::Css], source: markers::Source::Css };
+static TODO_SCSS: markers::TodoMarker = markers::TodoMarker { id: "scss/todo-marker", languages: &[Language::Scss], source: markers::Source::Scss };
+static TODO_HTML: markers::TodoMarker = markers::TodoMarker { id: "html/todo-marker", languages: &[Language::Html], source: markers::Source::Tree };
+static TODO_YAML: markers::TodoMarker = markers::TodoMarker { id: "yaml/todo-marker", languages: &[Language::Yaml], source: markers::Source::Tree };
+static TODO_TOML: markers::TodoMarker = markers::TodoMarker { id: "toml/todo-marker", languages: &[Language::Toml], source: markers::Source::Tree };
+static TODO_MD: markers::TodoMarker = markers::TodoMarker { id: "md/todo-marker", languages: &[Language::Markdown], source: markers::Source::Markdown };
+
 /// Every native rule; ids are unique, order doesn't matter.
 static REGISTRY: &[&dyn NativeRule] = &[
+    &TODO_JS,
+    &TODO_PY,
+    &TODO_CSS,
+    &TODO_SCSS,
+    &TODO_HTML,
+    &TODO_YAML,
+    &TODO_TOML,
+    &TODO_MD,
+    &test_markers::NoFocusedTests,
+    &test_markers::JsSkippedTest,
+    &test_markers::PySkippedTest,
     &css_modules::ClassNaming,
     &css_modules::ComposesValid,
     &css_modules::NoGlobal,

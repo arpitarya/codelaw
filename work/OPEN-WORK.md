@@ -29,9 +29,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (20)
+## Open items (19)
 
-### build (16)
+### build (15)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -52,8 +52,6 @@ here. Read that record before changing anything below it.
 🟡 **W-129** waits on **W-128** `agent` `deps/licence`, `deps/lockfile-sync`, `deps/version-drift`, `deps/runtime-agreement`. Filed by Arpit (Cowork). [detail](open/W-129-deps-hygiene-rules.md)
 
 🟢 **W-130** `agent` Feature-flag expiry: accessor patterns with six SDK presets, wrappers found through the graph, `.codelaw/flags.toml` and inline markers (registry wins), `keep` collapse fix. Filed by Arpit (Cowork). [detail](open/W-130-feature-flag-expiry.md)
-
-🟢 **W-131** `agent` TODOs with configurable ticket and date; no focused tests; skipped tests need a reason and expiry. Filed by Arpit (Cowork). [detail](open/W-131-todo-and-skipped-test-markers.md)
 
 🟢 **W-132** `agent` Complexity, nesting and React component limits; CODEOWNERS coverage. Filed by Arpit (Cowork). [detail](open/W-132-complexity-and-codeowners.md)
 

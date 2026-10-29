@@ -22,6 +22,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `css/conventions` | 1 | house conventions, opt-in: `css/no-important` |
 | `css/project` | 1 | `graph/no-unused-css-classes`, the rule that reads the whole repo, from purgecss — opt in |
 | `css/size` | 1 | Size limits for stylesheets, opt-in: a line limit per file (CSS, SCSS and CSS Modules) |
+| `css/markers` | 1 | TODO comments with a ticket (and a date when asked); opt in (SR-CONFIG decision 11a) |
 
 <!-- /docs-sync:presets -->
 

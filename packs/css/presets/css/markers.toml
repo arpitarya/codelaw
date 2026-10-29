@@ -1,0 +1,4 @@
+description = "TODO comments with a ticket (and a date when asked); opt in (SR-CONFIG decision 11a)"
+
+[rules]
+"css/todo-marker" = "error"

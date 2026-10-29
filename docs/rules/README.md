@@ -2,7 +2,7 @@
 
 # Rule reference
 
-**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 664 rules in 18 packs, plus the engine's 23 own rules.
+**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 675 rules in 18 packs, plus the engine's 23 own rules.
 
 ## Configuring any rule — the forms
 
@@ -35,29 +35,29 @@ remap = { error = "warn" }
 
 | Pack | npm | PyPI | Rules | With options |
 |---|---|---|---|---|
-| [js](#js) | `@codelaw/rules-js` | `codelaw-rules-js` | 77 | 8 |
+| [js](#js) | `@codelaw/rules-js` | `codelaw-rules-js` | 80 | 8 |
 | [ts](#ts) | `@codelaw/rules-ts` | — | 27 | 1 |
 | [react](#react) | `@codelaw/rules-react` | `codelaw-rules-react` | 32 | 1 |
 | [node](#node) | `@codelaw/rules-node` | — | 10 | 0 |
 | [stencil](#stencil) | `@codelaw/rules-stencil` | — | 18 | 3 |
-| [html](#html) | `@codelaw/rules-html` | `codelaw-rules-html` | 73 | 18 |
-| [css](#css) | `@codelaw/rules-css` | `codelaw-rules-css` | 72 | 33 |
-| [scss](#scss) | `@codelaw/rules-scss` | `codelaw-rules-scss` | 15 | 6 |
+| [html](#html) | `@codelaw/rules-html` | `codelaw-rules-html` | 74 | 18 |
+| [css](#css) | `@codelaw/rules-css` | `codelaw-rules-css` | 73 | 33 |
+| [scss](#scss) | `@codelaw/rules-scss` | `codelaw-rules-scss` | 16 | 6 |
 | [css-modules](#css-modules) | `@codelaw/rules-css-modules` | — | 5 | 1 |
-| [data](#data) | `@codelaw/rules-data` | `codelaw-rules-data` | 39 | 11 |
+| [data](#data) | `@codelaw/rules-data` | `codelaw-rules-data` | 42 | 11 |
 | [tanstack-query](#tanstack-query) | `@codelaw/rules-tanstack-query` | — | 13 | 1 |
 | [redux-toolkit](#redux-toolkit) | `@codelaw/rules-redux-toolkit` | — | 12 | 1 |
 | [security-js](#security-js) | `@codelaw/rules-security-js` | `codelaw-rules-security-js` | 66 | 4 |
 | [security-ts](#security-ts) | `@codelaw/rules-security-ts` | — | 16 | 3 |
 | [security-html](#security-html) | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | 19 | 1 |
 | [spell](#spell) | `@codelaw/rules-spell` | `codelaw-rules-spell` | 7 | 1 |
-| [python](#python) | — | `codelaw-rules-python` | 103 | 10 |
+| [python](#python) | — | `codelaw-rules-python` | 105 | 10 |
 | [security-python](#security-python) | — | `codelaw-rules-security-python` | 61 | 0 |
 | [engine](engine.md) | in `codelaw` | in `codelaw` | 23 | 0 |
 
 ## js
 
-Presets: `codelaw:js/recommended` · `codelaw:js/typescript` · `codelaw:js/conventions` · `codelaw:js/project` · `codelaw:js/size`.
+Presets: `codelaw:js/recommended` · `codelaw:js/typescript` · `codelaw:js/conventions` · `codelaw:js/project` · `codelaw:js/size` · `codelaw:js/markers`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
@@ -95,6 +95,7 @@ Presets: `codelaw:js/recommended` · `codelaw:js/typescript` · `codelaw:js/conv
 | [`js/no-ex-assign`](js/no-ex-assign.md) | A caught error is not reassigned | `manual` | — | `js/recommended` |
 | [`js/no-extra-boolean-cast`](js/no-extra-boolean-cast.md) | No needless !! or Boolean() in a condition | `auto` | — | `js/recommended` |
 | [`js/no-fallthrough`](js/no-fallthrough.md) | A switch case does not fall through into the next by accident | `manual` | — | `js/recommended` |
+| [`js/no-focused-tests`](js/no-focused-tests.md) | No focused tests left in the suite | `suggest` | — | `js/markers` |
 | [`js/no-func-assign`](js/no-func-assign.md) | A function declaration is not reassigned | `manual` | — | `js/recommended` |
 | [`js/no-global-assign`](js/no-global-assign.md) | No assignment to built-in globals | `manual` | — | `js/recommended` |
 | [`js/no-import-assign`](js/no-import-assign.md) | An imported binding is not reassigned | `manual` | — | `js/recommended` |
@@ -135,6 +136,8 @@ Presets: `codelaw:js/recommended` · `codelaw:js/typescript` · `codelaw:js/conv
 | [`js/prefer-spread`](js/prefer-spread.md) | Spread instead of .apply() | `auto` | — | `js/typescript` |
 | [`js/preserve-caught-error`](js/preserve-caught-error.md) | A rethrown error keeps the caught one as its cause | `suggest` | — | `js/recommended` |
 | [`js/require-yield`](js/require-yield.md) | A generator function yields | `manual` | — | `js/recommended` |
+| [`js/skipped-test`](js/skipped-test.md) | A skipped test has a reason and an expiry | `manual` | — | `js/markers` |
+| [`js/todo-marker`](js/todo-marker.md) | JavaScript and TypeScript TODO comments carry a ticket and, when asked, a date | `manual` | — | `js/markers` |
 | [`js/use-instead`](js/use-instead.md) | Use the project's function instead of the one it wraps | `auto` | `replacements` | `js/recommended` |
 | [`js/use-isnan`](js/use-isnan.md) | Test for NaN with Number.isNaN | `manual` | — | `js/recommended` |
 | [`js/valid-typeof`](js/valid-typeof.md) | typeof is compared with a type it can return | `manual` | — | `js/recommended` |
@@ -256,7 +259,7 @@ Presets: `codelaw:stencil/recommended` · `codelaw:stencil/conventions`.
 
 ## html
 
-Presets: `codelaw:html/recommended` · `codelaw:html/a11y` · `codelaw:html/document` · `codelaw:html/conventions` · `codelaw:html/security` · `codelaw:html/size`.
+Presets: `codelaw:html/recommended` · `codelaw:html/a11y` · `codelaw:html/document` · `codelaw:html/conventions` · `codelaw:html/security` · `codelaw:html/size` · `codelaw:html/markers`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
@@ -327,6 +330,7 @@ Presets: `codelaw:html/recommended` · `codelaw:html/a11y` · `codelaw:html/docu
 | [`html/tel-non-breaking`](html/tel-non-breaking.md) | Phone numbers don't wrap | `suggest` | `ignoreClasses`, `ignoreStyle` | `html/recommended` |
 | [`html/text-content`](html/text-content.md) | Buttons have text | `manual` | — | `html/recommended`, `html/a11y` |
 | [`html/th-scope`](html/th-scope.md) | Header cells in complex tables have scope | `manual` | `strict` | `html/recommended`, `html/a11y` |
+| [`html/todo-marker`](html/todo-marker.md) | HTML TODO comments carry a ticket and, when asked, a date | `manual` | — | `html/markers` |
 | [`html/unique-landmark`](html/unique-landmark.md) | Repeated landmarks have distinct names | `manual` | — | `html/recommended`, `html/a11y` |
 | [`html/unrecognized-char-ref`](html/unrecognized-char-ref.md) | Character references exist and are terminated | `manual` | `ignoreCase`, `requireSemicolon` | `html/recommended` |
 | [`html/valid-autocomplete`](html/valid-autocomplete.md) | autocomplete values are valid | `manual` | — | `html/recommended`, `html/a11y` |
@@ -336,7 +340,7 @@ Presets: `codelaw:html/recommended` · `codelaw:html/a11y` · `codelaw:html/docu
 
 ## css
 
-Presets: `codelaw:css/recommended` · `codelaw:css/standard` · `codelaw:css/conventions` · `codelaw:css/project` · `codelaw:css/size`.
+Presets: `codelaw:css/recommended` · `codelaw:css/standard` · `codelaw:css/conventions` · `codelaw:css/project` · `codelaw:css/size` · `codelaw:css/markers`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
@@ -410,12 +414,13 @@ Presets: `codelaw:css/recommended` · `codelaw:css/standard` · `codelaw:css/con
 | [`css/shorthand-property-no-redundant-values`](css/shorthand-property-no-redundant-values.md) | No repeated values in shorthands | `auto` | — | `css/standard` |
 | [`css/string-no-newline`](css/string-no-newline.md) | No line breaks inside selector strings | `manual` | `ignore` | `css/recommended` |
 | [`css/syntax-string-no-invalid`](css/syntax-string-no-invalid.md) | `@property` syntax strings are valid | `manual` | — | `css/recommended` |
+| [`css/todo-marker`](css/todo-marker.md) | CSS TODO comments carry a ticket and, when asked, a date | `manual` | — | `css/markers` |
 | [`css/value-no-vendor-prefix`](css/value-no-vendor-prefix.md) | No vendor-prefixed values | `suggest` | `ignoreValues` | `css/standard` |
 | [`graph/no-unused-css-classes`](graph/no-unused-css-classes.md) | CSS classes must be used somewhere | `suggest` | — | `css/project` |
 
 ## scss
 
-Presets: `codelaw:scss/recommended` · `codelaw:scss/strict`.
+Presets: `codelaw:scss/recommended` · `codelaw:scss/strict` · `codelaw:scss/markers`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
@@ -434,6 +439,7 @@ Presets: `codelaw:scss/recommended` · `codelaw:scss/strict`.
 | [`scss/no-import`](scss/no-import.md) | No `@import` | `suggest` | — | `scss/strict` |
 | [`scss/no-slash-division`](scss/no-slash-division.md) | No `/` as division | `suggest` | — | `scss/strict` |
 | [`scss/percent-placeholder-pattern`](scss/percent-placeholder-pattern.md) | `%placeholder` names are kebab-case | `manual` | `pattern` | `scss/strict` |
+| [`scss/todo-marker`](scss/todo-marker.md) | SCSS TODO comments carry a ticket and, when asked, a date | `manual` | — | `scss/markers` |
 
 ## css-modules
 
@@ -449,7 +455,7 @@ Presets: `codelaw:css-modules/recommended` · `codelaw:css-modules/strict`.
 
 ## data
 
-Presets: `codelaw:data/recommended` · `codelaw:md/recommended` · `codelaw:data/package-json` · `codelaw:data/tsconfig` · `codelaw:data/pyproject` · `codelaw:data/github-actions` · `codelaw:data/conventions`.
+Presets: `codelaw:data/recommended` · `codelaw:md/recommended` · `codelaw:data/package-json` · `codelaw:data/tsconfig` · `codelaw:data/pyproject` · `codelaw:data/github-actions` · `codelaw:data/conventions` · `codelaw:data/markers`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
@@ -480,10 +486,12 @@ Presets: `codelaw:data/recommended` · `codelaw:md/recommended` · `codelaw:data
 | [`md/relative-links`](md/relative-links.md) | Relative links point at a file that exists | `manual` | — | `md/recommended` |
 | [`md/single-h1`](md/single-h1.md) | One level-1 heading per document | `manual` | `level` | `md/recommended` |
 | [`md/table-column-count`](md/table-column-count.md) | Table rows have as many cells as the header | `manual` | — | `md/recommended` |
+| [`md/todo-marker`](md/todo-marker.md) | Markdown TODO comments carry a ticket and, when asked, a date | `manual` | — | `data/markers` |
 | [`toml/deps-sorted`](toml/deps-sorted.md) | pyproject.toml dependencies are sorted by name | `auto` | — | `data/pyproject` |
 | [`toml/no-duplicate-keys`](toml/no-duplicate-keys.md) | No key or table defined twice in TOML | `manual` | — | `data/recommended` |
 | [`toml/pyproject-requires-python`](toml/pyproject-requires-python.md) | pyproject.toml declares requires-python | `suggest` | `python` | `data/pyproject` |
 | [`toml/pyproject-schema`](toml/pyproject-schema.md) | pyproject.toml matches its schema | `manual` | — | `data/pyproject` |
+| [`toml/todo-marker`](toml/todo-marker.md) | TOML TODO comments carry a ticket and, when asked, a date | `manual` | — | `data/markers` |
 | [`yaml/document-start`](yaml/document-start.md) | A YAML document starts with --- | `auto` | — | `data/conventions` |
 | [`yaml/gha-action-schema`](yaml/gha-action-schema.md) | GitHub Actions action metadata matches its schema | `manual` | — | `data/github-actions` |
 | [`yaml/gha-pin-sha`](yaml/gha-pin-sha.md) | GitHub Actions are pinned to a commit SHA | `manual` | — | `data/github-actions` |
@@ -492,6 +500,7 @@ Presets: `codelaw:data/recommended` · `codelaw:md/recommended` · `codelaw:data
 | [`yaml/no-ambiguous-numbers`](yaml/no-ambiguous-numbers.md) | No numbers that YAML 1.1 and 1.2 read differently | `manual` | — | `data/recommended` |
 | [`yaml/no-duplicate-keys`](yaml/no-duplicate-keys.md) | No key twice in one YAML mapping | `manual` | — | `data/recommended` |
 | [`yaml/no-undeclared-alias`](yaml/no-undeclared-alias.md) | Every alias refers to an anchor defined before it | `manual` | — | `data/recommended` |
+| [`yaml/todo-marker`](yaml/todo-marker.md) | YAML TODO comments carry a ticket and, when asked, a date | `manual` | — | `data/markers` |
 
 ## tanstack-query
 
@@ -670,7 +679,7 @@ Presets: `codelaw:spell/recommended` · `codelaw:spell/strict`.
 
 ## python
 
-Presets: `codelaw:py/recommended` · `codelaw:py/conventions` · `codelaw:py/project` · `codelaw:py/size`.
+Presets: `codelaw:py/recommended` · `codelaw:py/conventions` · `codelaw:py/project` · `codelaw:py/size` · `codelaw:py/markers`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
@@ -752,10 +761,12 @@ Presets: `codelaw:py/recommended` · `codelaw:py/conventions` · `codelaw:py/pro
 | [`py/return-outside-function`](py/return-outside-function.md) | `return` only inside a function | `manual` | — | `py/recommended` |
 | [`py/reuse-of-groupby-generator`](py/reuse-of-groupby-generator.md) | A `groupby` group is used once | `manual` | — | `py/recommended` |
 | [`py/setattr-with-constant`](py/setattr-with-constant.md) | No `setattr` with a constant name | `auto` | — | `py/recommended` |
+| [`py/skipped-test`](py/skipped-test.md) | A skipped test has a reason and an expiry | `manual` | — | `py/markers` |
 | [`py/star-arg-unpacking-after-keyword-arg`](py/star-arg-unpacking-after-keyword-arg.md) | No `*args` after a keyword argument | `manual` | — | `py/recommended` |
 | [`py/star-import-usage`](py/star-import-usage.md) | No names that may only come from a star import | `manual` | — | `py/recommended` |
 | [`py/static-key-dict-comprehension`](py/static-key-dict-comprehension.md) | A dict comprehension's key varies | `manual` | — | `py/recommended` |
 | [`py/strip-with-multi-characters`](py/strip-with-multi-characters.md) | `.strip()` isn't given a word | `manual` | — | `py/recommended` |
+| [`py/todo-marker`](py/todo-marker.md) | Python TODO comments carry a ticket and, when asked, a date | `manual` | — | `py/markers` |
 | [`py/too-many-expressions-in-star-assignment`](py/too-many-expressions-in-star-assignment.md) | A starred assignment stays within Python's limits | `manual` | — | `py/recommended` |
 | [`py/true-false-comparison`](py/true-false-comparison.md) | Don't compare with `True` or `False` | `suggest` | — | `py/recommended` |
 | [`py/type-comparison`](py/type-comparison.md) | Don't compare types with `==` | `manual` | — | `py/recommended` |

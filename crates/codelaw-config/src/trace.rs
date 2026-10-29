@@ -307,6 +307,27 @@ impl Config {
         push("css.modules", v, s);
         let (v, s) = root_key(&["css", "modules_convention"], |r| r.css.modules_convention.as_ref().map(|x| json!(x)), json!("asIs"));
         push("css.modules_convention", v, s);
+        // `[todo]` and `[tests.skip]` (SR-CONFIG decision 11a).
+        let (v, s) = root_key(&["todo", "tags"], |r| r.todo.tags.as_ref().and_then(|x| serde_json::to_value(x).ok()), json!(["TODO", "FIXME", "HACK"]));
+        push("todo.tags", v, s);
+        let (v, s) = root_key(&["todo", "require_ticket"], |r| r.todo.require_ticket.map(|x| json!(x)), json!(true));
+        push("todo.require_ticket", v, s);
+        let (v, s) = root_key(&["todo", "require_date"], |r| r.todo.require_date.map(|x| json!(x)), json!(false));
+        push("todo.require_date", v, s);
+        let (v, s) = root_key(&["todo", "ticket_pattern"], |r| r.todo.ticket_pattern.as_ref().map(|x| json!(x)), json!(crate::raw::DEFAULT_TICKET_PATTERN));
+        push("todo.ticket_pattern", v, s);
+        let (v, s) = root_key(&["todo", "warn_days"], |r| r.todo.warn_days.map(|x| json!(x)), json!(14));
+        push("todo.warn_days", v, s);
+        let (v, s) = root_key(&["tests", "skip", "require_reason"], |r| r.tests.skip.require_reason.map(|x| json!(x)), json!(true));
+        push("tests.skip.require_reason", v, s);
+        let (v, s) = root_key(&["tests", "skip", "require_expiry"], |r| r.tests.skip.require_expiry.map(|x| json!(x)), json!(true));
+        push("tests.skip.require_expiry", v, s);
+        let (v, s) = root_key(&["tests", "skip", "require_ticket"], |r| r.tests.skip.require_ticket.map(|x| json!(x)), json!(false));
+        push("tests.skip.require_ticket", v, s);
+        let (v, s) = root_key(&["tests", "skip", "ticket_pattern"], |r| r.tests.skip.ticket_pattern.as_ref().map(|x| json!(x)), json!(crate::raw::DEFAULT_TICKET_PATTERN));
+        push("tests.skip.ticket_pattern", v, s);
+        let (v, s) = root_key(&["tests", "skip", "warn_days"], |r| r.tests.skip.warn_days.map(|x| json!(x)), json!(14));
+        push("tests.skip.warn_days", v, s);
         // `[spell]` (SR-SPELL decision 7).
         let (v, s) = root_key(&["spell", "locale"], |r| r.spell.locale.as_ref().map(|x| json!(x)), serde_json::Value::Null);
         push("spell.locale", v, s);

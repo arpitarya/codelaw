@@ -1,0 +1,5 @@
+description = "TODO comments with a ticket (and a date when asked), skipped tests with a reason and an expiry; opt in (SR-CONFIG decision 11a)"
+
+[rules]
+"py/todo-marker" = "error"
+"py/skipped-test" = "error"
