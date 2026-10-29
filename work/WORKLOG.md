@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — W-126 filed: a five-minute pipeline, measured first  ·  Cowork (Opus 5.5)
+
+- **Asked:** by voice, the whole CI/CD pipeline under five minutes; then *"Research and file it."*
+- **Done:** job and step timings from the GitHub API for four runs (cached CI 5m44, Rust-change CI 11m13, pack-change CI 16m21, publish 8m59) and six recent cached runs (4m51–6m30); W-126 filed with the critical paths, a plan ordered by win, what L2/L11 rule out (paid runners; unratified tools), and the honest bound (CI and the release are two waits). Not committed.
+- **Decided / left open:** a single build-and-publish workflow would drop "publish only what CI attested" — a ruling, not proposed.
+- **Mistakes:** by voice, said publishing jobs already run side by side; they do partly — `vscode` waits on `npm`, and npm uploads one by one.
+- **Next:** an agent takes W-126, `corpus` and `publish.yml` first.
+
+## 2026-10-29 — Disk back under L9's budget: 19.6 GB → 2.9 GB  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"19.6G 0d codelaw — do the cleanup"*.
+- **Done:** `target/debug` (17 GB of Rust debug build output, nothing written in it for 5 minutes; the one live session, `c86ab4d3`, had finished its `.vsix` build) removed with the deletion Arpit approved for the session. Kept: `target/release` (1.6 GB), `target/corpus` (1.1 GB, the pinned corpus repos), `dist/`. The project is 2.9 GB — under L9's 5 GB, so its GB approvals reset (`work/MACHINE.md`). The next debug `cargo build` regrows `target/debug`.
+- **Decided / left open:** none.
+- **Mistakes:** none.
+- **Next:** none.
+
 ## 2026-10-29 — The display name built; the `.vsix` files rebuilt  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"generate the VS Code extensions with the new name display name"*.
