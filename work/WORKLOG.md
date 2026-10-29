@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — L2 decision 8: `vsce` and `ovsx` for the VS Code extension only  ·  Cowork (Opus 5.5)
+
+- **Asked:** by voice, a package to check (and publish) the VS Code extension; ruled `@vscode/vsce` and `ovsx` as scoped exceptions; *"file it."*
+- **Done:** L2 decision 8 (the scoped exception, his words); L11 §3 *CI — the VS Code extension's registry tools*: D-46 `@vscode/vsce`, D-47 `ovsx`, the 2026-10-27 *not ratified* line marked superseded; SR-PACKAGES; **`CLAUDE.md`'s L2 line** gains *"one scoped exception, the VS Code extension's registry tools (decision 8)"* — a fact on the decider's ruling, said here per SR-WORK-DOCS 7a. W-95 → 🟢 agent (move the job to the tools, the check command, pins, the licences test); its "run the `curl` job once" inbox row dropped; W-117 noted. Not committed.
+- **Decided / left open:** ruled — both tools, only to publish and check the extension. Agent's reading, flagged in W-95: the job switches from `curl` to the tools.
+- **Mistakes:** none.
+- **Next:** an agent takes W-95.
+
 ## 2026-10-29 — W-119 step 1: `publish.yml` creates one new PyPI project from `main`  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement w119"*.

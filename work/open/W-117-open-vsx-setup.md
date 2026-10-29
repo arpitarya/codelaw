@@ -38,6 +38,8 @@ ball: arpit
 
 **State, 2026-10-29 01:15 (Cowork):** environment ✅, login and agreement ✅, namespace ✅ (unverified). Left: (1) the ownership claim — no issue titled *codelaw* found on `EclipseFdn/open-vsx.org` (GitHub search, 01:15); (2) one access token → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` for the first upload, which `publish.yml`'s `vscode` job uses; (3) after it, the trusted publisher and the token revoked.
 
+**2026-10-29 (voice):** `ovsx` is ratified for this extension only (L2 decision 8, D-47): W-95's job publishes with it — the first version with `OVSX_PAT`, later ones with `ovsx publish --trusted-publishing` once the trusted publisher is registered.
+
 ## The commands (from W-95's inbox row)
 
 ```bash

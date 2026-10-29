@@ -10,7 +10,7 @@ feature: the licence and cost of every dependency
 owns:
   - crates/codelaw-cli/tests/licences.rs
 laws: [L0, L2]
-timestamp: 2026-10-27T12:00:00Z
+timestamp: 2026-10-29T05:00:00Z
 content_sha: ""
 ---
 
@@ -92,6 +92,7 @@ source, nothing paid — and no copyleft anywhere, dev tooling included.
    under that licence.
 7. **A licence that changes** to one this law refuses: the dependency is
    pinned below that version or removed, in the change that notices.
+8. **One scoped exception: the VS Code extension's registry tools** (the decider, 2026-10-29 (voice; written on *"file it."*): on `@vscode/vsce`, *"Let's add it as an exception. And only to be used for checking the VS Code extension and publishing the VS Code extension. That's it, nothing else."*; asked whether `ovsx` takes the same terms, *"Yes."*). `@vscode/vsce` (MIT, but its tree holds `@vscode/vsce-sign` under Microsoft's proprietary licence — decision 3) and `ovsx` (EPL-2.0, weak copyleft — decision 2) are allowed **only** to publish the codelaw VS Code extension and to check what a registry holds of it — `vsce` on the Visual Studio Marketplace, `ovsx` on Open VSX — and only in `publish.yml`'s extension job and a check command beside it. Never in the engine, a package, a test, `ci.yml` or a consumer's repo; any other use of either is refused under decisions 2 and 3. Each is ratified by name in [L11](0013_LAW-11-dependencies.md) §3 (D-46, D-47).
 
 ### Consequences
 

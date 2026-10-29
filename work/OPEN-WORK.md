@@ -24,8 +24,6 @@ here. Read that record before changing anything below it.
 |---|---|
 | 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): **v0.3.0 is out (2026-10-29)** — <https://github.com/arpitarya/codelaw/releases/edit/v0.3.0> → tick *Publish this Action to the GitHub Marketplace* → accept the Marketplace Developer Agreement → *Update release*. Ruled 2026-10-27: SARIF stays on `gh`; a moving `v0` tag; Claude then runs the throwaway-repo proof. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
-| 🔴 **VS Code extension — run its job once** ([W-95](open/W-95-publish-vscode-extension.md)): v0.3.0's Marketplace upload was refused (content type, now fixed on `main`). Publishes `codelaw.codelaw` 0.3.0 to the Marketplace: `gh workflow run publish.yml -R arpitarya/codelaw --ref main -f only=vscode`. Say **"run it"** and an agent runs it and checks the listing. | 2026-10-29 |
-| ↳ **blocks:** W-95 itself | |
 | 🔴 **Open VSX — the ownership claim and one token** ([W-117](open/W-117-open-vsx-setup.md)). Done 10-29: environment `vscode`, login, Publisher Agreement, namespace `codelaw`. **1. Claim:** <https://github.com/EclipseFdn/open-vsx.org/issues/new?template=claim-namespace-ownership.yml&namespace=codelaw> — tick *Ownership* and *Account Age*; Option 1 once the Marketplace has the extension (the repo is yours), or Option 4 now — or ask Claude to file it. **2. Token:** open-vsx.org → *Settings → Access Tokens* → *Generate* `codelaw-publish` → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` (paste at the prompt). | 2026-10-29 |
 | ↳ **blocks:** W-117 itself | |
 | 🔴 **Guidance-vs-check redesign — three rulings** ([W-118](open/W-118-guidance-experiment-redesign.md) → [proposal](proposals/guidance-experiment-redesign.md)): **R1** the design — six arms (a no-codelaw arm 0, guidance-only A, the pilot's A as A+, B, C, and `hook --pre` as D), tasks screened by running arm 0 (keep ≥ 40% at 5 runs), 12 tasks × 5 runs = 60 per arm; **R2** the README rule — the line stays unless arm C's upper 95% bound is below a bound you set (2% needs 0/150; 5% needs 0/60), or rate-only; **R3** the budget — ~$85 and ~3 h (screen ~$22 + run ~$60), screen gated separately or not. Open questions §7. | 2026-10-29 |
@@ -41,7 +39,7 @@ here. Read that record before changing anything below it.
 
 🔴 **W-119** `arpit` The ten missing PyPI projects through CI, one pending publisher at a time: `publish.yml -f only=pypi-new` built (2026-10-29); left per project the pending publisher and the run (inbox), 0 of 10. npm's spell index done 10-29. Filed by Arpit (Cowork). [detail](open/W-119-pypi-through-pending-publishers.md)
 
-🔴 **W-95** `arpit` VS Code extension: v0.3.0 reached the Marketplace by trusted publishing, the upload refused (content type, fixed on `main`). Left: run the extension's job alone (inbox); Open VSX needs W-117's token. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
+🟢 **W-95** `agent` VS Code extension: ruled 10-29 — `vsce` and `ovsx` allowed for publishing and checking it only (L2 decision 8, D-46, D-47). Left: move `publish.yml`'s job to them, the check command, pins; Open VSX needs W-117's token. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
