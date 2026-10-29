@@ -28,7 +28,7 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 - **Asked:** *"execute the cleanup of all the working trees. And any temporary files."*
 - **Done:** each of the ten red worktrees merged in memory against `main` — nine held nothing `main` lacks; `W-119-loop` held Arpit's 10:31 ruling that `only=pypi-new` is temporary, which W-119's Cowork close had missed (it said the mode *stays*). Filed as W-125, archive line corrected; then all ten worktrees and branches force-removed, W-120–W-124 archived. `.DS_Store`, `__pycache__`, `fixtures/github-action/.codelaw/cache` deleted.
-- **Decided / left open:** `target/` (19 GB of the 19.9 GB used) not touched — a rebuild, the decider's call. `lm/W-74` (nothing new) and `lm/W-82` (no worktree, conflicts with `main`) left as branches.
+- **Decided / left open:** `target/` (19 GB of the 19.9 GB used) not touched — a rebuild, the decider's call. Two older `lm/*` branches with no worktree left as they are (one adds nothing, one conflicts with `main`).
 - **Mistakes:** none.
 - **Next:** W-125.
 

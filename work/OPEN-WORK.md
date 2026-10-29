@@ -35,7 +35,7 @@ here. Read that record before changing anything below it.
 
 ### build (9)
 
-🟢 **W-125** `agent` Revert `publish.yml`'s `only=pypi-new` and the `main` rule on the `pypi` environment, records and RELEASING.md with them — Arpit ruled it temporary (10-29 10:31); W-119 is done. Filed by Claude Code. [detail](open/W-125-revert-pypi-new.md)
+🟢 **W-125** `agent` Revert `publish.yml`'s `only=pypi-new` and the `main` rule on the `pypi` environment, records and RELEASING.md with them — Arpit ruled it temporary (10-29 10:31); W-119 is done. Filed by Arpit (Claude Code). [detail](open/W-125-revert-pypi-new.md)
 
 🟢 **W-95** `agent` VS Code extension: ruled 10-29 — `vsce` and `ovsx` allowed for publishing and checking it only (L2 decision 8, D-46, D-47). Left: move `publish.yml`'s job to them, the check command, pins; Open VSX needs W-117's token. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
