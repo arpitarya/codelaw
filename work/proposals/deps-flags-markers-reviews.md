@@ -285,7 +285,7 @@ warn_days      = 14
   `.node-version`, `.python-version`, `.tool-versions`, Dockerfile, CODEOWNERS and yarn
   classic's `yarn.lock` may carry findings — never linted or formatted as a language. A
   finding about one shows on the L3 file it concerns **and** on the text file's line:
-  [W-136](../open/W-136-l3-findings-on-plain-text-config.md).
+  [W-136](../../archive/open/W-136-l3-findings-on-plain-text-config.md).
 - **Registry names for `deps`** — two items, *"just before the deps release"*:
   [W-134](../open/W-134-deps-pypi-pending-publishers.md) (PyPI pending publishers,
   Claude fills the form in Chrome, Arpit submits) and

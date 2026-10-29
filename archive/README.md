@@ -28,6 +28,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-136-l3-findings-on-plain-text-config.md`](open/W-136-l3-findings-on-plain-text-config.md) | 2026-10-30 | done — [SR-LAW-3](../records/0005_LAW-3-languages.md) decision 10 (seven plain-text config files carry findings, never lint or format), [SR-ARCHITECTURE](../records/0108_architecture.md) decision 15d (`NativeRule::elsewhere`, the copy), [SR-EDITOR](../records/0114_editor.md) decision 2a; W-128, W-129 and W-132 report their second place through it |
 | [`W-127-release-0-4-0.md`](open/W-127-release-0-4-0.md) | 2026-10-30 | done — v0.4.0 released from d2a87c8: npm, PyPI and the Visual Studio Marketplace (all eight platforms); Open VSX waits on W-117 |
 | [`W-125-revert-pypi-new.md`](open/W-125-revert-pypi-new.md) | 2026-10-29 | done — `only=pypi-new` out of `publish.yml`, `main` off the `pypi` environment, L6 decision 9, SR-PACKAGES, RELEASING.md back to *a release uploads only existing projects* |
 | [`W-124-session-cleanup.md`](open/W-124-session-cleanup.md) | 2026-10-29 | done — dropped on the decider's ruling (*"execute the cleanup of all the working trees"*); the one unlanded ruling on `lm/W-119-loop` carried to [W-125](open/W-125-revert-pypi-new.md); [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) |

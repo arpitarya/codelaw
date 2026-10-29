@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-agents
   - templates/agents
 laws: [L0, L3, L4, L5, L6]
-timestamp: 2026-10-28T12:00:00Z
+timestamp: 2026-10-30T12:00:00Z
 content_sha: ""
 ---
 
@@ -141,7 +141,7 @@ Each agent reads a different set of files from a different place. Maintaining th
   - `[agents] targets`: the agents of the decision-2 matrix (`claude`, `cowork`, `copilot`, `codex`, `kiro`) whose files `sync-agents` writes. Empty by default, and then no agent file exists. An unknown name is an error naming the nearest one. `init --agents <list>` writes it.
   - `[agents] command`: how a hook or an MCP registration starts codelaw. Unset, it is the repo's own install: `npx --no-install codelaw` beside a `package.json`, `uv run codelaw` beside a `uv.lock`, else `codelaw`.
 - **`codelaw hook [paths]`** is the post-edit hook of every row of the matrix.
-  - The files are its arguments, or, with none, the ones the agent's hook payload on stdin names: `tool_input.file_path` / `path` (Claude Code, Codex), the files an `apply_patch` envelope adds or updates (Codex), or `toolArgs` (Copilot). A deleted file, or one with no [L3](0005_LAW-3-languages.md) extension, is ignored.
+  - The files are its arguments, or, with none, the ones the agent's hook payload on stdin names: `tool_input.file_path` / `path` (Claude Code, Codex), the files an `apply_patch` envelope adds or updates (Codex), or `toolArgs` (Copilot). A deleted file, or one with no [L3](0005_LAW-3-languages.md) extension, is ignored — except a plain-text config file (`.nvmrc`, `CODEOWNERS`, …: L3 decision 10), which is never fixed but reports the findings its project's L3 files place on it ([SR-ARCHITECTURE](0108_architecture.md) decision 15d), so an agent that edits `.nvmrc` hears that it now disagrees with `package.json`; an edited `package.json` reports both places. *(W-136, 2026-10-30.)*
   - It runs `codelaw fix` on them with `auto` fixes only, format step included ([L8](0010_LAW-8-performance-budgets.md) `fix_one_file`; [L4](0006_LAW-4-every-rule-has-a-fix.md) decision 8). It is the same engine call, so the bytes are `fix`'s ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 5). The files it was given count as touched, so a grandfathered finding in one gets the verdict CI would give it ([SR-BASELINE](0104_baseline-and-deprecations.md) decisions 3 and 8).
   - **It never loads a cold type program** ([L8](0010_LAW-8-performance-budgets.md) decision 8; W-105): `hook` and `hook --pre` run the type rules ([SR-TYPES](0117_types.md)) only through a helper a warm process in the same run already holds, and otherwise skip them with a note.
   - **It judges with the `ci` profile** ([SR-CONFIG](0110_config.md) decision 10) whether or not `CI` is set, so an agent never leaves behind what CI would fail; `--profile <name>` or `CODELAW_PROFILE` picks another.

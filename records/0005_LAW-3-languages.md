@@ -13,6 +13,7 @@ owns:
   - fixtures/scss
   - crates/codelaw-cli/tests/scss.rs
   - crates/codelaw-core/src/text_config.rs
+  - crates/codelaw-cli/tests/text_config.rs
 laws: [L0, L3]
 timestamp: 2026-10-30T12:00:00Z
 content_sha: ""
@@ -101,7 +102,7 @@ Real repos mix a JS/TS front end, Python services, config files and docs. A lint
 - **The fixtures are formatted.** Every fixture file is already in codelaw's format, so `check` on the matrix reports only the fixture rules. [SR-LAW-7](0009_LAW-7-linter-and-formatter.md)'s check, in the same `laws.rs`, fails on a fixture that `codelaw format` would change.
 - **Runtime fence:** the Python-only fixture runs in a container with no Node, and the JS-only fixture runs with no Python.
 - **Rule load check:** a rule whose `languages:` names a language outside the nine is refused at load (exit code 2).
-- **Text config files (decision 10):** `crates/codelaw-core/src/text_config.rs` tests the closed list and that none of it is an L3 file type; `crates/codelaw-engine/tests/text_config.rs` checks the copy, the cache, `fix` never writing one and the refusal of a file outside the list.
+- **Text config files (decision 10):** `crates/codelaw-core/src/text_config.rs` tests the closed list and that none of it is an L3 file type; `crates/codelaw-engine/tests/text_config.rs` checks the copy, the cache, `fix` never writing one and the refusal of a file outside the list; `crates/codelaw-cli/tests/text_config.rs` runs a repo whose `.nvmrc` disagrees with `engines.node` through `check` in every format (text, JSON, SARIF, GitHub), the LSP and the post-edit hook.
 
 #### Out of scope until this law is amended
 

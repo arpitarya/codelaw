@@ -29,7 +29,7 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (19)
+## Open items (18)
 
 ### build (16)
 
@@ -73,9 +73,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-102** `agent` Pilot 10-28: 60 sessions, $10.47; A = B = C at 2/20. Ruled 10-30: W-118's redesign as proposed — six arms, screened tasks, 60 runs per arm; the README line stays unless arm C is 0/60 (bound 5%); ~$85, no separate gate on the screen. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
-### record update (1)
-
-🟢 **W-136** `agent` L3 amended: `.nvmrc`, `.python-version`, `.tool-versions`, Dockerfile, CODEOWNERS and yarn classic `yarn.lock` may carry findings (never linted as languages); a finding shows on the manifest **and** on the text file's line. Filed by Arpit (Cowork). [detail](open/W-136-l3-findings-on-plain-text-config.md)
+### record update (0)
 
 ### research (0)
 

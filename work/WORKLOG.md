@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-136 closed: findings on plain-text config files  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Implement it and then close those out. Keep merging everything to main."* — W-136, one of six agents in parallel.
+- **Done:** SR-LAW-3 decision 10 and **CLAUDE.md's L3 line** (SR-WORK-DOCS 7a: changed on the 2026-10-30 Q-A ruling); `TEXT_CONFIG_FILES`, `NativeRule::elsewhere`, the engine's copy and `Project::check_text_config` (02548f0, landed first so W-128 and W-132 can build on it); then the LSP, the hook, the extension's selector, SR-EDITOR 2a, SR-AGENT-SURFACES, the CLI test in every format; item archived.
+- **Decided / left open:** `requirements*.txt` not added (B-051) — put to the decider; `Dockerfile.<name>` not on the list; a copy is `manual` unless the rule gives it edits, `fix` never writes a text file; the editor re-checks a text file on open and save only. Real rules using it are W-128's, W-129's and W-132's.
+- **Mistakes:** none in the work; the shared `CARGO_TARGET_DIR` let other worktrees' builds of `codelaw-core` overwrite this one's mid-build (touch and rebuild); the disk passed the approved ceiling during the parallel run.
+- **Next:** W-129 and W-132 implement `elsewhere` in their rules.
+
 ## 2026-10-30 — W-137 filed: the extension's look  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"I want CodeLaw extension … to be a bit more beautiful on how it highlights the to-do or whether a package published or not. … give me 2 to 3 images."*

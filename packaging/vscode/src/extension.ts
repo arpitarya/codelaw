@@ -25,6 +25,10 @@ const LANGUAGES = [
   "scss",
   "html",
 ];
+// The plain-text config files a finding may sit in, by name (SR-LAW-3
+// decision 10): opened under any language id, so matched by pattern. Keep
+// in step with `TEXT_CONFIG_FILES` in crates/codelaw-core/src/text_config.rs.
+const TEXT_CONFIG = "**/{.nvmrc,.node-version,.python-version,.tool-versions,Dockerfile,CODEOWNERS,yarn.lock}";
 
 let client: LanguageClient | undefined;
 let binary: Found | undefined;
@@ -120,7 +124,7 @@ async function start(context: vscode.ExtensionContext): Promise<void> {
     return Promise.resolve(child);
   };
   const options: LanguageClientOptions = {
-    documentSelector: LANGUAGES.map((language) => ({ scheme: "file", language })),
+    documentSelector: [...LANGUAGES.map((language) => ({ scheme: "file", language })), { scheme: "file", pattern: TEXT_CONFIG }],
     outputChannel: clientChannel(),
     initializationOptions: { logLevel: level },
     synchronize: {

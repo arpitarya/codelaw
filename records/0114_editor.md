@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-lsp
   - packaging/vscode
 laws: [L0, L3, L5, L6, L7, L8]
-timestamp: 2026-10-29T16:45:00Z
+timestamp: 2026-10-30T12:00:00Z
 content_sha: ""
 ---
 
@@ -73,6 +73,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - Everything stays warm in memory, within the tree-cache bound of [SR-ARCHITECTURE](0108_architecture.md) decision 24.
    - **Built (W-15):** incremental sync (`TextDocumentSyncKind::INCREMENTAL`). Each open document keeps its tree as a `DocumentTree`; an edit re-parses through tree-sitter's edit API; a whole-text change, or an edit that moves the byte-order mark, drops the tree; closing the document hands it to the closed files' tree cache of [SR-ARCHITECTURE](0108_architecture.md) decision 24 (its `[lsp] tree_cache` bound), and reopening the same text takes it back. Diagnostics equal a fresh parse's. Graph re-linking waits for project rules in the editor.
    - `lsp_after_edit` is an [L8](0010_LAW-8-performance-budgets.md) budget.
+2a. **Plain-text config files (W-136, 2026-10-30):** a finding's copy in a text config file ([L3](0005_LAW-3-languages.md) decision 10, [SR-ARCHITECTURE](0108_architecture.md) decision 15d) is published on **that file's URI**, never on the L3 document checked — so `.nvmrc` shows it, in the Problems panel too, whenever `package.json` is open. An open text config file gets the copies its project's L3 files report into it, as they are on disk (`Project::check_text_config`); it is re-checked on open and save, not per keystroke, and a copy's edits are its quick fix. A text file's diagnostics are the union of what each source found; closing an L3 document withdraws what it found. The extension opens these files by name (a `pattern` in its document selector, any language id) and also activates on `dockerfile`.
 3. **Same verdicts as the CLI ([L5](0007_LAW-5-no-model-in-the-engine.md)).** The server calls the same engine functions; the editor never shows a result that `codelaw check` wouldn't.
    - **A person's editor runs the `local` profile** ([SR-CONFIG](0110_config.md) decision 10), whether or not `CI` is set in its environment, unless `CODELAW_PROFILE` names another: its verdicts are `codelaw check --profile local`'s.
 4. **The VS Code extension `codelaw.codelaw-vscode`:**
