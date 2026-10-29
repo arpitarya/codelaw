@@ -20,7 +20,13 @@ name: publish
 on:
   release:
     types: [published]
-  workflow_dispatch: # npm only, from a v* tag: `gh workflow run publish.yml --ref v0.2.0`
+  workflow_dispatch: # npm only, from a v* tag: `gh workflow run publish.yml --ref v0.2.0`; or `-f only=vscode` from main: the extension's job alone (W-95)
+    inputs:
+      only:
+        description: 'npm (default, from a v* tag) or vscode (the extension alone, from main)'
+        type: choice
+        options: [npm, vscode]
+        default: npm
 permissions:
   contents: read
 defaults:
@@ -45,7 +51,7 @@ jobs:
         with:
           persist-credentials: false # nothing here pushes (W-18)
       - name: a run by hand is npm only, and starts from a v* tag (L6 decision 9)
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' && inputs.only != 'vscode'
         run: |
           [ "$GITHUB_REF_TYPE" = tag ] && [[ "$GITHUB_REF_NAME" == v* ]] || {
             echo "::error::run publish.yml from a v* tag (gh workflow run publish.yml --ref vX.Y.Z), not the ${GITHUB_REF_TYPE} ${GITHUB_REF_NAME}"
@@ -66,7 +72,8 @@ jobs:
           }
           echo "run=$run" >> "$GITHUB_OUTPUT"
       - name: the tag is the version, and every copy agrees (W-18)
-        run: python3 scripts/version.py --check --tag "$GITHUB_REF_NAME"
+        run: |
+          if [ "${{ inputs.only }}" = vscode ]; then python3 scripts/version.py --check; else python3 scripts/version.py --check --tag "$GITHUB_REF_NAME"; fi
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: dist
@@ -95,6 +102,7 @@ jobs:
     # workflow stops the release before PyPI or npm receives anything.
     name: npm trusts this workflow, before either registry is written
     needs: gate
+    if: inputs.only != 'vscode'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -134,6 +142,7 @@ jobs:
 
   npm:
     needs: [gate, trust]
+    if: inputs.only != 'vscode'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -245,7 +254,7 @@ jobs:
     # @vscode/vsce and ovsx are not ratified (L2, L11). continue-on-error: a listing problem never fails,
     # or withdraws, the engine's release; read the job summary. A version already listed is skipped.
     needs: [gate, npm]
-    if: github.event_name == 'release'
+    if: ${{ !cancelled() && needs.gate.result == 'success' && (github.event_name == 'release' && needs.npm.result == 'success' || inputs.only == 'vscode') }}
     continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -256,6 +265,9 @@ jobs:
       name: vscode # tag rule v*; the Marketplace's trusted-publishing policy names this environment
       url: https://marketplace.visualstudio.com/items?itemName=codelaw.codelaw
     steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: vscode
@@ -265,8 +277,9 @@ jobs:
       - name: the download is what ci.yml built (SHA256SUMS), at the release version
         run: |
           (cd dist/vscode && sha256sum --strict --quiet -c SHA256SUMS)
+          v="$(python3 scripts/version.py)"
           for f in dist/vscode/*.vsix; do
-            case "$f" in *"-${GITHUB_REF_NAME#v}.vsix") ;; *) echo "::error::$f is not ${GITHUB_REF_NAME#v}"; exit 1 ;; esac
+            case "$f" in *"-$v.vsix") ;; *) echo "::error::$f is not $v"; exit 1 ;; esac
           done
       - name: Visual Studio Marketplace — GitHub OIDC token → Marketplace credential → one upload per platform
         run: |
