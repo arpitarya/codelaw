@@ -380,6 +380,8 @@ def check_changelog():
         doc.problem("no release heading carries a date (`## 0.1.0 — YYYY-MM-DD`)")
         return doc
     day = re.search(r"\d{4}-\d{2}-\d{2}", release.splitlines()[0]).group(0)
+    # every release of that day: two can share one (0.3.0 and 0.4.0, 2026-10-29)
+    release = "".join(p for p in parts[1:] if day in p.splitlines()[0])
     for line in IMPLEMENTATION.read_text(encoding="utf-8").splitlines():
         cells = split_row(line) if line.startswith("| 20") else []
         if len(cells) < 2 or cells[0] < day:

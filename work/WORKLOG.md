@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — W-127: 0.4.0 bumped, CHANGELOG written  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"upgrade 0.4.0"*.
+- **Done:** `scripts/version.py --set 0.4.0`; CHANGELOG's 0.4.0 section with a lead line and install commands (the engine is 0.3.0's; new: every PyPI project exists, the extension's name, W-126's pipeline); W-127 filed as the release.
+- **Decided / left open:** pushing `main` and creating the Release are the decider's (RELEASING.md); the release is W-126's first measured run.
+- **Mistakes:** the first lead line said every package is on both registries — PyPI has eleven packs by design; corrected before landing.
+- **Next:** the decider pushes `main`; once `ci.yml` is green, `gh release create v0.4.0`.
+
 ## 2026-10-29 — W-126 built: corpus per pack, Fux apart, smoke and publish in parallel  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement W126"*.
