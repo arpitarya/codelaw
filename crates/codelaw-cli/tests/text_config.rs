@@ -48,7 +48,7 @@ fn check_shows_both_places_in_every_format() {
         .unwrap()
         .iter()
         .filter(|x| x["rule"] == "data/test-node-version")
-        .map(|x| (x["file"].as_str().unwrap().to_owned(), x["start"]["line"].as_u64().unwrap()))
+        .map(|x| (x["file"].as_str().unwrap().to_owned(), x["range"]["start"]["line"].as_u64().unwrap()))
         .collect();
     assert_eq!(found, [(".nvmrc".to_owned(), 1), ("package.json".to_owned(), 3)], "json: {out}");
     let copy = v["diagnostics"].as_array().unwrap().iter().find(|x| x["file"] == ".nvmrc").unwrap();
