@@ -363,6 +363,7 @@ jobs:
             code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X PUT -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
                       --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/publishers/codelaw/extensions/codelaw?api-version=7.2-preview.2')"
             if [ "${code:0:1}" != 2 ]; then
+              echo "  PUT HTTP $code: $(head -c 400 "$RUNNER_TEMP/m.out")" | tee -a "$GITHUB_STEP_SUMMARY"
               code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X POST -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
                         --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/extensions?api-version=7.2-preview.2')"
             fi
