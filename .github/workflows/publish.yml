@@ -300,8 +300,8 @@ jobs:
                         --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/extensions?api-version=7.2-preview.2')"
             fi
             if [ "${code:0:1}" = 2 ]; then echo "- ✓ $(basename "$f")" | tee -a "$GITHUB_STEP_SUMMARY"
-            elif grep -qi 'already exists' "$RUNNER_TEMP/m.out"; then echo "- ⏭ $(basename "$f") already listed" | tee -a "$GITHUB_STEP_SUMMARY"
-            else echo "- ✗ $(basename "$f") HTTP $code: $(head -c 300 "$RUNNER_TEMP/m.out")" | tee -a "$GITHUB_STEP_SUMMARY"; bad=1; fi
+            elif grep -qiE 'version.{0,40}already exists|already exists.{0,40}version' "$RUNNER_TEMP/m.out"; then echo "- ⏭ $(basename "$f") version already listed" | tee -a "$GITHUB_STEP_SUMMARY"
+            else echo "- ✗ $(basename "$f") HTTP $code: $(head -c 600 "$RUNNER_TEMP/m.out")" | tee -a "$GITHUB_STEP_SUMMARY"; bad=1; fi
           done
           [ "$bad" = 0 ]
       - name: Open VSX — skipped while OVSX_PAT is not set (W-117)
