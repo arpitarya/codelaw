@@ -4,7 +4,7 @@ name: W-125
 description: "Arpit, 2026-10-29 10:31: publish.yml's only=pypi-new was temporary — revert it, and the main rule on the pypi environment, now that W-119 created all ten projects."
 item: W-125
 filed: 2026-10-29
-filed_by: "Claude Code (Opus 5.5)"
+filed_by: "Arpit (Claude Code, Opus 5.5)"
 updated: 2026-10-29
 updated_by: "Claude Code (Opus 5.5)"
 ball: agent

@@ -12,7 +12,7 @@ owns:
   - .claude/hooks/guard-open-work-inbox.sh
   - scripts/check-work-system.py
 laws: [L0]
-timestamp: 2026-10-18T12:52:51Z
+timestamp: 2026-10-29T16:15:00Z
 content_sha: ""
 ---
 
@@ -167,9 +167,11 @@ the top.
 36. Priority is damage that accrues with elapsed time, above damage that is
     merely present.
 37. Grouped by what closing it takes — `build` (code) · `testing` (a run or a
-    harness) · `record update` (a ruling or a record; no code) · `research`
-    (a proposal or compare doc reached by reading; no code; closes on the decider
-    picking a shape).
+    harness) · `reporting and benchmarks` (a measurement — a bench, a budget, a
+    corpus count, an experiment — and the numbers or the write-up it yields; the
+    decider, 2026-10-29: *"In open work file, create a section for reporting and benchmarks. And reallocate the work items respectively."*) · `record update` (a ruling or a record; no
+    code) · `research` (a proposal or compare doc reached by reading; no code;
+    closes on the decider picking a shape). The queue lists them in that order.
 37a. **The `research` section runs in a chat/Cowork session, never in Claude
     Code.** Its rows' lane is `cowork`; its files say `**Model:** Cowork`.
 37b. **Every group heading carries its count of open items** (Arpit,

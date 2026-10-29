@@ -27,7 +27,7 @@ description: Walk Arpit through work/OPEN-WORK.md one item at a time — the dec
 
 1. **Drift** — each is a case of its own, fixed only with his OK.
 2. **The inbox** — table order, 🔺 first.
-3. **Open items** — `build` → `testing` → `record update` → `research`, in the order the queue lists them.
+3. **Open items** — `build` → `testing` → `reporting and benchmarks` → `record update` → `research`, in the order the queue lists them.
 
 Default is everything; he can say "inbox only" at any point.
 

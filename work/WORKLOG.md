@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — OPEN-WORK gains a `reporting and benchmarks` group  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"In open work file, create a section for reporting and benchmarks. And reallocate the work items respectively."*
+- **Done:** SR-WORK-OPEN-QUEUE rule 37 amended first (the group, what closing it takes, the order build → testing → reporting and benchmarks → record update → research, his words); OPEN-WORK's new `### reporting and benchmarks` with W-103 (left: the spell pack's L8 measurement and budget) and W-102 (left: the experiment run, its numbers and write-up); **`.claude/skills/docket/SKILL.md`'s group order** updated — an agent-steering file, said here per SR-WORK-DOCS 7a. Not committed.
+- **Decided / left open:** agent's calls, flagged: which rows move — W-103 because only its benchmark is left; W-102 because its output is a measured report (it was `testing`). W-105 stays `build` (four rules to write before its budgets).
+- **Mistakes:** none.
+- **Next:** none from this.
+
 ## 2026-10-29 — Worktree cleanup: ten dropped, W-120–W-124 closed, W-125 filed  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"execute the cleanup of all the working trees. And any temporary files."*
