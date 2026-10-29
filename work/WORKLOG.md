@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-127: v0.4.0's first publish run failed at the gate; fixed  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Upgrade to version 0.4.0 … commit everything and publish the version. If any stage fails, fix it and then push it. Make sure everything is green and the packages and even the VS Code extension gets published."* Then *"commit everything."*
+- **Done:** every copy was at 0.4.0 and 0.4.0 was on no registry, so 0.4.0 is released (not 0.5.0). CI red on `lint` only (the guard replay: 2c7fee8) → RULE-SINCE moved, pushed, CI green (40929506937, 12m30). Release v0.4.0 on 832d696 → `publish.yml` 40931548220 failed at the gate: W-126's parallel `gh attestation verify` raced initialising the trusted root (2 of 49). Fixed with one `gh attestation trusted-root` and `--custom-trusted-root`; npm uploads get one guarded retry. Nothing reached a registry.
+- **Decided / left open:** the tag and Release are re-cut on the fixed commit (nothing was published from the first).
+- **Mistakes:** W-126's parallel attestation check was stub-tested only; the race showed on the first real release.
+- **Next:** CI green on the fix, re-cut v0.4.0, watch npm, PyPI and the Marketplace.
+
 ## 2026-10-29 — W-125 closed: `only=pypi-new` reverted  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement work item 125, and 126"*.

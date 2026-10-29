@@ -36,3 +36,5 @@ The engine and the rules are 0.3.0's (no change under `crates/` or `packs/` but 
 - W-125 (revert `only=pypi-new`) is open; it does not block the release.
 
 **2026-10-29, Arpit:** *"commit everything and publish the version. If any stage fails, fix it and then push it. Make sure everything is green and the packages and even the VS Code extension gets published."* — Claude Code cuts the Release (step 4) once `ci.yml` is green.
+
+**2026-10-30 — v0.4.0's first `publish.yml` run (40931548220) failed at the gate, nothing published:** W-126's parallel `gh attestation verify` raced initialising the trusted root (2 of 49: *"public good verifier is not available"*). Fixed: `gh attestation trusted-root` once, `--custom-trusted-root` to each (tested locally on three 0.3.0 tarballs). The Release and tag are re-cut on the fixed commit once `ci.yml` is green there.
