@@ -14,7 +14,7 @@ owns:
   - crates/codelaw-fix
   - crates/codelaw-engine
 laws: [L0, L2, L3, L4, L5, L6, L7, L8]
-timestamp: 2026-10-28T22:00:00Z
+timestamp: 2026-10-30T12:00:00Z
 content_sha: ""
 ---
 
@@ -147,6 +147,13 @@ The decider asked for the architecture to be designed and its gaps filled. The f
   - **Data tables:** a pack's `data/` tables (CSS properties, HTML elements and attributes, JSON Schemas) are read at load, parsed once, and shared read-only by every rule that names them.
   - **Caching:** their hashes join the compiled rule set's cache key (decision 15).
   - **Nothing is fetched** (decision 27).
+
+15d. **A finding in a plain-text config file** ([L3](0005_LAW-3-languages.md) decision 10; W-136, 2026-10-30). A native rule that read one of L3's text config files (`.nvmrc`, `.node-version`, `.python-version`, `.tool-versions`, `Dockerfile`, `CODEOWNERS`, yarn classic's `yarn.lock`: `codelaw_core::TEXT_CONFIG_FILES`) reports its finding on the L3 file it is checking, as always, and names the text file's place in `NativeRule::elsewhere` (a path and a byte range of the text `FileContext::read` gives; `Elsewhere::line` makes one from a line number).
+  - **The copy** is a diagnostic of its own in that file: the same rule, severity, message and source; its own edits when the rule gave some and the rule's fix class is not `manual`, else `manual` with the rule's steps and one more that names the finding's `file:line:column`; `data` carries the rule's data plus `primary`, that place (`--format json`, SARIF). Every output carries it like any finding, sorted by its own path ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 2).
+  - **It goes where the finding goes:** a suppression of the finding suppresses the copy; the copy is cached with the checked file's result, and the text file's answer is one of that result's recorded questions (decision 15b), so a change to `.nvmrc` alone re-checks `package.json`. No rule runs on the text file, and a comment in it suppresses nothing.
+  - **Never written:** a copy's edits are not fix candidates; `codelaw fix` never writes a text config file (decision 12), and the editor offers them as a quick fix.
+  - **Refused outside the list:** a place in any other file, one that cannot be read, or a range that is not one of the file's makes the rule fail on the checked file (`codelaw/internal-error`, decision 25); the finding itself is kept.
+  - **From the text file's side:** `Project::check_text_config` gives the copies in one text config file, for the editor and the hook, which have that file and not the L3 one: it checks the L3 files in its folder and each folder above it up to the project root, and the root's `.github/workflows/`, and keeps their copies in that file.
 
 16. **Embedded regions** ([SR-LINTER](0106_linter.md) decision 3) are parsed lazily: a `<script>` is parsed only if JavaScript or TypeScript is enabled and at least one rule or the format check applies to it. A language switched off in `languages` is off inside host files too.
 17. **Monorepo scope.** One graph and one baseline per **project root**: the topmost config, or a nested config with `root = true` ([SR-CONFIG](0110_config.md) decision 2). A `root = true` package is a separate project with its own graph; cross-root imports are resolved as external.
