@@ -4,7 +4,7 @@
 #
 #   repos:
 #     - repo: https://github.com/arpitarya/codelaw
-#       rev: v0.2.0
+#       rev: v0.3.0
 #       hooks:
 #         - id: codelaw-fix
 #         - id: codelaw-check

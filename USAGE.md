@@ -135,7 +135,7 @@ extends = [
   "codelaw:py/recommended",     # codelaw-rules-python, on PyPI
   "codelaw:js/conventions",     # opt-in house style
 ]
-preview = true                  # every rule is preview in 0.1.0
+preview = true                  # every rule is preview in 0.3.0
 
 [rules]
 "js/use-isnan" = "warn"         # change a severity, or "off"
@@ -473,7 +473,7 @@ flowchart LR
     ```yaml
     repos:
       - repo: https://github.com/arpitarya/codelaw
-        rev: v0.2.0
+        rev: v0.3.0
         hooks:
           - id: codelaw-fix
           - id: codelaw-check
