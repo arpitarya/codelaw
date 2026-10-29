@@ -28,6 +28,8 @@
 "py/except-with-non-exception-classes" = 0
 "py/f-string-docstring" = 0
 "py/f-string-missing-placeholders" = 2
+"py/flag-expiry" = 0
+"py/flag-marker" = 0
 "py/format-invalid" = 0
 "py/format-missing-argument" = 0
 "py/format-mixed-numbering" = 0
