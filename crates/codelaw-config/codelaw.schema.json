@@ -458,6 +458,36 @@
         }
       }
     },
+    "flags": {
+      "x-codelaw-record": "SR-PROJECT-GRAPH",
+      "description": "Feature-flag expiry (SR-PROJECT-GRAPH decision 11): which calls read a flag, and how its expiry is declared. A `[flags]` table turns on `js/flag-expiry`, `js/flag-marker`, `py/flag-expiry`, `py/flag-marker` and `data/flag-registry`; their flags are registered in `.codelaw/flags.toml` or by inline `codelaw-flag` markers. Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "presets": {
+          "description": "The flag SDKs whose reads codelaw knows: each preset is the SDK's documented read of one flag by its key, for JS/TS and Python.",
+          "type": "array",
+          "items": { "enum": ["launchdarkly", "unleash", "split", "openfeature", "growthbook", "flagsmith"] },
+          "default": []
+        },
+        "accessors": {
+          "description": "More calls that read a flag: a pattern with one `$NAME` slot — positional (`isFeatureOn($NAME)`), among others (`flags.get($NAME, $$$)`, `$_` for one argument, `$$$` for the rest), an object key (`useFeature({ key: $NAME })`) or a Python keyword (`flag(key=$NAME)`); `$_.` before the callee matches any receiver. A function whose parameter flows unchanged into an accessor is one too, found through the project graph (`codelaw flags accessors`).",
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "inline": {
+          "description": "`allow`: an inline `codelaw-flag <name> expires <date> owner <owner>` marker registers a flag, and the registry wins when both do. `registry-only`: every marker is an error.",
+          "enum": ["allow", "registry-only"],
+          "default": "allow"
+        },
+        "warn_days": {
+          "description": "How many days before its `expires` a flag's reads warn: an integer or a string such as `\"14d\"` or `\"2w\"`.",
+          "type": ["integer", "string"],
+          "default": 14
+        }
+      }
+    },
     "deps": {
       "x-codelaw-record": "SR-RULE-PACKS",
       "description": "The dependency rules, `data/outdated-dependency` and `data/stale-deps-snapshot`, read against `.codelaw/deps-snapshot.json`, which `codelaw deps refresh` writes (SR-RULE-PACKS decision 15). Root config only.",

@@ -1,0 +1,9 @@
+extends = ["codelaw:js/recommended", "codelaw:py/recommended", "codelaw:data/recommended"]
+preview = true
+
+[format]
+check = false
+
+[flags]
+presets = ["launchdarkly", "unleash", "split", "openfeature", "growthbook", "flagsmith"]
+warn_days = 14

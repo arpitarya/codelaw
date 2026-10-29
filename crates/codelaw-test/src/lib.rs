@@ -190,8 +190,9 @@ impl<'a> Tester<'a> {
             let files = split_files(language, code);
             let multi = files.len() > 1 || files.first().is_some_and(|f| f.header.is_some());
             let set: Vec<(String, Language, String)> = files.iter().map(|f| (f.path.clone(), f.language, f.text.clone())).collect();
-            return self
-                .plain
+            // A multi-file snippet's `options=` apply too (W-130).
+            let p = if snippet.options.is_empty() { &self.plain } else { self.project(snippet) };
+            return p
                 .check_files(&set)
                 .into_iter()
                 .filter(|d| d.rule == id)
@@ -211,7 +212,8 @@ impl<'a> Tester<'a> {
         if self.as_files(code) {
             let files = split_files(language, code);
             let set: Vec<(String, Language, String)> = files.iter().map(|f| (f.path.clone(), f.language, f.text.clone())).collect();
-            let fixed = self.plain.fix_files(&set, true);
+            let p = if snippet.options.is_empty() { &self.plain } else { self.project(snippet) };
+            let fixed = p.fix_files(&set, true);
             return files
                 .iter()
                 .zip(fixed)

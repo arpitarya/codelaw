@@ -691,6 +691,7 @@ The rule packs come from the repository's own dependencies, so the step installs
 | `codelaw brief` | What is specific to this repo for the files an agent is about to write (SR-CLI-MCP decision 14) |
 | `codelaw migrate` | Translate an ESLint, Prettier, Biome, Ruff or stylelint config into codelaw.toml, with a report of what mapped and what did not (SR-CLI-MCP decision 14) |
 | `codelaw spell` | The spell pack's words file: `learn` adds the words no dictionary knows (SR-SPELL) |
+| `codelaw flags` | Feature flags: `accessors` lists every call the flag rules read a flag through (SR-PROJECT-GRAPH decision 11) |
 
 <!-- /docs-sync:commands -->
 

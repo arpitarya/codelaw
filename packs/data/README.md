@@ -29,7 +29,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 <!-- /docs-sync:presets -->
 
-43 rules: 8 `auto`, 6 `suggest`, 29 `manual`. Every rule is
+44 rules: 9 `auto`, 6 `suggest`, 29 `manual`. Every rule is
 **reimplemented**, not vendored: the checks, messages and docs are written
 fresh, and each ported rule's `ported_from:` names its source. Rules that need
 more than a pattern are native rules in `crates/codelaw-native/src/data_*.rs`;

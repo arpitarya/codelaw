@@ -13,7 +13,7 @@ owns:
   - scripts/corpus.py
   - scripts/corpus.json
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-28T12:00:00Z
+timestamp: 2026-10-30T12:00:00Z
 content_sha: ""
 ---
 
@@ -90,6 +90,8 @@ The decider asked that rules can be written manually or by an AI agent with a sk
    | cases | `<name>.cases.md` | exact diagnostics (`line:col rule`) and exact fixed output, per case |
    | invariants | frontmatter `invariant:` plus the built-ins | still parses · only the fix's range changed · deterministic · isolated across languages · rule-specific (e.g. `exports-unchanged`) |
    | corpus | `codelaw test --corpus` (codelaw's CI) | real pinned repos: invariants hold, every fix re-parses and is a fixpoint, finding counts are snapshotted |
+
+   A snippet checked as a set of files runs with its fence's `options=` too, as a one-file snippet does (W-130, 2026-10-30: the flag rules' examples name their accessors so).
 
    A file-scope rule's snippet whose first line names a file (`// path`, `# path` or `<!-- path -->`) is checked as a set of files too, so a native rule that reads the files around it (path, bytes, neighbours: [SR-ARCHITECTURE](0108_architecture.md) decision 15b) is tested on a virtual repo; "still parses" then counts each file in its own language. *(W-21, 2026-10-22.)*
 

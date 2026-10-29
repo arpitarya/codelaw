@@ -338,6 +338,17 @@ impl ConfigFile {
         }
         check_reviews(&raw.reviews, &path)?;
         check_markers(&raw, &path)?;
+        if let Some(f) = &raw.flags {
+            if let Some(p) = f.presets.iter().flatten().find(|p| !crate::raw::FLAG_PRESETS.contains(&p.as_str())) {
+                return Err(ConfigError::new(
+                    Some(path),
+                    format!("`[flags] presets`: `{p}` is not one of {}", crate::raw::FLAG_PRESETS.iter().map(|c| format!("`{c}`")).collect::<Vec<_>>().join(", ")),
+                ));
+            }
+            if let Some(i) = f.inline.as_deref().filter(|i| !crate::raw::FLAG_INLINE.contains(i)) {
+                return Err(ConfigError::new(Some(path), format!("`[flags] inline`: `{i}` is not one of `allow`, `registry-only`")));
+            }
+        }
         let spell_file_words = read_words_file(&path, &dir, raw.spell.words_file.as_deref())?;
         if let Some(globs) = &raw.css.modules {
             glob_set(globs, &path).map_err(|e| ConfigError::new(Some(path.clone()), format!("`[css] modules`: {}", e.message)))?;
@@ -560,7 +571,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
     "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
-    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]", "[todo]", "[tests]", "[codeowners]",
+    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]", "[todo]", "[tests]", "[codeowners]", "[flags]",
 ];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
@@ -585,6 +596,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.todo != Default::default(),
         raw.tests != Default::default(),
         raw.codeowners != Default::default(),
+        raw.flags.is_some(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -826,6 +838,7 @@ impl Config {
             ("todo", Some(r)) => serde_json::to_value(&r.todo).ok(),
             ("tests.skip", Some(r)) => serde_json::to_value(&r.tests.skip).ok(),
             ("codeowners", Some(r)) => serde_json::to_value(&r.codeowners).ok(),
+            ("flags", Some(r)) => r.flags.as_ref().and_then(|f| serde_json::to_value(f).ok()),
             // `[spell] words` and the words file are one list (W-112).
             ("spell", Some(r)) => serde_json::to_value(&r.spell).ok().map(|mut v| {
                 let file = self.files.first().map(|f| f.spell_file_words.as_slice()).unwrap_or_default();
@@ -841,6 +854,12 @@ impl Config {
             Some(serde_json::Value::Object(m)) => m.into_iter().collect(),
             _ => BTreeMap::new(),
         }
+    }
+
+    /// Whether the root config has a `[flags]` table: it turns the flag
+    /// rules on (SR-PROJECT-GRAPH decision 11).
+    pub fn flags_on(&self) -> bool {
+        self.root_raw().is_some_and(|r| r.flags.is_some())
     }
 
     /// `[css] modules`: globs naming CSS Module stylesheets besides
@@ -1199,6 +1218,20 @@ rules = { "js/no-console" = "error" }
         }
         let err = Config::from_toml(PathBuf::from("/x"), "[scope.utils]\nrules = {}\n").unwrap_err();
         assert!(err.message.contains("scope `utils` has no `files`"), "{}", err.message);
+    }
+
+    #[test]
+    fn the_flags_section_is_checked_and_read_as_options() {
+        let c = Config::from_toml(PathBuf::from("/x"), "[flags]\npresets = [\"unleash\"]\naccessors = [\"isOn($NAME)\"]\nwarn_days = \"2w\"\n").unwrap();
+        assert!(c.flags_on());
+        let o = c.section_options("flags");
+        assert_eq!(o["presets"], serde_json::json!(["unleash"]));
+        assert_eq!(o["warn_days"], serde_json::json!(14));
+        let err = Config::from_toml(PathBuf::from("/x"), "[flags]\npresets = [\"optimizely\"]\n").unwrap_err();
+        assert!(err.to_string().contains("`[flags] presets`: `optimizely` is not one of"), "{err}");
+        let err = Config::from_toml(PathBuf::from("/x"), "[flags]\ninline = \"never\"\n").unwrap_err();
+        assert!(err.to_string().contains("`[flags] inline`: `never`"), "{err}");
+        assert!(!Config::from_toml(PathBuf::from("/x"), "").unwrap().flags_on());
     }
 
     #[test]

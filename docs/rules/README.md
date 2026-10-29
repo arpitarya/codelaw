@@ -2,7 +2,7 @@
 
 # Rule reference
 
-**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 683 rules in 18 packs, plus the engine's 23 own rules.
+**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 688 rules in 18 packs, plus the engine's 23 own rules.
 
 ## Configuring any rule — the forms
 
@@ -35,7 +35,7 @@ remap = { error = "warn" }
 
 | Pack | npm | PyPI | Rules | With options |
 |---|---|---|---|---|
-| [js](#js) | `@codelaw/rules-js` | `codelaw-rules-js` | 82 | 10 |
+| [js](#js) | `@codelaw/rules-js` | `codelaw-rules-js` | 84 | 12 |
 | [ts](#ts) | `@codelaw/rules-ts` | — | 27 | 1 |
 | [react](#react) | `@codelaw/rules-react` | `codelaw-rules-react` | 35 | 4 |
 | [node](#node) | `@codelaw/rules-node` | — | 10 | 0 |
@@ -44,14 +44,14 @@ remap = { error = "warn" }
 | [css](#css) | `@codelaw/rules-css` | `codelaw-rules-css` | 73 | 33 |
 | [scss](#scss) | `@codelaw/rules-scss` | `codelaw-rules-scss` | 16 | 6 |
 | [css-modules](#css-modules) | `@codelaw/rules-css-modules` | — | 5 | 1 |
-| [data](#data) | `@codelaw/rules-data` | `codelaw-rules-data` | 43 | 12 |
+| [data](#data) | `@codelaw/rules-data` | `codelaw-rules-data` | 44 | 13 |
 | [tanstack-query](#tanstack-query) | `@codelaw/rules-tanstack-query` | — | 13 | 1 |
 | [redux-toolkit](#redux-toolkit) | `@codelaw/rules-redux-toolkit` | — | 12 | 1 |
 | [security-js](#security-js) | `@codelaw/rules-security-js` | `codelaw-rules-security-js` | 66 | 4 |
 | [security-ts](#security-ts) | `@codelaw/rules-security-ts` | — | 16 | 3 |
 | [security-html](#security-html) | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | 19 | 1 |
 | [spell](#spell) | `@codelaw/rules-spell` | `codelaw-rules-spell` | 7 | 1 |
-| [python](#python) | — | `codelaw-rules-python` | 107 | 12 |
+| [python](#python) | — | `codelaw-rules-python` | 109 | 14 |
 | [security-python](#security-python) | — | `codelaw-rules-security-python` | 61 | 0 |
 | [engine](engine.md) | in `codelaw` | in `codelaw` | 23 | 0 |
 
@@ -65,6 +65,8 @@ Presets: `codelaw:js/recommended` · `codelaw:js/typescript` · `codelaw:js/conv
 | [`js/complexity`](js/complexity.md) | A function's cyclomatic complexity stays under a maximum | `manual` | `max`, `count_optional_chain`, `ignore_names` | `js/size` |
 | [`js/constructor-super`](js/constructor-super.md) | A derived class's constructor calls super(); a base class's does not | `manual` | — | `js/recommended` |
 | [`js/exports-at-end`](js/exports-at-end.md) | Exports are gathered at the end of the file | `auto` | — | `js/conventions` |
+| [`js/flag-expiry`](js/flag-expiry.md) | Every feature flag read is registered, with an owner and a date it goes | `suggest` | `presets`, `accessors`, `inline`, `warn_days` | *[rules] only* |
+| [`js/flag-marker`](js/flag-marker.md) | An inline flag marker agrees with the registry | `auto` | `presets`, `accessors`, `inline`, `warn_days` | *[rules] only* |
 | [`js/for-direction`](js/for-direction.md) | A for loop's counter moves toward its end condition | `manual` | — | `js/recommended` |
 | [`js/getter-return`](js/getter-return.md) | A getter returns a value on every path | `manual` | — | `js/recommended` |
 | [`js/import-groups`](js/import-groups.md) | Imports are grouped builtin, external, internal, relative | `auto` | `internal` | `js/conventions` |
@@ -465,6 +467,7 @@ Presets: `codelaw:data/recommended` · `codelaw:md/recommended` · `codelaw:data
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
 | [`data/codeowners-coverage`](data/codeowners-coverage.md) | Every file has a code owner, and every CODEOWNERS pattern is live | `manual` | `path`, `allow_unowned`, `ignore` | `data/codeowners` |
+| [`data/flag-registry`](data/flag-registry.md) | The feature-flag registry is valid and holds only flags still read | `auto` | `presets`, `accessors`, `inline`, `warn_days` | *[rules] only* |
 | [`data/outdated-dependency`](data/outdated-dependency.md) | Dependencies are on their latest version | `suggest` | — | `data/package-json`, `data/pyproject` |
 | [`data/stale-deps-snapshot`](data/stale-deps-snapshot.md) | The dependency snapshot is recent | `manual` | — | `data/package-json`, `data/pyproject` |
 | [`json/no-duplicate-keys`](json/no-duplicate-keys.md) | No key twice in one JSON object | `manual` | — | `data/recommended` |
@@ -715,6 +718,8 @@ Presets: `codelaw:py/recommended` · `codelaw:py/conventions` · `codelaw:py/pro
 | [`py/except-with-non-exception-classes`](py/except-with-non-exception-classes.md) | `except` names exception classes | `manual` | — | `py/recommended` |
 | [`py/f-string-docstring`](py/f-string-docstring.md) | Docstrings aren't f-strings | `manual` | — | `py/recommended` |
 | [`py/f-string-missing-placeholders`](py/f-string-missing-placeholders.md) | An f-string has a placeholder | `auto` | — | `py/recommended` |
+| [`py/flag-expiry`](py/flag-expiry.md) | Every feature flag read is registered, with an owner and a date it goes | `suggest` | `presets`, `accessors`, `inline`, `warn_days` | *[rules] only* |
+| [`py/flag-marker`](py/flag-marker.md) | An inline flag marker agrees with the registry | `auto` | `presets`, `accessors`, `inline`, `warn_days` | *[rules] only* |
 | [`py/format-invalid`](py/format-invalid.md) | A `.format` string is well formed | `manual` | — | `py/recommended` |
 | [`py/format-missing-argument`](py/format-missing-argument.md) | Every `.format` field has an argument | `manual` | — | `py/recommended` |
 | [`py/format-mixed-numbering`](py/format-mixed-numbering.md) | A `.format` string doesn't mix `{}` and `{0}` | `manual` | — | `py/recommended` |

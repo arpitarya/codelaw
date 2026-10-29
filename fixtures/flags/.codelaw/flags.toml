@@ -1,0 +1,65 @@
+# The flags this repo reads: who owns each, and when it goes.
+
+[[flag]]
+name = "ld-js"
+owner = "@web"
+expires = "2026-01-01"
+
+[[flag]]
+name = "un-js"
+owner = "@web"
+expires = "2026-11-05"
+
+[[flag]]
+name = "split-js"
+owner = "@web"
+expires = "2027-06-01"
+
+[[flag]]
+name = "of-js"
+owner = "@web"
+expires = "never"
+reason = "the checkout kill switch"
+
+[[flag]]
+name = "wrapped"
+owner = "@web"
+ticket = "WEB-7"
+expires = "2026-10-01"
+keep = "on"
+
+[[flag]]
+name = "ld-py"
+owner = "@api"
+expires = "2026-03-01"
+
+[[flag]]
+name = "un-py"
+owner = "@api"
+expires = "2027-01-01"
+
+[[flag]]
+name = "split-py"
+owner = "@api"
+expires = "2026-11-01"
+
+[[flag]]
+name = "of-py"
+owner = "@api"
+expires = "2027-01-01"
+
+[[flag]]
+name = "fs-py"
+owner = "@api"
+expires = "2027-01-01"
+
+[[flag]]
+name = "py-wrapped"
+owner = "@api"
+expires = "2026-09-01"
+keep = "off"
+
+[[flag]]
+name = "retired"
+owner = "@web"
+expires = "2026-12-01"
