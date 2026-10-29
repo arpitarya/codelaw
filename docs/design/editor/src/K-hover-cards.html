@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>K · Hover cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3794ff;text-decoration:none}a:hover{color:#6cb0ff;text-decoration:underline}
+.mono{font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:12px}
+.spec{display:flex;flex-direction:column;gap:8px;min-width:0}
+.lbl{font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9d9d9d;text-transform:uppercase}
+.src{font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:13px;color:#d4d4d4;background:#1e1e1e;border:1px solid #2b2b2b;border-radius:4px;padding:7px 12px;white-space:pre;overflow:hidden}
+.kw{color:#c586c0}.kb{color:#569cd6}.fn{color:#dcdcaa}.s{color:#ce9178}.v{color:#9cdcfe}.cm{color:#6a9955}.ty{color:#4ec9b0}.tg{color:#569cd6}
+.we{text-decoration:underline wavy #f14c4c;text-underline-offset:4px;text-decoration-skip-ink:none}
+.ww{text-decoration:underline wavy #cca700;text-underline-offset:4px;text-decoration-skip-ink:none}
+.wg{text-decoration:underline wavy #73c991;text-underline-offset:4px;text-decoration-skip-ink:none}
+.wb{text-decoration:underline dotted #8a8a8a;text-underline-offset:4px}
+.card{background:#252526;border:1px solid #454545;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.45);font-size:13px;color:#cccccc;overflow:hidden;margin-left:24px}
+.hd{display:flex;align-items:center;gap:8px;padding:12px 14px 0}
+.tt{font-weight:600;color:#ffffff}
+.chip{border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600;border:1px solid;white-space:nowrap}
+.c-e{color:#ffa8a8;border-color:rgba(241,76,76,0.5);background:rgba(241,76,76,0.12)}
+.c-w{color:#ecd27a;border-color:rgba(204,167,0,0.5);background:rgba(204,167,0,0.12)}
+.c-i{color:#9ccbff;border-color:rgba(55,148,255,0.5);background:rgba(55,148,255,0.12)}
+.c-g{color:#8fd9a8;border-color:rgba(115,201,145,0.5);background:rgba(115,201,145,0.12)}
+.c-n{color:#cfcfcf;border-color:#555555}
+.bd{padding:8px 14px 12px;display:flex;flex-direction:column;gap:9px}
+.why{line-height:1.5}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.box{border-radius:4px;padding:6px 9px;white-space:pre;overflow:hidden}
+.bad{border:1px solid rgba(241,76,76,0.45)}
+.good{border:1px solid rgba(115,201,145,0.5)}
+.neutral{background:#1b1b1c;border:1px solid #3c3c3c}
+.cap{font-family:Inter,sans-serif;font-size:11px;margin-bottom:3px}
+.rows{display:grid;grid-template-columns:110px 1fr;row-gap:3px;font-size:12.5px}
+.k{color:#a9a9a9}
+.meta{color:#9d9d9d;font-size:12px}
+.ft{display:flex;align-items:center;gap:14px;padding:9px 14px;border-top:1px solid #3c3c3c;background:#202021;font-size:12.5px;flex-wrap:wrap}
+.btn{background:#0e639c;color:#ffffff;padding:4px 12px;border-radius:3px;text-decoration:none}
+.del{color:#ff9b9b;text-decoration:line-through}
+.ins{color:#8fd9a8}
+.code,.src,.mono{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+</style>
+</head>
+<body>
+
+<div style="width: 1760px; height: 1420px; box-sizing: border-box; padding: 40px; background: #181818; color: #cccccc; font-family: Inter, system-ui, sans-serif; font-size: 13px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 40px; row-gap: 34px; align-content: start; align-items: start">
+
+  <div class="spec">
+    <div class="lbl">1 · Security — needs your call</div>
+    <div class="src">  <span class="kw">return</span> &lt;<span class="tg">div</span> <span class="v we">dangerouslySetInnerHTML</span>={<span class="v">html</span>} /&gt;;</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#f14c4c"></circle><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#252526" stroke-width="1.6"></path></svg><span class="tt">Raw HTML from user data</span><span class="chip c-e" style="margin-left: auto">error</span><span class="chip c-n">needs your call</span></div>
+      <div class="bd">
+        <div class="why"><span class="mono" style="color: #9cdcfe">user.note</span> reaches the page as HTML, so anyone who can write a note can run script in every visitor's browser.</div>
+        <div class="two mono"><div class="box bad"><div class="cap" style="color: #ffa8a8">Don't</div>__html: note</div><div class="box good"><div class="cap" style="color: #8fd9a8">Do</div>__html: sanitize(note)</div></div>
+        <div class="meta"><span class="mono">sec-js/no-dangerously-set-inner-html</span> · CWE-79 · new in this branch</div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Ask agent to fix</a><a href="#">Rule page</a><a href="#">Ignore with expiry…</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">2 · Bug risk — one-click fix</div>
+    <div class="src">    <span class="kw ww">except</span>:</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M8 1.5l7 13H1z" fill="#cca700"></path><path d="M8 6v4M8 12v.6" stroke="#252526" stroke-width="1.6"></path></svg><span class="tt">Bare except catches everything</span><span class="chip c-w" style="margin-left: auto">warn</span><span class="chip c-i">one-click fix</span></div>
+      <div class="bd">
+        <div class="why">It also catches Ctrl-C and <span class="mono" style="color: #9cdcfe">SystemExit</span>, so the job can never be stopped cleanly.</div>
+        <div class="box neutral mono"><span class="del">except:</span>   →   <span class="ins">except Exception:</span></div>
+        <div class="meta"><span class="mono">py/no-bare-except</span> · new in this branch</div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Apply fix</a><a href="#">Rule page</a><a href="#">Ignore with expiry…</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">3 · Fixes itself on save</div>
+    <div class="src"><span class="kw">import</span> { <span class="v">api</span> } <span class="kw">from</span> <span class="s wg">"../api"</span>;</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#73c991"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg><span class="tt">Imports out of order</span><span class="chip c-g" style="margin-left: auto">fixes itself on save</span></div>
+      <div class="bd">
+        <div class="why">Builtin, then external, then internal, then relative. codelaw sorts them when you save — nothing for you to do.</div>
+        <div class="meta"><span class="mono">js/import-groups</span> · auto fix</div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Fix now</a><a href="#">Rule page</a><a href="#">Stop fixing on save</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">4 · Old finding in the baseline</div>
+    <div class="src"><span class="kw">export</span> <span class="kw wb">default</span> <span class="kb">function</span> <span class="fn">applyCoupon</span>(<span class="v">code</span>: <span class="ty">string</span>) {</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#9d9d9d" stroke-width="1.6" stroke-dasharray="2 2"></circle></svg><span class="tt">Default export</span><span class="chip c-n" style="margin-left: auto">baseline</span><span class="chip c-n">needs your call</span></div>
+      <div class="bd">
+        <div class="why">In the baseline since 2026-09-12, so it doesn't fail CI. Fix it the next time you change this file — every importer changes too.</div>
+        <div class="meta"><span class="mono">js/no-default-export</span> · 14 more in this repo</div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Ask agent to fix</a><a href="#">Rule page</a><a href="#">Show all 15</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">5 · Vulnerable package used here</div>
+    <div class="src"><span class="kw">import</span> { <span class="v">template</span> } <span class="kw">from</span> <span class="s we">"lodash"</span>;</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#f14c4c"><path d="M12 2.5l8 3v6.5c0 4.6-3.4 8.2-8 9.5-4.6-1.3-8-4.9-8-9.5V5.5z"></path></svg><span class="tt">lodash 4.17.15 is vulnerable</span><span class="chip c-e" style="margin-left: auto">high</span><span class="chip c-i">one-click fix</span></div>
+      <div class="bd">
+        <div class="why">This file imports <span class="mono" style="color: #9cdcfe">template</span>, the function <a href="#">GHSA-35jh-r3h4-6jhm</a> (command injection) is about.</div>
+        <div class="rows"><span class="k">Safe version</span><span style="color: #ffffff; font-weight: 600">4.17.21 <span class="k" style="font-weight: 400">same major</span></span><span class="k">Also</span><span>2 more advisories</span></div>
+        <div class="meta"><span class="mono">deps/vulnerable</span> · snapshot 2026-10-29</div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Change to ^4.17.21</a><a href="#">Open package.json</a><a href="#">Ignore with expiry…</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">6 · TODO past its date</div>
+    <div class="src">  <span class="cm we">// TODO(PAY-388, 2026-10-01): remove after migration</span></div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2.4"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span class="tt">TODO expired 29 days ago</span><span class="chip c-e" style="margin-left: auto">error</span><span class="chip c-n">needs your call</span></div>
+      <div class="bd">
+        <div class="rows"><span class="k">Ticket</span><a href="#">PAY-388</a><span class="k">Due</span><span>2026-10-01</span></div>
+        <div class="why">Do it now, agree a new date on the ticket, or delete the TODO.</div>
+        <div class="meta"><span class="mono">js/todo</span> · dates read against the as-of day</div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Open PAY-388</a><a href="#">Change date…</a><a href="#">Ask agent to do it</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">7 · TODO without a ticket</div>
+    <div class="src"><span class="cm">// <span class="ww">FIXME</span>: rounding is off for JPY</span></div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M8 1.5l7 13H1z" fill="#cca700"></path><path d="M8 6v4M8 12v.6" stroke="#252526" stroke-width="1.6"></path></svg><span class="tt">FIXME needs a ticket</span><span class="chip c-w" style="margin-left: auto">warn</span><span class="chip c-n">needs your call</span></div>
+      <div class="bd">
+        <div class="why">This repo asks every TODO and FIXME for a ticket, so none is forgotten.</div>
+        <div class="box neutral mono"><span class="cm">// FIXME(<span style="color: #9ccbff">ABC-123</span>): rounding is off for JPY</span></div>
+        <div class="meta"><span class="mono">js/todo</span> · <span class="mono">[todo] require_ticket = true</span></div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Add ticket…</a><a href="#">Rule page</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">8 · Feature flag expiring</div>
+    <div class="src">  <span class="kw">if</span> (<span class="fn">useFlag</span>(<span class="s ww">"new-checkout"</span>)) {</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.4"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg><span class="tt">Flag new-checkout expires in 2 days</span><span class="chip c-w" style="margin-left: auto">warn</span><span class="chip c-i">one-click fix</span></div>
+      <div class="bd">
+        <div class="rows"><span class="k">Owner</span><span>@payments-team</span><span class="k">Expires</span><span>2026-11-01 · then an error at 3 uses</span><span class="k">Keeps</span><span>the "on" branch</span></div>
+        <div class="meta"><span class="mono">js/flag-expiry</span> · <span class="mono">.codelaw/flags.toml</span></div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Remove flag, keep "on"</a><a href="#">Open flags.toml</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">9 · Feature flag expired</div>
+    <div class="src">  <span class="kw">if</span> (<span class="fn">useFlag</span>(<span class="s we">"summer-sale"</span>)) <span class="kw">return</span> <span class="fn">sale</span>(<span class="v">code</span>);</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2.4"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg><span class="tt">Flag summer-sale expired 3 days ago</span><span class="chip c-e" style="margin-left: auto">error</span><span class="chip c-n">needs your call</span></div>
+      <div class="bd">
+        <div class="why">The registry doesn't say which branch stays, so codelaw won't guess. Pick one and it removes the other.</div>
+        <div class="meta"><span class="mono">js/flag-expiry</span> · owner @growth</div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Keep "on" branch</a><a href="#">Keep "off" branch</a><a href="#">Open flags.toml</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">10 · Focused test</div>
+    <div class="src">  <span class="v">it</span>.<span class="fn we">only</span>(<span class="s">"applies 10% off"</span>, <span class="fn">tenOff</span>);</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2.4"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3.5"></circle></svg><span class="tt">Only this test will run</span><span class="chip c-e" style="margin-left: auto">error</span><span class="chip c-i">one-click fix</span></div>
+      <div class="bd">
+        <div class="why"><span class="mono">.only</span> turns off every other test in this file — in CI too.</div>
+        <div class="box neutral mono"><span class="del">it.only(</span>   →   <span class="ins">it(</span></div>
+        <div class="meta"><span class="mono">js/no-focused-test</span></div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Apply fix</a><a href="#">Rule page</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">11 · Skipped test without a reason</div>
+    <div class="src">  <span class="v">it</span>.<span class="fn ww">skip</span>(<span class="s">"rounds JPY totals"</span>, <span class="fn">jpy</span>);</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.6"><path d="M8 5v14M16 5v14"></path></svg><span class="tt">Skipped test needs a reason and a date</span><span class="chip c-w" style="margin-left: auto">warn</span><span class="chip c-n">needs your call</span></div>
+      <div class="bd">
+        <div class="why">Without them a skipped test stays off for good. Add one line above it:</div>
+        <div class="box neutral mono"><span class="cm">// SKIP(<span style="color: #9ccbff">ABC-123</span>, 2026-12-01): why it's off</span></div>
+        <div class="meta"><span class="mono">js/skip-needs-reason</span></div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Add reason…</a><a href="#">Unskip</a><a href="#">Rule page</a></div>
+    </div>
+  </div>
+
+  <div class="spec">
+    <div class="lbl">12 · Too complex</div>
+    <div class="src"><span class="kw">export</span> <span class="kw">default</span> <span class="kb">function</span> <span class="fn ww">applyCoupon</span>(<span class="v">code</span>: <span class="ty">string</span>) {</div>
+    <div class="card">
+      <div class="hd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M8 1.5l7 13H1z" fill="#cca700"></path><path d="M8 6v4M8 12v.6" stroke="#252526" stroke-width="1.6"></path></svg><span class="tt">applyCoupon is too complex</span><span class="chip c-w" style="margin-left: auto">warn</span><span class="chip c-n">needs your call</span></div>
+      <div class="bd">
+        <div class="rows"><span class="k">Complexity</span><span>23 <span class="k">· max 20</span></span><span class="k">Lines</span><span>74 <span class="k">· max 50</span></span></div>
+        <div class="why">Too many paths to test well. Split each flag path into its own function.</div>
+        <div class="meta"><span class="mono">js/complexity</span></div>
+      </div>
+      <div class="ft"><a href="#" class="btn">Ask agent to split</a><a href="#">Rule page</a><a href="#">Ignore with expiry…</a></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
