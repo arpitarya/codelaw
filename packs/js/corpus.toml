@@ -6,6 +6,8 @@
 "js/complexity" = 1
 "js/constructor-super" = 0
 "js/exports-at-end" = 436
+"js/flag-expiry" = 0
+"js/flag-marker" = 0
 "js/for-direction" = 0
 "js/getter-return" = 0
 "js/import-groups" = 76

@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-130 closed: feature-flag expiry  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Implement it and then close those out. Keep merging everything to main."* — W-130, one of six agents in parallel.
+- **Done:** 3a77a142 — `codelaw_graph::flags` (patterns, six presets, flag facts, wrapper fixpoint, name resolution, registry and marker verdicts), the engine's flag stage, `[flags]` in config/schema/trace, five preview rules with cases, `codelaw flags accessors`, `fixtures/flags` + `tests/flags.rs`; SR-PROJECT-GRAPH 11, SR-RULE-PACKS 17, SR-CONFIG, SR-CLI-MCP, SR-ARCHITECTURE, SR-RULE-AUTHORING. Then W-130-b: corpus counts (0), the L8 measurement, the item closed.
+- **Decided / left open:** placement — reads in `js`/`python`, markers as their own `auto` rules beside them (one fix class per rule), registry in `data`, no new pack; a `[flags]` table turns the rules on, in no preset; each finding graded (error/warn/info); `keep` alone makes a read "decided" (warn, with the collapse); method wrappers count only in files importing their module; conflicting markers have no auto fix; manual fixes use `codelaw-fix`; `init` writes no `flags.toml`. Not built: destructured `useFlags()`, a name via a local variable, JSX `&&` collapse.
+- **Mistakes:** end-of-turn auto-land committed half-resolved states onto the change branch; squashed and rebased once. The shared target dir swapped other worktrees' builds in (touch-and-rebuild, a private binary copy).
+- **Next:** the decider: confirm the placement and the `[flags]`-turns-them-on opt-in.
+
 ## 2026-10-30 — W-140 filed: port any rule on demand  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"propose a way how … anybody who is consuming code law can migrate any existing rule into code law"*; narrowed by voice to one rule at a time, named by its tool, plus *"how many people use that rule?"*; *"file it."*
