@@ -78,7 +78,6 @@ pub struct RawConfig {
     /// words. Root config only.
     #[serde(default)]
     pub spell: RawSpell,
-<<<<<<< HEAD
     /// SR-CONFIG decision 11a (W-131): the `*/todo-marker` rules' tags, ticket
     /// and date. Root config only.
     #[serde(default)]
@@ -86,12 +85,10 @@ pub struct RawConfig {
     /// SR-CONFIG decision 11a (W-131): `[tests.skip]`. Root config only.
     #[serde(default)]
     pub tests: RawTests,
-=======
     /// SR-PROJECT-GRAPH decision 11 (W-130): feature-flag expiry — the
     /// accessors, the SDK presets, the inline markers' policy and the
     /// warning window. Its presence turns the flag rules on. Root config only.
     pub flags: Option<RawFlags>,
->>>>>>> 7a0a398a (W-130 wip)
     #[serde(default)]
     pub adapters: RawAdapters,
     #[serde(default)]
@@ -344,7 +341,6 @@ pub struct RawSpell {
     pub words_file: Option<String>,
 }
 
-<<<<<<< HEAD
 /// `[todo]`: what a TODO-style comment must carry (SR-CONFIG decision 11a,
 /// W-131). The `*/todo-marker` rules read it as their options, so it
 /// serialises to the JSON they read.
@@ -401,7 +397,6 @@ pub struct RawTestsSkip {
 
 /// The ticket pattern when `ticket_pattern` is not set (`ABC-123`).
 pub const DEFAULT_TICKET_PATTERN: &str = "[A-Z][A-Z0-9]+-\\d+";
-=======
 /// `[flags]`: SR-PROJECT-GRAPH decision 11. The flag rules read it as their
 /// options, so it serialises to the JSON they read.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
@@ -426,7 +421,6 @@ pub const FLAG_PRESETS: &[&str] = &["launchdarkly", "unleash", "split", "openfea
 
 /// The values of `[flags] inline`.
 pub const FLAG_INLINE: &[&str] = &["allow", "registry-only"];
->>>>>>> 7a0a398a (W-130 wip)
 
 /// Where `[spell] words_file` points when it is not set: beside the rules
 /// folder. A missing file there is no error; a missing file the config

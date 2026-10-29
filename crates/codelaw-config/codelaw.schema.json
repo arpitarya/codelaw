@@ -419,7 +419,6 @@
         }
       }
     },
-<<<<<<< HEAD
     "todo": {
       "x-codelaw-record": "SR-CONFIG",
       "description": "What a TODO-style comment must carry (SR-CONFIG decision 11a): read by the `*/todo-marker` rules. A written date is enforced whether or not it is required. Root config only.",
@@ -456,7 +455,9 @@
             "ticket_pattern": { "description": "A regular expression a whole ticket must match.", "type": "string", "default": "[A-Z][A-Z0-9]+-\\d+" },
             "warn_days": { "description": "A skip is warned about this many days before its expiry.", "type": "integer", "minimum": 0, "default": 14 }
           }
-=======
+        }
+      }
+    },
     "flags": {
       "x-codelaw-record": "SR-PROJECT-GRAPH",
       "description": "Feature-flag expiry (SR-PROJECT-GRAPH decision 11): which calls read a flag, and how its expiry is declared. A `[flags]` table turns on `js/flag-expiry`, `js/flag-marker`, `py/flag-expiry`, `py/flag-marker` and `data/flag-registry`; their flags are registered in `.codelaw/flags.toml` or by inline `codelaw-flag` markers. Root config only.",
@@ -484,7 +485,6 @@
           "description": "How many days before its `expires` a flag's reads warn: an integer or a string such as `\"14d\"` or `\"2w\"`.",
           "type": ["integer", "string"],
           "default": 14
->>>>>>> 7a0a398a (W-130 wip)
         }
       }
     },
