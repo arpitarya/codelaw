@@ -10,6 +10,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Changed
 
+- **Housekeeping (W-120, W-121, W-122, W-123, W-124):** ten leftover worktrees were checked against `main` and removed; the one unlanded ruling in them is W-125. No code changed.
 - **Release pipeline (W-119):** `publish.yml` run by hand from `main` with `-f only=pypi-new -f release=<tag> -f project=<name>` creates one new PyPI project from that release's checked build, through the project's pending publisher — no token and no daily limit; the `pypi` environment now admits `main` for it.
 - **Housekeeping (W-88, W-89, W-115):** PyPI days 3 and 4 and the spell pack's first PyPI upload were folded into W-119, which creates the ten missing PyPI projects through CI; no code changed.
 

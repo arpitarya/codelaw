@@ -24,6 +24,30 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — OPEN-WORK gains a `reporting and benchmarks` group  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"In open work file, create a section for reporting and benchmarks. And reallocate the work items respectively."*
+- **Done:** SR-WORK-OPEN-QUEUE rule 37 amended first (the group, what closing it takes, the order build → testing → reporting and benchmarks → record update → research, his words); OPEN-WORK's new `### reporting and benchmarks` with W-103 (left: the spell pack's L8 measurement and budget) and W-102 (left: the experiment run, its numbers and write-up); **`.claude/skills/docket/SKILL.md`'s group order** updated — an agent-steering file, said here per SR-WORK-DOCS 7a. Not committed.
+- **Decided / left open:** agent's calls, flagged: which rows move — W-103 because only its benchmark is left; W-102 because its output is a measured report (it was `testing`). W-105 stays `build` (four rules to write before its budgets).
+- **Mistakes:** none.
+- **Next:** none from this.
+
+## 2026-10-29 — Worktree cleanup: ten dropped, W-120–W-124 closed, W-125 filed  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"execute the cleanup of all the working trees. And any temporary files."*
+- **Done:** each of the ten red worktrees merged in memory against `main` — nine held nothing `main` lacks; `W-119-loop` held Arpit's 10:31 ruling that `only=pypi-new` is temporary, which W-119's Cowork close had missed (it said the mode *stays*). Filed as W-125, archive line corrected; then all ten worktrees and branches force-removed, W-120–W-124 archived. `.DS_Store`, `__pycache__`, `fixtures/github-action/.codelaw/cache` deleted.
+- **Decided / left open:** `target/` (19 GB of the 19.9 GB used) not touched — a rebuild, the decider's call. Two older `lm/*` branches with no worktree left as they are (one adds nothing, one conflicts with `main`).
+- **Mistakes:** none.
+- **Next:** W-125.
+
+## 2026-10-29 — Every codelaw package published and trusted; W-119 closed  ·  Cowork (Opus 5.5)
+
+- **Asked:** one package at a time — *"add to pending publisher"*, *"next package"* — ten times.
+- **Done:** for each of ten PyPI projects, Claude in Chrome checked the last one (version, trusted publisher, pending slot free) and registered the next pending publisher; Arpit ran `publish.yml` `only=pypi-new`. Final check 11:25: PyPI 24/24 and npm 45/45 exist and are trusted, no pending publisher left. W-119 closed and archived; its inbox row (*"the next new project, through CI … 0 of 10"*, written by another session) and open row removed. Not committed.
+- **Decided / left open:** none.
+- **Mistakes:** one "next" arrived before its run had happened — caught by the check, the command re-sent.
+- **Next:** W-95 (the extension through `vsce`/`ovsx`), W-117 (Open VSX claim and token), W-97 (the Marketplace tick).
+
 ## 2026-10-29 — L2 decision 8: `vsce` and `ovsx` for the VS Code extension only  ·  Cowork (Opus 5.5)
 
 - **Asked:** by voice, a package to check (and publish) the VS Code extension; ruled `@vscode/vsce` and `ovsx` as scoped exceptions; *"file it."*
