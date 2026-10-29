@@ -30,6 +30,7 @@
     "onLanguage:css",
     "onLanguage:scss",
     "onLanguage:html",
+    "onLanguage:dockerfile",
     "workspaceContains:codelaw.toml"
   ],
   "contributes": {

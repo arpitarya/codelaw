@@ -226,6 +226,7 @@ yet is owned by an open `W-nn`.
 | `crates/codelaw-cli/tests/tests_for_new_code.rs` | SR-PROJECT-GRAPH | decision 9: the test rules of new code and `.codelawignore` on real git repos |
 | `fixtures/scss` | SR-LAW-3 | SCSS as a CSS dialect (amended 2026-10-26): the corpus the `css` and `scss` packs hold finding counts on |
 | `crates/codelaw-cli/tests/scss.rs` | SR-LAW-3 | runs that corpus, the `css/*`-quiet-on-Sass check and `format` idempotence through the binary |
+| `crates/codelaw-cli/tests/text_config.rs` | SR-LAW-3 | decision 10: a finding on `package.json` and on the `.nvmrc` line, through `check` in every format, the LSP and the hook |
 | `fixtures/react-no-context` | SR-RULE-PACKS | decision 8: `react/no-context`'s adoption recipe as a repo (W-41) |
 | `fixtures/skills-consumer` | SR-PACKAGES | decision 11: the consumer `smoke.sh` runs `sync-agents` in, from the npm and the PyPI skills package (W-77) |
 | `crates/codelaw-cli/tests/react_no_context.rs` | SR-RULE-PACKS | decision 8: runs that recipe through the binary (a different decision from the CLI's) |

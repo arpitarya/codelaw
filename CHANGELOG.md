@@ -12,6 +12,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ### Changed
 
+- **Findings on plain-text config files (W-136):** a finding about `.nvmrc`, `.node-version`, `.python-version`, `.tool-versions`, a `Dockerfile`, `CODEOWNERS` or yarn classic's `yarn.lock` shows on the file it concerns (`package.json`, a workflow) **and** on the text file's line — in `check`'s every format, the editor (the extension now opens these files) and the post-edit hook. They are not linted or formatted, and `fix` never writes one (L3 amended).
 - **GitHub Action (W-97):** its Marketplace name is `codelaw check` (the name `codelaw` is taken) and its description is under the Marketplace's 125 characters; `uses: arpitarya/codelaw@v0` is unchanged.
 
 ### Fixed
