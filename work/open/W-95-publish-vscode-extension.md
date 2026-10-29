@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-95 — Publish the VS Code extension — Marketplace and Open VSX
@@ -92,6 +92,8 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 **Found 2026-10-29 01:15 (Cowork):** the GitHub environment `vscode` exists (with `npm`, `pypi`); the `publish.yml` `vscode` job landed (`815f327`). Left: the first release run (W-116) proves the Marketplace upload and the deleted-0.2.0 question; Open VSX waits on `OVSX_PAT` (W-117); README/USAGE step 4.
 
 **State, 2026-10-29 10:05 (Cowork):** v0.3.0's `vscode` job got a Marketplace token through **trusted publishing** — the OIDC exchange works — but the upload was refused (HTTP 400: the gallery wants `application/json`); fixed on `main` (`216bf43`). `publish.yml` can now run the extension's job alone from `main` (`390c44b`): `gh workflow run publish.yml -R arpitarya/codelaw --ref main -f only=vscode`. Open VSX was skipped (no `OVSX_PAT`, W-117). Whether the deleted 0.2.0 blocks the name is still unknown — the next run answers it.
+
+**Arpit, 2026-10-29 (voice; written on *"file it."*):** asked for a package to check whether the extension is published; told `@vscode/vsce` needs an L2 exception and an L11 row: *"Let's add it as an exception. And only to be used for checking the VS Code extension and publishing the VS Code extension. That's it, nothing else."* Then on `ovsx`: *"Yes."* — ruled as L2 decision 8 (scoped exception), L11 D-46 and D-47. **So this item now:** move `publish.yml`'s extension job from `curl` to `vsce publish` (Marketplace — with its trusted-publishing credential, as the policy already set up allows) and `ovsx publish` (Open VSX — the first version with W-117's token, then `--trusted-publishing`); add the check command (`vsce show codelaw.codelaw`, and `ovsx`'s for Open VSX) — the only other use allowed; pin both, record their trees in D-46/D-47, and let `cargo test -p codelaw-cli --test licences` name them as decision 8's exception, not a breach. *Agent's reading, flagged:* switching the job to the tools follows from *"publishing the VS Code extension"* in the ruling; the drafted run of the `curl` job (the earlier inbox row) is dropped.
 
 ## Left
 

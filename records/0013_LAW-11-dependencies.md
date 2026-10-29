@@ -10,7 +10,7 @@ feature: "dependencies by ratification only"
 owns:
   - crates/codelaw-cli/tests/dependencies.rs
 laws: [L0, L2, L11]
-timestamp: 2026-10-28T12:00:00Z
+timestamp: 2026-10-29T05:00:00Z
 content_sha: ""
 ratifies: "Arpit, 2026-10-26 (Cowork): Okay. Create a law, no dependencies. For Rust, for Python, for JavaScript, TypeScript, JSON, CSS, YAML, TOML, HTML, nothing. No dependencies. Create a law. And then tell me what all dependencies do we have. We will ratify them one by one."
 ---
@@ -195,6 +195,15 @@ Installed only by `scripts/bench-rivals.py install` inside `.github/workflows/be
 |---|---|---|---|---|
 | D-45 | **typescript** (npm, Apache-2.0) | the TypeScript codelaw's own type-aware tests and CI run against (W-105's fixtures, W-106's matrix); installed into fixture folders only — never in a package, the engine or a consumer's repo. A consumer's project uses its own TypeScript, which is no dependency of codelaw ([SR-TYPES](0117_types.md) decision 5). Separate from D-28, the extension's compiler | the **7.1** line, blocking; `typescript@next` in a nightly, reporting-only job. **Pinned by W-105 (2026-10-28)** in `fixtures/types/package-lock.json`: `typescript@7.1.0-beta` (no dependencies of its own) and its 21 optional platform-binary packages `@typescript/typescript-<platform>@7.1.0-beta`, of which npm installs the one for the machine (≈ 33 MB) — nothing else. Installed by `npm ci` in `fixtures/types` (ci.yml); moves to the RC and GA by W-105 step 6 and W-106 | ratified 2026-10-27 — *"Yes."* (the decider, 2026-10-27 (voice docket); with *"make sure it is as fast as possible"*) |
 
+### CI — the VS Code extension's registry tools (L2 decision 8, W-95)
+
+Allowed only to publish the codelaw extension and to check what each registry holds of it, in `publish.yml`'s extension job and a check command beside it — never in the engine, a package, a test, `ci.yml` or a consumer's repo ([L2](0004_LAW-2-foss-dependencies.md) decision 8). Each ratification takes the unit's tree as pinned when W-95 lands it (decision 4).
+
+| id | unit | licence (L2) | what it does | pin | status |
+|---|---|---|---|---|---|
+| D-46 | **`@vscode/vsce`** (npm) | MIT; its tree holds `@vscode/vsce-sign` (proprietary) — L2 decision 8's exception | uploads the eight `.vsix` to the Visual Studio Marketplace; `vsce show codelaw.codelaw` checks the listing | exact version and tree recorded here when W-95 pins it (4.0.0 when proposed, 2026-10-27) | ratified 2026-10-29 — *"Let's add it as an exception. And only to be used for checking the VS Code extension and publishing the VS Code extension. That's it, nothing else."* (the decider, voice) |
+| D-47 | **`ovsx`** (npm) | EPL-2.0 (weak copyleft) — L2 decision 8's exception; depends on `@vscode/vsce` | uploads the `.vsix` to Open VSX, `--trusted-publishing` once the extension exists there; checks what Open VSX holds | exact version and tree recorded here when W-95 pins it (1.3.0 when proposed) | ratified 2026-10-29 — *"Yes."* to `ovsx` on the same terms as `vsce` (the decider, voice) |
+
 ### CI — GitHub Actions (`.github/workflows/`)
 
 | id | unit | what it does | status |
@@ -203,7 +212,7 @@ Installed only by `scripts/bench-rivals.py install` inside `.github/workflows/be
 | D-31 | **Swatinem/rust-cache** | caches Rust builds in CI | ratified 2026-10-26 — *"Ratify."* |
 | D-32 | **pypa/gh-action-pypi-publish** | uploads to PyPI with trusted publishing | ratified 2026-10-26 — *"Ratify."* |
 
-**Not ratified, 2026-10-27 (the decider, 2026-10-27 (voice docket)):** `github/codeql-action/upload-sarif` — the Action uploads SARIF through the REST API with `gh` (W-97, *"Okay."*); `@vscode/vsce` 4.0.0 and `ovsx` 1.3.0 — `publish.yml` uploads the `.vsix` files with `curl` (W-95, *"A. A."*); L2 refuses both as they stand (EPL-2.0; a proprietary `@vscode/vsce-sign`).
+**Not ratified, 2026-10-27 (the decider, 2026-10-27 (voice docket)):** `github/codeql-action/upload-sarif` — the Action uploads SARIF through the REST API with `gh` (W-97, *"Okay."*); `@vscode/vsce` 4.0.0 and `ovsx` 1.3.0 — `publish.yml` uploads the `.vsix` files with `curl` (W-95, *"A. A."*); L2 refuses both as they stand (EPL-2.0; a proprietary `@vscode/vsce-sign`). **Superseded 2026-10-29:** both ratified for the extension's publishing and checking only — D-46, D-47 under L2 decision 8.
 
 ### How it was taken
 
