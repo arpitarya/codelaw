@@ -97,20 +97,32 @@ fn patch_paths(patch: &str) -> Vec<String> {
         .collect()
 }
 
-/// The paths codelaw checks: existing files with an L3 extension. A deleted
-/// file or a `.rs` file is not the hook's business, and is dropped silently.
-fn checkable(paths: Vec<PathBuf>) -> Vec<PathBuf> {
-    let mut out: Vec<PathBuf> = paths.into_iter().filter(|p| p.is_file() && Language::from_path(p).is_some()).collect();
-    out.dedup();
-    out
+/// The paths codelaw checks: existing files with an L3 extension, then the
+/// plain-text config files (`.nvmrc`, `CODEOWNERS`, …: SR-LAW-3 decision
+/// 10), which are never fixed but carry the copies of findings their L3
+/// files report into them. A deleted file or a `.rs` file is not the hook's
+/// business, and is dropped silently.
+fn checkable(paths: Vec<PathBuf>) -> (Vec<PathBuf>, Vec<PathBuf>) {
+    let mut l3: Vec<PathBuf> = Vec::new();
+    let mut text: Vec<PathBuf> = Vec::new();
+    for p in paths.into_iter().filter(|p| p.is_file()) {
+        if Language::from_path(&p).is_some() {
+            l3.push(p);
+        } else if codelaw_core::is_text_config(&p.to_string_lossy()) {
+            text.push(std::fs::canonicalize(&p).unwrap_or(p));
+        }
+    }
+    l3.dedup();
+    text.dedup();
+    (l3, text)
 }
 
 /// Run the hook on `paths`, or on the payload when there are none. Returns
 /// the text for the agent and whether it must go back to it.
 pub fn run(paths: Vec<PathBuf>, payload: Option<&str>, profile: Option<String>) -> Result<Option<(String, bool)>, String> {
     let paths = if paths.is_empty() { payload.map(paths_from_payload).unwrap_or_default() } else { paths };
-    let paths = checkable(paths);
-    let Some(first) = paths.first() else { return Ok(None) };
+    let (paths, texts) = checkable(paths);
+    let Some(first) = paths.first().or(texts.first()) else { return Ok(None) };
     let start = first.parent().map(Path::to_path_buf).filter(|p| !p.as_os_str().is_empty()).unwrap_or_else(|| PathBuf::from("."));
     // The files the agent just edited are touched: a grandfathered finding
     // in one gets the verdict CI would give it (SR-BASELINE decision 8).
@@ -120,7 +132,20 @@ pub fn run(paths: Vec<PathBuf>, payload: Option<&str>, profile: Option<String>) 
     let options = EngineOptions { touched_paths: paths.clone(), profile, profile_surface: Some(("ci", "codelaw hook")), no_cold_types: true, ..EngineOptions::from_env() };
     let mut project = Project::load(&start, options).map_err(|e| e.to_string())?;
     // `auto` only, written: L4 decision 8. `suggest` goes back as a diff.
-    let report = project.fix(&paths, &FixOptions { unsafe_fixes: false, dry_run: false, trace: false }).map_err(|e| e.to_string())?;
+    let mut report = if paths.is_empty() {
+        codelaw_engine::FixReport::default()
+    } else {
+        project.fix(&paths, &FixOptions { unsafe_fixes: false, dry_run: false, trace: false }).map_err(|e| e.to_string())?
+    };
+    // An edited text config file: what its L3 files report into it
+    // (SR-ARCHITECTURE decision 15d), fixed nowhere.
+    for t in &texts {
+        report.check.diagnostics.extend(project.check_text_config(t));
+    }
+    if !texts.is_empty() {
+        report.check.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+        report.check.diagnostics.dedup();
+    }
     let text = codelaw_report::hook_text(&report.files, &report.check);
     Ok(Some((text, codelaw_report::hook_blocks(&report.check))))
 }
