@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>D · Final</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#a9a9a9;text-decoration:none}a:hover{color:#3794ff;text-decoration:underline}
+.code{font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:13px}
+.ln{display:flex;align-items:center;height:22px;white-space:pre}
+.g{width:20px;display:flex;justify-content:center;flex-shrink:0}
+.no{width:32px;text-align:right;color:#858585;padding-right:16px;flex-shrink:0}
+.c{flex:1;min-width:0;overflow:hidden;color:#d4d4d4;display:block;line-height:22px}
+.k{color:#9cdcfe}.s{color:#ce9178}.kw{color:#c586c0}.kb{color:#569cd6}.fn{color:#dcdcaa}.cm{color:#6a9955}.ty{color:#4ec9b0}.v{color:#9cdcfe}.tk{color:#569cd6}
+.tr{background:rgba(241,76,76,0.09)}
+.tw{background:rgba(204,167,0,0.07)}
+.b{margin-left:14px;border-radius:10px;padding:0 9px;height:18px;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-family:Inter,system-ui,sans-serif;border:1px solid}
+.be{background:rgba(241,76,76,0.14);border-color:rgba(241,76,76,0.5);color:#ffa8a8}
+.bw{background:rgba(204,167,0,0.13);border-color:rgba(204,167,0,0.5);color:#ecd27a}
+.bi{background:rgba(55,148,255,0.13);border-color:rgba(55,148,255,0.5);color:#9ccbff}
+.bo{background:transparent;border-color:transparent;color:#73c991;padding-left:0}
+.lens{height:20px;display:flex;align-items:center;gap:6px;font-family:Inter,system-ui,sans-serif;font-size:11.5px;color:#9d9d9d;white-space:pre}
+.tag{border-radius:3px;padding:0 4px;font-weight:600}
+.tg-todo{background:#3d3a1e;color:#e5c76b}
+.tg-fix{background:#4a2020;color:#ff9b9b}
+.tg-tk{background:#1f3550;color:#9ccbff}
+.tg-d{background:#2c2c2c;color:#cfcfcf}
+.tab{background:#1e1e1e;padding:0 16px;display:flex;align-items:center;gap:8px;font-size:13px}
+.pane{display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+.tabs{height:35px;background:#252526;display:flex;flex-shrink:0}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sec{height:24px;display:flex;align-items:center;gap:6px;padding:0 10px;font-size:11px;font-weight:600;letter-spacing:0.05em;color:#cccccc;border-top:1px solid #333333}
+.grp{height:22px;display:flex;align-items:center;gap:6px;padding:0 10px 0 22px;font-size:13px;color:#cccccc}
+.it{height:22px;display:flex;align-items:center;gap:8px;padding:0 10px 0 40px;font-size:13px;color:#cccccc;white-space:nowrap}
+.it.sel{background:#04395e;outline:1px solid #007fd4}
+.ds{color:#9d9d9d;font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.cnt{margin-left:auto;background:#4d4d4d;color:#ffffff;border-radius:9px;padding:0 6px;font-size:11px}
+.pill{margin-left:auto;border-radius:3px;padding:0 5px;font-size:10.5px;font-weight:600}
+.ph{background:#5a1d1d;color:#ffb4b4}
+.pm{background:#4d3d0a;color:#f2d77a}
+.chev{color:#c5c5c5;width:10px;font-size:10px}
+.sb{padding:0 9px;height:22px;display:flex;align-items:center;gap:5px}
+.b,.act,.man{vertical-align:middle}
+.code,.src,.mono{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+</style>
+</head>
+<body>
+
+<div style="width: 1760px; height: 900px; box-sizing: border-box; display: flex; flex-direction: column; background: #1e1e1e; color: #cccccc; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <div style="height: 32px; background: #323233; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0">package.json — checkout — Visual Studio Code</div>
+  <div style="flex: 1; display: flex; min-height: 0">
+    <div style="width: 48px; background: #333333; display: flex; flex-direction: column; align-items: center; gap: 22px; padding-top: 14px; flex-shrink: 0">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#858585" stroke-width="1.5"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5"></path></svg>
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#858585" stroke-width="1.5"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+      <div style="position: relative; width: 48px; display: flex; justify-content: center; border-left: 2px solid #ffffff; box-sizing: border-box">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5"><path d="M12 2.5l8 3v6.5c0 4.6-3.4 8.2-8 9.5-4.6-1.3-8-4.9-8-9.5V5.5z"></path><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg>
+        <span style="position: absolute; right: 7px; bottom: -6px; background: #f14c4c; color: #ffffff; font-size: 9px; font-weight: 600; border-radius: 7px; padding: 0 4px">9</span>
+      </div>
+    </div>
+    <div style="width: 330px; background: #252526; display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden">
+      <div style="height: 35px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px 0 20px; font-size: 11px; letter-spacing: 0.05em">
+        <span>CODELAW</span>
+        <span style="display: flex; gap: 10px; color: #c5c5c5">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"></path></svg>
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16l-6 7v6l-4 2v-8z"></path></svg>
+        </span>
+      </div>
+      <div style="margin: 0 12px 10px; padding: 8px 10px; border-radius: 4px; background: rgba(204,167,0,0.12); border: 1px solid rgba(204,167,0,0.45); font-size: 12px; display: flex; flex-direction: column; gap: 4px">
+        <div style="display: flex; align-items: center; gap: 6px; color: #ecd27a; font-weight: 600"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.2"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg>Scan incomplete</div>
+        <div style="color: #cccccc">osv was unavailable on 2026-10-29 (HTTP 403). Registry data only.</div>
+        <div style="display: flex; gap: 14px"><a href="#" style="color: #3794ff">Refresh</a><a href="#" style="color: #3794ff">Turn osv off</a></div>
+      </div>
+      <div class="sec"><span class="chev">▾</span>DEPENDENCIES<span class="cnt">8</span></div>
+      <div class="grp"><span class="chev">▾</span><span class="dot" style="background: #f14c4c"></span>Vulnerable<span class="ds">3</span></div>
+      <div class="it sel"><span>lodash</span><span class="ds">4.17.15 → 4.17.21</span><span class="pill ph">HIGH</span></div>
+      <div class="it"><span>express</span><span class="ds">4.17.1 → 4.21.2</span><span class="pill ph">HIGH</span></div>
+      <div class="it"><span>requests</span><span class="ds">2.25.0 → 2.33.0 · py</span><span class="pill pm">MOD</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #f14c4c"></span>Deprecated<span class="ds">1</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #f14c4c"></span>Licence denied<span class="ds">1</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #3794ff"></span>Outdated<span class="ds">3</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #cca700"></span>Runtime mismatch<span class="ds">1</span></div>
+      <div class="sec" style="margin-top: 6px"><span class="chev">▾</span>DEADLINES<span class="cnt">5</span></div>
+      <div class="grp"><span class="chev">▾</span><span class="dot" style="background: #f14c4c"></span>Expired<span class="ds">2</span></div>
+      <div class="it"><span>TODO PAY-388</span><span class="ds">coupon.ts:9 · 29 d ago</span></div>
+      <div class="it"><span>flag summer-sale</span><span class="ds">banner.tsx:14 · 3 d ago</span></div>
+      <div class="grp"><span class="chev">▾</span><span class="dot" style="background: #cca700"></span>Due soon<span class="ds">2</span></div>
+      <div class="it"><span>flag new-checkout</span><span class="ds">in 2 d · @payments-team</span></div>
+      <div class="it"><span>TODO PAY-412</span><span class="ds">coupon.ts:3 · in 16 d</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #f14c4c"></span>Missing ticket<span class="ds">1</span></div>
+      <div class="sec" style="margin-top: 6px"><span class="chev">▾</span>TESTS<span class="cnt">2</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #f14c4c"></span>Focused (.only)<span class="ds">1</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #cca700"></span>Skipped, no reason<span class="ds">1</span></div>
+      <div class="sec" style="margin-top: 6px"><span class="chev">▾</span>OWNERSHIP<span class="cnt">3</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #cca700"></span>Unowned paths<span class="ds">2</span></div>
+      <div class="grp"><span class="chev">▸</span><span class="dot" style="background: #9d9d9d"></span>Stale CODEOWNERS lines<span class="ds">1</span></div>
+    </div>
+    <div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); min-width: 0; position: relative">
+      <div style="position: absolute; z-index: 2; top: 196px; left: 150px; width: 470px; background: #252526; border: 1px solid #454545; border-radius: 4px; box-shadow: 0 6px 18px rgba(0,0,0,0.5); font-size: 13px; color: #cccccc">
+        <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ffffff"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"></path><path d="M12 8v5M12 16.5v.5"></path></svg>lodash 4.17.15 is vulnerable</div>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px">
+            <div style="display: flex; gap: 8px; align-items: baseline"><span style="background: #5a1d1d; color: #ffb4b4; border-radius: 3px; padding: 0 6px; font-size: 11px; font-weight: 600">HIGH</span><a href="#" style="color: #3794ff">GHSA-35jh-r3h4-6jhm</a><span>Command injection</span></div>
+            <div style="display: flex; gap: 8px; align-items: baseline"><span style="background: #5a1d1d; color: #ffb4b4; border-radius: 3px; padding: 0 6px; font-size: 11px; font-weight: 600">HIGH</span><a href="#" style="color: #3794ff">GHSA-p6mc-m468-83gw</a><span>Prototype pollution</span></div>
+            <div style="display: flex; gap: 8px; align-items: baseline"><span style="background: #4d3d0a; color: #f2d77a; border-radius: 3px; padding: 0 6px; font-size: 11px; font-weight: 600">MODERATE</span><a href="#" style="color: #3794ff">GHSA-29mw-wpgm-hmr9</a><span>ReDoS</span></div>
+          </div>
+          <div style="border-top: 1px solid #3c3c3c; padding-top: 10px; display: grid; grid-template-columns: 120px 1fr; row-gap: 4px; font-size: 12.5px">
+            <span style="color: #a9a9a9">Safe version</span><span style="color: #ffffff; font-weight: 600">4.17.21 <span style="color: #a9a9a9; font-weight: 400">same major</span></span>
+            <span style="color: #a9a9a9">Latest</span><span>4.17.21</span>
+            <span style="color: #a9a9a9">Data</span><span>snapshot 2026-10-29 · registry (osv unavailable)</span>
+          </div>
+        </div>
+        <div style="border-top: 1px solid #3c3c3c; padding: 8px 14px; display: flex; gap: 16px; font-size: 12.5px"><a href="#" style="color: #3794ff">Change to ^4.17.21</a><a href="#" style="color: #3794ff">Quick Fix… (⌘.)</a><a href="#" style="color: #3794ff">Ignore with expiry…</a></div>
+      </div>
+      <div style="position: absolute; z-index: 2; top: 622px; left: 150px; width: 470px; background: #252526; border: 1px solid #454545; border-radius: 4px; box-shadow: 0 6px 18px rgba(0,0,0,0.5); font-size: 13px; color: #cccccc">
+        <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ffffff"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"></path><path d="M12 8v5M12 16.5v.5"></path></svg>requests 2.25.0 is vulnerable</div>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px">
+            <div style="display: flex; gap: 8px; align-items: baseline"><span style="background: #4d3d0a; color: #f2d77a; border-radius: 3px; padding: 0 6px; font-size: 11px; font-weight: 600">MODERATE</span><a href="#" style="color: #3794ff">GHSA-j8r2-6x86-q33q</a><span>Proxy-Authorization leak</span></div>
+            <div style="display: flex; gap: 8px; align-items: baseline"><span style="background: #4d3d0a; color: #f2d77a; border-radius: 3px; padding: 0 6px; font-size: 11px; font-weight: 600">MODERATE</span><a href="#" style="color: #3794ff">GHSA-9wx4-h78v-vm56</a><span>verify=False sticks</span></div>
+            <div style="color: #a9a9a9">and 2 more</div>
+          </div>
+          <div style="border-top: 1px solid #3c3c3c; padding-top: 10px; display: grid; grid-template-columns: 120px 1fr; row-gap: 4px; font-size: 12.5px">
+            <span style="color: #a9a9a9">Safe version</span><span style="color: #ffffff; font-weight: 600">2.33.0 <span style="color: #a9a9a9; font-weight: 400">clean against all 4</span></span>
+            <span style="color: #a9a9a9">Data</span><span>snapshot 2026-10-29 · PyPI</span>
+          </div>
+        </div>
+        <div style="border-top: 1px solid #3c3c3c; padding: 8px 14px; display: flex; gap: 16px; font-size: 12.5px"><a href="#" style="color: #3794ff">Change to ==2.33.0</a><a href="#" style="color: #3794ff">Quick Fix… (⌘.)</a><a href="#" style="color: #3794ff">Ignore with expiry…</a></div>
+      </div>
+      <div class="pane" style="border-right: 1px solid #2b2b2b; border-bottom: 1px solid #2b2b2b">
+        <div class="tabs"><div class="tab" style="border-top: 1px solid #3794ff; color: #f48771"><span style="color: #cbcb41; font-weight: 600; font-size: 11px">{ }</span>package.json<span style="font-size: 12px">3</span></div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="g"></span><span class="no">1</span><span class="c">{</span></div>
+          <div class="ln"><span class="g"></span><span class="no">2</span><span class="c">  <span class="k">"name"</span>: <span class="s">"checkout-web"</span>,</span></div>
+          <div class="lens" style="padding-left: 68px"><span>codelaw</span><span>·</span><span style="color: #ff9b9b">2 vulnerable</span><span>·</span><span>1 deprecated</span><span>·</span><span>2 outdated</span><span>·</span><span>2 up to date</span><span>   </span><a href="#">Fix vulnerable (2)</a><span>|</span><a href="#">Update minor (1)</a></div>
+          <div class="ln"><span class="g"></span><span class="no">3</span><span class="c">  <span class="k">"dependencies"</span>: {</span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#73c991" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span><span class="no">4</span><span class="c">    <span class="k">"react"</span>: <span class="s">"^19.2.0"</span>,<span class="b bo">latest</span></span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3794ff" stroke-width="2.2"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></span><span class="no">5</span><span class="c">    <span class="k">"axios"</span>: <span class="s">"^1.6.0"</span>,<span class="b bi">↑ 1.13.2 · minor</span></span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="#f14c4c" stroke="#f14c4c" stroke-width="1.5"><path d="M12 2.5l8 3v6.5c0 4.6-3.4 8.2-8 9.5-4.6-1.3-8-4.9-8-9.5V5.5z"></path></svg></span><span class="no">6</span><span class="c">    <span class="k">"lodash"</span>: <span class="s">"^4.17.15"</span>,<span class="b be">HIGH · 3 advisories → 4.17.21</span></span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="#f14c4c" stroke="#f14c4c" stroke-width="1.5"><path d="M12 2.5l8 3v6.5c0 4.6-3.4 8.2-8 9.5-4.6-1.3-8-4.9-8-9.5V5.5z"></path></svg></span><span class="no">7</span><span class="c">    <span class="k">"express"</span>: <span class="s">"^4.17.1"</span>,<span class="b be">HIGH → 4.21.2</span><span class="b bi" style="margin-left: 6px">↑ 5.1.0 · major</span></span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2.2"><circle cx="12" cy="12" r="8.5"></circle><path d="M6 18L18 6"></path></svg></span><span class="no">8</span><span class="c">    <span class="k" style="text-decoration: line-through">"request"</span>: <span class="s">"^2.88.2"</span>,<span class="b be">deprecated · no safe version — replace</span></span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#73c991" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span><span class="no">9</span><span class="c">    <span class="k">"zod"</span>: <span class="s">"^3.23.8"</span><span class="b bo">latest</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">10</span><span class="c">  },</span></div>
+          <div class="ln"><span class="g"></span><span class="no">11</span><span class="c">  <span class="k">"devDependencies"</span>: {</span></div>
+          <div class="ln tw"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.2"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></span><span class="no">12</span><span class="c">    <span class="k">"vitest"</span>: <span class="s">"^2.1.0"</span><span class="b bw">↑ 3.2.4 · major</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">13</span><span class="c">  }</span></div>
+          <div class="ln"><span class="g"></span><span class="no">14</span><span class="c">}</span></div>
+        </div>
+      </div>
+      <div class="pane" style="border-bottom: 1px solid #2b2b2b">
+        <div class="tabs"><div class="tab" style="color: #f48771"><span style="color: #3178c6; font-weight: 600; font-size: 11px">TS</span>coupon.ts<span style="font-size: 12px">2</span></div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="g"></span><span class="no">1</span><span class="c"><span class="kw">import</span> { <span class="v">useFlag</span> } <span class="kw">from</span> <span class="s">"@/flags"</span>;</span></div>
+          <div class="ln"><span class="g"></span><span class="no">2</span><span class="c"></span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3794ff" stroke-width="2"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span><span class="no">3</span><span class="c"><span class="cm">// </span><span class="tag tg-todo">TODO</span><span class="cm">(</span><span class="tag tg-tk">PAY-412</span><span class="cm">, </span><span class="tag tg-d">2026-11-15</span><span class="cm">): drop the legacy path</span><span class="b bi">due in 16 d</span></span></div>
+          <div class="lens" style="padding-left: 68px"><span>codelaw</span><span>·</span><span>3 markers</span><span>·</span><span style="color: #ff9b9b">1 expired</span><span>·</span><span style="color: #ecd27a">flag expires in 2 d</span></div>
+          <div class="ln"><span class="g"></span><span class="no">4</span><span class="c"><span class="kw">export</span> <span class="kb">function</span> <span class="fn">applyCoupon</span>(<span class="v">code</span>: <span class="ty">string</span>) {</span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2.2"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg></span><span class="no">5</span><span class="c">  <span class="cm">// </span><span class="tag tg-fix">FIXME</span><span class="cm">: rounding is off for JPY</span><span class="b be">needs a ticket</span></span></div>
+          <div class="ln tw"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.2"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg></span><span class="no">6</span><span class="c">  <span class="kw">if</span> (<span class="fn">useFlag</span>(<span class="s">"new-checkout"</span>)) {<span class="b bw">flag · expires in 2 d · @payments-team</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">7</span><span class="c">    <span class="kw">return</span> <span class="fn">newCoupon</span>(<span class="v">code</span>);</span></div>
+          <div class="ln"><span class="g"></span><span class="no">8</span><span class="c">  }</span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span><span class="no">9</span><span class="c">  <span class="cm">// </span><span class="tag tg-todo">TODO</span><span class="cm">(</span><span class="tag tg-tk">PAY-388</span><span class="cm">, </span><span class="tag tg-fix">2026-10-01</span><span class="cm">): remove after migration</span><span class="b be">expired 29 d ago</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">10</span><span class="c">  <span class="kw">return</span> <span class="fn">legacyCoupon</span>(<span class="v">code</span>);</span></div>
+          <div class="ln"><span class="g"></span><span class="no">11</span><span class="c">}</span></div>
+        </div>
+      </div>
+      <div class="pane" style="border-right: 1px solid #2b2b2b">
+        <div class="tabs"><div class="tab" style="color: #e2c08d"><span style="color: #9c9c9c; font-weight: 600; font-size: 11px">TOML</span>pyproject.toml<span style="font-size: 12px">2</span></div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="g"></span><span class="no">1</span><span class="c"><span class="tk">[project]</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">2</span><span class="c"><span class="k">name</span> = <span class="s">"checkout-api"</span></span></div>
+          <div class="ln tw"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.2"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg></span><span class="no">3</span><span class="c"><span class="k">requires-python</span> = <span class="s">"&gt;=3.11"</span><span class="b bw">.python-version says 3.10</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">4</span><span class="c"><span class="k">dependencies</span> = [</span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#73c991" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span><span class="no">5</span><span class="c">  <span class="s">"httpx&gt;=0.28.1"</span>,<span class="b bo">latest</span></span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3794ff" stroke-width="2.2"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></span><span class="no">6</span><span class="c">  <span class="s">"pydantic~=2.5"</span>,<span class="b bi">↑ 2.12.4 · minor</span></span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="#f14c4c" stroke="#f14c4c" stroke-width="1.5"><path d="M12 2.5l8 3v6.5c0 4.6-3.4 8.2-8 9.5-4.6-1.3-8-4.9-8-9.5V5.5z"></path></svg></span><span class="no">7</span><span class="c">  <span class="s">"requests==2.25.0"</span>,<span class="b be">MODERATE · 4 advisories → 2.33.0</span></span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="#f14c4c" stroke="#f14c4c" stroke-width="1.5"><path d="M12 2.5l8 3v6.5c0 4.6-3.4 8.2-8 9.5-4.6-1.3-8-4.9-8-9.5V5.5z"></path></svg></span><span class="no">8</span><span class="c">  <span class="s">"django&gt;=3.2,&lt;4"</span>,<span class="b be">HIGH → 3.2.25</span><span class="b bi" style="margin-left: 6px">↑ 5.2 · major</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">9</span><span class="c">]</span></div>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="tabs"><div class="tab" style="color: #f48771"><span style="color: #3178c6; font-weight: 600; font-size: 11px">TS</span>coupon.test.ts<span style="font-size: 12px">2</span></div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="g"></span><span class="no">1</span><span class="c"><span class="fn">describe</span>(<span class="s">"applyCoupon"</span>, () =&gt; {</span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3.5"></circle></svg></span><span class="no">2</span><span class="c">  <span class="v">it</span>.<span class="fn">only</span>(<span class="s">"applies 10% off"</span>, <span class="fn">tenOff</span>);<span class="b be">focused test — the rest are off</span></span></div>
+          <div class="ln tw"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.2"><path d="M7 5v14M17 5v14"></path></svg></span><span class="no">3</span><span class="c">  <span class="v">it</span>.<span class="fn">skip</span>(<span class="s">"rounds JPY totals"</span>, <span class="fn">jpy</span>);<span class="b bw">skip needs a reason and an expiry</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">4</span><span class="c">  <span class="cm">// </span><span class="tag tg-todo">SKIP</span><span class="cm">(</span><span class="tag tg-tk">PAY-390</span><span class="cm">, </span><span class="tag tg-d">2026-12-01</span><span class="cm">): flaky on CI</span></span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9d9d9d" stroke-width="2.2"><path d="M7 5v14M17 5v14"></path></svg></span><span class="no">5</span><span class="c">  <span class="v">it</span>.<span class="fn">skip</span>(<span class="s">"stacks two coupons"</span>, <span class="fn">stack</span>);<span class="b bo" style="color: #a9a9a9">skipped until 1 Dec · PAY-390</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">6</span><span class="c">});</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="height: 22px; background: #007acc; color: #ffffff; display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0">
+    <div style="display: flex; gap: 14px; align-items: center; padding-left: 10px"><span>main</span><span>⊗ 9  ⚠ 5</span></div>
+    <div style="display: flex; align-items: center">
+      <span class="sb"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 2.5l8 3v6.5c0 4.6-3.4 8.2-8 9.5-4.6-1.3-8-4.9-8-9.5V5.5z"></path></svg>3 vulnerable</span>
+      <span class="sb">↑ 3 outdated</span>
+      <span class="sb"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>2 expired · 2 due</span>
+      <span class="sb" style="background: #7a5f00">codelaw · scan incomplete</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

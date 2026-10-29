@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>L · Defaults together</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.code{font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:13px}
+.ln{display:flex;align-items:center;height:22px;white-space:pre}
+.g{width:20px;display:flex;justify-content:center;flex-shrink:0}
+.no{width:32px;text-align:right;color:#858585;padding-right:16px;flex-shrink:0}
+.c{flex:1;min-width:0;overflow:hidden;color:#d4d4d4;display:block;line-height:22px}
+.kw{color:#c586c0}.kb{color:#569cd6}.fn{color:#dcdcaa}.s{color:#ce9178}.v{color:#9cdcfe}.cm{color:#6a9955}.ty{color:#4ec9b0}
+.we{text-decoration:underline wavy #f14c4c;text-underline-offset:4px;text-decoration-skip-ink:none}
+.ww{text-decoration:underline wavy #cca700;text-underline-offset:4px;text-decoration-skip-ink:none}
+.wi{text-decoration:underline wavy #3794ff;text-underline-offset:4px;text-decoration-skip-ink:none}
+.wg{text-decoration:underline wavy #73c991;text-underline-offset:4px;text-decoration-skip-ink:none}
+.wb{text-decoration:underline dotted #8a8a8a;text-underline-offset:4px}
+.tr{background:rgba(241,76,76,0.09)}
+.tw{background:rgba(204,167,0,0.07)}
+.b{margin-left:14px;border-radius:10px;padding:0 9px;height:18px;display:inline-flex;align-items:center;font-size:11.5px;font-family:Inter,system-ui,sans-serif;border:1px solid;white-space:nowrap}
+.be{background:rgba(241,76,76,0.14);border-color:rgba(241,76,76,0.5);color:#ffa8a8}
+.bw{background:rgba(204,167,0,0.13);border-color:rgba(204,167,0,0.5);color:#ecd27a}
+.bo{background:transparent;border-color:transparent;color:#a9a9a9}
+.tag{border-radius:3px;padding:0 4px;font-weight:600}
+.tg-todo{background:#3d3a1e;color:#e5c76b}
+.tg-fix{background:#4a2020;color:#ff9b9b}
+.tg-tk{background:#1f3550;color:#9ccbff}
+.tg-d{background:#2c2c2c;color:#cfcfcf}
+.pane{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.tabs{height:35px;background:#252526;display:flex;flex-shrink:0}
+.tab{background:#1e1e1e;padding:0 16px;display:flex;align-items:center;gap:8px;font-size:13px;color:#ffffff}
+.b,.act,.man{vertical-align:middle}
+.code,.src,.mono{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+</style>
+</head>
+<body>
+
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; flex-direction: column; background: #1e1e1e; color: #cccccc; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <div style="height: 32px; background: #323233; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0">coupon.ts — checkout — Visual Studio Code</div>
+  <div style="flex: 1; display: flex; min-height: 0">
+    <div style="width: 48px; background: #333333; display: flex; flex-direction: column; align-items: center; gap: 22px; padding-top: 14px; flex-shrink: 0">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5"></path></svg>
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#858585" stroke-width="1.5"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+    </div>
+    <div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); min-width: 0">
+      <div class="pane" style="grid-row: 1 / 3; border-right: 1px solid #2b2b2b">
+        <div class="tabs"><div class="tab" style="border-top: 1px solid #3794ff"><span style="color: #3178c6; font-weight: 600; font-size: 11px">TS</span>coupon.ts</div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="g"></span><span class="no">1</span><span class="c"><span class="kw">import</span> { <span class="v">template</span> } <span class="kw">from</span> <span class="s we">"lodash"</span>;</span></div>
+          <div class="ln"><span class="g"></span><span class="no">2</span><span class="c"><span class="kw">import</span> { <span class="v">useFlag</span> } <span class="kw">from</span> <span class="s">"@/flags"</span>;</span></div>
+          <div class="ln"><span class="g"></span><span class="no">3</span><span class="c"><span class="kw">import</span> { <span class="v">api</span> } <span class="kw">from</span> <span class="s wg">"../api"</span>;</span></div>
+          <div class="ln"><span class="g"></span><span class="no">4</span><span class="c"></span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9d9d9d" stroke-width="2"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span><span class="no">5</span><span class="c"><span class="cm">// </span><span class="tag tg-todo">TODO</span><span class="cm">(</span><span class="tag tg-tk">PAY-412</span><span class="cm">, </span><span class="tag tg-d">2026-11-15</span><span class="cm">): drop the legacy path</span><span class="b bo">due in 16 d</span></span></div>
+          <div class="ln tw"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.2"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg></span><span class="no">6</span><span class="c"><span class="cm">// </span><span class="tag tg-fix">FIXME</span><span class="cm">: rounding is off for JPY</span><span class="b bw">needs a ticket</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">7</span><span class="c"><span class="kw">export</span> <span class="kw wb">default</span> <span class="kb">function</span> <span class="fn ww">applyCoupon</span>(<span class="v">code</span>: <span class="ty">string</span>) {</span></div>
+          <div class="ln"><span class="g"></span><span class="no">8</span><span class="c">  <span class="kw">if</span> (<span class="fn">useFlag</span>(<span class="s ww">"new-checkout"</span>)) {</span></div>
+          <div class="ln"><span class="g"></span><span class="no">9</span><span class="c">    <span class="kw">return</span> <span class="fn">template</span>(<span class="v">code</span>)({ <span class="v">rate</span> });</span></div>
+          <div class="ln"><span class="g"></span><span class="no">10</span><span class="c">  }</span></div>
+          <div class="ln tr"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f14c4c" stroke-width="2"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span><span class="no">11</span><span class="c">  <span class="cm">// </span><span class="tag tg-todo">TODO</span><span class="cm">(</span><span class="tag tg-tk">PAY-388</span><span class="cm">, </span><span class="tag tg-fix">2026-10-01</span><span class="cm">): remove after migration</span><span class="b be">expired 29 d ago</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">12</span><span class="c">  <span class="kw">if</span> (<span class="fn">useFlag</span>(<span class="s we">"summer-sale"</span>)) <span class="kw">return</span> <span class="fn">sale</span>(<span class="v">code</span>);</span></div>
+          <div class="ln"><span class="g"></span><span class="no">13</span><span class="c">  <span class="kw">return</span> <span class="fn">legacyCoupon</span>(<span class="v">code</span>);</span></div>
+          <div class="ln"><span class="g"></span><span class="no">14</span><span class="c">}</span></div>
+        </div>
+      </div>
+      <div class="pane" style="border-bottom: 1px solid #2b2b2b">
+        <div class="tabs"><div class="tab"><span style="color: #3178c6; font-weight: 600; font-size: 11px">TS</span>coupon.test.ts</div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="g"></span><span class="no">1</span><span class="c"><span class="fn">describe</span>(<span class="s">"applyCoupon"</span>, () =&gt; {</span></div>
+          <div class="ln"><span class="g"></span><span class="no">2</span><span class="c">  <span class="v">it</span>.<span class="fn we">only</span>(<span class="s">"applies 10% off"</span>, <span class="fn">tenOff</span>);</span></div>
+          <div class="ln tw"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.2"><path d="M8 5v14M16 5v14"></path></svg></span><span class="no">3</span><span class="c">  <span class="v">it</span>.<span class="fn">skip</span>(<span class="s">"rounds JPY totals"</span>, <span class="fn">jpy</span>);<span class="b bw">skip needs a reason and a date</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">4</span><span class="c">  <span class="cm">// </span><span class="tag tg-todo">SKIP</span><span class="cm">(</span><span class="tag tg-tk">PAY-390</span><span class="cm">, </span><span class="tag tg-d">2026-12-01</span><span class="cm">): flaky on CI</span></span></div>
+          <div class="ln"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9d9d9d" stroke-width="2.2"><path d="M8 5v14M16 5v14"></path></svg></span><span class="no">5</span><span class="c">  <span class="v">it</span>.<span class="fn">skip</span>(<span class="s">"stacks two coupons"</span>, <span class="fn">stack</span>);<span class="b bo">skipped until 1 Dec · PAY-390</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">6</span><span class="c">});</span></div>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="tabs"><div class="tab"><span style="color: #3572a5; font-weight: 600; font-size: 11px">PY</span>refund.py</div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="g"></span><span class="no">1</span><span class="c"><span class="kw">import</span> <span class="v we">requests</span></span></div>
+          <div class="ln"><span class="g"></span><span class="no">2</span><span class="c"></span></div>
+          <div class="ln"><span class="g"></span><span class="no">3</span><span class="c"><span class="kb">def</span> <span class="fn">refund</span>(<span class="v">order</span>, <span class="v">amount</span>, <span class="v">retries</span>=<span class="ww">[]</span>):</span></div>
+          <div class="ln"><span class="g"></span><span class="no">4</span><span class="c">    <span class="kw">try</span>:</span></div>
+          <div class="ln"><span class="g"></span><span class="no">5</span><span class="c">        <span class="v">r</span> = <span class="v">requests</span>.<span class="fn">post</span>(<span class="v">URL</span>, <span class="v">json</span>=<span class="v">body</span>, <span class="we"><span class="v">verify</span>=<span class="kb">False</span></span>)</span></div>
+          <div class="ln"><span class="g"></span><span class="no">6</span><span class="c">    <span class="kw ww">except</span>:</span></div>
+          <div class="ln"><span class="g"></span><span class="no">7</span><span class="c">        <span class="fn wi">print</span>(<span class="s">"refund failed"</span>)</span></div>
+          <div class="ln tw"><span class="g"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cca700" stroke-width="2.2"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg></span><span class="no">8</span><span class="c">        <span class="cm"># </span><span class="tag tg-todo">TODO</span><span class="cm">: retry with backoff</span><span class="b bw">needs a ticket</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="height: 22px; background: #007acc; color: #ffffff; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 12px; flex-shrink: 0">
+    <div style="display: flex; gap: 14px"><span>main</span><span>⊗ 6  ⚠ 8  ⓘ 1</span></div>
+    <div style="display: flex; gap: 16px"><span>Ln 6, Col 4</span><span>TypeScript</span><span>codelaw</span></div>
+  </div>
+</div>
+</body>
+</html>

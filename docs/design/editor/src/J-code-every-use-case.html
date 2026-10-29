@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>J · Squiggles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.code{font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:13px}
+.ln{display:flex;align-items:center;height:22px;white-space:pre}
+.no{width:52px;text-align:right;color:#858585;padding-right:18px;flex-shrink:0}
+.c{flex:1;min-width:0;overflow:hidden;color:#d4d4d4}
+.kw{color:#c586c0}.kb{color:#569cd6}.fn{color:#dcdcaa}.s{color:#ce9178}.v{color:#9cdcfe}.cm{color:#6a9955}.ty{color:#4ec9b0}
+.we{text-decoration:underline wavy #f14c4c;text-underline-offset:4px;text-decoration-skip-ink:none}
+.ww{text-decoration:underline wavy #cca700;text-underline-offset:4px;text-decoration-skip-ink:none}
+.wi{text-decoration:underline wavy #3794ff;text-underline-offset:4px;text-decoration-skip-ink:none}
+.wg{text-decoration:underline wavy #73c991;text-underline-offset:4px;text-decoration-skip-ink:none}
+.wb{text-decoration:underline dotted #8a8a8a;text-underline-offset:4px}
+.pane{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.tabs{height:35px;background:#252526;display:flex;flex-shrink:0}
+.tab{background:#1e1e1e;padding:0 16px;display:flex;align-items:center;gap:8px;font-size:13px;color:#ffffff}
+.code,.src,.mono{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+</style>
+</head>
+<body>
+
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; flex-direction: column; background: #1e1e1e; color: #cccccc; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <div style="height: 32px; background: #323233; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0">coupon.ts — checkout — Visual Studio Code</div>
+  <div style="flex: 1; display: flex; min-height: 0">
+    <div style="width: 48px; background: #333333; display: flex; flex-direction: column; align-items: center; gap: 22px; padding-top: 14px; flex-shrink: 0">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5"></path></svg>
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#858585" stroke-width="1.5"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+    </div>
+    <div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); min-width: 0">
+      <div class="pane" style="grid-row: 1 / 3; border-right: 1px solid #2b2b2b">
+        <div class="tabs"><div class="tab" style="border-top: 1px solid #3794ff"><span style="color: #3178c6; font-weight: 600; font-size: 11px">TS</span>coupon.ts</div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="no">1</span><span class="c"><span class="kw">import</span> { <span class="v">template</span> } <span class="kw">from</span> <span class="s we">"lodash"</span>;</span></div>
+          <div class="ln"><span class="no">2</span><span class="c"><span class="kw">import</span> { <span class="v">useFlag</span> } <span class="kw">from</span> <span class="s">"@/flags"</span>;</span></div>
+          <div class="ln"><span class="no">3</span><span class="c"><span class="kw">import</span> { <span class="v">api</span> } <span class="kw">from</span> <span class="s wg">"../api"</span>;</span></div>
+          <div class="ln"><span class="no">4</span><span class="c"></span></div>
+          <div class="ln"><span class="no">5</span><span class="c"><span class="cm">// TODO(PAY-412, 2026-11-15): drop the legacy path</span></span></div>
+          <div class="ln"><span class="no">6</span><span class="c"><span class="cm">// <span class="ww">FIXME</span>: rounding is off for JPY</span></span></div>
+          <div class="ln"><span class="no">7</span><span class="c"><span class="kw">export</span> <span class="kw wb">default</span> <span class="kb">function</span> <span class="fn ww">applyCoupon</span>(<span class="v">code</span>: <span class="ty">string</span>) {</span></div>
+          <div class="ln"><span class="no">8</span><span class="c">  <span class="kw">if</span> (<span class="fn">useFlag</span>(<span class="s ww">"new-checkout"</span>)) {</span></div>
+          <div class="ln"><span class="no">9</span><span class="c">    <span class="kw">return</span> <span class="fn">template</span>(<span class="v">code</span>)({ <span class="v">rate</span> });</span></div>
+          <div class="ln"><span class="no">10</span><span class="c">  }</span></div>
+          <div class="ln"><span class="no">11</span><span class="c">  <span class="cm we">// TODO(PAY-388, 2026-10-01): remove after migration</span></span></div>
+          <div class="ln"><span class="no">12</span><span class="c">  <span class="kw">if</span> (<span class="fn">useFlag</span>(<span class="s we">"summer-sale"</span>)) <span class="kw">return</span> <span class="fn">sale</span>(<span class="v">code</span>);</span></div>
+          <div class="ln"><span class="no">13</span><span class="c">  <span class="kw">return</span> <span class="fn">legacyCoupon</span>(<span class="v">code</span>);</span></div>
+          <div class="ln"><span class="no">14</span><span class="c">}</span></div>
+        </div>
+      </div>
+      <div class="pane" style="border-bottom: 1px solid #2b2b2b">
+        <div class="tabs"><div class="tab"><span style="color: #3178c6; font-weight: 600; font-size: 11px">TS</span>coupon.test.ts</div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="no">1</span><span class="c"><span class="fn">describe</span>(<span class="s">"applyCoupon"</span>, () =&gt; {</span></div>
+          <div class="ln"><span class="no">2</span><span class="c">  <span class="v">it</span>.<span class="fn we">only</span>(<span class="s">"applies 10% off"</span>, <span class="fn">tenOff</span>);</span></div>
+          <div class="ln"><span class="no">3</span><span class="c">  <span class="v">it</span>.<span class="fn ww">skip</span>(<span class="s">"rounds JPY totals"</span>, <span class="fn">jpy</span>);</span></div>
+          <div class="ln"><span class="no">4</span><span class="c">  <span class="cm">// SKIP(PAY-390, 2026-12-01): flaky on CI</span></span></div>
+          <div class="ln"><span class="no">5</span><span class="c">  <span class="v">it</span>.<span class="fn">skip</span>(<span class="s">"stacks two coupons"</span>, <span class="fn">stack</span>);</span></div>
+          <div class="ln"><span class="no">6</span><span class="c">});</span></div>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="tabs"><div class="tab"><span style="color: #3572a5; font-weight: 600; font-size: 11px">PY</span>refund.py</div></div>
+        <div class="code" style="padding-top: 6px">
+          <div class="ln"><span class="no">1</span><span class="c"><span class="kw">import</span> <span class="v we">requests</span></span></div>
+          <div class="ln"><span class="no">2</span><span class="c"></span></div>
+          <div class="ln"><span class="no">3</span><span class="c"><span class="kb">def</span> <span class="fn">refund</span>(<span class="v">order</span>, <span class="v">amount</span>, <span class="v">retries</span>=<span class="ww">[]</span>):</span></div>
+          <div class="ln"><span class="no">4</span><span class="c">    <span class="kw">try</span>:</span></div>
+          <div class="ln"><span class="no">5</span><span class="c">        <span class="v">r</span> = <span class="v">requests</span>.<span class="fn">post</span>(<span class="v">URL</span>, <span class="v">json</span>=<span class="v">body</span>, <span class="we"><span class="v">verify</span>=<span class="kb">False</span></span>)</span></div>
+          <div class="ln"><span class="no">6</span><span class="c">    <span class="kw ww">except</span>:</span></div>
+          <div class="ln"><span class="no">7</span><span class="c">        <span class="fn wi">print</span>(<span class="s">"refund failed"</span>)</span></div>
+          <div class="ln"><span class="no">8</span><span class="c">        <span class="cm"># todo: retry with backoff</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="height: 22px; background: #007acc; color: #ffffff; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 12px; flex-shrink: 0">
+    <div style="display: flex; gap: 14px"><span>main</span><span>⊗ 6  ⚠ 7  ⓘ 1</span></div>
+    <div style="display: flex; gap: 16px"><span>Ln 8, Col 18</span><span>TypeScript</span><span>codelaw</span></div>
+  </div>
+</div>
+</body>
+</html>
