@@ -28,6 +28,7 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-127-release-0-4-0.md`](open/W-127-release-0-4-0.md) | 2026-10-30 | done — v0.4.0 released from d2a87c8: npm, PyPI and the Visual Studio Marketplace (all eight platforms); Open VSX waits on W-117 |
 | [`W-125-revert-pypi-new.md`](open/W-125-revert-pypi-new.md) | 2026-10-29 | done — `only=pypi-new` out of `publish.yml`, `main` off the `pypi` environment, L6 decision 9, SR-PACKAGES, RELEASING.md back to *a release uploads only existing projects* |
 | [`W-124-session-cleanup.md`](open/W-124-session-cleanup.md) | 2026-10-29 | done — dropped on the decider's ruling (*"execute the cleanup of all the working trees"*); the one unlanded ruling on `lm/W-119-loop` carried to [W-125](open/W-125-revert-pypi-new.md); [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) |
 | [`W-123-session-cleanup.md`](open/W-123-session-cleanup.md) | 2026-10-29 | done — dropped on the decider's ruling (*"execute the cleanup of all the working trees"*); the one unlanded ruling on `lm/W-119-loop` carried to [W-125](open/W-125-revert-pypi-new.md); [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) |

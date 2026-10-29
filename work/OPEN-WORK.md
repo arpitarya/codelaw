@@ -35,15 +35,13 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (17)
+## Open items (16)
 
-### build (14)
+### build (13)
 
-🟢 **W-127** `agent` Release 0.4.0 through CI: bumped 10-29, `main` pushed; Arpit ruled *publish it* — Claude Code fixes CI to green, then `gh release create v0.4.0` and checks npm, PyPI and the Marketplace. Filed by Arpit (Claude Code). [detail](open/W-127-release-0-4-0.md)
+🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
-🟢 **W-126** `agent` A five-minute pipeline: built 10-29 — corpus one job per pack, Fux job apart, smoke and `publish.yml` in parallel (npm tiers kept). Left: step 4, three runs of each kind measured, once `main` is pushed. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
-
-🟢 **W-95** `agent` VS Code extension **live** 10-29 as `codelaw.codelaw-vscode` (Arpit, by hand) — 0.3.0 for `darwin-arm64` only. Left: the other seven platforms (0.4.0's `publish.yml` job), Open VSX (W-117), the install docs. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
+🟢 **W-95** `agent` VS Code extension live as `codelaw.codelaw-vscode`; 0.4.0 uploaded for all eight platforms by `publish.yml` (10-30). Left: Open VSX (W-117), the install docs, `vsce`/`ovsx` in `publish.yml` (D-46, D-47). Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
