@@ -8,6 +8,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 - **`pip install codelaw` and `uvx codelaw` work (W-86, W-87, W-38):** `codelaw` and the six first rule packs are on PyPI, with the eight platform wheels and 0.2.0 back-filled; checked from a fresh environment.
 
+### Changed
+
+- **Housekeeping (W-88, W-89, W-115):** PyPI days 3 and 4 and the spell pack's first PyPI upload were folded into W-119, which creates the ten missing PyPI projects through CI; no code changed.
+
 ## 0.3.0 — 2026-10-29
 
 ### Added
