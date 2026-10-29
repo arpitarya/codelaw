@@ -33,15 +33,13 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (12)
+## Open items (11)
 
-### build (9)
+### build (8)
 
 🔴 **W-127** `arpit` Release 0.4.0 through CI: bumped and CHANGELOG written 10-29; next push `main` (your go), `ci.yml` green, then `gh release create v0.4.0` from CHANGELOG's section. Filed by Arpit (Claude Code). [detail](open/W-127-release-0-4-0.md)
 
 🟢 **W-126** `agent` A five-minute pipeline: built 10-29 — corpus one job per pack, Fux job apart, smoke and `publish.yml` in parallel (npm tiers kept). Left: step 4, three runs of each kind measured, once `main` is pushed. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
-
-🟢 **W-125** `agent` Revert `publish.yml`'s `only=pypi-new` and the `main` rule on the `pypi` environment, records and RELEASING.md with them — Arpit ruled it temporary (10-29 10:31); W-119 is done. Filed by Arpit (Claude Code). [detail](open/W-125-revert-pypi-new.md)
 
 🟢 **W-95** `agent` VS Code extension: the Marketplace blocks `codelaw` (removed 0.2.0; Support emailed 10-29). Renamed `codelaw.codelaw-vscode` 10-29; its 0.3.0 `.vsix` files in `dist/vscode/` for the upload by hand; then `vsce`/`ovsx` in `publish.yml` (D-46, D-47). Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 

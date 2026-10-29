@@ -26,7 +26,7 @@ uvx codelaw@0.4.0 init     # a Python repo: installs the codelaw-rules-* it need
 - **A faster pipeline (W-126):** CI checks each rule pack's corpus in its own job on the binary it ships, builds the Fux index packages beside the release set, and installs npm and PyPI side by side in the install smoke; a release verifies, trust-checks and uploads eight packages at a time, npm's order kept (binaries, packs, `codelaw`, skills). Nothing that was checked is dropped.
 - **The VS Code extension is `codelaw.codelaw-vscode` (W-95):** the Marketplace keeps the name `codelaw` reserved since an early listing was removed, so the extension is published under the name `codelaw-vscode`. Its commands and settings are still `codelaw.*`.
 - **Housekeeping (W-120, W-121, W-122, W-123, W-124):** ten leftover worktrees were checked against `main` and removed; the one unlanded ruling in them is W-125. No code changed.
-- **Release pipeline (W-119):** `publish.yml` run by hand from `main` with `-f only=pypi-new -f release=<tag> -f project=<name>` creates one new PyPI project from that release's checked build, through the project's pending publisher — no token and no daily limit; the `pypi` environment now admits `main` for it.
+- **Release pipeline (W-119, W-125):** the ten PyPI projects that were missing were created by CI, one at a time, through a temporary by-hand path in `publish.yml` (`only=pypi-new`), removed again once they existed; `publish.yml` publishes only from a Release or, npm only, a `v*` tag.
 - **Housekeeping (W-88, W-89, W-115):** PyPI days 3 and 4 and the spell pack's first PyPI upload were folded into W-119, which creates the ten missing PyPI projects through CI; no code changed.
 
 ## 0.3.0 — 2026-10-29

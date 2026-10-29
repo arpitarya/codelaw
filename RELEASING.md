@@ -26,7 +26,7 @@ anywhere — both registries use trusted publishing (OIDC).
 | workflow | when | what | time |
 |---|---|---|---|
 | `ci.yml` | every push | tests, clippy, the SR-guard replay; **8 platform builds in parallel**; the 24 packages (31 files: 17 npm tarballs, 14 wheels) assembled and checked, and on `main` attested; **the install smoke on all 8 platforms** | see [W-04](archive/open/W-04-release-pipeline.md) §Measured |
-| `publish.yml` | a GitHub Release (both registries), by hand on a `v*` tag (npm only), or by hand from `main` with `only=pypi-new` (one new PyPI project, W-119) | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | the first run by hand, npm only: 5 min 21 s (run 40207195373, `v0.2.0`, 2026-10-25) — 17 names published with provenance, the two hand-published skipped |
+| `publish.yml` | a GitHub Release (both registries), or by hand on a `v*` tag (npm only) | the gate (CI green on this sha, on `main`; every file matches `SHA256SUMS` and ci.yml's build attestation for this commit), then npm and PyPI **in parallel**, then the checksums on the release | the first run by hand, npm only: 5 min 21 s (run 40207195373, `v0.2.0`, 2026-10-25) — 17 names published with provenance, the two hand-published skipped |
 
 Every check `ci.yml` runs on the packages is `scripts/package.py check`:
 only the SR-PACKAGES names (B-020), one version (W-18), zero runtime
@@ -104,38 +104,24 @@ trusted; `--fux-index` adds the Fux index packages); `publish.yml` then skips th
      way — the first version by hand with `twine upload`, then a trusted
      publisher. Its `Requires-Dist: codelaw==<v>` means pip installs it only
      once that `codelaw` is on PyPI too.
-   - **Since 2026-10-29, every new project is created by CI instead** (W-119; L6
-     decision 9) — no daily limit, no token, and its pending publisher becomes
-     its trusted publisher. One project at a time:
-     1. a pending publisher for it at <https://pypi.org/manage/account/publishing/>
-        (`arpitarya` · `codelaw` · `publish.yml` · `pypi`), right before the run —
-        it does not reserve the name;
-     2. `gh workflow run publish.yml -R arpitarya/codelaw --ref main -f only=pypi-new -f release=v0.3.0 -f project=<name>`
-        — the gate checks the tag's build exactly as a Release does, then the
-        `pypi` job uploads that one wheel (a `-fux-index` name from the same run's
-        `fux-index` artifact). It refuses a name the build has no wheel of, and
-        one already on PyPI; PyPI refuses it if no pending publisher names it;
-     3. the next name only after that run has created its project (one pending
-        publisher per repository · workflow · environment).
-
-     `twine` within the four-a-day limit stays the fallback if PyPI ever limits
-     this path.
+   - **2026-10-29: the ten projects still missing were created by CI** through
+     pending publishers, one at a time (W-119, `only=pypi-new`); that path was
+     temporary and is gone (W-125). A new project from now on is the `twine`
+     way above (four a day), then a trusted publisher.
 5. **GitHub environments** `npm` and `pypi` (*Settings → Environments*) —
    **required, both:**
    - *Deployment branches and tags* → **Selected branches and tags** → add one
-     **tag** rule, `v*`, and **no branch rule** — except `pypi`, which also has
-     the **branch** rule `main` for `only=pypi-new` (the decider, 2026-10-29; W-119). A trusted publisher checks the
+     **tag** rule, `v*`, and **no branch rule** (`pypi`'s `main` rule for W-119
+     was removed by W-125). A trusted publisher checks the
      repository, the workflow file and the environment, never the ref, so this
      rule is what makes a published release the only way to publish: a
-     `publish.yml` run from any branch is refused at the environment. `main`'s
-     rule on `pypi` admits only what the gate admits — a `v*` tag's attested
-     build, one new project at a time.
+     `publish.yml` run from any branch is refused at the environment.
    - Optionally, yourself as a required reviewer, to approve each publish (`npm`
      is asked twice: the trust preflight and the publish both use it).
 
 After this, no release needs a token, a code or your machine.
 
-**A PyPI project that does not exist yet is skipped, not failed (W-116).** The `pypi` job uploads a wheel only if its project is on PyPI or is `codelaw` (the pending publisher, step 4); every skipped project is named in the job summary. Create each one with `only=pypi-new` (step 4, W-119) — the release after that, CI carries it.
+**A PyPI project that does not exist yet is skipped, not failed (W-116).** The `pypi` job uploads a wheel only if its project is on PyPI or is `codelaw` (the pending publisher, step 4); every skipped project is named in the job summary. Upload its first version by hand (step 4) — the release after that, CI carries it.
 
 **Cut the Release only on a commit whose `ci.yml` run has finished green on `main`.** `publish.yml`'s gate verifies every file's attestation against the release commit's sha; a Release created on a later commit fails there (v0.2.0's first run, 2026-10-28).
 
