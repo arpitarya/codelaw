@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-131: TODO markers, focused and skipped tests  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *"Implement it and then close those out. Keep merging everything to main."* (W-131)
+- **Done:** `[todo]` and `[tests.skip]` in the config; eight `*/todo-marker` rules, `js/no-focused-tests`, `js/skipped-test`, `py/skipped-test`; six opt-in `markers` presets; SR-CONFIG decision 11a, SR-RULE-PACKS, ownership rows; USAGE, CHANGELOG, generated docs; item closed and archived.
+- **Decided / left open:** one rule id per language in its own pack; Markdown markers in `<!-- -->` only; a skip's ticket and expiry always from the `SKIP` comment; expiring is a warning. Corpus and a timed run not done (the shared debug binary was another agent's).
+- **Mistakes:** none.
+- **Next:** the other open items of the batch (W-128, W-130, W-132, W-133, W-136).
+
 ## 2026-10-30 — W-138 and W-139 filed: rule parity with nine tools  ·  Cowork (Opus 5.5)
 
 - **Asked:** (voice) a comparison of Biome, ESLint, Ruff, Prettier, TSLint, html-validate, stylelint and markdownlint with codelaw; where codelaw is shallower; then *"one big item for Opus to research it and once the research is done, then one big work item to build it."* · *"file it."*

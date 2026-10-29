@@ -123,7 +123,7 @@ The decider asked for the architecture to be designed and its gaps filled. The f
   - **Where the approach comes from:** `oxc_semantic` (MIT) for JS/TS and Ruff's semantic model (MIT) for Python. Taking either as a dependency needs its own record.
   - **Cached** with the file's results ([SR-CACHE](0109_cache.md)).
 
-15b. **Native rules.** A rule whose `codelaw` block is `native: <id>` runs a Rust implementation registered under that id in `codelaw-native`. It's for checks a pattern can't express: control flow (`no-unreachable`), hook order (`rules-of-hooks`), dependency lists (`exhaustive-deps`).
+15b. **Native rules.** A rule whose `codelaw` block is `native: <id>` runs a Rust implementation registered under that id in `codelaw-native`. It's for checks a pattern can't express: control flow (`no-unreachable`), hook order (`rules-of-hooks`), dependency lists (`exhaustive-deps`). The comment-marker and test-marker rules (`*/todo-marker`, `js/no-focused-tests`, `js/skipped-test`, `py/skipped-test`; W-131) are native too: they read comment nodes and a call's callee, and judge a date only on the as-of date ([SR-CONFIG](0110_config.md) decision 11a).
   - **The Markdown file is still the rule.** It carries the docs, fix class, options and examples, and `codelaw test` runs them unchanged.
   - **An unknown id refuses the rule at load,** naming the pack's `min_codelaw`.
   - **Same discipline as every rule:** a native rule declares the node kinds it needs (decision 15), is isolated on panic (decision 25) and is deterministic ([L5](0007_LAW-5-no-model-in-the-engine.md)).

@@ -278,6 +278,9 @@ A component may be narrowed to symbols: `` `path::name,name` ``.
 | `crates/codelaw-cli/src/init.rs` | SR-SPELL | decision 1: `init` adds the spell pack and writes and fills the words file (W-112) |
 | `templates/init/.codelaw/spell` | SR-SPELL | decision 7: the words file's template (W-112) |
 | `crates/codelaw-native/src/deps` | SR-RULE-PACKS | decision 15: the manifests, lockfiles, snapshot and version order the dependency rules read |
+| `crates/codelaw-native/src/markers.rs` | SR-CONFIG | decision 11a: the TODO-marker rules, the marker syntax and the dates they judge (W-131) |
+| `crates/codelaw-native/src/test_markers.rs` | SR-CONFIG | decision 11a: the focused- and skipped-test rules and the `SKIP` comment (W-131) |
+| `crates/codelaw-cli/tests/markers.rs` | SR-CONFIG | decision 11a: the markers through the binary (W-131) |
 | `crates/codelaw-cli/src/deps_cmd.rs` | SR-RULE-PACKS | decision 15: what `codelaw deps refresh` reads, sends and writes |
 | `crates/codelaw-cli/src/deps_cmd.rs` | SR-LAW-5 | decision 3: the one command that may use the network |
 | `crates/codelaw-engine/src/suppress.rs` | SR-LINTER | decision 6: the suppression syntax and what it covers |

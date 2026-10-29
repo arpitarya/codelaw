@@ -250,6 +250,38 @@ extends = ["codelaw:html/size", "codelaw:css/size"]
 
 A line holding code and a comment counts as code. A finding names the first line over the limit and carries the count: `412 lines (max 300; blank lines and comments not counted)`. The fix is manual: split the file.
 
+### TODOs with a ticket and a date, tests that stay on
+
+Opt-in presets make a TODO carry its ticket (and, if you want, its date), refuse a focused test and make a skipped test say why and until when: `codelaw:js/markers`, `codelaw:py/markers`, `codelaw:css/markers`, `codelaw:scss/markers`, `codelaw:html/markers` and `codelaw:data/markers` (YAML, TOML and Markdown). They are in no default preset, because a repo with bare TODOs gets every one at once.
+
+```toml
+extends = ["codelaw:js/markers", "codelaw:py/markers"]
+
+[todo]
+tags           = ["TODO", "FIXME", "HACK"]
+require_ticket = true        # default
+require_date   = false       # default; a date that is written is enforced either way
+ticket_pattern = "[A-Z][A-Z0-9]+-\\d+"
+warn_days      = 14
+
+[tests.skip]
+require_reason = true        # default
+require_expiry = true        # default
+require_ticket = false       # default
+```
+
+```js
+// TODO(SHOP-214, 2027-01-31): handle the empty cart
+// SKIP(SHOP-77, 2027-01-31): flaky on the CI clock
+it.skip("totals the items", () => {});
+```
+
+- **The marker:** a tag at the start of a comment line, then `(ticket, date)` in either order, then an optional `:` and text. Another item in the parentheses (an owner's name) is ignored. In Markdown only `<!-- -->` comments count.
+- **Dates:** a written date is expired from the as-of date on (`--as-of`, `CODELAW_AS_OF`, else `HEAD`'s commit date, never the clock) and a warning for `warn_days` before it. A date that is not a calendar day is reported.
+- **Skipped tests:** the reason is the framework's own (`reason=` in pytest, the argument of `unittest.skip`, Playwright's `test.skip(cond, "reason")`) or the text of a `SKIP(ticket, date): reason` comment directly above the test; the expiry and ticket are always in that comment.
+- **Focused tests** (`.only`, `fit`, `fdescribe`) are errors; `codelaw fix --unsafe` drops the focus. Every other fix is yours: the ticket, the date and the reason are facts only the author knows.
+- **An existing codebase:** `codelaw baseline add --rule js/todo-marker` keeps today's bare TODOs, and a new one still fails; or set `require_ticket = false` and enforce only the dates that are written.
+
 ### Your own sanitizer, your own wrappers
 
 A rule that requires a function at a sink takes it from your config, matched by name and by where it is imported from. The five HTML-sink rules read `sanitizers`; `sanitizers_mode` is `extend` (add to the built-in list, the default) or `replace` (only yours count):

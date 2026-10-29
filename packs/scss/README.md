@@ -24,6 +24,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 |---|---|---|
 | `scss/recommended` | 7 | correctness: at-rule-no-unknown, duplicate definitions, `@extend` placeholders, null tests, empty comments, partial names |
 | `scss/strict` | 15 | the additions to `scss/recommended` (it extends it): Dart Sass's module migrations (no `@import`, no global function names, no slash division), unknown functions, naming patterns and a nesting limit |
+| `scss/markers` | 1 | TODO comments with a ticket (and a date when asked); opt in (SR-CONFIG decision 11a) |
 
 <!-- /docs-sync:presets -->
 

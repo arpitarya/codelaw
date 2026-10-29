@@ -61,17 +61,17 @@ This record was rewritten to that ruling and then accepted ("go with the recomme
 | Pack | npm | PyPI | Languages | Presets |
 |---|---|---|---|---|
 | engine | `codelaw` | `codelaw` | none: this is the engine. It ships only the `codelaw/*` meta diagnostics, the formatter's `format/unformatted` and `format/failed`, and `graph/no-deprecated-usage` | — |
-| `js` | `@codelaw/rules-js` | `codelaw-rules-js` | JS, JSX; its core rules also run on TS and TSX | `js/recommended`, `js/typescript`, `js/conventions`, `js/project`, `js/size` · *later:* `js/strict` |
+| `js` | `@codelaw/rules-js` | `codelaw-rules-js` | JS, JSX; its core rules also run on TS and TSX | `js/recommended`, `js/typescript`, `js/conventions`, `js/project`, `js/size`, `js/markers` · *later:* `js/strict` |
 | `ts` | `@codelaw/rules-ts` | — | TS, TSX | `ts/recommended`, `ts/conventions`, `ts/type-checked` (the type-aware rules, [SR-TYPES](0117_types.md)) |
 | `react` | `@codelaw/rules-react` | `codelaw-rules-react` | JSX, TSX, and React in JS and TS | `react/recommended`, `react/conventions` |
 | `node` | `@codelaw/rules-node` | — | JS, JSX, TS, TSX run on Node.js | `node/recommended` |
 | `stencil` | `@codelaw/rules-stencil` | — | TS, TSX Stencil components | `stencil/recommended`, `stencil/conventions` |
-| `html` | `@codelaw/rules-html` | `codelaw-rules-html` | HTML, incl. HTML embedded in Markdown and templates | `html/recommended`, `html/a11y`, `html/document`, `html/conventions`, `html/security`, `html/size` |
-| `css` | `@codelaw/rules-css` | `codelaw-rules-css` | CSS, and SCSS for the rules that declare it | `css/recommended`, `css/standard`, `css/conventions`, `css/project`, `css/size` |
-| `scss` | `@codelaw/rules-scss` | `codelaw-rules-scss` | SCSS | `scss/recommended`, `scss/strict` (extends `scss/recommended`) |
+| `html` | `@codelaw/rules-html` | `codelaw-rules-html` | HTML, incl. HTML embedded in Markdown and templates | `html/recommended`, `html/a11y`, `html/document`, `html/conventions`, `html/security`, `html/size`, `html/markers` |
+| `css` | `@codelaw/rules-css` | `codelaw-rules-css` | CSS, and SCSS for the rules that declare it | `css/recommended`, `css/standard`, `css/conventions`, `css/project`, `css/size`, `css/markers` |
+| `scss` | `@codelaw/rules-scss` | `codelaw-rules-scss` | SCSS | `scss/recommended`, `scss/strict` (extends `scss/recommended`), `scss/markers` |
 | `css-modules` | `@codelaw/rules-css-modules` | — | `*.module.css`, `*.module.scss` and the JS and TS that import them | `css-modules/recommended`, `css-modules/strict` (extends `css-modules/recommended`) |
-| `python` | — | `codelaw-rules-python` | Python | `py/recommended`, `py/conventions`, `py/project`, `py/size` · *later:* `py/strict` |
-| `data` | `@codelaw/rules-data` | `codelaw-rules-data` | JSON, YAML, TOML, Markdown; the dependencies of `package.json` and `pyproject.toml` (decision 15) | `data/recommended`, `md/recommended`, `data/package-json`, `data/tsconfig`, `data/pyproject`, `data/github-actions`, `data/conventions` |
+| `python` | — | `codelaw-rules-python` | Python | `py/recommended`, `py/conventions`, `py/project`, `py/size`, `py/markers` · *later:* `py/strict` |
+| `data` | `@codelaw/rules-data` | `codelaw-rules-data` | JSON, YAML, TOML, Markdown; the dependencies of `package.json` and `pyproject.toml` (decision 15) | `data/recommended`, `md/recommended`, `data/package-json`, `data/tsconfig`, `data/pyproject`, `data/github-actions`, `data/conventions`, `data/markers` |
 | `tanstack-query` | `@codelaw/rules-tanstack-query` | — | JS, JSX, TS, TSX using TanStack Query | `tanstack-query/recommended` |
 | `redux-toolkit` | `@codelaw/rules-redux-toolkit` | — | JS, JSX, TS, TSX using Redux | `redux-toolkit/recommended` |
 | `security-js` | `@codelaw/rules-security-js` | `codelaw-rules-security-js` | JS, JSX, and the TS and TSX that run them | `sec-js/recommended`, `sec-js/strict` |
@@ -153,6 +153,7 @@ The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the
      - **A first-party preset extends only a pack published on every registry its own pack is** (a test in `pack.rs` holds it), so neither registry's users need the other: `sec-ts/*` (npm) extends `sec-js/*` (npm and PyPI); `sec-html/*` (both) extends `html/security` (both); each `strict` extends its `recommended`.
      - **`html/security`** gathers the html pack's five security rules — `html/require-sri`, `html/target-blank-rel`, `html/no-inline-script`, `html/autocomplete-password`, `html/meta-refresh` — so `sec-html/recommended` turns them on without a copy.
      - **`size` presets** (W-61, 2026-10-26): `html/size` holds `html/max-lines` and `css/size` holds `css/max-lines`, each opt-in and in no `recommended`. Both count lines of a whole file only (`.html`/`.htm`; `.css`, and `.scss` once it is a language) and do nothing on a `<style>` region or a fenced block. Options: `max` (HTML 400, CSS 300), `skip_blank_lines` and `skip_comments` (true), `skip_imports` (CSS, false), `skip_embedded` (HTML, false: lines wholly inside `<script>` and `<style>`). `fix: manual`.
+     - **`markers` presets** (W-131, 2026-10-30; [SR-CONFIG](0110_config.md) decision 11a): `js/markers`, `py/markers`, `css/markers`, `scss/markers`, `html/markers` and `data/markers`, each opt-in and in no `recommended`, since a repo with bare TODOs gets them all at once. The rules, each `native:` in the pack of its language: `js/todo-marker` (JS, JSX, TS, TSX), `py/todo-marker`, `css/todo-marker`, `scss/todo-marker`, `html/todo-marker`, `yaml/todo-marker`, `toml/todo-marker` and `md/todo-marker` (`manual`); `js/no-focused-tests` (`suggest`: the fix drops the focus), `js/skipped-test` and `py/skipped-test` (`manual`). They read `[todo]` and `[tests.skip]`; a date is judged on the as-of date, never the clock ([L5](0007_LAW-5-no-model-in-the-engine.md)).
    - **A data table** is `data/**/*.json`, named by its path under `data/` without `.json` (`data/globals/browser.json` is `globals/browser`).
 4. **Resolution.** First-party presets are named `codelaw:<namespace>/<preset>` in `extends`, for example `codelaw:js/recommended`.
    - **A pack is first-party** when its manifest `name` is one of §1's: the npm name when the pack is on npm, else its PyPI name (`codelaw-rules-python`).

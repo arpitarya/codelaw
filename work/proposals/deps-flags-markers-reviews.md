@@ -12,7 +12,7 @@ timestamp: 2026-10-30T00:15:00+05:30
 [W-128](../open/W-128-deps-pack-and-vulnerabilities.md) ·
 [W-129](../open/W-129-deps-hygiene-rules.md) ·
 [W-130](../open/W-130-feature-flag-expiry.md) ·
-[W-131](../open/W-131-todo-and-skipped-test-markers.md) ·
+[W-131](../../archive/open/W-131-todo-and-skipped-test-markers.md) ·
 [W-132](../open/W-132-complexity-and-codeowners.md) ·
 [W-133](../../archive/open/W-133-rules-from-review-comments.md).
 This file is the design until each item writes its record; the record then wins.

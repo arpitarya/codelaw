@@ -1,0 +1,6 @@
+description = "TODO comments with a ticket (and a date when asked) in YAML, TOML and Markdown; opt in (SR-CONFIG decision 11a)"
+
+[rules]
+"yaml/todo-marker" = "error"
+"toml/todo-marker" = "error"
+"md/todo-marker" = "error"

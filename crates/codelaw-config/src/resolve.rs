@@ -337,6 +337,7 @@ impl ConfigFile {
             return Err(ConfigError::new(Some(path), format!("`[spell] words`: `{w}` is not one word")));
         }
         check_reviews(&raw.reviews, &path)?;
+        check_markers(&raw, &path)?;
         let spell_file_words = read_words_file(&path, &dir, raw.spell.words_file.as_deref())?;
         if let Some(globs) = &raw.css.modules {
             glob_set(globs, &path).map_err(|e| ConfigError::new(Some(path.clone()), format!("`[css] modules`: {}", e.message)))?;
@@ -409,6 +410,29 @@ fn check_reviews(r: &crate::raw::RawReviews, path: &Path) -> Result<(), ConfigEr
     }
     if let Some(w) = r.window.as_deref().filter(|w| !crate::raw::is_review_window(w)) {
         return err(format!("`[reviews] window`: `{w}` is not a window; write e.g. \"6m\", \"90d\", \"2w\" or \"1y\""));
+    }
+    Ok(())
+}
+
+/// `[todo]` and `[tests.skip]` (SR-CONFIG decision 11a): tags are plain words and
+/// a ticket pattern is a regular expression, so a typo fails on a laptop as
+/// it would in CI.
+fn check_markers(raw: &RawConfig, path: &Path) -> Result<(), ConfigError> {
+    let fail = |m: String| Err(ConfigError::new(Some(path.to_path_buf()), m));
+    if let Some(tags) = &raw.todo.tags {
+        if tags.is_empty() {
+            return fail("`[todo] tags`: name at least one tag".into());
+        }
+        if let Some(t) = tags.iter().find(|t| t.is_empty() || !t.chars().all(|c| c.is_alphanumeric() || c == '_')) {
+            return fail(format!("`[todo] tags`: `{t}` is not one word of letters, digits and `_`"));
+        }
+    }
+    for (table, pattern) in [("[todo]", &raw.todo.ticket_pattern), ("[tests.skip]", &raw.tests.skip.ticket_pattern)] {
+        if let Some(p) = pattern
+            && let Err(e) = regex::Regex::new(p)
+        {
+            return fail(format!("`{table} ticket_pattern`: `{p}` is not a regular expression: {e}"));
+        }
     }
     Ok(())
 }
@@ -536,7 +560,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
     "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
-    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]",
+    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]", "[todo]", "[tests]",
 ];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
@@ -558,6 +582,8 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.coverage.is_some(),
         raw.spell != Default::default(),
         raw.reviews != Default::default(),
+        raw.todo != Default::default(),
+        raw.tests != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -796,6 +822,8 @@ impl Config {
         let value = match (name, self.root_raw()) {
             ("deps", Some(r)) => serde_json::to_value(&r.deps).ok(),
             ("css", Some(r)) => serde_json::to_value(&r.css).ok(),
+            ("todo", Some(r)) => serde_json::to_value(&r.todo).ok(),
+            ("tests.skip", Some(r)) => serde_json::to_value(&r.tests.skip).ok(),
             // `[spell] words` and the words file are one list (W-112).
             ("spell", Some(r)) => serde_json::to_value(&r.spell).ok().map(|mut v| {
                 let file = self.files.first().map(|f| f.spell_file_words.as_slice()).unwrap_or_default();

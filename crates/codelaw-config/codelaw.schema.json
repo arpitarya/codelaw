@@ -396,6 +396,45 @@
         }
       }
     },
+    "todo": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "What a TODO-style comment must carry (SR-CONFIG decision 11a): read by the `*/todo-marker` rules. A written date is enforced whether or not it is required. Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tags": {
+          "description": "The words that open a marker, at the start of a comment line.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^\\w+$" },
+          "default": ["TODO", "FIXME", "HACK"]
+        },
+        "require_ticket": { "description": "A ticket matching `ticket_pattern` is required.", "type": "boolean", "default": true },
+        "require_date": { "description": "A `YYYY-MM-DD` date is required.", "type": "boolean", "default": false },
+        "ticket_pattern": { "description": "A regular expression a whole ticket must match.", "type": "string", "default": "[A-Z][A-Z0-9]+-\\d+" },
+        "warn_days": { "description": "A marker is warned about this many days before its date.", "type": "integer", "minimum": 0, "default": 14 }
+      }
+    },
+    "tests": {
+      "x-codelaw-record": "SR-CONFIG",
+      "description": "Tables about tests (SR-CONFIG decision 11a). Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "skip": {
+          "description": "What a skipped test must carry: read by the `*/skipped-test` rules.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "require_reason": { "description": "A reason is required: the framework's own argument, or the text of a `SKIP(…): reason` comment above.", "type": "boolean", "default": true },
+            "require_expiry": { "description": "A `YYYY-MM-DD` expiry in a `SKIP(…)` comment is required.", "type": "boolean", "default": true },
+            "require_ticket": { "description": "A ticket matching `ticket_pattern` is required.", "type": "boolean", "default": false },
+            "ticket_pattern": { "description": "A regular expression a whole ticket must match.", "type": "string", "default": "[A-Z][A-Z0-9]+-\\d+" },
+            "warn_days": { "description": "A skip is warned about this many days before its expiry.", "type": "integer", "minimum": 0, "default": 14 }
+          }
+        }
+      }
+    },
     "deps": {
       "x-codelaw-record": "SR-RULE-PACKS",
       "description": "The dependency rules, `data/outdated-dependency` and `data/stale-deps-snapshot`, read against `.codelaw/deps-snapshot.json`, which `codelaw deps refresh` writes (SR-RULE-PACKS decision 15). Root config only.",
