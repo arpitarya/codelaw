@@ -29,9 +29,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (18)
+## Open items (20)
 
-### build (15)
+### build (16)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -64,6 +64,8 @@ here. Read that record before changing anything below it.
 
 🟢 **W-137** `agent` The extension's look (board D, 10-30): inline badges, gutter icons, TODO chips, hover cards on manifests, a codelaw sidebar, status-bar counts; ordinary source files squiggles only, with a designed hover card (board H, ruled 10-30). Filed by Arpit (Cowork). [detail](open/W-137-editor-findings-look.md)
 
+🟡 **W-139** waits on **W-138** `agent` Port every rule W-138 picks (as Arpit rules) into codelaw's packs — cases, fixes, docs, budgets. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
+
 ### testing (0)
 
 ### reporting and benchmarks (2)
@@ -76,7 +78,9 @@ here. Read that record before changing anything below it.
 
 🟢 **W-136** `agent` L3 amended: `.nvmrc`, `.python-version`, `.tool-versions`, Dockerfile, CODEOWNERS and yarn classic `yarn.lock` may carry findings (never linted as languages); a finding shows on the manifest **and** on the text file's line. Filed by Arpit (Cowork). [detail](open/W-136-l3-findings-on-plain-text-config.md)
 
-### research (0)
+### research (1)
+
+🟢 **W-138** `cowork` Research: every rule of ESLint, typescript-eslint, TSLint, Ruff, Prettier, Biome, stylelint, html-validate and markdownlint matched against codelaw's 665, each gap classed; Arpit reviews the port list. Filed by Arpit (Cowork). [detail](open/W-138-rule-parity-research.md)
 
 
 ---

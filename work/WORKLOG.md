@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-138 and W-139 filed: rule parity with nine tools  ·  Cowork (Opus 5.5)
+
+- **Asked:** (voice) a comparison of Biome, ESLint, Ruff, Prettier, TSLint, html-validate, stylelint and markdownlint with codelaw; where codelaw is shallower; then *"one big item for Opus to research it and once the research is done, then one big work item to build it."* · *"file it."*
+- **Done:** W-138 (research, Cowork/Opus: every rule matched against codelaw's 665, eight classes, data per tool, a proposal) and W-139 (build, waits on W-138 and Arpit's ruling). Also, earlier tonight: `docs/design/editor/` (W-137's chosen designs).
+- **Decided / left open:** Arpit reviews W-138's port list before W-139 starts.
+- **Mistakes:** none.
+- **Next:** W-138's research, in a Cowork session.
+
 ## 2026-10-30 — W-133 built and closed: rules from review comments  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Implement it and then close those out. Keep merging everything to main."* — W-133, one of six items run in parallel.
