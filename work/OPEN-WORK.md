@@ -39,7 +39,7 @@ here. Read that record before changing anything below it.
 
 ### build (8)
 
-🔴 **W-119** `arpit` The ten missing PyPI projects through CI, one pending publisher at a time: `publish.yml -f only=pypi-new` built (2026-10-29); left per project the pending publisher and the run (inbox), 0 of 10; npm's spell index by hand. Filed by Arpit (Cowork). [detail](open/W-119-pypi-through-pending-publishers.md)
+🔴 **W-119** `arpit` The ten missing PyPI projects through CI, one pending publisher at a time: `publish.yml -f only=pypi-new` built (2026-10-29); left per project the pending publisher and the run (inbox), 0 of 10. npm's spell index done 10-29. Filed by Arpit (Cowork). [detail](open/W-119-pypi-through-pending-publishers.md)
 
 🔴 **W-95** `arpit` VS Code extension: v0.3.0 reached the Marketplace by trusted publishing, the upload refused (content type, fixed on `main`). Left: run the extension's job alone (inbox); Open VSX needs W-117's token. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
