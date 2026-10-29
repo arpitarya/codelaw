@@ -293,11 +293,11 @@ jobs:
           bad=0
           for f in dist/vscode/*.vsix; do
             # the first version creates the extension (POST); every other file updates it (PUT)
-            code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X PUT -H "Authorization: Basic $auth" -H 'Content-Type: application/json' \
-                      --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/publishers/codelaw/extensions/codelaw?api-version=7.1-preview.1')"
+            code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X PUT -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
+                      --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/publishers/codelaw/extensions/codelaw?api-version=7.2-preview.2')"
             if [ "${code:0:1}" != 2 ]; then
-              code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X POST -H "Authorization: Basic $auth" -H 'Content-Type: application/json' \
-                        --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/extensions?api-version=7.1-preview.1')"
+              code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X POST -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
+                        --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/extensions?api-version=7.2-preview.2')"
             fi
             if [ "${code:0:1}" = 2 ]; then echo "- ✓ $(basename "$f")" | tee -a "$GITHUB_STEP_SUMMARY"
             elif grep -qi 'already exists' "$RUNNER_TEMP/m.out"; then echo "- ⏭ $(basename "$f") already listed" | tee -a "$GITHUB_STEP_SUMMARY"
