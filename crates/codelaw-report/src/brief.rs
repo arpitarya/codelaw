@@ -196,6 +196,7 @@ mod tests {
             preview: false,
             tags: Vec::new(),
             security: None,
+            ported_from: Vec::new(),
         }
     }
 

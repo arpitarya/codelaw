@@ -14,7 +14,7 @@
 //! refuse with exit 2 and the install line.
 
 use crate::package::{self, AgentFiles};
-use crate::skills::{rule_author, skills, with_generated_note};
+use crate::skills::{CUSTOM_AGENTS, custom_agent, skills, with_generated_note};
 use crate::{AgentsConfig, Target, launcher};
 use clap::Args;
 use codelaw_core::template::json_escape;
@@ -311,12 +311,14 @@ pub fn plan(root: &Path, cfg: &AgentsConfig, sources: &Sources, agents: &AgentFi
         files.insert(".kiro/steering/codelaw.md".into(), Some(agents.render("kiro/steering.md", &[("note", note), ("body", &body)])?));
     }
 
-    // Custom agent.
-    if has(Target::Claude) {
-        files.insert(".claude/agents/codelaw-rule-author.md".into(), Some(with_generated_note(agents, rule_author(agents)?)?));
-    }
-    if has(Target::Copilot) {
-        files.insert(".github/agents/codelaw-rule-author.agent.md".into(), Some(with_generated_note(agents, rule_author(agents)?)?));
+    // Custom agents.
+    for name in CUSTOM_AGENTS {
+        if has(Target::Claude) {
+            files.insert(format!(".claude/agents/{name}.md"), Some(with_generated_note(agents, custom_agent(agents, name)?)?));
+        }
+        if has(Target::Copilot) {
+            files.insert(format!(".github/agents/{name}.agent.md"), Some(with_generated_note(agents, custom_agent(agents, name)?)?));
+        }
     }
 
     // Hooks and MCP registration.

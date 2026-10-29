@@ -137,6 +137,7 @@ pub const KNOWN_SKILLS: &[&str] = &[
     "codelaw-fix",
     "codelaw-migrate",
     "codelaw-pack",
+    "codelaw-port-rule",
     "codelaw-review",
     "codelaw-rules-from-reviews",
     "codelaw-setup",

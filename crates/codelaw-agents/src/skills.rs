@@ -12,7 +12,7 @@ pub struct Skill<'a> {
 }
 
 /// The catalogue, P1 first (SR-AGENT-SURFACES §The skill catalogue).
-pub const NAMES: [&str; 13] = [
+pub const NAMES: [&str; 14] = [
     "codelaw-write",
     "codelaw-fix",
     "codelaw-explain",
@@ -26,6 +26,7 @@ pub const NAMES: [&str; 13] = [
     "codelaw-pack",
     "codelaw-upgrade",
     "codelaw-rules-from-reviews",
+    "codelaw-port-rule",
 ];
 
 /// Every skill of the catalogue, from the package.
@@ -33,9 +34,14 @@ pub fn skills(files: &AgentFiles) -> Result<Vec<Skill<'_>>, String> {
     NAMES.iter().map(|name| Ok(Skill { name, text: files.text(&format!("skills/{name}/SKILL.md"))? })).collect()
 }
 
-/// The custom agent `codelaw-rule-author` (Claude Code and Copilot).
-pub fn rule_author(files: &AgentFiles) -> Result<&str, String> {
-    files.text("agents/codelaw-rule-author.md")
+/// The custom agents (Claude Code and Copilot), each a context-isolated
+/// twin of a skill: `codelaw-rule-author` of `codelaw-author-rule`,
+/// `codelaw-rule-porter` of `codelaw-port-rule` (W-140).
+pub const CUSTOM_AGENTS: [&str; 2] = ["codelaw-rule-author", "codelaw-rule-porter"];
+
+/// One custom agent's text, from the package.
+pub fn custom_agent<'a>(files: &'a AgentFiles, name: &str) -> Result<&'a str, String> {
+    files.text(&format!("agents/{name}.md"))
 }
 
 /// The trigger evals of every skill (decision 5).
@@ -114,6 +120,16 @@ mod tests {
             assert!(e["should_not"].as_array().is_some_and(|a| a.len() >= 3), "{}: needs near-misses", s.name);
         }
         assert_eq!(v["skills"].as_object().unwrap().len(), NAMES.len());
+    }
+
+    #[test]
+    fn every_custom_agent_names_itself() {
+        let files = source();
+        for name in CUSTOM_AGENTS {
+            let (fm, _) = split(custom_agent(&files, name).unwrap()).unwrap_or_else(|| panic!("{name}: no frontmatter"));
+            assert_eq!(field(fm, "name"), Some(name));
+            assert!(field(fm, "description").is_some_and(|d| d.contains("Use ")), "{name}: the description says when to use it");
+        }
     }
 
     #[test]
