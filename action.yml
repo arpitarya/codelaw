@@ -12,8 +12,8 @@
 # that codelaw, because scripts/version.py writes `version`'s default below at
 # every bump. It uses no other action (L11): the install is npm or pip, the
 # upload is GitHub's code-scanning REST API.
-name: codelaw
-description: Lint and format-check JS, TS, Python, CSS, HTML, JSON, YAML, TOML and Markdown with codelaw; findings annotate the pull request.
+name: codelaw check
+description: Lint and format-check JS, TS, Python, CSS, HTML, JSON, YAML, TOML and Markdown; findings annotate the pull request.
 author: arpitarya
 branding:
   icon: check-square

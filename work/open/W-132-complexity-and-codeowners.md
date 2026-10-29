@@ -34,12 +34,12 @@ ball: agent
 |---|---|---|
 | 1 · complexity | `js/complexity`, `py/complexity` (20), `js/max-depth`, `py/max-depth` (4); in `js/size`, `py/size` | ⏳ |
 | 2 · components | `react/component-max-lines` (200), `react/max-props` (8), `react/max-jsx-depth` (6); `react/size` opt-in | ⏳ |
-| 3 · codeowners | GitHub and GitLab paths, `[codeowners] path`; unowned files, stale patterns, empty owners unless `allow_unowned`; findings on the root manifest (Q-A option A) | ⏳ |
+| 3 · codeowners | GitHub and GitLab paths, `[codeowners] path`; unowned files, stale patterns, empty owners unless `allow_unowned`; stale patterns on the CODEOWNERS line, unowned paths on the root manifest — both places, Q-A ruled B (W-136) | ⏳ |
 | 4 · records, tests, docs | SR-RULE-PACKS, SR-CONFIG `[codeowners]`; manual fixes with a skill; corpus counts; L8 | ⏳ |
 
 ## Blockers
 
-None. Q-A (inbox) may move where CODEOWNERS findings land.
+None. The CODEOWNERS-line location waits on W-136.
 
 ## Record affected
 
@@ -47,7 +47,7 @@ SR-RULE-PACKS · SR-CONFIG (`[codeowners]`).
 
 ## Hazards
 
-- CODEOWNERS is not L3 — no finding on its lines unless Q-A is ruled B.
+- CODEOWNERS is not an L3 language; findings on its lines come only through W-136's amendment.
 - Which pack holds `codeowners-coverage` is the agent's call (`data` fits: a repo-level file); say so when it lands.
 
 ## Reference

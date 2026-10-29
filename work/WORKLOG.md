@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — Inbox walked by voice: Q-A, deps names, Action name, Open VSX, W-118  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"What are the decisions waiting on me?"* — one by one — then *"file it."*
+- **Done:** W-134, W-135 (the `deps` registry names, split out of W-128), W-136 (L3: findings on plain-text config files) filed; W-128, W-129, W-132 and the deps proposal updated; `action.yml` renamed `codelaw check` with a 115-character description, CHANGELOG *Unreleased*; W-97, W-117, W-102 updated; W-118 closed and archived; its proposal graduated; inbox down to W-97 and W-117.
+- **Decided / left open:** Arpit: *"in both the places, in package.json as well as in nvmrc"*; *"just before the deps release"*, two items; *"Let's go with codelaw check"*; *"token isn't done. We are going to go with trusted publisher"*; on W-118 *"whatever you propose"*. Open: Open VSX's wiki said the first version needs a token before trusted publishing — W-117 brings it back to Arpit if it still holds. The description written is the accurate 115-character one, not the "auto-fix" wording said by voice — the Action does not fix.
+- **Mistakes:** none.
+- **Next:** W-102 (the agent reruns the experiment); the Marketplace tick on the next release.
+
 ## 2026-10-30 — v0.4.0 released  ·  Claude Code (Opus 5.5)
 
 - **Asked:** (the turn before) publish 0.4.0, everything green, the extension too; Arpit ruled *re-cut v0.4.0* after the first cut failed.

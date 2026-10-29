@@ -131,7 +131,7 @@ advisory_sources = [
   says replace, remove, or a dated ignore.
 - **Where a transitive finding lands:** on the lockfile's line where the lockfile is
   an L3 language (package-lock JSON, pnpm YAML, uv/poetry TOML); yarn classic's
-  `yarn.lock` is not → on `package.json`, naming the lockfile (§8 Q-A).
+  `yarn.lock` is not → on `package.json` **and** on the `yarn.lock` line (§8 Q-A, ruled B; W-136).
 - **Severity:** `[deps] severity` gains `critical`/`high` → `error`, `moderate` →
   `warn`, `low` → `info` (each settable, `off` drops it).
 - **Ignore:** `[deps] ignore` entries may name an advisory —
@@ -181,7 +181,7 @@ advisory_sources = [
   `node-version` / `setup-python` `python-version`, Dockerfile `FROM node:` /
   `python:` (read only). Pins must satisfy the declared range and equal each other.
   `[deps.runtime] source` names the truth (default `engines.node` /
-  `requires-python`). Fix suggest on L3 files; manual on the text files (§8 Q-A).
+  `requires-python`). Fix suggest on L3 files; manual on the text files. Findings show on both the L3 file and the text file's line (§8 Q-A, ruled B; W-136).
 
 ## 3 · Feature-flag expiry (W-130)
 
@@ -254,8 +254,8 @@ warn_days      = 14
   or `[codeowners] path`. gitignore-style patterns, last match wins, GitLab sections.
 - Reports: a discovered file no pattern owns; a pattern that matches no file
   (stale); an owner line with no owners unless `allow_unowned = true`.
-- CODEOWNERS is not an L3 language → findings on the root manifest, once per
-  project, listing the paths (§8 Q-A). Fix manual (stale pattern: suggest delete).
+- Findings on the CODEOWNERS line itself (a stale pattern) and on the root manifest
+  once per project listing unowned paths (§8 Q-A, ruled B; W-136). Fix manual (stale pattern: suggest delete).
 
 ## 7 · Rules from review comments (W-133)
 
@@ -278,27 +278,26 @@ warn_days      = 14
   The decider approves every step; nothing turns on by itself. A reviewer's
   `codelaw: rule` comment fast-tracks a point into the next run.
 
-## 8 · Open for the decider
+## 8 · Ruled after filing (2026-10-30, voice)
 
-- **Q-A — findings for files outside L3.** `.nvmrc`, `.node-version`,
-  `.python-version`, `.tool-versions`, Dockerfile, CODEOWNERS and yarn classic's
-  `yarn.lock` are read as inputs but are not L3 languages, so no rule may report on
-  their lines (as B-051 for `requirements*.txt`). **A (built unless ruled
-  otherwise):** report on the nearest L3 file (root manifest, workflow YAML), naming
-  the text file and its line in the message; no law change. **B:** amend L3 to admit
-  these as "plain-text config" for findings only.
-- **Registry names for `deps`** — PyPI pending trusted publishers for
-  `codelaw-rules-deps` and `codelaw-rules-deps-fux-index`; npm's first hand publish of
-  `@codelaw/rules-deps` and its Fux index (RELEASING.md). The decider asked Claude to
-  register the PyPI pending publishers in the browser, confirming before submit.
+- **Q-A — findings for files outside L3 → B.** *"I want the error to be displayed in
+  both the places, in package.json as well as in nvmrc."* L3 is amended so `.nvmrc`,
+  `.node-version`, `.python-version`, `.tool-versions`, Dockerfile, CODEOWNERS and yarn
+  classic's `yarn.lock` may carry findings — never linted or formatted as a language. A
+  finding about one shows on the L3 file it concerns **and** on the text file's line:
+  [W-136](../open/W-136-l3-findings-on-plain-text-config.md).
+- **Registry names for `deps`** — two items, *"just before the deps release"*:
+  [W-134](../open/W-134-deps-pypi-pending-publishers.md) (PyPI pending publishers,
+  Claude fills the form in Chrome, Arpit submits) and
+  [W-135](../open/W-135-deps-npm-first-publish.md) (npm first hand publish).
 
 ## 9 · Laws touched
 
 L5 decision 3 (advisory and licence hosts in `deps refresh`) · L6 (nineteen packs) ·
 L4 (every new rule has its fix class above) · L8 (each new rule measured before its
 budget) · L10 (any file `init` writes, e.g. a starter `flags.toml`, from a template) ·
-L11 (no new dependency: semver, PEP 440 and SPDX parsing are codelaw's own) · L3 only
-if Q-A is ruled B.
+L11 (no new dependency: semver, PEP 440 and SPDX parsing are codelaw's own) · L3
+(plain-text config files carry findings — W-136).
 
 ## 10 · Sources (read 2026-10-29)
 

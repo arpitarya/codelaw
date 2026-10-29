@@ -4,6 +4,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+### Changed
+
+- **GitHub Action (W-97):** its Marketplace name is `codelaw check` (the name `codelaw` is taken) and its description is under the Marketplace's 125 characters; `uses: arpitarya/codelaw@v0` is unchanged.
+
 ### Fixed
 
 - **Release pipeline (W-127):** a release's attestation checks run eight at a time against one trusted root fetched first — v0.4.0's first run failed when eight checks set it up at once, before anything was published — and an npm upload is tried once more unless it landed.

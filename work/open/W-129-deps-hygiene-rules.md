@@ -20,7 +20,7 @@ ball: agent
 | 2 | Build `deps/lockfile-sync` | a manifest edited without its lockfile caught | ⏳ |
 | 3 | Build `deps/version-drift` | one version of a package across a monorepo | ⏳ |
 | 4 | Build `deps/runtime-agreement` | Node and Python versions agree everywhere they are named | ⏳ |
-| 5 | The decider rules Q-A (findings for non-L3 files) | where text-file findings land | 🔴 decider decides (A built meanwhile) |
+| 5 | Report each text-file finding in both places, once W-136 amends L3 | the `.nvmrc` line and `package.json` both show it | 🟡 W-136 (ruled B, 2026-10-30) |
 
 **Arpit, 2026-10-29:** *"The license check, I like it. The lock file sync, I like it. Version drift in monorepo, I like that one as well. The runtime version agreement, I like that as well."*
 
@@ -42,7 +42,7 @@ ball: agent
 
 ## Blockers
 
-🟡 waits on **W-128** (the pack, and licence metadata in the snapshot). Q-A does not block: build option A.
+🟡 waits on **W-128** (the pack, and licence metadata in the snapshot). The text-file location waits on **W-136**; the L3-file location does not.
 
 ## Record affected
 
@@ -50,7 +50,7 @@ SR-RULE-PACKS decision 15 (as W-128 leaves it) · SR-CONFIG §`[deps]`.
 
 ## Hazards
 
-- `.nvmrc`, `.python-version`, `.tool-versions`, Dockerfile, yarn classic `yarn.lock` are not L3 — read them, report on an L3 file (Q-A option A).
+- `.nvmrc`, `.python-version`, `.tool-versions`, Dockerfile, yarn classic `yarn.lock`: Q-A ruled B (2026-10-30, *"in both the places"*) — the finding goes on the L3 file **and** the text file's line, through W-136.
 - A licence field is free text on old packages — `unknown`, never a guess.
 - No new dependency (L11): write the SPDX parser.
 

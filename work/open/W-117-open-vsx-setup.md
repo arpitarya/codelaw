@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-29 (voice): set up Open VSX for the codelaw extensi
 item: W-117
 filed: 2026-10-29
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-29
+updated: 2026-10-30
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
@@ -25,6 +25,15 @@ ball: arpit
 **Arpit, 2026-10-29 (voice docket):** on W-95, Open VSX now and the Marketplace by hand on release day: *"Yes."* Asked what Open VSX is (the Eclipse Foundation's store, used by Cursor, VSCodium, Windsurf and Gitpod) — then *"You have the access to the browser. We will go ahead and implement Open VSX You can go ahead and create the ID and everything."* and, the browser being out of reach of the voice call, *"That's okay. Let's put it as a work item and we'll work on it."*
 
 **Model:** Sonnet (step 5); steps 1–4 with Arpit in a text session, Claude in Chrome helping.
+
+## Ruled 2026-10-30 — trusted publishing, no token
+
+**Arpit, 2026-10-30 (voice):** *"No, no, token isn't done. We are going to go with trusted publisher. Open VSX has trusted publisher."* · *"The namespace isn't approved yet."*
+
+- **Step 3 (the `OVSX_PAT` token) is dropped.** CI publishes through Open VSX trusted publishing only.
+- **The claim is filed:** [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928) *Claiming namespace `codelaw`*, open (checked 2026-10-30 00:30).
+- **Next:** on approval, Arpit adds the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`); then step 5.
+- **Hazard, to settle before step 5:** the wiki (2026-10-29 finding below) says the extension must already have one version published with an access token before trusted publishing works. If that still holds when the namespace is approved, the first upload needs a one-time token (or Open VSX staff) — bring that back to Arpit, do not create a token unasked.
 
 ## Progress and a finding — 2026-10-29 (Arpit, with Cowork and Claude in Chrome)
 

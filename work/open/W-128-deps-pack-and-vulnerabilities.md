@@ -21,7 +21,7 @@ ball: agent
 | 3 | Teach `deps refresh` to fetch advisories from a list of on/off sources and merge them | vulnerability facts in the committed snapshot | ⏳ |
 | 4 | Build `deps/vulnerable` (direct and transitive) and `deps/incomplete-scan` | each vulnerable package named, with the safe version | ⏳ |
 | 5 | Tell agents: MCP `check_dependency`, the hook (inform or block), `rules_for_path`, the skills | the agent uses the fixed version unprompted | ⏳ |
-| 6 | The decider binds the two PyPI and two npm names | the pack can be released | 🔴 decider decides |
+| 6 | The two PyPI and two npm names — [W-134](W-134-deps-pypi-pending-publishers.md), [W-135](W-135-deps-npm-first-publish.md), just before the release | the pack can be released | ⏳ split out 2026-10-30 |
 
 **Arpit, 2026-10-29:** *"I want the URLs configurable … multiple sources … I can mark them as true or false … find a URL that will definitely not be blocked and keep it as the first one."* · *"Merge all the enabled ones."* · *"We build everything in single shot."*
 
@@ -42,11 +42,11 @@ The design is [the proposal](../proposals/deps-flags-markers-reviews.md) §2.1�
 | 5 · agents | MCP `check_dependency` offline; post-edit hook message; `[deps] agent` inform/block per severity (default inform; never changes CI); `rules_for_path` names vulnerable and major-behind imports (B-052 promoted here); the skills package's instruction | ⏳ |
 | 6 · tests | sources served on 127.0.0.1 (one blocked, one disagreeing); the merge's safety cases; the network fence case extended; corpus counts; L8 budget measured | ⏳ |
 | 7 · docs | rule docs, USAGE, CHANGELOG, GLOSSARY (`advisory source`, `known-clean`), README counts | ⏳ |
-| 8 · names | PyPI pending publishers `codelaw-rules-deps`, `codelaw-rules-deps-fux-index`; npm first publish of `@codelaw/rules-deps` and its Fux index (inbox) | 🔴 |
+| 8 · names | moved to W-134 (PyPI) and W-135 (npm), 2026-10-30 | ↗ |
 
 ## Blockers
 
-None for building. DoD 8 is the decider's (inbox); it gates only the release.
+None. The release waits on W-134 and W-135; a transitive finding's second location on yarn classic `yarn.lock` waits on W-136.
 
 ## Record affected
 
