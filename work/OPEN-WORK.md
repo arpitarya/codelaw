@@ -43,7 +43,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-125** `agent` Revert `publish.yml`'s `only=pypi-new` and the `main` rule on the `pypi` environment, records and RELEASING.md with them — Arpit ruled it temporary (10-29 10:31); W-119 is done. Filed by Arpit (Claude Code). [detail](open/W-125-revert-pypi-new.md)
 
-🟢 **W-95** `agent` VS Code extension: the Marketplace blocks `codelaw` (removed 0.2.0; Support emailed 10-29). Renamed `codelaw.codelaw-vscode` 10-29; its 0.3.0 `.vsix` files in `dist/vscode/` for the upload by hand; then `vsce`/`ovsx` in `publish.yml` (D-46, D-47). Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
+🟢 **W-95** `agent` VS Code extension **live** 10-29 as `codelaw.codelaw-vscode` (Arpit, by hand) — 0.3.0 for `darwin-arm64` only. Left: the other seven platforms (0.4.0's `publish.yml` job), Open VSX (W-117), the install docs. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
 🔴 **W-97** `arpit` GitHub Action built; ruled 10-27: SARIF via `gh`, a moving `v0`. Left: the Marketplace agreement on the v0.3.0 release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
