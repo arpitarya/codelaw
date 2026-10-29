@@ -62,14 +62,11 @@ remap = { error = "warn" }
 [css]         # SR-PROJECT-GRAPH (CSS Modules: which stylesheets, and the bundler's class-name mapping)
 [coverage]    # SR-PROJECT-GRAPH (the test rules of new code; [coverage.ignore] is SR-BASELINE's)
 [spell]       # SR-SPELL (the spell pack's locale, accepted words and words file)
-<<<<<<< HEAD
 [todo]        # SR-CONFIG (what a TODO-style comment must carry: decision 11a)
 [tests]       # SR-CONFIG (`[tests.skip]`: what a skipped test must carry: decision 11a)
 [reviews]     # SR-AGENT-SURFACES (the codelaw-rules-from-reviews skill's platform and thresholds; validated, read by no engine code)
 [codeowners]  # SR-RULE-PACKS (CODEOWNERS coverage: the file's path, patterns that need no owner)
-=======
 [flags]       # SR-PROJECT-GRAPH (feature-flag expiry: accessors, SDK presets, inline markers, warn_days)
->>>>>>> 7a0a398a (W-130 wip)
 ```
 
 ```mermaid
@@ -112,11 +109,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 2. **Finding it:** walk up from each file to the nearest folder with a home.
    - **Monorepos:** the topmost config is the root. A nested config (for example in `packages/web/`) **inherits** the root and overrides it, unless it sets `root = true`, which makes that folder a separate project with its own graph and baseline ([SR-ARCHITECTURE](0108_architecture.md) decision 17).
    - **Globs** in `include`, `exclude` and every `[scope.<name>]` are relative to the directory of the config file that declares them ([SR-ARCHITECTURE](0108_architecture.md) decision 11).
-<<<<<<< HEAD
-   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]`, `[markdown]`, `[daemon]`, `[lsp]`, `[profile]`, `[deps]`, `[css]`, `[coverage]`, `[spell]`, `[reviews]`, `[todo]`, `[tests]` and `[codeowners]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
-=======
-   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]`, `[markdown]`, `[daemon]`, `[lsp]`, `[profile]`, `[deps]`, `[css]`, `[coverage]`, `[spell]` and `[flags]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
->>>>>>> 7a0a398a (W-130 wip)
+   - **Root-only keys:** `extends`, `rules_dir`, `preview`, `allow_pack_fixers`, `[files]`, `[cache]`, `[fix]`, `[lint]`, `[markdown]`, `[daemon]`, `[lsp]`, `[profile]`, `[deps]`, `[css]`, `[coverage]`, `[spell]`, `[reviews]`, `[todo]`, `[tests]`, `[codeowners]` and `[flags]` belong to the root config, so a project has one rule set and one cache. A nested config that sets one is a load error naming the root config.
    - **A nested `root = true` project** is checked by running codelaw in its folder; a run from the parent skips its files and says so.
 3. **Sections and owners.** The top-level keys belong to this record:
    - `extends`, `languages`, `include`, `exclude`, `rules_dir`;
@@ -137,11 +130,7 @@ Configuration keys were scattered across six records. The decider asked for one 
 
    `extends` takes first-party presets as `codelaw:<namespace>/<preset>`, resolved from the installed rule pack, and team packs as `npm:`, `pypi:` or `path:` ([SR-RULE-PACKS](0101_rule-packs.md) decisions 4 and 11). One preset has no namespace: `codelaw:tests` is the engine's own and turns on the test rules of new code ([SR-PROJECT-GRAPH](0103_project-graph.md) decision 9); no pack resolves it.
 
-<<<<<<< HEAD
-   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]`, `[deprecation]`, `[exceptions]`, `[deps]`, `[css]`, `[coverage]`, `[spell]`, `[todo]`, `[tests]`, `[reviews]` and `[codeowners]` are validated by the loader like `[fix]` and `[lint]` — `[reviews]` only that: no engine code reads it, a skill does ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 10; W-133, 2026-10-30); `[format]`, `[graph]` and `[baseline]` are still read as tables. **One key names a file the loader reads:** `[spell] words_file` (default `.codelaw/spell/words.txt`, relative to the root config's folder; W-112, 2026-10-28): its words join `[spell] words`, a set path that is missing is a load error naming it, and a missing default is none ([SR-SPELL](0116_spell.md) decision 7).
-=======
-   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]`, `[deprecation]`, `[exceptions]`, `[deps]`, `[css]`, `[coverage]`, `[spell]` and `[flags]` are validated by the loader like `[fix]` and `[lint]`; `[format]`, `[graph]` and `[baseline]` are still read as tables. **One key names a file the loader reads:** `[spell] words_file` (default `.codelaw/spell/words.txt`, relative to the root config's folder; W-112, 2026-10-28): its words join `[spell] words`, a set path that is missing is a load error naming it, and a missing default is none ([SR-SPELL](0116_spell.md) decision 7).
->>>>>>> 7a0a398a (W-130 wip)
+   Each `[section]` belongs to the record named beside it in §1, and that record states its keys. A record adding a key adds it to the schema in the same change. `[adapters]`, `[agents]`, `[daemon]`, `[lsp]`, `[deprecation]`, `[exceptions]`, `[deps]`, `[css]`, `[coverage]`, `[spell]`, `[todo]`, `[tests]`, `[reviews]`, `[codeowners]` and `[flags]` are validated by the loader like `[fix]` and `[lint]` — `[reviews]` only that: no engine code reads it, a skill does ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 10; W-133, 2026-10-30); `[format]`, `[graph]` and `[baseline]` are still read as tables. **One key names a file the loader reads:** `[spell] words_file` (default `.codelaw/spell/words.txt`, relative to the root config's folder; W-112, 2026-10-28): its words join `[spell] words`, a set path that is missing is a load error naming it, and a missing default is none ([SR-SPELL](0116_spell.md) decision 7).
 4. **Precedence, last wins:**
    1. Built-in defaults.
    2. `.editorconfig` (formatter keys only).

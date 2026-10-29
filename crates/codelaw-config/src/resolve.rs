@@ -336,10 +336,8 @@ impl ConfigFile {
         if let Some(w) = raw.spell.words.iter().flatten().find(|w| w.is_empty() || w.chars().any(char::is_whitespace)) {
             return Err(ConfigError::new(Some(path), format!("`[spell] words`: `{w}` is not one word")));
         }
-<<<<<<< HEAD
         check_reviews(&raw.reviews, &path)?;
         check_markers(&raw, &path)?;
-=======
         if let Some(f) = &raw.flags {
             if let Some(p) = f.presets.iter().flatten().find(|p| !crate::raw::FLAG_PRESETS.contains(&p.as_str())) {
                 return Err(ConfigError::new(
@@ -351,7 +349,6 @@ impl ConfigFile {
                 return Err(ConfigError::new(Some(path), format!("`[flags] inline`: `{i}` is not one of `allow`, `registry-only`")));
             }
         }
->>>>>>> 7a0a398a (W-130 wip)
         let spell_file_words = read_words_file(&path, &dir, raw.spell.words_file.as_deref())?;
         if let Some(globs) = &raw.css.modules {
             glob_set(globs, &path).map_err(|e| ConfigError::new(Some(path.clone()), format!("`[css] modules`: {}", e.message)))?;
@@ -574,11 +571,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
     "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
-<<<<<<< HEAD
-    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]", "[todo]", "[tests]", "[codeowners]",
-=======
-    "[deps]", "[css]", "[coverage]", "[spell]", "[flags]",
->>>>>>> 7a0a398a (W-130 wip)
+    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]", "[todo]", "[tests]", "[codeowners]", "[flags]",
 ];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
@@ -599,14 +592,11 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.css != Default::default(),
         raw.coverage.is_some(),
         raw.spell != Default::default(),
-<<<<<<< HEAD
         raw.reviews != Default::default(),
         raw.todo != Default::default(),
         raw.tests != Default::default(),
         raw.codeowners != Default::default(),
-=======
         raw.flags.is_some(),
->>>>>>> 7a0a398a (W-130 wip)
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -845,13 +835,10 @@ impl Config {
         let value = match (name, self.root_raw()) {
             ("deps", Some(r)) => serde_json::to_value(&r.deps).ok(),
             ("css", Some(r)) => serde_json::to_value(&r.css).ok(),
-<<<<<<< HEAD
             ("todo", Some(r)) => serde_json::to_value(&r.todo).ok(),
             ("tests.skip", Some(r)) => serde_json::to_value(&r.tests.skip).ok(),
             ("codeowners", Some(r)) => serde_json::to_value(&r.codeowners).ok(),
-=======
             ("flags", Some(r)) => r.flags.as_ref().and_then(|f| serde_json::to_value(f).ok()),
->>>>>>> 7a0a398a (W-130 wip)
             // `[spell] words` and the words file are one list (W-112).
             ("spell", Some(r)) => serde_json::to_value(&r.spell).ok().map(|mut v| {
                 let file = self.files.first().map(|f| f.spell_file_words.as_slice()).unwrap_or_default();
