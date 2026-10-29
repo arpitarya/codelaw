@@ -74,7 +74,7 @@ Every door gets the same answer, because they all call the same engine.
 ---
 
 > [!IMPORTANT]
-> **codelaw is a preview.** 0.2.0 is on npm — the engine, the eight platform binaries and all ten npm packs below; on PyPI, two of the six packs are up and the rest, with `codelaw` itself, follow within days. The linter, the fixer, the formatter, the MCP server, the language server and all eighteen rule packs work today if you build from source. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
+> **codelaw is a preview.** 0.2.0 is on npm — the engine, the eight platform binaries and all ten npm packs below; on PyPI, `codelaw` and the six packs are up (0.3.0 is the latest; the security packs follow). The linter, the fixer, the formatter, the MCP server, the language server and all eighteen rule packs work today if you build from source. The editor extension's Marketplace listing comes later. [Roadmap](#roadmap) lists what is built and what is not.
 
 ---
 
@@ -363,7 +363,7 @@ $ codelaw test acme/no-console-log
 | ✅ | `--format agent`, `--format json` and `--format sarif`; `--timings` | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | Watch mode: `check --watch` and `fix --watch` re-check on every save | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | npm package (`npx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0 published from CI with provenance, ten packs |
-| 🔜 | PyPI package (`uvx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | 0.2.0: `codelaw-rules-css` and `-data` up; the other four packs and `codelaw` next (W-38) |
+| ✅ | PyPI package (`uvx codelaw`) | [SR-PACKAGES](records/0107_packages.md) | `codelaw` and six packs live, trusted; checked from a fresh venv and `uvx` (W-38) |
 | ✅ | Formatter (`codelaw format`, and the last step of `fix`): Prettier-style JS/TS/JSON, Black-style Python | [SR-FORMATTER](records/0105_formatter.md) | built |
 | ✅ | MCP server (`codelaw mcp`) | [SR-CLI-MCP](records/0115_cli-and-mcp.md) | built |
 | ✅ | Language server (`codelaw lsp`): diagnostics, quick fixes, formatting | [SR-EDITOR](records/0114_editor.md) | built; the VS Code extension is built, not published |

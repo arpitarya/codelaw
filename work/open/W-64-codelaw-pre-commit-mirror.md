@@ -42,7 +42,7 @@ A consumer's `.pre-commit-config.yaml`:
 
 ## Blockers
 
-Waits on **W-38**: `codelaw` must be on PyPI first.
+W-38 is done: `codelaw` is on PyPI (checked 2026-10-29).
 
 ## Record affected
 

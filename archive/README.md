@@ -28,6 +28,10 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-116-release-0-3-0.md`](open/W-116-release-0-3-0.md) | 2026-10-29 | done — v0.3.0 on npm and PyPI; the extension's listing → [W-95](../work/open/W-95-publish-vscode-extension.md) |
+| [`W-87-pypi-day-2.md`](open/W-87-pypi-day-2.md) | 2026-10-29 | done — `codelaw` and three Fux index projects on PyPI, trusted |
+| [`W-86-pypi-day-1.md`](open/W-86-pypi-day-1.md) | 2026-10-29 | done — six packs and `codelaw` on PyPI, trusted; the user check is [W-38](../work/open/W-38-pypi-0-2-0-by-hand.md) |
+| [`W-38-pypi-0-2-0-by-hand.md`](open/W-38-pypi-0-2-0-by-hand.md) | 2026-10-29 | done — PyPI `codelaw` and six packs live, trusted, checked as a user; the eight-platform registry smoke stays a CI job |
 | [`W-77-skills-package.md`](open/W-77-skills-package.md) | 2026-10-29 | built (SR-PACKAGES, SR-AGENT-SURFACES); npm live; PyPI `codelaw-skills` → [W-88](../work/open/W-88-pypi-day-3.md) |
 | [`W-34-fux-index-packages.md`](open/W-34-fux-index-packages.md) | 2026-10-29 | built (L6 decision 12, SR-PACKAGES decision 14); npm live; PyPI uploads → [W-87](../work/open/W-87-pypi-day-2.md), [W-88](../work/open/W-88-pypi-day-3.md), [W-89](../work/open/W-89-pypi-day-4.md); `publish.yml` for them → B-063 |
 | [`W-114-session-cleanup.md`](open/W-114-session-cleanup.md) | 2026-10-29 | done — the five worktrees of session 2df06f6d dropped on the decider's ruling; [SR-WORK-CLEANUP](../records/0062_WORK-cleanup.md) |

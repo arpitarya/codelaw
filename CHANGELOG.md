@@ -4,6 +4,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+### Added
+
+- **`pip install codelaw` and `uvx codelaw` work (W-86, W-87, W-38):** `codelaw` and the six first rule packs are on PyPI, with the eight platform wheels and 0.2.0 back-filled; checked from a fresh environment.
+
 ## 0.3.0 — 2026-10-29
 
 ### Added

@@ -66,7 +66,7 @@ In this order. npm binds a trusted publisher only to a package that already
 exists, so the first npm publish cannot come from CI. PyPI can: a *pending*
 publisher creates the project on its first upload.
 
-**Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](archive/open/W-29-first-npm-publish.md)). **Step 5 done 2026-10-24** (both environments, tag rule `v*`, [W-18](work/open/W-18-release-hardening.md)). Left: step 4.
+**Done for npm on 2026-10-24** (steps 1–3, 0.1.0, [W-29](archive/open/W-29-first-npm-publish.md)). **Step 5 done 2026-10-24** (both environments, tag rule `v*`, [W-18](work/open/W-18-release-hardening.md)). Step 4 (PyPI) done 2026-10-29 for `codelaw` and the six first packs ([W-38](archive/open/W-38-pypi-0-2-0-by-hand.md)); the later packs follow W-88 and W-89.
 Steps 2–3 come back for **every pack name new to npm**: the three dev-server plugins `@codelaw/vite-plugin`, `@codelaw/webpack-plugin` and `@codelaw/next` ([W-49](archive/open/W-49-dev-server-plugins.md), closed; SR-PACKAGES decision 3a), and at 0.2.0,
 `@codelaw/rules-ts`, `-react`, `-node` and `-stencil` ([W-31](archive/open/W-31-registry-pack-split.md)), and
 at the first release with the security packs `@codelaw/rules-security-js`, `-security-ts` and
@@ -99,7 +99,7 @@ trusted; `--fux-index` adds the Fux index packages); `publish.yml` then skips th
      `twine upload dist/pypi/codelaw_rules_*.whl` from the release's `dist`
      with your account token, then a trusted publisher on each project's
      *Settings → Publishing*; `publish.yml` skips versions already uploaded.
-     ([W-38](work/open/W-38-pypi-0-2-0-by-hand.md); the decider, 2026-10-25.)
+     ([W-38](archive/open/W-38-pypi-0-2-0-by-hand.md); the decider, 2026-10-25.)
    - `codelaw-skills` (W-77, `codelaw_skills-<v>-py3-none-any.whl`): the same
      way — the first version by hand with `twine upload`, then a trusted
      publisher. Its `Requires-Dist: codelaw==<v>` means pip installs it only

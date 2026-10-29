@@ -24,6 +24,32 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — W-38 executed and closed: PyPI checked as a user  ·  Claude Code (Sonnet 5.5)
+
+- **Asked:** *"execute W38 and test it out in a sibling repo. And then close it."*
+- **Done:** fresh venv: `codelaw` 0.2.0 and 0.3.0 install and report their version; `uvx codelaw --version` 0.3.0; `codelaw-rules-python`, `-css` install by name; `codelaw check` on `codelaw-playground` ran (17 errors, 7 warnings, no files changed). README, RELEASING.md, IMPLEMENTATION written; W-38 archived; W-64 unblocked.
+- **Decided / left open:** the eight-platform install from the registries is a CI job and was not run here.
+- **Mistakes:** none.
+- **Next:** the inbox (W-88/W-89 uploads, W-95 "run it", W-97 tick, W-117, W-118 rulings).
+
+---
+
+## 2026-10-29 — v0.3.0 found released; W-116 closed; day-2 notes corrected  ·  Cowork (Opus 5.5)
+
+- **Asked:** (continuing day 2) — reconciling after the publishers turned up `codelaw` already at 0.3.0.
+- **Done:** v0.3.0 was released 01:28 IST (IMPLEMENTATION had it; the item files did not): npm and PyPI at 0.3.0, `codelaw` created on PyPI by CI through its pending publisher. W-116 closed and archived. W-86/W-87's close notes and IMPLEMENTATION row corrected — day 2 back-filled `codelaw` 0.2.0 and created three new projects, not four. W-95 → 🔴 with an inbox row (run the extension's job alone from `main`); W-97's inbox row now points at the v0.3.0 release's edit page. Not committed.
+- **Decided / left open:** none.
+- **Mistakes:** this session's 09:59 notes said the pending publisher became `codelaw`'s on Arpit's upload; it had become so at v0.3.0's run — corrected the same turn.
+- **Next:** Arpit: "run it" for W-95, the Marketplace tick for W-97; one PyPI new-project slot is free today.
+
+## 2026-10-29 — PyPI day 2 done: `codelaw` is on PyPI; W-86 and W-87 closed  ·  Cowork (Opus 5.5)
+
+- **Asked:** Arpit's day-2 run (09:53): the v0.2.0 tag's CI `dist` downloaded, SHA256SUMS all OK, law-gate passed, `twine upload` of `codelaw` 0.2.0 and three Fux index wheels.
+- **Done:** trusted publishers checked and added in Chrome — `codelaw`'s pending publisher had become its normal one on creation; the three Fux index projects added; all four `arpitarya/codelaw` · `publish.yml` · `pypi`; no pending publisher left. W-86, W-87 closed and archived; W-38 → 🟢 (the user check); the day-2 inbox row removed; W-116 noted (the pending slot is free). Not committed.
+- **Decided / left open:** none.
+- **Mistakes:** none.
+- **Next:** an agent runs W-38's user check; day 3 on Friday.
+
 ## 2026-10-29 — W-34 and W-77 closed into the PyPI days; B-063 filed  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"W34 can be archived and it can be merged with PyPy day 2, day 3, day 4 items. W77, the npm package is published, the PyPy package merge it with PyPy day 2, day 3, day 4 or create a new one day 5."*
