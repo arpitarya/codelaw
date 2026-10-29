@@ -26,8 +26,6 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — the ownership claim and one token** ([W-117](open/W-117-open-vsx-setup.md)). Done 10-29: environment `vscode`, login, Publisher Agreement, namespace `codelaw`. **1. Claim:** <https://github.com/EclipseFdn/open-vsx.org/issues/new?template=claim-namespace-ownership.yml&namespace=codelaw> — tick *Ownership* and *Account Age*; Option 1 once the Marketplace has the extension (the repo is yours), or Option 4 now — or ask Claude to file it. **2. Token:** open-vsx.org → *Settings → Access Tokens* → *Generate* `codelaw-publish` → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` (paste at the prompt). | 2026-10-29 |
 | ↳ **blocks:** W-117 itself | |
-| 🔴 **Release 0.4.0 — push `main`** ([W-127](open/W-127-release-0-4-0.md)): bumped and CHANGELOG written 10-29; `main` is ahead of `origin` (W-95, W-119, W-126, the bump). Say *push*, or `git push origin main`; when `ci.yml` is green, `gh release create v0.4.0` from CHANGELOG's section (W-127 step 4). | 2026-10-29 |
-| ↳ **blocks:** W-127; W-126 step 4 | |
 | 🔴 **Guidance-vs-check redesign — three rulings** ([W-118](open/W-118-guidance-experiment-redesign.md) → [proposal](proposals/guidance-experiment-redesign.md)): **R1** the design — six arms (a no-codelaw arm 0, guidance-only A, the pilot's A as A+, B, C, and `hook --pre` as D), tasks screened by running arm 0 (keep ≥ 40% at 5 runs), 12 tasks × 5 runs = 60 per arm; **R2** the README rule — the line stays unless arm C's upper 95% bound is below a bound you set (2% needs 0/150; 5% needs 0/60), or rate-only; **R3** the budget — ~$85 and ~3 h (screen ~$22 + run ~$60), screen gated separately or not. Open questions §7. | 2026-10-29 |
 | ↳ **blocks:** W-118 itself; W-102 waits on it | |
 
@@ -37,7 +35,7 @@ here. Read that record before changing anything below it.
 
 ### build (8)
 
-🔴 **W-127** `arpit` Release 0.4.0 through CI: bumped and CHANGELOG written 10-29; next push `main` (your go), `ci.yml` green, then `gh release create v0.4.0` from CHANGELOG's section. Filed by Arpit (Claude Code). [detail](open/W-127-release-0-4-0.md)
+🟢 **W-127** `agent` Release 0.4.0 through CI: bumped 10-29, `main` pushed; Arpit ruled *publish it* — Claude Code fixes CI to green, then `gh release create v0.4.0` and checks npm, PyPI and the Marketplace. Filed by Arpit (Claude Code). [detail](open/W-127-release-0-4-0.md)
 
 🟢 **W-126** `agent` A five-minute pipeline: built 10-29 — corpus one job per pack, Fux job apart, smoke and `publish.yml` in parallel (npm tiers kept). Left: step 4, three runs of each kind measured, once `main` is pushed. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
