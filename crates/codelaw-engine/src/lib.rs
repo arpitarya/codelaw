@@ -488,6 +488,49 @@ impl Project {
         d
     }
 
+    /// The findings shown in a text config file (`.nvmrc`, `CODEOWNERS`, …:
+    /// SR-LAW-3 decision 10), for an editor or a hook that has that file and
+    /// not the L3 file a finding concerns (SR-ARCHITECTURE decision 15d). No
+    /// rule runs on the text file: the L3 files that may report into it are
+    /// checked as they are on disk — those in its folder and in each folder
+    /// above it up to the project root, and the root's
+    /// `.github/workflows/*.yml` — and only their copies in this file are
+    /// kept. Empty for any other file.
+    pub fn check_text_config(&self, abs: &Path) -> Vec<Diagnostic> {
+        if !codelaw_core::is_text_config(&abs.to_string_lossy()) {
+            return Vec::new();
+        }
+        let rel = discover::rel_path(abs, self.root());
+        let root = self.root().to_path_buf();
+        let mut folders: Vec<PathBuf> = Vec::new();
+        let mut dir = abs.parent();
+        while let Some(d) = dir {
+            if !d.starts_with(&root) {
+                break;
+            }
+            folders.push(d.to_path_buf());
+            dir = d.parent();
+        }
+        folders.push(root.join(".github").join("workflows"));
+        let mut files: Vec<PathBuf> = folders
+            .iter()
+            .filter_map(|d| std::fs::read_dir(d).ok())
+            .flat_map(|it| it.filter_map(|e| e.ok()).map(|e| e.path()).filter(|p| p.is_file()))
+            .collect();
+        files.sort();
+        files.dedup();
+        let mut out: Vec<Diagnostic> = Vec::new();
+        for path in files {
+            let Some(entry) = self.entry_for(&path) else { continue };
+            let Ok(text) = std::fs::read_to_string(&path) else { continue };
+            let body = text.strip_prefix('\u{feff}').unwrap_or(&text);
+            out.extend(self.check_document(&entry, body).into_iter().filter(|d| d.file == rel));
+        }
+        out.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
+        out.dedup();
+        out
+    }
+
     /// Whether `fix` may start an external fixer (decision 18), a command
     /// that inherits the environment of the process running it.
     pub fn runs_external_fixers(&self) -> bool {

@@ -206,6 +206,48 @@ pub trait NativeRule: Send + Sync {
     fn severity_of(&self, _finding: &NativeFinding, _options: &BTreeMap<String, serde_json::Value>) -> Option<Severity> {
         None
     }
+    /// Where else one finding is shown: a line of a plain-text config file
+    /// the rule read (`.nvmrc`, `CODEOWNERS`, …: [`codelaw_core::TEXT_CONFIG_FILES`],
+    /// SR-LAW-3 decision 10). The finding stays on this file, where its fix
+    /// is; each place returned here gets a copy of it (SR-ARCHITECTURE
+    /// decision 15d). A path outside the list fails the rule on this file.
+    /// Called once per finding, after `check`, with the same context.
+    fn elsewhere(&self, _finding: &NativeFinding, _ctx: &NativeContext<'_>) -> Vec<Elsewhere> {
+        Vec::new()
+    }
+}
+
+/// A second place for a finding, in a plain-text config file
+/// ([`NativeRule::elsewhere`]): the file's project-relative path and a byte
+/// range of its text as [`FileContext::read`] gives it. `edits` are in that
+/// file; the editor offers them and `--format json` carries them, but
+/// `codelaw fix` never writes a text config file (SR-LAW-3 decision 10).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Elsewhere {
+    pub path: String,
+    pub start: usize,
+    pub end: usize,
+    pub edits: Vec<TextEdit>,
+}
+
+impl Elsewhere {
+    pub fn new(path: impl Into<String>, start: usize, end: usize) -> Self {
+        Elsewhere { path: path.into(), start, end, edits: Vec::new() }
+    }
+
+    /// Line `line` (1-based) of `text`, without its line ending; `None`
+    /// past the last line.
+    pub fn line(path: impl Into<String>, text: &str, line: usize) -> Option<Self> {
+        let mut start = 0;
+        for (i, l) in text.split_inclusive('\n').enumerate() {
+            if i + 1 == line {
+                let body = l.trim_end_matches(['\n', '\r']);
+                return Some(Elsewhere::new(path, start, start + body.len()));
+            }
+            start += l.len();
+        }
+        None
+    }
 }
 
 const JS_ONLY: &[Language] = &[Language::Javascript, Language::Jsx];
