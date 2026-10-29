@@ -37,7 +37,12 @@ impl Project {
             .enumerate()
             .filter(|(_, r)| matches!(r.matcher, Matcher::Graph(_)))
             .filter(|(_, r)| only.is_none_or(|o| o.iter().any(|id| id == r.id())))
-            .filter(|(_, r)| self.rules.effective(&r.loaded, &[]).is_some() || self.config.named_rule_ids().iter().any(|(id, _)| id == r.id()))
+            .filter(|(_, r)| {
+                self.rules.effective(&r.loaded, &[]).is_some()
+                    || self.config.named_rule_ids().iter().any(|(id, _)| id == r.id())
+                    // A `[flags]` table turns the flag rules on (SR-PROJECT-GRAPH decision 11).
+                    || (crate::flags::is_flag_rule(r) && self.flag_rule_config(r, &[]).is_some())
+            })
             .collect()
     }
 
@@ -64,6 +69,7 @@ impl Project {
         let mut dirs: BTreeSet<PathBuf> = BTreeSet::new();
         let root = self.config.root_dir.clone();
         let terms = self.reads_terms();
+        let flags = self.reads_flags();
         for f in files {
             let mut d = f.abs.parent().map(Path::to_path_buf);
             while let Some(dir) = d {
@@ -74,7 +80,8 @@ impl Project {
             }
             let name = f.abs.file_name().and_then(|n| n.to_str()).unwrap_or_default().to_owned();
             let reported = crate::discover::reported(self, &f.abs, f.language);
-            if !terms && !codelaw_graph::reads(f.language) && !is_manifest(&name) {
+            let registry = flags && f.rel == codelaw_graph::flags::REGISTRY_REL;
+            if !terms && !registry && !codelaw_graph::reads(f.language) && !is_manifest(&name) {
                 // Other files only exist for resolution.
                 out.push(Source { rel: f.rel, abs: f.abs, language: None, text: String::new(), reported });
                 continue;
@@ -157,22 +164,30 @@ impl Project {
         }
         let by_rel: BTreeMap<&str, &Source> = sources.iter().map(|s| (s.rel.as_str(), s)).collect();
         let mut per_file: BTreeMap<String, Vec<Diagnostic>> = BTreeMap::new();
+        // The flag analysis runs once per set of options, for every flag rule.
+        let mut flag_reports = BTreeMap::new();
         for (_, rule) in rules {
             let Matcher::Graph(g) = &rule.matcher else { continue };
             let languages = &rule.loaded.rule.languages;
             let template = rule.loaded.rule.block.message.clone().unwrap_or_else(|| rule.loaded.rule.title.clone());
-            let found = match g.query {
-                Query::InconsistentTerms => self.term_findings(rule, sources),
-                _ => codelaw_graph::run(g, graph, languages),
+            let found: Vec<(GraphFinding, Option<Severity>)> = match g.query {
+                Query::InconsistentTerms => self.term_findings(rule, sources).into_iter().map(|f| (f, None)).collect(),
+                Query::Flags(check) => self.flag_findings(rule, check, graph, sources, &mut flag_reports),
+                _ => codelaw_graph::run(g, graph, languages).into_iter().map(|f| (f, None)).collect(),
             };
-            for f in found {
+            for (f, graded) in found {
                 if !rule.applies_to_path(&f.file) {
                     continue;
                 }
                 let Some(src) = by_rel.get(f.file.as_str()).filter(|s| s.reported) else { continue };
                 let layers = self.config.layers_for(&src.abs);
-                let Some(cfg) = self.rules.effective(&rule.loaded, &layers) else { continue };
+                let cfg = if crate::flags::is_flag_rule(rule) { self.flag_rule_config(rule, &layers) } else { self.rules.effective(&rule.loaded, &layers) };
+                let Some(cfg) = cfg else { continue };
                 let Some(mut severity) = cfg.severity else { continue };
+                // A graded finding's own severity (the flag rules').
+                if let Some(g) = graded {
+                    severity = g;
+                }
                 let index = LineIndex::new(&src.text);
                 let mut message = f.render(&template);
                 let mut note = None;

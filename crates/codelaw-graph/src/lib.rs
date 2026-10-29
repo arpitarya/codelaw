@@ -9,6 +9,7 @@
 pub mod config;
 pub mod deprecated;
 pub mod facts;
+pub mod flags;
 pub mod link;
 pub mod modules;
 pub mod query;

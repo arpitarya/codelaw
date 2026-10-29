@@ -12,7 +12,7 @@ owns:
   - fixtures/react-no-context
   - crates/codelaw-cli/tests/react_no_context.rs
 laws: [L0, L2, L3, L4, L5, L6, L7]
-timestamp: 2026-10-28T18:00:00Z
+timestamp: 2026-10-30T12:00:00Z
 content_sha: ""
 ---
 
@@ -236,11 +236,15 @@ The research ([W-03](../archive/open/W-03-rule-packs.md)) found that porting the
     - **`[deps]`** is the root config's ([SR-CONFIG](0110_config.md) decision 2): `[deps] severity` (a table of the six grades above, each `error`, `warn`, `info` or `off`), `[deps] min_release_age` (days, default 0), `[deps] prerelease` (default `false`), `[deps] ignore` (`npm:<name>` / `pypi:<name>`, or `{ package, expires, added_by, reason }`, which holds until its `expires` on the as-of date, as a dated exception: [SR-BASELINE](0104_baseline-and-deprecations.md) decision 9) and `[deps] max_snapshot_age` (days, default 14). The rules receive it as their options: a native rule may name one config section to read so ([SR-ARCHITECTURE](0108_architecture.md) decision 15b).
     - **Not read:** `requirements*.txt` — a text file is not one of [L3](0005_LAW-3-languages.md)'s nine languages, so no rule can report on its lines; and the agent hint W-52 names (`rules_for_path` naming a source file's major-version gaps), which is not built.
 
+<<<<<<< HEAD
 16. **CODEOWNERS coverage** (W-132, ruled 2026-10-29: *"Then code owners coverage. I want that as well."*). One native rule in `data`, **`data/codeowners-coverage`** (`manual`, in the opt-in preset `data/codeowners`), reads the project's CODEOWNERS file and its file list, never a network (L5). The pack is `data` because the rule reads a repo-level file, not a language; this is the agent's choice (the item left it open).
     - **The file** is `[codeowners] path`, else the first that exists of `.github/CODEOWNERS`, `CODEOWNERS`, `docs/CODEOWNERS` and `.gitlab/CODEOWNERS`. GitHub's and GitLab's syntax: gitignore-style patterns (`*`, `**`, `?`, a leading `/` anchors, a trailing `/` names a folder), the last match wins, and GitLab's `[Section]`, `^[Optional]` and `[Section][2]` lines start a section whose default owners fill a pattern with none; a file is owned when any section owns it. A project with no CODEOWNERS file and no `[codeowners] path` gets no finding (the rule does not demand the file); a `[codeowners] path` that cannot be read is a finding.
     - **The files** are those the engine's walk finds — every type, not only the nine languages — minus the ignore files and the default excludes (`FileContext::project_files`, whose answer is part of the cache key).
     - **Three findings:** a file no pattern owns (one finding per project, naming up to ten paths and the count); a pattern that matches no file (stale); a pattern that names no owner, unless `[codeowners] allow_unowned = true` (the line then takes its paths out of ownership on purpose and neither it nor they are reported). Each is a message on the project's **root manifest** — `package.json`, else `pyproject.toml`, else `codelaw.toml` — once per project, naming the CODEOWNERS line. The mirror finding on the CODEOWNERS line itself waits for [W-136](../work/open/W-136-l3-findings-on-plain-text-config.md) (L3 amended so a listed plain-text file may carry findings; ruled Q-A → B, 2026-10-30). Fix `manual`: add a pattern, delete the stale line, name an owner; the skill carries the steps.
     - **`[codeowners]`** is the root config's ([SR-CONFIG](0110_config.md) decision 2): `[codeowners] path`, `[codeowners] allow_unowned` (default `false`) and `[codeowners] ignore` (gitignore-style patterns of paths that need no owner, such as `*.lock`). The rule receives them as its options.
+=======
+16. **Feature-flag expiry** (W-130, 2026-10-30; Arpit asked for it 2026-10-29). Five project rules, placed by the agent as the item allowed — **no new pack, and [L6](0008_LAW-6-python-and-node-packages.md)'s eighteen are unchanged**: the reads in the existing language packs, `js/flag-expiry` (JS, JSX, TS, TSX; `suggest`) and `py/flag-expiry` (`suggest`); the inline markers beside them, `js/flag-marker` and `py/flag-marker` (`auto`) — a rule of its own because its fix is `auto` and a read's is `suggest`, and a rule has one fix class ([L4](0006_LAW-4-every-rule-has-a-fix.md)); and the registry in `data`, `data/flag-registry` (TOML, `.codelaw/flags.toml`; `auto`). Each is `graph: { flags: reads | markers | registry }`: what they read, find and fix, and `[flags]`, are [SR-PROJECT-GRAPH](0103_project-graph.md) decision 11. They are in no preset: a `[flags]` table turns them on. A manual fix is carried by the default `codelaw-fix` skill and the rules' steps; no flag-specific skill ships.
+>>>>>>> 7a0a398a (W-130 wip)
 
 ### Starter catalogue (v0)
 

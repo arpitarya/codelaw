@@ -224,6 +224,8 @@ yet is owned by an open `W-nn`.
 | `fixtures/css-modules` | SR-PROJECT-GRAPH | decision 8: the React app the `css-modules` rules run on |
 | `crates/codelaw-cli/tests/css_modules.rs` | SR-PROJECT-GRAPH | decision 8: runs that app, `[css]` and `init` through the binary |
 | `crates/codelaw-cli/tests/tests_for_new_code.rs` | SR-PROJECT-GRAPH | decision 9: the test rules of new code and `.codelawignore` on real git repos |
+| `fixtures/flags` | SR-PROJECT-GRAPH | decision 11: the repo the feature-flag rules run on — every SDK preset in JS/TS and Python, a two-level wrapper, markers and a registry (W-130) |
+| `crates/codelaw-cli/tests/flags.rs` | SR-PROJECT-GRAPH | decision 11: runs that repo through `check`, `fix --unsafe` and `flags accessors` (W-130) |
 | `fixtures/scss` | SR-LAW-3 | SCSS as a CSS dialect (amended 2026-10-26): the corpus the `css` and `scss` packs hold finding counts on |
 | `crates/codelaw-cli/tests/scss.rs` | SR-LAW-3 | runs that corpus, the `css/*`-quiet-on-Sass check and `format` idempotence through the binary |
 | `crates/codelaw-cli/tests/text_config.rs` | SR-LAW-3 | decision 10: a finding on `package.json` and on the `.nvmrc` line, through `check` in every format, the LSP and the hook |

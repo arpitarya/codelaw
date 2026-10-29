@@ -12,6 +12,7 @@ mod graph_cmd;
 mod config_cmd;
 mod deps_cmd;
 mod exceptions_cmd;
+mod flags_cmd;
 mod init;
 mod match_cmd;
 mod migrate;
@@ -83,6 +84,8 @@ enum Command {
     Debug(debug_cmd::DebugArgs),
     /// Query the project graph: `refs`, `why-unused`.
     Graph(graph_cmd::GraphArgs),
+    /// Feature flags: `accessors` lists every call the flag rules read a flag through (SR-PROJECT-GRAPH decision 11).
+    Flags(flags_cmd::FlagsArgs),
     /// Print the resolved configuration with each value's source, or its JSON Schema.
     Config(config_cmd::ConfigArgs),
     /// Manage the cache.
@@ -644,6 +647,7 @@ fn main() -> ExitCode {
         }
         Command::Debug(a) => debug_cmd::debug(a),
         Command::Graph(a) => graph_cmd::graph(a),
+        Command::Flags(a) => flags_cmd::flags(a),
         Command::Config(a) => config_cmd::run(a),
         Command::Cache { action } => cache(action),
         Command::Mcp => {

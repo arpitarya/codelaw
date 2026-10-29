@@ -342,6 +342,15 @@ impl Config {
         push("spell.words", v, s);
         let (v, s) = root_key(&["spell", "words_file"], |r| r.spell.words_file.as_ref().map(|x| json!(x)), json!(crate::raw::SPELL_WORDS_FILE));
         push("spell.words_file", v, s);
+        // `[flags]` (SR-PROJECT-GRAPH decision 11).
+        let (v, s) = root_key(&["flags", "presets"], |r| r.flags.as_ref()?.presets.as_ref().and_then(|x| serde_json::to_value(x).ok()), json!([]));
+        push("flags.presets", v, s);
+        let (v, s) = root_key(&["flags", "accessors"], |r| r.flags.as_ref()?.accessors.as_ref().and_then(|x| serde_json::to_value(x).ok()), json!([]));
+        push("flags.accessors", v, s);
+        let (v, s) = root_key(&["flags", "inline"], |r| r.flags.as_ref()?.inline.as_ref().map(|x| json!(x)), json!("allow"));
+        push("flags.inline", v, s);
+        let (v, s) = root_key(&["flags", "warn_days"], |r| r.flags.as_ref()?.warn_days.map(|d| json!(d.0)), json!(14));
+        push("flags.warn_days", v, s);
         // The sections not validated yet: shown as written.
         for (name, get) in [
             ("format", (|r: &RawConfig| r.format.clone()) as fn(&RawConfig) -> Option<toml::Table>),

@@ -492,3 +492,14 @@ fn terms_query_compiles_and_is_the_engines_to_run() {
     assert!(compile(&serde_json::json!({"terms": "inconsistent"}), Some(&serde_json::json!({"do": ["remove-rule"]}))).is_err());
     assert!(compile(&serde_json::json!({"class": {"defined_in": "css"}}), Some(&respell)).is_err());
 }
+
+#[test]
+fn the_flags_query_compiles() {
+    assert_eq!(compile(&serde_json::json!({"flags": "reads"}), None).unwrap().query, crate::Query::Flags(crate::flags::FlagCheck::Reads));
+    assert_eq!(compile(&serde_json::json!({"flags": "registry"}), None).unwrap().query, crate::Query::Flags(crate::flags::FlagCheck::Registry));
+    assert!(compile(&serde_json::json!({"flags": "all"}), None).unwrap_err().contains("`reads`, `markers` or `registry`"));
+    assert!(compile(&serde_json::json!({"flags": "reads"}), Some(&serde_json::json!({"do": ["remove-rule"]}))).is_err());
+    assert!(compile(&serde_json::json!({"flags": "reads"}), Some(&serde_json::json!({"do": ["keep-branch"]}))).is_ok());
+    assert!(compile(&serde_json::json!({"flags": "registry"}), Some(&serde_json::json!({"do": ["keep-branch"]}))).unwrap_err().contains("remove-entry"));
+    assert!(compile(&serde_json::json!({"symbol": {"exported": true}, "when": {"external_references": 0}}), Some(&serde_json::json!({"do": ["fix-marker"]}))).is_err());
+}

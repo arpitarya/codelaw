@@ -28,6 +28,10 @@ pub enum Query {
     /// (`spell/inconsistent-term`, SR-SPELL). Its words are the spell
     /// pack's, so the engine runs it, over every file's prose.
     InconsistentTerms,
+    /// `flags: reads | markers | registry`: feature-flag expiry
+    /// (SR-PROJECT-GRAPH decision 11). Its registry, markers and as-of date
+    /// are inputs the engine holds, so the engine runs it (`crate::flags`).
+    Flags(crate::flags::FlagCheck),
 }
 
 /// What a `graph: import:` query reports.
@@ -49,6 +53,12 @@ pub enum Primitive {
     RemoveRule,
     /// `spell/inconsistent-term`: write the spelling the project uses most.
     Respell,
+    /// `graph: { flags: reads }`: keep the branch of a decided flag.
+    KeepBranch,
+    /// `graph: { flags: markers }`: rewrite a marker to the registry, or remove it.
+    FixMarker,
+    /// `graph: { flags: registry }`: remove an entry with no read left.
+    RemoveEntry,
 }
 
 /// A `fix:` of `when`/`else` branches over `local_references`.
@@ -84,7 +94,10 @@ fn primitives(v: Option<&Value>) -> Result<Vec<Primitive>, String> {
             "remove-declaration" => Ok(Primitive::RemoveDeclaration),
             "remove-rule" => Ok(Primitive::RemoveRule),
             "respell" => Ok(Primitive::Respell),
-            other => Err(format!("unknown graph fix primitive `{other}` (strip-export-keyword, remove-declaration, remove-rule, respell)")),
+            "keep-branch" => Ok(Primitive::KeepBranch),
+            "fix-marker" => Ok(Primitive::FixMarker),
+            "remove-entry" => Ok(Primitive::RemoveEntry),
+            other => Err(format!("unknown graph fix primitive `{other}` (strip-export-keyword, remove-declaration, remove-rule, respell, keep-branch, fix-marker, remove-entry)")),
         })
         .collect()
 }
@@ -98,7 +111,7 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         Some(other) => return Err(format!("`certainty_from: {other}` must be `module.dynamic`")),
     };
     for k in g.keys() {
-        if !["symbol", "unless", "when", "class", "deprecated", "import", "module", "terms", "certainty_from"].contains(&k.as_str()) {
+        if !["symbol", "unless", "when", "class", "deprecated", "import", "module", "terms", "flags", "certainty_from"].contains(&k.as_str()) {
             return Err(format!("unknown `graph:` key `{k}`"));
         }
     }
@@ -150,6 +163,14 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
             return Err("`graph: terms:` takes `inconsistent`".into());
         }
         Query::InconsistentTerms
+    } else if let Some(flags) = g.get("flags") {
+        use crate::flags::FlagCheck;
+        match flags.as_str() {
+            Some("reads") => Query::Flags(FlagCheck::Reads),
+            Some("markers") => Query::Flags(FlagCheck::Markers),
+            Some("registry") => Query::Flags(FlagCheck::Registry),
+            _ => return Err("`graph: flags:` takes `reads`, `markers` or `registry`".into()),
+        }
     } else if g.get("deprecated").is_some() {
         Query::DeprecatedUsage
     } else if let Some(imp) = g.get("import") {
@@ -180,7 +201,7 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         };
         Query::Imports { forms, check }
     } else {
-        return Err("`graph:` names no query (`symbol:`, `class:`, `module:`, `import:`, `terms:` or `deprecated:`)".into());
+        return Err("`graph:` names no query (`symbol:`, `class:`, `module:`, `import:`, `terms:`, `flags:` or `deprecated:`)".into());
     };
     let mut gf = GraphFix::default();
     match fix {
@@ -212,8 +233,23 @@ pub fn compile(graph: &Value, fix: Option<&Value>) -> Result<GraphRule, String> 
         if used.any(|p| *p != Primitive::Respell) {
             return Err("a `graph: terms:` rule's fix is `do: [respell]`".into());
         }
-    } else if used.any(|p| *p == Primitive::Respell) {
-        return Err("`respell` is the fix of a `graph: terms:` rule only".into());
+    } else if let Query::Flags(check) = query {
+        // Each flag check has its one primitive; its findings carry the edits.
+        use crate::flags::FlagCheck;
+        let (own, name) = match check {
+            FlagCheck::Reads => (Primitive::KeepBranch, "reads"),
+            FlagCheck::Markers => (Primitive::FixMarker, "markers"),
+            FlagCheck::Registry => (Primitive::RemoveEntry, "registry"),
+        };
+        if used.any(|p| *p != own) {
+            return Err(format!("a `graph: flags: {name}` rule's fix is `do: [{}]`", match own {
+                Primitive::KeepBranch => "keep-branch",
+                Primitive::FixMarker => "fix-marker",
+                _ => "remove-entry",
+            }));
+        }
+    } else if used.any(|p| matches!(p, Primitive::Respell | Primitive::KeepBranch | Primitive::FixMarker | Primitive::RemoveEntry)) {
+        return Err("`respell` is the fix of a `graph: terms:` rule only; `keep-branch`, `fix-marker` and `remove-entry` of a `graph: flags:` rule".into());
     }
     Ok(GraphRule { query, fix: gf, certainty_from_dynamic })
 }
@@ -373,7 +409,7 @@ fn fix_edits(fix: &GraphFix, d: &Decl, python_all: bool) -> Vec<TextEdit> {
                     return vec![TextEdit::delete(a, b)];
                 }
             }
-            Primitive::RemoveRule | Primitive::Respell => {}
+            Primitive::RemoveRule | Primitive::Respell | Primitive::KeepBranch | Primitive::FixMarker | Primitive::RemoveEntry => {}
         }
     }
     Vec::new()
@@ -390,6 +426,9 @@ pub fn run(rule: &GraphRule, graph: &Graph, languages: &[Language]) -> Vec<Graph
         // The engine runs `spell/inconsistent-term` itself, with the spell
         // pack's word data (SR-SPELL; `codelaw_native::spell`).
         Query::InconsistentTerms => Vec::new(),
+        // The engine runs the flag rules itself, with the registry, the
+        // markers and the as-of date (SR-PROJECT-GRAPH decision 11).
+        Query::Flags(_) => Vec::new(),
         Query::Imports { forms, check } => imports(graph, languages, forms, *check),
         Query::UnusedModuleClasses => unused_module_classes(rule, graph, languages),
         Query::UndefinedModuleClasses => undefined_module_classes(graph, languages),

@@ -11,6 +11,7 @@ mod discover;
 mod exceptions;
 mod files;
 mod fix;
+mod flags;
 mod format;
 mod git;
 mod incremental;
@@ -326,6 +327,7 @@ impl Project {
             return Err(EngineError::Config(codelaw_config::ConfigError::new(config.files.first().map(|f| f.path.clone()), e)));
         }
         let (baselines, deprecations, exceptions) = baseline::load(&config)?;
+        flags::check_config(&config)?;
         let tests = new_code::load(&config)?;
         let aliases = Aliases::load(&config, &rules);
         let pool = pool(options.threads);
