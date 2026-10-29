@@ -28,12 +28,16 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-117 itself | |
 | 🔴 **Guidance-vs-check redesign — three rulings** ([W-118](open/W-118-guidance-experiment-redesign.md) → [proposal](proposals/guidance-experiment-redesign.md)): **R1** the design — six arms (a no-codelaw arm 0, guidance-only A, the pilot's A as A+, B, C, and `hook --pre` as D), tasks screened by running arm 0 (keep ≥ 40% at 5 runs), 12 tasks × 5 runs = 60 per arm; **R2** the README rule — the line stays unless arm C's upper 95% bound is below a bound you set (2% needs 0/150; 5% needs 0/60), or rate-only; **R3** the budget — ~$85 and ~3 h (screen ~$22 + run ~$60), screen gated separately or not. Open questions §7. | 2026-10-29 |
 | ↳ **blocks:** W-118 itself; W-102 waits on it | |
+| 🔴 **`deps` pack — the four registry names** ([W-128](open/W-128-deps-pack-and-vulnerabilities.md)): PyPI pending trusted publishers for `codelaw-rules-deps` and `codelaw-rules-deps-fux-index` (same repo, `publish.yml`, the packs' environment) — you asked Claude to do these in the browser, confirming before submit; npm's first hand publish of `@codelaw/rules-deps` and `@codelaw/rules-deps-fux-index` (RELEASING.md). | 2026-10-30 |
+| ↳ **blocks:** W-128's release only (DoD 8) | |
+| 🔴 **Q-A — findings for files outside L3** ([proposal §8](proposals/deps-flags-markers-reviews.md)): `.nvmrc`, `.python-version`, `.tool-versions`, Dockerfile, CODEOWNERS, yarn classic `yarn.lock`. **A** (being built): report on the nearest L3 file, naming the text file and line — no law change. **B:** amend L3 to admit them for findings only. | 2026-10-30 |
+| ↳ **blocks:** nothing — W-129 and W-132 build A; B would move those findings | |
 
 ---
 
-## Open items (11)
+## Open items (17)
 
-### build (8)
+### build (14)
 
 🟢 **W-127** `agent` Release 0.4.0 through CI: bumped 10-29, `main` pushed; Arpit ruled *publish it* — Claude Code fixes CI to green, then `gh release create v0.4.0` and checks npm, PyPI and the Marketplace. Filed by Arpit (Claude Code). [detail](open/W-127-release-0-4-0.md)
 
@@ -50,6 +54,18 @@ here. Read that record before changing anything below it.
 🔴 **W-117** `arpit` Open VSX: environment, login, agreement and namespace done 10-29. Left: the ownership claim (no issue found yet) and one token as `OVSX_PAT` (inbox); then the trusted publisher. Filed by Arpit (Cowork). [detail](open/W-117-open-vsx-setup.md)
 
 🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
+
+🟢 **W-128** `agent` The `deps` pack (nineteenth): `deps refresh` merges advisories from on/off sources (registry first, OSV), `deps/vulnerable` names the safe version, direct and transitive; agents told via MCP, hook (inform/block), `rules_for_path`, skills. Filed by Arpit (Cowork). [detail](open/W-128-deps-pack-and-vulnerabilities.md)
+
+🟡 **W-129** waits on **W-128** `agent` `deps/licence`, `deps/lockfile-sync`, `deps/version-drift`, `deps/runtime-agreement`. Filed by Arpit (Cowork). [detail](open/W-129-deps-hygiene-rules.md)
+
+🟢 **W-130** `agent` Feature-flag expiry: accessor patterns with six SDK presets, wrappers found through the graph, `.codelaw/flags.toml` and inline markers (registry wins), `keep` collapse fix. Filed by Arpit (Cowork). [detail](open/W-130-feature-flag-expiry.md)
+
+🟢 **W-131** `agent` TODOs with configurable ticket and date; no focused tests; skipped tests need a reason and expiry. Filed by Arpit (Cowork). [detail](open/W-131-todo-and-skipped-test-markers.md)
+
+🟢 **W-132** `agent` Complexity, nesting and React component limits; CODEOWNERS coverage. Filed by Arpit (Cowork). [detail](open/W-132-complexity-and-codeowners.md)
+
+🟢 **W-133** `agent` Skill: repeated review comments → proposed rules (GitHub, GitLab, Bitbucket, Azure DevOps; ≥ 3 repeats, ≥ 1 reviewer, 6 months — all configurable), approved step by step, landed as previews. Filed by Arpit (Cowork). [detail](open/W-133-rules-from-review-comments.md)
 
 ### testing (0)
 

@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-128–W-133 filed: the `deps` pack and five more rule groups  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Can we build out a module which can look into dependencies of Node and Python and check it against some URL which tells us what packages are vulnerable … tell what should be the correct version to upgrade."* Designed over chat and voice; then *"file it."*
+- **Done:** probed the sources from the decider's Mac (npm bulk advisories and PyPI JSON answer; OSV and its bucket refused 403). Wrote `work/proposals/deps-flags-markers-reviews.md` (graduated) and W-128–W-133; OPEN-WORK rows and two inbox rows; B-052 promoted into W-128; proposals index; INTERVIEW.
+- **Decided / left open:** ruled by the decider: configurable on/off sources, registry first, merge all; incomplete scan warns; agents informed, block configurable per severity; a separate `deps` pack; one build, transitive included; flags generic, registry and inline; TODO ticket/date configurable; reviews on all platforms, 3 repeats, 1 reviewer, window configurable. Agent's calls, flagged in the items: flag and CODEOWNERS rule placement in existing packs; 6-month window default. Open: Q-A (non-L3 files) and the four registry names.
+- **Mistakes:** none.
+- **Next:** the PyPI pending publishers, in the browser, with the decider's confirmation; then W-128 to Claude Code.
+
 ## 2026-10-30 — W-127: v0.4.0's first publish run failed at the gate; fixed  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Upgrade to version 0.4.0 … commit everything and publish the version. If any stage fails, fix it and then push it. Make sure everything is green and the packages and even the VS Code extension gets published."* Then *"commit everything."*
