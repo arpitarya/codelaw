@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+ball: arpit
 ---
 
 # W-95 — Publish the VS Code extension — Marketplace and Open VSX
@@ -90,6 +90,8 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 - **Left for an agent:** (1) the GitHub environment `vscode` (`gh api -X PUT repos/arpitarya/codelaw/environments/vscode`, tag rule `v*`, with Arpit's OK — W-117 step 1 is the same environment); (2) `publish.yml`'s job — `id-token: write` in environment `vscode`, the GitHub OIDC token exchanged for a Marketplace token per Microsoft's *Learn more* page, then the eight `.vsix` uploaded with `curl` (no `vsce`, L2/L11); (3) the first release proves it, including the deleted-name question.
 
 **Found 2026-10-29 01:15 (Cowork):** the GitHub environment `vscode` exists (with `npm`, `pypi`); the `publish.yml` `vscode` job landed (`815f327`). Left: the first release run (W-116) proves the Marketplace upload and the deleted-0.2.0 question; Open VSX waits on `OVSX_PAT` (W-117); README/USAGE step 4.
+
+**State, 2026-10-29 10:05 (Cowork):** v0.3.0's `vscode` job got a Marketplace token through **trusted publishing** — the OIDC exchange works — but the upload was refused (HTTP 400: the gallery wants `application/json`); fixed on `main` (`216bf43`). `publish.yml` can now run the extension's job alone from `main` (`390c44b`): `gh workflow run publish.yml -R arpitarya/codelaw --ref main -f only=vscode`. Open VSX was skipped (no `OVSX_PAT`, W-117). Whether the deleted 0.2.0 blocks the name is still unknown — the next run answers it.
 
 ## Left
 
