@@ -4,6 +4,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+### Added
+
+- **Rules from review comments (W-133):** the skill `codelaw-rules-from-reviews` reads merged pull requests' review comments on GitHub, GitLab, Bitbucket (Cloud and Data Center) or Azure DevOps through their own CLIs, finds the points reviewers repeat, and — with your approval at each step — builds them as `preview` rules with a baseline. Its settings are `[reviews]` in `codelaw.toml` (`min_repeats = 3`, `min_reviewers = 1`, `window = "6m"`, `platform`, `url`); codelaw itself fetches nothing.
+
 ### Changed
 
 - **GitHub Action (W-97):** its Marketplace name is `codelaw check` (the name `codelaw` is taken) and its description is under the Marketplace's 125 characters; `uses: arpitarya/codelaw@v0` is unchanged.

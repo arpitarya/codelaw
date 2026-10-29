@@ -234,6 +234,17 @@ impl Config {
         push("agents.targets", v, s);
         let (v, s) = root_key(&["agents", "command"], |r| r.agents.command.as_ref().map(|x| json!(x)), Value::Null);
         push("agents.command", v, s);
+        // `[reviews]` (SR-AGENT-SURFACES decision 10): the skill's settings.
+        let (v, s) = root_key(&["reviews", "platform"], |r| r.reviews.platform.as_ref().map(|x| json!(x)), Value::Null);
+        push("reviews.platform", v, s);
+        let (v, s) = root_key(&["reviews", "url"], |r| r.reviews.url.as_ref().map(|x| json!(x)), Value::Null);
+        push("reviews.url", v, s);
+        let (v, s) = root_key(&["reviews", "min_repeats"], |r| r.reviews.min_repeats.map(|x| json!(x)), json!(3));
+        push("reviews.min_repeats", v, s);
+        let (v, s) = root_key(&["reviews", "min_reviewers"], |r| r.reviews.min_reviewers.map(|x| json!(x)), json!(1));
+        push("reviews.min_reviewers", v, s);
+        let (v, s) = root_key(&["reviews", "window"], |r| r.reviews.window.as_ref().map(|x| json!(x)), json!("6m"));
+        push("reviews.window", v, s);
 
         // `[deprecation]` (SR-BASELINE decision 6).
         let (v, s) = root_key(&["deprecation", "until"], |r| r.deprecation.as_ref().and_then(|d| d.until.as_ref()).map(|x| json!(x)), Value::Null);

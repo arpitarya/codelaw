@@ -486,6 +486,42 @@
         }
       }
     },
+    "reviews": {
+      "x-codelaw-record": "SR-AGENT-SURFACES",
+      "description": "The settings of the codelaw-rules-from-reviews skill (SR-AGENT-SURFACES decision 10): which review platform to read and when a repeated review comment becomes a candidate rule. The skill reads them; the engine only validates them and never fetches. Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "dependencies": { "url": ["platform"] },
+      "properties": {
+        "platform": {
+          "description": "The review platform, when the git remote does not say: `github`, `gitlab`, `bitbucket` (Cloud), `bitbucket-datacenter` or `azure` (Azure DevOps). Unset, the skill detects it from the remote's host.",
+          "enum": ["github", "gitlab", "bitbucket", "bitbucket-datacenter", "azure"]
+        },
+        "url": {
+          "description": "The base URL of a self-hosted instance (GitHub Enterprise Server, GitLab self-managed, Bitbucket Data Center, Azure DevOps Server); needs `platform`. Never a token.",
+          "type": "string",
+          "pattern": "^https?://\\S+$"
+        },
+        "min_repeats": {
+          "description": "How many merged pull requests must carry the same review point before it is proposed as a rule; 3 by default.",
+          "type": "integer",
+          "minimum": 1,
+          "default": 3
+        },
+        "min_reviewers": {
+          "description": "How many different reviewers must have made the point; 1 by default, so one reviewer's repeated point counts.",
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "window": {
+          "description": "How far back merged pull requests are read: a whole number and `d`, `w`, `m` (months) or `y`; \"6m\" by default.",
+          "type": "string",
+          "pattern": "^[1-9][0-9]*[dwmy]$",
+          "default": "6m"
+        }
+      }
+    },
     "daemon": {
       "x-codelaw-record": "SR-ARCHITECTURE",
       "description": "The opt-in warm daemon (SR-ARCHITECTURE decision 22). Root config only.",

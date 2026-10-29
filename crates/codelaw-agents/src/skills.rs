@@ -12,7 +12,7 @@ pub struct Skill<'a> {
 }
 
 /// The catalogue, P1 first (SR-AGENT-SURFACES §The skill catalogue).
-pub const NAMES: [&str; 12] = [
+pub const NAMES: [&str; 13] = [
     "codelaw-write",
     "codelaw-fix",
     "codelaw-explain",
@@ -25,6 +25,7 @@ pub const NAMES: [&str; 12] = [
     "codelaw-suppress",
     "codelaw-pack",
     "codelaw-upgrade",
+    "codelaw-rules-from-reviews",
 ];
 
 /// Every skill of the catalogue, from the package.
