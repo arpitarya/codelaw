@@ -63,7 +63,7 @@ here. Read that record before changing anything below it.
 
 🟡 **W-135** waits on **W-128** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
 
-🟢 **W-137** `agent` The extension's look (board D, picked 10-30): inline badges, gutter icons, TODO chips, hover cards on manifests, a codelaw sidebar, status-bar counts; ordinary source files squiggles only, with a designed hover card (board H, ruled 10-30). Filed by Arpit (Cowork). [detail](open/W-137-editor-findings-look.md)
+🟢 **W-137** `agent` The extension's look (board D, 10-30): inline badges, gutter icons, TODO chips, hover cards on manifests, a codelaw sidebar, status-bar counts; ordinary source files squiggles only, with a designed hover card (board H, ruled 10-30). Filed by Arpit (Cowork). [detail](open/W-137-editor-findings-look.md)
 
 ### testing (0)
 
