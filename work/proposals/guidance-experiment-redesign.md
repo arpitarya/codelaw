@@ -2,13 +2,13 @@
 type: Proposal
 title: Redesign the guidance-vs-check experiment — a baseline, screened temptations, a bound instead of "zero in 60"
 description: "W-118's research outcome: why W-102's pilot could not separate its arms (floor effect, requested violations, a leaked check, n = 1), what the literature says about context files and agent randomness, a six-arm design with empirically screened tasks, its downsides and the rulings it needs."
-status: proposed
+status: graduated
 timestamp: 2026-10-29T01:30:00+05:30
 ---
 
 # Redesign the guidance-vs-check experiment — W-118's proposal
 
-**For the decider to pick.** Three rulings close W-118 (§8); W-102 then runs the design.
+**Ruled 2026-10-30** (Arpit, voice: *"Oh, it's whatever you propose."*): R1 adopted as written, R2 the 5% bound (0/60), R3 ~$85 with no separate gate on the screen → W-102 runs it; W-118 closed.
 Researched 2026-10-29 (Cowork, Fable 5.1): the pilot's data (`experiments/guidance-vs-check/results/2026-10-w102-pilot/`),
 its 20 tasks and arms, and the papers in §9.
 

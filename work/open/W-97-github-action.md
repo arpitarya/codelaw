@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-27 (W-36 gap G3): a first-party GitHub Action for c
 item: W-97
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-28
+updated: 2026-10-30
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
@@ -39,10 +39,17 @@ Why: Biome (`setup-biome`) and Ruff (`ruff-action`) ship one ([proposal](../prop
 - **`init --ci github`** (no `--autofix`) writes `.github/workflows/codelaw.yml` from `templates/ci/github/codelaw.yml` (SR-CLI-MCP decision 12a); `--ci gitlab` alone is refused.
 - Records: SR-PACKAGES decision 15, SR-CLI-MCP 12a; USAGE, RELEASING, CHANGELOG.
 
-## Left (ruled 2026-10-27)
+## Ruled 2026-10-30 — the listing's name and description
 
-1. **Arpit:** on the v0.3.0 release, accept the Marketplace Developer Agreement and tick *Publish this Action to the GitHub Marketplace* (the inbox row).
-2. **Agent, after the v0.3.0 tag:** the DoD proof — `gh repo create arpitarya/codelaw-action-test --public --clone`, `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, one `debugger`, then the annotation and Security → Code scanning checked.
+**Arpit, 2026-10-30 (voice), on the v0.4.0 edit page:** GitHub refused the listing — *"name codelaw must be unique, cannot match an existing action, user or organization name"* and *"description … must be less than 125 characters."* → *"Let's go with codelaw check."* · *"Whatever you are suggesting sounds good."*
+
+- `action.yml`: `name: codelaw check`; the description shortened to 115 characters, keeping what the Action does (it checks and annotates; it does not fix). Written 2026-10-30 (Cowork). The repo path is unchanged, so `uses: arpitarya/codelaw@v0` still works.
+- v0.4.0 carries the old `action.yml`, so the listing waits for **the next release**.
+
+## Left (ruled 2026-10-27; step 1 moved by the 2026-10-30 ruling)
+
+1. **Arpit:** on **the first release after 0.4.0**, accept the Marketplace Developer Agreement and tick *Publish this Action to the GitHub Marketplace* (the inbox row).
+2. **Agent, after that release:** the DoD proof — `gh repo create arpitarya/codelaw-action-test --public --clone`, `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, one `debugger`, then the annotation and Security → Code scanning checked.
 3. **Agent, each release:** `git tag -f v0 v<x> && git push -f origin v0` (RELEASING.md).
 4. **Offered, not ruled:** a clear error when `upload-sarif` is on and `gh` is absent (a self-hosted runner or slim image) — the plain check-and-annotate path needs no `gh`.
 

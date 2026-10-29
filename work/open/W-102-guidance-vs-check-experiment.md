@@ -5,9 +5,9 @@ description: "Arpit, 2026-10-27 (W-36 R4): measure whether an agent with Fux and
 item: W-102
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-29
+updated: 2026-10-30
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-102 — Experiment — does good guidance make the check unnecessary?
@@ -21,7 +21,9 @@ ball: arpit
 | 3 | Measure `codelaw check` on each diff (new findings by rule), with `hook` and `hook --pre` off; record tokens and turns | the data | ✅ scorer and table built, proven by `harness.py dry-run` (180/180 again after the pilot's fixes); the pilot's table: [`results/2026-10-w102-pilot/`](../../experiments/guidance-vs-check/results/2026-10-w102-pilot/RESULTS.md) |
 | 4 | Decide: arm C gives zero new `error`s in all 60 runs → the README's "rules it can't skip" line goes; otherwise it stays with the measured rate | a README line backed by data | ⏳ |
 
-**Arpit, 2026-10-29 (voice docket; written on *"file it."*):** recommended redesigning before the full 180: *"Let's post a research document on how do you want to design it again. With the downsides and details on why the current one failed, or the previous one failed, and what needs to be improved in next use case. Or what is something that you need to figure out in the next use case. So probably create a research work item."* — [W-118](W-118-guidance-experiment-redesign.md); the 180 waits on it.
+**Arpit, 2026-10-30 (voice), on W-118's R1–R3:** *"Oh, it's whatever you propose."* — **R1** the [proposal](../proposals/guidance-experiment-redesign.md)'s design: six arms (0 no codelaw, A guidance only, A+ the pilot's A, B, C, D `hook --pre`), tasks screened by running arm 0 (keep ≥ 40% at 5 runs), 12 tasks × 5 runs = 60 per arm; **R2** the README's "rules it can't skip" line stays unless arm C's upper 95% bound is below **5%** (0 new errors in 60); **R3** ~$85 and ~3 h, the screen not gated separately. Steps 1–4 below are rewritten to that design by the agent before the run.
+
+**Arpit, 2026-10-29 (voice docket; written on *"file it."*):** recommended redesigning before the full 180: *"Let's post a research document on how do you want to design it again. With the downsides and details on why the current one failed, or the previous one failed, and what needs to be improved in next use case. Or what is something that you need to figure out in the next use case. So probably create a research work item."* — [W-118](../../archive/open/W-118-guidance-experiment-redesign.md); the 180 waits on it.
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"This is in my local, right?"* — yes: on the Mac, from the main checkout, with his Claude Code login, one session at a time (9–18 hours in all; nothing in CI) — then *"Approved."*: (1) the CLI is Claude Code 2.1, `claude -p … --setting-sources project --strict-mcp-config` (`experiment.toml` `[agent.claude]`); (2) `fux` (D-34) runs in arm C outside CI; (3) run it — the pilot first, `harness.py run --agent claude --runs 1 --out experiments/guidance-vs-check/runs/2026-10-w102` (60 sessions, ~$29), then the same `--out` without `--runs` for the full 180 (~$86).
 
