@@ -29,7 +29,7 @@ owns:
   - RELEASING.md
   - rust-toolchain.toml
 laws: [L0, L2, L3, L6, L7, L8]
-timestamp: 2026-10-28T04:00:00Z
+timestamp: 2026-10-29T05:00:00Z
 content_sha: ""
 ---
 
@@ -178,7 +178,8 @@ The decider asked for a record of what goes into which package, under the naming
     - **`ci.yml`'s `corpus` job is level 4 of `codelaw test`** ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 4) over the pinned corpus; once every pack's counts hold, it writes `scripts/corpus.py promote`'s report — which preview rules the promotion criterion passes, and why each other one is held — to the job summary (W-100, 2026-10-27). It promotes nothing: `promote --write` is a reviewed change on a ratified criterion (decision 6a there).
     - **`scripts/law-gate.py`** refuses a release whose binary has no `format`, `mcp` or `lsp` command ([L7](0009_LAW-7-linter-and-formatter.md); [L6](0008_LAW-6-python-and-node-packages.md) decision 3). `publish.yml`'s gate runs it and stops; `ci.yml`'s `package` job runs it on every push and fails, so `main` learns the day the binary loses one, not release day (W-24, 2026-10-24); the decider runs it before the one-time hand publish (`RELEASING.md`).
     - **`publish.yml`, a published GitHub Release, or a run by hand on a `v*` tag that publishes npm only** ([L6](0008_LAW-6-python-and-node-packages.md) decision 9, ruled 2026-10-25): it refuses a commit on which `ci.yml` did not succeed on `main`, downloads **that run's** checked set, checks it again, verifies every file against `ci.yml`'s attestation for the release commit on `main`, and uploads it; each upload job re-checks its download against the gate's `SHA256SUMS`. Trusted publishing (OIDC) on both registries; no token exists.
-    - **Only a `v*` tag may deploy** to the `npm` and `pypi` environments (a deployment rule the decider sets in GitHub; `RELEASING.md`): a trusted publisher checks repository, workflow and environment, not the ref.
+    - **A new PyPI project, by hand from `main`** ([L6](0008_LAW-6-python-and-node-packages.md) decision 9, W-119, ruled 2026-10-29): `only=pypi-new` with `release=<v* tag>` and `project=<name>` runs the same gate on **the tag's** commit — its ci.yml run, its `dist`, its attestation, checked by the tag's own scripts — skips npm, and uploads exactly that project's wheel at the tag's version through its pending publisher; it refuses a name the build has no wheel of, and one already on PyPI. A `-fux-index` name is taken from the same ci.yml run's `fux-index` artifact, checked against its `SHA256SUMS`; that artifact has no attestation (decision 14).
+    - **Only a `v*` tag may deploy** to the `npm` and `pypi` environments (a deployment rule the decider sets in GitHub; `RELEASING.md`), **and `main` to `pypi`** for the run above (the decider, 2026-10-29): a trusted publisher checks repository, workflow and environment, not the ref.
     - **Hardening (W-18):** every `run:` is `bash -eo pipefail`; every action is pinned by commit SHA; the OIDC jobs install an exact npm version; no checkout keeps its credentials.
     - **Nothing is written until npm trusts the workflow for every package:** a preflight job makes npm's OIDC exchange per package, and both registry jobs wait on it.
     - **npm order:** the eight binaries, then the sixteen npm packs, then `codelaw`, then `@codelaw/skills` — so a failure leaves the previous `codelaw` as `latest`, and the skills package never reaches npm before the engine it depends on. A version already published is skipped, so a failed job is re-run, not re-released.

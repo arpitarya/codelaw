@@ -2,8 +2,9 @@
 # when a GitHub Release is published — both registries — or by hand on a `v*`
 # tag, npm only, so a release can reach npm while PyPI's first uploads are still
 # made by hand (L6 decision 9, the decider 2026-10-25). The Release on that same
-# tag later runs both, skipping every version already published. Nothing else
-# publishes. No token anywhere: npm and PyPI trusted publishing (OIDC).
+# tag later runs both, skipping every version already published. Or by hand from
+# main with `only=pypi-new`: ONE new PyPI project, from a release's build, through
+# its pending publisher (W-119). Nothing else publishes. No token anywhere: npm and PyPI trusted publishing (OIDC).
 #
 # Nothing is built here. ci.yml assembled and checked `dist` on the release
 # commit; this downloads THAT artifact, re-runs the checks, and uploads it.
@@ -20,13 +21,21 @@ name: publish
 on:
   release:
     types: [published]
-  workflow_dispatch: # npm only, from a v* tag: `gh workflow run publish.yml --ref v0.2.0`; or `-f only=vscode` from main: the extension's job alone (W-95)
+  workflow_dispatch: # npm only, from a v* tag: `gh workflow run publish.yml --ref v0.2.0`; or `-f only=vscode` from main: the extension's job alone (W-95); or `-f only=pypi-new` from main (W-119)
     inputs:
       only:
-        description: 'npm (default, from a v* tag) or vscode (the extension alone, from main)'
+        description: 'npm (default, from a v* tag), vscode (the extension alone, from main) or pypi-new (one new PyPI project, from main)'
         type: choice
-        options: [npm, vscode]
+        options: [npm, vscode, pypi-new]
         default: npm
+      release:
+        description: 'pypi-new: the v* tag whose build is uploaded (v0.3.0)'
+        type: string
+        default: ''
+      project:
+        description: 'pypi-new: the one PyPI project to create (codelaw-rules-scss); its pending publisher must be registered'
+        type: string
+        default: ''
 permissions:
   contents: read
 defaults:
@@ -46,12 +55,31 @@ jobs:
     outputs:
       run: ${{ steps.ci.outputs.run }}
       sums: ${{ steps.verified.outputs.sums }}
+      sha: ${{ steps.rel.outputs.sha }}
     steps:
+      - id: rel
+        name: the release commit — this run's, or with pypi-new the commit of the named v* tag (W-119)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ONLY: ${{ inputs.only }}
+          RELEASE: ${{ inputs.release }}
+          PROJECT: ${{ inputs.project }}
+        run: |
+          if [ "$ONLY" != pypi-new ]; then
+            [ -z "$RELEASE$PROJECT" ] || { echo "::error::release and project are for only=pypi-new"; exit 1; }
+            echo "sha=$GITHUB_SHA" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          [[ "$RELEASE" =~ ^v[0-9] ]] || { echo "::error::pypi-new needs -f release=vX.Y.Z (got '${RELEASE}')"; exit 1; }
+          [[ "$PROJECT" =~ ^codelaw-[a-z0-9-]+$ ]] || { echo "::error::pypi-new needs -f project=codelaw-… (got '${PROJECT}')"; exit 1; }
+          sha="$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE" -q .sha)"
+          echo "pypi-new: $PROJECT from $RELEASE (${sha::8})"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
+          ref: ${{ steps.rel.outputs.sha }} # the release's own scripts check the release's own build
           persist-credentials: false # nothing here pushes (W-18)
       - name: a run by hand is npm only, and starts from a v* tag (L6 decision 9)
-        if: github.event_name == 'workflow_dispatch' && inputs.only != 'vscode'
+        if: github.event_name == 'workflow_dispatch' && inputs.only == 'npm'
         run: |
           [ "$GITHUB_REF_TYPE" = tag ] && [[ "$GITHUB_REF_NAME" == v* ]] || {
             echo "::error::run publish.yml from a v* tag (gh workflow run publish.yml --ref vX.Y.Z), not the ${GITHUB_REF_TYPE} ${GITHUB_REF_NAME}"
@@ -62,18 +90,21 @@ jobs:
         name: ci.yml succeeded on this commit, on main
         env:
           GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.rel.outputs.sha }}
         run: |
-          read -r run got < <(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&branch=main&event=push&per_page=1" \
+          read -r run got < <(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$SHA&branch=main&event=push&per_page=1" \
             -q '.workflow_runs[0] | "\(.id) \(.status)/\(.conclusion)"')
-          echo "ci.yml on ${GITHUB_SHA::8} (main): run ${run:-none}, ${got:-no run}"
+          echo "ci.yml on ${SHA::8} (main): run ${run:-none}, ${got:-no run}"
           [ "$got" = "completed/success" ] || {
-            echo "::error::refusing to publish: ci.yml has not succeeded on ${GITHUB_SHA::8} on main (${got:-no run}). Wait for it or fix it, then re-run this job."
+            echo "::error::refusing to publish: ci.yml has not succeeded on ${SHA::8} on main (${got:-no run}). Wait for it or fix it, then re-run this job."
             exit 1
           }
           echo "run=$run" >> "$GITHUB_OUTPUT"
       - name: the tag is the version, and every copy agrees (W-18)
+        env:
+          RELEASE: ${{ inputs.release }}
         run: |
-          if [ "${{ inputs.only }}" = vscode ]; then python3 scripts/version.py --check; else python3 scripts/version.py --check --tag "$GITHUB_REF_NAME"; fi
+          if [ "${{ inputs.only }}" = vscode ]; then python3 scripts/version.py --check; else python3 scripts/version.py --check --tag "${RELEASE:-$GITHUB_REF_NAME}"; fi
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: dist
@@ -86,11 +117,12 @@ jobs:
         name: every file is the one ci.yml built and attested, from this commit, on main (SR-PACKAGES decision 11)
         env:
           GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.rel.outputs.sha }}
         run: |
           for f in dist/npm/* dist/pypi/*; do
             gh attestation verify "$f" --repo "$GITHUB_REPOSITORY" \
               --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
-              --source-ref refs/heads/main --source-digest "$GITHUB_SHA" >/dev/null
+              --source-ref refs/heads/main --source-digest "$SHA" >/dev/null
             echo "✓ $f"
           done
           echo "sums=$(sha256sum dist/SHA256SUMS | cut -c1-64)" >> "$GITHUB_OUTPUT"
@@ -102,7 +134,7 @@ jobs:
     # workflow stops the release before PyPI or npm receives anything.
     name: npm trusts this workflow, before either registry is written
     needs: gate
-    if: inputs.only != 'vscode'
+    if: github.event_name == 'release' || inputs.only == 'npm'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -142,7 +174,7 @@ jobs:
 
   npm:
     needs: [gate, trust]
-    if: inputs.only != 'vscode'
+    if: github.event_name == 'release' || inputs.only == 'npm'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -202,16 +234,19 @@ jobs:
           done
 
   pypi:
+    # A Release uploads every wheel whose project exists; a run by hand with
+    # only=pypi-new uploads one new project, from main (W-119). Any other run by
+    # hand is npm only (L6 decision 9).
     needs: [gate, trust]
-    if: github.event_name == 'release' # a run by hand is npm only (L6 decision 9)
+    if: ${{ !cancelled() && needs.gate.result == 'success' && (github.event_name == 'release' && needs.trust.result == 'success' || inputs.only == 'pypi-new') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       id-token: write # PyPI trusted publishing
       actions: read
     environment:
-      name: pypi
-      url: https://pypi.org/project/codelaw/
+      name: pypi # tag rule v* and branch main (W-119, the decider 2026-10-29)
+      url: https://pypi.org/project/${{ inputs.project || 'codelaw' }}/
     steps:
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
@@ -226,8 +261,40 @@ jobs:
           echo "$SUMS  dist/SHA256SUMS" | sha256sum --strict --quiet -c
           (cd dist && sha256sum --strict --quiet -c SHA256SUMS)
           [ "$(find dist/npm dist/pypi -type f | wc -l)" = "$(wc -l < dist/SHA256SUMS)" ] || { echo "::error::dist holds a file SHA256SUMS does not list"; exit 1; }
+      - name: pypi-new, a Fux index project — the same run's fux-index artifact (built beside dist, not attested; SR-PACKAGES decision 14)
+        if: inputs.only == 'pypi-new' && endsWith(inputs.project, '-fux-index')
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: fux-index
+          path: dist/fux-index/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
+      - id: one
+        name: pypi-new — exactly the named project, at the release's version, and only if PyPI has no such project yet (W-119)
+        if: inputs.only == 'pypi-new'
+        env:
+          RELEASE: ${{ inputs.release }}
+          PROJECT: ${{ inputs.project }}
+        run: |
+          mkdir -p upload
+          dir=dist/pypi
+          if [[ "$PROJECT" == *-fux-index ]]; then dir=dist/fux-index/pypi; (cd dist/fux-index && sha256sum --strict --quiet -c SHA256SUMS); fi
+          for w in "$dir"/*.whl; do
+            [ "$(basename "$w" | cut -d- -f1 | tr '_' '-')" = "$PROJECT" ] || continue
+            [ "$(basename "$w" | cut -d- -f2)" = "${RELEASE#v}" ] || { echo "::error::$(basename "$w") is not ${RELEASE#v}"; exit 1; }
+            cp "$w" upload/
+          done
+          [ -n "$(ls upload)" ] || { echo "::error::$RELEASE's build has no wheel of $PROJECT"; exit 1; }
+          code="$(curl -s -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/$PROJECT/json")"
+          [ "$code" = 404 ] || { echo "::error::$PROJECT is already on PyPI (HTTP $code): a Release uploads it; pypi-new only creates a project"; exit 1; }
+          {
+            echo "### PyPI — one new project (W-119)"
+            echo "- → create \`$PROJECT\` with $(ls upload) through its pending publisher (arpitarya/codelaw · publish.yml · pypi)."
+            echo "- PyPI refuses the upload if no pending publisher names it: register one, then re-run."
+          } | tee -a "$GITHUB_STEP_SUMMARY"
       - id: exists
         name: only wheels whose PyPI project exists, or is codelaw (its pending publisher creates it); the rest are named, not failed (L6 decision 9)
+        if: github.event_name == 'release'
         run: |
           mkdir -p upload
           {

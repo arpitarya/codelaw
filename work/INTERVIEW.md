@@ -116,6 +116,8 @@ checkout.
 
 ## 2 · In flight, and the immediate next step
 
+**W-119 step 1 built 2026-10-29 (Claude Code):** Arpit ruled *"Admit main in pypi"* — over a v0.3.1 tag or a W-119-only rule — so `publish.yml -f only=pypi-new` runs from `main` and uploads one new project from v0.3.0's attested build. **Next:** the loop, one name at a time from `codelaw-rules-scss` (the inbox row); the first run is the test of the new mode.
+
 **Ruled 2026-10-29 (Cowork, voice):** the next release is **0.3.0 through CI** (W-116) — npm everything, PyPI only `codelaw` and the six packs that exist; it replaces W-86's v0.2.0 Release. W-114: drop all five worktrees. W-95: Open VSX now (W-117), the Marketplace by hand on release day. W-105: agents add the four type questions (SR-TYPES decision 4), profile before budgets. W-102: redesign first (W-118, research). W-103: spell measured as its own operation (B-062 for the shared benchmark). The inbox holds only PyPI days 2–4, W-97's Marketplace tick and W-117.
 
 **Reconciled 2026-10-29 (Cowork):** nothing open was done. The v0.2.0 GitHub Release is still not created (`codelaw` absent from PyPI); PyPI day 2 is today. W-111 merged into W-114 (drop all five recommended); W-115 filed (the spell pack's first publish); W-95's Marketplace token is blocked by Azure, and global PATs end 2026-12-01. PyPI's pending publishers cannot create many projects at once — one per repository · workflow · environment.
