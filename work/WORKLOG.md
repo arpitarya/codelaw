@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — The VS Code extension is live (one platform so far)  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"I published the code law Microsoft Visual Studio Code extension. Check on it and update the open work items."*
+- **Done:** the Marketplace's public query: `codelaw.codelaw-vscode`, *"codelaw - Rules for AI Agents: Lint, Format, Spell"*, `validated, public, preview`, published 22:16 IST, versions **0.3.0 `darwin-arm64` only**. W-95's file and row updated. Not committed.
+- **Decided / left open:** the other seven platforms — by hand now, or with 0.4.0's release (W-127, pending a push and the Release).
+- **Mistakes:** none.
+- **Next:** Arpit pushes `main` and releases 0.4.0 (W-127), which publishes all eight; or uploads the seven by hand.
+
 ## 2026-10-29 — W-127: 0.4.0 bumped, CHANGELOG written  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"upgrade 0.4.0"*.

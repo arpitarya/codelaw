@@ -6,7 +6,7 @@ item: W-95
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
-updated_by: "Claude Code (Opus 5.5)"
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
@@ -104,6 +104,8 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 **Arpit, 2026-10-29 22:05 (text) — the display name:** a manual upload of `codelaw-vscode` answered *"This extension display name is taken. Please try a different one."* — the removed 0.2.0 also holds `displayName` `codelaw`, which the Marketplace keeps unique. Ruled: *"codelaw - Linter & Formatter"*, then — *"add ai n spell as well suggest more names"* — *"codelaw - Rules for AI Agents: Lint, Format, Spell"* (22:06). For an agent: `packaging/vscode/package.json` `displayName` → `codelaw - Rules for AI Agents: Lint, Format, Spell`, `scripts/vsix.py`'s manifest check if it reads it, SR-EDITOR's ruled line; then a fresh `.vsix` from CI (the display name is inside the file).
 
 **Built 2026-10-29 22:12 (Claude Code):** `displayName` `codelaw - Rules for AI Agents: Lint, Format, Spell` (`vsix.py` writes and checks it from the manifest, unchanged); the eight `codelaw-vscode-<platform>-0.3.0.vsix` rebuilt into `dist/vscode/` from v0.3.0's CI binaries; `check --release --bins` green; VS Code installs `codelaw.codelaw-vscode@0.3.0` with that display name. **Next:** Arpit uploads them.
+
+**Listed, 2026-10-29 (checked 23:30 IST, Cowork):** Arpit published `codelaw.codelaw-vscode` by hand — the Marketplace answers *"codelaw - Rules for AI Agents: Lint, Format, Spell"*, flags `validated, public, preview`, first published 2026-10-29 16:46 UTC (22:16 IST); its page is <https://marketplace.visualstudio.com/items?itemName=codelaw.codelaw-vscode>. **Only one of eight platforms is there: 0.3.0 `darwin-arm64`** — VS Code on Windows, Linux and Intel Macs finds no build to install. Left: the other seven (the next release's `publish.yml` job, or by hand with *Update* from `dist/vscode/`), then Open VSX (W-117), README/USAGE's install line.
 
 ## Left
 
