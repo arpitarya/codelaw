@@ -24,6 +24,32 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — The display name built; the `.vsix` files rebuilt  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"generate the VS Code extensions with the new name display name"*.
+- **Done:** `packaging/vscode/package.json` `displayName` set to Arpit's 22:06 ruling; SR-EDITOR's line marked built (with Cowork's uncommitted ruling notes). `dist/vscode/` had been emptied at 22:08 (not by this session — the files were likely taken for the upload), so the v0.3.0 CI binaries came again from that run's `vscode` artifact; eight `codelaw-vscode-<platform>-0.3.0.vsix` rebuilt, `check --release --bins` green, installed in VS Code with the new display name.
+- **Decided / left open:** none.
+- **Mistakes:** none.
+- **Next:** Arpit uploads the eight files.
+
+---
+
+## 2026-10-29 — The display name, final: `codelaw - Rules for AI Agents: Lint, Format, Spell`  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"codelaw - Linter & Formatter add ai n spell as well suggest more names"*; six offered ("for AI agents", not "AI-powered" — L5); chose *"codelaw - Rules for AI Agents: Lint, Format, Spell"*.
+- **Done:** SR-EDITOR decision 4's display-name line and W-95 updated (replaces the 22:05 pick). Not committed.
+- **Decided / left open:** ruled — the display name.
+- **Mistakes:** none.
+- **Next:** an agent sets `displayName`; CI builds; publish.
+
+## 2026-10-29 — The extension's display name: `codelaw - Linter & Formatter`  ·  Cowork (Opus 5.5)
+
+- **Asked:** after *"This extension display name is taken"*, Arpit picked *"codelaw - Linter & Formatter"* from three options.
+- **Done:** W-95 and SR-EDITOR decision 4 record it (*ruled, not built*) with what an agent changes (`displayName`, the `.vsix` check, a fresh build). The rename to `codelaw.codelaw-vscode` had already landed (71ceefc, 22:03). Not committed.
+- **Decided / left open:** ruled — the display name. Open: asking Support to release the display name `codelaw` too.
+- **Mistakes:** none.
+- **Next:** an agent changes `displayName`; CI builds the `.vsix`; publish.
+
 ## 2026-10-29 — The extension renamed `codelaw.codelaw-vscode`; its 0.3.0 `.vsix` files built  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"generate the VS Code extension with the new name."*
