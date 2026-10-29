@@ -29,9 +29,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (18)
+## Open items (19)
 
-### build (15)
+### build (16)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -63,6 +63,8 @@ here. Read that record before changing anything below it.
 🟢 **W-137** `agent` The extension's look (board D, 10-30): inline badges, gutter icons, TODO chips, hover cards on manifests, a codelaw sidebar, status-bar counts; ordinary source files squiggles only, with a designed hover card (board H, ruled 10-30). Filed by Arpit (Cowork). [detail](open/W-137-editor-findings-look.md)
 
 🟡 **W-139** waits on **W-138** `agent` Port every rule W-138 picks (as Arpit rules) into codelaw's packs — cases, fixes, docs, budgets. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
+
+🟢 **W-140** `agent` Port any rule on demand: a `codelaw-port-rule` skill writes a named ESLint/Pylint/any-tool rule into `.codelaw/rules/`, tested on its cases; an opt-in share issue and a code-search script count demand. Filed by Arpit (Cowork). [detail](open/W-140-port-rule-on-demand.md)
 
 ### testing (0)
 

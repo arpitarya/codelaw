@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-140 filed: port any rule on demand  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"propose a way how … anybody who is consuming code law can migrate any existing rule into code law"*; narrowed by voice to one rule at a time, named by its tool, plus *"how many people use that rule?"*; *"file it."*
+- **Done:** W-140 — the `codelaw-port-rule` skill (check `ported_from` first, port fresh, source cases as tests, `preview`), an opt-in share issue through `rule_request.yml`, a maintainer code-search script.
+- **Decided / left open:** not filed: the wider migration lanes proposed in chat (`migrate rules` for no-restricted-syntax/Semgrep/ast-grep, an ESLint bridge adapter, `migrate verify`) — Arpit narrowed the ask.
+- **Mistakes:** none.
+- **Next:** W-140 to Claude Code.
+
 ## 2026-10-30 — W-136 closed: findings on plain-text config files  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Implement it and then close those out. Keep merging everything to main."* — W-136, one of six agents in parallel.
