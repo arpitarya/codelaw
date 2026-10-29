@@ -25,10 +25,11 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 | `data/github-actions` | 3 | `yaml/gha-pin-sha`, `yaml/gha-workflow-schema`, `yaml/gha-action-schema` — workflows and composite actions |
 | `data/conventions` | 2 | opt-in house style: `yaml/document-start`, `md/no-inline-html` |
 | `data/markers` | 3 | TODO comments with a ticket (and a date when asked) in YAML, TOML and Markdown; opt in (SR-CONFIG decision 11a) |
+| `data/codeowners` | 1 | CODEOWNERS coverage: every file has an owner, every pattern is live; opt in |
 
 <!-- /docs-sync:presets -->
 
-42 rules: 8 `auto`, 6 `suggest`, 28 `manual`. Every rule is
+43 rules: 8 `auto`, 6 `suggest`, 29 `manual`. Every rule is
 **reimplemented**, not vendored: the checks, messages and docs are written
 fresh, and each ported rule's `ported_from:` names its source. Rules that need
 more than a pattern are native rules in `crates/codelaw-native/src/data_*.rs`;

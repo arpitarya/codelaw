@@ -2,7 +2,7 @@
 
 # Rule reference
 
-**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 675 rules in 18 packs, plus the engine's 23 own rules.
+**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 683 rules in 18 packs, plus the engine's 23 own rules.
 
 ## Configuring any rule — the forms
 
@@ -35,23 +35,23 @@ remap = { error = "warn" }
 
 | Pack | npm | PyPI | Rules | With options |
 |---|---|---|---|---|
-| [js](#js) | `@codelaw/rules-js` | `codelaw-rules-js` | 80 | 8 |
+| [js](#js) | `@codelaw/rules-js` | `codelaw-rules-js` | 82 | 10 |
 | [ts](#ts) | `@codelaw/rules-ts` | — | 27 | 1 |
-| [react](#react) | `@codelaw/rules-react` | `codelaw-rules-react` | 32 | 1 |
+| [react](#react) | `@codelaw/rules-react` | `codelaw-rules-react` | 35 | 4 |
 | [node](#node) | `@codelaw/rules-node` | — | 10 | 0 |
 | [stencil](#stencil) | `@codelaw/rules-stencil` | — | 18 | 3 |
 | [html](#html) | `@codelaw/rules-html` | `codelaw-rules-html` | 74 | 18 |
 | [css](#css) | `@codelaw/rules-css` | `codelaw-rules-css` | 73 | 33 |
 | [scss](#scss) | `@codelaw/rules-scss` | `codelaw-rules-scss` | 16 | 6 |
 | [css-modules](#css-modules) | `@codelaw/rules-css-modules` | — | 5 | 1 |
-| [data](#data) | `@codelaw/rules-data` | `codelaw-rules-data` | 42 | 11 |
+| [data](#data) | `@codelaw/rules-data` | `codelaw-rules-data` | 43 | 12 |
 | [tanstack-query](#tanstack-query) | `@codelaw/rules-tanstack-query` | — | 13 | 1 |
 | [redux-toolkit](#redux-toolkit) | `@codelaw/rules-redux-toolkit` | — | 12 | 1 |
 | [security-js](#security-js) | `@codelaw/rules-security-js` | `codelaw-rules-security-js` | 66 | 4 |
 | [security-ts](#security-ts) | `@codelaw/rules-security-ts` | — | 16 | 3 |
 | [security-html](#security-html) | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | 19 | 1 |
 | [spell](#spell) | `@codelaw/rules-spell` | `codelaw-rules-spell` | 7 | 1 |
-| [python](#python) | — | `codelaw-rules-python` | 105 | 10 |
+| [python](#python) | — | `codelaw-rules-python` | 107 | 12 |
 | [security-python](#security-python) | — | `codelaw-rules-security-python` | 61 | 0 |
 | [engine](engine.md) | in `codelaw` | in `codelaw` | 23 | 0 |
 
@@ -62,11 +62,13 @@ Presets: `codelaw:js/recommended` · `codelaw:js/typescript` · `codelaw:js/conv
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
 | [`graph/no-unused-exports`](graph/no-unused-exports.md) | Exported symbols must be used somewhere | `suggest` | — | `js/project`, `py/project` |
+| [`js/complexity`](js/complexity.md) | A function's cyclomatic complexity stays under a maximum | `manual` | `max`, `count_optional_chain`, `ignore_names` | `js/size` |
 | [`js/constructor-super`](js/constructor-super.md) | A derived class's constructor calls super(); a base class's does not | `manual` | — | `js/recommended` |
 | [`js/exports-at-end`](js/exports-at-end.md) | Exports are gathered at the end of the file | `auto` | — | `js/conventions` |
 | [`js/for-direction`](js/for-direction.md) | A for loop's counter moves toward its end condition | `manual` | — | `js/recommended` |
 | [`js/getter-return`](js/getter-return.md) | A getter returns a value on every path | `manual` | — | `js/recommended` |
 | [`js/import-groups`](js/import-groups.md) | Imports are grouped builtin, external, internal, relative | `auto` | `internal` | `js/conventions` |
+| [`js/max-depth`](js/max-depth.md) | Blocks nest no deeper than a maximum | `manual` | `max` | `js/size` |
 | [`js/max-lines`](js/max-lines.md) | A file stays under a maximum number of lines | `manual` | `max`, `skip_blank_lines`, `skip_comments`, `skip_imports` | `js/size` |
 | [`js/max-lines-per-function`](js/max-lines-per-function.md) | A function stays under a maximum number of lines | `manual` | `max`, `skip_blank_lines`, `skip_comments`, `include_nested`, `include_iife`, `ignore_names` | `js/size` |
 | [`js/max-params`](js/max-params.md) | A function takes at most a maximum number of parameters | `manual` | `max`, `count_this`, `count_varargs`, `ignore_names`, `ignore_overrides`, `ignore_declarations`, `ignore_constructor_injection` | `js/size` |
@@ -178,10 +180,11 @@ Presets: `codelaw:ts/recommended` · `codelaw:ts/conventions` · `codelaw:ts/typ
 
 ## react
 
-Presets: `codelaw:react/recommended` · `codelaw:react/conventions`.
+Presets: `codelaw:react/recommended` · `codelaw:react/conventions` · `codelaw:react/size`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
+| [`react/component-max-lines`](react/component-max-lines.md) | A React component stays under a maximum number of lines | `manual` | `max`, `skip_blank_lines`, `skip_comments`, `ignore_names` | `react/size` |
 | [`react/display-name`](react/display-name.md) | A component passed to memo or forwardRef has a name | `manual` | — | `react/recommended` |
 | [`react/error-boundaries`](react/error-boundaries.md) | Errors in children are caught by an Error Boundary, not try/catch | `manual` | — | `react/recommended` |
 | [`react/exhaustive-deps`](react/exhaustive-deps.md) | Effect and memo dependency lists name every value they read | `suggest` | — | `react/recommended` |
@@ -192,6 +195,8 @@ Presets: `codelaw:react/recommended` · `codelaw:react/conventions`.
 | [`react/jsx-no-duplicate-props`](react/jsx-no-duplicate-props.md) | No prop given twice on one element | `manual` | — | `react/recommended` |
 | [`react/jsx-no-target-blank`](react/jsx-no-target-blank.md) | Links that open a new tab set rel="noreferrer" | `auto` | — | `react/recommended` |
 | [`react/jsx-no-undef`](react/jsx-no-undef.md) | Components used in JSX are declared | `manual` | — | `react/recommended` |
+| [`react/max-jsx-depth`](react/max-jsx-depth.md) | JSX elements nest no deeper than a maximum | `manual` | `max` | `react/size` |
+| [`react/max-props`](react/max-props.md) | A React component takes at most a maximum number of props | `manual` | `max`, `ignore_names` | `react/size` |
 | [`react/no-children-prop`](react/no-children-prop.md) | Children are passed as children, not as a prop | `manual` | — | `react/recommended` |
 | [`react/no-context`](react/no-context.md) | No React context: no createContext, no useContext | `manual` | `use_instead` | *[rules] only* |
 | [`react/no-danger-with-children`](react/no-danger-with-children.md) | No dangerouslySetInnerHTML together with children | `manual` | — | `react/recommended` |
@@ -455,10 +460,11 @@ Presets: `codelaw:css-modules/recommended` · `codelaw:css-modules/strict`.
 
 ## data
 
-Presets: `codelaw:data/recommended` · `codelaw:md/recommended` · `codelaw:data/package-json` · `codelaw:data/tsconfig` · `codelaw:data/pyproject` · `codelaw:data/github-actions` · `codelaw:data/conventions` · `codelaw:data/markers`.
+Presets: `codelaw:data/recommended` · `codelaw:md/recommended` · `codelaw:data/package-json` · `codelaw:data/tsconfig` · `codelaw:data/pyproject` · `codelaw:data/github-actions` · `codelaw:data/conventions` · `codelaw:data/markers` · `codelaw:data/codeowners`.
 
 | Rule | What it checks | Fix | Options | Turned on by |
 |---|---|---|---|---|
+| [`data/codeowners-coverage`](data/codeowners-coverage.md) | Every file has a code owner, and every CODEOWNERS pattern is live | `manual` | `path`, `allow_unowned`, `ignore` | `data/codeowners` |
 | [`data/outdated-dependency`](data/outdated-dependency.md) | Dependencies are on their latest version | `suggest` | — | `data/package-json`, `data/pyproject` |
 | [`data/stale-deps-snapshot`](data/stale-deps-snapshot.md) | The dependency snapshot is recent | `manual` | — | `data/package-json`, `data/pyproject` |
 | [`json/no-duplicate-keys`](json/no-duplicate-keys.md) | No key twice in one JSON object | `manual` | — | `data/recommended` |
@@ -696,6 +702,7 @@ Presets: `codelaw:py/recommended` · `codelaw:py/conventions` · `codelaw:py/pro
 | [`py/batched-without-explicit-strict`](py/batched-without-explicit-strict.md) | `itertools.batched()` says `strict=` | `suggest` | `target_version` | `py/recommended` |
 | [`py/break-outside-loop`](py/break-outside-loop.md) | `break` only inside a loop | `manual` | — | `py/recommended` |
 | [`py/cached-instance-method`](py/cached-instance-method.md) | No `lru_cache` on methods | `manual` | — | `py/recommended` |
+| [`py/complexity`](py/complexity.md) | A function's cyclomatic complexity stays under a maximum | `manual` | `max`, `ignore_names` | `py/size` |
 | [`py/continue-outside-loop`](py/continue-outside-loop.md) | `continue` only inside a loop | `manual` | — | `py/recommended` |
 | [`py/default-except-not-last`](py/default-except-not-last.md) | A bare `except:` is the last handler | `manual` | — | `py/recommended` |
 | [`py/duplicate-dict-key`](py/duplicate-dict-key.md) | A dict literal doesn't repeat a literal key | `manual` | — | `py/recommended` |
@@ -726,6 +733,7 @@ Presets: `codelaw:py/recommended` · `codelaw:py/conventions` · `codelaw:py/pro
 | [`py/late-future-import`](py/late-future-import.md) | `from __future__` imports come first | `manual` | — | `py/recommended` |
 | [`py/loop-variable-overrides-iterator`](py/loop-variable-overrides-iterator.md) | A loop variable doesn't replace what it iterates | `manual` | — | `py/recommended` |
 | [`py/map-without-explicit-strict`](py/map-without-explicit-strict.md) | `map()` over several iterables says `strict=` | `suggest` | `target_version` | `py/recommended` |
+| [`py/max-depth`](py/max-depth.md) | Blocks nest no deeper than a maximum | `manual` | `max` | `py/size` |
 | [`py/max-lines`](py/max-lines.md) | A module stays under a maximum number of lines | `manual` | `max`, `skip_blank_lines`, `skip_comments`, `skip_docstrings`, `skip_imports` | `py/size` |
 | [`py/max-lines-per-function`](py/max-lines-per-function.md) | A function stays under a maximum number of lines | `manual` | `max`, `skip_blank_lines`, `skip_comments`, `skip_docstrings`, `include_nested`, `ignore_names` | `py/size` |
 | [`py/max-params`](py/max-params.md) | A function takes at most a maximum number of parameters | `manual` | `max`, `max_positional`, `count_varargs`, `ignore_self_cls`, `ignore_names`, `ignore_overrides`, `ignore_declarations` | `py/size` |

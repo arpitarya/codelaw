@@ -95,6 +95,7 @@ The decider asked that rules can be written manually or by an AI agent with a sk
 
    A type rule ([SR-TYPES](0117_types.md)) is checked at the examples, cases and corpus levels only when a type program can answer: the TypeScript `CODELAW_TYPESCRIPT` names, with Node on `PATH`; without one it is reported as a warning, never a pass or a failure (W-105).
 
+   - **A multi-file example may name a plain-text config file** (W-132; [L3](0005_LAW-3-languages.md) decision 10): a `// CODEOWNERS` section (any name in `codelaw_core::TEXT_CONFIG_FILES`) is a file of the virtual repo, so a rule that reads one can be tested; the file is never linted.
 5. **Bugs become cases first.** A false positive or negative is fixed by adding the failing case, then changing the rule. The `codelaw-debug-rule` skill enforces that order.
 6. **Lifecycle.** A new rule starts `stability: preview` and becomes `stable` after a corpus run with no unexpressible false positives ([SR-RULE-PACKS](0101_rule-packs.md) decision 9).
    - **6a. The promotion criterion — RATIFIED 2026-10-27 as proposed** (the decider, 2026-10-27 (voice docket): *"Ratify."*; W-100). Decision 6 names no number and no evidence of a false positive; these four values are its measure, and `scripts/corpus.py promote --write` applies them. A preview rule passes when, on the corpus run that has just held its count:

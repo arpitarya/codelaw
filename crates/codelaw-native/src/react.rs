@@ -85,7 +85,7 @@ impl NativeRule for NoUnknownProperty {
 }
 
 /// Whether a class extends `Component` or `PureComponent` (bare or on `React`).
-fn is_component_class(class: Node<'_>, src: &str) -> bool {
+pub(crate) fn is_component_class(class: Node<'_>, src: &str) -> bool {
     children(class).into_iter().any(|c| {
         c.kind() == "class_heritage" && {
             let t = text(c, src);

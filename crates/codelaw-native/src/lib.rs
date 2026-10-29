@@ -25,6 +25,7 @@ mod data_md;
 mod data_toml;
 mod data_yaml;
 pub mod deps;
+mod codeowners;
 mod duplicates;
 mod expressions;
 #[cfg(feature = "fault-injection")]
@@ -109,6 +110,14 @@ pub trait FileContext: Sync {
     fn read(&self, path: &str) -> Option<String>;
     /// The names in the folder at `path` (`""` is the root), sorted.
     fn list(&self, path: &str) -> Option<Vec<String>>;
+    /// Every file of the project, whatever its type, that the ignore files
+    /// and the default excludes leave in: project-relative, sorted. `None`
+    /// when the context does not know them (a file checked alone). The
+    /// engine records the question, so a cached result is reused only
+    /// while the list is the same.
+    fn project_files(&self) -> Option<Vec<String>> {
+        None
+    }
     /// The as-of date, `YYYY-MM-DD`, when there is one (L5 decision 2):
     /// the only date a rule may judge by. The engine records the question,
     /// so a cached result is reused only on the same date.
@@ -260,6 +269,13 @@ static JS_MAX_LINES_PER_FUNCTION: size::Size = size::Size::js("js/max-lines-per-
 static JS_MAX_PARAMS: size::Size = size::Size::js("js/max-params", size::Measure::Params);
 static PY_MAX_LINES: size::Size = size::Size::py("py/max-lines", size::Measure::FileLines);
 static PY_MAX_LINES_PER_FUNCTION: size::Size = size::Size::py("py/max-lines-per-function", size::Measure::FunctionLines);
+static JS_COMPLEXITY: size::Size = size::Size::js("js/complexity", size::Measure::Complexity);
+static JS_MAX_DEPTH: size::Size = size::Size::js("js/max-depth", size::Measure::Depth);
+static PY_COMPLEXITY: size::Size = size::Size::py("py/complexity", size::Measure::Complexity);
+static PY_MAX_DEPTH: size::Size = size::Size::py("py/max-depth", size::Measure::Depth);
+static REACT_COMPONENT_MAX_LINES: size::Size = size::Size::react("react/component-max-lines", size::Measure::ComponentLines);
+static REACT_MAX_PROPS: size::Size = size::Size::react("react/max-props", size::Measure::Props);
+static REACT_MAX_JSX_DEPTH: size::Size = size::Size::react("react/max-jsx-depth", size::Measure::JsxDepth);
 static PY_MAX_PARAMS: size::Size = size::Size::py("py/max-params", size::Measure::Params);
 static JS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "js/no-unused-vars", languages: JS_ONLY };
 static TS_NO_UNUSED_VARS: unused_vars::NoUnusedVars = unused_vars::NoUnusedVars { id: "ts/no-unused-vars", languages: TS_ONLY };
@@ -499,9 +515,16 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &JS_MAX_LINES,
     &JS_MAX_LINES_PER_FUNCTION,
     &JS_MAX_PARAMS,
+    &JS_COMPLEXITY,
+    &JS_MAX_DEPTH,
+    &REACT_COMPONENT_MAX_LINES,
+    &REACT_MAX_PROPS,
+    &REACT_MAX_JSX_DEPTH,
     &PY_MAX_LINES,
     &PY_MAX_LINES_PER_FUNCTION,
     &PY_MAX_PARAMS,
+    &PY_COMPLEXITY,
+    &PY_MAX_DEPTH,
     &no_undef::NoUndef,
     &literals::NoUnexpectedMultiline,
     &no_unreachable::NoUnreachable,
@@ -689,6 +712,7 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &stencil::StrictMutable,
     &stencil::TagPrefix,
     &data_toml::DepsSorted,
+    &codeowners::CodeownersCoverage,
     &deps::OutdatedDependency,
     &deps::StaleDepsSnapshot,
     &data_toml::NoDuplicateKeys,

@@ -426,11 +426,13 @@ fn header_path(line: &str) -> Option<String> {
         t.strip_prefix('#')?
     };
     let p = inner.trim();
-    if p.is_empty() || p.contains(char::is_whitespace) || !p.contains('.') {
+    // A plain-text config file (`CODEOWNERS`) is a file of a multi-file snippet too.
+    let text_config = codelaw_core::is_text_config(p);
+    if p.is_empty() || p.contains(char::is_whitespace) || (!p.contains('.') && !text_config) {
         return None;
     }
     let name = p.rsplit('/').next().unwrap_or(p);
-    let known = Language::from_path(std::path::Path::new(p)).is_some() || matches!(name, "setup.py" | "setup.cfg");
+    let known = Language::from_path(std::path::Path::new(p)).is_some() || matches!(name, "setup.py" | "setup.cfg") || text_config;
     known.then(|| p.to_owned())
 }
 

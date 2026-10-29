@@ -32,6 +32,8 @@ pub(crate) enum Question {
     IsDir(String),
     Read(String),
     List(String),
+    /// The project's whole file list.
+    Files,
     /// The as-of date (L5 decision 2).
     AsOf,
 }
@@ -121,6 +123,7 @@ fn answer(root: &Path, tree: Tree<'_>, q: &Question, as_of: &dyn Fn() -> Option<
         Question::IsDir(p) => hash_bool(is_dir(root, tree, p)),
         Question::Read(p) => hash_text(&read(root, tree, p)),
         Question::List(p) => hash_list(&list(root, tree, p)),
+        Question::Files => hash_list(&Some(project_files(root, tree))),
     }
 }
 
@@ -168,6 +171,17 @@ fn read(root: &Path, tree: Tree<'_>, path: &str) -> Option<String> {
     }
 }
 
+fn project_files(root: &Path, tree: Tree<'_>) -> Vec<String> {
+    match tree {
+        Tree::Disk => crate::discover::walk_files(root),
+        Tree::Memory(files) => {
+            let mut v: Vec<String> = files.iter().map(|(p, _, _)| p.clone()).collect();
+            v.sort();
+            v
+        }
+    }
+}
+
 fn list(root: &Path, tree: Tree<'_>, path: &str) -> Option<Vec<String>> {
     if !safe(path) || !is_dir(root, tree, path) {
         return None;
@@ -210,6 +224,11 @@ impl FileContext for ProjectFile<'_> {
         let a = list(self.root, self.tree, path);
         self.record(Question::List(path.to_owned()), hash_list(&a));
         a
+    }
+    fn project_files(&self) -> Option<Vec<String>> {
+        let files = project_files(self.root, self.tree);
+        self.record(Question::Files, hash_list(&Some(files.clone())));
+        Some(files)
     }
     fn as_of(&self) -> Option<String> {
         let a = self.as_of.and_then(|f| f());

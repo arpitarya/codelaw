@@ -219,6 +219,8 @@ Six rules cap how big a file, a function and a parameter list may grow, for Java
 | `js/max-lines` · `py/max-lines` | lines per file | 300 / 1000 |
 | `js/max-lines-per-function` · `py/max-lines-per-function` | lines per function | 50 / 50 |
 | `js/max-params` · `py/max-params` | parameters per function | 3 / 5 |
+| `js/complexity` · `py/complexity` | cyclomatic complexity of a function (branches plus one) | 20 / 20 |
+| `js/max-depth` · `py/max-depth` | blocks nested inside one another in a function | 4 / 4 |
 
 ```toml
 extends = ["codelaw:js/size", "codelaw:py/size"]

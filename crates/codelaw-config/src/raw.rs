@@ -70,6 +70,10 @@ pub struct RawConfig {
     /// SR-PROJECT-GRAPH decision 8 (W-63): CSS Modules. Root config only.
     #[serde(default)]
     pub css: RawCss,
+    /// SR-RULE-PACKS decision 16 (W-132): `data/codeowners-coverage`. Root
+    /// config only.
+    #[serde(default)]
+    pub codeowners: RawCodeowners,
     /// SR-SPELL decision 7 (W-103): the spell pack's locale and accepted
     /// words. Root config only.
     #[serde(default)]
@@ -277,6 +281,25 @@ pub struct RawCoverageIgnore {
     pub require_on_touch: Option<bool>,
     pub on_touch: Option<String>,
     pub on_touch_scope: Option<String>,
+}
+
+/// `[codeowners]`: where CODEOWNERS is and what it may leave out. The
+/// `data/codeowners-coverage` rule reads it as its options, so it
+/// serialises to the JSON the rule reads.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawCodeowners {
+    /// The CODEOWNERS file, from the project root; by default the first of
+    /// `.github/CODEOWNERS`, `CODEOWNERS`, `docs/CODEOWNERS` and
+    /// `.gitlab/CODEOWNERS` that exists.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+    /// A pattern that names no owner is meant (default `false`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_unowned: Option<bool>,
+    /// Gitignore-style patterns of paths that need no owner.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ignore: Option<Vec<String>>,
 }
 
 /// `[css]`: which stylesheets are CSS Modules, and how the bundler maps class

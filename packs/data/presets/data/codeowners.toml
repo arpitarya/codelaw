@@ -1,0 +1,4 @@
+description = "CODEOWNERS coverage: every file has an owner, every pattern is live; opt in"
+
+[rules]
+"data/codeowners-coverage" = "warn"

@@ -373,6 +373,29 @@
         }
       }
     },
+    "codeowners": {
+      "x-codelaw-record": "SR-RULE-PACKS",
+      "description": "CODEOWNERS coverage (SR-RULE-PACKS decision 16): where the file is and what it may leave out. Read by `data/codeowners-coverage`. Root config only.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "The CODEOWNERS file, from the project root. By default the first of `.github/CODEOWNERS`, `CODEOWNERS`, `docs/CODEOWNERS` and `.gitlab/CODEOWNERS` that exists; a path set here that cannot be read is a finding.",
+          "type": "string"
+        },
+        "allow_unowned": {
+          "description": "A pattern that names no owner is meant (it takes a path out of ownership on purpose), so `data/codeowners-coverage` does not report it.",
+          "type": "boolean",
+          "default": false
+        },
+        "ignore": {
+          "description": "Gitignore-style patterns of paths that need no owner, such as `*.lock`; `data/codeowners-coverage` does not list them as unowned.",
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
     "spell": {
       "x-codelaw-record": "SR-SPELL",
       "description": "The spell pack's options (SR-SPELL decision 7): the locale whose spellings are right, and the words the project accepts, inline and in a words file. Read by the `spell/*` rules. Root config only.",

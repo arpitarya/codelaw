@@ -3,11 +3,13 @@
 
 [findings]
 "graph/no-unused-exports" = 117
+"js/complexity" = 1
 "js/constructor-super" = 0
 "js/exports-at-end" = 436
 "js/for-direction" = 0
 "js/getter-return" = 0
 "js/import-groups" = 76
+"js/max-depth" = 15
 "js/max-lines" = 23
 "js/max-lines-per-function" = 177
 "js/max-params" = 7

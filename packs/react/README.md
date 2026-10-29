@@ -18,6 +18,7 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 |---|---|---|
 | `react/recommended` | 29 | eslint-plugin-react 7.37.5 `recommended` + `jsx-runtime` (17 of its 20 active rules); eslint-plugin-react-hooks 7.1.1's `rules-of-hooks`, `exhaustive-deps` and 8 of the 14 React Compiler rules its `recommended` turns on; and 2 of @eslint-react 5.28.8's hooks rules (`no-unnecessary-use-prefix`, the lazy-initialisation part of `use-state`), at `warn` as there |
 | `react/conventions` | 2 | codelaw's starter catalogue: `react/hook-prefix`, `react/props-type-name` — opt in |
+| `react/size` | 3 | Component size: lines per component, props per component and JSX nesting depth; opt in |
 
 <!-- /docs-sync:presets -->
 

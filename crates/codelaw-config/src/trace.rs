@@ -328,6 +328,13 @@ impl Config {
         push("tests.skip.ticket_pattern", v, s);
         let (v, s) = root_key(&["tests", "skip", "warn_days"], |r| r.tests.skip.warn_days.map(|x| json!(x)), json!(14));
         push("tests.skip.warn_days", v, s);
+        // `[codeowners]` (SR-RULE-PACKS decision 16).
+        let (v, s) = root_key(&["codeowners", "path"], |r| r.codeowners.path.as_ref().map(|x| json!(x)), serde_json::Value::Null);
+        push("codeowners.path", v, s);
+        let (v, s) = root_key(&["codeowners", "allow_unowned"], |r| r.codeowners.allow_unowned.map(|x| json!(x)), json!(false));
+        push("codeowners.allow_unowned", v, s);
+        let (v, s) = root_key(&["codeowners", "ignore"], |r| r.codeowners.ignore.as_ref().and_then(|x| serde_json::to_value(x).ok()), json!([]));
+        push("codeowners.ignore", v, s);
         // `[spell]` (SR-SPELL decision 7).
         let (v, s) = root_key(&["spell", "locale"], |r| r.spell.locale.as_ref().map(|x| json!(x)), serde_json::Value::Null);
         push("spell.locale", v, s);

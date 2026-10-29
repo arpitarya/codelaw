@@ -102,6 +102,29 @@ fn error_path(e: &ignore::Error) -> Option<PathBuf> {
     }
 }
 
+/// Every file under the project root, whatever its type, that the ignore
+/// files and the default excludes leave in: project-relative, `/`-separated,
+/// sorted. A rule that asks which files a project has (`data/codeowners-coverage`)
+/// reads it through `FileContext::project_files`.
+pub(crate) fn walk_files(root: &Path) -> Vec<String> {
+    let above = ancestor_ignores(root);
+    let root_for_filter = root.to_path_buf();
+    let mut b = WalkBuilder::new(root);
+    b.hidden(false)
+        .git_ignore(true)
+        .git_exclude(true)
+        .git_global(false)
+        .ignore(true)
+        .parents(false)
+        .require_git(false)
+        .follow_links(false)
+        .sort_by_file_path(|a, b| a.cmp(b))
+        .filter_entry(move |e| !excluded_by_default(e.path(), &root_for_filter) && !ignored_by(&above, e.path(), e.file_type().is_some_and(|t| t.is_dir())));
+    let mut out: Vec<String> = b.build().filter_map(Result::ok).filter(|e| e.file_type().is_some_and(|t| t.is_file())).map(|e| rel_path(e.path(), root)).collect();
+    out.sort();
+    out
+}
+
 /// The files to check, the files skipped before reading, and warnings.
 pub(crate) type Discovered = (Vec<FileEntry>, Vec<Skipped>, Vec<String>);
 

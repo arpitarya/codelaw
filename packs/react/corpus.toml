@@ -2,6 +2,7 @@
 # Rewrite with --update-snapshot, and review the change.
 
 [findings]
+"react/component-max-lines" = 0
 "react/display-name" = 0
 "react/error-boundaries" = 0
 "react/exhaustive-deps" = 0
@@ -12,6 +13,8 @@
 "react/jsx-no-duplicate-props" = 0
 "react/jsx-no-target-blank" = 0
 "react/jsx-no-undef" = 0
+"react/max-jsx-depth" = 60
+"react/max-props" = 0
 "react/no-children-prop" = 1
 "react/no-context" = 10
 "react/no-danger-with-children" = 0

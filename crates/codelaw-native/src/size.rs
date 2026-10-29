@@ -29,6 +29,16 @@ pub enum Measure {
     FileLines,
     FunctionLines,
     Params,
+    /// Cyclomatic complexity of a function (W-132).
+    Complexity,
+    /// How deeply blocks nest in a function (W-132).
+    Depth,
+    /// Lines of a React component (W-132).
+    ComponentLines,
+    /// Props a React component takes (W-132).
+    Props,
+    /// How deeply JSX elements nest (W-132).
+    JsxDepth,
 }
 
 pub struct Size {
@@ -45,6 +55,10 @@ impl Size {
             _ => &["program"],
         };
         Size { id, py: false, measure, kinds }
+    }
+    /// A React rule: JS and TS files, a measure of a component (W-132).
+    pub const fn react(id: &'static str, measure: Measure) -> Size {
+        Size { id, py: false, measure, kinds: &["program"] }
     }
     pub const fn py(id: &'static str, measure: Measure) -> Size {
         let kinds = match measure {
@@ -89,6 +103,11 @@ impl NativeRule for Size {
             Measure::FileLines if root => file_lines(self, n, ctx, out),
             Measure::FunctionLines if root => function_lines(self, n, ctx, out),
             Measure::Params if !root => params(self, n, ctx, out),
+            Measure::Complexity if root => complexity(self, n, ctx, out),
+            Measure::Depth if root => depth(self, n, ctx, out),
+            Measure::ComponentLines if root => component_lines(n, ctx, out),
+            Measure::Props if root => component_props(n, ctx, out),
+            Measure::JsxDepth if root => jsx_depth(n, ctx, out),
             _ => {}
         }
     }
@@ -97,7 +116,10 @@ impl NativeRule for Size {
     fn data_of(&self, finding: &NativeFinding, _options: &BTreeMap<String, Value>) -> Option<Value> {
         let (head, tail) = finding.message.rsplit_once(" (max ")?;
         let max: u64 = tail.chars().take_while(char::is_ascii_digit).collect::<String>().parse().ok()?;
-        let (rest, key) = [(" positional parameters", "positional"), (" parameters", "parameters"), (" parameter", "parameters"), (" lines", "lines"), (" line", "lines")]
+        if let Some((_, n)) = head.split_once(" has a complexity of ") {
+            return Some(json!({ "complexity": n.parse::<u64>().ok()?, "max": max }));
+        }
+        let (rest, key) = [(" positional parameters", "positional"), (" parameters", "parameters"), (" parameter", "parameters"), (" deep", "depth"), (" props", "props"), (" prop", "props"), (" lines", "lines"), (" line", "lines")]
             .iter()
             .find_map(|(suffix, key)| head.strip_suffix(suffix).map(|r| (r, *key)))?;
         let digits: String = rest.chars().rev().take_while(char::is_ascii_digit).collect::<Vec<_>>().into_iter().rev().collect();
@@ -503,6 +525,328 @@ fn nested_rows(n: Node<'_>, py: bool, iife: bool, first: usize, last: usize) -> 
     merged
 }
 
+// ---- complexity (W-132) ----
+
+/// Whether `n` adds a branch to a function's cyclomatic complexity.
+fn is_branch(n: Node<'_>, py: bool, src: &str, count_optional_chain: bool) -> bool {
+    let kind = n.kind();
+    if py {
+        return match kind {
+            "if_statement" | "elif_clause" | "for_statement" | "while_statement" | "except_clause" | "except_group_clause" | "conditional_expression" | "boolean_operator" | "for_in_clause" | "if_clause" => true,
+            // `case _:` is the fall-through, as `default:` is.
+            "case_clause" => n.named_child(0).is_none_or(|p| text(p, src).trim() != "_"),
+            _ => false,
+        };
+    }
+    match kind {
+        "if_statement" | "ternary_expression" | "for_statement" | "for_in_statement" | "while_statement" | "do_statement" | "switch_case" | "catch_clause" => true,
+        "binary_expression" => n.child_by_field_name("operator").is_some_and(|o| matches!(o.kind(), "&&" | "||" | "??")),
+        "augmented_assignment_expression" => n.child_by_field_name("operator").is_some_and(|o| matches!(o.kind(), "&&=" | "||=" | "??=")),
+        "optional_chain" => count_optional_chain,
+        _ => false,
+    }
+}
+
+/// The nodes of function `f` that are not inside a function nested in it.
+fn own_nodes<'t>(f: Node<'t>, py: bool) -> Vec<Node<'t>> {
+    let mut out = Vec::new();
+    let mut cur = f.walk();
+    let mut stack: Vec<Node<'t>> = f.children(&mut cur).collect();
+    while let Some(x) = stack.pop() {
+        if is_function(x.kind(), py) {
+            continue;
+        }
+        out.push(x);
+        let mut c = x.walk();
+        stack.extend(x.children(&mut c).collect::<Vec<_>>());
+    }
+    out
+}
+
+fn complexity(rule: &Size, root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+    let o = ctx.options;
+    let max = uint(o, "max", 20);
+    let optional = flag(o, "count_optional_chain", false);
+    let mut stack = vec![root];
+    while let Some(n) = stack.pop() {
+        if is_function(n.kind(), rule.py) {
+            let (name_node, name) = name_of(n, ctx.source);
+            let exempt = name.as_deref().is_some_and(|s| name_matches(o, "ignore_names", s));
+            if !exempt {
+                let count = 1 + own_nodes(n, rule.py).into_iter().filter(|x| is_branch(*x, rule.py, ctx.source, optional)).count();
+                if count > max {
+                    let (start, end) = function_span(n, name_node, ctx.source);
+                    let who = name.map_or_else(|| "Anonymous function".to_owned(), |s| format!("`{s}`"));
+                    out.push(NativeFinding { start, end, message: format!("{who} has a complexity of {count} (max {max})"), edits: Vec::new() });
+                }
+            }
+        }
+        if n.child_count() > 0 {
+            let mut cur = n.walk();
+            let kids: Vec<Node<'_>> = n.children(&mut cur).collect();
+            stack.extend(kids.into_iter().rev());
+        }
+    }
+}
+
+// ---- max-depth (W-132) ----
+
+/// Whether a statement opens a block that counts toward nesting. `else if`
+/// continues its chain and adds none.
+fn is_depth_block(n: Node<'_>, py: bool) -> bool {
+    match n.kind() {
+        "if_statement" => !n.parent().is_some_and(|p| p.kind() == "else_clause"),
+        "for_statement" | "while_statement" | "try_statement" | "with_statement" => true,
+        "switch_statement" | "for_in_statement" | "do_statement" => !py,
+        "match_statement" => py,
+        _ => false,
+    }
+}
+
+fn depth_walk(n: Node<'_>, level: usize, max: usize, rule: &Size, src: &str, out: &mut Vec<NativeFinding>) {
+    let mut cur = n.walk();
+    let kids: Vec<Node<'_>> = n.children(&mut cur).collect();
+    for c in kids {
+        if is_function(c.kind(), rule.py) {
+            continue;
+        }
+        let mut next = level;
+        if is_depth_block(c, rule.py) {
+            next += 1;
+            if next > max {
+                let (start, end) = function_span(c, None, src);
+                out.push(NativeFinding { start, end, message: format!("Blocks are nested {next} deep (max {max})"), edits: Vec::new() });
+            }
+        }
+        depth_walk(c, next, max, rule, src, out);
+    }
+}
+
+fn depth(rule: &Size, root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+    let max = uint(ctx.options, "max", 4);
+    // The file's own statements and every function start at depth 0.
+    depth_walk(root, 0, max, rule, ctx.source, out);
+    let mut stack = vec![root];
+    while let Some(n) = stack.pop() {
+        if n.id() != root.id() && is_function(n.kind(), rule.py) {
+            depth_walk(n, 0, max, rule, ctx.source, out);
+        }
+        if n.child_count() > 0 {
+            let mut cur = n.walk();
+            let kids: Vec<Node<'_>> = n.children(&mut cur).collect();
+            stack.extend(kids.into_iter().rev());
+        }
+    }
+}
+
+// ---- React components (W-132) ----
+
+/// A React component: a function whose name starts with a capital letter
+/// and that holds JSX (also when wrapped in `memo` or `forwardRef`), or a
+/// class that extends `Component` or `PureComponent`. The node, the node
+/// that names it and the name.
+struct Component<'t> {
+    node: Node<'t>,
+    name_node: Option<Node<'t>>,
+    name: String,
+}
+
+fn holds_jsx(f: Node<'_>) -> bool {
+    own_nodes(f, false).into_iter().any(|x| matches!(x.kind(), "jsx_element" | "jsx_self_closing_element" | "jsx_fragment"))
+}
+
+/// The name a function component goes by: its own, or the variable it is
+/// assigned to, looking through `memo(…)` and `forwardRef(…)`.
+fn component_name<'t>(f: Node<'t>, src: &str) -> Option<(Option<Node<'t>>, String)> {
+    if let Some(n) = f.child_by_field_name("name") {
+        return Some((Some(n), text(n, src).to_owned()));
+    }
+    let mut cur = f;
+    while let Some(p) = cur.parent() {
+        match p.kind() {
+            "arguments" => {
+                let call = p.parent()?;
+                let callee = call.child_by_field_name("function").map_or("", |c| text(c, src));
+                if !(callee.ends_with("memo") || callee.ends_with("forwardRef")) {
+                    return None;
+                }
+                cur = call;
+            }
+            "parenthesized_expression" | "as_expression" | "satisfies_expression" => cur = p,
+            "variable_declarator" => {
+                let n = p.child_by_field_name("name").filter(|c| c.kind() == "identifier")?;
+                return Some((Some(n), text(n, src).to_owned()));
+            }
+            _ => return None,
+        }
+    }
+    None
+}
+
+fn components<'t>(root: Node<'t>, src: &str) -> Vec<Component<'t>> {
+    let mut out = Vec::new();
+    let mut stack = vec![root];
+    while let Some(n) = stack.pop() {
+        match n.kind() {
+            "function_declaration" | "function_expression" | "arrow_function" => {
+                if let Some((name_node, name)) = component_name(n, src).filter(|(_, s)| crate::react::is_component_name(s))
+                    && holds_jsx(n)
+                {
+                    out.push(Component { node: n, name_node, name });
+                }
+            }
+            "class_declaration" | "class" if crate::react::is_component_class(n, src) => {
+                if let Some(name_node) = n.child_by_field_name("name") {
+                    out.push(Component { node: n, name_node: Some(name_node), name: text(name_node, src).to_owned() });
+                }
+            }
+            _ => {}
+        }
+        if n.child_count() > 0 {
+            let mut cur = n.walk();
+            let kids: Vec<Node<'_>> = n.children(&mut cur).collect();
+            stack.extend(kids.into_iter().rev());
+        }
+    }
+    out.sort_by_key(|c| c.node.start_byte());
+    out
+}
+
+fn component_lines(root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+    let o = ctx.options;
+    let max = uint(o, "max", 200);
+    let skips = Skips::read(o, false);
+    let m = Measured::new(root, ctx.source, false, &skips);
+    let note = skips.note();
+    let note = if note.is_empty() { String::new() } else { format!("; {note}") };
+    for c in components(root, ctx.source) {
+        if name_matches(o, "ignore_names", &c.name) {
+            continue;
+        }
+        let (first, last) = rows(c.node);
+        let count = m.rows(first, last);
+        if count > max {
+            let (start, end) = function_span(c.node, c.name_node, ctx.source);
+            out.push(NativeFinding { start, end, message: format!("Component `{}` is {count} lines (max {max}{note})", c.name), edits: Vec::new() });
+        }
+    }
+}
+
+/// Members of an object type or an interface body.
+fn type_members(body: Node<'_>) -> usize {
+    let mut cur = body.walk();
+    body.named_children(&mut cur).filter(|c| matches!(c.kind(), "property_signature" | "method_signature")).count()
+}
+
+/// The members of the type named `name`, declared in this file.
+fn declared_members(root: Node<'_>, name: &str, src: &str) -> usize {
+    let mut best = 0;
+    let mut stack = vec![root];
+    while let Some(n) = stack.pop() {
+        match n.kind() {
+            "interface_declaration" | "type_alias_declaration" if n.child_by_field_name("name").is_some_and(|x| text(x, src) == name) => {
+                let body = n.child_by_field_name("body").or_else(|| n.child_by_field_name("value"));
+                if let Some(b) = body.filter(|b| matches!(b.kind(), "object_type" | "interface_body")) {
+                    best = best.max(type_members(b));
+                }
+            }
+            "program" | "export_statement" => {
+                let mut cur = n.walk();
+                stack.extend(n.named_children(&mut cur).collect::<Vec<_>>());
+            }
+            _ => {}
+        }
+    }
+    best
+}
+
+/// How many props a component's first parameter names: the larger of the
+/// keys it destructures and the members of its declared type.
+fn prop_count(f: Node<'_>, root: Node<'_>, src: &str) -> usize {
+    let param = match f.child_by_field_name("parameters") {
+        Some(ps) => {
+            let mut cur = ps.walk();
+            ps.named_children(&mut cur).find(|c| c.kind() != "comment")
+        }
+        None => f.child_by_field_name("parameter"),
+    };
+    let Some(param) = param else { return 0 };
+    let pattern = if matches!(param.kind(), "required_parameter" | "optional_parameter") { param.child_by_field_name("pattern").unwrap_or(param) } else { param };
+    let pattern = if pattern.kind() == "assignment_pattern" { pattern.child_by_field_name("left").unwrap_or(pattern) } else { pattern };
+    let mut destructured = 0;
+    if pattern.kind() == "object_pattern" {
+        let mut cur = pattern.walk();
+        destructured = pattern.named_children(&mut cur).filter(|c| matches!(c.kind(), "shorthand_property_identifier_pattern" | "pair_pattern" | "object_assignment_pattern")).count();
+    }
+    let mut declared = 0;
+    if let Some(ty) = param.child_by_field_name("type") {
+        let mut cur = ty.walk();
+        if let Some(inner) = ty.named_children(&mut cur).next() {
+            declared = match inner.kind() {
+                "object_type" => type_members(inner),
+                "type_identifier" => declared_members(root, text(inner, src), src),
+                _ => 0,
+            };
+        }
+    }
+    destructured.max(declared)
+}
+
+fn component_props(root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+    let o = ctx.options;
+    let max = uint(o, "max", 8);
+    for c in components(root, ctx.source) {
+        if c.node.kind().starts_with("class") || name_matches(o, "ignore_names", &c.name) {
+            continue;
+        }
+        let count = prop_count(c.node, root, ctx.source);
+        if count > max {
+            let (start, end) = function_span(c.node, c.name_node, ctx.source);
+            let noun = if count == 1 { "prop" } else { "props" };
+            out.push(NativeFinding { start, end, message: format!("Component `{}` takes {count} {noun} (max {max})", c.name), edits: Vec::new() });
+        }
+    }
+}
+
+fn is_jsx(kind: &str) -> bool {
+    matches!(kind, "jsx_element" | "jsx_fragment" | "jsx_self_closing_element")
+}
+
+/// The deepest JSX nesting at or below `n`, counting `n` as `level`.
+fn deepest_jsx(n: Node<'_>, level: usize) -> usize {
+    let mut best = level;
+    let mut cur = n.walk();
+    for c in n.children(&mut cur) {
+        let l = if is_jsx(c.kind()) { level + 1 } else { level };
+        best = best.max(deepest_jsx(c, l));
+    }
+    best
+}
+
+fn jsx_depth(root: Node<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
+    let max = uint(ctx.options, "max", 6);
+    // Nesting is counted through any `{…}` between elements. The first
+    // element past `max` is reported, with how deep its own branch goes.
+    let mut stack: Vec<(Node<'_>, usize)> = vec![(root, 0)];
+    while let Some((n, level)) = stack.pop() {
+        let mut here = level;
+        if is_jsx(n.kind()) {
+            here += 1;
+            if here == max + 1 {
+                let deepest = deepest_jsx(n, here);
+                let (start, end) = function_span(n, None, ctx.source);
+                out.push(NativeFinding { start, end, message: format!("JSX is nested {deepest} deep (max {max})"), edits: Vec::new() });
+                continue;
+            }
+        }
+        if n.child_count() > 0 {
+            let mut cur = n.walk();
+            let kids: Vec<Node<'_>> = n.children(&mut cur).collect();
+            stack.extend(kids.into_iter().rev().map(|k| (k, here)));
+        }
+    }
+}
+
 // ---- parameters ----
 
 /// One parameter, seen the same way in JS, TS and Python.
@@ -836,8 +1180,91 @@ mod tests {
         assert_eq!(f.len(), 2);
     }
 
+    const JS_CX: Size = Size::js("js/complexity", Measure::Complexity);
+    const REACT_LINES: Size = Size::react("react/component-max-lines", Measure::ComponentLines);
+    const REACT_PROPS: Size = Size::react("react/max-props", Measure::Props);
+    const REACT_JSX: Size = Size::react("react/max-jsx-depth", Measure::JsxDepth);
+    const PY_CX: Size = Size::py("py/complexity", Measure::Complexity);
+    const JS_DEPTH: Size = Size::js("js/max-depth", Measure::Depth);
+    const PY_DEPTH: Size = Size::py("py/max-depth", Measure::Depth);
+
+    #[test]
+    fn js_complexity_counts_branches_not_nested_functions() {
+        let src = "function f(a, b) {\n  if (a && b || a) { return 1; }\n  for (const x of a) { while (x) { x = a ?? b; } }\n  switch (a) { case 1: break; case 2: break; default: break; }\n  try { a(); } catch (e) { b(); }\n  const g = () => { if (a) { b(); } };\n  return a ? 1 : 2;\n}\n";
+        // 1 + if + && + || + for + while + ?? + 2 cases + catch + ternary = 11
+        let f = js(&JS_CX, src, json!({ "max": 10 }));
+        assert_eq!(messages(&f), ["`f` has a complexity of 11 (max 10)"]);
+        assert!(js(&JS_CX, src, json!({ "max": 11 })).is_empty());
+        let f = js(&JS_CX, src, json!({ "max": 1, "ignore_names": "^f$" }));
+        assert_eq!(messages(&f), ["`g` has a complexity of 2 (max 1)"]);
+        let chain = "function f(a) { return a?.b?.c; }";
+        assert!(js(&JS_CX, chain, json!({ "max": 1 })).is_empty());
+        assert_eq!(messages(&js(&JS_CX, chain, json!({ "max": 1, "count_optional_chain": true }))), ["`f` has a complexity of 3 (max 1)"]);
+        let assign = "function f(a) { a ||= 1; a &&= 2; a ??= 3; }";
+        assert_eq!(messages(&js(&JS_CX, assign, json!({ "max": 1 }))), ["`f` has a complexity of 4 (max 1)"]);
+    }
+
+    #[test]
+    fn python_complexity() {
+        let src = "def f(a, b):\n    if a and b or a:\n        pass\n    elif b:\n        pass\n    for x in a:\n        while x:\n            pass\n    try:\n        pass\n    except E:\n        pass\n    y = [i for i in a if i]\n    z = 1 if a else 2\n    match a:\n        case 1:\n            pass\n        case _:\n            pass\n    def g():\n        if a:\n            pass\n";
+        // 1 + if + and + or + elif + for + while + except + for_in + if_clause + ternary + case 1 = 12
+        let f = py(&PY_CX, src, json!({ "max": 11 }));
+        assert_eq!(messages(&f), ["`f` has a complexity of 12 (max 11)"]);
+        assert!(py(&PY_CX, src, json!({ "max": 12 })).is_empty());
+    }
+
+    #[test]
+    fn react_component_lines() {
+        let src = "const Big = () => {\n  const a = 1;\n  const b = 2;\n  return <div>{a}{b}</div>;\n};\nfunction helper() {\n  const a = 1;\n  const b = 2;\n  const c = 3;\n  return a + b + c;\n}\nconst Wrapped = memo(forwardRef((p, r) => {\n  const a = 1;\n  const b = 2;\n  return <i ref={r} />;\n}));\nclass K extends React.Component {\n  render() {\n    const a = 1;\n    return <b />;\n  }\n}\n";
+        let f = run(&REACT_LINES, Language::Jsx, "a.jsx", src, json!({ "max": 4 }));
+        assert_eq!(messages(&f), ["Component `Big` is 5 lines (max 4; blank lines and comments not counted)", "Component `Wrapped` is 5 lines (max 4; blank lines and comments not counted)", "Component `K` is 6 lines (max 4; blank lines and comments not counted)"]);
+        let f = run(&REACT_LINES, Language::Jsx, "a.jsx", src, json!({ "max": 4, "ignore_names": "^(Big|K)$" }));
+        assert_eq!(f.len(), 1);
+    }
+
+    #[test]
+    fn react_props() {
+        let src = "function A({ a, b, c = 1, d: e, ...rest }) { return <i />; }\ninterface BProps { a: string; b: number; onX(): void }\nconst B = (props: BProps) => <b />;\nconst C = ({ a }: { a: 1; b: 2; c: 3; d: 4 }) => <b />;\nfunction notAComponent({ a, b, c, d }) { return 1; }\n";
+        let tsx = |o: Value| run(&REACT_PROPS, Language::Tsx, "a.tsx", src, o);
+        assert_eq!(messages(&tsx(json!({ "max": 3 }))), ["Component `A` takes 4 props (max 3)", "Component `C` takes 4 props (max 3)"]);
+        assert_eq!(messages(&tsx(json!({ "max": 2 }))), ["Component `A` takes 4 props (max 2)", "Component `B` takes 3 props (max 2)", "Component `C` takes 4 props (max 2)"]);
+    }
+
+    #[test]
+    fn react_jsx_depth() {
+        let src = "const A = () => (\n  <a>\n    <b>\n      {xs.map((x) => (\n        <c>\n          <d />\n          <e><f /></e>\n        </c>\n      ))}\n    </b>\n  </a>\n);\n";
+        let f = run(&REACT_JSX, Language::Jsx, "a.jsx", src, json!({ "max": 2 }));
+        assert_eq!(messages(&f), ["JSX is nested 5 deep (max 2)"]);
+        assert_eq!(&src[f[0].start..f[0].end], "<c>");
+        assert!(run(&REACT_JSX, Language::Jsx, "a.jsx", src, json!({ "max": 5 })).is_empty());
+    }
+
+    #[test]
+    fn js_depth() {
+        let src = "function f(a) {\n  if (a) {\n    for (;;) {\n      while (a) {\n        if (a) {\n          try { a(); } catch (e) {}\n        } else if (a) { a(); }\n      }\n    }\n  }\n}\n";
+        let f = js(&JS_DEPTH, src, json!({ "max": 3 }));
+        assert_eq!(messages(&f), ["Blocks are nested 4 deep (max 3)", "Blocks are nested 5 deep (max 3)"]);
+        assert_eq!(&src[f[0].start..f[0].end], "if (a) {");
+        assert!(js(&JS_DEPTH, src, json!({ "max": 5 })).is_empty());
+        // a function resets the count
+        let nested = "if (a) { if (b) { const f = () => { if (c) { if (d) {} } }; } }";
+        assert!(js(&JS_DEPTH, nested, json!({ "max": 2 })).is_empty());
+    }
+
+    #[test]
+    fn python_depth() {
+        let src = "def f(a):\n    if a:\n        for x in a:\n            with x:\n                if x:\n                    pass\n                elif a:\n                    pass\n";
+        let f = py(&PY_DEPTH, src, json!({ "max": 3 }));
+        assert_eq!(messages(&f), ["Blocks are nested 4 deep (max 3)"]);
+        assert!(py(&PY_DEPTH, src, json!({ "max": 4 })).is_empty());
+    }
+
     #[test]
     fn data_carries_the_value_and_the_limit() {
+        let f = NativeFinding { start: 0, end: 0, message: "`f` has a complexity of 24 (max 20)".into(), edits: Vec::new() };
+        assert_eq!(JS_CX.data_of(&f, &BTreeMap::new()), Some(json!({ "complexity": 24, "max": 20 })));
+        let f = NativeFinding { start: 0, end: 0, message: "Blocks are nested 5 deep (max 4)".into(), edits: Vec::new() };
+        assert_eq!(JS_DEPTH.data_of(&f, &BTreeMap::new()), Some(json!({ "depth": 5, "max": 4 })));
         let rule = &JS_FILE;
         let f = NativeFinding { start: 0, end: 0, message: "412 lines (max 300; blank lines and comments not counted)".into(), edits: Vec::new() };
         assert_eq!(rule.data_of(&f, &BTreeMap::new()), Some(json!({ "lines": 412, "max": 300 })));

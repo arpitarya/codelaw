@@ -560,7 +560,7 @@ pub const DEFAULT_EXCLUDES: &[&str] = &[".git", "node_modules", ".venv", ".codel
 /// Keys a nested config may not set yet; they belong to the root config.
 const ROOT_ONLY: &[&str] = &[
     "extends", "rules_dir", "preview", "allow_pack_fixers", "[files]", "[cache]", "[fix]", "[lint]", "[markdown]", "[daemon]", "[lsp]", "[profile]",
-    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]", "[todo]", "[tests]",
+    "[deps]", "[css]", "[coverage]", "[spell]", "[reviews]", "[todo]", "[tests]", "[codeowners]",
 ];
 
 fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
@@ -584,6 +584,7 @@ fn root_only_keys(raw: &RawConfig) -> Vec<&'static str> {
         raw.reviews != Default::default(),
         raw.todo != Default::default(),
         raw.tests != Default::default(),
+        raw.codeowners != Default::default(),
     ];
     ROOT_ONLY.iter().zip(set).filter(|(_, s)| *s).map(|(k, _)| *k).collect()
 }
@@ -824,6 +825,7 @@ impl Config {
             ("css", Some(r)) => serde_json::to_value(&r.css).ok(),
             ("todo", Some(r)) => serde_json::to_value(&r.todo).ok(),
             ("tests.skip", Some(r)) => serde_json::to_value(&r.tests.skip).ok(),
+            ("codeowners", Some(r)) => serde_json::to_value(&r.codeowners).ok(),
             // `[spell] words` and the words file are one list (W-112).
             ("spell", Some(r)) => serde_json::to_value(&r.spell).ok().map(|mut v| {
                 let file = self.files.first().map(|f| f.spell_file_words.as_slice()).unwrap_or_default();

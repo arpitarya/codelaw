@@ -1,6 +1,8 @@
-description = "Size limits: max lines per file, max lines per function and max parameters (ESLint's defaults); opt in"
+description = "Size limits: lines per file and function, parameters, complexity and nesting depth (ESLint's defaults); opt in"
 
 [rules]
 "js/max-lines" = "warn"
 "js/max-lines-per-function" = "warn"
 "js/max-params" = "warn"
+"js/complexity" = "warn"
+"js/max-depth" = "warn"

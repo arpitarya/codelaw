@@ -15,6 +15,7 @@
 "py/batched-without-explicit-strict" = 0
 "py/break-outside-loop" = 0
 "py/cached-instance-method" = 7
+"py/complexity" = 20
 "py/continue-outside-loop" = 0
 "py/default-except-not-last" = 0
 "py/duplicate-dict-key" = 0
@@ -45,6 +46,7 @@
 "py/late-future-import" = 0
 "py/loop-variable-overrides-iterator" = 0
 "py/map-without-explicit-strict" = 0
+"py/max-depth" = 58
 "py/max-lines" = 13
 "py/max-lines-per-function" = 91
 "py/max-params" = 134

@@ -1,0 +1,6 @@
+description = "Component size: lines per component, props per component and JSX nesting depth; opt in"
+
+[rules]
+"react/component-max-lines" = "warn"
+"react/max-props" = "warn"
+"react/max-jsx-depth" = "warn"
