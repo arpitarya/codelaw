@@ -35,9 +35,10 @@ Look for a rule whose `ported_from:` lists that id (also the same rule under
 its other names: a Ruff code for a Pylint symbol, `ruff/PLW0603` for
 `pylint/global-statement`; Biome's source for a Biome rule):
 
-1. **Installed rules:** MCP `list_rules` (CLI: `codelaw rules --format
-   json`). Each card carries `ported_from` when the rule has one; that is
-   every rule in the installed packs and the project's own `.codelaw/rules/`.
+1. **The rules this project loads:** MCP `list_rules` (CLI: `codelaw rules
+   --format json`). Each card carries `ported_from` when the rule has one.
+   That is every rule its presets and `[rules]` turn on, and the project's
+   own `.codelaw/rules/` — not a pack rule that is installed but off.
 2. **Every first-party rule, installed or not:** the catalogue
    `https://raw.githubusercontent.com/arpitarya/codelaw/main/docs/rules/rules.json`
    (each rule's `ported_from`, `packs`, `npm`, `pypi`, `presets`). Fetch it
