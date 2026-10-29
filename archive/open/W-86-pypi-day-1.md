@@ -18,7 +18,7 @@ ball: arpit
 |---|---|---|---|
 | 1 | `twine upload` the four 0.2.0 wheels already in `dist/pypi/` (built from the v0.2.0 tag, byte-identical to CI's) | `codelaw-rules-{html,js,python,react}` exist | ✅ 2026-10-28 — Arpit uploaded the four (`twine`; pypi.org lists each at 0.2.0) |
 | 2 | A trusted publisher on each of the four | CI can upload them | ✅ 2026-10-28 — Claude in Chrome added all four (`arpitarya` · `codelaw` · `publish.yml` · `pypi`); `codelaw`'s pending publisher still listed |
-| 3 | Publish the GitHub Release `v0.2.0` on W-37's tag (`08b7158`, CI green there) | CI creates `codelaw` on PyPI through its pending publisher, skips everything already uploaded, attaches the checksums | 🔴 moved to day 2 (2026-10-29): `codelaw` by hand from the v0.2.0 tag's CI `dist` — [W-87](W-87-pypi-day-2.md); the failed v0.2.0 Release (00:33) published nothing |
+| 3 | Publish the GitHub Release `v0.2.0` on W-37's tag (`08b7158`, CI green there) | CI creates `codelaw` on PyPI through its pending publisher, skips everything already uploaded, attaches the checksums | ✅ 2026-10-29 — `codelaw` 0.2.0 by hand on day 2 (W-87), trusted |
 
 **Arpit, 2026-10-29 (voice docket; written on *"file it."*):** offered this item's last step, the v0.2.0 Release: *"Let's do this. Let's publish version 0.3.0 for all the packages through CI/CD pipeline."* — told PyPI can take only the projects that exist: *"We can skip the one pending for pipe here. The ones for NPM, it is being built and it should be ready. In few minutes."* Read as: the Release is v0.3.0's ([W-116](W-116-release-0-3-0.md)), which creates `codelaw` on PyPI through its pending publisher; this item closes when it lands. **Flagged:** a Claude Code session (`c6c222e8`, 00:31) was on this item's v0.2.0 Release, held by the permission classifier.
 
@@ -31,6 +31,8 @@ ball: arpit
 **Found 2026-10-29 (Cowork):** the v0.2.0 Release exists (no assets) and its `publish` run failed at the gate step, before any registry was written; nothing is half-published. v0.3.0 (W-116) brings `codelaw` instead; the v0.2.0 Release can stay, or be deleted by hand — it publishes nothing.
 
 **Arpit, 2026-10-29 (text):** *"getting code law in itself into PyPy. I'm talking about W86. Is it part of PyPy Day 2? If not, make it a part of PyPy Day 2. Or can you go ahead and mark it as pending release? If you do, mark it as pending trusted publisher and then I push it from my local. Will that work for W86?"* — yes: `codelaw` 0.2.0 goes up by hand on **day 2** ([W-87](W-87-pypi-day-2.md)), from the v0.2.0 tag's CI `dist`; then its trusted publisher. This item closes when `codelaw` is on PyPI and trusted; v0.3.0 (W-116) no longer has to create it.
+
+**Done 2026-10-29 09:53 IST (Arpit):** `gh run download 40194930874 … -n dist`, every file `OK` against SHA256SUMS, *"law-gate: the engine is complete"*, then `twine upload` — `codelaw` 0.2.0 (eight platform wheels) and the `react`, `scss`, `python` Fux index wheels; pypi.org shows each at 0.2.0. **Correction, 10:05:** `codelaw` already existed — v0.3.0's `publish.yml` (2026-10-29 01:28 IST, run 40759085164) created it through its pending publisher, so day 2 back-filled 0.2.0 beside 0.3.0 and created **three** new projects, not four. **Trusted publishers, 09:59 (Claude in Chrome):** `codelaw`'s is the converted pending one; the three Fux index projects got theirs; all four read `arpitarya/codelaw` · `publish.yml` · `pypi`; no pending publisher is left. Closed.
 
 ## The command (repo root, on the Mac, not before Wed 2026-10-28)
 

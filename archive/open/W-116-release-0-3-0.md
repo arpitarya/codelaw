@@ -19,9 +19,9 @@ ball: agent
 | 1 | Records first: `publish.yml` skips a PyPI project that does not exist yet, naming it, instead of failing the job (L6 decision 9, SR-PACKAGES, RELEASING.md) | a release that never half-fails on a name PyPI lacks | ✅ |
 | 2 | `publish.yml`'s `pypi` job uploads only wheels whose project exists (or holds the pending publisher, `codelaw`); the skipped names are printed in the job summary | the change | ✅ |
 | 3 | npm: every name at 0.3.0 — the new spell pack's first version by hand first ([W-115](W-115-spell-pack-first-publish.md)), or the job skips it the same way | npm complete — every name is already on npm at 0.2.0, the spell pack included; nothing by hand | ✅ |
-| 4 | Bump to 0.3.0 (`scripts/version.py`), CHANGELOG's 0.3.0 section; `ci.yml` green on `main` | the release commit | ⏳ |
-| 5 | Arpit: `gh release create v0.3.0 …` (an inbox row with the exact command when step 4 is green) | CI publishes | ⏳ |
-| 6 | Check: npm shows every `@codelaw/*` at 0.3.0; PyPI shows `codelaw` (created through its pending publisher) and the six packs at 0.3.0 | the release, verified | ⏳ |
+| 4 | Bump to 0.3.0 (`scripts/version.py`), CHANGELOG's 0.3.0 section; `ci.yml` green on `main` | the release commit | ✅ 2026-10-29 — 0.3.0 from `457764c`, `ci.yml` green |
+| 5 | Arpit: `gh release create v0.3.0 …` (an inbox row with the exact command when step 4 is green) | CI publishes | ✅ 2026-10-29 01:28 IST — v0.3.0 released |
+| 6 | Check: npm shows every `@codelaw/*` at 0.3.0; PyPI shows `codelaw` (created through its pending publisher) and the six packs at 0.3.0 | the release, verified | ✅ 2026-10-29 10:05 — npm `codelaw` 0.3.0 (every name); PyPI `codelaw` 0.3.0 (created through its pending publisher) and the six packs 0.3.0 |
 
 **Arpit, 2026-10-29 (voice docket):** offered the v0.2.0 Release (W-86): *"Let's do this. Let's publish version 0.3.0 for all the packages through CI/CD pipeline."* Told CI can publish only what exists and trusts `publish.yml`: *"We can skip the one pending for pipe here. The ones for NPM, it is being built and it should be ready. In few minutes."* ("pipe here" is PyPI) — then *"Next."* to filing it.
 
@@ -33,6 +33,10 @@ ball: agent
 - **npm:** every name already published and trusted; `@codelaw/rules-spell` is new (W-115).
 
 **Changed 2026-10-29 01:17:** `codelaw` 0.2.0 now goes to PyPI by hand on day 2 (W-87, W-86), with a normal trusted publisher after; v0.3.0's CI uploads it as an existing project, not through the pending publisher.
+
+**2026-10-29 09:59:** `codelaw` is now on PyPI and trusted (W-86/W-87), and PyPI holds **no pending publisher** — the one slot for `arpitarya/codelaw` · `publish.yml` · `pypi` is free again, so one new project (e.g. `codelaw-rules-spell`) could be created by CI through it, if `publish.yml`'s skip rule allows a pending name.
+
+**Closed 2026-10-29 (Cowork, reconciling):** v0.3.0's `publish.yml` run 40759085164 — gate, trust, npm, pypi, attach green (IMPLEMENTATION, 2026-10-29). Its `vscode` job reached the Marketplace through trusted publishing but the upload was refused (HTTP 400, content type) — fixed on `main`; the extension goes on with [W-95](../../work/open/W-95-publish-vscode-extension.md). The DoD is met.
 
 ## Definition of done
 

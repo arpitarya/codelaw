@@ -1,8 +1,8 @@
 ---
 type: Handoff
-name: W-87
-description: "Arpit, 2026-10-27 (voice docket): PyPI day 2 of 4 — at most four new projects a day, one item per day, the command ready to paste."
-item: W-87
+name: W-88
+description: "Arpit, 2026-10-27 (voice docket): PyPI day 3 of 4 — at most four new projects a day, one item per day, the command ready to paste."
+item: W-88
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
@@ -10,32 +10,33 @@ updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
 
-# W-87 — PyPI day 2 (Thu 2026-10-29): four Fux index projects
+# W-88 — PyPI day 3 (Fri 2026-10-30): two Fux index projects, the skills package and the SCSS pack
 
 ## At a glance
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | `twine upload` **`codelaw` itself** (its eight 0.2.0 platform wheels, from the v0.2.0 tag's CI `dist`) and three 0.2.0 Fux index wheels | `codelaw`, `codelaw-rules-{react,scss,python}-fux-index` exist; `security-js`'s index moves to day 4 | 🔴 Arpit |
-| 2 | A trusted publisher on each | CI can upload them once W-34 teaches `publish.yml` | 🔴 Claude in Chrome, once Arpit is logged in to PyPI (ruled 2026-10-27) |
+| 1 | `twine upload` two 0.2.0 Fux index wheels from `dist/fux-index/pypi/` | `codelaw-rules-security-{html,python}-fux-index` exist | 🔴 Arpit |
+| 2 | `twine upload` `codelaw-skills` and `codelaw-rules-scss` at 0.2.0 — the version npm got (W-85, 2026-10-27) | both names exist | 🔴 Arpit |
+| 3 | A trusted publisher on each of the four | CI can upload them | 🔴 Claude in Chrome, once Arpit is logged in to PyPI (ruled 2026-10-27) |
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Yes."* — on running days 1–4 as filed, with Claude adding the trusted publishers through Chrome.
 
 **Arpit, 2026-10-27 (voice docket):** *"create work items, one work item to publish all NPM packages and then multiple work items, four packages a day but make sure all the packages are accounted in this."* Earlier: *"create a work item just for publishing four packages a day for PyPI … add the command in the OpenWork file so that I can just copy it and paste it every day … don't count today's day"*, and *"Include these SCSS and security packs as well."*
 
+**Version: 0.2.0**, the one npm got on 2026-10-27 (W-85). These are not in the v0.2.0 tag; take the wheels from the same local build npm was published from (`…/scratchpad/pub/dist/pypi/`), copied into `dist/pypi/` before the day — that scratch folder does not survive a reboot.
 
-**Arpit, 2026-10-29 (text):** *"getting code law in itself into PyPy. I'm talking about W86. Is it part of PyPy Day 2? If not, make it a part of PyPy Day 2. Or can you go ahead and mark it as pending release? If you do, mark it as pending trusted publisher and then I push it from my local. Will that work for W86?"* — `codelaw` joins day 2 (W-86), still four new projects: `security-js-fux-index` moves to day 4 (W-89). `codelaw`'s **pending** publisher does not reserve the name and does not stop an upload by its owner; once `codelaw` exists, Claude in Chrome adds its normal trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `pypi`) with the other three, and v0.3.0's CI uploads from then on. The wheels are CI's own (SHA256SUMS, law-gate), so PyPI's `codelaw` 0.2.0 equals npm's (L6).
-
-## The command (repo root, on the Mac, not before Thu 2026-10-29)
+## The command (repo root, on the Mac, not before Fri 2026-10-30)
 
 ```bash
-gh run download 40194930874 -R arpitarya/codelaw -n dist -D /tmp/v020-dist   # the v0.2.0 tag's CI build (08b7158, green); kept until 2026-11-24
-(cd /tmp/v020-dist && shasum -a 256 -c SHA256SUMS) && python3 scripts/law-gate.py /tmp/v020-dist
-twine upload --skip-existing /tmp/v020-dist/pypi/codelaw-0.2.0-*.whl \
-  dist/fux-index/pypi/codelaw_rules_{react,scss,python}_fux_index-0.2.0-py3-none-any.whl
+twine upload --skip-existing dist/fux-index/pypi/codelaw_rules_security_{html,python}_fux_index-0.2.0-py3-none-any.whl
+# the 0.2.0 wheels of the build npm was published from (2026-10-27), copied into dist/pypi/ first
+twine upload --skip-existing dist/pypi/codelaw_skills-0.2.0-py3-none-any.whl dist/pypi/codelaw_rules_scss-0.2.0-py3-none-any.whl
 ```
 
-**Merged 2026-10-29:** this day carries W-34's `react`, `scss`, `python` Fux index uploads (W-34 closed 2026-10-29).
+**Merged 2026-10-29:** this day carries W-34's `security-html`, `security-python` Fux index uploads and W-77's `codelaw-skills` (both closed 2026-10-29).
+
+**Closed 2026-10-29 — merged into [W-119](../../work/open/W-119-pypi-through-pending-publishers.md) (Arpit, voice):** *"That's all right. Let's go by that approach. Uh, let's create a work item remove all the existing publishing work items and we'll go with this approach."* Its PyPI projects are created through CI, one pending publisher at a time, instead of by `twine` within the four-a-day limit.
 
 ## Trusted publisher, per project
 
@@ -66,3 +67,4 @@ No SR affected.
 
 - PyPI answers **429** past four new projects in a day — wait a day; `--skip-existing` makes the retry safe.
 - A project with no trusted publisher refuses CI's token before "already exists" is checked, so the publisher goes on the same day as the upload.
+- `codelaw-skills` requires `codelaw==<v>`: until `codelaw` is on PyPI at `<v>`, installing the skills package fails (expected; W-77).

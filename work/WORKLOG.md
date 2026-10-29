@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — W-119 filed: PyPI through pending publishers; W-88, W-89, W-115 closed into it  ·  Cowork (Opus 5.5)
+
+- **Asked:** by voice, how to publish more than four new PyPI projects a day; then *"file it."*
+- **Done:** W-119 filed (a one-project `publish.yml` run, then the per-project loop; the ten PyPI projects listed with where each wheel is; what step 1 must solve — the ref and the `pypi` environment's tag rule, the `fux-index` artifact, the skip rule, one pending slot). W-88, W-89, W-115 archived; the day-3 and day-4 inbox rows removed. Not committed.
+- **Decided / left open:** ruled — CI creates the projects one pending publisher at a time; the npm spell index stays a separate step. Open for step 1: run from `main` (the `pypi` environment admits it) or a v0.3.1 tag.
+- **Mistakes:** none.
+- **Next:** an agent builds W-119 step 1; then the loop with Arpit.
+
 ## 2026-10-29 — W-38 executed and closed: PyPI checked as a user  ·  Claude Code (Sonnet 5.5)
 
 - **Asked:** *"execute W38 and test it out in a sibling repo. And then close it."*

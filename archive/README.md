@@ -28,6 +28,9 @@ Rules: [SR-WORK-ARCHIVE](../records/0057_WORK-archive.md).
 
 | file | closed | where the live answer lives now |
 |---|---|---|
+| [`W-115-spell-pack-first-publish.md`](open/W-115-spell-pack-first-publish.md) | 2026-10-29 | merged into [W-119](../work/open/W-119-pypi-through-pending-publishers.md) — PyPI projects created by CI through pending publishers |
+| [`W-89-pypi-day-4.md`](open/W-89-pypi-day-4.md) | 2026-10-29 | merged into [W-119](../work/open/W-119-pypi-through-pending-publishers.md) — PyPI projects created by CI through pending publishers |
+| [`W-88-pypi-day-3.md`](open/W-88-pypi-day-3.md) | 2026-10-29 | merged into [W-119](../work/open/W-119-pypi-through-pending-publishers.md) — PyPI projects created by CI through pending publishers |
 | [`W-116-release-0-3-0.md`](open/W-116-release-0-3-0.md) | 2026-10-29 | done — v0.3.0 on npm and PyPI; the extension's listing → [W-95](../work/open/W-95-publish-vscode-extension.md) |
 | [`W-87-pypi-day-2.md`](open/W-87-pypi-day-2.md) | 2026-10-29 | done — `codelaw` and three Fux index projects on PyPI, trusted |
 | [`W-86-pypi-day-1.md`](open/W-86-pypi-day-1.md) | 2026-10-29 | done — six packs and `codelaw` on PyPI, trusted; the user check is [W-38](../work/open/W-38-pypi-0-2-0-by-hand.md) |

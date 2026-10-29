@@ -1,8 +1,8 @@
 ---
 type: Handoff
-name: W-88
-description: "Arpit, 2026-10-27 (voice docket): PyPI day 3 of 4 — at most four new projects a day, one item per day, the command ready to paste."
-item: W-88
+name: W-89
+description: "Arpit, 2026-10-27 (voice docket): PyPI day 4 of 4 — at most four new projects a day, one item per day, the command ready to paste."
+item: W-89
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-29
@@ -10,15 +10,14 @@ updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
 
-# W-88 — PyPI day 3 (Fri 2026-10-30): two Fux index projects, the skills package and the SCSS pack
+# W-89 — PyPI day 4 (Sat 2026-10-31): the three security rule packs
 
 ## At a glance
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | `twine upload` two 0.2.0 Fux index wheels from `dist/fux-index/pypi/` | `codelaw-rules-security-{html,python}-fux-index` exist | 🔴 Arpit |
-| 2 | `twine upload` `codelaw-skills` and `codelaw-rules-scss` at 0.2.0 — the version npm got (W-85, 2026-10-27) | both names exist | 🔴 Arpit |
-| 3 | A trusted publisher on each of the four | CI can upload them | 🔴 Claude in Chrome, once Arpit is logged in to PyPI (ruled 2026-10-27) |
+| 1 | `twine upload` the three security packs at 0.2.0 — the version npm got (W-85, 2026-10-27) | `codelaw-rules-security-{js,html,python}` exist, and `codelaw-rules-security-js-fux-index` (moved from day 2, 2026-10-29) | 🔴 Arpit |
+| 2 | A trusted publisher on each | CI can upload them | 🔴 Claude in Chrome, once Arpit is logged in to PyPI (ruled 2026-10-27) |
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Yes."* — on running days 1–4 as filed, with Claude adding the trusted publishers through Chrome.
 
@@ -26,15 +25,17 @@ ball: arpit
 
 **Version: 0.2.0**, the one npm got on 2026-10-27 (W-85). These are not in the v0.2.0 tag; take the wheels from the same local build npm was published from (`…/scratchpad/pub/dist/pypi/`), copied into `dist/pypi/` before the day — that scratch folder does not survive a reboot.
 
-## The command (repo root, on the Mac, not before Fri 2026-10-30)
+## The command (repo root, on the Mac, not before Sat 2026-10-31)
 
 ```bash
-twine upload --skip-existing dist/fux-index/pypi/codelaw_rules_security_{html,python}_fux_index-0.2.0-py3-none-any.whl
 # the 0.2.0 wheels of the build npm was published from (2026-10-27), copied into dist/pypi/ first
-twine upload --skip-existing dist/pypi/codelaw_skills-0.2.0-py3-none-any.whl dist/pypi/codelaw_rules_scss-0.2.0-py3-none-any.whl
+twine upload --skip-existing dist/pypi/codelaw_rules_security_{js,html,python}-0.2.0-py3-none-any.whl \
+  dist/fux-index/pypi/codelaw_rules_security_js_fux_index-0.2.0-py3-none-any.whl
 ```
 
-**Merged 2026-10-29:** this day carries W-34's `security-html`, `security-python` Fux index uploads and W-77's `codelaw-skills` (both closed 2026-10-29).
+**Merged 2026-10-29:** this day carries W-34's `security-js` Fux index upload (W-34 closed 2026-10-29).
+
+**Closed 2026-10-29 — merged into [W-119](../../work/open/W-119-pypi-through-pending-publishers.md) (Arpit, voice):** *"That's all right. Let's go by that approach. Uh, let's create a work item remove all the existing publishing work items and we'll go with this approach."* Its PyPI projects are created through CI, one pending publisher at a time, instead of by `twine` within the four-a-day limit.
 
 ## Trusted publisher, per project
 
@@ -65,4 +66,3 @@ No SR affected.
 
 - PyPI answers **429** past four new projects in a day — wait a day; `--skip-existing` makes the retry safe.
 - A project with no trusted publisher refuses CI's token before "already exists" is checked, so the publisher goes on the same day as the upload.
-- `codelaw-skills` requires `codelaw==<v>`: until `codelaw` is on PyPI at `<v>`, installing the skills package fails (expected; W-77).
