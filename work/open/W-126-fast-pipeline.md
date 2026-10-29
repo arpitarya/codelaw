@@ -55,6 +55,14 @@ Recent cached runs on `main` take 4m51–6m30. Other long steps: `test` 2m49–3
 - **Not changed, and why:** the **builds** — win32-arm64's 6m28 is 1m36 restoring an 897 MB rust-cache (66 s of it untar) and 3m52 compiling with `lto = "thin"`, `codegen-units = 1`; a thinner profile changes the shipped binary (L6), so the cache size is the lever, and it is being evicted (10.19 / 10 GB). **`test`** (≤ 3m46) is not on the critical path once `corpus` is split, so it was not split.
 - **Expected:** cached CI ~4–5 min (smoke win32-arm64 the tail); Rust change ~9–10 min (build win32-arm64 → package → smoke); pack change ~5 min; release ~4 min. Step 4 measures.
 
+## Measured on the runners
+
+| run | kind | wall | critical path | notes |
+|---|---|---|---|---|
+| `ci` 40927104004 (`7accdae`, 0.4.0) | Rust + packs changed | **13m38** | build darwin-arm64 (queued 5m01 for a macOS runner, built 4m57) → `package` 0m54 → smoke win32-x64 2m36 | `corpus` 16 jobs, all done 3m10 after `build`, python slowest (3m10; was 14m52 as one job); `fux-index` 0m47 at the start; smoke win32-arm64 2m12 (was 2m52–3m09); `lint` red on the guard replay only (RULE-SINCE moved) |
+
+**Found:** the pipeline's own work ended near 8m37; the other 5 min was `build darwin-arm64` waiting for a macOS runner (the account's macOS concurrency: two `macos-latest` builds plus the `macos-15-intel` smoke legs). Not a workflow change; a paid runner is out (L2). Two more runs of each kind still to measure.
+
 ## What cannot be bought
 
 - **Larger or faster runners are paid** — [L2](../../records/0004_LAW-2-foss-dependencies.md) decision 5 refuses a paid hosted service; the plan uses standard GitHub-hosted runners only.

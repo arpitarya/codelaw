@@ -54,4 +54,11 @@
 #   anyway (the third such landing; the kit's submit does not stop on the
 #   commit-msg guard). It is pushed, so it cannot be reworded; it is the newest
 #   failing commit, so the baseline is that commit.
-d69b476ed1a4a8bb3aa80af67b3fc96464104b39
+# - 2026-10-29, W-127, CI's `lint` red on main from run 40927104004: d69b476 ->
+#   2c7fee8. One commit since d69b476 fails the replay: 2c7fee8 (W-127), the
+#   0.4.0 bump's first `lockmaster submit`, which the commit-msg guard refused
+#   (the version copies in Cargo.toml, action.yml, packaging/vscode and packs/
+#   without their records or a `no SR affected` line) — yet it landed; the
+#   resubmit 162a8f5 carries the line. It is pushed, so it cannot be reworded;
+#   it is the newest failing commit, so the baseline is that commit.
+2c7fee810772e3afb931e2a7a3b73cabdcdb9d6a
