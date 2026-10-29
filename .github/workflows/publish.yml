@@ -330,7 +330,7 @@ jobs:
       actions: read
     environment:
       name: vscode # tag rule v*; the Marketplace's trusted-publishing policy names this environment
-      url: https://marketplace.visualstudio.com/items?itemName=codelaw.codelaw
+      url: https://marketplace.visualstudio.com/items?itemName=codelaw.codelaw-vscode
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
@@ -361,7 +361,7 @@ jobs:
           for f in dist/vscode/*.vsix; do
             # the first version creates the extension (POST); every other file updates it (PUT)
             code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X PUT -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \
-                      --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/publishers/codelaw/extensions/codelaw?api-version=7.2-preview.2')"
+                      --data-binary "@$f" 'https://marketplace.visualstudio.com/_apis/gallery/publishers/codelaw/extensions/codelaw-vscode?api-version=7.2-preview.2')"
             if [ "${code:0:1}" != 2 ]; then
               echo "  PUT HTTP $code: $(head -c 400 "$RUNNER_TEMP/m.out")" | tee -a "$GITHUB_STEP_SUMMARY"
               code="$(curl -sS -o "$RUNNER_TEMP/m.out" -w '%{http_code}' -X POST -H "Authorization: Basic $auth" -H 'Content-Type: application/octet-stream' \

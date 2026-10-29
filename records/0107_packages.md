@@ -51,14 +51,14 @@ content_sha: ""
 | PyPI | `codelaw-rules-<name>-fux-index` × 11 | the same, as one pure `py3-none-any` wheel |
 | npm | `@codelaw/skills` | every agent file codelaw writes — `templates/agents/` byte for byte and `codelaw-skills.json`; one dependency, `codelaw` at exactly its version (decision 3b) |
 | PyPI | `codelaw-skills` | the same files as one pure `py3-none-any` wheel (`codelaw_skills/`); `Requires-Dist: codelaw==<version>` |
-| VS Code Marketplace + Open VSX | `codelaw.codelaw` | LSP client ([SR-EDITOR](0114_editor.md)) |
+| VS Code Marketplace + Open VSX | `codelaw.codelaw-vscode` (W-95: the Marketplace holds the name `codelaw`) | LSP client ([SR-EDITOR](0114_editor.md)) |
 
 ```mermaid
 flowchart LR
     W["20 crates"] --> B["one binary"]
     B --> N["npm: codelaw<br/>+ @codelaw/cli-* x8"]
     B --> P["PyPI: codelaw<br/>(8 wheels)"]
-    B --> V["VS Code: codelaw.codelaw"]
+    B --> V["VS Code: codelaw.codelaw-vscode"]
     R["packs/ (15)"] --> NR["npm: @codelaw/rules-* x13"]
     R --> PR["PyPI: codelaw-rules-* x9"]
 ```
@@ -141,7 +141,7 @@ The decider asked for a record of what goes into which package, under the naming
    - eight platform wheels, built with maturin's `bin` bindings;
    - each wheel holds the binary, a `codelaw` Python module (`check`, `fix`, `format`, `rules_for`; the same calls and JSON as decision 3, options as keyword arguments) and `py.typed`;
    - no sdist ([L6](0008_LAW-6-python-and-node-packages.md) decision 7).
-6. **The editor extension `codelaw.codelaw`** (source: `packaging/vscode`) is published as platform-specific packages. It runs the project's own codelaw first (`node_modules/.bin`, then `.venv/bin`) and falls back to a bundled binary ([SR-EDITOR](0114_editor.md)).
+6. **The editor extension `codelaw.codelaw-vscode`** (source: `packaging/vscode`) is published as platform-specific packages. It runs the project's own codelaw first (`node_modules/.bin`, then `.venv/bin`) and falls back to a bundled binary ([SR-EDITOR](0114_editor.md)).
    - **Built (W-95):** `scripts/vsix.py build` writes **eight `.vsix` files**, one per platform of decision 4 under VS Code's target name (`linux-x64-musl` is `alpine-x64`), each with that build's binary as `bin/codelaw`, the compiled extension, the runtime packages its `package-lock.json` does not mark `dev`, the repository's `LICENSE` as `LICENSE.txt` and `icon.png`. It writes the zip itself with the standard library, deterministically, as decision 9's builder writes the npm tarballs: `@vscode/vsce` is not ratified ([L11](0013_LAW-11-dependencies.md)), and its tree holds a proprietary package that [L2](0004_LAW-2-foss-dependencies.md) decision 3 refuses. `scripts/vsix.py check` refuses a missing platform, another platform's binary, a binary that is not the build's (`--bins`), the extension's sources or a dev dependency, a manifest identity or `package.json` at another version, a `LICENSE.txt` that is not the repository's, an icon under 128×128, a relative link in the README (the listing page breaks it), and a digest `SHA256SUMS` does not hold; `--release` also refuses a pre-release version, which the Marketplace does not take. `ci.yml`'s `vscode` job compiles and tests the extension, builds and checks them, and uploads the artifact `vscode` — **beside `dist`, never in it**, so `publish.yml` does not upload them until the decider has created the Marketplace publisher and the Open VSX namespace and stored their tokens (W-95; [RELEASING.md](../RELEASING.md)). **Ruled 2026-10-29: the upload and its check may use `@vscode/vsce` and `ovsx`** — [L2](0004_LAW-2-foss-dependencies.md) decision 8, L11 D-46, D-47 — and W-95 moves the job to them; until it lands, **the upload is `curl`** with **trusted publishing** on both registries — the Visual Studio Marketplace's policy for `arpitarya/codelaw` · `publish.yml` · environment `vscode` is active since 2026-10-29, and Open VSX's follows its first version (W-117); no token is stored — to each registry's API — Open VSX's `POST /api/-/publish` and the Marketplace's gallery upload — with no tool (the decider, 2026-10-27 (voice docket), W-95: *"A. A."*).
 7. **One version for everything:** every crate, both registries' engine packages, the eighteen rule packs, the skills package and the extension carry the same version from one file ([L6](0008_LAW-6-python-and-node-packages.md) decision 9).
    - `scripts/version.py --set` writes every copy that is not generated — the pack manifests, `Cargo.lock`'s workspace crates and the extension's `packaging/vscode/package.json` and `package-lock.json` — and `--check` fails when any one drifts (W-27).
