@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-lsp
   - packaging/vscode
 laws: [L0, L3, L5, L6, L7, L8]
-timestamp: 2026-10-27T12:00:00Z
+timestamp: 2026-10-29T16:30:00Z
 content_sha: ""
 ---
 
@@ -75,7 +75,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - `lsp_after_edit` is an [L8](0010_LAW-8-performance-budgets.md) budget.
 3. **Same verdicts as the CLI ([L5](0007_LAW-5-no-model-in-the-engine.md)).** The server calls the same engine functions; the editor never shows a result that `codelaw check` wouldn't.
    - **A person's editor runs the `local` profile** ([SR-CONFIG](0110_config.md) decision 10), whether or not `CI` is set in its environment, unless `CODELAW_PROFILE` names another: its verdicts are `codelaw check --profile local`'s.
-4. **The VS Code extension `codelaw.codelaw`:**
+4. **The VS Code extension `codelaw.codelaw-vscode`:**
    - **Source:** `packaging/vscode`, TypeScript. **Contents:** an LSP client (`vscode-languageclient`, MIT; its tree is MIT and ISC), a status-bar item, and the commands *Fix all*, *Format*, *Explain rule* (runs `codelaw explain`), *Restart server* and *Show output* and *Copy debug info*. Its build and test tools (`typescript`, Apache-2.0; `@types/*`, MIT) are dev-only; `crates/codelaw-cli/tests/licences.rs` checks its lockfile.
    - **Settings:** `codelaw.enable`, `codelaw.path`, `codelaw.fixOnSave`, `codelaw.formatOnSave`, `codelaw.logLevel`, `codelaw.trace.server`.
    - **Choosing a binary:**
@@ -87,8 +87,9 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
      The project's own version wins, so the editor agrees with CI.
    - **Published to** the VS Code Marketplace and Open VSX, so Kiro, Cursor and VSCodium get it too.
      **Packaged, not yet published (W-95):** CI builds the eight platform `.vsix` files and checks them ([SR-PACKAGES](0107_packages.md) decision 6); the listing waits on the Marketplace publisher `codelaw` and the Open VSX namespace `codelaw`, which only the decider can create. The README is the listing page, so its links are absolute.
+   - **Ruled 2026-10-29, built the same day (W-95): the extension is `codelaw.codelaw-vscode`** (the decider: *"write the email. You go ahead and write the email and send it out. In the meanwhile, let's go ahead and create the extension under a different name, so at least we can publish it."*). The Marketplace holds the name `codelaw` since the 0.2.0 listing was removed, and *"Only Microsoft Marketplace Support can release a deleted extension name"*; Support was asked to release it (email to vsmarketplace@microsoft.com, 2026-10-29). `packaging/vscode/package.json`'s `name` is `codelaw-vscode`; the publisher, the commands (`codelaw.*`) and the settings (`codelaw.*`) are unchanged. If Support releases `codelaw`, returning to `codelaw.codelaw` is a new ruling.
 5. **Other editors:** the docs give setup snippets for Neovim (`nvim-lspconfig`), Zed, Helix and JetBrains (LSP4IJ). No other first-party plugins are written.
-6. **The repo recommends it.** `codelaw init` adds `codelaw.codelaw` to `.vscode/extensions.json` ([SR-CONSUMER-LAYOUT](0111_consumer-layout.md)).
+6. **The repo recommends it.** `codelaw init` adds `codelaw.codelaw-vscode` to `.vscode/extensions.json` ([SR-CONSUMER-LAYOUT](0111_consumer-layout.md)).
 7. **The log (W-74).** The output channel is one VS Code `LogOutputChannel` (timestamps and levels, no dependency) carrying the extension's lines and the server's `window/logMessage`s; stdout is the transport, so the server never prints.
    - **Levels:** `codelaw.logLevel` is `error`, `warn`, `info` (default) or `debug`. The extension passes it as `initializationOptions.logLevel` and changes it live with `workspace/didChangeConfiguration` (`settings.codelaw.logLevel`); the server sends nothing above it. A debug line reaches the channel at its info level behind `[debug]`, so it shows without raising VS Code's own log level. `codelaw.trace.server` (the raw protocol) is unchanged.
    - **At `info`:** the extension and VS Code versions, OS and architecture, workspace folders, every binary candidate with its verdict, the one chosen, and the server's version; per project the config and root it loaded and its rule count; per file the project that checks it, or why it gets nothing (no covered language, excluded or outside `include`, enabled languages, a config or project that does not load), each **once per file per reload**; every reload and what caused it. **At `debug`:** one line per check (file, language, rule count, diagnostics, milliseconds) and a request that returned nothing.

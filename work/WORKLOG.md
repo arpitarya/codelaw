@@ -24,6 +24,24 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — The extension renamed `codelaw.codelaw-vscode`; its 0.3.0 `.vsix` files built  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"generate the VS Code extension with the new name."*
+- **Done:** the rename Arpit ruled at 21:57 (W-95) — manifest and lock, `publish.yml`'s Marketplace URL and gallery path, SR-EDITOR, SR-PACKAGES, RELEASING.md, CHANGELOG (with Cowork's uncommitted SR-EDITOR ruling line and W-95 notes). Eight `codelaw-vscode-<platform>-0.3.0.vsix` in `dist/vscode/`, built by `vsix.py` from v0.3.0's CI binaries (extracted from that run's `.vsix`, after downloading the build artifacts was killed); `npm test` 13/13, `check --release --bins` green, VS Code installs it as `codelaw.codelaw-vscode@0.3.0`.
+- **Decided / left open:** `codelaw init` writes no `.vscode/extensions.json`, though SR-EDITOR decision 6 says it does — not built; only the record's id changed.
+- **Mistakes:** none.
+- **Next:** Arpit uploads the eight files on the Marketplace.
+
+---
+
+## 2026-10-29 — The Marketplace holds `codelaw`: Support emailed; the extension to be renamed `codelaw-vscode`  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"write the email. You go ahead and write the email and send it out. In the meanwhile, let's go ahead and create the extension under a different name, so at least we can publish it."*
+- **Done:** found that a removed extension's name stays blocked until Marketplace Support releases it; sent the release request from Arpit's Gmail to vsmarketplace@microsoft.com (publisher `codelaw`, extension `codelaw`). Recorded the rename ruling in SR-EDITOR decision 4 (*ruled, not built*) and W-95 with the files it touches; W-95's row. Not committed.
+- **Decided / left open:** ruled — publish under a different name now. Agent's choice, flagged: `codelaw-vscode` (id `codelaw.codelaw-vscode`), on both registries. Open: returning to `codelaw.codelaw` if Support releases it.
+- **Mistakes:** this session told Arpit earlier that removing and republishing under the same name was possible; since the 2025 reports, Microsoft keeps removed names.
+- **Next:** an agent renames and publishes (W-95); watch for Support's reply.
+
 ## 2026-10-29 — The 0.3.0 `.vsix` files for a Marketplace upload by hand; docs at 0.3.0  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"generate the visx extension so that I can manually upload to VS Code marketplace. Make sure all the versions within the repo are at 0.3.0."*

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """vsix — the editor extension's eight platform packages (SR-PACKAGES decision 6; W-95).
 
-`codelaw.codelaw` ships one `.vsix` per platform, each with that platform's
+`codelaw.codelaw-vscode` ships one `.vsix` per platform, each with that platform's
 `bin/codelaw` beside the compiled extension (SR-EDITOR decision 4, step 4 of
 the binary lookup). A `.vsix` is a zip in the Open Packaging Conventions
 layout: `extension.vsixmanifest`, `[Content_Types].xml` and the extension's
