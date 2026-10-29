@@ -31,9 +31,11 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (10)
+## Open items (11)
 
-### build (7)
+### build (8)
+
+🟢 **W-126** `agent` A five-minute pipeline: measured — CI 5m44 cached, 11m Rust change, 16m pack change; publish 9m. Plan: corpus per pack, parallel publish checks and uploads, smoke split. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
 🟢 **W-125** `agent` Revert `publish.yml`'s `only=pypi-new` and the `main` rule on the `pypi` environment, records and RELEASING.md with them — Arpit ruled it temporary (10-29 10:31); W-119 is done. Filed by Arpit (Claude Code). [detail](open/W-125-revert-pypi-new.md)
 
