@@ -89,12 +89,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ github.sha }}
         # Eight files at a time (W-126: one by one took three minutes); xargs
-        # fails the step when any one verification fails.
+        # fails the step when any one verification fails. The trusted root is
+        # fetched once and handed to each: eight `gh attestation verify`
+        # initialising it at once failed with "public good verifier is not
+        # available" (v0.4.0's first run, 40931548220).
         run: |
+          ROOT="$RUNNER_TEMP/trusted-root.jsonl"
+          gh attestation trusted-root > "$ROOT"
+          export ROOT
           verify() {
             gh attestation verify "$1" --repo "$GITHUB_REPOSITORY" \
               --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
-              --source-ref refs/heads/main --source-digest "$SHA" >/dev/null
+              --source-ref refs/heads/main --source-digest "$SHA" \
+              --custom-trusted-root "$ROOT" >/dev/null
             echo "✓ $1"
           }
           export -f verify
@@ -210,7 +217,13 @@ jobs:
             [ "${id##*@}" = "$v" ] || { echo "::error::$id is not the release version $v"; return 1; }  # the version after the LAST @
             if npm view "$id" version >/dev/null 2>&1; then echo "✓ $id is already on npm"; return 0; fi
             echo "→ $id ($tag)"
-            npm publish "$1" --tag "$tag" --provenance --access public
+            # once more on a failure, unless it did land: parallel provenance
+            # signing can trip on its first set-up, as the attestation checks did
+            npm publish "$1" --tag "$tag" --provenance --access public || {
+              sleep 5
+              npm view "$id" version >/dev/null 2>&1 && { echo "✓ $id is on npm"; return 0; }
+              echo "↻ $id"; npm publish "$1" --tag "$tag" --provenance --access public
+            }
           }
           export -f one
           export v tag
