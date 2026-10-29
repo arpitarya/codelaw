@@ -176,6 +176,10 @@ struct Doc {
     /// The syntax tree of the body, kept between edits; `None` until the
     /// document is first checked, or after an edit it cannot follow.
     tree: Option<DocumentTree>,
+    /// For a plain-text config file (`.nvmrc`, `CODEOWNERS`, …: SR-LAW-3
+    /// decision 10), its project-relative path: `diagnostics` are then the
+    /// copies of findings its L3 files reported into it.
+    text_config: Option<String>,
 }
 
 impl Doc {
@@ -227,11 +231,25 @@ struct Server<'c> {
     /// Log lines already said since the last reload, so a keystroke never
     /// repeats one: `(file or project, line)`.
     said: HashSet<(String, String)>,
+    /// What is published for each plain-text config file, by the document
+    /// whose check found it: an open L3 file's copies, or the text file's
+    /// own `check_text_config` (SR-EDITOR decision 2, SR-ARCHITECTURE
+    /// decision 15d). A text file's diagnostics are all of these, at once.
+    copies: HashMap<String, BTreeMap<String, Vec<lsp_types::Diagnostic>>>,
 }
 
 impl<'c> Server<'c> {
     fn new(connection: &'c Connection, roots: Vec<PathBuf>) -> Self {
-        Server { connection, roots, docs: HashMap::new(), projects: HashMap::new(), closed: HashMap::new(), level: LogLevel::Info, said: HashSet::new() }
+        Server {
+            connection,
+            roots,
+            docs: HashMap::new(),
+            projects: HashMap::new(),
+            closed: HashMap::new(),
+            level: LogLevel::Info,
+            said: HashSet::new(),
+            copies: HashMap::new(),
+        }
     }
 
     fn send(&self, msg: impl Into<Message>) -> Result<(), Error> {
@@ -282,7 +300,7 @@ impl<'c> Server<'c> {
             DidOpenTextDocument::METHOD => {
                 let p: DidOpenTextDocumentParams = serde_json::from_value(n.params)?;
                 let d = p.text_document;
-                let doc = Doc { uri: d.uri, version: d.version, text: d.text, target: None, diagnostics: vec![], tree: None };
+                let doc = Doc { uri: d.uri, version: d.version, text: d.text, target: None, diagnostics: vec![], tree: None, text_config: None };
                 let key = doc.uri.as_str().to_owned();
                 self.docs.insert(key.clone(), doc);
                 self.check(&key)?;
@@ -296,7 +314,11 @@ impl<'c> Server<'c> {
                         doc.change(change);
                     }
                     doc.version = p.text_document.version;
-                    self.check(&key)?;
+                    // A text config file's copies come from its L3 files on
+                    // disk: it is checked when saved, not per keystroke.
+                    if doc.text_config.is_none() {
+                        self.check(&key)?;
+                    }
                 }
             }
             DidSaveTextDocument::METHOD => {
@@ -317,7 +339,15 @@ impl<'c> Server<'c> {
                     {
                         cache.put(doc.uri.as_str().to_owned(), tree);
                     }
-                    self.notify::<PublishDiagnostics>(PublishDiagnosticsParams { uri: doc.uri, diagnostics: vec![], version: None })?;
+                    let key = doc.uri.as_str().to_owned();
+                    // What this document found in text config files goes
+                    // with it; a text file keeps what open L3 files found.
+                    self.set_copies(&key, BTreeMap::new())?;
+                    if self.copies.contains_key(&key) {
+                        self.publish_copies(&key)?;
+                    } else {
+                        self.notify::<PublishDiagnostics>(PublishDiagnosticsParams { uri: doc.uri, diagnostics: vec![], version: None })?;
+                    }
                 }
             }
             // Config, rules or baseline changed on disk: reload live
@@ -450,6 +480,12 @@ impl<'c> Server<'c> {
                 None
             }
         };
+        if target.is_none()
+            && let Some(path) = uri::to_path(key).map(|p| canonical(&p))
+            && codelaw_core::is_text_config(&path.to_string_lossy())
+        {
+            return self.check_text_config(key, &path);
+        }
         if let Some(reason) = why_not {
             let name = uri::to_path(key).map_or_else(|| key.to_owned(), |p| p.display().to_string());
             self.log_once(LogLevel::Info, &name, format!("no diagnostics for {name}: {reason}"))?;
@@ -477,6 +513,12 @@ impl<'c> Server<'c> {
                 vec![]
             }
         };
+        // A finding's copy in a text config file is published on that file
+        // (SR-ARCHITECTURE decision 15d), never here.
+        let (copies, diagnostics): (Vec<Diagnostic>, Vec<Diagnostic>) = diagnostics
+            .into_iter()
+            .partition(|d| target.as_ref().is_some_and(|(_, e)| e.rel != d.file) && codelaw_core::is_text_config(&d.file));
+        let copies = project.map(|p| copies_by_uri(p.root(), &copies)).unwrap_or_default();
         let lsp = to_lsp(doc, target.as_ref().map(|t| &t.1), project.map(Project::root), &diagnostics);
         let params = PublishDiagnosticsParams { uri: doc.uri.clone(), diagnostics: lsp, version: Some(doc.version) };
         let summary = format!(
@@ -490,7 +532,66 @@ impl<'c> Server<'c> {
         doc.target = target;
         doc.diagnostics = diagnostics;
         self.notify::<PublishDiagnostics>(params)?;
+        self.set_copies(key, copies)?;
         self.log_at(LogLevel::Debug, format!("{summary} ({lang})"))
+    }
+
+    /// Check an open plain-text config file: the copies its project's L3
+    /// files report into it, as they are on disk (`check_text_config`).
+    fn check_text_config(&mut self, key: &str, path: &Path) -> Result<(), Error> {
+        let pk = self.project_for(path)?;
+        let project = pk.as_ref().and_then(|pk| self.projects[pk].as_ref().ok());
+        let found = project.map(|p| p.check_text_config(path)).unwrap_or_default();
+        let lsp = project.map(|p| copies_by_uri(p.root(), &found)).unwrap_or_default().into_values().flatten().collect();
+        let rel = project.map(|p| codelaw_core::normalize_path(path.strip_prefix(p.root()).unwrap_or(path)));
+        self.log_at(LogLevel::Debug, format!("check {}: {} finding(s) copied in from its L3 files", path.display(), found.len()))?;
+        if let Some(doc) = self.docs.get_mut(key) {
+            doc.target = None;
+            doc.tree = None;
+            doc.text_config = rel;
+            doc.diagnostics = found;
+        }
+        let mine = self.copies.entry(key.to_owned()).or_default();
+        mine.insert(key.to_owned(), lsp);
+        self.publish_copies(key)
+    }
+
+    /// Replace what `from` found in text config files with `found`, by the
+    /// text file's URI, and republish every text file that changes.
+    fn set_copies(&mut self, from: &str, found: BTreeMap<String, Vec<lsp_types::Diagnostic>>) -> Result<(), Error> {
+        let mut touched: Vec<String> = Vec::new();
+        for (uri, by) in self.copies.iter_mut() {
+            if uri != from && !found.contains_key(uri) && by.remove(from).is_some() {
+                touched.push(uri.clone());
+            }
+        }
+        for (uri, d) in found {
+            let by = self.copies.entry(uri.clone()).or_default();
+            if by.get(from) != Some(&d) {
+                by.insert(from.to_owned(), d);
+                touched.push(uri);
+            }
+        }
+        touched.sort();
+        touched.dedup();
+        for uri in touched {
+            self.publish_copies(&uri)?;
+        }
+        self.copies.retain(|_, by| !by.is_empty());
+        Ok(())
+    }
+
+    /// Publish everything found for one text config file, once each.
+    fn publish_copies(&self, uri_key: &str) -> Result<(), Error> {
+        let Ok(uri) = Uri::from_str(uri_key) else { return Ok(()) };
+        let mut all: Vec<lsp_types::Diagnostic> = Vec::new();
+        for d in self.copies.get(uri_key).into_iter().flat_map(|by| by.values().flatten()) {
+            if !all.iter().any(|a| a.range == d.range && a.code == d.code && a.message == d.message) {
+                all.push(d.clone());
+            }
+        }
+        let version = self.docs.get(uri_key).map(|d| d.version);
+        self.notify::<PublishDiagnostics>(PublishDiagnosticsParams { uri, diagnostics: all, version })
     }
 
     // ---- requests ------------------------------------------------------
@@ -538,7 +639,10 @@ impl<'c> Server<'c> {
         let idx = Utf16Index::new(&doc.text);
         let shift = doc.body().1;
         let (start, end) = (idx.offset(p.range.start).saturating_sub(shift), idx.offset(p.range.end).saturating_sub(shift));
-        let own = |d: &&Diagnostic| doc.target.as_ref().is_some_and(|(_, e)| e.rel == d.file);
+        let own = |d: &&Diagnostic| match &doc.target {
+            Some((_, e)) => e.rel == d.file,
+            None => doc.text_config.as_deref() == Some(d.file.as_str()),
+        };
         let mut out = Vec::new();
         if wanted(CodeActionKind::QUICKFIX.as_str()) {
             for d in doc.diagnostics.iter().filter(own) {
@@ -678,6 +782,25 @@ fn canonical(path: &Path) -> PathBuf {
         (Some(dir), Some(name)) => dir.join(name),
         _ => path.to_path_buf(),
     }
+}
+
+/// The copies of findings in text config files, as LSP diagnostics by the
+/// text file's URI, their ranges taken from the file on disk, the text the
+/// engine read (SR-ARCHITECTURE decision 15d).
+fn copies_by_uri(root: &Path, copies: &[Diagnostic]) -> BTreeMap<String, Vec<lsp_types::Diagnostic>> {
+    let mut out: BTreeMap<String, Vec<lsp_types::Diagnostic>> = BTreeMap::new();
+    for d in copies {
+        let path = root.join(&d.file);
+        let range = match std::fs::read_to_string(&path) {
+            Ok(text) => Utf16Index::new(&text).range(d.start_byte, d.end_byte),
+            Err(_) => Range {
+                start: lsp_types::Position { line: d.start.line.saturating_sub(1), character: d.start.column.saturating_sub(1) },
+                end: lsp_types::Position { line: d.end.line.saturating_sub(1), character: d.end.column.saturating_sub(1) },
+            },
+        };
+        out.entry(uri::from_path(&canonical(&path))).or_default().push(lsp_diagnostic(d, range));
+    }
+    out
 }
 
 fn lsp_diagnostic(d: &Diagnostic, range: Range) -> lsp_types::Diagnostic {
