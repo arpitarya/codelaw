@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-29 — W-125 closed: `only=pypi-new` reverted  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement work item 125, and 126"*.
+- **Done:** W-125's three steps — `publish.yml`'s `only=pypi-new` out (gate and `pypi` job back to pre-W-119, W-126's parallel checks kept); the `pypi` environment's `main` rule deleted on GitHub (`v*` only); L6 decision 9, SR-PACKAGES decision 11, RELEASING.md, CHANGELOG. Archived.
+- **Decided / left open:** W-126's only open step is measuring on the runners, which needs `main` pushed — asked.
+- **Mistakes:** none.
+- **Next:** push `main` (W-127), then W-126 step 4.
+
 ## 2026-10-29 — The VS Code extension is live (one platform so far)  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"I published the code law Microsoft Visual Studio Code extension. Check on it and update the open work items."*
