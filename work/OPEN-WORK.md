@@ -33,7 +33,7 @@ here. Read that record before changing anything below it.
 
 ## Open items (10)
 
-### build (9)
+### build (8)
 
 🟢 **W-125** `agent` Revert `publish.yml`'s `only=pypi-new` and the `main` rule on the `pypi` environment, records and RELEASING.md with them — Arpit ruled it temporary (10-29 10:31); W-119 is done. Filed by Arpit (Claude Code). [detail](open/W-125-revert-pypi-new.md)
 
