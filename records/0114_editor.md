@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-lsp
   - packaging/vscode
 laws: [L0, L3, L5, L6, L7, L8]
-timestamp: 2026-10-29T16:30:00Z
+timestamp: 2026-10-29T16:45:00Z
 content_sha: ""
 ---
 
@@ -88,6 +88,7 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - **Published to** the VS Code Marketplace and Open VSX, so Kiro, Cursor and VSCodium get it too.
      **Packaged, not yet published (W-95):** CI builds the eight platform `.vsix` files and checks them ([SR-PACKAGES](0107_packages.md) decision 6); the listing waits on the Marketplace publisher `codelaw` and the Open VSX namespace `codelaw`, which only the decider can create. The README is the listing page, so its links are absolute.
    - **Ruled 2026-10-29, built the same day (W-95): the extension is `codelaw.codelaw-vscode`** (the decider: *"write the email. You go ahead and write the email and send it out. In the meanwhile, let's go ahead and create the extension under a different name, so at least we can publish it."*). The Marketplace holds the name `codelaw` since the 0.2.0 listing was removed, and *"Only Microsoft Marketplace Support can release a deleted extension name"*; Support was asked to release it (email to vsmarketplace@microsoft.com, 2026-10-29). `packaging/vscode/package.json`'s `name` is `codelaw-vscode`; the publisher, the commands (`codelaw.*`) and the settings (`codelaw.*`) are unchanged. If Support releases `codelaw`, returning to `codelaw.codelaw` is a new ruling.
+   - **Display name, ruled 2026-10-29 22:06, built the same day (W-95):** `codelaw - Rules for AI Agents: Lint, Format, Spell` — the Marketplace answered *"This extension display name is taken"* for `codelaw`, held by the removed listing; the decider first picked `codelaw - Linter & Formatter`, then asked for AI and spell in it and chose *"codelaw - Rules for AI Agents: Lint, Format, Spell"*. "for AI agents", not "AI-powered": the engine holds no model ([L5](0007_LAW-5-no-model-in-the-engine.md)).
 5. **Other editors:** the docs give setup snippets for Neovim (`nvim-lspconfig`), Zed, Helix and JetBrains (LSP4IJ). No other first-party plugins are written.
 6. **The repo recommends it.** `codelaw init` adds `codelaw.codelaw-vscode` to `.vscode/extensions.json` ([SR-CONSUMER-LAYOUT](0111_consumer-layout.md)).
 7. **The log (W-74).** The output channel is one VS Code `LogOutputChannel` (timestamps and levels, no dependency) carrying the extension's lines and the server's `window/logMessage`s; stdout is the transport, so the server never prints.
