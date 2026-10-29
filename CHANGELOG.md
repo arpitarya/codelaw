@@ -4,6 +4,19 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+## 0.4.0 — 2026-10-29
+
+**codelaw complete on PyPI, and the editor extension under its own name.**
+Every PyPI project codelaw publishes now exists — the engine, its eleven
+packs and `codelaw-skills` — so a release reaches all of them; the VS Code
+extension is `codelaw.codelaw-vscode`. The engine and its rules are 0.3.0's — the same
+verdicts, from either registry (W-127).
+
+```bash
+npx codelaw@0.4.0 init     # a Node repo: installs the @codelaw/rules-* it needs
+uvx codelaw@0.4.0 init     # a Python repo: installs the codelaw-rules-* it needs
+```
+
 ### Added
 
 - **`pip install codelaw` and `uvx codelaw` work (W-86, W-87, W-38):** `codelaw` and the six first rule packs are on PyPI, with the eight platform wheels and 0.2.0 back-filled; checked from a fresh environment.

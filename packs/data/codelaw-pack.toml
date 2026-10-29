@@ -1,5 +1,5 @@
 name = "@codelaw/rules-data"
-version = "0.3.0"
+version = "0.4.0"
 min_codelaw = "0.1.0"
 languages = ["json", "yaml", "toml", "markdown"]
 presets = ["data/recommended", "md/recommended", "data/package-json", "data/tsconfig", "data/pyproject", "data/github-actions", "data/conventions"]
