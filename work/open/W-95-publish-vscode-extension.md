@@ -107,6 +107,8 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 
 **Listed, 2026-10-29 (checked 23:30 IST, Cowork):** Arpit published `codelaw.codelaw-vscode` by hand — the Marketplace answers *"codelaw - Rules for AI Agents: Lint, Format, Spell"*, flags `validated, public, preview`, first published 2026-10-29 16:46 UTC (22:16 IST); its page is <https://marketplace.visualstudio.com/items?itemName=codelaw.codelaw-vscode>. **Only one of eight platforms is there: 0.3.0 `darwin-arm64`** — VS Code on Windows, Linux and Intel Macs finds no build to install. Left: the other seven (the next release's `publish.yml` job, or by hand with *Update* from `dist/vscode/`), then Open VSX (W-117), README/USAGE's install line.
 
+**Published by CI, 2026-10-30:** v0.4.0's `publish.yml` (40932853880) uploaded all eight `codelaw-vscode-<platform>-0.4.0.vsix` to the Marketplace by trusted publishing (✓ each); Open VSX skipped, no `OVSX_PAT` (W-117).
+
 ## Left
 
 1. **The decider (step 2, the inbox row):** the GitHub environment `vscode` with a `v*` tag rule; the Marketplace publisher `codelaw` and a PAT → secret `VSCE_PAT`; the Open VSX account, Eclipse publisher agreement, a token → secret `OVSX_PAT`, and the namespace `codelaw`; **and the ruling: (a) own `curl` uploads, no dependency (recommended), or (b) amend L2 and ratify `@vscode/vsce` 4.0.0 and `ovsx` 1.3.0, CI-only.**

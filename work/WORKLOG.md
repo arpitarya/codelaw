@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — v0.4.0 released  ·  Claude Code (Opus 5.5)
+
+- **Asked:** (the turn before) publish 0.4.0, everything green, the extension too; Arpit ruled *re-cut v0.4.0* after the first cut failed.
+- **Done:** v0.4.0 Release deleted (nothing had been published) and re-created on d2a87c8 (CI green, 4m25); `publish.yml` 40932853880 green in 3m50 — npm 26, PyPI 13, Marketplace 8 `.vsix`. W-127 closed; W-126 and W-95 updated.
+- **Decided / left open:** Open VSX still skipped (W-117, the token).
+- **Mistakes:** none new.
+- **Next:** W-117's token; W-126 more measured runs.
+
 ## 2026-10-30 — W-128–W-133 filed: the `deps` pack and five more rule groups  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"Can we build out a module which can look into dependencies of Node and Python and check it against some URL which tells us what packages are vulnerable … tell what should be the correct version to upgrade."* Designed over chat and voice; then *"file it."*

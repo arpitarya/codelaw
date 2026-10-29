@@ -18,9 +18,9 @@ ball: agent
 |---|---|---|---|
 | 1 | `scripts/version.py --set 0.4.0` (Cargo, the eighteen packs, the extension, the Action's default), CHANGELOG's 0.4.0 section | the release commit | ✅ 2026-10-29 |
 | 2 | Push `main` to `origin` (it also carries the 17 commits before it — W-95, W-119, W-126, …) | CI runs on the release commit | ✅ 2026-10-29 — pushed `6553a6d..7accdae` |
-| 3 | `ci.yml` green on that commit, on `main` (the first run of W-126's pipeline) | `publish.yml`'s gate passes | 🟡 run 40927104004: all green but `lint` (the guard replay; RULE-SINCE moved past 2c7fee8) — re-run on the fix |
-| 4 | Arpit: notes from CHANGELOG, then `gh release create v0.4.0 --title "v0.4.0 — codelaw complete on PyPI, and the editor extension under its own name" --notes-file notes.md` on the green commit (RELEASING.md §Every release step 3) | CI publishes npm, PyPI and the extension | ⏳ after 3 |
-| 5 | Check: npm every `@codelaw/*` at 0.4.0, PyPI every project at 0.4.0, the Marketplace `codelaw.codelaw-vscode` 0.4.0; W-126 step 4 takes the release's times | the release, verified | ⏳ |
+| 3 | `ci.yml` green on that commit, on `main` (the first run of W-126's pipeline) | `publish.yml`'s gate passes | ✅ 2026-10-30 — `lint` red on the guard replay (RULE-SINCE moved), then green: 40929506937 (832d696), 40932052080 (d2a87c8) |
+| 4 | Arpit: notes from CHANGELOG, then `gh release create v0.4.0 --title "v0.4.0 — codelaw complete on PyPI, and the editor extension under its own name" --notes-file notes.md` on the green commit (RELEASING.md §Every release step 3) | CI publishes npm, PyPI and the extension | ✅ 2026-10-30 — by Claude Code on Arpit's go; the first cut (832d696) failed at the gate, nothing published; re-cut on d2a87c8 on Arpit's ruling |
+| 5 | Check: npm every `@codelaw/*` at 0.4.0, PyPI every project at 0.4.0, the Marketplace `codelaw.codelaw-vscode` 0.4.0; W-126 step 4 takes the release's times | the release, verified | ✅ 2026-10-30 — `publish.yml` 40932853880 green (3m50): npm 26 names at 0.4.0, PyPI 13 projects uploaded, the Marketplace accepted all eight `.vsix`; Open VSX skipped (no `OVSX_PAT`, W-117) |
 
 **Arpit, 2026-10-29:** *"upgrade 0.4.0"*.
 
@@ -38,3 +38,5 @@ The engine and the rules are 0.3.0's (no change under `crates/` or `packs/` but 
 **2026-10-29, Arpit:** *"commit everything and publish the version. If any stage fails, fix it and then push it. Make sure everything is green and the packages and even the VS Code extension gets published."* — Claude Code cuts the Release (step 4) once `ci.yml` is green.
 
 **2026-10-30 — v0.4.0's first `publish.yml` run (40931548220) failed at the gate, nothing published:** W-126's parallel `gh attestation verify` raced initialising the trusted root (2 of 49: *"public good verifier is not available"*). Fixed: `gh attestation trusted-root` once, `--custom-trusted-root` to each (tested locally on three 0.3.0 tarballs). The Release and tag are re-cut on the fixed commit once `ci.yml` is green there.
+
+**Closed 2026-10-30 (Claude Code):** v0.4.0 is released from d2a87c8 — <https://github.com/arpitarya/codelaw/releases/tag/v0.4.0>. Registries' caches lagged a few minutes behind the uploads.

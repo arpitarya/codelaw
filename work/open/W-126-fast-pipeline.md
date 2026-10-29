@@ -59,6 +59,9 @@ Recent cached runs on `main` take 4m51–6m30. Other long steps: `test` 2m49–3
 
 | run | kind | wall | critical path | notes |
 |---|---|---|---|---|
+| `ci` 40932052080 (`d2a87c8`) | cached (no Rust or pack change) | **4m25** | — | ≤ 5 min ✅ |
+| `ci` 40929506937 (`832d696`) | cached build, guard fix | **12m30** | smoke darwin-arm64 queued for a macOS runner | the queue, not the work |
+| `publish` 40932853880 (v0.4.0) | release | **3m50** | gate → trust → npm (26 uploads, eight at a time) | was 8m59; the first cut (40931548220) failed at the gate on a trusted-root race, fixed in f11c8db |
 | `ci` 40927104004 (`7accdae`, 0.4.0) | Rust + packs changed | **13m38** | build darwin-arm64 (queued 5m01 for a macOS runner, built 4m57) → `package` 0m54 → smoke win32-x64 2m36 | `corpus` 16 jobs, all done 3m10 after `build`, python slowest (3m10; was 14m52 as one job); `fux-index` 0m47 at the start; smoke win32-arm64 2m12 (was 2m52–3m09); `lint` red on the guard replay only (RULE-SINCE moved) |
 
 **Found:** the pipeline's own work ended near 8m37; the other 5 min was `build darwin-arm64` waiting for a macOS runner (the account's macOS concurrency: two `macos-latest` builds plus the `macos-15-intel` smoke legs). Not a workflow change; a paid runner is out (L2). Two more runs of each kind still to measure.

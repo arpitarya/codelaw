@@ -4,6 +4,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+### Fixed
+
+- **Release pipeline (W-127):** a release's attestation checks run eight at a time against one trusted root fetched first — v0.4.0's first run failed when eight checks set it up at once, before anything was published — and an npm upload is tried once more unless it landed.
+
 ## 0.4.0 — 2026-10-29
 
 **codelaw complete on PyPI, and the editor extension under its own name.**
