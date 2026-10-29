@@ -16,7 +16,7 @@ use codelaw_core::{Diagnostic, FixClass, Language, LineIndex, Severity, Skipped,
 use codelaw_fix::{Candidate, DataFixContext, ExternalCall, FixContext, FixSpec, data_edits, edits_for, group_edits, run_external};
 use codelaw_lang::{Grammar, Region, RegionOptions, Root};
 use codelaw_match::{Match, interpolate};
-use codelaw_native::{NativeContext, NativeFinding};
+use codelaw_native::{Elsewhere, FileContext, NativeContext, NativeFinding};
 use std::collections::BTreeSet;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::time::Instant;
@@ -83,6 +83,9 @@ struct Finding {
     data: Option<serde_json::Value>,
     /// A graded finding's own severity (a native rule's `severity_of`).
     severity: Option<Severity>,
+    /// The text config files it is shown in too (a native rule's
+    /// `elsewhere`, decision 15d).
+    also: Vec<Elsewhere>,
 }
 
 const FALLBACK_STEP: &str = "Make the change by hand; `codelaw explain <rule>` shows what the rule requires.";
@@ -489,8 +492,12 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
         findings.iter().filter(|f| f.note.as_deref() == Some(INTERNAL_ERROR)).map(|f| project.compiled[f.rule].id()).collect();
     let ran: Vec<(usize, &CompiledRule, RuleConfig)> =
         active.iter().filter(|(i, r, _)| !failed.contains(r.id()) && !not_run.contains(i)).cloned().collect();
-    for f in findings {
+    // Copies of findings in text config files (decision 15d), each with the
+    // place of the finding it copies: kept only while that one is.
+    let mut mirrors: Vec<((usize, usize, String), Diagnostic)> = Vec::new();
+    for mut f in findings {
         let rule = &project.compiled[f.rule];
+        let also = std::mem::take(&mut f.also);
         if f.note.as_deref() == Some(INTERNAL_ERROR) {
             // Decision 25: a rule failure is the engine's own diagnostic,
             // never the rule's, so no severity, suppression or cache hides it.
@@ -551,14 +558,34 @@ pub(crate) fn lint_text_with(project: &Project, entry: &FileEntry, text: &str, m
             note,
             data: f.data,
         });
+        let primary = diagnostics.last().expect("just pushed");
+        let mut refused = None;
+        for e in also {
+            match mirror(&file, primary, declared, &rule.loaded.rule.steps, e) {
+                Ok(d) => mirrors.push(((primary.start_byte, primary.end_byte, primary.rule.clone()), d)),
+                Err(why) => refused = refused.or(Some(why)),
+            }
+        }
+        if let Some(why) = refused {
+            diagnostics.extend(meta_diagnostic(&entry.rel, &layers, "codelaw/internal-error", format!("rule `{}` failed on this file: {why}", rule.id())));
+        }
     }
 
     {
         let _timed = project.timings.as_ref().map(|t| t.guard(Phase::Suppress));
         apply_suppressions(&entry.rel, &layers, text, &index, &comments, project, &ran, &mut diagnostics);
     }
+    // A copy goes where its finding goes: a suppression of the finding
+    // suppresses it too (decision 15d).
+    for ((start, end, id), d) in mirrors {
+        if diagnostics.iter().any(|p| p.file == entry.rel && p.start_byte == start && p.end_byte == end && p.rule == id && p.message == d.message) {
+            diagnostics.push(d);
+        }
+    }
+    // A text config file is never written: its edits are for the editor.
     let candidates = diagnostics
         .iter()
+        .filter(|d| d.file == entry.rel)
         .filter(|d| d.fix != FixClass::Manual && !d.edits.is_empty())
         .map(|d| (Candidate { rule: d.rule.clone(), edits: d.edits.clone() }, d.fix))
         .collect();
@@ -676,11 +703,58 @@ fn apply_suppressions(
     }
 }
 
+/// The copy of `primary` at `e`, a place in a text config file (SR-LAW-3
+/// decision 10, SR-ARCHITECTURE decision 15d): the same rule, severity and
+/// message; its own edits when the rule gave some and its fix class allows
+/// them, else `manual`, with a step that names where the fix is. `data`
+/// carries `primary`: that finding's file, line and column.
+fn mirror(file: &dyn FileContext, primary: &Diagnostic, declared: FixClass, steps: &[String], e: Elsewhere) -> Result<Diagnostic, String> {
+    if !codelaw_core::is_text_config(&e.path) {
+        return Err(format!("it put a finding in `{}`, which is not a text config file (SR-LAW-3 decision 10)", e.path));
+    }
+    let text = file.read(&e.path).ok_or_else(|| format!("it put a finding in `{}`, which cannot be read", e.path))?;
+    let ok = |o: usize| text.is_char_boundary(o);
+    if e.start > e.end || !ok(e.start) || !ok(e.end) || e.edits.iter().any(|x| x.start > x.end || !ok(x.start) || !ok(x.end)) {
+        return Err(format!("its place in `{}` is not a range of that file", e.path));
+    }
+    let index = LineIndex::new(&text);
+    let at = format!("{}:{}:{}", primary.file, primary.start.line, primary.start.column);
+    let (fix, edits, steps) = if declared != FixClass::Manual && !e.edits.is_empty() {
+        (declared, e.edits, Vec::new())
+    } else {
+        let mut s = steps.to_vec();
+        s.push(format!("This finding is reported at `{at}` too; fixing it there clears it here."));
+        (FixClass::Manual, Vec::new(), s)
+    };
+    let mut data = match primary.data.clone() {
+        Some(serde_json::Value::Object(m)) => m,
+        Some(v) => serde_json::Map::from_iter([("value".to_owned(), v)]),
+        None => serde_json::Map::new(),
+    };
+    data.insert("primary".into(), serde_json::json!({ "file": primary.file, "line": primary.start.line, "column": primary.start.column }));
+    Ok(Diagnostic {
+        rule: primary.rule.clone(),
+        severity: primary.severity,
+        file: e.path,
+        start_byte: e.start,
+        end_byte: e.end,
+        start: index.position(e.start),
+        end: index.position(e.end),
+        message: primary.message.clone(),
+        fix,
+        edits,
+        steps,
+        source: primary.source.clone(),
+        note: None,
+        data: Some(serde_json::Value::Object(data)),
+    })
+}
+
 /// The note that marks a finding as a rule failure (decision 25).
 const INTERNAL_ERROR: &str = "internal-error";
 
 fn internal_error(rule: usize, start: usize, end: usize, id: &str, what: &str) -> Finding {
-    Finding { rule, start, end, message: format!("rule `{id}` failed on this file: {what}"), edits: None, note: Some(INTERNAL_ERROR.into()), data: None, severity: None }
+    Finding { rule, start, end, message: format!("rule `{id}` failed on this file: {what}"), edits: None, note: Some(INTERNAL_ERROR.into()), data: None, severity: None, also: Vec::new() }
 }
 
 fn panic_message(p: &(dyn std::any::Any + Send)) -> String {
@@ -813,11 +887,19 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
         match &rule.matcher {
             Matcher::Native(nr) => {
                 let options = sectioned[slot].as_ref().unwrap_or(&unit.rules[slot].2.options);
+                let nctx = NativeContext { source: &unit.text, language: unit.language, semantic: semantic.as_ref(), options, data: &rule.loaded.data, file };
                 for f in std::mem::take(&mut native[slot]) {
                     let severity = nr.severity_of(&f, options);
                     let data = nr.data_of(&f, options);
+                    let also = match catch_unwind(AssertUnwindSafe(|| nr.elsewhere(&f, &nctx))) {
+                        Ok(a) => a,
+                        Err(p) => {
+                            out.push(internal_error(*index, 0, 0, rule.id(), &panic_message(p.as_ref())));
+                            Vec::new()
+                        }
+                    };
                     let edits = (wants_fix && !f.edits.is_empty()).then_some(f.edits);
-                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: f.message, edits, note: None, data, severity });
+                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: f.message, edits, note: None, data, severity, also });
                 }
             }
             Matcher::Match(_) => {
@@ -875,7 +957,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     _ => {}
                 }
                 for (m, (edits, note)) in ms.iter().zip(per) {
-                    out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note, data: None, severity: None });
+                    out.push(Finding { rule: *index, start: m.start, end: m.end, message: interpolate(message, m, &unit.text), edits, note, data: None, severity: None, also: Vec::new() });
                 }
             }
             Matcher::Graph(_) => {}
@@ -913,7 +995,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                         _ => (None, None),
                     };
                     let text = codelaw_match::target::interpolate(message, tree, &f.slot, &unit.text, f.error.as_deref());
-                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: text, edits, note, data: None, severity: None });
+                    out.push(Finding { rule: *index, start: f.start, end: f.end, message: text, edits, note, data: None, severity: None, also: Vec::new() });
                 }
             }
             Matcher::TypeErrors => {
@@ -921,7 +1003,7 @@ fn run_unit(project: &Project, entry: &FileEntry, unit: &Unit<'_>, mode: &RunMod
                     // TypeScript's warnings stay warnings; its errors take
                     // the rule's severity.
                     let severity = (d.category == "warning").then_some(Severity::Warn);
-                    out.push(Finding { rule: *index, start: d.start, end: d.end, message: format!("TS{}: {}", d.code, d.message), edits: None, note: None, data: None, severity });
+                    out.push(Finding { rule: *index, start: d.start, end: d.end, message: format!("TS{}: {}", d.code, d.message), edits: None, note: None, data: None, severity, also: Vec::new() });
                 }
             }
             Matcher::Unsupported(_) => {}

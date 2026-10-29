@@ -107,7 +107,7 @@ Start from `TEMPLATE.md`.
 | [0002](0002_LAW-0-authority.md) | **SR-LAW-0** | **L0** — records are the only source of truth; Law records outrank every other record | accepted | yes |
 | [0003](0003_LAW-1-retired-records-archived.md) | **SR-LAW-1** | **L1** — a retired record is archived, never deleted | accepted | yes |
 | [0004](0004_LAW-2-foss-dependencies.md) | **SR-LAW-2** | **L2** — every dependency is free, open source and permissive | accepted | partly |
-| [0005](0005_LAW-3-languages.md) | **SR-LAW-3** | **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS (with its dialect SCSS), HTML — each alone or in any combination | accepted | partly |
+| [0005](0005_LAW-3-languages.md) | **SR-LAW-3** | **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS (with its dialect SCSS), HTML — each alone or in any combination; a closed list of plain-text config files carries findings, never lint or format | accepted | partly |
 | [0006](0006_LAW-4-every-rule-has-a-fix.md) | **SR-LAW-4** | **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix | accepted | partly |
 | [0007](0007_LAW-5-no-model-in-the-engine.md) | **SR-LAW-5** | **L5** — no model in the engine; works the same with or without an agent | accepted | partly |
 | [0008](0008_LAW-6-python-and-node-packages.md) | **SR-LAW-6** | **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as eighteen packs, sixteen on npm (`@codelaw/rules-*`) and eleven on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` | accepted | partly |
@@ -206,6 +206,7 @@ yet is owned by an open `W-nn`.
 | `templates/agents` | SR-AGENT-SURFACES | decisions 1, 4 and 5: the skill sources, the custom agent and the trigger evals |
 | `templates` | SR-LAW-10 | every file codelaw writes into a consumer's repo, its registry and its slot-only renderer; `templates/agents` is carved out to SR-AGENT-SURFACES |
 | `crates/codelaw-core/src/template.rs` | SR-LAW-10 | decisions 4–7: the renderer and the registry test |
+| `crates/codelaw-core/src/text_config.rs` | SR-LAW-3 | decision 10: the closed list of plain-text config files a finding may sit in |
 | `crates/codelaw-cli/tests/layers.rs` | SR-PACKAGES | the veto's layer check (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/licences.rs` | SR-LAW-2 | how L2 is enforced: the Cargo packages, the npm lockfiles and the build tools |
 | `crates/codelaw-cli/tests/dependencies.rs` | SR-LAW-11 | how L11 is enforced: every manifest and lockfile against the ledger in the law's §3 |

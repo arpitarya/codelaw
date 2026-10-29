@@ -87,7 +87,7 @@ Each law is stated in exactly one record and is **not restated here**:
 - **L0** — SRs are the only source of truth; Law records outrank every other record — [SR-LAW-0](records/0002_LAW-0-authority.md)
 - **L1** — a retired record is archived, never deleted — [SR-LAW-1](records/0003_LAW-1-retired-records-archived.md)
 - **L2** — every dependency is free, open source and permissive; nothing paid, nothing copyleft — one scoped exception, the VS Code extension's registry tools (decision 8) — [SR-LAW-2](records/0004_LAW-2-foss-dependencies.md)
-- **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS (with its dialect SCSS), HTML — each alone or in any combination — [SR-LAW-3](records/0005_LAW-3-languages.md)
+- **L3** — nine languages — JS, TS, Python, JSON, YAML, TOML, Markdown, CSS (with its dialect SCSS), HTML — each alone or in any combination; a closed list of plain-text config files (`.nvmrc`, `Dockerfile`, `CODEOWNERS`, …) carries findings, never lint or format — [SR-LAW-3](records/0005_LAW-3-languages.md)
 - **L4** — every rule has a fix — `auto` wherever safe, otherwise `suggest` or `manual`, and a skill carries every `manual` fix — [SR-LAW-4](records/0006_LAW-4-every-rule-has-a-fix.md)
 - **L5** — no model in the engine, and no network in it: `codelaw deps refresh` is the one networked command, outside the engine; works the same with or without an agent — [SR-LAW-5](records/0007_LAW-5-no-model-in-the-engine.md)
 - **L6** — one release — `codelaw` on PyPI and on npm — each a complete engine, identical output; rules as eighteen packs, sixteen on npm (`@codelaw/rules-*`) and eleven on PyPI (`codelaw-rules-*`); npm sub-packages only as `@codelaw/*` — [SR-LAW-6](records/0008_LAW-6-python-and-node-packages.md)
