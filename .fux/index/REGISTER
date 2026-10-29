@@ -1,19 +1,40 @@
 # fux.register.v2	rules=5
 # loc	sha	decoder	[k=v ...]
-README.md	ca9475622406ba7c517b46e66f527f2c703f8495	prose
-archive/README.md	1606f0b0a0d723ebc387771905d1cf990b831ae7	prose	archived=true
+README.md	e18234d27092e312ad2c33e64cae6f75427c9f36	prose
+archive/DEPENDENCIES.md	5f61466e6adab030597fe48df0e7209792550a85	prose	archived=true
+archive/README.md	7d5533d7389ee50dae057b7749602836ce4e05c4	prose	archived=true
 archive/bootstrap/WORK-SYSTEM.md	596ed34d20a3476fd702bfd021200e94eb35b91e	prose	archived=true
 archive/open/W-01-rule-pack-records.md	78910b43392f62d75923d781051e226450ef67a2	prose	archived=true
 archive/open/W-02-engine-p0.md	d973a1d8002070f691a826554ca3ee503ea8e0b3	prose	archived=true
 archive/open/W-03-rule-packs.md	a24b86c841f4932fa777e0468a187163851a2d1e	prose	archived=true
 archive/open/W-04-release-pipeline.md	a042e9e56bc101165a99c26d04ac9f6c285caf0e	prose	archived=true
+archive/open/W-05-write-time-guidance.md	bd6c32a810e2dceb23193de1e0bfb2a74bd033d1	prose	archived=true
 archive/open/W-06-consumer-readme.md	79f54503eb5fe5198d462b8a7ceb598f27acdbd6	prose	archived=true
 archive/open/W-07-formatter.md	5df652c3dc5f14ba88b6c9bc1e9364649bb19b7f	prose	archived=true
 archive/open/W-08-mcp-server.md	43b21d5bf01f583ff54b56fa85e821a8c85a0ed2	prose	archived=true
 archive/open/W-09-lsp-and-extension.md	3778b3ff73afcad384d44851203b60c101fe60a6	prose	archived=true
 archive/open/W-10-agent-surfaces.md	5b1f3bd4360a24b2f7825a11c2c26d9c1c9ca96f	prose	archived=true
+archive/open/W-100-rule-promotion.md	58dafea98384c819a3075fc8b52eaf2429994821	prose	archived=true
+archive/open/W-101-type-aware-ts-research.md	69f46b4528353fba7098e16af09413319147a670	prose	archived=true
+archive/open/W-104-type-aware-records.md	ba22ad4d410e50b9f5e31945fcff479b908cdb42	prose	archived=true
+archive/open/W-107-oxlint-type-aware-gap.md	0d92975b9d464a57e5b7d3cf4718305820ba4046	prose	archived=true
+archive/open/W-108-oxlint-live-capture.md	01f211a2580721435b4dd3d0ff58caddfed5b494	prose	archived=true
+archive/open/W-109-bitbucket-pipelines.md	79b538020e67c9b69f7f4423af13ee7af2b3232b	prose	archived=true
 archive/open/W-11-project-graph.md	23458f83549cb9422cf72f3b0e4bc0c03d0e9085	prose	archived=true
+archive/open/W-110-session-2df06f6d-cleanup.md	a64e08f182e5cdcf5e61d278a9aa564571874adb	prose	archived=true
+archive/open/W-111-two-unmerged-worktrees.md	67e5484f6d0ea944a98aea2daaef3f69e7de208b	prose	archived=true
+archive/open/W-112-spell-words-file-and-learn.md	4dfda3758dddbafc53b24cad93c9dc22fe42bc91	prose	archived=true
+archive/open/W-113-project-icon.md	1366a4bacf21cc30d32704f510f62e6fb70fdc77	prose	archived=true
+archive/open/W-114-session-cleanup.md	d9790922854593849a0bbe00f6f7c2d6966ab2fb	prose	archived=true
+archive/open/W-115-spell-pack-first-publish.md	2fd70e334e48235091f7ec742ddf040cea583857	prose	archived=true
+archive/open/W-116-release-0-3-0.md	8d5a6bff111c391e9faa777df0f34103e3b4dc0a	prose	archived=true
+archive/open/W-119-pypi-through-pending-publishers.md	ea8a92051f1606a72e8f2773ce3983330f855bd2	prose	archived=true
 archive/open/W-12-structured-file-rules.md	a0788c7ac14251e705515d3818b2f4dd43b4697d	prose	archived=true
+archive/open/W-120-session-cleanup.md	3e1a4ba5dea508cdfcc2f4ff9dc1bf6297f9c65b	prose	archived=true
+archive/open/W-121-session-cleanup.md	59231f0d6c7a87a5b23384444c5bc98c8d30d788	prose	archived=true
+archive/open/W-122-session-cleanup.md	617ca3b178af351cb4d3177d38b05bd5aa272871	prose	archived=true
+archive/open/W-123-session-cleanup.md	b476da6108d06ae0904197801d31ebae9f2f4f7e	prose	archived=true
+archive/open/W-124-session-cleanup.md	952b22f139ebfee30b0a93f06541891ada1a64e7	prose	archived=true
 archive/open/W-13-baseline-and-time.md	8a46c23a385dee69d3bdda0309d248b449e55152	prose	archived=true
 archive/open/W-14-adapters.md	835cc6cdc4e5f3cf10aa303958600f53f207393a	prose	archived=true
 archive/open/W-15-warm-processes.md	8f166ed758b1f790aea42e7295182fabd45c7143	prose	archived=true
@@ -35,102 +56,806 @@ archive/open/W-30-first-pypi-publish.md	0edfb11be4d5aeada0de4e29dbf46b008586458d
 archive/open/W-31-registry-pack-split.md	b8b8a28b9d5ed3e9c5a89c5317108bff38c4b1d9	prose	archived=true
 archive/open/W-32-redux-and-query-packs.md	0891cad17a7b26bb13a7ff5125ba7cae1f52a79c	prose	archived=true
 archive/open/W-33-stencil-preset-gaps.md	2540eab19f1784b6b0828652199c7698ccdfc774	prose	archived=true
+archive/open/W-34-fux-index-packages.md	0e74ff8840b063bb5ad7101f82c7f2970cd19fdc	prose	archived=true
+archive/open/W-35-before-while-after-positioning.md	6ba68adee4fa53c2ad6fdef9fae2ea43941400b1	prose	archived=true
+archive/open/W-36-position-against-eslint-and-biome.md	a99f3beb8be67ffa24bd1bc300ac8263c170c32d	prose	archived=true
 archive/open/W-37-npm-0-2-0-through-the-pipeline.md	e2278986ec1aad823f0759d3cbf88760e6e39869	prose	archived=true
+archive/open/W-38-pypi-0-2-0-by-hand.md	8508c0f381a7da2c9d3b525d3708c2c3f0bb0f4b	prose	archived=true
 archive/open/W-39-ci-and-local-profiles.md	5f46fc6dc5c7aed3341a600cc8676b98b18a2525	prose	archived=true
 archive/open/W-40-dated-exceptions.md	c1f4fa5b4f663a4078aba91c57a5fc06a45e0c99	prose	archived=true
 archive/open/W-41-react-no-context.md	da1ec0c7fc6427d90bcefbbdadbcb82d3a75a3f6	prose	archived=true
 archive/open/W-42-tanstack-query-hooks-rules.md	e4fcd3f03a628598de5cbcc73f0d335fa3779916	prose	archived=true
 archive/open/W-43-react-hooks-rules.md	1e25928f3badbf102d22ee069d221048e1089182	prose	archived=true
+archive/open/W-44-watch-mode.md	1cbdd8efccdea0f30719f6dc73dcd99bf4269092	prose	archived=true
+archive/open/W-45-ci-report-formats.md	c3711ee2214510c731cc760118b71201b920a443	prose	archived=true
 archive/open/W-46-exceptions-report.md	3b9c5eaee10c8e8b1a5ea4fab30a518edee6cd88	prose	archived=true
 archive/open/W-47-baseline-burn-down.md	4516c7a23c1c0d964b6044cc60ca9c376bf60892	prose	archived=true
 archive/open/W-48-codelaw-migrate.md	7af5bc89c26ab90218b682979582f19531841dc3	prose	archived=true
 archive/open/W-49-dev-server-plugins.md	40427e6f5fd51c847fa480b4ac5bacc36cbb8cd8	prose	archived=true
 archive/open/W-50-git-hooks.md	516ada6a79bd8033dc44fa9f48f19a99b7f25cf4	prose	archived=true
+archive/open/W-51-scheduled-autofix-pr.md	b586f7e09286661eeb2eb514ee538e2cbe9117a5	prose	archived=true
 archive/open/W-52-dependency-latest-versions.md	c843d1254342ec7f1855bb3342712de382adebf6	prose	archived=true
 archive/open/W-53-security-packs-groundwork.md	9774b03a8a8d2990d564446afb7493e84995a4d2	prose	archived=true
 archive/open/W-54-security-js-pack.md	68f1b0dde9e3f6a39d188ffb97c15a941b573705	prose	archived=true
 archive/open/W-55-security-ts-pack.md	17c7e8153b4efcacbc04c074563c18871c2e8e2e	prose	archived=true
 archive/open/W-56-security-html-pack.md	4b43b02651944b542802c7faf1801b78bfbcb3bb	prose	archived=true
 archive/open/W-57-security-python-pack.md	20e3499a07e0733c6fd6e34ca24b810f55a60670	prose	archived=true
+archive/open/W-58-size-limits.md	55b4a212445c47cd9beda41e73eb414384aad19d	prose	archived=true
 archive/open/W-59-scope-and-profile-tables.md	fbab82d3c6e5a036d4b1de0e075fe7b7865aaa9f	prose	archived=true
 archive/open/W-60-consumer-templates.md	14e1fa349fc2f760a7ef63f612d5483a041094e5	prose	archived=true
 archive/open/W-61-max-lines-html-css.md	147118a7316deb71b80e9282b45d51fad532c85f	prose	archived=true
+archive/open/W-62-scss-support.md	3756bbde8655a291e1c25d14e263e1b21688dc4c	prose	archived=true
 archive/open/W-63-css-modules.md	ee92b7b92461ce18677477db38bb55cfebfefeb1	prose	archived=true
 archive/open/W-65-dependency-check.md	fecbdc138f66645136c7bc6988a8b3ae53786ba9	prose	archived=true
 archive/open/W-66-ratify-dependencies.md	211e8ee9821c68b7bd2fc9c0433b4c2b00c29a8a	prose	archived=true
 archive/open/W-67-replace-three-dependencies.md	a1c65ee713de6df5b46c65319a56a3014b01ba02	prose	archived=true
+archive/open/W-70-dev-server-example-apps.md	a3162fefaaf4dcce7612f3e05ec96180fb7359c8	prose	archived=true
+archive/open/W-71-tests-for-new-code.md	c7023e8706d9b3ea551348c2a253f0b28020c6e7	prose	archived=true
+archive/open/W-73-configurable-approved-calls.md	3a5b942941cc9d22b6b41f0a592771c15efdf2c7	prose	archived=true
+archive/open/W-74-editor-logs.md	fe9d44b8a2ef0de255c8569c9287c86d9067d9b9	prose	archived=true
 archive/open/W-75-commit-main-checkout.md	d332f6aab3bf02a92041832c7736a387050baa1d	prose	archived=true
-docs/DESIGN.md	164f518611f272a308438fe9f0980c3eebc1864e	prose
-docs/GLOSSARY.md	d7968e0a92f7cc6e1554188ab45beb48ce17382b	prose
-records/0001_LAWS.md	fc68bd6308f459513969528a37b33c5cf9b1cfa8	prose
+archive/open/W-76-commit-main-and-clean-worktrees.md	971a3f1f4cd1ee5a0c45e77956dceb6e0a332481	prose	archived=true
+archive/open/W-77-skills-package.md	ee79900c9d5a8698fc5eec7c90f576a1757600a3	prose	archived=true
+archive/open/W-78-commit-main-checkout.md	dc534bd53a81772de79e4e8fa3395edf5828193a	prose	archived=true
+archive/open/W-79-session-cleanup.md	700a10ca31e57d54717e8be106ec368080cebe1a	prose	archived=true
+archive/open/W-80-session-cleanup.md	cee3c276a4d3c98ea427845664ed9fc11e449f4e	prose	archived=true
+archive/open/W-81-commit-main-checkout.md	522bebb0355b558ba0c63f4e4bf25d22e722b1c7	prose	archived=true
+archive/open/W-84-ci-green-on-main.md	a91036ef81b85b381d43a89be8dacbeeb5fd64a3	prose	archived=true
+archive/open/W-85-npm-first-publish.md	1505208a8cf5c3c8929c301ebec73edb1f20d02b	prose	archived=true
+archive/open/W-86-pypi-day-1.md	51b019d317aa3ad7b36ac30247fdfb23d2b36142	prose	archived=true
+archive/open/W-87-pypi-day-2.md	ce0836342263d6683bb5f197082fc8014cb71440	prose	archived=true
+archive/open/W-88-pypi-day-3.md	f362f1279f551f46ac7316f38f1c161f24cd98c7	prose	archived=true
+archive/open/W-89-pypi-day-4.md	8757ca9ddd0c9164f362a0dce00296e296082113	prose	archived=true
+archive/open/W-90-l11-holds-the-dependency-list.md	ac5be977810a3e51ed68a08d7e03aa740bc511e6	prose	archived=true
+archive/open/W-91-fux-auto-bump.md	12d45ce71f4250265340f26471d29f45f89bc7f7	prose	archived=true
+archive/open/W-93-hook-pre-and-brief.md	359bf07d30fb067580461420317d98fd984c03bc	prose	archived=true
+archive/open/W-94-codelaw-migrate.md	5e26616b6047c3b49cf816632d492ea735ab155e	prose	archived=true
+archive/open/W-96-agent-format-autodetect.md	19a2dd830226a00a4b98c117632520f291d0395a	prose	archived=true
+archive/open/W-98-llms-txt.md	7342916abfb13bde680ca9e3d9ab174a59207f8a	prose	archived=true
+archive/open/W-99-side-by-side-bench.md	c487e415e9738f54e4bdea93866990a6776685f6	prose	archived=true
+docs/DESIGN.md	16827d750211cc4c1b40ed0ca57892950bc2143b	prose
+docs/GLOSSARY.md	ff9a0802473f06a07800088ad08f9f7e7b17120a	prose
+docs/brand/README.md	6a6acdd129f71c43395f10d99a029d9d528a7b64	prose
+docs/rules/README.md	102fad1036084d7f5c9a63496ce79a46f9f13c4a	prose
+docs/rules/css-modules/class-naming.md	6abba10d62c602fec443fa75160ca0a1549fbcbc	prose
+docs/rules/css-modules/composes-valid.md	b8fcc14cb88df0f8ef3528bde9833da832bd8fad	prose
+docs/rules/css-modules/no-global.md	a88febc7c1314fb32b2ba37b032e4cf6f9836fae	prose
+docs/rules/css-modules/no-undefined-class.md	7980772715e08b7a845d5215410153b2035c7067	prose
+docs/rules/css-modules/no-unused-class.md	c97f133796574dd1addfb16770bac39f90b5528c	prose
+docs/rules/css/alpha-value-notation.md	56ac91631b214dad068685340e1ed6473ea36dec	prose
+docs/rules/css/annotation-no-unknown.md	6627d869b40db34fa3582328ea5bd4e7439370bb	prose
+docs/rules/css/at-rule-descriptor-no-unknown.md	c2e06641d3ec398cbc92163163bf6d622eca64a0	prose
+docs/rules/css/at-rule-descriptor-value-no-unknown.md	2f19d71212a901785d4c059c003f2f5f0260cbd6	prose
+docs/rules/css/at-rule-no-deprecated.md	9eed1f0f515231a2703579e2a30bd228dac9ff7e	prose
+docs/rules/css/at-rule-no-unknown.md	f1af4384a3285eeae02549168e9f912326c20fe4	prose
+docs/rules/css/at-rule-no-vendor-prefix.md	edc1dbb4b676963277d79d458eec17cfc922c9d1	prose
+docs/rules/css/at-rule-prelude-no-invalid.md	10feef2fa1fce5e70bb12714d0ef7dfd1da8559d	prose
+docs/rules/css/block-no-redundant-nested-style-rules.md	b971037f5c8690683ef4b9f34148707a4084ef82	prose
+docs/rules/css/color-function-alias-notation.md	bd03ffbf667a01ee97fcada46d693b31b460ccc3	prose
+docs/rules/css/color-function-notation.md	3763500b59428bf7d8148116350a57fcad6b1743	prose
+docs/rules/css/color-hex-length.md	3b78d8dc5adecac34deb3390a31caec73695cb47	prose
+docs/rules/css/comment-no-empty.md	736a3fe46df0c5150d6cf8adec87733d4db6bba7	prose
+docs/rules/css/container-name-pattern.md	1170fd09f42ab3ddfe61a69e5f0d83ff61820e11	prose
+docs/rules/css/custom-media-pattern.md	66fa061f644d514d4aee062f9c864a299cfc797f	prose
+docs/rules/css/custom-property-no-missing-var-function.md	394f951f20fcce49dd0a978f67dd7a89de70b3fd	prose
+docs/rules/css/custom-property-pattern.md	e8d425075b125129de09b30f4fd731f7abb7cf03	prose
+docs/rules/css/declaration-block-no-duplicate-custom-properties.md	9073109b28be279097c9ef59df97a7cb747e76d8	prose
+docs/rules/css/declaration-block-no-duplicate-properties.md	fe30fac723dde888ddda05329d25cd748d915084	prose
+docs/rules/css/declaration-block-no-redundant-longhand-properties.md	2d35a64b57ec8aa498e02a8ca3835f67fc744d11	prose
+docs/rules/css/declaration-block-no-shorthand-property-overrides.md	137fb2e8be8ba585ef3628f689371c637a799f7f	prose
+docs/rules/css/declaration-property-value-keyword-no-deprecated.md	e1d1635fa62d9d7cd84f27c5cbda1c196a0cb9e1	prose
+docs/rules/css/declaration-property-value-no-unknown.md	b409481a5e969607e3d7a4b1cd99c60289f63702	prose
+docs/rules/css/font-family-no-duplicate-names.md	04f080f6eb5de4c98632f64dd67fc740290f632e	prose
+docs/rules/css/font-family-no-missing-generic-family-keyword.md	34fd2dd4fc0cc254a424ed53511250f48dacbfe8	prose
+docs/rules/css/function-calc-no-unspaced-operator.md	0ad7824d0e539e71b256777e1b8a20f1f6ad807a	prose
+docs/rules/css/hue-degree-notation.md	ccabd043e9472ba03ec08bd1711d176f3714f126	prose
+docs/rules/css/import-notation.md	81fb76fc369c63874ab79a8baaacc9e88ede0a0d	prose
+docs/rules/css/keyframe-block-no-duplicate-selectors.md	bf00743b2103669b3fe34b8e1fb1a6f8f7c43727	prose
+docs/rules/css/keyframe-declaration-no-important.md	6d46c36f7473f3c0141676888004c49d6f29e8d5	prose
+docs/rules/css/keyframe-selector-notation.md	dd4803343b8694c3d0668c36057da2a18cb8d7ae	prose
+docs/rules/css/keyframes-name-pattern.md	39331dfdbcee19b3ce39b2ff0f9dbd333eb9e399	prose
+docs/rules/css/layer-name-pattern.md	76b5b197e100d2475a1f9b4e5e78a9cdfe84898d	prose
+docs/rules/css/length-zero-no-unit.md	2cd3744d6c7c5bd612962e94c88dac13701f0a09	prose
+docs/rules/css/lightness-notation.md	527f0cf107ff648c5ccbf8fff4d04cdc20ed88b0	prose
+docs/rules/css/max-lines.md	299f080ecfba5c661b27f757a00acc4927ae4a7c	prose
+docs/rules/css/media-feature-name-no-unknown.md	4393ecb4a22c33af1e8d3c0a3dbde2fd9c57897c	prose
+docs/rules/css/media-feature-name-no-vendor-prefix.md	1b8e32332737802f4fa1642b43b0f84395c4b338	prose
+docs/rules/css/media-feature-name-value-no-unknown.md	bb19c8b782ed6450a70337c429da8adee03cb0fd	prose
+docs/rules/css/media-feature-range-notation.md	ff583566038c21db08af62fb3fb11e7bf36410f8	prose
+docs/rules/css/media-query-no-invalid.md	4c82e0f4264ccb5ec1ffcb5f5c53bd7b486062b8	prose
+docs/rules/css/media-type-no-deprecated.md	d4e980cc2df3b7cd0083035aff1b55a3788d0975	prose
+docs/rules/css/named-grid-areas-no-invalid.md	77468be66d5223beeb3ee76212e952afd1548c4a	prose
+docs/rules/css/nesting-selector-no-missing-scoping-root.md	64bbf74025f92335090e16c3eb3a43dba8c5aeaa	prose
+docs/rules/css/no-descending-specificity.md	57ab0b570366b935a7d204d8de7e351188542902	prose
+docs/rules/css/no-duplicate-at-import-rules.md	78dd0cb43bfd90261ecee5ba81e2f8f649647a1c	prose
+docs/rules/css/no-duplicate-selector.md	ae6a96374aa5c2873cf437eb131107053ef2837f	prose
+docs/rules/css/no-empty-block.md	59da774f5cf7a79926d23143373354f325dac539	prose
+docs/rules/css/no-empty-source.md	68e642cf7cfaa2576219b78b70dd01105e5ef93d	prose
+docs/rules/css/no-important.md	3a462892126abf24ed74cdff85b1c239fa6d73fb	prose
+docs/rules/css/no-invalid-double-slash-comments.md	d69f7035ebbefedb4f4f1fb9c8ed0569d5297310	prose
+docs/rules/css/no-invalid-position-at-import-rule.md	9d352e9ea5338557a03c3cc5573b434aca3ba2b0	prose
+docs/rules/css/no-invalid-position-declaration.md	f03ef337644f0408d06ef90e8b3229a2f4a8b9fa	prose
+docs/rules/css/no-irregular-whitespace.md	0db3000642b950caa45d2eecb4130432553a19c5	prose
+docs/rules/css/no-unknown-property.md	f8de86f2aebb37ec06ec470dd967ccb1a87e79bf	prose
+docs/rules/css/number-max-precision.md	08c4b1513cd5b12b7a03ed262e43b0e617634474	prose
+docs/rules/css/property-no-deprecated.md	ab3f2ff9e0ddd1e74eff9180904f2531d2002324	prose
+docs/rules/css/property-no-vendor-prefix.md	d19c907a378cd8827d65a11bf6e3879482bb55de	prose
+docs/rules/css/selector-anb-no-unmatchable.md	9495b9b6a1bbf1a20a95ea07ed596ac5e9a0b35f	prose
+docs/rules/css/selector-class-pattern.md	a9521e6fed8a1e097e3b8d835b5b9d77dfa75a20	prose
+docs/rules/css/selector-id-pattern.md	991f5ed7cf2f5ff0466be6f40dacff647683f55a	prose
+docs/rules/css/selector-no-vendor-prefix.md	8ef0b78026a4814e65b8b116354a5d9240869882	prose
+docs/rules/css/selector-not-notation.md	d242d460e1c123a069acfd55e984bca08efb64a3	prose
+docs/rules/css/selector-pseudo-class-no-unknown.md	88b729d16cc436b781909992c30a01118225e19e	prose
+docs/rules/css/selector-pseudo-element-colon-notation.md	f788ff128de9b98c2f764f524d9f575bc93c732e	prose
+docs/rules/css/selector-pseudo-element-no-unknown.md	05e96fd51fb577be9d878eba20faa5495615c455	prose
+docs/rules/css/selector-type-no-unknown.md	1de6f6b43e8d7046c571a1792bda6c434358c567	prose
+docs/rules/css/shorthand-property-no-redundant-values.md	08400aaef413c6e89946ac46891b764c5205febc	prose
+docs/rules/css/string-no-newline.md	a7236e5c79b49cb155756ed4122aaaa7b038173c	prose
+docs/rules/css/syntax-string-no-invalid.md	349210d98373990d41ca2205d8a2c3b8d13d6453	prose
+docs/rules/css/value-no-vendor-prefix.md	5d73517d635c57f6ae0489c1e0cd1ed2b8dbbba5	prose
+docs/rules/data/outdated-dependency.md	1a2319beabf6b5602d2c38b10fb39d2ad8f185b3	prose
+docs/rules/data/stale-deps-snapshot.md	05b42d88ce6b217a90504efb9d31402c5310e8d9	prose
+docs/rules/engine.md	204981c4db9abc2bef2110e4b903efface276552	prose
+docs/rules/graph/no-unused-css-classes.md	39ad9ee2fedcc7d86339a769b25b39a69a4fe20e	prose
+docs/rules/graph/no-unused-exports.md	94b64fff0b07c7c2b05d9dc6d508935b3ff02813	prose
+docs/rules/html/area-alt.md	647b6e172c19bf89165b001a02d3d6701f602e0c	prose
+docs/rules/html/aria-hidden-body.md	ba60e646ba2eaa5c52a9c1cc82cab82ceb47cc62	prose
+docs/rules/html/aria-label-misuse.md	ac5f1a52c530a795f4898494ba94f43b7e616634	prose
+docs/rules/html/attribute-allowed-values.md	2fa7a82c3b192fd28e4384ccae8a6f8f65feca35	prose
+docs/rules/html/attribute-misuse.md	1a45eb982caa023d8b8e4c947c7651ff2dcbac6e	prose
+docs/rules/html/autocomplete-password.md	92ee0f12746e4043a7e408b972f90949bddb0774	prose
+docs/rules/html/button-type.md	b96f38499f470bf1cbed9319d0da019ed753b300	prose
+docs/rules/html/close-attr.md	a3f58f8e18c6a35bbdda26cfb73fbaa32c023080	prose
+docs/rules/html/close-order.md	de7d48305ddd71be90f0004bf9f52701a636a27f	prose
+docs/rules/html/deprecated.md	46826a197fafc5a988aff25eca7e12d358e473ea	prose
+docs/rules/html/doctype-html.md	5d0069052cc4ca485cb7f91ca04390374b8e5049	prose
+docs/rules/html/element-name.md	2340c4e5e4e9f399f3c91d98909a777f0abbd312	prose
+docs/rules/html/element-permitted-content.md	686734ff747b9ad98f6731013217fdacbb4de76b	prose
+docs/rules/html/element-permitted-occurrences.md	5a68b0dc5cb925143117bdd23934b30778c07b1d	prose
+docs/rules/html/element-permitted-order.md	e6eee76a65acfb72530f0f1338294671062e32a2	prose
+docs/rules/html/element-permitted-parent.md	6d84ca6b2267369ed3281947584590ce994bd17c	prose
+docs/rules/html/element-required-ancestor.md	925da3f4c086941ca0c0e5c54540cad71aaa5dc5	prose
+docs/rules/html/element-required-attributes.md	898b53c7caf46507b4e157cb1303e9aff0809c01	prose
+docs/rules/html/element-required-content.md	29770c676facd276fb66d154f720a6bbc92984c4	prose
+docs/rules/html/empty-heading.md	1ef8e39ed5469f26c042aa1d83c69dfcc8a16efe	prose
+docs/rules/html/empty-title.md	4babf3661b6f823b0fea61eeb37e17219cbd56e6	prose
+docs/rules/html/fieldset-legend.md	8da6361e9241e892539d05b3be6cd7d4ddf7b53d	prose
+docs/rules/html/form-dup-name.md	c090d8ed02cb647e1d740c2cef4890abd639831a	prose
+docs/rules/html/form-submit.md	e9a691d13516ee3efc79c8e1fa93b1c554ed03db	prose
+docs/rules/html/heading-level.md	76a9d3fe9a9b48f4733f5043bf79cccf3c1cc7ab	prose
+docs/rules/html/hidden-focusable.md	b77f0e67181f4cb6c97d95cd5d6f3ab846649c93	prose
+docs/rules/html/img-alt.md	dbcfb7364d5d7d3c53e201fb661df9f338cb36f6	prose
+docs/rules/html/img-title.md	62923f3308f9a0415b9eb68e21d068decaa5b886	prose
+docs/rules/html/input-attributes.md	e92bb05e4d68b05eaf89bc7a2b4d2d40744066fc	prose
+docs/rules/html/input-image-alt.md	4b14b3ab362fb6e162bd2f9a8b6dab07a5134207	prose
+docs/rules/html/input-missing-label.md	5fee0acaf2bf1cb646a40a34e83d31f5e18e6495	prose
+docs/rules/html/link-text.md	e8cbaa92798a8cb9ef1a51e8a8add37003a7e20b	prose
+docs/rules/html/long-title.md	146fa422fd89c4858727a565cab0dbb22840b4a1	prose
+docs/rules/html/map-dup-name.md	7d5d25da2040c0d45dff9dc0c4b491a5bffb986a	prose
+docs/rules/html/map-id-name.md	83e2e092749ff87abd5d70be91a918e5c2992468	prose
+docs/rules/html/max-lines.md	4048b501a2f4faba8b3c8a25356fc5aaa406a87f	prose
+docs/rules/html/meta-refresh.md	052cdb5b8e420bc77c0978140ac01cac9d761869	prose
+docs/rules/html/missing-doctype.md	718dafdee2288bbe85155e90b89dbb362e3f6e7b	prose
+docs/rules/html/multiple-labeled-controls.md	abc68a058da88223e5625e3c7a28a28efa72a9d1	prose
+docs/rules/html/no-abstract-role.md	8c4ee514f5bce28d3c7909a8688c1d1d2ed79cf7	prose
+docs/rules/html/no-autoplay.md	d5d7b92772f05f54fe1cc29df8e58909d091f69f	prose
+docs/rules/html/no-conditional-comment.md	93612cae325e61475c50c4f2f1e54de1c35d11c5	prose
+docs/rules/html/no-deprecated-attr.md	81d6f469c85575126de858303c3da17d11757a58	prose
+docs/rules/html/no-dup-attr.md	098269f3d19a82466dda11c64204dc506ea42994	prose
+docs/rules/html/no-dup-class.md	df8a5cb48c77aed87050e0e1e7cbfdbefee1fa34	prose
+docs/rules/html/no-duplicate-id.md	1e8ad4d495c72f7dd022f9b26de13968453a840d	prose
+docs/rules/html/no-implicit-close.md	4ffca8a931a46e1cece5ad39a73fceaed6b3ed38	prose
+docs/rules/html/no-implicit-input-type.md	23660c05e5ceae4807ba9b488e03cf3e0404d645	prose
+docs/rules/html/no-inline-script.md	04caaa7c35ebce10a9ccaffb86bd81af8e2c710f	prose
+docs/rules/html/no-inline-style.md	758b736ccd55b024e66e3991f06fbfb1cbebe7b3	prose
+docs/rules/html/no-missing-references.md	9e96c4ff87974f7bdf7b4dc97246cd2a9d5deac6	prose
+docs/rules/html/no-multiple-main.md	0a566ad2222e0990c08b654973b563ec87bb35df	prose
+docs/rules/html/no-raw-characters.md	bb3bb1b663be0402a3378a52d1c572134d4e24e2	prose
+docs/rules/html/no-redundant-aria-label.md	29a0d6ff9814572dda2789c5cd457390f3438848	prose
+docs/rules/html/no-redundant-for.md	c57c947385e7f4604106a88998c34e00d744717a	prose
+docs/rules/html/no-redundant-role.md	55a211172925cf8dd33238cbe4c9541c19f1ba92	prose
+docs/rules/html/no-utf8-bom.md	e57cfbad2fe03a7736d5949175035b3b9ee34e2d	prose
+docs/rules/html/prefer-button.md	078cfe3c1bf7ff16115c8b58ffb9ed99b2436f6e	prose
+docs/rules/html/prefer-native-element.md	24fcad24a4c294c0c02d1a81ea42d5649901c0c5	prose
+docs/rules/html/prefer-tbody.md	de9ed4a7501d1082e8f1a61d90f6099458fa3112	prose
+docs/rules/html/require-sri.md	28f59eafcbc2d69b4e7cbf077e87194aeae616b9	prose
+docs/rules/html/script-element.md	d629d1f3d1acfb53c6eecc44ec42b39e371bb293	prose
+docs/rules/html/script-type.md	1490c80c02f682b02dcdc8d1333ecedc38fe8ab5	prose
+docs/rules/html/target-blank-rel.md	595cc0dffaf208dc33923dd713e1320504b1ce4f	prose
+docs/rules/html/tel-non-breaking.md	28cf6455ee3c65c02373dfd8aff691e4f2702afe	prose
+docs/rules/html/text-content.md	d681b53a58a7b5831ba02b2c09b93f25d36f4ce7	prose
+docs/rules/html/th-scope.md	4122607d318d2a69df9a38f4d79d77cfe93c3088	prose
+docs/rules/html/unique-landmark.md	dc46b2000a33ca47693e0c91074bb6c30823c8ce	prose
+docs/rules/html/unrecognized-char-ref.md	25c7976b9182fb781bfcba75fb65f7d8d63eeee9	prose
+docs/rules/html/valid-autocomplete.md	4a9d2061a9c2c66d2b335b4bee4c573983586f4e	prose
+docs/rules/html/valid-for.md	eddb46fd142f25eb203badcc3a96ab8068abd81e	prose
+docs/rules/html/valid-id.md	3fc7048ee50973d6fa1c3419e70718033c257494	prose
+docs/rules/html/void-content.md	87604857cee2fba6cf334c5a5db5172986d92599	prose
+docs/rules/js/constructor-super.md	1779571f9eeea560e92dcc2d7629089b70eb77a9	prose
+docs/rules/js/exports-at-end.md	ea76bf4b6509308308f71c306abdd4d0d02bede6	prose
+docs/rules/js/for-direction.md	ad18ea97ae89219f500a1a98211a67909bf9b178	prose
+docs/rules/js/getter-return.md	196f3aca38781692b00bc35052c756e5af56dba6	prose
+docs/rules/js/import-groups.md	1294c34382b76aed4f80f00737236ceabcb0bf57	prose
+docs/rules/js/max-lines-per-function.md	42a7ce611e998fdfeb61dea2ca5a98644f74754e	prose
+docs/rules/js/max-lines.md	ace0d2b56415e73eeead2fab335651355971e2b7	prose
+docs/rules/js/max-params.md	e9a147cd864e9deb79db65784aeea8ce459ae450	prose
+docs/rules/js/no-async-promise-executor.md	92d63d5dd6838c503e4650667ac34cf49f597dea	prose
+docs/rules/js/no-case-declarations.md	32ce596a8617085baff34842e87e0ad81b6a0dd8	prose
+docs/rules/js/no-class-assign.md	6cddf78a37c64484b40ad46ae22068b3a6e674be	prose
+docs/rules/js/no-compare-neg-zero.md	745a787ef8233a98c818926e82d3d519c7d95a0d	prose
+docs/rules/js/no-cond-assign.md	67795b5614906a69ec1357adf9f5fe0efd725bf3	prose
+docs/rules/js/no-console.md	383c5d1093d45b3383c485178d3053bcb0a86122	prose
+docs/rules/js/no-const-assign.md	7e0105f94a5345e489fa2fa87bfa1220e330a49a	prose
+docs/rules/js/no-constant-binary-expression.md	2e2fc2ebde47d6b76cf5d99dddfdc42ec01311d4	prose
+docs/rules/js/no-constant-condition.md	9fa8fff16bafa9a158afe5997e38bc25f206382b	prose
+docs/rules/js/no-control-regex.md	5c71bc8b726479b29244a30df73f5b4002918632	prose
+docs/rules/js/no-debugger.md	0c1456e4b12fb220703923a06734d340bfa540da	prose
+docs/rules/js/no-default-export.md	61f99c04e9c5e999cb79dacfc36bd8c8edb83bc0	prose
+docs/rules/js/no-delete-var.md	6ede72c75bc50abf490007d32c0a8d4af6b28e19	prose
+docs/rules/js/no-dupe-args.md	877d992e36db632b15c7bebf3e3a3f36b2d9e308	prose
+docs/rules/js/no-dupe-class-members.md	8c40596f1fbddf587eca1f8f84066a988abcc03c	prose
+docs/rules/js/no-dupe-else-if.md	16ac90a7f8f534704b09bc9d8af68eabb628ae8c	prose
+docs/rules/js/no-dupe-keys.md	f447ac05920d2e5a7d489456386da02c7d5cb20d	prose
+docs/rules/js/no-duplicate-case.md	e318c51d6ec901cb7e55ff97f69d9d0803a2eea6	prose
+docs/rules/js/no-empty-character-class.md	ced7be66ac1c45a86be8f2ef60893f44f871f1e8	prose
+docs/rules/js/no-empty-pattern.md	2634828130927b881d56dccf59083c0509bbe016	prose
+docs/rules/js/no-empty-static-block.md	70149cea3bb0fe8d857823d9f57d4dacc25792d1	prose
+docs/rules/js/no-empty.md	f9900523cda8374cc5f0b2fd1dc4f436245ef65f	prose
+docs/rules/js/no-ex-assign.md	584476af02c2311ca2c21adb2617edb05fac911e	prose
+docs/rules/js/no-extra-boolean-cast.md	084a4e8a1a035a4b13c8cb14c2043925a34dca27	prose
+docs/rules/js/no-fallthrough.md	f2e4116889db1f9fb3f67637b50066e1da0d48d4	prose
+docs/rules/js/no-func-assign.md	4449d0903511fc75f16a29c707debe770701d675	prose
+docs/rules/js/no-global-assign.md	8b32ecc8bd2aa9060e0e7f2b583e10ef119cbfa8	prose
+docs/rules/js/no-import-assign.md	f2365db8cdf47bf3bf17336e8d12375cd6f3eb4a	prose
+docs/rules/js/no-invalid-regexp.md	7b9d567a89b4f01934c57071f85a0ac246fcdfab	prose
+docs/rules/js/no-irregular-whitespace.md	6f8471eaac9279640c32d46be8165a3f61e0aee9	prose
+docs/rules/js/no-loss-of-precision.md	bb257f07cb6f030e1f77d959411fef9bdce89fdb	prose
+docs/rules/js/no-misleading-character-class.md	3a19a5539203e7485ad153cb585eade09826ab7f	prose
+docs/rules/js/no-new-native-nonconstructor.md	eadc547b21a0b37fa6200ebacaca1e4314b428d9	prose
+docs/rules/js/no-nonoctal-decimal-escape.md	424d2b3d0a5b43ba094e2451503b0c42b664d607	prose
+docs/rules/js/no-obj-calls.md	52b9ceba5bbc95a302dc7b25b5e80c2c29f0bc0b	prose
+docs/rules/js/no-octal.md	353b12cd4d65790e79f8da266c8573c4506c17b2	prose
+docs/rules/js/no-prototype-builtins.md	6f14d9ea57deaf67cc90bcf0848b9e52ec4fd373	prose
+docs/rules/js/no-redeclare.md	41ea894490b8587e2525922b4497dd34635d981d	prose
+docs/rules/js/no-regex-spaces.md	086fe7c459cdd91bf7b8be5640a4d64b16257135	prose
+docs/rules/js/no-self-assign.md	234fdfc9c23c8a64240da35dcbc8ef7b77becab3	prose
+docs/rules/js/no-setter-return.md	efef050f7b1cd601ac2c4274decc0a1f728990c5	prose
+docs/rules/js/no-shadow-restricted-names.md	632c3c2f24cebbc0cc2d76e0506fcb2272cafc6a	prose
+docs/rules/js/no-sparse-arrays.md	83685d01f84a369ad3a165f9f60a5317363b9cfc	prose
+docs/rules/js/no-this-before-super.md	4dcd495215fad8a0230bbdf1bd4aa218ace1f360	prose
+docs/rules/js/no-unassigned-vars.md	76e36a41c0dc33260cb4c32d0736ceb35b93bdc6	prose
+docs/rules/js/no-undef.md	e1cda71f8f7b9d1aff7b2a5735e248bec1b420ea	prose
+docs/rules/js/no-unexpected-multiline.md	dfc3a6bb6405b034f7e316778daf19a7198c7804	prose
+docs/rules/js/no-unreachable.md	f565e6c5e3a430e47c71b09ecbaad57939795180	prose
+docs/rules/js/no-unsafe-finally.md	5186d7c0de822ae540f4d21649d1e17411116a4e	prose
+docs/rules/js/no-unsafe-negation.md	17607f11b231128a5667f1e007e6a5f0bcfa0973	prose
+docs/rules/js/no-unsafe-optional-chaining.md	f07309c40743974d0f05b193a370bb875af6bc82	prose
+docs/rules/js/no-unused-labels.md	8665b3fbb0f7ac8f67f4da0dd4ffc5c26a3c7252	prose
+docs/rules/js/no-unused-private-class-members.md	f200f071537b48d6348fb149be15ed8dd0a30886	prose
+docs/rules/js/no-unused-vars.md	21c456e028554e88bc61ca1e60cdbb14e1bd9db2	prose
+docs/rules/js/no-useless-assignment.md	661a4cef31b975b360782d1908683b2f45e34a15	prose
+docs/rules/js/no-useless-backreference.md	b841651060b3835a15ab39c807d5011d81c4ec6f	prose
+docs/rules/js/no-useless-catch.md	442306529c5c2e60986454bd90300875a7bf3e59	prose
+docs/rules/js/no-useless-escape.md	f9eb8e9a196fc31588938ba5caef1bdf2055ce69	prose
+docs/rules/js/no-var.md	069ea379ce3996b9f347602af1e6143c8bbfdedf	prose
+docs/rules/js/no-with.md	4526d45c228c5cbb7415108542c21f5c46093d13	prose
+docs/rules/js/prefer-const.md	43825702813837a53279888e2b4bf97d16f6f709	prose
+docs/rules/js/prefer-rest-params.md	5e7f270e0e79d826240f4de92a7efeb419b1fa3e	prose
+docs/rules/js/prefer-spread.md	58dd14cb5c8f1b0265f3849129f60b62c2996aad	prose
+docs/rules/js/preserve-caught-error.md	4eaf9c01313cdd85160fb36cfa0634284dd53846	prose
+docs/rules/js/require-yield.md	672f3b5146156de499d9b458c96f14c2a7a604a8	prose
+docs/rules/js/use-instead.md	0c6719d50bfa345cf334927e8b3b924594abe368	prose
+docs/rules/js/use-isnan.md	fcfe1e53ff66beb6639722b4172fdbdd8c0018d0	prose
+docs/rules/js/valid-typeof.md	a242490ff7ff29c12390954ac1cec6997089fd59	prose
+docs/rules/json/no-duplicate-keys.md	147d36c4ea9b8b96167b80bb7caad21b2b49306a	prose
+docs/rules/json/package-deps-sorted.md	27967e8a7760cfaa7e86c66417b5992deaf8839b	prose
+docs/rules/json/package-engines.md	e9f46e29bacf1f1995524d317a9e887768da10ac	prose
+docs/rules/json/package-json-schema.md	86f4059f187e0847c5aa4f38f0f4b1e215b20994	prose
+docs/rules/json/package-scripts-sorted.md	d05d5d19ab7460fd71be94c7d5f6156ef4f09f7e	prose
+docs/rules/json/tsconfig-schema.md	e5dea15a6753a89d216bb3440d47cc7958460ac8	prose
+docs/rules/json/tsconfig-strict.md	4c03226e172f7c474cf03978e7066bc58b4c50d6	prose
+docs/rules/llms-full.txt	018bed370022df27c976174c03af2618d21b2367	prose
+docs/rules/md/commands-show-output.md	1f3a15e960740970c3781ea0ab5dbba463b57ef6	prose
+docs/rules/md/descriptive-link-text.md	fe966a74a10464c11b40fa38e4b73a765eb1c632	prose
+docs/rules/md/fence-language.md	45c0d9c097136ccfce2b84276c7f6aba14767746	prose
+docs/rules/md/first-line-heading.md	9d72185099cfa4980ce24182e2e4208747f60cf2	prose
+docs/rules/md/heading-increment.md	1ef2cbae1610258253d7f6046b2b516f720e601e	prose
+docs/rules/md/link-fragments.md	e45e4a1c224ac1626e4f47e745c884c35d0ed97e	prose
+docs/rules/md/link-image-reference-definitions.md	cdf4c0dca4697b51086c17356b2c414844ca2516	prose
+docs/rules/md/no-alt-text.md	128cf520396d4adf2802e8e66cc010392edb1223	prose
+docs/rules/md/no-bare-urls.md	082c0522440679944eb8131edbc30bac344e1511	prose
+docs/rules/md/no-duplicate-heading.md	e812c855179a54ccadd4b9f8d4bec19e80396685	prose
+docs/rules/md/no-emphasis-as-heading.md	d46c713cc798847f88cb834f297e00d9207b25bb	prose
+docs/rules/md/no-empty-links.md	dffd6c96aef20c3a9f803901c9004685784f0d99	prose
+docs/rules/md/no-inline-html.md	a14c71e88d3cecfb55ed7cd11feb19bccd73c5bd	prose
+docs/rules/md/no-reversed-links.md	a5d8054db5d189743bdd8b67e54878ca0353f6ba	prose
+docs/rules/md/reference-links-images.md	a36136cbde340b9aecb512f30d3c32f0fc427e88	prose
+docs/rules/md/relative-links.md	9512504ce88f7741d3614470d3e8eb0545ac78a5	prose
+docs/rules/md/single-h1.md	79b3b0876551553fd418699f8026595c51018bcf	prose
+docs/rules/md/table-column-count.md	b37daf6266b914397a3777123db62de6ee6d98ac	prose
+docs/rules/node/hashbang.md	7241ea2eb15a549f2b38c150950638ae5e108cbe	prose
+docs/rules/node/no-deprecated-api.md	b041c00080a07ea8229355927be66f618cadd619	prose
+docs/rules/node/no-exports-assign.md	6afdd1b25ce75c451b072cfb742c360ff7fc0e14	prose
+docs/rules/node/no-extraneous-import.md	708b328be6c969cf80827a487be90037218c2891	prose
+docs/rules/node/no-extraneous-require.md	9c39e16fa1738dde628b47eb4a39a8c26cbeb084	prose
+docs/rules/node/no-missing-import.md	3b96cf0b33c25de7e64dbb18a3cac3b9034f7383	prose
+docs/rules/node/no-missing-require.md	f6122e4046e988f56ee54cf12bf6808dc28f126f	prose
+docs/rules/node/no-process-exit.md	1dc995d9db0893392e93eb7c55c258cdc5602cc5	prose
+docs/rules/node/no-unpublished-import.md	c519fb18cbf3c1a08823c88e2c27a7f66927a02d	prose
+docs/rules/node/no-unpublished-require.md	f4bd568af19ce71bbce340e20bbb3d30873c024d	prose
+docs/rules/py/abstract-base-class-without-abstract-method.md	daa8da8593c2d92c23258fe9f1a8370c3321d1a8	prose
+docs/rules/py/all-sorted.md	adeab124f46199c9a4d85b137b9261845cd51719	prose
+docs/rules/py/ambiguous-class-name.md	9afa7695519583ebb1a03be30e45359dba4eb382	prose
+docs/rules/py/ambiguous-function-name.md	4c3814eaf5e50408dbe0933ce5c82bfc247b7869	prose
+docs/rules/py/ambiguous-variable-name.md	64c8a7462b36e5df7d4e6a943c062a523cd3d660	prose
+docs/rules/py/assert-false.md	08aa59737448d4ec9d914e0b7cb5434a3daa4aee	prose
+docs/rules/py/assert-raises-exception.md	c266c19f205013594facf0a252b1606beda14b16	prose
+docs/rules/py/assert-tuple.md	fccc89aff14dcfffb287c43b86bc1b723fb63fac	prose
+docs/rules/py/assignment-to-os-environ.md	a322af01e9fec5785e23ca30e7c959e46192a217	prose
+docs/rules/py/batched-without-explicit-strict.md	0a33adc4256cafe9c8138e7bb64f4b994b8f993d	prose
+docs/rules/py/break-outside-loop.md	0dc7343a8d140a6c43448ae78af625a1144675fd	prose
+docs/rules/py/cached-instance-method.md	437d1f9f20af3897fdd38cc134665a5b0287d7a1	prose
+docs/rules/py/continue-outside-loop.md	842b63098f0210c4daab495363ebbc7936774d02	prose
+docs/rules/py/default-except-not-last.md	7714cf645a61f5055d20b95fd4fae3ea5fee1d77	prose
+docs/rules/py/duplicate-dict-key-variable.md	0a46c48ebe0ae72f24fc376c29009d51c735414c	prose
+docs/rules/py/duplicate-dict-key.md	524b82e2fcb956bc0b9f079fe14edc7e7c683b17	prose
+docs/rules/py/duplicate-handler-exception.md	9c31f67c56e48db17eed1e6ddda5cc723ba1a380	prose
+docs/rules/py/duplicate-set-value.md	c4ec5006d7e555b5f9a1b0751517effc73241d06	prose
+docs/rules/py/duplicate-try-block-exception.md	102bbc5c12330bed3e9d4fa2a272d0b394417c8b	prose
+docs/rules/py/empty-method-without-abstract-decorator.md	9b66d9651c0312ac2cf90ad364d8cd3d5301463c	prose
+docs/rules/py/except-with-empty-tuple.md	71b3a9bbf6c50812d3c0b557fe220207264210f0	prose
+docs/rules/py/except-with-non-exception-classes.md	68f139493fe7d7e389d3391f0e5311071c8abbea	prose
+docs/rules/py/f-string-docstring.md	ef2dfa2f83007f4456d58044eb0386a5cdcaf9b4	prose
+docs/rules/py/f-string-missing-placeholders.md	0a030d3b59ac0e0b9755d2f595ed32ba1d8a265e	prose
+docs/rules/py/format-invalid.md	69b84256c72340660443ea598dd471d876a6ef66	prose
+docs/rules/py/format-missing-argument.md	43a925d1c24e56524734fecb7b22193e64d2ffa2	prose
+docs/rules/py/format-mixed-numbering.md	7a91a06fedcbcdfd450ec1fa2da31120c280b490	prose
+docs/rules/py/format-unused-named-argument.md	a2e282077e2813a8945084e9dc3e6828d3183523	prose
+docs/rules/py/format-unused-positional-argument.md	3a25e537f334e181d730dd2c19ea75cd2561e0d9	prose
+docs/rules/py/forward-annotation-syntax-error.md	0137f73b85779b5872c44070bb7d08550c401455	prose
+docs/rules/py/function-call-in-default-argument.md	fee5aebde69f86815bfb33ea99c33d65debdd66f	prose
+docs/rules/py/function-uses-loop-variable.md	a47e6a0c9490022a6e05c389fc76167842da836c	prose
+docs/rules/py/getattr-with-constant.md	4fce05d55f31bf0147dab023eb06e4448a1160f9	prose
+docs/rules/py/if-tuple.md	92f9e83dcbfae186a25d6fb9eabcee97c31356b1	prose
+docs/rules/py/import-shadowed-by-loop-var.md	3168cc5c99ab410382696afabf44fdc51b64ee0b	prose
+docs/rules/py/invalid-print-syntax.md	11dd88d2f1f0108239b6303a9f3d2c86a0c85935	prose
+docs/rules/py/is-literal.md	d74b8cbc44f3cd0806e663e3ca5448b7dc70e465	prose
+docs/rules/py/jump-statement-in-finally.md	141a8f7c7c7dc8b61a530c886bdf48fe4fd1e376	prose
+docs/rules/py/lambda-assignment.md	cbfbb131447ce5e68a4e7fb376d2ef9cf6b36cba	prose
+docs/rules/py/late-future-import.md	967ce0eafbc0ea5a77dfbd0a1b41ae2b553edc12	prose
+docs/rules/py/loop-variable-overrides-iterator.md	cefa3dfd5cac3baa9b2ca88f21fb8b14dd9402ff	prose
+docs/rules/py/map-without-explicit-strict.md	6b2fb119263405654e9ffe32aeaf1b85a910335d	prose
+docs/rules/py/max-lines-per-function.md	0df5060bb27c937d9bb5e06805f5cd6eab471100	prose
+docs/rules/py/max-lines.md	8f50f9833b8cb1c15579ef263137223d9853c9da	prose
+docs/rules/py/max-params.md	d3b916700337a4c44005bd2f426bbdbfc5eb3897	prose
+docs/rules/py/module-import-not-at-top.md	42e154b3b6a6c7758df4cfb206bf94a45e3b7baa	prose
+docs/rules/py/multiple-imports-on-one-line.md	fce764f0b3683017e2b936f232005f57e71aa715	prose
+docs/rules/py/multiple-starred-expressions.md	14d837bd8e89888c4f20c5d8e5b5539fb3061574	prose
+docs/rules/py/mutable-contextvar-default.md	f5f92e1cb17d85f588b0a6a49bbd5b7fa47b70c0	prose
+docs/rules/py/nested-star-import.md	16b99aac6b034b7fb0b296a9978dcaef6cdea001	prose
+docs/rules/py/no-bare-except.md	86b4abee2520a339d486448ed98a67a910a7910d	prose
+docs/rules/py/no-explicit-stacklevel.md	b8b71ed7671d107d1c1d9d735d6ff8bb30573358	prose
+docs/rules/py/no-mutable-default.md	4b023269125cbda0768defd5f2dfc97e1dca3268	prose
+docs/rules/py/no-print.md	081628d5bf9471b42171f5091d0f2b9ccea9a096	prose
+docs/rules/py/no-star-import.md	6107bb602e86d8414455ed6c0ea39ec927202c5e	prose
+docs/rules/py/no-tunable-literals.md	23c5406d51ef2f7551363125f16ba8d9972df7f2	prose
+docs/rules/py/none-comparison.md	9948c902bb2db96470a5bf8698cf3412e2b428e4	prose
+docs/rules/py/not-in-test.md	2311982e988fca48d6f84f5ce3c6b9f5a083792a	prose
+docs/rules/py/not-is-test.md	18ef85a8136b1aaa9ca864c2c3af2053b7c65ea7	prose
+docs/rules/py/percent-format-count-mismatch.md	9689d62059e3316fa3b395ac95389950edd73b2f	prose
+docs/rules/py/percent-format-expected-mapping.md	778e7c2aa8e8ff56bdbf68d51545a4bcc4856f14	prose
+docs/rules/py/percent-format-expected-sequence.md	d3544a7f4f1e306f9e97841987b990665d91709c	prose
+docs/rules/py/percent-format-invalid.md	190c421fc92e0af71e89a5a877bf93f77d80d956	prose
+docs/rules/py/percent-format-missing-argument.md	a11f70a8fdc0c73d82b87fc4fa41cf988433bd06	prose
+docs/rules/py/percent-format-mixed-placeholders.md	0903b0ab991278eaef2cbf7928b18f17718bb0b4	prose
+docs/rules/py/percent-format-star-requires-sequence.md	5b6cb4d58e2113801645a48abdd8c20430bf3372	prose
+docs/rules/py/percent-format-unsupported-character.md	58a670a68a4da903f9b6c114dc190d95989cae83	prose
+docs/rules/py/percent-format-unused-named-argument.md	46470f5a47fc63a68e9e52e51d1cb91c6c7e12ba	prose
+docs/rules/py/raise-literal.md	9e79cb97dcb2221e8a149d0cbfd43f453ef1e62a	prose
+docs/rules/py/raise-not-implemented.md	754f86f97d1ec6e05439ccf72e08e6b7aa8d7305	prose
+docs/rules/py/raise-without-from-inside-except.md	1a3e36d0b819ea69a0bbb363252805f5738788af	prose
+docs/rules/py/re-sub-positional-args.md	f802a3054c680c4f1c98bf290ff514ef6bf23080	prose
+docs/rules/py/redefined-while-unused.md	6d5f14f395093e6fcd97f3cdcff6446126b53233	prose
+docs/rules/py/redundant-tuple-in-exception-handler.md	d4594482e514ecb8ce6d6b3069da62b548dc3838	prose
+docs/rules/py/return-outside-function.md	88238249b9737781853d8e53e8da9f3ae25be122	prose
+docs/rules/py/reuse-of-groupby-generator.md	b3c41a7b604797817090a5a07a4ecb805ee7c19d	prose
+docs/rules/py/setattr-with-constant.md	e86d93ee2ceca5ef22cce991ed84eb15a67092c3	prose
+docs/rules/py/star-arg-unpacking-after-keyword-arg.md	26666e27633fcce98f985d7eeca83849dbd28b60	prose
+docs/rules/py/star-import-usage.md	9a0e589446e8d67a252bae6aabad9ec6173ef7b0	prose
+docs/rules/py/static-key-dict-comprehension.md	c16a9cb65cab8032b809bb9e483851da4cda1b42	prose
+docs/rules/py/strip-with-multi-characters.md	975894f5cc0f40a4028d1c5d294b39f2fae9dc50	prose
+docs/rules/py/too-many-expressions-in-star-assignment.md	6acb90764b5904802d2a463f3ed119e6f076ee66	prose
+docs/rules/py/true-false-comparison.md	e2773bce85bee7460c4dac545fa14a3ac2da8fb2	prose
+docs/rules/py/type-comparison.md	616d40d8394c945509b0bf54bd55cb88090c75ff	prose
+docs/rules/py/unary-prefix-increment.md	93dc7ca1a7cc3a3e0f9376440f0fe2398ac2ebb2	prose
+docs/rules/py/undefined-export.md	1d4dfb3b5c389778da2e5485ce67666bbddee95d	prose
+docs/rules/py/undefined-future-feature.md	5f2ff705e8db8138d9146df1299001703d3f3c03	prose
+docs/rules/py/undefined-local.md	8bfca0b5eab0947769266f451d146bfaafb26ce0	prose
+docs/rules/py/undefined-name.md	b3addf10a9ccae2cfcdc8d52d387cee27839fd85	prose
+docs/rules/py/unintentional-type-annotation.md	fc6c9a4f5b842c8a1ca83d544aba4f6673985fe4	prose
+docs/rules/py/unreliable-callable-check.md	d02265de3a4ef99ee833d03df7f0aa0334c196fa	prose
+docs/rules/py/unsorted-imports.md	c545fdd9bbf57e5a5499fd66fbe530994df361f5	prose
+docs/rules/py/unused-annotation.md	1d5e847dab6ac5c4173a12b3f2fcf294f75ecd38	prose
+docs/rules/py/unused-import.md	4e9bd550523d3b0c668ca7b1a3dcef1ccb9a8e8e	prose
+docs/rules/py/unused-loop-control-variable.md	d83977275a87475c21bd625e3c7befff849963e1	prose
+docs/rules/py/unused-variable.md	ee76d4860ad4e58a7c857520395564d4824ae38c	prose
+docs/rules/py/use-instead.md	4b362eafff538fc5ce0042aab162aa7497ff4469	prose
+docs/rules/py/useless-comparison.md	18f664a9d84fcbf49076993fa1d1f2a9e88fc4ec	prose
+docs/rules/py/useless-contextlib-suppress.md	939a995b275a6de781583354a8c4d1a68bd7e8d8	prose
+docs/rules/py/useless-expression.md	8860cf6fa92d239fa9f0057a91fe8e690714c63b	prose
+docs/rules/py/yield-outside-function.md	485886d5ac21441f8b9f211bd823761782991743	prose
+docs/rules/py/zip-without-explicit-strict.md	7f1d4c158e57c79d4aa11ab8be73e537c3052133	prose
+docs/rules/react/display-name.md	878985c2b0ef87b5eacbfc372b4f52ffc721ac50	prose
+docs/rules/react/error-boundaries.md	ab16fea583a563e44a2c8f7351b8a0d20ef3d8a3	prose
+docs/rules/react/exhaustive-deps.md	3220eca9c36768598aee0dc1b9b1a19e61d20f42	prose
+docs/rules/react/globals.md	173ca81d4c96e226bb191da14309bb2341498303	prose
+docs/rules/react/hook-prefix.md	23411c9c4472b1418898a54483bea8b5d14dee0e	prose
+docs/rules/react/jsx-key.md	d91cb45c211ba4bb269060d6782471bd7f867631	prose
+docs/rules/react/jsx-no-comment-textnodes.md	2cc92cd3ac9599a0b091a0f25de318f6fe2d8af1	prose
+docs/rules/react/jsx-no-duplicate-props.md	97462b91512e759cd15a974a27d640cdf292f713	prose
+docs/rules/react/jsx-no-target-blank.md	4294b8d7d5d6828eccce70835392eb160ce25625	prose
+docs/rules/react/jsx-no-undef.md	20b6d53f0f84602a3e48096b2b52d0891f0483fc	prose
+docs/rules/react/no-children-prop.md	4589b043f3b5555ddab2a64bc75d2d3707d23b94	prose
+docs/rules/react/no-context.md	da443e1972f90cce8674e98c7c6f0402527c16a3	prose
+docs/rules/react/no-danger-with-children.md	8e4a4b8d6e30cc6af7b6682650266e7a2218a75f	prose
+docs/rules/react/no-deprecated.md	e6dd6aa5fc29cba27516f39361f943cf29b09b9f	prose
+docs/rules/react/no-direct-mutation-state.md	6c786b50baa3b30fb0f57df87bbfd2ae1f5fca7a	prose
+docs/rules/react/no-find-dom-node.md	c17c8533eb0653b61c548d78b25e3ec71addd1a0	prose
+docs/rules/react/no-is-mounted.md	4e0ea4fbb6fdaf2c10d167ba0ffee8c6883a643a	prose
+docs/rules/react/no-nested-components.md	2137cb9f439792449b327afccdd6d28fd668667c	prose
+docs/rules/react/no-ref-in-render.md	fcb13c26d4561162318ae4fb9232b0db39ca0c1f	prose
+docs/rules/react/no-render-return-value.md	fa873ef49f297e3a60a43ffd292e18f23b0436c7	prose
+docs/rules/react/no-set-state-in-effect.md	124b6030f890ca437a1f071b1a5685019aee990d	prose
+docs/rules/react/no-set-state-in-render.md	f36199df79376276dd217fef1adeeefb8d8007c6	prose
+docs/rules/react/no-string-refs.md	c1799cccde9a794e7f38c2ca3a94a95bb20e6f05	prose
+docs/rules/react/no-unescaped-entities.md	b788011e09fd8833ce44fc7d37a278c616cb5d7c	prose
+docs/rules/react/no-unknown-property.md	3c1ba085adf15ee3f05ec5cd18eca911d1386457	prose
+docs/rules/react/no-unnecessary-use-prefix.md	543055184a2dd6626a4e64efa908317cb3d6cf2f	prose
+docs/rules/react/prefer-lazy-state-init.md	5b1d6be64e6345c203176a26aa1d812dec43f022	prose
+docs/rules/react/props-type-name.md	c29440fffb9719a0d015c9c0cb7250f64c53c229	prose
+docs/rules/react/purity.md	e594f795762ed239a0bd8790a690ff2077852acd	prose
+docs/rules/react/require-render-return.md	fffbe21aac27ec02e97caa9acf79e8cab6abc4b3	prose
+docs/rules/react/rules-of-hooks.md	88d416fccdb52df5c460c94edef2983f6bca6d20	prose
+docs/rules/react/use-memo.md	14bdff69587c0127ecdebdd0ed1900d953baf745	prose
+docs/rules/redux-toolkit/no-blind-payload-return.md	3a7b42bbf0aa995a12e650b3e83470bfa13f2852	prose
+docs/rules/redux-toolkit/no-immutable-js.md	1ae7cafeb0c0937ecdd88182aad8c6eddcdec88e	prose
+docs/rules/redux-toolkit/no-legacy-create-store.md	3c0dbed1236d17077d28f05d539930396b0a5003	prose
+docs/rules/redux-toolkit/no-mutating-reducer.md	4830036607987e477de6c2cb0d36aacfbb4c53b5	prose
+docs/rules/redux-toolkit/no-non-serializable-state.md	6ef2eec4f79306ad239e49dbe6119fb225598ed5	prose
+docs/rules/redux-toolkit/no-object-selector.md	3ceb1aaec28cc4cb6b3b1e50b1a9156c4a14b190	prose
+docs/rules/redux-toolkit/no-sequential-dispatch.md	513380beff496b370b9bd9a30ee3189877d6c267	prose
+docs/rules/redux-toolkit/no-side-effects-in-reducer.md	85113da73d9c5798884d3c0a3be51a6759e526cf	prose
+docs/rules/redux-toolkit/object-shorthand-mapdispatch.md	07906654e0863e9c03d81ea02a92c301aa7f4631	prose
+docs/rules/redux-toolkit/prefer-create-slice.md	406cb6c4ccb2c29a678b1500c354ef5eb9cdd841	prose
+docs/rules/redux-toolkit/prefer-hooks-api.md	282531dea784b5ee7effe6fcb92a5bbe331ce5be	prose
+docs/rules/redux-toolkit/slice-key-names.md	5b2573bc2d711e8daed868cf911eb419f4d9fdf7	prose
+docs/rules/rules.json	230630572ff31cbf2280c99ddd5df97f26818a1d	pkg:fux-decoder-json@5.1.1/json@1+limits@1
+docs/rules/scss/at-extend-no-missing-placeholder.md	91cbd065a9e168811f4a0e79508215395103cb3a	prose
+docs/rules/scss/at-if-no-null.md	92825859e9db055951887bc0a62e48aa8db7052c	prose
+docs/rules/scss/at-mixin-pattern.md	82c032c9ae6e3dbaca4b428897c034d6a6aee86a	prose
+docs/rules/scss/at-rule-no-unknown.md	7b790d17303a4be1fcd65d1bde88a64d52c1ce9e	prose
+docs/rules/scss/dollar-variable-pattern.md	ea5867be3e24e6f935786331b8350c6d6e5a6de4	prose
+docs/rules/scss/double-slash-comment-empty.md	63f97f49b89d343538d8a9b350e0a195811de24d	prose
+docs/rules/scss/function-no-unknown.md	0315b41d5daec2fe4e36f4bd9ae637f3ef6e0eae	prose
+docs/rules/scss/load-no-partial-leading-underscore.md	4a54d67fca8d30611f964302769a98ca883a43a8	prose
+docs/rules/scss/max-nesting-depth.md	b4dc99b88b5b251aacdb618ad33afd34d420e6ab	prose
+docs/rules/scss/no-duplicate-dollar-variables.md	5c176fb27a2b28356e604171f80aee5735f00006	prose
+docs/rules/scss/no-duplicate-mixins.md	361f9a5d8dedb398dcf97f123c85c7f9230cdf8b	prose
+docs/rules/scss/no-global-function-names.md	d066f8dac612b8d3840a96fffaaea843bada1e94	prose
+docs/rules/scss/no-import.md	cf30b3977a1a7634e12be2ecb9e67e3cf856f2bf	prose
+docs/rules/scss/no-slash-division.md	feb102a3219b41b0fd763ec09f125d0d747d04bf	prose
+docs/rules/scss/percent-placeholder-pattern.md	d2182993018b99e33e8403d7da120096b272cc93	prose
+docs/rules/sec-html/angularjs-url-expression.md	9f01c125a4a0d069410c46719659693945abd1d9	prose
+docs/rules/sec-html/csp-meta-unsafe.md	4665954d1c11e30452a2363274030db6f57c646f	prose
+docs/rules/sec-html/form-csrf-token.md	50b0a43292e8a976dae38aeac5420f2c92dd5387	prose
+docs/rules/sec-html/iframe-allow-powerful.md	c4eec1c916b282c7fb6ba306c9c56191baf059a5	prose
+docs/rules/sec-html/iframe-sandbox.md	a7b57c459623fa9b05b6306b2dc07f9ed849651f	prose
+docs/rules/sec-html/no-credentials-in-url.md	5f7b1bf56ef1dce316f1e93cf508a2ce9d69b6b5	prose
+docs/rules/sec-html/no-external-base.md	a0fbbe85a68ee3fd5682ef754ae3bb7a661d23d5	prose
+docs/rules/sec-html/no-inline-event-handler.md	48b9f18fc8049eca83e16e94804902a1f64695f4	prose
+docs/rules/sec-html/no-javascript-url.md	7a9216a1fc5de304aeb2ae437f74b2d49757f6c6	prose
+docs/rules/sec-html/no-mixed-content.md	2269e6d3c2171ee90f6ba9fdd383eb782be95e6f	prose
+docs/rules/sec-html/no-plugin-embed.md	3ddf571b2567fd0f60b2a20fe74831e89a0e3cee	prose
+docs/rules/sec-html/no-secret-in-hidden-input.md	ef04bca50e1eef29085d936220920104c63800c9	prose
+docs/rules/sec-html/no-sensitive-comments.md	7d32c808201fc2b1a02e95ba7c81e897ae6b84df	prose
+docs/rules/sec-html/no-srcdoc-script.md	0f21830aa540de7fa2b7511b92dfbdf045468624	prose
+docs/rules/sec-html/no-template-html-sink.md	59aa744767de3793643fb69b10ec7c15fcc57bf2	prose
+docs/rules/sec-html/no-unsafe-template-interpolation.md	c50d7f2f96733b8d3760f64385c96dc82e47948c	prose
+docs/rules/sec-html/password-form-post.md	f516647543a94f08ec4be4a08aefdabe1e90b72a	prose
+docs/rules/sec-html/referrer-policy.md	1052f605b96e42d15c3b9365f87ee29f55fbdf51	prose
+docs/rules/sec-html/sri-crossorigin.md	83c7c2d6a1be17a5c8865916282ab673e51aa289	prose
+docs/rules/sec-js/angularjs-sce-disabled.md	7a17a1eb0cd9315a67e091fd0e42f96a136083a7	prose
+docs/rules/sec-js/cookie-flags.md	b84ed1385d62bd39197c9a7183113c863fafac5b	prose
+docs/rules/sec-js/express-hardening.md	1daee16ee9d472e06e0add6a11c33b17f3c078d6	prose
+docs/rules/sec-js/express-session-secret.md	0c6bc9feabff23c34c17fba51e1af905844e6850	prose
+docs/rules/sec-js/graphql-hardening.md	eab7236d6ac5323a27418be62ce116e69281308b	prose
+docs/rules/sec-js/helmet-config.md	1e42d5cd4fe2c036520c7aa48e65b505b68fdd02	prose
+docs/rules/sec-js/jwt-verify.md	cd33c9f5b1227762a5b326654babc10f7407496a	prose
+docs/rules/sec-js/missing-rate-limit.md	4a84d74013907d97e87a80dbb5b244985c54c698	prose
+docs/rules/sec-js/no-archive-slip.md	b5c412658816abc4d3b472df1d30cacc165e9ae4	prose
+docs/rules/sec-js/no-bad-tag-filter.md	19bdadc6669a936a9e063007b469fc6363c2c572	prose
+docs/rules/sec-js/no-biased-random.md	436f24e9ba12b4285d67447eb267d24831472e1f	prose
+docs/rules/sec-js/no-bidi-characters.md	e0fa66a4946b0b0cf5441d9ee1ae29bb8884f4c4	prose
+docs/rules/sec-js/no-child-process-shell.md	0243473eb80e79183aa67589d0f2a9d832414d75	prose
+docs/rules/sec-js/no-cleartext-http.md	403a591cb6694c7e960d5ba1be43de3af72c6efb	prose
+docs/rules/sec-js/no-cors-wildcard-credentials.md	df999caf909e4e98229f561fc097862f1078faa3	prose
+docs/rules/sec-js/no-csrf-before-method-override.md	3d4d04e3c2fecd277d57310b3a915676bbba9798	prose
+docs/rules/sec-js/no-dangerously-set-inner-html.md	d7ca2200c93c253580f58f4a95fdd2dbd66bb7ec	prose
+docs/rules/sec-js/no-document-cookie-token.md	09bb96216951c746a5393fb06127bac824366985	prose
+docs/rules/sec-js/no-dynamic-script-src.md	02cbd467d2d19e3addd78a418156fb3da4cb5df1	prose
+docs/rules/sec-js/no-electron-insecure.md	9f4f8ba4f8cc2cc7a19e9058154fbcb4b1603fd3	prose
+docs/rules/sec-js/no-eval.md	8d5ad2271e7230083351a58d8ae6af09f3b55f17	prose
+docs/rules/sec-js/no-format-string.md	a6f7e17febeaebaaa075bcdd5c7bc6e00030785d	prose
+docs/rules/sec-js/no-hardcoded-crypto-key.md	ab450ef10c04915c35b7facdff6d6e61d63e89d7	prose
+docs/rules/sec-js/no-hardcoded-secret.md	272d75a6698d5bbf9b3b17b45a35ef05fc0174f9	prose
+docs/rules/sec-js/no-header-injection.md	ba9be933d7c9b37e2948d5825db2f6876bac734c	prose
+docs/rules/sec-js/no-incomplete-sanitization.md	b31460c97ea8d0ec0ac2c3218f96dc1aae319544	prose
+docs/rules/sec-js/no-incomplete-url-check.md	84747eeac4bf932fef787722bed8cf76c475d7e1	prose
+docs/rules/sec-js/no-insecure-random.md	53ab3bbd1b341ca0ae9ca0b11882c29e59810fc5	prose
+docs/rules/sec-js/no-javascript-url.md	2b51269f2a58144070f2e2c38d1f519d3cdf04d5	prose
+docs/rules/sec-js/no-jquery-html-sink.md	d516d433063f06b1fc104dcba6bc57cdbe1529e4	prose
+docs/rules/sec-js/no-ldap-injection.md	a1eec6dc6301b4d9cde6d1451766b994be6afb98	prose
+docs/rules/sec-js/no-llm-output-to-sink.md	c111e52e8a99b194ec99641e70f78f35d4772372	prose
+docs/rules/sec-js/no-log-injection.md	a1ae8f191b7b1b687c4b06dc6e71ecb16a757e77	prose
+docs/rules/sec-js/no-mass-assignment.md	53cac96aa2fadb0f20047836bed9cf63ab51f1e2	prose
+docs/rules/sec-js/no-new-buffer.md	faad3b9db0778bb4f88ca88092d1a65b914a0e62	prose
+docs/rules/sec-js/no-non-literal-fs-filename.md	78c292f459f6ac7367b5d9940cfa9b8d7546a36d	prose
+docs/rules/sec-js/no-non-literal-require.md	865ec9ff3c7d44dadd044e99ef9df42b9689fb81	prose
+docs/rules/sec-js/no-nosql-injection.md	14e16840d17a5d43d3d32122910d89343d5f8b2b	prose
+docs/rules/sec-js/no-open-redirect.md	9a033d5513f8975412663311d7fe6147f76c7ba4	prose
+docs/rules/sec-js/no-path-traversal.md	d57df7930eb612c6526aeadf96d964bb98644934	prose
+docs/rules/sec-js/no-prompt-injection.md	434670043d85318f5df047a317cfeaa1afbddb8b	prose
+docs/rules/sec-js/no-prototype-pollution.md	14fc9058bef3cd23265a14362d5fd1ed074c8456	prose
+docs/rules/sec-js/no-secret-in-log.md	b5f892dd54918eff8b404d8556a2592173ebcc41	prose
+docs/rules/sec-js/no-sensitive-get-query.md	cac55fc54dae15b97ef7c0b46b5c09f8aa397fc5	prose
+docs/rules/sec-js/no-server-env-in-client.md	1faabe379310b335d27b9160db8864291dc67e1b	prose
+docs/rules/sec-js/no-sql-template.md	c168fdd32bdb7c6628e13c19fd1ca4bcc6857f53	prose
+docs/rules/sec-js/no-ssrf.md	f34aa24ceae6b35577199898f81e54b737922e43	prose
+docs/rules/sec-js/no-ssti.md	849969018c74a4d47759d728244481909fc6c346	prose
+docs/rules/sec-js/no-stack-trace-response.md	243ff7e1c37e6c7654e96731161d6d0eff56d2e9	prose
+docs/rules/sec-js/no-tls-bypass.md	f0ad01a1eae869f1c57a68c22c922be928ff9ce6	prose
+docs/rules/sec-js/no-token-in-web-storage.md	31a80cfa93b1caccc48247254110b22161a80fd8	prose
+docs/rules/sec-js/no-unsafe-deserialize.md	b33c883a79b51bb32dd7e6434a5ac097308e229b	prose
+docs/rules/sec-js/no-unsafe-regex.md	b534aaae1805cebb38f33b60c8a35313808ec83a	prose
+docs/rules/sec-js/no-unsanitized-html.md	1d0ffac6945de151366e185910e7955b7ede4838	prose
+docs/rules/sec-js/no-unvalidated-dynamic-method.md	20da567026087e189a87537b1636d61452b8df2a	prose
+docs/rules/sec-js/no-user-controlled-auth-bypass.md	d3553219e0881863e566deed67b7cd587080c356	prose
+docs/rules/sec-js/no-weak-cipher.md	e52d6348e1f386aa00e4033deed4b6b38a0563fc	prose
+docs/rules/sec-js/no-weak-hash.md	7507e0137f208bfd42b5d490040a0ac6d3cfb54d	prose
+docs/rules/sec-js/no-weak-key-size.md	55f6638618cfd348fa1f9f05985d6f7cefda0efc	prose
+docs/rules/sec-js/no-window-open-opener.md	5b506739c3bc69b09dc018f6a7d5745ab9b50520	prose
+docs/rules/sec-js/no-xpath-injection.md	637901e2bfb46d67e04e0a009b2e37a2dca83e72	prose
+docs/rules/sec-js/no-xxe.md	b43547263a32f5c70bcfb114258321dab62c6874	prose
+docs/rules/sec-js/password-hash-effort.md	f29206fd63d2a4fe00c4d78ef26fee93b4f5a8ee	prose
+docs/rules/sec-js/postmessage-origin.md	938ffe040a3dee20d4a58dcec4ac9dd1145e2aec	prose
+docs/rules/sec-js/timing-safe-compare.md	a63a3c7454ad1cbea62f03aeab2ac2a554cc82fe	prose
+docs/rules/sec-js/upload-limits.md	8b2bf8a26db858658020528d360250dbdd35e31a	prose
+docs/rules/sec-py/cookie-flags.md	5293c1446e6dc23ebf0d754c4df510e55b04345a	prose
+docs/rules/sec-py/django-settings.md	5f6cdb0a7fbe02d656071b9aa9441cad8d256deb	prose
+docs/rules/sec-py/fastapi-cors.md	218c379e3c9904de9e06b5b5e3cf11ebb72b5be6	prose
+docs/rules/sec-py/flask-debug.md	a9d906c2bf70022088e75aa86448fc5e5a4e4871	prose
+docs/rules/sec-py/flask-settings.md	361b6b2e954fb22133ce06ddca24bf8d57b0fa97	prose
+docs/rules/sec-py/hf-pin-revision.md	6642a1bcf738a94cd9fb1821bd4448814f011e0a	prose
+docs/rules/sec-py/jinja-autoescape.md	aab991e7cbc3a0f0fce8618de800340df6d0807c	prose
+docs/rules/sec-py/logging-listen.md	74eb42bc4cf828f1bb4dcbc172fb12e687e4cee5	prose
+docs/rules/sec-py/ml-unsafe-load.md	63afa562065cc908c3368927928998592016f58c	prose
+docs/rules/sec-py/no-assert-for-auth.md	08bb0bca37342fca2d31966aae7d0fbaa4d6a2d3	prose
+docs/rules/sec-py/no-bind-all-interfaces.md	e2f7e55dc910cba60d464a9e89e551f40dc24bf9	prose
+docs/rules/sec-py/no-cleartext-http.md	09caa517579590d84e9baf8442130abb581d7b53	prose
+docs/rules/sec-py/no-csrf-exempt.md	e3a78c8f139e4541d06b403eea01487b8b58af54	prose
+docs/rules/sec-py/no-dynamic-import.md	5b9e2eb10b163e9c2e506aca4583b156938ae430	prose
+docs/rules/sec-py/no-exec-eval.md	310a92bf1f977a5e72d0fb35967d835769eebdec	prose
+docs/rules/sec-py/no-format-string-injection.md	ae05c4f16c56911267d478829bc663ed93fa5751	prose
+docs/rules/sec-py/no-hardcoded-crypto-key.md	17c9429753dc465d4cb17c1f9dba4f5d0ab88c45	prose
+docs/rules/sec-py/no-hardcoded-secret.md	5068b2027a3104a20abaa73ac454b7471e1c9991	prose
+docs/rules/sec-py/no-header-injection.md	e3c424ca8204cbbb553d361641421f79695fa1ca	prose
+docs/rules/sec-py/no-insecure-protocol.md	3c1701d6a8233d76619d3e143a709935683dea8b	prose
+docs/rules/sec-py/no-insecure-random.md	96fe6e54cafbd1dcff287d7d8cce4eee9374f817	prose
+docs/rules/sec-py/no-insecure-tempfile.md	a8fde91418fc56cf4c0640cccbfda58444e4da55	prose
+docs/rules/sec-py/no-ldap-injection.md	f14dd3c35f93e623e0f444b287fcd9db092c22d8	prose
+docs/rules/sec-py/no-llm-output-to-sink.md	d8c579544ce013c0a9de921206634a33006a66d3	prose
+docs/rules/sec-py/no-log-injection.md	bd4249f16573a22c62ea86ae2a7cf42b8a935718	prose
+docs/rules/sec-py/no-mako.md	1c9ff6b0d8cf036b645697c1ba945de91a453bb8	prose
+docs/rules/sec-py/no-mark-safe.md	eb8b9f86bc671fb996cd400bb271f360d91526f7	prose
+docs/rules/sec-py/no-mass-assignment.md	b4047836ae91895f8c5da7e3168da28a72607b11	prose
+docs/rules/sec-py/no-nosql-injection.md	5b5f7883938666bffc3b347b00d2d3702b4c8ce4	prose
+docs/rules/sec-py/no-open-redirect.md	be285fe2abd5094df1462fe5bbbcd68ddbf591bb	prose
+docs/rules/sec-py/no-partial-path.md	b019c3d1d1829bea61c4e86df613e58837364f18	prose
+docs/rules/sec-py/no-path-traversal.md	9ceeefd59cb092816a2704f0f88d1dcdf9bd62ab	prose
+docs/rules/sec-py/no-prompt-injection.md	e35e3a5e8d0ea23bf492a4cfa1e9144c38d93d3a	prose
+docs/rules/sec-py/no-pycrypto.md	339646cca143adfb86327941b17d0e8df596db51	prose
+docs/rules/sec-py/no-reflected-xss.md	054ff5cd54aabb1bd975eb621f1f8bf8cf4ba7bd	prose
+docs/rules/sec-py/no-regex-injection.md	510969b797b4b420582782c0ad59e267c7535bba	prose
+docs/rules/sec-py/no-secret-in-log.md	cb624f1f9032fc8fcd1d3b4c9de1375b26e08d5a	prose
+docs/rules/sec-py/no-shell.md	ae0cc224e8a83fe12506506a00b0a9f574841c37	prose
+docs/rules/sec-py/no-silent-except.md	3aa0786f06765f3da667cdfdda7e40e9d6c223b2	prose
+docs/rules/sec-py/no-sql-string.md	e2abf64aed4d293c705006f86115029c742e2afa	prose
+docs/rules/sec-py/no-ssrf.md	cd1a411a18c4b8db8e7d7c7a732e31a3ad66b293	prose
+docs/rules/sec-py/no-stack-trace-response.md	49ddcf8bebe7f00db441843b170ca9449148d4df	prose
+docs/rules/sec-py/no-tls-bypass.md	8b92b0d67a139d731d7be449fd35ff0e103105e7	prose
+docs/rules/sec-py/no-trust-remote-code.md	0461b43621febd0ae3149e8a9a47260e1246bb28	prose
+docs/rules/sec-py/no-unsafe-deserialize.md	9d48ede9041bf7080f50f84d4d9f4ce115d218ab	prose
+docs/rules/sec-py/no-weak-cipher.md	83d7d4fe07169098fa9ef2b6c4892981c11f135b	prose
+docs/rules/sec-py/no-weak-hash.md	97b3f0e399dc5c9dc519013008b1b15637f2193d	prose
+docs/rules/sec-py/no-wildcard-injection.md	269f309047f868a8289ecd618eb5e10cc3095fd0	prose
+docs/rules/sec-py/no-world-writable.md	4baa4d62fedb15860207e23901d677d2d74664a2	prose
+docs/rules/sec-py/no-xml-unsafe-parser.md	a97f3974dc43935b5981e824d716f432342411e4	prose
+docs/rules/sec-py/no-xmlrpc.md	ed19dcc20619bfe2ccf5ea0ec872288ed3cdfec8	prose
+docs/rules/sec-py/no-xpath-injection.md	f35dea1b06a5274239b3055e97f7cfccfebfa82c	prose
+docs/rules/sec-py/paramiko-host-key.md	31660162c60d6bc89a4c253abdfa2cc514a15a1d	prose
+docs/rules/sec-py/password-hash-effort.md	978f054e12ecd6f7c856badd22d7f95f75426ba0	prose
+docs/rules/sec-py/requests-timeout.md	f36cd6d397fe3350b3be5c84a629ae194583cf8f	prose
+docs/rules/sec-py/tarfile-filter.md	c3d92b3e2fa430b003263665dd2c29488a26afd2	prose
+docs/rules/sec-py/torch-load-weights-only.md	f56400f3cdd80f001b500c3e33603af343fae8a7	prose
+docs/rules/sec-py/upload-secure-filename.md	51287b32fc674cec97dd0397700bd39e95e59217	prose
+docs/rules/sec-py/urlopen-scheme.md	9e5c14a72fb6ef740ca686897afb602eeabcce5c	prose
+docs/rules/sec-py/weak-key-size.md	212880ec4b766bc66c0815a2f1a82cfa331703cc	prose
+docs/rules/sec-py/yaml-safe-load.md	072f186216206dc397f2d1827a74cfef125c3e97	prose
+docs/rules/sec-ts/angular-bypass-security-trust.md	3d648cfae5629372691e3f6c5c0c06b16ee8ae18	prose
+docs/rules/sec-ts/angular-native-element-html.md	1bcc6830c43edead8196c7e795f41229ae2e5633	prose
+docs/rules/sec-ts/nest-cors.md	e81119183db4f5ea151ae19e46a72383dac749bc	prose
+docs/rules/sec-ts/nest-missing-guard.md	e169d9a5743029d8c810c88d501bbddb48b356e8	prose
+docs/rules/sec-ts/nest-throttler.md	bc53a0752ea46cca8b647a17125eea5e4e3c5bf5	prose
+docs/rules/sec-ts/nest-validation-whitelist.md	4dc0a6ad2c859b7ffecc60ba9d5f09b3d2a076a0	prose
+docs/rules/sec-ts/next-server-action-validation.md	40ecb4e897ff37e1d0b449c37bcc10e9de2d8adf	prose
+docs/rules/sec-ts/no-any-request-handler.md	2c6200d1c5655e7d2d8561d837bba0e168da8b33	prose
+docs/rules/sec-ts/no-permissive-schema.md	2d3518013dc94c3ab146a1562c667704ec1e7c6e	prose
+docs/rules/sec-ts/no-prisma-raw-unsafe.md	662a009d8b7ccf5acd145a9a398e2739754ef44c	prose
+docs/rules/sec-ts/no-query-builder-raw.md	38d545a1ce4e6ba9129ba42a61e19cdf2daae8e9	prose
+docs/rules/sec-ts/no-ts-ignore-on-sink.md	ae5de1c8f99d6f4dbb8f95ed40d2f5bbe1de81c2	prose
+docs/rules/sec-ts/no-typeorm-string-query.md	8203c1ab335766d8e25e0cda3327ea46c7330921	prose
+docs/rules/sec-ts/no-unchecked-cast-of-input.md	f6731cbff8c3b185fc25a36f0b2ef6839423e42a	prose
+docs/rules/sec-ts/trpc-public-mutation.md	069df27a001924acd2377793d3adb3fc9383403a	prose
+docs/rules/sec-ts/typeorm-synchronize.md	b182178f081f04dd4238252ca8b6cb4e98a2b968	prose
+docs/rules/spell/inconsistent-term.md	14b54dd3f0d4075830858b03aaaa3617bff65d3f	prose
+docs/rules/spell/known-typo-identifier.md	6210d6786b67de975c6e771d6a77f49e49c902a2	prose
+docs/rules/spell/known-typo-key.md	f2963f4dc296aedfa19623f0742763d532a4f20e	prose
+docs/rules/spell/known-typo.md	1702735ba7cc4cd2226f4e135b0ffe150ddf5f4e	prose
+docs/rules/spell/locale-variant.md	f294d7b0c09997e23b3cdc4ac3bd097661157f9b	prose
+docs/rules/spell/suspicious-word.md	0aa6802eeb5a7ad8f559356a62d5c4c31e0e4502	prose
+docs/rules/spell/unknown-word.md	a30138e6bada1e24cfdfde22d31c24874d7bfb71	prose
+docs/rules/stencil/ban-default-true.md	f3fc5b10231c2b506fc4b9c5cef4363505fe9320	prose
+docs/rules/stencil/ban-exported-const-enums.md	7677a80b21a92901e7e312ec1fcf2b40cdc8a418	prose
+docs/rules/stencil/ban-prefix.md	daf46f052ff25dba5ad5902bbed054477209f0a2	prose
+docs/rules/stencil/ban-side-effects.md	68c4c8cc2bbed79df9257d49236446897ae26df4	prose
+docs/rules/stencil/decorators-context.md	5c4a0e9259f4fb400c5df9f8fbbfcb2b3ef986a8	prose
+docs/rules/stencil/enforce-slot-jsdoc.md	dde0e160780e7475facafb9321e6ea7b312b3943	prose
+docs/rules/stencil/host-data-deprecated.md	ff63e1db7a889df78cddef13d6eb377df6d37520	prose
+docs/rules/stencil/methods-must-be-public.md	7adc8d4fbb73b0c8995c0424827e7af6281ae665	prose
+docs/rules/stencil/no-unused-watch.md	f6797a7312f68bd53e47cffc826076eb5e263dc5	prose
+docs/rules/stencil/own-methods-must-be-private.md	a103b425b5e88cac30950cc249ca23acdfd144c9	prose
+docs/rules/stencil/own-props-must-be-private.md	2c8833ed0f4fe64cb03ea98c3e04b14be441205d	prose
+docs/rules/stencil/prefer-vdom-listener.md	3649e291336e27fec91d28862bd7da86c03e4dbc	prose
+docs/rules/stencil/prop-readonly.md	6b60206245c0ce5eab75ef1d3efb7ee42ca50aaa	prose
+docs/rules/stencil/props-must-be-public.md	52feba0189eff29c5e1590cc0b519d592dd755d3	prose
+docs/rules/stencil/required-jsdoc.md	cb82ce2fea49bcef4933ff489b271063a01ac854	prose
+docs/rules/stencil/reserved-member-names.md	d9428c8314f396b2a86921c365a56825d1ab1604	prose
+docs/rules/stencil/strict-mutable.md	2725bcd299397eede23437e056a4d7b109f62ca1	prose
+docs/rules/stencil/tag-prefix.md	6fa194d5fb4bd79776274cfd22111ffde5dcd613	prose
+docs/rules/tanstack-query/array-query-key.md	23d7d3ec745a0c5ec6109860e2cf87b43d6ebc3d	prose
+docs/rules/tanstack-query/exhaustive-deps.md	36d3cdf8aabd8b6b73e87d30c3d22dfe872dd692	prose
+docs/rules/tanstack-query/infinite-query-property-order.md	6311588bc0ce4e179782484a57543a95cb852420	prose
+docs/rules/tanstack-query/mutation-property-order.md	9ddd03167bd062f1b371dff52adea5dca33086f6	prose
+docs/rules/tanstack-query/no-mutating-set-query-data.md	97240cd07c39abd2ac3f9c4a3192b4e06a718f0c	prose
+docs/rules/tanstack-query/no-removed-v4-options.md	eecfba828948a4c1e742a803e2306255ca6ee508	prose
+docs/rules/tanstack-query/no-renamed-v4-options.md	f28bbadae35121ce294601f8f8746af0239ae655	prose
+docs/rules/tanstack-query/no-rest-destructuring.md	d8e06c7d5877fc99222fb0bbeea99ee057008a99	prose
+docs/rules/tanstack-query/no-unstable-deps.md	4c35e49b8e915bfa99c345741fcf7b96d9b9a8f5	prose
+docs/rules/tanstack-query/no-unsupported-suspense-options.md	2398c60d37b819ffd8f589036afa577631f52326	prose
+docs/rules/tanstack-query/no-void-query-fn.md	3fecfde6e09bb0dcbb2aa0d2721cdc66098ab578	prose
+docs/rules/tanstack-query/object-syntax.md	f529ec5aef25c1162f825c1e8c165302ed92175d	prose
+docs/rules/tanstack-query/stable-query-client.md	d15d0ca03c4ef72041b24a255fd1e859dd41fc4f	prose
+docs/rules/toml/deps-sorted.md	5e7f2a65016eeef18aecf9bcb88f25a2d94bb515	prose
+docs/rules/toml/no-duplicate-keys.md	63e08eb39a035a8e24783e4cd324c80e0f96ad4b	prose
+docs/rules/toml/pyproject-requires-python.md	5ab92266b3898eea2328316d481a2d3b45f50835	prose
+docs/rules/toml/pyproject-schema.md	4001e31d9d531c6fb70f0393eb8f0f2945b637d1	prose
+docs/rules/ts/await-thenable.md	1a885458414385c6c6632d47ab864988685e459d	prose
+docs/rules/ts/ban-ts-comment.md	adaca3befc774f3ac4667e2ec4e4d1dab6c9a6bb	prose
+docs/rules/ts/no-array-constructor.md	3074aa4f0b01667265eb0977baa45be9c7e226ea	prose
+docs/rules/ts/no-duplicate-enum-values.md	218461b319643a8480f58f4ce2b9efe897484b3b	prose
+docs/rules/ts/no-empty-object-type.md	955af8779b6562548fbd7e250babb06ceb740f85	prose
+docs/rules/ts/no-explicit-any.md	093506e057646813620c27e53b8dd97aab168937	prose
+docs/rules/ts/no-extra-non-null-assertion.md	5317994aeb295f99917a85e12879f96146565e66	prose
+docs/rules/ts/no-floating-promises.md	ccf7b9c249c5d6a16094594ecb14c75ee96596d1	prose
+docs/rules/ts/no-misused-new.md	b006aadb1a8a8dcdb1e8206af18c528fcb86673e	prose
+docs/rules/ts/no-namespace.md	d55887fa3df907d18151c4798d06cada598e51a2	prose
+docs/rules/ts/no-non-null-asserted-optional-chain.md	c0b7f91e772ab38d356698a4149860401482044d	prose
+docs/rules/ts/no-require-imports.md	69af142ec4c7f2f3459e11647344c72090bebc09	prose
+docs/rules/ts/no-this-alias.md	c603ddf3eda465d7a21f93e93c93432a529d8857	prose
+docs/rules/ts/no-unnecessary-type-constraint.md	81883a4a88bf470532c33ab9369c53c1cd271232	prose
+docs/rules/ts/no-unsafe-call.md	814bef744dd96a5d5ceef09d6b5b8acef904d160	prose
+docs/rules/ts/no-unsafe-declaration-merging.md	066c87a9952ff2c1afdaf1da59802ecd545abf26	prose
+docs/rules/ts/no-unsafe-function-type.md	cfb8f10c8194c7e41de050ac81cfcff32d07b43c	prose
+docs/rules/ts/no-unsafe-member-access.md	9c6736ba8920e437d4b9608f26c05f78c91870ab	prose
+docs/rules/ts/no-unsafe-return.md	f264a94fa67459a96a1772280e8137d8d5555cef	prose
+docs/rules/ts/no-unused-expressions.md	55ac82548c91e9a16123a92dd30a4e7a02855fe9	prose
+docs/rules/ts/no-unused-vars.md	e4677224640437b8f842c855ab0faa6408e26fc2	prose
+docs/rules/ts/no-wrapper-object-types.md	0fd2aeeaf26bc8abd5cefc4aea6f9b84fed3784c	prose
+docs/rules/ts/prefer-as-const.md	bfd241863b9a1b9ddbecd4efb2d626091c7543f6	prose
+docs/rules/ts/prefer-namespace-keyword.md	20eeea84ae8a7c0e09746c99949643a9a1715006	prose
+docs/rules/ts/triple-slash-reference.md	5defedff1e0dc8ba122279d4135122335ae832ad	prose
+docs/rules/ts/type-error.md	11f621ab1785bca80be6511249dd2a152043f8e7	prose
+docs/rules/ts/type-only-imports.md	5cf013a7b0d880dfaa0f94bdbd12303fc58045f5	prose
+docs/rules/yaml/document-start.md	3148653f8ce3c2cbcd4911228f381ac904a08ee7	prose
+docs/rules/yaml/gha-action-schema.md	059986f34fce5d21c036e376bbb133274906ef23	prose
+docs/rules/yaml/gha-pin-sha.md	211d29f86901afaadacbdc731b7effa064136053	prose
+docs/rules/yaml/gha-workflow-schema.md	e8d768a0dc439d9e35eec9a8a2e2f6190dad65f3	prose
+docs/rules/yaml/no-ambiguous-booleans.md	c213f8e923a8d5659f3a64c84401a83420fe6bf5	prose
+docs/rules/yaml/no-ambiguous-numbers.md	02e6035d2ed4200001284e3ffb8dbdbe22d80456	prose
+docs/rules/yaml/no-duplicate-keys.md	6db03b576380e61cfa2888593a6a0cdb71bfa8ee	prose
+docs/rules/yaml/no-undeclared-alias.md	009618901a90b67152e8677ebcd57310a5e3a6e9	prose
+records/0001_LAWS.md	740b999df3658f47423cc703ec7608ba27c4b90c	prose
 records/0002_LAW-0-authority.md	258a325331c5e75a348fad8d1fcae25fd08429c4	prose
 records/0003_LAW-1-retired-records-archived.md	2ec4ffd655e5313c2344c9a5b953adf6389144e5	prose
-records/0004_LAW-2-foss-dependencies.md	92bc84bdda8e2a5f041323a6b630ed9a60a705e4	prose
-records/0005_LAW-3-languages.md	7240cead6c50b4442e1b4d0a38e65a7ede7f6ad2	prose
+records/0004_LAW-2-foss-dependencies.md	45ed17fed16e509aa3d080cc1f290540a846cd0c	prose
+records/0005_LAW-3-languages.md	2cc77cb05cffc5b101c5d3e013865940b3c07c17	prose
 records/0006_LAW-4-every-rule-has-a-fix.md	2697f0e8b510b1ada883ec3c4e09c473b59d4396	prose
-records/0007_LAW-5-no-model-in-the-engine.md	3e7771d96700cf0c51849482b03055235f2351ef	prose
-records/0008_LAW-6-python-and-node-packages.md	50ad526459eba18026bbabdf5f2b979053592999	prose
+records/0007_LAW-5-no-model-in-the-engine.md	56607fc4c3f4ebc7d49688f04dbd00ba2f67d130	prose
+records/0008_LAW-6-python-and-node-packages.md	76f2842d1b684f1fa9ceb99750a1f067ba05ea8d	prose
 records/0009_LAW-7-linter-and-formatter.md	7d04139c1435532f210e273bd3613a9cf02c59ca	prose
-records/0010_LAW-8-performance-budgets.md	c7b77347e3654b4c4cf1368621837eb375381095	prose
+records/0010_LAW-8-performance-budgets.md	e0f04d68e0afddc0167d52d28a4ec4fdec4e684e	prose
 records/0011_LAW-9-machine-budget.md	7d7c3902bbad96257c125b86b737f2dd7a1c8810	prose
-records/0012_LAW-10-consumer-templates.md	ad1301c2f84f09b0db6df2bac2bdac6725a3e164	prose
-records/0013_LAW-11-no-dependencies.md	0c7c40ffbaa85da69afed4e96f71c27fb24a5acb	prose
-records/0051_WORK-open-queue.md	81ea1e1928ef21f93a2542b54d2e0684e07809f7	prose
+records/0012_LAW-10-consumer-templates.md	f4069444532b201397996dca41b4e2809d06165e	prose
+records/0013_LAW-11-dependencies.md	97d3a1d18cf19481bf5bc33961215037eb4a5af6	prose
+records/0051_WORK-open-queue.md	e07056254755adc4de1267e8d26305a8d60a9376	prose
 records/0052_WORK-backlog.md	f31b16cf6433a7949fc3cc15da418430dc9b87eb	prose
 records/0053_WORK-lifecycle.md	6beee72d6c2cb0df11cfc54d8ee8d42a4a13e97f	prose
-records/0054_WORK-session.md	b0dda9768a116a448a31b03ff8c0b4d9aab03113	prose
+records/0054_WORK-session.md	72d06b4db0e63b36e34cd197e51a5265fa83bca4	prose
 records/0055_WORK-docs.md	4a85e496462bdb018cf4296a8a9d23ac42c1197e	prose
 records/0056_WORK-blockers.md	11353a9b6eb9e86d1172a31e47809457a9f3366b	prose
 records/0057_WORK-archive.md	1360d7d398540cdab891dab3fcb22615306a1b2e	prose
 records/0058_WORK-ownership.md	4c538d16315273de183a141282f380bc26b20799	prose
 records/0059_WORK-governance.md	ed8c50e3a722b4c4c13ec2d1e1943619255ef2f7	prose
-records/0060_WORK-registry.md	83df81b67054348d351b2eca1aa4b817c75142bc	prose
+records/0060_WORK-registry.md	559f75fc7d46263b1d6afc14b2e93c3f5b70a916	prose
 records/0061_WORK-now.md	6a5d4bd9d653c55d232d7abf7d13d968e30ba889	prose
 records/0062_WORK-cleanup.md	d01e97992d4efc37731cc7cdb1d6c0fab81456fb	prose
-records/0101_rule-packs.md	a5dc10d7d803a1334cbef6a2f92f04280f88c1e6	prose
-records/0102_agent-surfaces.md	7d1519cdc145c1ee20f2710a572af729ea29bf4e	prose
-records/0103_project-graph.md	6c3c671f1147145ff1ae318d04284d09baa5c0a8	prose
-records/0104_baseline-and-deprecations.md	895710abe0c8022cea42a203bb7ff9f295d97bb4	prose
+records/0101_rule-packs.md	fa664e6bdcb85dab423822dfa400c477c95e7512	prose
+records/0102_agent-surfaces.md	2576a36694ca56996ce2845120e9076fef4f9c0f	prose
+records/0103_project-graph.md	c7997fc5d6be90b8ba71b706c252ac20aa0e3b63	prose
+records/0104_baseline-and-deprecations.md	e2726dde9c1addac4eb8c93801beabbe33a2dd9c	prose
 records/0105_formatter.md	a95a016965cd7995ce9ee0e3fc312ad6f5160d23	prose
-records/0106_linter.md	8aeedd12cdd21539d3dce8de3204e1afc61ee7b7	prose
-records/0107_packages.md	bfd0eb2aa7ca73c11475c5f592475c324e09b48c	prose
-records/0108_architecture.md	ba4ebe03c7dd1710476cc5cc31852fcc27047a4c	prose
-records/0109_cache.md	a73dd2677b7974e9fa60c4ced587c65dac54bbcd	prose
-records/0110_config.md	8f3ce0419ed96b720b538ff2be82856d5f67dedc	prose
-records/0111_consumer-layout.md	279a396d9ec76451b60b7c982db6b11ddae07199	prose
-records/0112_rule-format.md	916d5207e1f4e11f888ad44d22f2331fb71c3aaa	prose
-records/0113_rule-authoring.md	30808f09370925f4f4e6661c87dcb82790e7cf0c	prose
-records/0114_editor.md	f914b744391b835624528abc5e72df65d6752f7c	prose
-records/0115_cli-and-mcp.md	14166fa3a26035bc56503c8e8ffee0aa6558a446	prose
-records/README.md	525a62e8923039783d13552f02997a13e651f7a7	prose
+records/0106_linter.md	bad14f54e7cfb012fbb144af46dcd29ae3b80b87	prose
+records/0107_packages.md	bcc2b84cabee8da73a3f968697105a9e86d77b4c	prose
+records/0108_architecture.md	c785f1a952e6118275451c39251ef46e8e3212e1	prose
+records/0109_cache.md	a45d781bb1032eda80caefb47595801992ebda8c	prose
+records/0110_config.md	e34432dd7b5db351c9a5aa7d534acdb95ea27d8f	prose
+records/0111_consumer-layout.md	fab8c36da02d026215ba65ac90c549a2821623d0	prose
+records/0112_rule-format.md	9461d141161a0392153533d6516bd44b5489377b	prose
+records/0113_rule-authoring.md	0d3d396e14a69df10640fa59e41c3992f84be4be	prose
+records/0114_editor.md	cd6df480e8576a216dbfc65d00b9140f322e362c	prose
+records/0115_cli-and-mcp.md	cf3f391b1b35bf7541e544afd47eb144e8422a4e	prose
+records/0116_spell.md	e5be026495d361ba1c51ed1cbf3d78cd94606042	prose
+records/0117_types.md	ead641e07ce24839008fdd10eae8ded235afa6a8	prose
+records/README.md	3844400e6af3540d8d053c20d972c8a007dfee26	prose
 records/TEMPLATE.md	227d3572bfbb7da4327396f8d073d8269a2859ed	prose
-work/BACKLOG.md	6ababe5d93b7a939febaf9c45186a754190a0ce8	prose
-work/BLOCKED.json	d1cf19366dcd3b1a8431d8d1786011e0bff997d9	pkg:fux-decoder-json@5.1.1/json@1+limits@1
-work/IMPLEMENTATION.md	c679d9ec1756f16b5821930fd55914386ca69c55	prose
-work/INTERVIEW.md	7e632e9663916eb36f97bd17ca83b6c0663923dd	prose
+work/BACKLOG.md	bbf40ddb7a8a227268d4ebf88e15691288ecb803	prose
+work/BLOCKED.json	3fa753c12ea628534518c18d0692a3f8b4c107f2	pkg:fux-decoder-json@5.1.1/json@1+limits@1
+work/IMPLEMENTATION.md	ae04c605fa1faf581479bf287ce4388ecf00971c	prose
+work/INTERVIEW.md	1084e94b1085dce9896791199d4fa14a00d69d10	prose
 work/LESSONS.md	4a9885fe867f95f2fd1bcc046fa21922b9311198	prose
 work/MACHINE.md	a5b8840949acb76c0492068466e044d7a1950ad2	prose
-work/NOW.md	b0ff05e8900ab1a94f920e45ce6783a3fcc651af	prose
-work/OPEN-WORK.md	944a3facfc320718bfc97d2c0597ef7b65105c17	prose
+work/NOW.md	324ec2bd3d6e26211fa78b393342c6cfdd030e44	prose
+work/OPEN-WORK.md	42c02fd5c286f937f20007690229321167f2e7e2	prose
 work/README.md	6b31915cf9322827f31f6b28dc4fbfe6cb29e3c4	prose
-work/WORKLOG.md	5fd559af0509ca3a32daa8997bdba55aa207014e	prose
-work/compare/README.md	18d791face63144aa25a2dd8b40d1aefa79a7d69	prose
+work/WORKLOG.md	ce605c145f9769e8622e2f6b799f7cfd550c1d1e	prose
+work/compare/README.md	e87a66c3340448477cc4193ca1a558c6f8ad7c7d	prose
 work/compare/ci-profiles-and-dated-exceptions.compare.md	8e0070ca1930c2bf2151d538dd7c6dc7c53e58bf	prose
+work/compare/spell-checking.compare.md	357ee6ba557a5c6f9dddbef61959086d8c2ba86c	prose
 work/open/README.md	671c84a0497eb6fb302929fab4af30df8697a6f4	prose
-work/open/W-05-write-time-guidance.md	fea5835adfc526562bbc4c5149892d6e5585f042	prose
-work/open/W-34-fux-index-packages.md	d93d74c1861625ce3b86d194661b62409fdc3e54	prose
-work/open/W-35-before-while-after-positioning.md	3bac40145edb0e07ab42b812ad3ba88889f74c2e	prose
-work/open/W-36-position-against-eslint-and-biome.md	f1d83f149237dc0f003f33ce48a1a408b59f447a	prose
-work/open/W-38-pypi-0-2-0-by-hand.md	d768cf3d57752b27b935cd8a36791b56443860f0	prose
-work/open/W-44-watch-mode.md	75304bcb6418f5e41089381400e7b835006118ae	prose
-work/open/W-45-ci-report-formats.md	f0f2ff3199e70606f4c6a56e5bf99fd7e71f3385	prose
-work/open/W-51-scheduled-autofix-pr.md	d176a9019e25f7f2289b737f958fffc58db8fa8f	prose
-work/open/W-58-size-limits.md	33fe5240663d301f68ec9a242b315dea6677664d	prose
-work/open/W-62-scss-support.md	d843cb95e408f7fca0269c8b72325d17a631d529	prose
-work/open/W-64-codelaw-pre-commit-mirror.md	c03d59c1cc6804029b86b4d9df043ecef1e245f9	prose
-work/open/W-70-dev-server-example-apps.md	cfbc8783b70191277e8d3219b33b10ae7d67ebe4	prose
-work/open/W-71-tests-for-new-code.md	ca17c33c1652a963e96aa8d7ffd2f4fa136cc257	prose
-work/open/W-73-configurable-approved-calls.md	9178326085fa864a060553548e104b5349a3bade	prose
-work/open/W-74-editor-logs.md	cde8c9bb0d70199d155c29b284cffcd2002f80f3	prose
-work/proposals/README.md	fb4ea0b14c6582432ea279de4845401f78d15662	prose
-work/proposals/type-aware-rules.md	3bb35867a8d47b047f37893fc3a0ec5aaa21d8ca	prose
+work/open/W-102-guidance-vs-check-experiment.md	0181b4c1027c7f2701e355d9c404c599daa3f65a	prose
+work/open/W-103-spell-pack.md	b68f4982dffd76aa58967fb5b43de685f7e6d3ce	prose
+work/open/W-105-type-aware-engine.md	a536aa77fb4e1c6de9d329c1cfa331bf0413fb9d	prose
+work/open/W-106-typescript-version-watch.md	2020d1a9bdcc5808f67eb5e4a1fccf35ecaf819b	prose
+work/open/W-117-open-vsx-setup.md	e8695062e09f76ec302bbdf897682b049bba3380	prose
+work/open/W-118-guidance-experiment-redesign.md	104debe5de2aff4632c9ad875ec9ac663dbe812d	prose
+work/open/W-125-revert-pypi-new.md	336368666169c7a6c51e407f42d8c1ec9ea6dac7	prose
+work/open/W-126-fast-pipeline.md	ffbe3f09358edcd2e07d437e14edcf19815c905f	prose
+work/open/W-127-release-0-4-0.md	19d3d3f6653fe671425f001381c9b1eda1dbc0a3	prose
+work/open/W-64-codelaw-pre-commit-mirror.md	795979b76fc9c9ff56bb8371f4f4937e695f8e6c	prose
+work/open/W-95-publish-vscode-extension.md	f2d428e0ac457bb8a3cf45ea2394e2187ccd7b56	prose
+work/open/W-97-github-action.md	ba371f9de80dff7acbc23495573dc00b2c01eebd	prose
+work/proposals/README.md	167be7bfee4dfcd4bd24146288e9a4c735de6364	prose
+work/proposals/guidance-experiment-redesign.md	578597e25d68e64cf9f97c35f7748adb8a50c437	prose
+work/proposals/linter-for-ai-positioning.md	350d6f7b1aab8760b5b97a7b2b2b6f0280b72b11	prose
+work/proposals/type-aware-rules.md	9cd73785985953a1f36df30c19d20f634ec935e7	prose
+work/proposals/write-time-guidance.md	6139e154377c92546299412097785cf10bd07a2d	prose
