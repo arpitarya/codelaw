@@ -166,7 +166,7 @@ the top.
 35. Three lanes, ordered independently: `arpit` · `agent` · `cowork`.
 36. Priority is damage that accrues with elapsed time, above damage that is
     merely present.
-37. Grouped by what closing it takes — `build` (code) · `testing` (a run or a
+37. Grouped by what closing it takes — `build` (code) · `ci/cd` (the pipelines, a release, and publishing to a registry, store or marketplace — workflows, tags, names, trusted publishers; the decider, 2026-10-30: *"In OpenWork, create another section for CI/CD. And reallocate the work items respectively."*) · `cleanup` (removing what is stale — leftover worktrees and branches, dead files, duplicate or settled backlog rows, abandoned registry versions; no new behaviour; the decider, 2026-10-30: *"create another section for cleanup."*) · `testing` (a run or a
     harness) · `reporting and benchmarks` (a measurement — a bench, a budget, a
     corpus count, an experiment — and the numbers or the write-up it yields; the
     decider, 2026-10-29: *"In open work file, create a section for reporting and benchmarks. And reallocate the work items respectively."*) · `record update` (a ruling or a record; no
