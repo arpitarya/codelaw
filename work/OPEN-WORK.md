@@ -22,6 +22,8 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
+| 🔴 **W-153** — keep or drop each worktree in [the item](open/W-153-session-cleanup.md): removing it would lose data (SR-WORK-CLEANUP decision 3) | 2026-10-30 |
+| ↳ **blocks:** nothing else in the queue | |
 | 🔴 **Guidance experiment — the screen came back null** ([W-102](open/W-102-guidance-vs-check-experiment.md)): arm 0 (no codelaw at all) broke a rule on only **7 of 38** candidate tasks (6 at 5/5, 31 at 0/5) — it uses `apiFetch`, `http_get` and the clock because it reads them in the code; what tempts is inline style, SQL column names and copied `== None` / `tags=[]`. Fewer than 12, so by the pre-registration no run. **Pick one:** (1) *recommended* — run the 7 at 9 runs each (63 per arm, the 5% bound holds; ~$65, ~$85 with the screen); (2) write ~10 more in the families that tempted, re-screen, then 12 × 5 (~$95 in all); (3) stop and close: the README line stays. | 2026-10-30 |
 | ↳ **blocks:** W-102 itself | |
 | 🔴 **A public repo, twice** ([W-97](open/W-97-github-action.md)): the Action's proof needs a throwaway repo, and the pre-commit mirror its own. Claude Code's permission check refused `gh repo create --public`. **Allow it** when it asks, or create `arpitarya/codelaw-action-test` and `arpitarya/codelaw-pre-commit` yourself and say so. | 2026-10-30 |
@@ -33,9 +35,11 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (15)
+## Open items (16)
 
-### build (8)
+### build (9)
+
+🔴 **W-153** `arpit` Worktrees left by session 3ae9bb46-993d-4181-bf61-71e189463e09 would lose data if removed. Filed by now-ledger.py (Claude Code). [detail](open/W-153-session-cleanup.md)
 
 🟢 **W-105** `agent` Type-aware TypeScript: five rules landed; the four type questions, previews, profiling, corpus counts, the RC (11-10); then the version watch (was W-106: tested range, CI, nightly, bump job). Merged 10-30. Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
