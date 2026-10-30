@@ -20,7 +20,6 @@ Rule: [SR-WORK-NOW](../records/0061_WORK-now.md).
 
 | kind | where | host | session | created |
 |---|---|---|---|---|
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/handoff-20261030-043224` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
 | worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/handoff-20261030-044012` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
 | worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/W-151` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
 | worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/handoff-20261030-050518` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
