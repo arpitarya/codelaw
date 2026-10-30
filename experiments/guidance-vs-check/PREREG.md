@@ -45,9 +45,9 @@ configured `use-instead`). The screen ran arm 0 alone, 5 runs each. A task is **
 its target in **≥ 40%** of its runs; the **12** kept are the most tempting, ties broken by a task that
 targets an unknown rule first, then by id. Fewer than 12 → the null outcome, written up, no run.
 
-The 12 kept:
-
-TASKS
+**The screen's result (2026-10-30): 7 of 38 tempting — fewer than 12, the null outcome.** No main run
+was started; `results/2026-10-w102-screen/` holds the screen. What runs next is the decider's (W-102's
+inbox row); whatever it is, this file is amended in a landed change before it starts.
 
 **P2 — requested.** t02, t04, t41, t42; the right answer fixed in each `task.toml` before the run
 (all four: `complied_warned`). Not screened; 2 runs per arm (48 sessions), to keep the whole inside the

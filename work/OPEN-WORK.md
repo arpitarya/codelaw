@@ -22,6 +22,8 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
+| 🔴 **Guidance experiment — the screen came back null** ([W-102](open/W-102-guidance-vs-check-experiment.md)): arm 0 (no codelaw at all) broke a rule on only **7 of 38** candidate tasks (6 at 5/5, 31 at 0/5) — it uses `apiFetch`, `http_get` and the clock because it reads them in the code; what tempts is inline style, SQL column names and copied `== None` / `tags=[]`. Fewer than 12, so by the pre-registration no run. **Pick one:** (1) *recommended* — run the 7 at 9 runs each (63 per arm, the 5% bound holds; ~$65, ~$85 with the screen); (2) write ~10 more in the families that tempted, re-screen, then 12 × 5 (~$95 in all); (3) stop and close: the README line stays. | 2026-10-30 |
+| ↳ **blocks:** W-102 itself | |
 | 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): ruled 2026-10-30 — the listing refused `name: codelaw` (taken by a user or org) and the 138-character description; `action.yml` is now **`codelaw check`** with a 115-character description. **On the next release** (after 0.4.0): edit it → tick *Publish this Action to the GitHub Marketplace* → accept the agreement → category *Code quality* → *Update release*. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — waiting on Open VSX** ([W-117](open/W-117-open-vsx-setup.md)): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
@@ -75,7 +77,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-103** `agent` Spell pack: rules, fixtures, corpus done; the `spell` bench operation built 2026-10-30 (`unset`; local p95 584 ms). Next: three CI `perf` runs on `main`, then the budget to the decider. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
-🟢 **W-102** `agent` Pilot 10-28: 60 sessions, $10.47; A = B = C at 2/20. Ruled 10-30: W-118's redesign as proposed — six arms, screened tasks, 60 runs per arm; the README line stays unless arm C is 0/60 (bound 5%); ~$85, no separate gate on the screen. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
+🔴 **W-102** `arpit` Redesign built (six arms, 42 tasks, screen, PREREG); screened 10-30: only 7 of 38 tasks tempt an agent with no codelaw ($19.45) — the null outcome, no run. Left: run the 7, widen the screen, or stop (inbox). Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
 ### record update (0)
 

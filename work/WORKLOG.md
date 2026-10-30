@@ -48,6 +48,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** none kept — a scoped-source parse error in the Biome step and the recheck file breaking the tables were caught and fixed before writing.
 - **Next:** Arpit's R5–R8.
 
+## 2026-10-30 — W-102 redesign built and screened: the null outcome  ·  Claude Code (Opus 5.5, a fork of the W-102/W-103 session)
+
+- **Asked:** *"implement 102 & 103"* — W-102: build W-118's redesign, screen, pre-register, run, write up
+- **Done:** the six-arm harness, 22 new tasks, the screen and P2 scorer, intervals and the bootstrap, `PREREG.md`; dry run 756/756; the real screen (arm 0, 190 sessions, $19.45): 7 of 38 tasks tempting, under the 12 needed — by the pre-registration no main run. Results in `experiments/guidance-vs-check/results/2026-10-w102-screen/`; W-102 detail written up; inbox row with three options
+- **Decided / left open:** arm 0 keeps `codelaw.toml` visible (the proposal's default); the pinned codelaw 0.2.0 needs the packs at `7b839af5` (`--packs`); P2 at 2 runs per arm to stay in budget. Open: run the 7 at 9 runs, widen the screen, or stop (the decider)
+- **Mistakes:** the first dry run used today's packs with the pilot's binary and refused to load (packs newer than the engine) — fixed with `--packs`; no money spent on it
+- **Next:** the decider's pick on W-102's inbox row
+
 ## 2026-10-30 — Eight items in parallel: W-128, W-130–W-133, W-136, W-137, W-140  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement 130 … 131 … 132 … 133 … 136 … 128 … in parallel if possible, close it as fast as possible … Keep merging everything to main. And keep doing the cleanup"*; then W-137 and W-140 the same way.
