@@ -1164,6 +1164,7 @@ version = "0.4.0"
 dependencies = [
  "codelaw-core",
  "codelaw-engine",
+ "codelaw-native",
  "codelaw-report",
  "codelaw-rules",
  "serde_json",
