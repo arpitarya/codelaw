@@ -70,6 +70,7 @@ The decider wants performance to be a key property and accepts that today's numb
    | `peak_memory_10k` | peak resident memory during `check_cold_10k` |
    | `check_types_cold` | `codelaw check` with the type-aware rules on, no warm program: Node started, the project's TypeScript program loaded once, every type question answered (added 2026-10-27, W-104; [SR-TYPES](0117_types.md)) |
    | `check_types_warm` | the same run through a warm process that already holds the program (decision 8) |
+   | `spell` | `codelaw check` with the spell pack's `spell/recommended` alone on the three pinned repos (decision 2) as one project, empty cache — the time the spell pass costs, measured apart so no budget above moves (added 2026-10-30, W-103, on the decider's ruling of 2026-10-29 in [SR-SPELL](0116_spell.md) decision 9; folding it into the shared workload is B-062) |
 
 2. **The reference workload.**
    - A deterministic, seeded, generated repo of 10,000 files spanning every [L3](0005_LAW-3-languages.md) language, in `fixtures/perf/`.
@@ -198,8 +199,9 @@ The decider wants performance to be a key property and accepts that today's numb
 
 - **Performance work is first-class:** a feature that costs time must fit inside the budget, or be optimised until it does.
 - **CI timing is noisy;** p95 over repeated runs and a dedicated reference machine are the price.
+- **`spell` (added 2026-10-30, W-103) is `unset`**: it entered `perf/budgets.toml`, `unset`, with the bench that times it, and is set by decision 4's method once `perf` has run three times on `main` with it. One local run on a loaded developer Mac (load 23, release build, 5 timed runs): median 538 ms, p95 584 ms on the three repos' 1,004 files, 12 spell findings — reference only.
 - **`check_types_cold` and `check_types_warm` (added 2026-10-27) are `unset`**: they entered `perf/budgets.toml`, `unset`, with the bench that times them on the type workload (W-105, 2026-10-28; [SR-CLI-MCP](0115_cli-and-mcp.md) decision 10), and are set by decision 4's method like the rest once `perf` has run three times on `main`. Their `proposed` values come from one run on a loaded developer Mac and are reference only.
-- **The gate binds seven of the eleven operations measured today** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100), and the decider, 2026-10-27 (voice docket): leave it unset (W-93).
+- **The gate binds seven of the twelve operations measured today** (§Measurements): a `perf` p95 over one of them fails CI. `fix_one_file` stays `unset` and only reported: the guard held it back and the decider, 2026-10-25: leave it unset (`W-19`). `hook_pre` (added 2026-10-27) is `unset`: decision 4's method on three `perf` runs on `main` held it back (worst p95 86.2 ms × 1.5 = 129.3 > 100), and the decider, 2026-10-27 (voice docket): leave it unset (W-93).
 
 ### Alternatives considered
 

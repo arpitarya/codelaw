@@ -251,6 +251,34 @@ pub fn write_repo(src: &Path, dir: &Path, packs: &Path) -> Result<usize, String>
     Ok(files)
 }
 
+/// The `spell` operation's config (SR-SPELL decision 9, ruled 2026-10-29):
+/// the spell pack's `recommended` preset alone, preview rules on, so what is
+/// timed is the spell pass and not the shared workload's rules.
+pub const SPELL_CONFIG: &str = "preview = true\nextends = [\"codelaw:spell/recommended\"]\n";
+
+/// Copy the pinned real repositories `srcs` into `dir` (replacing what a run
+/// before wrote), one folder each, as one project with [`SPELL_CONFIG`] and
+/// the spell pack: one `check` over all of them is one sample of `spell`.
+/// Returns how many files were copied.
+pub fn write_spell(srcs: &[std::path::PathBuf], dir: &Path, packs: &Path) -> Result<usize, String> {
+    let io = |e: std::io::Error| format!("cannot write the spell workload in {}: {e}", codelaw_core::normalize_path(dir));
+    if dir.exists() {
+        std::fs::remove_dir_all(dir).map_err(io)?;
+    }
+    let mut files = 0;
+    for src in srcs {
+        if !src.is_dir() {
+            return Err(format!("--repo {}: no such folder (scripts/corpus.py fetch checks the pinned repos out)", codelaw_core::normalize_path(src)));
+        }
+        let name = src.file_name().ok_or_else(|| format!("--repo {}: not a folder name", codelaw_core::normalize_path(src)))?;
+        files += copy_repo(src, &dir.join(name)).map_err(io)?;
+    }
+    std::fs::write(dir.join("codelaw.toml"), SPELL_CONFIG).map_err(io)?;
+    let spell = codelaw_rules::FIRST_PARTY_PACKS.iter().find(|p| p.short == "spell").expect("the spell pack");
+    copy_dir(&packs.join(spell.short), &dir.join(install_path(spell))).map_err(io)?;
+    Ok(files)
+}
+
 /// The type-aware operations' config (`check_types_cold`,
 /// `check_types_warm`; SR-TYPES): the `ts` pack's `type-checked` preset
 /// alone, so what is timed is the type rules and their program.
@@ -568,6 +596,25 @@ mod tests {
             assert!(dir.join(install_path(pack)).join("codelaw-pack.toml").is_file(), "{} installed", pack.short);
         }
         assert!(write_repo(&tmp.join("nope"), &dir, &packs).unwrap_err().contains("corpus.py fetch"));
+        std::fs::remove_dir_all(&tmp).unwrap();
+    }
+
+    #[test]
+    fn the_spell_workload_is_every_repo_as_one_project_with_the_spell_pack_alone() {
+        let packs = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packs");
+        let tmp = std::env::temp_dir().join(format!("codelaw-bench-spell-{}", std::process::id()));
+        for f in ["one/a.md", "one/.git/HEAD", "two/b.py", "two/codelaw.toml"] {
+            std::fs::create_dir_all(tmp.join(f).parent().unwrap()).unwrap();
+            std::fs::write(tmp.join(f), "x\n").unwrap();
+        }
+        let dir = tmp.join("spell");
+        assert_eq!(write_spell(&[tmp.join("one"), tmp.join("two")], &dir, &packs).unwrap(), 2);
+        assert!(dir.join("one/a.md").is_file() && dir.join("two/b.py").is_file() && !dir.join("one/.git").exists());
+        assert_eq!(std::fs::read_to_string(dir.join("codelaw.toml")).unwrap(), SPELL_CONFIG);
+        for pack in codelaw_rules::FIRST_PARTY_PACKS {
+            assert_eq!(dir.join(install_path(pack)).join("codelaw-pack.toml").is_file(), pack.short == "spell", "{}", pack.short);
+        }
+        assert!(write_spell(&[tmp.join("nope")], &dir, &packs).unwrap_err().contains("corpus.py fetch"));
         std::fs::remove_dir_all(&tmp).unwrap();
     }
 

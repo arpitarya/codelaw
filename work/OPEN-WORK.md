@@ -71,7 +71,7 @@ here. Read that record before changing anything below it.
 
 ### reporting and benchmarks (2)
 
-🟢 **W-103** `agent` Spell pack: seven rules, fixtures, corpus done; ruled 10-29 — measure it as its own `spell` operation (B-062: the shared benchmark later), then its L8 budget. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
+🟢 **W-103** `agent` Spell pack: rules, fixtures, corpus done; the `spell` bench operation built 2026-10-30 (`unset`; local p95 584 ms). Next: three CI `perf` runs on `main`, then the budget to the decider. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🟢 **W-102** `agent` Pilot 10-28: 60 sessions, $10.47; A = B = C at 2/20. Ruled 10-30: W-118's redesign as proposed — six arms, screened tasks, 60 runs per arm; the README line stays unless arm C is 0/60 (bound 5%); ~$85, no separate gate on the screen. Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 

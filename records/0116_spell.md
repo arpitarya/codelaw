@@ -372,6 +372,7 @@ question its maintainers left open. The forks and the rulings are in
      and no compact format is proposed. Suggestions are cached per thread
      for the run, keyed by the dictionary and the word.
    - **Ruled 2026-10-29 (W-103): its own operation.** The pack is measured as a `spell` operation on the pinned repos with `spell/recommended` on, not inside the shared `perf` workload, so no ruled budget moves; folding it into the shared workload is B-062 (the decider: *"We can, but add an item in the backlog so that we can have a shared benchmark."*).
+   - **The operation, as built (W-103, 2026-10-30; not yet a budget):** `codelaw bench`'s `spell` ([SR-LAW-8](0010_LAW-8-performance-budgets.md) decision 1, [SR-CLI-MCP](0115_cli-and-mcp.md) decision 10) copies the three pinned repos (`djangoproject.com`, `full-stack-fastapi-template`, `html5-boilerplate`) into one project with `spell/recommended` alone and times a cold `check`; `perf/budgets.toml` carries it `unset`, and CI's `perf` job runs it with no change to `ci.yml`. One local run (release build, a developer Mac at load 23, 5 timed runs): median **538 ms**, p95 **584 ms** on 1,004 files, 12 spell findings — reference only. The budget is decision 4's method on three `perf` runs on `main`, by the decider's ruling.
 10. **English only.** Another language needs a word list under a permissive
     licence and its own ratified row.
 
