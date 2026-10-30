@@ -46,6 +46,7 @@ pub const OPERATIONS: &[Op] = &[
     Op { name: "peak_memory_10k", unit: "MiB", budgeted: true, what: "peak resident memory of `check_cold_10k`" },
     Op { name: "check_types_cold", unit: "ms", budgeted: true, what: "`check` with `ts/type-checked` on the type workload, empty cache, no warm process: Node started, the program loaded once" },
     Op { name: "check_types_warm", unit: "ms", budgeted: true, what: "the same `check --prefer-warm`, served by the daemon, which holds the program" },
+    Op { name: "spell", unit: "ms", budgeted: true, what: "`check` with `spell/recommended` alone on the pinned repos as one project, empty cache, no warm process" },
 ];
 
 /// Context rows: not L8 operations, never gated.
@@ -339,6 +340,27 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
             }
         }
     }
+    let mut spell_workload = Value::Null;
+    if wanted("spell") {
+        if args.repos.is_empty() {
+            if args.only.iter().any(|o| o == "spell") {
+                return Err("spell needs the pinned repos: --repo <DIR> for each (scripts/corpus.py fetch --repo checks them out)".into());
+            }
+            skipped.push("spell: no --repo <DIR> (it runs on the pinned repos; CI passes the three scripts/corpus.json names)".into());
+        } else {
+            let at = dir.with_file_name(format!("{}.spell", dir.file_name().and_then(|n| n.to_str()).unwrap_or("workload")));
+            let files = workload::write_spell(&args.repos, &at, &packs)?;
+            let sb = Bench { exe: b.exe.clone(), dir: std::fs::canonicalize(&at).map_err(|e| e.to_string())?, caches: caches.clone(), runs: args.runs };
+            let found = sb.spell_found(&caches.join("spell-check"))?;
+            results.push(sb.repeat(op("spell"), |i| {
+                let cache = caches.join(format!("spell-cold-{i}"));
+                let r = sb.cli(&["check", "--no-adapters"], Some(&cache));
+                let _ = std::fs::remove_dir_all(&cache);
+                r.map(|r| r.ms)
+            })?);
+            spell_workload = json!({ "files": files, "findings": found, "path": codelaw_core::normalize_path(&at) });
+        }
+    }
     let mut repos = Vec::new();
     if wanted("check_cold_repo") || wanted("check_warm_repo") {
         let base = dir.with_file_name(format!("{}.repos", dir.file_name().and_then(|n| n.to_str()).unwrap_or("workload")));
@@ -413,6 +435,7 @@ fn run(args: BenchArgs) -> Result<ExitCode, String> {
         "reference_machine": budgets.as_ref().map(|b| b.machine.clone()),
         "repos": repos,
         "types_workload": types_workload,
+        "spell_workload": spell_workload,
         "skipped": skipped,
         "operations": rows,
     });
@@ -483,6 +506,10 @@ fn text(r: &Value) -> String {
     let t = &r["types_workload"];
     if let Some(files) = t["files"].as_u64() {
         s.push_str(&format!("type workload: {files} TypeScript files (digest {}), TypeScript {}\n", t["digest"].as_str().unwrap_or(""), t["typescript"].as_str().unwrap_or("")));
+    }
+    let sp = &r["spell_workload"];
+    if let Some(files) = sp["files"].as_u64() {
+        s.push_str(&format!("spell workload: {files} files of the pinned repos, {} spell findings\n", sp["findings"].as_u64().unwrap_or(0)));
     }
     for why in r["skipped"].as_array().into_iter().flatten() {
         s.push_str(&format!("skipped: {}\n", why.as_str().unwrap_or("")));
@@ -573,6 +600,19 @@ impl Bench {
             Some(ts) if notes.is_empty() => Ok(ts.to_owned()),
             _ => Err(format!("the type rules did not run on the type workload: {}", if notes.is_empty() { "no TypeScript answered".to_owned() } else { notes.join("; ") })),
         }
+    }
+
+    /// One `check --format json` run in the spell workload: how many spell
+    /// findings it gave. A run with none is refused: the pass it times
+    /// would not be shown to have read anything.
+    fn spell_found(&self, cache: &Path) -> Result<usize, String> {
+        let r = self.cli(&["check", "--no-adapters", "--format", "json"], Some(cache))?;
+        let v: Value = serde_json::from_str(&r.stdout).map_err(|e| format!("`codelaw check --format json` printed no JSON report: {e}"))?;
+        let found = v["diagnostics"].as_array().into_iter().flatten().filter(|f| f["rule"].as_str().is_some_and(|r| r.starts_with("spell/"))).count();
+        if found == 0 {
+            return Err("spell: `spell/recommended` found nothing on the pinned repos, so the run would time no spell pass; is the spell pack in --packs?".into());
+        }
+        Ok(found)
     }
 
     /// `check --prefer-warm` on the type workload, served by a daemon that
@@ -874,7 +914,7 @@ mod tests {
         let names: Vec<&str> = OPERATIONS.iter().map(|o| o.name).collect();
         assert_eq!(
             names,
-            ["startup", "check_warm_10k", "check_cold_10k", "format_warm_10k", "fix_one_file", "lsp_after_edit", "mcp_rules_for_path", "hook_pre", "peak_memory_10k", "check_types_cold", "check_types_warm"]
+            ["startup", "check_warm_10k", "check_cold_10k", "format_warm_10k", "fix_one_file", "lsp_after_edit", "mcp_rules_for_path", "hook_pre", "peak_memory_10k", "check_types_cold", "check_types_warm", "spell"]
         );
         assert!(OPERATIONS.iter().all(|o| o.budgeted) && CONTEXT.iter().all(|o| !o.budgeted));
     }

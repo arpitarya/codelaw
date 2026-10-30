@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-103's `spell` bench operation; W-102's redesign handed to a parallel agent  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *implement 102 & 103*
+- **Done:** W-103 step 6's operation, as ruled 2026-10-29: `codelaw bench`'s `spell` (cold `check`, `spell/recommended` alone, the three pinned repos as one project), `perf/budgets.toml` `unset`, L8 decision 1, SR-CLI-MCP decision 10, SR-SPELL decision 9, `fixtures/perf/README.md`, CHANGELOG. W-102 (the six-arm redesign, the screen, the run) given to a parallel agent in its own lockmaster change; it writes its own entry.
+- **Decided / left open:** the operation runs on the pinned repos (decision 2), not the shared workload — SR-SPELL decision 9's wording; one budgetable number, so the three repos are one project. The budget: three `perf` runs on `main`, then the decider.
+- **Mistakes:** the first build read `findings` from the JSON report; it is `diagnostics` — caught before the run.
+- **Next:** three `perf` runs on `main` with `spell`, then decision 4's method to the decider.
+
 ## 2026-10-30 — W-144 ruled: round 2 joins W-139  ·  Cowork (Opus 5.5)
 
 - **Asked:** R5–R8 walked by voice, then *"file it."*

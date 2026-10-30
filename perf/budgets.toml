@@ -113,3 +113,14 @@ proposed = 5933 # local p95 3955.1 x 1.5 = 5932.65
 unit = "ms"
 budget = "unset" # not measured on the reference machine yet
 proposed = 4755 # local p95 3169.8 x 1.5 = 4754.7
+
+# spell (added 2026-10-30, W-103): the spell pack measured as its own
+# operation (the decider, 2026-10-29, SR-SPELL decision 9) so no ruled budget
+# above moves; `check` with `spell/recommended` alone, preview on, on the
+# three pinned repos copied in as one project, empty cache. Folding it into
+# the shared workload is B-062. Set by decision 4's method once perf has run
+# three times on main with it, by the decider's ruling.
+
+[operation.spell]
+unit = "ms"
+budget = "unset" # not measured on the reference machine yet

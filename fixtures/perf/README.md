@@ -9,6 +9,7 @@ same bytes appear on every machine without 10,000 files in git.
 codelaw bench --workload /tmp/workload --generate-only   # seed 20261018, 10,000 files
 codelaw bench --repo <dir> ...                           # also time `check` on a pinned real repo (scripts/corpus.py fetch --repo <name>)
 codelaw bench --typescript fixtures/types/node_modules/typescript   # also time check_types_cold / check_types_warm
+codelaw bench --only spell --repo <dir> ...                          # the spell pack alone on the pinned repos
 ```
 
 - **The generator** is `crates/codelaw-cli/src/bench/workload.rs`; its digest is
@@ -26,3 +27,8 @@ codelaw bench --typescript fixtures/types/node_modules/typescript   # also time 
   `node_modules/typescript` linked to `--typescript` (`npm ci` in
   `fixtures/types` installs the one CI uses). Its digest is pinned by a test
   beside `REFERENCE_DIGEST`.
+- **The spell workload** (`spell`; W-103) is written beside it from the
+  `--repo` folders: the pinned repos copied in as one project, a config
+  extending only `codelaw:spell/recommended`, and the spell pack alone. It is
+  not generated, so it has no digest; the repos are pinned by commit in
+  `scripts/corpus.json`.
