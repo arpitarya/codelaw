@@ -26,6 +26,13 @@ ball: arpit
 
 **Model:** Sonnet (step 5); steps 1–4 with Arpit in a text session, Claude in Chrome helping.
 
+## Uploaded by hand, 2026-10-30 (Arpit, from his Mac)
+
+- **`codelaw.codelaw-vscode` 0.3.0 and 0.4.0 are on Open VSX**, all eight platforms each (alpine-arm64, alpine-x64, darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-arm64, win32-x64), uploaded with an access token and `npx ovsx publish` from v0.4.0's `vscode` artifact (`ci` 40932052080). Seen on Arpit's *Settings → Extensions* page, 10:35 IST.
+- **Inactive:** every platform is struck through and the status reads *"Namespace not verified"* — Open VSX keeps them hidden until claim [#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928) is approved. Total downloads 0.
+- **This satisfies the wiki's "one version published with an access token first"** (finding below), so trusted publishing can follow approval directly.
+- The token was pasted into a chat on 2026-10-30: **Arpit revokes it** (*Settings → Access Tokens*).
+
 ## Ruled 2026-10-30 — trusted publishing, no token
 
 **Arpit, 2026-10-30 (voice):** *"No, no, token isn't done. We are going to go with trusted publisher. Open VSX has trusted publisher."* · *"The namespace isn't approved yet."*
