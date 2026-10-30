@@ -57,7 +57,7 @@ TARGETS = {
 assert set(TARGETS) == set(pkg.TARGETS), "vsix.py TARGETS and package.py TARGETS name different platforms"
 
 # The extension's own files, as installed (`extension/<path>`).
-OWN = ("package.json", "README.md", "icon.png")
+OWN = ("package.json", "README.md", "icon.png", "media/codelaw.svg")  # media: the activity bar's icon (W-137)
 SKIP_IN_MODULES = (".d.ts", ".map", ".ts")  # types and source maps: not run
 CONTENT_TYPES = {  # any other extension is application/octet-stream, as vsce writes it
     ".js": "application/javascript",
@@ -65,6 +65,7 @@ CONTENT_TYPES = {  # any other extension is application/octet-stream, as vsce wr
     ".md": "text/markdown",
     ".txt": "text/plain",
     ".png": "image/png",
+    ".svg": "image/svg+xml",
     ".vsixmanifest": "text/xml",
 }
 MIN_ICON = 128  # the Marketplace's smallest icon
@@ -261,7 +262,7 @@ def check(out: pathlib.Path, bins: pathlib.Path | None, release: bool) -> None:
             names = set(z.namelist())
             exe = f"extension/bin/{pkg.exe(key)}"
             need = {"extension.vsixmanifest", "[Content_Types].xml", "extension/package.json", "extension/README.md",
-                    "extension/LICENSE.txt", f"extension/{m['icon']}", "extension/" + m["main"].lstrip("./"), exe}
+                    "extension/LICENSE.txt", f"extension/{m['icon']}", "extension/media/codelaw.svg", "extension/" + m["main"].lstrip("./"), exe}
             for n in sorted(need - names):
                 bad.append(f"{f.name}: no {n}")
             other = [n for n in names if n.startswith("extension/bin/") and n != exe]

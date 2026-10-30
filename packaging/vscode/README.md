@@ -13,9 +13,53 @@ the editor shows exactly what `codelaw check` reports
 platform package. The project's own codelaw wins, so the editor agrees with CI.
 
 **Commands:** Fix all · Format · Explain rule · Restart server · Show output ·
-Copy debug info.
+Copy debug info · Refresh the dependency snapshot.
 **Settings:** `codelaw.enable`, `codelaw.path`, `codelaw.fixOnSave`,
-`codelaw.formatOnSave`, `codelaw.logLevel`, `codelaw.trace.server`.
+`codelaw.formatOnSave`, `codelaw.logLevel`, `codelaw.trace.server`, and the
+look's settings below.
+
+## How findings look
+
+Three kinds of file, each with its own setting; every one can be `squiggles`
+or `badges`:
+
+| setting | covers | default |
+|---|---|---|
+| `codelaw.view.code` | findings in JavaScript, TypeScript and Python code | `squiggles` |
+| `codelaw.view.manifests` | `package.json`, `pyproject.toml`, their lockfiles, `.nvmrc`, `.python-version`, `.tool-versions` | `badges` |
+| `codelaw.view.markers` | TODO, FIXME, HACK and SKIP comments, skipped tests | `badges` |
+
+- **Code** gets a squiggle only — red error, yellow warning, blue info, green
+  when codelaw fixes it on save, dotted grey when the baseline holds it — and a
+  card **while you hover**: what is wrong in plain words, the severity and what
+  the fix takes, one sentence on why, the fix as before → after or the rule's
+  Don't/Do, the rule id, and one action (*Apply fix*, *Ask agent to fix*, …)
+  with *Rule page* and *Ignore with expiry…*.
+- **Manifests** get a glyph in the gutter, a tinted line and a badge with words
+  on each dependency (`HIGH · 3 advisories → 4.17.21`, `↑ 1.13.2 · minor`,
+  `latest`), a summary line with *Fix vulnerable* and *Update minor and patch*,
+  and the same card on hover with the safe version and the advisories.
+- **Markers** get chips on the tag, the ticket and the date, and a badge
+  (`expired 29 d ago`, `needs a ticket`, `skip needs a reason and a date`).
+- **The codelaw sidebar** lists Dependencies, Deadlines, Tests and Ownership,
+  with a banner and *Refresh* while the dependency scan is incomplete
+  (`codelaw.sidebar`); **the status bar** counts vulnerable, outdated, expired
+  and due; **tab names** take the colour and count of their findings.
+  `codelaw.badges.clean` turns the `latest` badge off.
+
+Colours are theme colours (`codelaw.*` in *Preferences: Color Theme* →
+`workbench.colorCustomizations`), so light and high-contrast themes get their
+own; a badge always carries words, never colour alone.
+
+The pictures below are **the design** this extension builds
+([docs/design/editor](https://github.com/arpitarya/codelaw/tree/main/docs/design/editor)), not screenshots; version numbers in them are
+illustrative.
+
+![Design, board D: package.json, pyproject.toml and markers with badges, the sidebar and the status bar](https://raw.githubusercontent.com/arpitarya/codelaw/main/docs/design/editor/png/D-manifests-badges.png)
+
+![Design, board L: the defaults together — code squiggles beside TODO, FIXME and SKIP badges](https://raw.githubusercontent.com/arpitarya/codelaw/main/docs/design/editor/png/L-defaults-together.png)
+
+![Design, board K: the hover card for twelve kinds of finding](https://raw.githubusercontent.com/arpitarya/codelaw/main/docs/design/editor/png/K-hover-cards.png)
 
 ## Troubleshooting
 
@@ -35,7 +79,7 @@ Copy debug info.
 ## Developing
 
 ```bash
-npm ci && npm test     # compiles and tests the binary lookup and the logging helpers
+npm ci && npm test     # compiles and tests the binary lookup, the logging helpers and the findings' look
 ```
 
 `version` is the one version (L6 decision 9): `scripts/version.py --set` writes

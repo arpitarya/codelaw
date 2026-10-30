@@ -39,6 +39,10 @@ fn kinds_come_from_the_rule_and_the_message() {
     assert_eq!(kind_of("py/todo-marker", "`TODO(A-1, 2026-11-15)` expires in 16 days (2026-11-15)"), "due");
     assert_eq!(kind_of("js/todo-marker", "`FIXME` needs a ticket matching `X`"), "ticket");
     assert_eq!(kind_of("js/flag-expiry", "flag `summer-sale` expired 3 days ago"), "flag-expired");
+    assert_eq!(kind_of("js/flag-expiry", "Flag `new-checkout` expires on 2026-11-01, in 2 days"), "flag");
+    // A flag marker or the registry is kept in line by an `auto` fix: plain code.
+    assert_eq!(kind_of("js/flag-marker", "x"), "code");
+    assert_eq!(kind_of("data/codeowners-coverage", "x"), "ownership");
     assert_eq!(kind_of("js/no-focused-tests", "x"), "focused");
     assert_eq!(kind_of("js/skipped-test", "x"), "skipped");
     assert_eq!(kind_of("js/complexity", "x"), "complexity");

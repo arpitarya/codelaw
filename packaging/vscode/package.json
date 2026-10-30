@@ -40,7 +40,19 @@
       { "command": "codelaw.explainRule", "title": "Explain rule", "category": "codelaw" },
       { "command": "codelaw.restartServer", "title": "Restart server", "category": "codelaw" },
       { "command": "codelaw.showOutput", "title": "Show output", "category": "codelaw" },
-      { "command": "codelaw.copyDebugInfo", "title": "Copy debug info", "category": "codelaw" }
+      { "command": "codelaw.copyDebugInfo", "title": "Copy debug info", "category": "codelaw" },
+      { "command": "codelaw.applyFix", "title": "Apply this fix", "category": "codelaw" },
+      { "command": "codelaw.quickFix", "title": "Quick Fix…", "category": "codelaw" },
+      { "command": "codelaw.askAgent", "title": "Ask agent to fix", "category": "codelaw" },
+      { "command": "codelaw.ignoreWithExpiry", "title": "Ignore with expiry…", "category": "codelaw" },
+      { "command": "codelaw.stopFixOnSave", "title": "Stop fixing on save", "category": "codelaw" },
+      { "command": "codelaw.openManifest", "title": "Open the manifest", "category": "codelaw" },
+      { "command": "codelaw.refreshDeps", "title": "Refresh the dependency snapshot", "category": "codelaw", "icon": "$(refresh)" },
+      { "command": "codelaw.changeDate", "title": "Change the date…", "category": "codelaw" },
+      { "command": "codelaw.addTicket", "title": "Add a ticket…", "category": "codelaw" },
+      { "command": "codelaw.addSkipReason", "title": "Add a skip reason…", "category": "codelaw" },
+      { "command": "codelaw.openFlags", "title": "Open flags.toml", "category": "codelaw" },
+      { "command": "codelaw.turnSourceOff", "title": "Turn an advisory source off", "category": "codelaw" }
     ],
     "configuration": {
       "title": "codelaw",
@@ -50,13 +62,67 @@
         "codelaw.fixOnSave": { "type": "boolean", "default": false, "description": "Apply the auto fixes when a file is saved." },
         "codelaw.formatOnSave": { "type": "boolean", "default": false, "description": "Format with codelaw when a file is saved." },
         "codelaw.logLevel": { "type": "string", "enum": ["error", "warn", "info", "debug"], "default": "info", "description": "How much codelaw writes to its output channel. debug adds per-check timings and counts; the log never holds source text." },
-        "codelaw.trace.server": { "type": "string", "enum": ["off", "messages", "verbose"], "default": "off", "description": "Log the LSP traffic to the output channel." }
+        "codelaw.trace.server": { "type": "string", "enum": ["off", "messages", "verbose"], "default": "off", "description": "Log the LSP traffic to the output channel." },
+        "codelaw.view.code": { "type": "string", "enum": ["squiggles", "badges"], "default": "squiggles", "description": "How findings in JavaScript, TypeScript and Python code look: `squiggles` (a wavy underline; the card shows on hover) or `badges` (gutter icon, row tint and an end-of-line badge)." },
+        "codelaw.view.manifests": { "type": "string", "enum": ["squiggles", "badges"], "default": "badges", "description": "How findings in package.json, pyproject.toml, their lockfiles, .nvmrc, .python-version and .tool-versions look: `badges` (gutter icon, row tint, end-of-line badge, the summary CodeLens) or `squiggles`." },
+        "codelaw.view.markers": { "type": "string", "enum": ["squiggles", "badges"], "default": "badges", "description": "How TODO, FIXME, HACK and SKIP comments and skipped tests look: `badges` (chips on the tag, ticket and date, an end-of-line badge) or `squiggles`." },
+        "codelaw.sidebar": { "type": "boolean", "default": true, "description": "Show the codelaw sidebar: dependencies, deadlines, tests and ownership." },
+        "codelaw.badges.clean": { "type": "boolean", "default": true, "description": "Show `latest` beside a dependency at the latest version the committed snapshot has." }
       }
-    }
+    },
+    "viewsContainers": { "activitybar": [{ "id": "codelaw", "title": "codelaw", "icon": "media/codelaw.svg" }] },
+    "views": { "codelaw": [{ "id": "codelaw.findings", "name": "Findings", "when": "config.codelaw.sidebar" }] },
+    "viewsWelcome": [{ "view": "codelaw.findings", "contents": "No codelaw findings in the open files and the workspace's manifests." }],
+    "menus": {
+      "view/title": [{ "command": "codelaw.refreshDeps", "when": "view == codelaw.findings", "group": "navigation" }],
+      "commandPalette": [
+        { "command": "codelaw.applyFix", "when": "false" },
+        { "command": "codelaw.quickFix", "when": "false" },
+        { "command": "codelaw.askAgent", "when": "false" },
+        { "command": "codelaw.ignoreWithExpiry", "when": "false" },
+        { "command": "codelaw.openManifest", "when": "false" },
+        { "command": "codelaw.changeDate", "when": "false" },
+        { "command": "codelaw.addTicket", "when": "false" },
+        { "command": "codelaw.addSkipReason", "when": "false" },
+        { "command": "codelaw.turnSourceOff", "when": "false" }
+      ]
+    },
+    "colors": [
+      { "id": "codelaw.squiggleFixOnSave", "description": "The wavy underline of a finding codelaw fixes on save.", "defaults": { "dark": "#73c991", "light": "#388a34", "highContrast": "#73c991", "highContrastLight": "#388a34" } },
+      { "id": "codelaw.squiggleBaseline", "description": "The dotted underline of a finding the baseline holds.", "defaults": { "dark": "#8a8a8a", "light": "#6e6e6e", "highContrast": "#c0c0c0", "highContrastLight": "#5a5a5a" } },
+      { "id": "codelaw.badgeErrorForeground", "description": "An end-of-line badge's text (error).", "defaults": { "dark": "#f14c4c", "light": "#e51400", "highContrast": "#ff8080", "highContrastLight": "#b5200d" } },
+      { "id": "codelaw.badgeErrorBackground", "description": "An end-of-line badge's background (error).", "defaults": { "dark": "#f14c4c26", "light": "#e514001f", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.badgeErrorBorder", "description": "An end-of-line badge's border (error).", "defaults": { "dark": "#f14c4c80", "light": "#e5140080", "highContrast": "#ff8080", "highContrastLight": "#b5200d" } },
+      { "id": "codelaw.badgeWarningForeground", "description": "An end-of-line badge's text (warning).", "defaults": { "dark": "#cca700", "light": "#bf8803", "highContrast": "#ffd700", "highContrastLight": "#895503" } },
+      { "id": "codelaw.badgeWarningBackground", "description": "An end-of-line badge's background (warning).", "defaults": { "dark": "#cca70026", "light": "#bf88031f", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.badgeWarningBorder", "description": "An end-of-line badge's border (warning).", "defaults": { "dark": "#cca70080", "light": "#bf880380", "highContrast": "#ffd700", "highContrastLight": "#895503" } },
+      { "id": "codelaw.badgeInfoForeground", "description": "An end-of-line badge's text (info).", "defaults": { "dark": "#3794ff", "light": "#1a85ff", "highContrast": "#75beff", "highContrastLight": "#0f4a85" } },
+      { "id": "codelaw.badgeInfoBackground", "description": "An end-of-line badge's background (info).", "defaults": { "dark": "#3794ff26", "light": "#1a85ff1f", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.badgeInfoBorder", "description": "An end-of-line badge's border (info).", "defaults": { "dark": "#3794ff80", "light": "#1a85ff80", "highContrast": "#75beff", "highContrastLight": "#0f4a85" } },
+      { "id": "codelaw.badgeOkForeground", "description": "An end-of-line badge's text (ok).", "defaults": { "dark": "#73c991", "light": "#388a34", "highContrast": "#89d185", "highContrastLight": "#1f6b21" } },
+      { "id": "codelaw.badgeOkBackground", "description": "An end-of-line badge's background (ok).", "defaults": { "dark": "#73c99126", "light": "#388a341f", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.badgeOkBorder", "description": "An end-of-line badge's border (ok).", "defaults": { "dark": "#73c99180", "light": "#388a3480", "highContrast": "#89d185", "highContrastLight": "#1f6b21" } },
+      { "id": "codelaw.badgeMutedForeground", "description": "An end-of-line badge's text (muted).", "defaults": { "dark": "#9d9d9d", "light": "#6e6e6e", "highContrast": "#c0c0c0", "highContrastLight": "#5a5a5a" } },
+      { "id": "codelaw.badgeMutedBackground", "description": "An end-of-line badge's background (muted).", "defaults": { "dark": "#9d9d9d26", "light": "#6e6e6e1f", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.badgeMutedBorder", "description": "An end-of-line badge's border (muted).", "defaults": { "dark": "#9d9d9d80", "light": "#6e6e6e80", "highContrast": "#c0c0c0", "highContrastLight": "#5a5a5a" } },
+      { "id": "codelaw.rowErrorBackground", "description": "The tint of a line with an error, in badges view.", "defaults": { "dark": "#f14c4c14", "light": "#e5140010", "highContrast": "#00000000", "highContrastLight": "#00000000" } },
+      { "id": "codelaw.rowWarningBackground", "description": "The tint of a line with a warning, in badges view.", "defaults": { "dark": "#cca70012", "light": "#bf880310", "highContrast": "#00000000", "highContrastLight": "#00000000" } },
+      { "id": "codelaw.chipTagForeground", "description": "A TODO/FIXME/SKIP tag chip's text.", "defaults": { "dark": "#e2c08d", "light": "#895503", "highContrast": "#ffd700", "highContrastLight": "#895503" } },
+      { "id": "codelaw.chipTagBackground", "description": "A TODO/FIXME/SKIP tag chip's background.", "defaults": { "dark": "#cca70033", "light": "#bf880326", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.chipTicketForeground", "description": "A ticket chip's text.", "defaults": { "dark": "#9cdcfe", "light": "#0f4a85", "highContrast": "#75beff", "highContrastLight": "#0f4a85" } },
+      { "id": "codelaw.chipTicketBackground", "description": "A ticket chip's background.", "defaults": { "dark": "#3794ff33", "light": "#1a85ff1f", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.chipDateForeground", "description": "A date chip's text.", "defaults": { "dark": "#d4d4d4", "light": "#3b3b3b", "highContrast": "#ffffff", "highContrastLight": "#000000" } },
+      { "id": "codelaw.chipDateBackground", "description": "A date chip's background.", "defaults": { "dark": "#80808033", "light": "#8080801f", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.chipLateForeground", "description": "A chip's text when its marker is past its date or has no ticket.", "defaults": { "dark": "#ff8080", "light": "#b5200d", "highContrast": "#ff8080", "highContrastLight": "#b5200d" } },
+      { "id": "codelaw.chipLateBackground", "description": "A chip's background when its marker is past its date or has no ticket.", "defaults": { "dark": "#f14c4c33", "light": "#e514001f", "highContrast": "#000000", "highContrastLight": "#ffffff" } },
+      { "id": "codelaw.fileError", "description": "A file name with a codelaw error.", "defaults": { "dark": "#f14c4c", "light": "#e51400", "highContrast": "#ff8080", "highContrastLight": "#b5200d" } },
+      { "id": "codelaw.fileWarning", "description": "A file name with a codelaw warning.", "defaults": { "dark": "#cca700", "light": "#bf8803", "highContrast": "#ffd700", "highContrastLight": "#895503" } },
+      { "id": "codelaw.fileInfo", "description": "A file name with a codelaw info finding.", "defaults": { "dark": "#3794ff", "light": "#1a85ff", "highContrast": "#75beff", "highContrastLight": "#0f4a85" } }
+    ]
   },
   "scripts": {
     "build": "tsc -p .",
-    "test": "tsc -p . && node --test out/test/binary.test.js out/test/logging.test.js"
+    "test": "tsc -p . && node --test out/test/binary.test.js out/test/logging.test.js out/test/findings.test.js"
   },
   "dependencies": {
     "vscode-languageclient": "9.0.1"

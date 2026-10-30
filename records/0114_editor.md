@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-lsp
   - packaging/vscode
 laws: [L0, L3, L5, L6, L7, L8]
-timestamp: 2026-10-30T18:00:00Z
+timestamp: 2026-10-30T18:30:00Z
 content_sha: ""
 ---
 
@@ -77,8 +77,8 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
 3. **Same verdicts as the CLI ([L5](0007_LAW-5-no-model-in-the-engine.md)).** The server calls the same engine functions; the editor never shows a result that `codelaw check` wouldn't.
    - **A person's editor runs the `local` profile** ([SR-CONFIG](0110_config.md) decision 10), whether or not `CI` is set in its environment, unless `CODELAW_PROFILE` names another: its verdicts are `codelaw check --profile local`'s.
 4. **The VS Code extension `codelaw.codelaw-vscode`:**
-   - **Source:** `packaging/vscode`, TypeScript. **Contents:** an LSP client (`vscode-languageclient`, MIT; its tree is MIT and ISC), a status-bar item, and the commands *Fix all*, *Format*, *Explain rule* (runs `codelaw explain`), *Restart server* and *Show output* and *Copy debug info*. Its build and test tools (`typescript`, Apache-2.0; `@types/*`, MIT) are dev-only; `crates/codelaw-cli/tests/licences.rs` checks its lockfile.
-   - **Settings:** `codelaw.enable`, `codelaw.path`, `codelaw.fixOnSave`, `codelaw.formatOnSave`, `codelaw.logLevel`, `codelaw.trace.server`.
+   - **Source:** `packaging/vscode`, TypeScript. **Contents:** an LSP client (`vscode-languageclient`, MIT; its tree is MIT and ISC), a status-bar item, the look of decision 8, and the commands *Fix all*, *Format*, *Explain rule* (runs `codelaw explain`), *Restart server* and *Show output* and *Copy debug info*. Its build and test tools (`typescript`, Apache-2.0; `@types/*`, MIT) are dev-only; `crates/codelaw-cli/tests/licences.rs` checks its lockfile.
+   - **Settings:** `codelaw.enable`, `codelaw.path`, `codelaw.fixOnSave`, `codelaw.formatOnSave`, `codelaw.logLevel`, `codelaw.trace.server`, and decision 8's `codelaw.view.*`, `codelaw.sidebar`, `codelaw.badges.clean`.
    - **Choosing a binary:**
      1. `codelaw.path`;
      2. the workspace's `node_modules/.bin/codelaw`;
@@ -102,6 +102,14 @@ The decider asked for a VS Code extension as well as an LSP. Earlier records nam
    - **The hover card** (board K): a plain title, the severity (a vulnerability's grade) and fix chips (`one-click fix`, `needs your call`, `baseline`), one sentence on why (the finding's own words for a fact-bearing kind, the rule's Why for code), an example — the fix's line before → after, the facts as rows (safe version, latest, ticket, due, owner) or the rule's first Don't/Do — and a meta line (rule id, CWE, new or in the baseline, fix class). Portable markdown; the VS Code extension adds the icon and the action links.
    - **Inlay hints:** at the end of each line holding a `manifest` or `marker` finding, its badge (the most severe first); `latest` beside a dependency no finding is on whose requirement names the latest version in the committed `.codelaw/deps-snapshot.json` (read, never written). Never on `code` findings.
    - **CodeLens, manifests only:** a summary over the first finding's line (`codelaw · 2 vulnerable · 1 deprecated · 2 outdated · 2 up to date`; the summary's command is empty) and the bulk fixes `Fix vulnerable (n)` and `Update minor and patch (n)`, which run `codelaw.applyFixes [uri, kinds, grades]` (`executeCommandProvider`): every `auto`/`suggest` fix of those kinds as one `workspace/applyEdit` the editor applies — overlapping edits after the first wait for the next run.
+   - **The extension draws it (VS Code and its forks), from the `data` alone** (`packaging/vscode/src/findings.ts` maps it, unit-tested; `decorations.ts`, `sidebar.ts`, `status.ts`, `actions.ts` draw it with the VS Code API — no UI library, [L11](0013_LAW-11-dependencies.md)). **Three settings, each `squiggles` or `badges`:** `codelaw.view.code` (default `squiggles`), `codelaw.view.manifests` (default `badges`), `codelaw.view.markers` (default `badges`); and `codelaw.sidebar` (default on), `codelaw.badges.clean` (`latest`, default on).
+     - **Squiggles:** the severity's own line; a finding codelaw fixes on save (`codelaw.fixOnSave` on, an `auto` fix) is drawn green and one the baseline holds dotted grey — each becomes a hint for the editor, so it leaves the Problems panel and its own squiggle. No glyph, tint, badge or CodeLens on code drawn as squiggles; the card shows only while the pointer is on the finding.
+     - **Badges:** per line, its worst finding's glyph in the gutter (shield, circle-slash, arrow-up, check, clock, flag, target, pause, warning, person), a tint on error and warning lines, and the badge's words at the line's end; `latest` from the server's `clean` inlay hints; in markers, chips on the tag, the ticket and the date (late chips when the marker is expired or has no ticket). The server's inlay hints are not drawn twice; the summary CodeLens shows while manifests are badges.
+     - **The card's foot:** an icon before the title and one primary action, then plain links — *Apply fix* / *Change to x* (the server's quick fix), *Ask agent to fix* (the editor's chat, else the clipboard), *Fix now* and *Stop fixing on save*, *Change date…*, *Add ticket…*, *Add reason…* (a `SKIP(ticket, date): why` line above), *Open the manifest*, *Open flags.toml*, *Pick a branch…* (the quick-fix menu), *Refresh* (`codelaw deps refresh` in a terminal the person sees), *Rule page* (*Explain rule*), *Ignore with expiry…* (a dated `codelaw-ignore` line above, or for a manifest a `[deps] ignore` entry on the clipboard). The markdown trusts those commands and no other. **Not built, as ruled:** a pop-up notification ("Fix both").
+     - **The sidebar** `codelaw.findings` in the `codelaw` activity-bar container: Dependencies (Vulnerable, Deprecated, Licence denied, Outdated, Runtime mismatch), Deadlines (Expired, Due soon, Missing ticket), Tests (Focused, Skipped with no reason), Ownership; above them, while a `scan` finding is published, the banner *Scan incomplete* with *Refresh* and *Turn ⟨source⟩ off*. It lists what the server has published — the open files, and each workspace folder's `package.json` and `pyproject.toml`, which the extension opens without showing.
+     - **The status bar and the tabs:** `$(shield) n vulnerable`, `$(arrow-up) n outdated`, `$(clock) n expired · n due`, and `codelaw · scan incomplete` on the warning background; a `FileDecorationProvider` gives a file's count and its worst colour.
+     - **Colours** are `contributes.colors` (`codelaw.squiggle*`, `codelaw.badge*`, `codelaw.row*`, `codelaw.chip*`, `codelaw.file*`) with dark, light and both high-contrast defaults; badges always carry words. The gutter glyphs are images, so they carry the Dark+ and Light+ values of those colours.
+     - **Repainting:** from the latest published diagnostics, visible editors only.
 
 ### Consequences
 
