@@ -87,6 +87,8 @@ Left: one more cached run; three clean Rust-change and pack-change runs once W-1
 | `ci` 41006814384 (`7fafb2f4`) | `ci.yml` + scripts changed (builds cached; `perf` runs on a `ci.yml` change) | **11m29** | `perf` 11m08 | the rest done by 05:20:41 UTC with smoke win32-x64 |
 | `ci` 41007205048 (`c4d519c7`, 0.4.1) | version bump: every crate rebuilt | **18m44** | **queued 7m26** (05:13:19 → 05:20:45, behind 41006814384), then build darwin-x64 6m25 → `package` → smoke win32-x64 (05:31:37); `perf` 11m18 last (05:32:03) | the pipeline's own work 11m18 |
 
+| `publish` 41031729649 (v0.4.2) | release | **6m54** attempt 1 (npm 5m17, Sigstore 409s retried) + **3m51** PyPI re-run (Rekor 502 on attempt 1) | the first release with the Fux index set: 47 npm names, 26 wheels' projects |
+
 **Found:** the tail of a Rust- or pack-change run is now **`perf`**, not the builds or `corpus`: it runs whenever `crates`, `packs`, `perf` or `ci.yml` change (W-24's skip), builds its own release binary (3m09) and benches every L8 operation — `spell` among them since W-103 (1.3 s p95 per run). In the 10-29 cached runs it was skipped (6–8 s). Levers, none taken here: reuse `build linux-x64-gnu`'s binary as `corpus` does (−3 min; it can still run on `ubuntu-24.04`, but that binary is built through maturin with `--zig` for manylinux2014, not `cargo build --release`, so L8 would measure a different build — a ruling), or fewer bench iterations (L8's p95 needs them). **To put to Arpit with the next measurement.**
 
 ## What cannot be bought

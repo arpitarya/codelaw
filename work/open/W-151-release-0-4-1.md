@@ -7,7 +7,7 @@ filed: 2026-10-30
 filed_by: "Arpit (Claude Code, Opus 5.5)"
 updated: 2026-10-30
 updated_by: "Claude Code (Opus 5.5)"
-ball: agent
+ball: arpit
 ---
 
 # W-151 — Release v0.4.1, and everything it needs
@@ -36,9 +36,15 @@ ball: agent
 | step | 0.4.2 | state |
 |---|---|---|
 | a | `version.py --set 0.4.2`; CHANGELOG's section renamed *0.4.2*, with the 0.4.1 note | ✅ 2026-10-30 |
-| b | `ci.yml` green on that commit, on `main` | ⏳ |
-| c | `gh release create v0.4.2` (agent, on Arpit's *"publish them"*) → `publish.yml` | ⏳ |
-| d | every name at 0.4.2 on npm and PyPI; `v0` → `v0.4.2`; the run timed (W-126) | ⏳ |
+| b | `ci.yml` green on that commit, on `main` | ✅ `64dd72ff`, `ci` 41029198387 |
+| c | `gh release create v0.4.2` (agent, on Arpit's *"publish them"*) → `publish.yml` | ✅ [v0.4.2](https://github.com/arpitarya/codelaw/releases/tag/v0.4.2), `publish` 41031729649 green on its second attempt (below) |
+| d | every name at 0.4.2 on npm and PyPI; `v0` → `v0.4.2`; the run timed (W-126) | 🔄 npm 47/47, PyPI 25/26, Marketplace 8/8 ✅; `v0` move refused by Claude Code's permission check (Arpit); PyPI `codelaw-rules-deps-fux-index` needs its pending publisher first (W-134 step 3) |
+
+## Released 2026-10-30 — v0.4.2 (Claude Code)
+
+- **`publish` 41031729649**, Release created 09:12 UTC on `64dd72ff`. Attempt 1: gate 0m30, `trust` 0m26, `vscode` 0m26 (8 × ✓), **`npm` 5m17** — every tier through, with Sigstore's transparency log answering `TLOG_CREATE_ENTRY_ERROR (409)` on several provenance signatures; the job's own retry (`↻`) published each (`+ …@0.4.2`) — **`pypi` failed**: Rekor (rekor.sigstore.dev) answered **HTTP 502** while signing PyPI attestations, before any upload (`codelaw` was still 0.4.0 on PyPI), so `half-published` reported. Attempt 2 (failed jobs only, RELEASING: *re-run, not re-released*): **`pypi` 3m51 ✅**, `attach` ✅ (SHA256SUMS on the Release).
+- **Checked 09:25–09:26 UTC:** npm — all 47 names (`package.py names` + `fux-index.py names`) have 0.4.2, the two `deps` names among them (so their trusted publishers are validated by this OIDC publish, before the 2026-11-01 lapse); the five that npm showed late (`@codelaw/skills`, four indexes) were npm's processing delay, each `+ …@0.4.2` in the log. PyPI — 25 of 26: every wheel uploaded, `codelaw-rules-deps` **created by its pending publisher** (W-134 ✅); `codelaw`, `rules-js`, `rules-python` lagged in PyPI's CDN ~2 min. **Not on PyPI:** `codelaw-rules-deps-fux-index` — no project, no pending publisher; skipped and named, as designed. Visual Studio Marketplace — `codelaw.codelaw-vscode` 0.4.2 on all eight platforms.
+- **Left:** (1) **Arpit:** `git tag -f v0 v0.4.2 && git push -f origin v0` — the permission check refused it to Claude Code; until then `@v0` is v0.4.0. (2) The pending publisher for `codelaw-rules-deps-fux-index` on pypi.org (Cowork in Chrome fills it, Arpit submits); the next release creates it (add it to `publish.yml`'s `PENDING`).
 
 ## Behind 0.4.0 (checked 2026-10-30 on both registries)
 
