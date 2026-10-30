@@ -4,6 +4,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+### Changed
+
+- **Release pipeline (W-151):** the next release creates `codelaw-rules-deps-fux-index` on PyPI through its pending publisher; `codelaw-rules-deps`, created by 0.4.2, is uploaded as any existing project.
+
 ## 0.4.2 — 2026-10-30
 
 **The `deps` pack, and every package on its registries.** A nineteenth
