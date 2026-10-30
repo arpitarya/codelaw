@@ -182,6 +182,20 @@
         "Reply to the review comments on my PR",
         "Summarise the comments on PR 42"
       ]
+    },
+    "codelaw-port-rule": {
+      "should": [
+        "I want ESLint's no-nested-ternary in codelaw",
+        "Port pylint's global-statement check to codelaw",
+        "codelaw doesn't have stylelint's declaration-no-important, can you add it?",
+        "Bring this rule over: https://eslint.org/docs/latest/rules/no-plusplus"
+      ],
+      "should_not": [
+        "Migrate our .eslintrc to codelaw.toml",
+        "Make a rule that forbids importing lodash directly",
+        "Why did js/eqeqeq fire on this line?",
+        "Publish our rules as a pack"
+      ]
     }
   }
 }

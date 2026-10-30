@@ -31,6 +31,9 @@ pub struct RuleRow {
     /// CWE, OWASP and severity, for a security rule (SR-RULE-FORMAT
     /// decision 2a).
     pub security: Option<Security>,
+    /// The source rules this one reimplements, `<tool>/<rule>`
+    /// (SR-RULE-FORMAT decision 2; the `codelaw-port-rule` skill's lookup).
+    pub ported_from: Vec<String>,
 }
 
 impl RuleRow {
@@ -83,6 +86,7 @@ fn row(r: &LoadedRule, severity: String) -> RuleRow {
         preview: r.preview_blocked,
         tags: r.rule.tags.clone(),
         security: r.rule.security.clone(),
+        ported_from: r.rule.ported_from.clone(),
     }
 }
 

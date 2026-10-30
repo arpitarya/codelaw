@@ -34,6 +34,9 @@ pub fn rules_json(rows: &[RuleRow], for_file: Option<&str>) -> Value {
             if let Some(s) = &r.security {
                 card["security"] = security_json(s);
             }
+            if !r.ported_from.is_empty() {
+                card["ported_from"] = json!(r.ported_from);
+            }
             card
         })
         .collect();

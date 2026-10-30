@@ -219,6 +219,9 @@ yet is owned by an open `W-nn`.
 | `scripts/rule-docs.py` | SR-WORK-REGISTRY | `docs/rules/`, one page per rule generated from the rule files, presets and cases, and `llms.txt`, `docs/rules/llms-full.txt` and `docs/rules/rules.json` for agents (W-98); `--check` in CI |
 | `scripts/corpus.py` | SR-RULE-AUTHORING | decision 4: fetches the pinned corpus and runs level 4 per pack (W-20) |
 | `scripts/corpus.json` | SR-RULE-AUTHORING | decision 4: the pinned corpus — repositories, commits, licences, packs |
+| `scripts/ported-rule-demand.py` | SR-RULE-AUTHORING | decision 2: counts who wants each ported rule — public `.codelaw/rules/` by `ported_from:` and the opt-in `port:` issues; maintainer-run with `gh`, never in CI (W-140) |
+| `fixtures/port-rule` | SR-RULE-AUTHORING | decision 2: the three recorded ports — ESLint, Pylint, stylelint — as project rules (W-140) |
+| `crates/codelaw-cli/tests/port_rule.rs` | SR-RULE-AUTHORING | decision 2: runs those ports under `codelaw test` and finds a rule by `ported_from:` through the CLI and MCP (a different decision from the CLI's) |
 | `crates/codelaw-cli/tests/laws.rs` | SR-LAW-3 | the fixture matrix and isolation check; it also runs the L4 and L5 checks |
 | `fixtures/l3` | SR-LAW-3 | the fixture matrix |
 | `fixtures/css-modules` | SR-PROJECT-GRAPH | decision 8: the React app the `css-modules` rules run on |

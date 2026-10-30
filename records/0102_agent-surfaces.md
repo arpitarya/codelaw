@@ -11,7 +11,7 @@ owns:
   - crates/codelaw-agents
   - templates/agents
 laws: [L0, L3, L4, L5, L6]
-timestamp: 2026-10-30T12:00:00Z
+timestamp: 2026-10-30T18:00:00Z
 content_sha: ""
 ---
 
@@ -22,7 +22,7 @@ content_sha: ""
 
 **Scope.** This record covers the **whole agent-facing set**: skills, steering, rules and instruction files, AGENTS.md / CLAUDE.md, custom agents, agent hooks and MCP registration.
 
-**The decision in one line.** codelaw ships **13 skills** written once in the open **Agent Skills** format (`SKILL.md`). `codelaw sync-agents` copies them into each agent's skills folder and generates every other agent file from the rules. Nothing agent-facing is ever hand-edited in a consumer repo. **Since 2026-10-27 (W-77) every one of those files ships in its own package, `@codelaw/skills` on npm and `codelaw-skills` on PyPI, at the engine's exact version; the codelaw binary carries none of them (decision 8).**
+**The decision in one line.** codelaw ships **14 skills** written once in the open **Agent Skills** format (`SKILL.md`). `codelaw sync-agents` copies them into each agent's skills folder and generates every other agent file from the rules. Nothing agent-facing is ever hand-edited in a consumer repo. **Since 2026-10-27 (W-77) every one of those files ships in its own package, `@codelaw/skills` on npm and `codelaw-skills` on PyPI, at the engine's exact version; the codelaw binary carries none of them (decision 8).**
 
 **Four kinds of surface, four jobs** (the fourth, *Gate*, since 2026-10-27, W-93):
 
@@ -86,7 +86,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 | Always-on instructions | `CLAUDE.md` block | via plugin skills | `AGENTS.md` block (also reads `.github/copilot-instructions.md`) | `AGENTS.md` block | `.kiro/steering/codelaw.md` (`inclusion: always`) |
 | Path-scoped instructions | via `codelaw-write` skill + MCP | via plugin | `.github/instructions/codelaw-<lang>.instructions.md` (`applyTo`) | via skill + MCP | `.kiro/steering/codelaw-<lang>.md` (`inclusion: fileMatch`) |
 | Skills | `.claude/skills/<n>/SKILL.md` | bundled in a codelaw plugin | `.github/skills/<n>/SKILL.md` | `.agents/skills/<n>/SKILL.md` | `.kiro/skills/<n>/SKILL.md` |
-| Custom agent | `.claude/agents/codelaw-rule-author.md` | none | `.github/agents/codelaw-rule-author.agent.md` | none | none |
+| Custom agents | `.claude/agents/codelaw-rule-author.md`, `codelaw-rule-porter.md` | none | `.github/agents/codelaw-rule-author.agent.md`, `codelaw-rule-porter.agent.md` | none | none |
 | Pre-write hook (Gate, decision 9) | `.claude/settings.json` `PreToolUse` | plugin hook (reported not to fire in Cowork; not counted on) | not written yet: the payload's argument names are unconfirmed | `PreToolUse` hook (printed snippet) | not written yet: the stdin shape is unconfirmed |
 | Post-edit hook | `.claude/settings.json` `PostToolUse` | plugin hook | `.github/hooks/codelaw.json` | `PostToolUse` hook (printed snippet; config is user-level) | agent hook (file save / post-tool) |
 | MCP registration | `.mcp.json` | plugin | `.vscode/mcp.json` | printed `config.toml` snippet | `.kiro/settings/mcp.json` |
@@ -150,7 +150,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 
 #### 7. What `sync-agents` writes, file by file
 
-- **Owned files** are written whole, with a "generated, do not edit" note after any frontmatter: the skills, the custom agent, `.kiro/steering/codelaw*.md`, `.github/instructions/codelaw-<lang>.instructions.md`, `.github/hooks/codelaw.json`, `.kiro/hooks/codelaw.json` and the Cowork plugin.
+- **Owned files** are written whole, with a "generated, do not edit" note after any frontmatter: the skills, the custom agents, `.kiro/steering/codelaw*.md`, `.github/instructions/codelaw-<lang>.instructions.md`, `.github/hooks/codelaw.json`, `.kiro/hooks/codelaw.json` and the Cowork plugin.
 - **Shared files** are touched only at codelaw's part:
   - `CLAUDE.md` and `AGENTS.md`: the marker block, replaced in place, or appended when there is none;
   - `.mcp.json`, `.kiro/settings/mcp.json` (`mcpServers.codelaw`) and `.vscode/mcp.json` (`servers.codelaw`): that one key;
@@ -224,6 +224,16 @@ Each agent reads a different set of files from a different place. Maintaining th
 - **The fast track.** A review comment carrying `codelaw: rule` on a line of its own puts its point into the next run's proposals whatever the thresholds; every approval step still applies.
 - **Read-only on the platform.** The skill posts, resolves and approves nothing there.
 
+#### 11. Port any rule on demand: `codelaw-port-rule`
+
+**Asked by Arpit, 2026-10-30 (voice; W-140):** *"if somebody wants to use it, they can just say that this is a rule that is in ESLint, or this is a rule that is there in PyLint, and any tool, and I want it in code law. So write a rule for it."* — and on counting: *"how can I know … how many people use that rule?"*, both by a share prompt and by a code search: *"Yes."* Written by an agent in the change that built it (2026-10-30).
+
+- **A skill and its subagent, never engine code.** `codelaw-port-rule` takes `<tool>/<rule>` from any tool, or a link to the rule's page; `codelaw-rule-porter` is its context-isolated custom agent, written beside `codelaw-rule-author` (decision 2's matrix).
+- **Check first.** A rule whose `ported_from:` names the source is found before anything is written: the project's loaded rules through `codelaw rules --format json` or MCP `list_rules`, whose cards carry `ported_from` ([SR-CLI-MCP](0115_cli-and-mcp.md) decision 3, the smallest change that answers it — no `find_rule` tool), then every first-party rule through the published catalogue `docs/rules/rules.json`, which the agent fetches. Found → the preset or `[rules]` line that turns it on, and no port.
+- **Otherwise the port loop** ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 2): the agent reads the source's docs and tests — **never runs them** ([L5](0007_LAW-5-no-model-in-the-engine.md)) and **never pastes a copyleft source's text** ([L2](0004_LAW-2-foss-dependencies.md)) — and writes a project rule from `codelaw new-rule`'s template ([L10](0012_LAW-10-consumer-templates.md)), `ported_from:` set, `stability: preview`. It counts only when `codelaw test` is green. What codelaw cannot express (engine code, types not asked for) is named, and offered as a request instead.
+- **The share prompt is opt-in, every time.** After a port the skill asks once; *yes* opens `.github/ISSUE_TEMPLATE/rule_request.yml` pre-filled in the browser (title `port: <tool>/<rule>`, label `ported-rule`, the `ported_from` and `rule_file` fields) for the user to submit, or `gh issue create` on an explicit yes to the exact text; *no* sends nothing. codelaw itself sends nothing, ever (no telemetry).
+- **The count is a maintainer's script**, `scripts/ported-rule-demand.py` ([SR-RULE-AUTHORING](0113_rule-authoring.md) decision 2): never in CI, never in the engine.
+
 ### The skill catalogue
 
 **P1** ships with the MCP server. **P2** follows once rules can be authored outside the codelaw repo. **P3** comes later.
@@ -242,9 +252,10 @@ Each agent reads a different set of files from a different place. Maintaining th
 | **P3** | `codelaw-suppress` | "this violation is intended", "ignore this rule here" | Picks the narrowest suppression (inline with reason → per-glob override), refuses a blanket disable, and records the reason | Code / config |
 | **P3** | `codelaw-pack` | "share our rules across repos", "publish a rule pack" | Scaffolds a pack ([SR-RULE-PACKS](0101_rule-packs.md)) with its manifest, versioning, tests, and npm/PyPI publish config | Pack folder |
 | **P3** | `codelaw-upgrade` | "upgrade codelaw", a new version is available | Reads the changelog, runs the new rules in preview, and fixes or adopts them deliberately | Config + code |
+| **P3** | `codelaw-port-rule` | "I want ESLint's no-nested-ternary in codelaw", "port pylint's global-statement", a link to another linter's rule | Finds the codelaw rule whose `ported_from:` names it and says how to turn it on; otherwise reads the source rule (never runs it), writes it fresh as a `preview` project rule until `codelaw test` is green, then offers an opt-in share issue (decision 11) | `.codelaw/rules/` |
 | **P3** | `codelaw-rules-from-reviews` | "turn our review comments into rules", "what do reviewers keep saying" | Reads merged pull requests' review comments on any platform through its CLI, clusters the repeated points, proposes each as a rule or guidance with evidence, and builds the approved ones as `preview` rules with a baseline — the decider approving every step (decision 10) | `.codelaw/rules/`, baseline |
 
-**Custom agent: `codelaw-rule-author`.** A subagent version of `codelaw-author-rule`. Rule authoring is iterative (inspect the tree → write → test → repeat) and floods the context with syntax trees, so it runs in its own context and returns only the finished rule and the test result.
+**Custom agents: `codelaw-rule-author` and `codelaw-rule-porter`.** Subagent versions of `codelaw-author-rule` and `codelaw-port-rule`. Rule authoring is iterative (inspect the tree → write → test → repeat) and floods the context with syntax trees — a port adds the source's docs and tests — so each runs in its own context and returns only the finished rule and the test result.
 
 **Slash commands come free.** Each skill can be invoked directly (for example `/codelaw-fix`) in agents that expose skills as commands. No separate command files are generated.
 

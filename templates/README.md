@@ -24,6 +24,7 @@ what consumers receive, edit the template here — the diff is the change.
 | template | lands at | written by | record |
 |---|---|---|---|
 | `agents/agents/codelaw-rule-author.md` | .claude/agents/codelaw-rule-author.md, .github/agents/codelaw-rule-author.agent.md | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
+| `agents/agents/codelaw-rule-porter.md` | .claude/agents/codelaw-rule-porter.md, .github/agents/codelaw-rule-porter.agent.md | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/always-on.md` | the body of the `CLAUDE.md` and `AGENTS.md` blocks and of `.kiro/steering/codelaw.md` | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/block.md` | the marker block in `CLAUDE.md` and `AGENTS.md` (the merge stays in code) | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/claude/hook-group.json` | the `PostToolUse` entry of `.claude/settings.json` and the Cowork `hooks.json` | `sync-agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
@@ -51,6 +52,7 @@ what consumers receive, edit the template here — the diff is the change.
 | `agents/skills/codelaw-fix/SKILL.md` | `<agent>/skills/codelaw-fix/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/skills/codelaw-migrate/SKILL.md` | `<agent>/skills/codelaw-migrate/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/skills/codelaw-pack/SKILL.md` | `<agent>/skills/codelaw-pack/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
+| `agents/skills/codelaw-port-rule/SKILL.md` | `<agent>/skills/codelaw-port-rule/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/skills/codelaw-review/SKILL.md` | `<agent>/skills/codelaw-review/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/skills/codelaw-rules-from-reviews/SKILL.md` | `<agent>/skills/codelaw-rules-from-reviews/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |
 | `agents/skills/codelaw-setup/SKILL.md` | `<agent>/skills/codelaw-setup/SKILL.md` — .claude/skills, .github/skills, .agents/skills, .kiro/skills, the Cowork plugin | `sync-agents`, `init --agents` | [SR-AGENT-SURFACES](../records/0102_agent-surfaces.md) |

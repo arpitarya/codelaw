@@ -1,5 +1,5 @@
 name: Rule request
-description: Ask for a new rule, or a port of one from another linter.
+description: Ask for a new rule, or a port of one from another linter — or share a rule the codelaw-port-rule skill ported into your project.
 title: "[rule] "
 labels: ["rule request"]
 body:
@@ -35,7 +35,13 @@ body:
     id: source
     attributes:
       label: The original rule, if it exists elsewhere
-      description: A link to the rule in ESLint, typescript-eslint, Ruff, stylelint, html-validate or markdownlint.
+      description: A link to the rule in ESLint, typescript-eslint, Ruff, Pylint, stylelint, Biome, html-validate, markdownlint or any other tool.
+  - type: input
+    id: ported_from
+    attributes:
+      label: Ported from
+      description: "For a port: the source rule as `<tool>/<rule>`, the value a rule file's `ported_from:` takes (`eslint/no-nested-ternary`, `pylint/global-statement`). Title the issue `port: <tool>/<rule>`; maintainers count requests by it."
+      placeholder: eslint/no-nested-ternary
   - type: textarea
     id: dont
     attributes:
@@ -66,3 +72,9 @@ body:
     id: steps
     attributes:
       label: Fix steps, or anything else
+  - type: textarea
+    id: rule_file
+    attributes:
+      label: The ported rule file, if you have one
+      description: "The `.codelaw/rules/<namespace>/<name>.md` the codelaw-port-rule skill wrote in your project, green under `codelaw test`. Nothing is sent unless you submit this form."
+      render: markdown

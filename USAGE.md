@@ -419,6 +419,7 @@ The rule file itself is shown in the [README](README.md#a-rule-is-one-markdown-f
 - **`codelaw test` checks more than the examples:** every `Don't` must fire and fix to its `Do`, every `Do` must pass, and every fix must be a fixpoint.
 - **`codelaw tree`** shows the syntax tree the matcher sees: `codelaw tree -e 'console.log(1)' --lang typescript`.
 - **`codelaw rules lint`** checks rule files against the template.
+- **A rule another tool has, in codelaw:** ask your agent for it — *"I want ESLint's no-nested-ternary in codelaw"*. The `codelaw-port-rule` skill first looks for a codelaw rule whose `ported_from:` names it (`codelaw rules --format json` shows `ported_from` on each card; so does MCP `list_rules`) and tells you how to turn it on; otherwise it writes the rule into `.codelaw/rules/` as `preview`, from the source rule's docs and tests (read, never run), and is done only when `codelaw test` is green. Afterwards it asks once whether to share the rule with codelaw as a pre-filled issue; nothing is sent unless you say yes.
 - **Matchers use ast-grep's pattern syntax** (`pattern`, `kind`, `has`, `inside`, `not`, `any`, …), plus codelaw's fix primitives for moving code: `strip-export-keyword`, `collect-into-block` and others. The full format is [SR-RULE-FORMAT](records/0112_rule-format.md).
 
 ---

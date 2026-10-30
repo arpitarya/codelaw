@@ -377,6 +377,8 @@ fn init_agents_writes_the_layout_and_sync_keeps_it() {
         ".claude/settings.json",
         ".claude/agents/codelaw-rule-author.md",
         ".github/agents/codelaw-rule-author.agent.md",
+        ".claude/agents/codelaw-rule-porter.md",
+        ".github/agents/codelaw-rule-porter.agent.md",
         ".github/hooks/codelaw.json",
         ".vscode/mcp.json",
         ".kiro/steering/codelaw.md",
