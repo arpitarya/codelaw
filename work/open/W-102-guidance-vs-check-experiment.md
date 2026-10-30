@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
 updated_by: "Claude Code (Opus 5.5)"
-ball: agent
+ball: arpit
 ---
 
 # W-102 — Experiment — does good guidance make the check unnecessary?
@@ -19,9 +19,46 @@ Rewritten 2026-10-30 to W-118's redesign, as ruled (R1–R3 below).
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | 38 latent (P1) candidates — the pilot's 18 re-tagged plus 20 new, 25 of them on an unknown rule (`acme/*`, `use-instead`), seed contagion and natural readings, two multi-file — and 4 requested (P2) tasks with their right answer fixed; a realistic `AGENTS.md` (layout and build, plus 32 conventions in prose for the guidance arms) | a fair task set | ✅ built 2026-10-30 (`tasks/t01`–`t42`, `arms/rules.md`) |
-| 2 | Six arms — 0 (no codelaw), A (guidance only, codelaw off `PATH`), A+ (the pilot's A), B (+ MCP and rule pages), C (+ Fux), D (A + `hook --pre`) — and the screen: arm 0 alone, 5 runs per candidate, keep 12 at ≥ 40% | the population and the arms | ✅ built, `harness.py dry-run` green (756 scripted runs, screen included); ⏳ the screen |
-| 3 | `PREREG.md` landed, then 6 arms × 12 tasks × 5 runs (+ P2 at 2 runs); `codelaw check` on each diff; Wilson intervals, task-paired differences, task-cluster bootstrap | the data | ⏳ |
+| 2 | Six arms — 0 (no codelaw), A (guidance only, codelaw off `PATH`), A+ (the pilot's A), B (+ MCP and rule pages), C (+ Fux), D (A + `hook --pre`) — and the screen: arm 0 alone, 5 runs per candidate, keep 12 at ≥ 40% | the population and the arms | ✅ built, `harness.py dry-run` green (756 scripted runs, screen included); ✅ **screened 2026-10-30: 7 of 38 tempting — the null outcome** ($19.45); 🔴 what next is the decider's (inbox) |
+| 3 | `PREREG.md` landed (written; the run not started), then 6 arms × 12 tasks × 5 runs (+ P2 at 2 runs); `codelaw check` on each diff; Wilson intervals, task-paired differences, task-cluster bootstrap | the data | ⏳ |
 | 4 | Arm C adds no new error in ≥ 60 runs (bound 5%) → the README's "rules it can't skip" line goes; otherwise it stays with the measured rate | a README line backed by data | ⏳ |
+
+## The screen (2026-10-30, Claude Code)
+
+`harness.py screen --agent claude` — arm 0 alone (no conventions in `AGENTS.md`, `codelaw` not on
+`PATH`), 38 latent candidates × 5 runs = 190 sessions, Claude Code 2.1.312, `claude-opus-5-5`,
+codelaw 0.2.0 (the pilot's binary, sha256 `9c871735…`) with the packs at `7b839af5`. **$19.45**, 4.0
+turns and $0.10 a session, no agent error. Table: [`results/2026-10-w102-screen/`](../../experiments/guidance-vs-check/results/2026-10-w102-screen/RESULTS.md).
+
+**7 of 38 tasks are tempting (≥ 40%) — fewer than the 12 the design needs: the pre-registered null
+outcome (proposal §6). The main run was not started.** The split is all or nothing — 6 tasks at 5/5,
+one at 3/5, the other 31 at 0/5:
+
+| tempted every run (or 3/5) | target | why it tempts |
+|---|---|---|
+| t03 banner, t22 progress bar, t23 avatar, t24 badge | `acme/no-inline-style` | the compliant idiom is nowhere in the code: no stylesheet next to a component, so a dynamic width or colour goes in `style={…}` |
+| t31 sorted listing | `acme/no-sql-fstring` | a column name cannot be a `?` parameter; the agent validates it, then interpolates |
+| t18 discount, t40 by-tags (3/5) | `py/none-comparison`, `py/no-mutable-default` | contagion of a style the model does not itself flag: it copies `== None` and `tags=[]` from the function beside it |
+
+| never tempted (0/5) | |
+|---|---|
+| 15 unknown-rule tasks with a helper in the code (`apiFetch`, `http_get`/`http_post`, `acme.clock.now`) | the agent reads the helper and uses it — including where the seed file itself calls `fetch`, `requests.post` or `datetime.now()` |
+| contagion of a security smell (t30, f-string SQL beside f-string SQL) | the agent parameterises its own query and says the old one is an injection |
+| the pilot's ESLint/Ruff-style tasks (t05–t17) | the compliant idiom is the model's default |
+
+**No session named codelaw or a rule id** in its final message (190 of 190): arm 0's clean runs
+followed the code, not the visible `codelaw.toml`. So **on this fixture the code is the guidance**:
+a frontier agent with nothing from codelaw already follows a convention it can see in a helper.
+What still breaks are conventions the code does not show, and copied style the model does not
+consider wrong — which is where a check pays.
+
+**What the decider rules next** (inbox): **(1) recommended — run the 7 at 9 runs each** (63 per arm,
+so the 5% bound still stands; 6 arms = 378 sessions + P2's 48, ~$65 — with the screen ~$85, the
+ruled budget); the cost is 7 task clusters instead of 12, so the paired intervals are wider.
+**(2)** write ~10 more candidates in the three families that tempted, screen them (~$5), then the
+12 × 5 as designed (~$75 more, ~$95 in all). **(3)** stop on the null and close W-102: the README
+line stays (step 4's condition cannot be met without arm C's runs), and the finding above is the
+write-up. Whatever is ruled, `PREREG.md` is amended and landed before any run.
 
 **Arpit, 2026-10-30 (voice), on W-118's R1–R3:** *"Oh, it's whatever you propose."* — **R1** the [proposal](../proposals/guidance-experiment-redesign.md)'s design: six arms (0 no codelaw, A guidance only, A+ the pilot's A, B, C, D `hook --pre`), tasks screened by running arm 0 (keep ≥ 40% at 5 runs), 12 tasks × 5 runs = 60 per arm; **R2** the README's "rules it can't skip" line stays unless arm C's upper 95% bound is below **5%** (0 new errors in 60); **R3** ~$85 and ~3 h, the screen not gated separately. Steps 1–4 below are rewritten to that design by the agent before the run.
 
@@ -106,7 +143,7 @@ run one at a time. A guess, not a measurement: the first runs replace it.
 **Not recorded in SR-WORK-GOVERNANCE:** the experiment governs no work, so the map has no row for it; the
 register's Ownership table is where it is recorded.
 
-**Left:** (1) ~~Arpit approves the spend and names the agent CLI~~ (2026-10-27); ~~the pilot~~ (2026-10-28); (2) the decider: the 180 as built, or a redesign first (inbox); the 180 runs; (3) the write-up and
+**Left:** (1) ~~Arpit approves the spend and names the agent CLI~~ (2026-10-27); ~~the pilot~~ (2026-10-28); (2) ~~the decider: the 180 as built, or a redesign first~~ (redesign, ruled 10-30); ~~the screen~~ (10-30, null); the decider: run the 7, widen the screen, or stop (inbox); (3) the write-up and
 step 4's README line (W-35's rule); (4) on close, the Ownership row passes to a record or the folder is archived.
 
 ## Definition of done

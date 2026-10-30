@@ -1,0 +1,6257 @@
+{
+  "meta": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "codelaw": "codelaw 0.2.0",
+    "as_of": "2026-10-27",
+    "started": "2026-10-30T09:56:16",
+    "arms": {
+      "0": "no codelaw: AGENTS.md without the conventions, codelaw not on PATH"
+    },
+    "runs": 5,
+    "p2_runs": 2,
+    "tasks": [
+      "t01-orders-list",
+      "t03-banner-alert",
+      "t05-saved-prefs",
+      "t06-feature-flags",
+      "t07-qty-input",
+      "t08-refunded-status",
+      "t09-retry",
+      "t10-load-image",
+      "t11-fx-rates",
+      "t12-created-at",
+      "t13-user-by-email",
+      "t14-order-tags",
+      "t15-load-config",
+      "t16-order-not-found",
+      "t17-sort-key",
+      "t18-discount",
+      "t19-summary",
+      "t20-backfill",
+      "t21-search-suggest",
+      "t22-progress-bar",
+      "t23-avatar",
+      "t24-badge",
+      "t25-upload",
+      "t26-health",
+      "t27-order-history",
+      "t28-notify-refund",
+      "t29-geoip",
+      "t30-reports",
+      "t31-sorted-listing",
+      "t32-token-expiry",
+      "t33-purge-carts",
+      "t34-audit-log",
+      "t35-refund",
+      "t36-block-customer",
+      "t37-send-sms",
+      "t38-parse-qty",
+      "t39-pick",
+      "t40-by-tags"
+    ],
+    "expected": {},
+    "argv": [
+      "claude",
+      "-p",
+      "{prompt}",
+      "--model",
+      "{model}",
+      "--output-format",
+      "json",
+      "--permission-mode",
+      "bypassPermissions",
+      "--setting-sources",
+      "project",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{mcp_config}",
+      "--max-turns",
+      "{max_turns}"
+    ],
+    "fux": "/Users/arpitarya/.local/bin/fux",
+    "work": "/var/folders/jh/xlrx0c9d7_vgkqm9xbjvf7d40000gn/T/codelaw-w102/2026-10-w102-screen",
+    "pins": {
+      "claude": "2.1.312 (Claude Code)",
+      "codelaw_sha256": "9c871735762aaff054851641198e2e3d061b8c5b257d4f869691bf38ed10a503",
+      "fux": "fux 5.1.1",
+      "tasks_sha256": "1c4cada137a25f9a3055cd866866e7e9facd62d0e5137d382b35873ff2d730ac",
+      "packs": "7b839af5"
+    }
+  },
+  "summary": {
+    "0": {
+      "runs": 190,
+      "broke_targeted": 33,
+      "broke_targeted_ci": [
+        0.12642881010746768,
+        0.23387362239412127
+      ],
+      "any_new_error": 33,
+      "any_new_error_ci": [
+        0.12642881010746768,
+        0.23387362239412127
+      ],
+      "tampered": 0,
+      "suppressions": 0,
+      "invalid": 0,
+      "agent_errors": 0,
+      "cost_total": 19.45,
+      "turns_mean": 4.021052631578947,
+      "tokens_in_mean": 75400.16315789474,
+      "tokens_out_mean": 1018.1947368421053
+    }
+  },
+  "paired": {},
+  "p2": {},
+  "verdict": null,
+  "runs": [
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0999012,
+      "duration_ms": 11999,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67826,
+        "cache_creation_input_tokens": 8713,
+        "output_tokens": 830
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t01-orders-list",
+      "run": 1,
+      "wall_s": 13.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.094994,
+      "duration_ms": 10931,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48490,
+        "cache_creation_input_tokens": 8414,
+        "output_tokens": 898
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t01-orders-list",
+      "run": 2,
+      "wall_s": 11.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09979919999999999,
+      "duration_ms": 11897,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67916,
+        "cache_creation_input_tokens": 8678,
+        "output_tokens": 838
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t01-orders-list",
+      "run": 3,
+      "wall_s": 12.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.09069840000000001,
+      "duration_ms": 8626,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48452,
+        "cache_creation_input_tokens": 8398,
+        "output_tokens": 690
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t01-orders-list",
+      "run": 4,
+      "wall_s": 9.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0918418,
+      "duration_ms": 9711,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48489,
+        "cache_creation_input_tokens": 8330,
+        "output_tokens": 774
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t01-orders-list",
+      "run": 5,
+      "wall_s": 10.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0819792,
+      "duration_ms": 7813,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47856,
+        "cache_creation_input_tokens": 7798,
+        "output_tokens": 500
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t03-banner-alert",
+      "run": 1,
+      "wall_s": 8.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08400160000000001,
+      "duration_ms": 8289,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48088,
+        "cache_creation_input_tokens": 7775,
+        "output_tokens": 608
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t03-banner-alert",
+      "run": 2,
+      "wall_s": 9.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0774766,
+      "duration_ms": 7190,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47823,
+        "cache_creation_input_tokens": 7341,
+        "output_tokens": 458
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t03-banner-alert",
+      "run": 3,
+      "wall_s": 7.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0938066,
+      "duration_ms": 10744,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66993,
+        "cache_creation_input_tokens": 7892,
+        "output_tokens": 862
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t03-banner-alert",
+      "run": 4,
+      "wall_s": 11.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08394700000000001,
+      "duration_ms": 7808,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48115,
+        "cache_creation_input_tokens": 7805,
+        "output_tokens": 593
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t03-banner-alert",
+      "run": 5,
+      "wall_s": 8.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-empty"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10866279999999999,
+      "duration_ms": 28499,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67694,
+        "cache_creation_input_tokens": 8869,
+        "output_tokens": 1207
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t05-saved-prefs",
+      "run": 1,
+      "wall_s": 29.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-empty"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1106492,
+      "duration_ms": 14782,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67626,
+        "cache_creation_input_tokens": 8809,
+        "output_tokens": 1331
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t05-saved-prefs",
+      "run": 2,
+      "wall_s": 15.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-empty"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1061052,
+      "duration_ms": 13992,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67766,
+        "cache_creation_input_tokens": 8725,
+        "output_tokens": 1136
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t05-saved-prefs",
+      "run": 3,
+      "wall_s": 14.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-empty"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.11411619999999999,
+      "duration_ms": 15551,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87801,
+        "cache_creation_input_tokens": 8877,
+        "output_tokens": 1275
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t05-saved-prefs",
+      "run": 4,
+      "wall_s": 16.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-empty"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10711019999999999,
+      "duration_ms": 13540,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67691,
+        "cache_creation_input_tokens": 8780,
+        "output_tokens": 1165
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t05-saved-prefs",
+      "run": 5,
+      "wall_s": 14.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1082952,
+      "duration_ms": 15881,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87176,
+        "cache_creation_input_tokens": 8585,
+        "output_tokens": 1107
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t06-feature-flags",
+      "run": 1,
+      "wall_s": 16.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0939462,
+      "duration_ms": 10523,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48371,
+        "cache_creation_input_tokens": 8291,
+        "output_tokens": 896
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t06-feature-flags",
+      "run": 2,
+      "wall_s": 11.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 6,
+      "cost_usd": 0.1170998,
+      "duration_ms": 15743,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 106979,
+        "cache_creation_input_tokens": 9027,
+        "output_tokens": 1172
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t06-feature-flags",
+      "run": 3,
+      "wall_s": 16.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 6,
+      "cost_usd": 0.11955120000000001,
+      "duration_ms": 16337,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 106796,
+        "cache_creation_input_tokens": 8973,
+        "output_tokens": 1318
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t06-feature-flags",
+      "run": 4,
+      "wall_s": 17.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0945898,
+      "duration_ms": 10150,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67309,
+        "cache_creation_input_tokens": 8282,
+        "output_tokens": 742
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t06-feature-flags",
+      "run": 5,
+      "wall_s": 10.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-isnan"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1122568,
+      "duration_ms": 16424,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87044,
+        "cache_creation_input_tokens": 8626,
+        "output_tokens": 1290
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t07-qty-input",
+      "run": 1,
+      "wall_s": 17.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-isnan"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10078879999999998,
+      "duration_ms": 11840,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67924,
+        "cache_creation_input_tokens": 8569,
+        "output_tokens": 931
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t07-qty-input",
+      "run": 2,
+      "wall_s": 12.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-isnan"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10298299999999999,
+      "duration_ms": 13549,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68095,
+        "cache_creation_input_tokens": 8569,
+        "output_tokens": 1039
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t07-qty-input",
+      "run": 3,
+      "wall_s": 14.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-isnan"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1092002,
+      "duration_ms": 15107,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87141,
+        "cache_creation_input_tokens": 8489,
+        "output_tokens": 1191
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t07-qty-input",
+      "run": 4,
+      "wall_s": 16.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-isnan"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09898320000000001,
+      "duration_ms": 12557,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68076,
+        "cache_creation_input_tokens": 8647,
+        "output_tokens": 808
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t07-qty-input",
+      "run": 5,
+      "wall_s": 13.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0946226,
+      "duration_ms": 12541,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67373,
+        "cache_creation_input_tokens": 8102,
+        "output_tokens": 815
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t08-refunded-status",
+      "run": 1,
+      "wall_s": 13.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10116439999999999,
+      "duration_ms": 15848,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67482,
+        "cache_creation_input_tokens": 8307,
+        "output_tokens": 1059
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t08-refunded-status",
+      "run": 2,
+      "wall_s": 16.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08731339999999999,
+      "duration_ms": 10475,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48167,
+        "cache_creation_input_tokens": 7947,
+        "output_tokens": 704
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t08-refunded-status",
+      "run": 3,
+      "wall_s": 11.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.097179,
+      "duration_ms": 13077,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67375,
+        "cache_creation_input_tokens": 8189,
+        "output_tokens": 908
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t08-refunded-status",
+      "run": 4,
+      "wall_s": 13.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08592359999999999,
+      "duration_ms": 9781,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48218,
+        "cache_creation_input_tokens": 7802,
+        "output_tokens": 692
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t08-refunded-status",
+      "run": 5,
+      "wall_s": 10.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1083768,
+      "duration_ms": 14828,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68004,
+        "cache_creation_input_tokens": 8933,
+        "output_tokens": 1164
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t09-retry",
+      "run": 1,
+      "wall_s": 15.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10192920000000001,
+      "duration_ms": 13413,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67586,
+        "cache_creation_input_tokens": 8550,
+        "output_tokens": 999
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t09-retry",
+      "run": 2,
+      "wall_s": 14.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10200079999999999,
+      "duration_ms": 12566,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67784,
+        "cache_creation_input_tokens": 8544,
+        "output_tokens": 1003
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t09-retry",
+      "run": 3,
+      "wall_s": 13.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1028208,
+      "duration_ms": 13030,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67684,
+        "cache_creation_input_tokens": 8694,
+        "output_tokens": 985
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t09-retry",
+      "run": 4,
+      "wall_s": 13.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.11492339999999998,
+      "duration_ms": 15852,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87377,
+        "cache_creation_input_tokens": 9251,
+        "output_tokens": 1170
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t09-retry",
+      "run": 5,
+      "wall_s": 16.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0833564,
+      "duration_ms": 8643,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48322,
+        "cache_creation_input_tokens": 7936,
+        "output_tokens": 509
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t10-load-image",
+      "run": 1,
+      "wall_s": 9.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0864994,
+      "duration_ms": 10336,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48377,
+        "cache_creation_input_tokens": 8025,
+        "output_tokens": 630
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t10-load-image",
+      "run": 2,
+      "wall_s": 11.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0849712,
+      "duration_ms": 8910,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48396,
+        "cache_creation_input_tokens": 8006,
+        "output_tokens": 561
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t10-load-image",
+      "run": 3,
+      "wall_s": 9.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0850902,
+      "duration_ms": 10409,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48391,
+        "cache_creation_input_tokens": 8001,
+        "output_tokens": 569
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t10-load-image",
+      "run": 4,
+      "wall_s": 11.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.084978,
+      "duration_ms": 9476,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48350,
+        "cache_creation_input_tokens": 7993,
+        "output_tokens": 567
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t10-load-image",
+      "run": 5,
+      "wall_s": 10.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0937542,
+      "duration_ms": 12902,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68371,
+        "cache_creation_input_tokens": 8431,
+        "output_tokens": 630
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t11-fx-rates",
+      "run": 1,
+      "wall_s": 13.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10082580000000001,
+      "duration_ms": 12361,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68349,
+        "cache_creation_input_tokens": 8723,
+        "output_tokens": 867
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t11-fx-rates",
+      "run": 2,
+      "wall_s": 13.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0942518,
+      "duration_ms": 11777,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67639,
+        "cache_creation_input_tokens": 8294,
+        "output_tokens": 717
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t11-fx-rates",
+      "run": 3,
+      "wall_s": 12.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1066274,
+      "duration_ms": 17677,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86677,
+        "cache_creation_input_tokens": 8529,
+        "output_tokens": 1051
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t11-fx-rates",
+      "run": 4,
+      "wall_s": 18.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.084423,
+      "duration_ms": 8852,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48395,
+        "cache_creation_input_tokens": 7835,
+        "output_tokens": 602
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t11-fx-rates",
+      "run": 5,
+      "wall_s": 9.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09607639999999999,
+      "duration_ms": 11400,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67302,
+        "cache_creation_input_tokens": 8038,
+        "output_tokens": 914
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t12-created-at",
+      "run": 1,
+      "wall_s": 12.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0887286,
+      "duration_ms": 10104,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48243,
+        "cache_creation_input_tokens": 8012,
+        "output_tokens": 748
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t12-created-at",
+      "run": 2,
+      "wall_s": 10.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08721620000000001,
+      "duration_ms": 8998,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48201,
+        "cache_creation_input_tokens": 7909,
+        "output_tokens": 714
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t12-created-at",
+      "run": 3,
+      "wall_s": 9.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0885384,
+      "duration_ms": 10405,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48152,
+        "cache_creation_input_tokens": 7928,
+        "output_tokens": 773
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t12-created-at",
+      "run": 4,
+      "wall_s": 11.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0892926,
+      "duration_ms": 9626,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48023,
+        "cache_creation_input_tokens": 8323,
+        "output_tokens": 654
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t12-created-at",
+      "run": 5,
+      "wall_s": 10.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1002014,
+      "duration_ms": 13344,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68207,
+        "cache_creation_input_tokens": 8646,
+        "output_tokens": 868
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t13-user-by-email",
+      "run": 1,
+      "wall_s": 14.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10362060000000001,
+      "duration_ms": 14616,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86403,
+        "cache_creation_input_tokens": 8260,
+        "output_tokens": 1011
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t13-user-by-email",
+      "run": 2,
+      "wall_s": 15.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1039548,
+      "duration_ms": 14341,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68374,
+        "cache_creation_input_tokens": 8781,
+        "output_tokens": 1000
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t13-user-by-email",
+      "run": 3,
+      "wall_s": 15.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0930576,
+      "duration_ms": 11679,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48668,
+        "cache_creation_input_tokens": 8395,
+        "output_tokens": 807
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t13-user-by-email",
+      "run": 4,
+      "wall_s": 12.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09968020000000001,
+      "duration_ms": 12693,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68201,
+        "cache_creation_input_tokens": 8631,
+        "output_tokens": 848
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t13-user-by-email",
+      "run": 5,
+      "wall_s": 13.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09166060000000001,
+      "duration_ms": 11540,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48123,
+        "cache_creation_input_tokens": 8149,
+        "output_tokens": 841
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t14-order-tags",
+      "run": 1,
+      "wall_s": 12.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09668539999999999,
+      "duration_ms": 11951,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66887,
+        "cache_creation_input_tokens": 8057,
+        "output_tokens": 941
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t14-order-tags",
+      "run": 2,
+      "wall_s": 12.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0938088,
+      "duration_ms": 13056,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48024,
+        "cache_creation_input_tokens": 8090,
+        "output_tokens": 973
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t14-order-tags",
+      "run": 3,
+      "wall_s": 13.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09356880000000001,
+      "duration_ms": 14100,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67084,
+        "cache_creation_input_tokens": 8075,
+        "output_tokens": 776
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t14-order-tags",
+      "run": 4,
+      "wall_s": 14.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09300739999999999,
+      "duration_ms": 10387,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67077,
+        "cache_creation_input_tokens": 8070,
+        "output_tokens": 750
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t14-order-tags",
+      "run": 5,
+      "wall_s": 11.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 8,
+      "cost_usd": 0.17084300000000002,
+      "duration_ms": 31661,
+      "tokens": {
+        "input_tokens": 14,
+        "cache_read_input_tokens": 133595,
+        "cache_creation_input_tokens": 11431,
+        "output_tokens": 2631
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t15-load-config",
+      "run": 1,
+      "wall_s": 32.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.11795960000000001,
+      "duration_ms": 17330,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68458,
+        "cache_creation_input_tokens": 9742,
+        "output_tokens": 1315
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t15-load-config",
+      "run": 2,
+      "wall_s": 18.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.11866479999999999,
+      "duration_ms": 16496,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68464,
+        "cache_creation_input_tokens": 9455,
+        "output_tokens": 1465
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t15-load-config",
+      "run": 3,
+      "wall_s": 17.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1270318,
+      "duration_ms": 18122,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 88799,
+        "cache_creation_input_tokens": 9459,
+        "output_tokens": 1678
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t15-load-config",
+      "run": 4,
+      "wall_s": 18.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.11569780000000002,
+      "duration_ms": 17828,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68529,
+        "cache_creation_input_tokens": 9240,
+        "output_tokens": 1402
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t15-load-config",
+      "run": 5,
+      "wall_s": 18.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0943394,
+      "duration_ms": 11770,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67377,
+        "cache_creation_input_tokens": 8214,
+        "output_tokens": 756
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t16-order-not-found",
+      "run": 1,
+      "wall_s": 12.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.089282,
+      "duration_ms": 8839,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48230,
+        "cache_creation_input_tokens": 8174,
+        "output_tokens": 711
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t16-order-not-found",
+      "run": 2,
+      "wall_s": 9.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09457199999999999,
+      "duration_ms": 11171,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67320,
+        "cache_creation_input_tokens": 8202,
+        "output_tokens": 773
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t16-order-not-found",
+      "run": 3,
+      "wall_s": 11.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.093869,
+      "duration_ms": 10564,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67105,
+        "cache_creation_input_tokens": 8102,
+        "output_tokens": 780
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t16-order-not-found",
+      "run": 4,
+      "wall_s": 11.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0957154,
+      "duration_ms": 12365,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67277,
+        "cache_creation_input_tokens": 8236,
+        "output_tokens": 817
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t16-order-not-found",
+      "run": 5,
+      "wall_s": 13.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09587100000000001,
+      "duration_ms": 13091,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67115,
+        "cache_creation_input_tokens": 8077,
+        "output_tokens": 890
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t17-sort-key",
+      "run": 1,
+      "wall_s": 13.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0947436,
+      "duration_ms": 10030,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67438,
+        "cache_creation_input_tokens": 8198,
+        "output_tokens": 782
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t17-sort-key",
+      "run": 2,
+      "wall_s": 10.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09446399999999999,
+      "duration_ms": 10002,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48620,
+        "cache_creation_input_tokens": 8562,
+        "output_tokens": 811
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t17-sort-key",
+      "run": 3,
+      "wall_s": 10.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09171399999999999,
+      "duration_ms": 11277,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67050,
+        "cache_creation_input_tokens": 8004,
+        "output_tokens": 712
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t17-sort-key",
+      "run": 4,
+      "wall_s": 12.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.0995842,
+      "duration_ms": 10845,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67261,
+        "cache_creation_input_tokens": 8530,
+        "output_tokens": 893
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t17-sort-key",
+      "run": 5,
+      "wall_s": 11.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/none-comparison"
+      ],
+      "targets_broken": [
+        "py/none-comparison"
+      ],
+      "new_by_rule": {
+        "py/none-comparison": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08830940000000001,
+      "duration_ms": 11328,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47867,
+        "cache_creation_input_tokens": 7864,
+        "output_tokens": 790
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t18-discount",
+      "run": 1,
+      "wall_s": 12.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/none-comparison"
+      ],
+      "targets_broken": [
+        "py/none-comparison"
+      ],
+      "new_by_rule": {
+        "py/none-comparison": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.09154520000000001,
+      "duration_ms": 11019,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47966,
+        "cache_creation_input_tokens": 8016,
+        "output_tokens": 890
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t18-discount",
+      "run": 2,
+      "wall_s": 11.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/none-comparison"
+      ],
+      "targets_broken": [
+        "py/none-comparison"
+      ],
+      "new_by_rule": {
+        "py/none-comparison": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0856352,
+      "duration_ms": 9139,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47816,
+        "cache_creation_input_tokens": 7926,
+        "output_tokens": 632
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t18-discount",
+      "run": 3,
+      "wall_s": 9.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/none-comparison"
+      ],
+      "targets_broken": [
+        "py/none-comparison"
+      ],
+      "new_by_rule": {
+        "py/none-comparison": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0818272,
+      "duration_ms": 9896,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47876,
+        "cache_creation_input_tokens": 7551,
+        "output_tokens": 591
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t18-discount",
+      "run": 4,
+      "wall_s": 10.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/none-comparison"
+      ],
+      "targets_broken": [
+        "py/none-comparison"
+      ],
+      "new_by_rule": {
+        "py/none-comparison": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08228540000000001,
+      "duration_ms": 8723,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47867,
+        "cache_creation_input_tokens": 7561,
+        "output_tokens": 610
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t18-discount",
+      "run": 5,
+      "wall_s": 9.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.12465,
+      "duration_ms": 19694,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 88070,
+        "cache_creation_input_tokens": 9142,
+        "output_tokens": 1693
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t19-summary",
+      "run": 1,
+      "wall_s": 20.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.110374,
+      "duration_ms": 15770,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67750,
+        "cache_creation_input_tokens": 8704,
+        "output_tokens": 1358
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t19-summary",
+      "run": 2,
+      "wall_s": 16.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09981539999999998,
+      "duration_ms": 13274,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66977,
+        "cache_creation_input_tokens": 8121,
+        "output_tokens": 1071
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t19-summary",
+      "run": 3,
+      "wall_s": 14.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10890520000000001,
+      "duration_ms": 15142,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86706,
+        "cache_creation_input_tokens": 8458,
+        "output_tokens": 1193
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t19-summary",
+      "run": 4,
+      "wall_s": 16.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09728300000000001,
+      "duration_ms": 11810,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67595,
+        "cache_creation_input_tokens": 8204,
+        "output_tokens": 905
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t19-summary",
+      "run": 5,
+      "wall_s": 12.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 6,
+      "cost_usd": 0.14672980000000002,
+      "duration_ms": 22220,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 111509,
+        "cache_creation_input_tokens": 11480,
+        "output_tokens": 1627
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": true,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t20-backfill",
+      "run": 1,
+      "wall_s": 23.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.108537,
+      "duration_ms": 18157,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87205,
+        "cache_creation_input_tokens": 8612,
+        "output_tokens": 1108
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t20-backfill",
+      "run": 2,
+      "wall_s": 18.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.13541979999999998,
+      "duration_ms": 18867,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 91219,
+        "cache_creation_input_tokens": 11007,
+        "output_tokens": 1454
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t20-backfill",
+      "run": 3,
+      "wall_s": 19.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1199406,
+      "duration_ms": 19344,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87343,
+        "cache_creation_input_tokens": 9039,
+        "output_tokens": 1506
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t20-backfill",
+      "run": 4,
+      "wall_s": 20.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 6,
+      "cost_usd": 0.1306102,
+      "duration_ms": 20252,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87891,
+        "cache_creation_input_tokens": 10299,
+        "output_tokens": 1530
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t20-backfill",
+      "run": 5,
+      "wall_s": 21.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09952860000000001,
+      "duration_ms": 11842,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67783,
+        "cache_creation_input_tokens": 8435,
+        "output_tokens": 923
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t21-search-suggest",
+      "run": 1,
+      "wall_s": 12.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10167799999999999,
+      "duration_ms": 12030,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86770,
+        "cache_creation_input_tokens": 8283,
+        "output_tokens": 901
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t21-search-suggest",
+      "run": 2,
+      "wall_s": 12.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 6,
+      "cost_usd": 0.111125,
+      "duration_ms": 14705,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 106065,
+        "cache_creation_input_tokens": 8548,
+        "output_tokens": 1074
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t21-search-suggest",
+      "run": 3,
+      "wall_s": 15.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10621439999999999,
+      "duration_ms": 12696,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67952,
+        "cache_creation_input_tokens": 9204,
+        "output_tokens": 948
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t21-search-suggest",
+      "run": 4,
+      "wall_s": 13.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1063112,
+      "duration_ms": 12635,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86996,
+        "cache_creation_input_tokens": 8654,
+        "output_tokens": 982
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t21-search-suggest",
+      "run": 5,
+      "wall_s": 13.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 2
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.09472799999999999,
+      "duration_ms": 11896,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48080,
+        "cache_creation_input_tokens": 8051,
+        "output_tokens": 1034
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t22-progress-bar",
+      "run": 1,
+      "wall_s": 12.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 2
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.093349,
+      "duration_ms": 11224,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48125,
+        "cache_creation_input_tokens": 8005,
+        "output_tokens": 983
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t22-progress-bar",
+      "run": 2,
+      "wall_s": 12.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 2
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08960860000000001,
+      "duration_ms": 10876,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47983,
+        "cache_creation_input_tokens": 7791,
+        "output_tokens": 883
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t22-progress-bar",
+      "run": 3,
+      "wall_s": 11.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 2
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 2,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0941016,
+      "duration_ms": 11928,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48108,
+        "cache_creation_input_tokens": 8067,
+        "output_tokens": 996
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t22-progress-bar",
+      "run": 4,
+      "wall_s": 12.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0885436,
+      "duration_ms": 9949,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48038,
+        "cache_creation_input_tokens": 7839,
+        "output_tokens": 810
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t22-progress-bar",
+      "run": 5,
+      "wall_s": 10.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0844124,
+      "duration_ms": 8730,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48062,
+        "cache_creation_input_tokens": 7732,
+        "output_tokens": 646
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t23-avatar",
+      "run": 1,
+      "wall_s": 9.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08527860000000001,
+      "duration_ms": 8634,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48093,
+        "cache_creation_input_tokens": 7762,
+        "output_tokens": 677
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t23-avatar",
+      "run": 2,
+      "wall_s": 9.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0851796,
+      "duration_ms": 8872,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48118,
+        "cache_creation_input_tokens": 7789,
+        "output_tokens": 661
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t23-avatar",
+      "run": 3,
+      "wall_s": 9.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0844008,
+      "duration_ms": 8449,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48064,
+        "cache_creation_input_tokens": 7733,
+        "output_tokens": 645
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t23-avatar",
+      "run": 4,
+      "wall_s": 9.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        },
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0857808,
+      "duration_ms": 9917,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48064,
+        "cache_creation_input_tokens": 7733,
+        "output_tokens": 714
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t23-avatar",
+      "run": 5,
+      "wall_s": 10.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.090499,
+      "duration_ms": 9870,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66795,
+        "cache_creation_input_tokens": 7891,
+        "output_tokens": 699
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t24-badge",
+      "run": 1,
+      "wall_s": 10.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0912472,
+      "duration_ms": 9940,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66856,
+        "cache_creation_input_tokens": 7948,
+        "output_tokens": 713
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t24-badge",
+      "run": 2,
+      "wall_s": 10.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0902148,
+      "duration_ms": 9556,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66794,
+        "cache_creation_input_tokens": 7893,
+        "output_tokens": 684
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t24-badge",
+      "run": 3,
+      "wall_s": 10.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.090727,
+      "duration_ms": 10018,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66815,
+        "cache_creation_input_tokens": 7909,
+        "output_tokens": 703
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t24-badge",
+      "run": 4,
+      "wall_s": 11.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "targets_broken": [
+        "acme/no-inline-style"
+      ],
+      "new_by_rule": {
+        "acme/no-inline-style": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09139900000000001,
+      "duration_ms": 10233,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66795,
+        "cache_creation_input_tokens": 7891,
+        "output_tokens": 744
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t24-badge",
+      "run": 5,
+      "wall_s": 11.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1031778,
+      "duration_ms": 14468,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67529,
+        "cache_creation_input_tokens": 8430,
+        "output_tokens": 1110
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t25-upload",
+      "run": 1,
+      "wall_s": 15.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09956,
+      "duration_ms": 12883,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67400,
+        "cache_creation_input_tokens": 8326,
+        "output_tokens": 972
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t25-upload",
+      "run": 2,
+      "wall_s": 13.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1018356,
+      "duration_ms": 14267,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67578,
+        "cache_creation_input_tokens": 8426,
+        "output_tokens": 1044
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t25-upload",
+      "run": 3,
+      "wall_s": 15.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0986648,
+      "duration_ms": 13367,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67604,
+        "cache_creation_input_tokens": 8334,
+        "output_tokens": 922
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t25-upload",
+      "run": 4,
+      "wall_s": 14.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.101812,
+      "duration_ms": 14113,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67640,
+        "cache_creation_input_tokens": 8539,
+        "output_tokens": 997
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t25-upload",
+      "run": 5,
+      "wall_s": 14.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10357,
+      "duration_ms": 12252,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67650,
+        "cache_creation_input_tokens": 8711,
+        "output_tokens": 1016
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t26-health",
+      "run": 1,
+      "wall_s": 13.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1027804,
+      "duration_ms": 11593,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67542,
+        "cache_creation_input_tokens": 8705,
+        "output_tokens": 980
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t26-health",
+      "run": 2,
+      "wall_s": 12.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.099642,
+      "duration_ms": 11349,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67610,
+        "cache_creation_input_tokens": 8551,
+        "output_tokens": 884
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t26-health",
+      "run": 3,
+      "wall_s": 12.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0998474,
+      "duration_ms": 12475,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67477,
+        "cache_creation_input_tokens": 8450,
+        "output_tokens": 936
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t26-health",
+      "run": 4,
+      "wall_s": 13.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09963499999999999,
+      "duration_ms": 12523,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67355,
+        "cache_creation_input_tokens": 8474,
+        "output_tokens": 917
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t26-health",
+      "run": 5,
+      "wall_s": 13.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1121736,
+      "duration_ms": 14487,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67888,
+        "cache_creation_input_tokens": 9048,
+        "output_tokens": 1309
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t27-order-history",
+      "run": 1,
+      "wall_s": 15.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.112361,
+      "duration_ms": 14905,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67885,
+        "cache_creation_input_tokens": 9059,
+        "output_tokens": 1314
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t27-order-history",
+      "run": 2,
+      "wall_s": 15.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.11508059999999999,
+      "duration_ms": 15639,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87043,
+        "cache_creation_input_tokens": 9034,
+        "output_tokens": 1268
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t27-order-history",
+      "run": 3,
+      "wall_s": 16.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.11001259999999999,
+      "duration_ms": 14655,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67883,
+        "cache_creation_input_tokens": 8973,
+        "output_tokens": 1231
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t27-order-history",
+      "run": 4,
+      "wall_s": 15.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.1034948,
+      "duration_ms": 13275,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48394,
+        "cache_creation_input_tokens": 8524,
+        "output_tokens": 1280
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t27-order-history",
+      "run": 5,
+      "wall_s": 14.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10272619999999999,
+      "duration_ms": 14554,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67811,
+        "cache_creation_input_tokens": 8704,
+        "output_tokens": 975
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t28-notify-refund",
+      "run": 1,
+      "wall_s": 15.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.11093900000000001,
+      "duration_ms": 17041,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87875,
+        "cache_creation_input_tokens": 8803,
+        "output_tokens": 1145
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t28-notify-refund",
+      "run": 2,
+      "wall_s": 17.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.09622,
+      "duration_ms": 12058,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48360,
+        "cache_creation_input_tokens": 8523,
+        "output_tokens": 917
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t28-notify-refund",
+      "run": 3,
+      "wall_s": 13.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1052884,
+      "duration_ms": 14907,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67342,
+        "cache_creation_input_tokens": 8701,
+        "output_tokens": 1109
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t28-notify-refund",
+      "run": 4,
+      "wall_s": 15.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1006196,
+      "duration_ms": 13560,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67138,
+        "cache_creation_input_tokens": 8595,
+        "output_tokens": 920
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t28-notify-refund",
+      "run": 5,
+      "wall_s": 14.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.098461,
+      "duration_ms": 12983,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68105,
+        "cache_creation_input_tokens": 8356,
+        "output_tokens": 898
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t29-geoip",
+      "run": 1,
+      "wall_s": 13.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10192840000000002,
+      "duration_ms": 13447,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68302,
+        "cache_creation_input_tokens": 8782,
+        "output_tokens": 899
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t29-geoip",
+      "run": 2,
+      "wall_s": 14.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0993952,
+      "duration_ms": 15040,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68336,
+        "cache_creation_input_tokens": 8622,
+        "output_tokens": 836
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t29-geoip",
+      "run": 3,
+      "wall_s": 16.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1014142,
+      "duration_ms": 14229,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68351,
+        "cache_creation_input_tokens": 8629,
+        "output_tokens": 934
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t29-geoip",
+      "run": 4,
+      "wall_s": 15.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09699039999999999,
+      "duration_ms": 12817,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68172,
+        "cache_creation_input_tokens": 8413,
+        "output_tokens": 801
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t29-geoip",
+      "run": 5,
+      "wall_s": 13.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09430919999999998,
+      "duration_ms": 10738,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66786,
+        "cache_creation_input_tokens": 8270,
+        "output_tokens": 738
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t30-reports",
+      "run": 1,
+      "wall_s": 11.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1053666,
+      "duration_ms": 14899,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 85913,
+        "cache_creation_input_tokens": 8428,
+        "output_tokens": 1036
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t30-reports",
+      "run": 2,
+      "wall_s": 15.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10649199999999999,
+      "duration_ms": 16866,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 85560,
+        "cache_creation_input_tokens": 8490,
+        "output_tokens": 1071
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t30-reports",
+      "run": 3,
+      "wall_s": 17.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10696800000000001,
+      "duration_ms": 15900,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 85800,
+        "cache_creation_input_tokens": 8786,
+        "output_tokens": 974
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t30-reports",
+      "run": 4,
+      "wall_s": 16.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10637599999999998,
+      "duration_ms": 14104,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 85980,
+        "cache_creation_input_tokens": 8385,
+        "output_tokens": 1103
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t30-reports",
+      "run": 5,
+      "wall_s": 15.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [
+        "acme/no-sql-fstring"
+      ],
+      "new_by_rule": {
+        "acme/no-sql-fstring": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10941959999999999,
+      "duration_ms": 14275,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86658,
+        "cache_creation_input_tokens": 8661,
+        "output_tokens": 1138
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t31-sorted-listing",
+      "run": 1,
+      "wall_s": 15.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [
+        "acme/no-sql-fstring"
+      ],
+      "new_by_rule": {
+        "acme/no-sql-fstring": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1057362,
+      "duration_ms": 14154,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48821,
+        "cache_creation_input_tokens": 8976,
+        "output_tokens": 1207
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t31-sorted-listing",
+      "run": 2,
+      "wall_s": 15.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [
+        "acme/no-sql-fstring"
+      ],
+      "new_by_rule": {
+        "acme/no-sql-fstring": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10803479999999999,
+      "duration_ms": 14904,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68654,
+        "cache_creation_input_tokens": 9014,
+        "output_tokens": 1108
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t31-sorted-listing",
+      "run": 3,
+      "wall_s": 15.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [
+        "acme/no-sql-fstring"
+      ],
+      "new_by_rule": {
+        "acme/no-sql-fstring": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1108876,
+      "duration_ms": 17094,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86678,
+        "cache_creation_input_tokens": 8684,
+        "output_tokens": 1202
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t31-sorted-listing",
+      "run": 4,
+      "wall_s": 17.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "targets_broken": [
+        "acme/no-sql-fstring"
+      ],
+      "new_by_rule": {
+        "acme/no-sql-fstring": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.11063400000000001,
+      "duration_ms": 14026,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68690,
+        "cache_creation_input_tokens": 9103,
+        "output_tokens": 1202
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t31-sorted-listing",
+      "run": 5,
+      "wall_s": 14.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.09863860000000002,
+      "duration_ms": 11522,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 85853,
+        "cache_creation_input_tokens": 8106,
+        "output_tokens": 829
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t32-token-expiry",
+      "run": 1,
+      "wall_s": 12.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0928918,
+      "duration_ms": 11705,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67019,
+        "cache_creation_input_tokens": 8027,
+        "output_tokens": 762
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t32-token-expiry",
+      "run": 2,
+      "wall_s": 12.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09416119999999999,
+      "duration_ms": 11212,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67086,
+        "cache_creation_input_tokens": 8004,
+        "output_tokens": 834
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t32-token-expiry",
+      "run": 3,
+      "wall_s": 12.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.09352060000000001,
+      "duration_ms": 10635,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67043,
+        "cache_creation_input_tokens": 8040,
+        "output_tokens": 788
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t32-token-expiry",
+      "run": 4,
+      "wall_s": 11.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.0972058,
+      "duration_ms": 11624,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67229,
+        "cache_creation_input_tokens": 8341,
+        "output_tokens": 850
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t32-token-expiry",
+      "run": 5,
+      "wall_s": 12.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 6,
+      "cost_usd": 0.16305039999999998,
+      "duration_ms": 25987,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 110772,
+        "cache_creation_input_tokens": 12001,
+        "output_tokens": 2242
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t33-purge-carts",
+      "run": 1,
+      "wall_s": 26.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.127908,
+      "duration_ms": 22297,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67320,
+        "cache_creation_input_tokens": 9344,
+        "output_tokens": 1983
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t33-purge-carts",
+      "run": 2,
+      "wall_s": 23.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1370866,
+      "duration_ms": 25740,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67373,
+        "cache_creation_input_tokens": 9620,
+        "output_tokens": 2331
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t33-purge-carts",
+      "run": 3,
+      "wall_s": 26.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1354648,
+      "duration_ms": 25090,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87824,
+        "cache_creation_input_tokens": 9800,
+        "output_tokens": 1973
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t33-purge-carts",
+      "run": 4,
+      "wall_s": 25.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.15323579999999998,
+      "duration_ms": 25970,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87799,
+        "cache_creation_input_tokens": 11297,
+        "output_tokens": 2263
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t33-purge-carts",
+      "run": 5,
+      "wall_s": 26.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.100714,
+      "duration_ms": 13654,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67290,
+        "cache_creation_input_tokens": 8503,
+        "output_tokens": 960
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t34-audit-log",
+      "run": 1,
+      "wall_s": 14.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1036362,
+      "duration_ms": 14378,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68541,
+        "cache_creation_input_tokens": 8857,
+        "output_tokens": 952
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t34-audit-log",
+      "run": 2,
+      "wall_s": 15.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1007266,
+      "duration_ms": 14245,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67173,
+        "cache_creation_input_tokens": 8420,
+        "output_tokens": 995
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t34-audit-log",
+      "run": 3,
+      "wall_s": 15.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 7,
+      "cost_usd": 0.1247942,
+      "duration_ms": 19461,
+      "tokens": {
+        "input_tokens": 12,
+        "cache_read_input_tokens": 107291,
+        "cache_creation_input_tokens": 8926,
+        "output_tokens": 1594
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t34-audit-log",
+      "run": 4,
+      "wall_s": 20.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1065328,
+      "duration_ms": 15355,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86844,
+        "cache_creation_input_tokens": 8648,
+        "output_tokens": 997
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t34-audit-log",
+      "run": 5,
+      "wall_s": 16.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.1015162,
+      "duration_ms": 13849,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48561,
+        "cache_creation_input_tokens": 8560,
+        "output_tokens": 1165
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t35-refund",
+      "run": 1,
+      "wall_s": 14.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.12281500000000001,
+      "duration_ms": 20932,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68475,
+        "cache_creation_input_tokens": 9166,
+        "output_tokens": 1788
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t35-refund",
+      "run": 2,
+      "wall_s": 21.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.1019806,
+      "duration_ms": 15887,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48563,
+        "cache_creation_input_tokens": 8638,
+        "output_tokens": 1157
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t35-refund",
+      "run": 3,
+      "wall_s": 16.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.13234639999999998,
+      "duration_ms": 22645,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 88672,
+        "cache_creation_input_tokens": 9389,
+        "output_tokens": 1973
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t35-refund",
+      "run": 4,
+      "wall_s": 23.5
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1239508,
+      "duration_ms": 20610,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68734,
+        "cache_creation_input_tokens": 9299,
+        "output_tokens": 1789
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t35-refund",
+      "run": 5,
+      "wall_s": 21.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1381648,
+      "duration_ms": 17040,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 71364,
+        "cache_creation_input_tokens": 11605,
+        "output_tokens": 1551
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": true,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t36-block-customer",
+      "run": 1,
+      "wall_s": 17.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.131461,
+      "duration_ms": 16062,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 70445,
+        "cache_creation_input_tokens": 11155,
+        "output_tokens": 1405
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t36-block-customer",
+      "run": 2,
+      "wall_s": 16.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1396754,
+      "duration_ms": 18536,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 71417,
+        "cache_creation_input_tokens": 11725,
+        "output_tokens": 1578
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t36-block-customer",
+      "run": 3,
+      "wall_s": 19.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1329556,
+      "duration_ms": 17766,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 70418,
+        "cache_creation_input_tokens": 11230,
+        "output_tokens": 1450
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t36-block-customer",
+      "run": 4,
+      "wall_s": 18.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "acme/no-datetime-now",
+        "js/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.13562079999999999,
+      "duration_ms": 16649,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 71364,
+        "cache_creation_input_tokens": 11592,
+        "output_tokens": 1429
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t36-block-customer",
+      "run": 5,
+      "wall_s": 17.4
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10075440000000001,
+      "duration_ms": 12283,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68512,
+        "cache_creation_input_tokens": 8675,
+        "output_tokens": 881
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t37-send-sms",
+      "run": 1,
+      "wall_s": 13.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.11531280000000002,
+      "duration_ms": 15116,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 87944,
+        "cache_creation_input_tokens": 9033,
+        "output_tokens": 1271
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t37-send-sms",
+      "run": 2,
+      "wall_s": 15.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.089377,
+      "duration_ms": 8908,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48825,
+        "cache_creation_input_tokens": 8286,
+        "output_tokens": 665
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t37-send-sms",
+      "run": 3,
+      "wall_s": 9.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.10985979999999998,
+      "duration_ms": 13172,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 88459,
+        "cache_creation_input_tokens": 8871,
+        "output_tokens": 1058
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t37-send-sms",
+      "run": 4,
+      "wall_s": 14.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/use-instead"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.10235319999999999,
+      "duration_ms": 13830,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 68546,
+        "cache_creation_input_tokens": 8724,
+        "output_tokens": 941
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t37-send-sms",
+      "run": 5,
+      "wall_s": 14.6
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0903146,
+      "duration_ms": 11281,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47913,
+        "cache_creation_input_tokens": 7806,
+        "output_tokens": 913
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t38-parse-qty",
+      "run": 1,
+      "wall_s": 12.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.09079380000000001,
+      "duration_ms": 11220,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47869,
+        "cache_creation_input_tokens": 7847,
+        "output_tokens": 921
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t38-parse-qty",
+      "run": 2,
+      "wall_s": 12.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 5,
+      "cost_usd": 0.1134264,
+      "duration_ms": 16547,
+      "tokens": {
+        "input_tokens": 10,
+        "cache_read_input_tokens": 86512,
+        "cache_creation_input_tokens": 8683,
+        "output_tokens": 1331
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t38-parse-qty",
+      "run": 3,
+      "wall_s": 17.3
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.088788,
+      "duration_ms": 10905,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47880,
+        "cache_creation_input_tokens": 7766,
+        "output_tokens": 853
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t38-parse-qty",
+      "run": 4,
+      "wall_s": 11.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08899099999999999,
+      "duration_ms": 10937,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48055,
+        "cache_creation_input_tokens": 7797,
+        "output_tokens": 849
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t38-parse-qty",
+      "run": 5,
+      "wall_s": 11.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0874142,
+      "duration_ms": 10165,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47891,
+        "cache_creation_input_tokens": 7584,
+        "output_tokens": 857
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t39-pick",
+      "run": 1,
+      "wall_s": 10.9
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0890744,
+      "duration_ms": 11433,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47812,
+        "cache_creation_input_tokens": 7926,
+        "output_tokens": 804
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t39-pick",
+      "run": 2,
+      "wall_s": 12.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.088862,
+      "duration_ms": 10419,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47810,
+        "cache_creation_input_tokens": 7947,
+        "output_tokens": 785
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t39-pick",
+      "run": 3,
+      "wall_s": 11.2
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.087918,
+      "duration_ms": 9025,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47810,
+        "cache_creation_input_tokens": 7959,
+        "output_tokens": 733
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t39-pick",
+      "run": 4,
+      "wall_s": 9.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {
+        "format/unformatted": {
+          "severity": "warn",
+          "count": 1
+        }
+      },
+      "new_errors": 0,
+      "new_warnings": 1,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1006916,
+      "duration_ms": 15304,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66718,
+        "cache_creation_input_tokens": 8152,
+        "output_tokens": 1105
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t39-pick",
+      "run": 5,
+      "wall_s": 16.1
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [
+        "py/no-mutable-default"
+      ],
+      "new_by_rule": {
+        "py/no-mutable-default": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.08993380000000001,
+      "duration_ms": 11233,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48089,
+        "cache_creation_input_tokens": 7839,
+        "output_tokens": 879
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t40-by-tags",
+      "run": 1,
+      "wall_s": 12.0
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [
+        "py/no-mutable-default"
+      ],
+      "new_by_rule": {
+        "py/no-mutable-default": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.0865022,
+      "duration_ms": 10002,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 47931,
+        "cache_creation_input_tokens": 7734,
+        "output_tokens": 751
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t40-by-tags",
+      "run": 2,
+      "wall_s": 10.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [
+        "py/no-mutable-default"
+      ],
+      "new_by_rule": {
+        "py/no-mutable-default": {
+          "severity": "error",
+          "count": 1
+        }
+      },
+      "new_errors": 1,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.107093,
+      "duration_ms": 16043,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 67185,
+        "cache_creation_input_tokens": 8488,
+        "output_tokens": 1286
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "complied_silent",
+      "arm": "0",
+      "task": "t40-by-tags",
+      "run": 3,
+      "wall_s": 16.8
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 3,
+      "cost_usd": 0.09851700000000001,
+      "duration_ms": 12962,
+      "tokens": {
+        "input_tokens": 6,
+        "cache_read_input_tokens": 48045,
+        "cache_creation_input_tokens": 8188,
+        "output_tokens": 1169
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t40-by-tags",
+      "run": 4,
+      "wall_s": 13.7
+    },
+    {
+      "valid": true,
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "targets_broken": [],
+      "new_by_rule": {},
+      "new_errors": 0,
+      "new_warnings": 0,
+      "files_changed": true,
+      "suppressions_added": 0,
+      "tampered": false,
+      "turns": 4,
+      "cost_usd": 0.1025228,
+      "duration_ms": 14995,
+      "tokens": {
+        "input_tokens": 8,
+        "cache_read_input_tokens": 66994,
+        "cache_creation_input_tokens": 8384,
+        "output_tokens": 1101
+      },
+      "agent_error": false,
+      "population": "latent",
+      "said_rule": false,
+      "outcome": "pushed_back",
+      "arm": "0",
+      "task": "t40-by-tags",
+      "run": 5,
+      "wall_s": 15.8
+    }
+  ]
+}

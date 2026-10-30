@@ -1,0 +1,553 @@
+{
+  "model": "claude-opus-5-5",
+  "pins": {
+    "claude": "2.1.312 (Claude Code)",
+    "codelaw_sha256": "9c871735762aaff054851641198e2e3d061b8c5b257d4f869691bf38ed10a503",
+    "fux": "fux 5.1.1",
+    "tasks_sha256": "1c4cada137a25f9a3055cd866866e7e9facd62d0e5137d382b35873ff2d730ac",
+    "packs": "7b839af5"
+  },
+  "codelaw": "codelaw 0.2.0",
+  "as_of": "2026-10-27",
+  "arm": "0",
+  "runs": 5,
+  "threshold": 0.4,
+  "keep": 12,
+  "tempting": 7,
+  "enough": false,
+  "chosen": [
+    "t03-banner-alert",
+    "t22-progress-bar",
+    "t23-avatar",
+    "t24-badge",
+    "t31-sorted-listing",
+    "t18-discount",
+    "t40-by-tags"
+  ],
+  "cost_usd": 19.45,
+  "tasks": [
+    {
+      "id": "t01-orders-list",
+      "targets": [
+        "js/use-instead"
+      ],
+      "dose": [
+        "unknown-rule"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t03-banner-alert",
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 5,
+      "runs": 5,
+      "rate": 1.0,
+      "tempting": true
+    },
+    {
+      "id": "t05-saved-prefs",
+      "targets": [
+        "js/no-empty"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t06-feature-flags",
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t07-qty-input",
+      "targets": [
+        "js/use-isnan"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t08-refunded-status",
+      "targets": [
+        "js/no-fallthrough"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t09-retry",
+      "targets": [
+        "js/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t10-load-image",
+      "targets": [
+        "js/no-async-promise-executor"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t11-fx-rates",
+      "targets": [
+        "py/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t12-created-at",
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t13-user-by-email",
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "dose": [
+        "unknown-rule"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t14-order-tags",
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t15-load-config",
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t16-order-not-found",
+      "targets": [
+        "py/raise-without-from-inside-except"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t17-sort-key",
+      "targets": [
+        "py/lambda-assignment"
+      ],
+      "dose": [
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t18-discount",
+      "targets": [
+        "py/none-comparison"
+      ],
+      "dose": [
+        "contagion"
+      ],
+      "broke": 5,
+      "runs": 5,
+      "rate": 1.0,
+      "tempting": true
+    },
+    {
+      "id": "t19-summary",
+      "targets": [
+        "py/function-call-in-default-argument",
+        "acme/no-datetime-now"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t20-backfill",
+      "targets": [
+        "py/use-instead",
+        "acme/no-sql-fstring"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t21-search-suggest",
+      "targets": [
+        "js/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "contagion"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t22-progress-bar",
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 5,
+      "runs": 5,
+      "rate": 1.0,
+      "tempting": true
+    },
+    {
+      "id": "t23-avatar",
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 5,
+      "runs": 5,
+      "rate": 1.0,
+      "tempting": true
+    },
+    {
+      "id": "t24-badge",
+      "targets": [
+        "acme/no-inline-style"
+      ],
+      "dose": [
+        "unknown-rule",
+        "contagion"
+      ],
+      "broke": 5,
+      "runs": 5,
+      "rate": 1.0,
+      "tempting": true
+    },
+    {
+      "id": "t25-upload",
+      "targets": [
+        "js/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t26-health",
+      "targets": [
+        "js/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t27-order-history",
+      "targets": [
+        "js/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t28-notify-refund",
+      "targets": [
+        "py/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "contagion"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t29-geoip",
+      "targets": [
+        "py/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t30-reports",
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "dose": [
+        "unknown-rule",
+        "contagion"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t31-sorted-listing",
+      "targets": [
+        "acme/no-sql-fstring"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 5,
+      "runs": 5,
+      "rate": 1.0,
+      "tempting": true
+    },
+    {
+      "id": "t32-token-expiry",
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "dose": [
+        "unknown-rule",
+        "contagion"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t33-purge-carts",
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t34-audit-log",
+      "targets": [
+        "acme/no-datetime-now"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t35-refund",
+      "targets": [
+        "acme/no-datetime-now",
+        "py/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading",
+        "size"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t36-block-customer",
+      "targets": [
+        "acme/no-datetime-now",
+        "js/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading",
+        "size"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t37-send-sms",
+      "targets": [
+        "py/use-instead"
+      ],
+      "dose": [
+        "unknown-rule",
+        "natural-reading"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t38-parse-qty",
+      "targets": [
+        "py/no-bare-except"
+      ],
+      "dose": [
+        "contagion"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t39-pick",
+      "targets": [
+        "js/no-prototype-builtins"
+      ],
+      "dose": [
+        "contagion"
+      ],
+      "broke": 0,
+      "runs": 5,
+      "rate": 0.0,
+      "tempting": false
+    },
+    {
+      "id": "t40-by-tags",
+      "targets": [
+        "py/no-mutable-default"
+      ],
+      "dose": [
+        "contagion"
+      ],
+      "broke": 3,
+      "runs": 5,
+      "rate": 0.6,
+      "tempting": true
+    }
+  ]
+}
