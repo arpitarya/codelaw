@@ -6,8 +6,8 @@ item: W-150
 filed: 2026-10-30
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+updated_by: "Claude Code (Opus 5.5)"
+ball: agent
 ---
 
 # W-150 — `publish.yml` uploads the dev-server plugins
@@ -16,13 +16,15 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Arpit publishes the three at 0.4.0 by hand from v0.4.0's `dist` (`ci` run 40932052080) | they catch up now | 🔴 Arpit — commands given 2026-10-30 |
-| 2 | `publish.yml`'s npm job: a tier for `codelaw-vite-plugin-*.tgz`, `codelaw-webpack-plugin-*.tgz`, `codelaw-next-*.tgz` (after `codelaw`, since they spawn it) | every release ships them | ⏳ |
-| 3 | `scripts/package.py check` (or the gate) fails when `dist/npm` holds a tarball no tier uploads | this cannot happen again | ⏳ |
+| 1 | ~~Arpit publishes the three at 0.4.0 by hand~~ — **ruled 2026-10-30: release v0.4.1 from CI instead** ([W-151](W-151-release-0-4-1.md)) | they catch up at 0.4.1 | ➡ W-151 |
+| 2 | `publish.yml`'s npm job: a tier for `codelaw-vite-plugin-*.tgz`, `codelaw-webpack-plugin-*.tgz`, `codelaw-next-*.tgz` (after `codelaw`, since they spawn it) | every release ships them | ✅ 2026-10-30 — in `@codelaw/skills`' tier, after `codelaw`; the Fux index packages (B-063) a last tier |
+| 3 | `scripts/package.py check` (or the gate) fails when `dist/npm` holds a tarball no tier uploads | this cannot happen again | ✅ 2026-10-30 — `package.py check` reads `publish.yml`'s `tier` globs (`publish_tiers()`); on v0.4.0's real `dist/npm` the old tiers leave exactly the three untiered, the new ones none |
 
 **Asked 2026-10-30 (Arpit, text):** *"What are the packages that aren't published? Check on all of them."* → *"For npm, give me the command so that I can publish them right away from my local."*
 
 **Model:** Sonnet (Claude Code): a workflow tier and one check.
+
+**Arpit, 2026-10-30 (Claude Code, asked how the lagging packages reach 0.4.0 — CI cannot upload at 0.4.0: the `npm`/`pypi` environments take `v*` tags only and v0.4.0's own `publish.yml` has no tier for them; this machine has no npm login):** *"Release v0.4.1 from CI"* — [W-151](W-151-release-0-4-1.md).
 
 ## Found
 
@@ -33,7 +35,7 @@ ball: arpit
 | DoD | what | state |
 |---|---|---|
 | 1 | npm shows the three at the current release | ⏳ |
-| 2 | the next release uploads them from CI; the new check is tested | ⏳ |
+| 2 | the next release uploads them from CI; the new check is tested | 🔄 check tested 2026-10-30; the upload is W-151's release |
 
 ## Blockers
 

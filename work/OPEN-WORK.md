@@ -27,9 +27,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (22)
+## Open items (23)
 
-### build (20)
+### build (21)
 
 🟢🧨 **W-149** `agent` CI red on `main` since the 10-30 batch: `corpus` fails in exactly the six packs that gained the marker rules (css, data, scss, html, python, js); update and read the snapshots. Filed by Arpit (Cowork). [detail](open/W-149-ci-red-corpus-markers.md)
 
@@ -49,7 +49,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-129** `agent` `deps/licence`, `deps/lockfile-sync`, `deps/version-drift`, `deps/runtime-agreement` — unblocked: W-128 and W-136 built 10-30; nothing built yet. Filed by Arpit (Cowork). [detail](open/W-129-deps-hygiene-rules.md)
 
-🟢 **W-134** `agent` `codelaw-rules-deps`: pending publisher saved 10-30; ruled the same day — CI creates it, never a local upload: `publish.yml` exception + L6 decision 9 amended, before the next release. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
+🟡 **W-134** waits on **W-151** `agent` `codelaw-rules-deps`: `publish.yml` creates it through its pending publisher, `only=pypi` uploads one project (built 10-30, L6 d9 amended). Left: the release creates it; the index's pending publisher. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
 
 🟢 **W-135** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher — W-128 built 10-30; just before the next release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
 
@@ -69,7 +69,9 @@ here. Read that record before changing anything below it.
 
 🟢 **W-148** `agent` From Oxlint: Oxc's native formatters measured on W-141's corpus (CSS 88.6% vs 41.8%, Markdown 97.3% vs 73.3%) and put to Arpit under L11; 18 Oxlint-only rules into W-139; 38 bug rules corpus-run for `recommended`. Filed by Arpit (Cowork). [detail](open/W-148-oxc-formatters-and-oxlint-rules.md)
 
-🔴 **W-150** `arpit` Dev-server plugins stuck at 0.2.0 on npm: `publish.yml` never uploads them. Arpit publishes 0.4.0 by hand (commands given 10-30); then the agent adds the tier and a check. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
+🟡 **W-150** waits on **W-151** `agent` `publish.yml` uploads the dev-server plugins (a tier after `codelaw`) and `package.py check` refuses an untiered tarball — built 10-30. Left: the upload proven by v0.4.1. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
+
+🟢 **W-151** `agent` Release v0.4.1 from CI (ruled 10-30): every package behind 0.4.0 catches up and `deps` ships. `publish.yml` wired 10-30 (W-150, B-063, W-134). Next: bump to 0.4.1, `main` green; then Arpit's npm trust + W-135 and the Release. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
 
 ### testing (0)
 

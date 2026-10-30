@@ -6,7 +6,7 @@ item: W-134
 filed: 2026-10-30
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -43,6 +43,13 @@ ball: agent
 2b. **Asked the same day:** *"For the PyPy package, give me the GitHub command to trigger the pipeline just for that one package."* — no such trigger exists (`workflow_dispatch` takes `only: npm|vscode`; the PyPI job runs on a Release only). Add `only: pypi` with a `package` input, from a `v*` tag, uploading just that wheel from the tag's `dist`: `gh workflow run publish.yml -R arpitarya/codelaw --ref v<next> -f only=pypi -f package=codelaw-rules-deps`. W-125 removed a similar path (`only=pypi-new`); this is its narrower return, by this ruling — say so in SR-PACKAGES.
 3. After the release that creates `codelaw-rules-deps`: Claude adds the pending publisher for `codelaw-rules-deps-fux-index` (PyPI allows one at a time) — it is uploaded only once B-063 is done.
 
+## Built 2026-10-30 (Claude Code, in W-150's change)
+
+- **Step 1:** `publish.yml`'s `exists` step uploads a missing project when it is in `PENDING` (`codelaw`, `codelaw-rules-deps`); every other missing one is skipped and named.
+- **Step 2:** L6 decision 9 amended with the ruling quoted; SR-PACKAGES decision 11's *"No new-project path in CI"* rewritten as *"A new PyPI project in CI only through a pending publisher"*; RELEASING.md's skipped-project paragraph. CLAUDE.md's L6 line does not name the rule — unchanged.
+- **Step 2b:** `workflow_dispatch` `only: pypi` + `package`, from a `v*` tag only, uploads that one project's wheel from the tag's `dist`: `gh workflow run publish.yml -R arpitarya/codelaw --ref v0.4.1 -f only=pypi -f package=codelaw-rules-deps` — once v0.4.1 exists (W-151).
+- **Left:** step 3 after v0.4.1.
+
 ## Found 2026-10-30 (Cowork) — a pending publisher alone does not publish
 
 - **`publish.yml` skips a PyPI project that does not exist yet**, except `codelaw` (its `exists` step; RELEASING.md: *"its first upload is by hand"*). So the pending publisher only works if `publish.yml` also uploads `codelaw-rules-deps` (one line beside the `codelaw` exception), or its first version goes up by hand: `gh run download <ci-run-id> -R arpitarya/codelaw -n dist -D dist && twine upload dist/pypi/codelaw_rules_deps-<v>-py3-none-any.whl`.
@@ -53,8 +60,8 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 | Both pending publishers saved on PyPI | ⏳ |
-| 2 | The first release with the `deps` pack creates both projects | ⏳ |
+| 1 | Both pending publishers saved on PyPI | 🔄 `codelaw-rules-deps` saved 10-30; the Fux index's after the first exists (step 3) |
+| 2 | The first release with the `deps` pack creates both projects | ⏳ v0.4.1, [W-151](W-151-release-0-4-1.md) |
 
 ## Blockers
 
@@ -67,7 +74,7 @@ None — W-128 closed 2026-10-30. Do it just before the next release.
 ## Hazards
 
 - A pending publisher reserves nothing: someone else can take the name first — do it close to the release, as ruled, but not after it.
-- B-063: the Fux-index packages are not uploaded by `publish.yml` yet; the second name may stay pending until B-063 lands.
+- B-063 landed 2026-10-30 (W-150): `publish.yml` uploads the Fux index wheels, so the second name is created by the release after its pending publisher is added.
 
 ## Reference
 

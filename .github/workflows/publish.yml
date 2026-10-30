@@ -5,8 +5,9 @@
 # tag later runs both, skipping every version already published. Nothing else
 # publishes. No token anywhere: npm and PyPI trusted publishing (OIDC).
 #
-# Nothing is built here. ci.yml assembled and checked `dist` on the release
-# commit; this downloads THAT artifact, re-runs the checks, and uploads it.
+# Nothing is built here. ci.yml assembled and checked `dist` and the Fux index
+# set `fux-index` on the release commit; this downloads THOSE artifacts, re-runs
+# the checks, and uploads them (the index packages since B-063).
 #
 # Every `run:` is `bash -eo pipefail`; every action is pinned by commit SHA,
 # and npm by exact version (W-18). The `npm` and `pypi` environments accept
@@ -20,13 +21,17 @@ name: publish
 on:
   release:
     types: [published]
-  workflow_dispatch: # npm only, from a v* tag: `gh workflow run publish.yml --ref v0.2.0`; or `-f only=vscode` from main: the extension's job alone (W-95)
+  workflow_dispatch: # npm only, from a v* tag: `gh workflow run publish.yml --ref v0.2.0`; or `-f only=vscode` from main: the extension's job alone (W-95); or `-f only=pypi -f package=<project>` from a v* tag: one PyPI project's wheel (W-134)
     inputs:
       only:
-        description: 'npm (default, from a v* tag) or vscode (the extension alone, from main)'
+        description: 'npm (default, from a v* tag), vscode (the extension alone, from main) or pypi (one project, from a v* tag)'
         type: choice
-        options: [npm, vscode]
+        options: [npm, vscode, pypi]
         default: npm
+      package:
+        description: 'only=pypi: the one PyPI project to upload, e.g. codelaw-rules-deps'
+        required: false
+        default: ''
 permissions:
   contents: read
 defaults:
@@ -46,18 +51,27 @@ jobs:
     outputs:
       run: ${{ steps.ci.outputs.run }}
       sums: ${{ steps.verified.outputs.sums }}
+      fuxsums: ${{ steps.verified.outputs.fuxsums }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false # nothing here pushes (W-18)
-      - name: a run by hand is npm only, and starts from a v* tag (L6 decision 9)
-        if: github.event_name == 'workflow_dispatch' && inputs.only == 'npm'
+      - name: a run by hand is npm only, or one PyPI project, and starts from a v* tag (L6 decision 9)
+        if: github.event_name == 'workflow_dispatch' && inputs.only != 'vscode'
+        env:
+          ONLY: ${{ inputs.only }}
+          PACKAGE: ${{ inputs.package }}
         run: |
           [ "$GITHUB_REF_TYPE" = tag ] && [[ "$GITHUB_REF_NAME" == v* ]] || {
             echo "::error::run publish.yml from a v* tag (gh workflow run publish.yml --ref vX.Y.Z), not the ${GITHUB_REF_TYPE} ${GITHUB_REF_NAME}"
             exit 1
           }
-          echo "npm only: PyPI and the release checksums wait for the GitHub Release on ${GITHUB_REF_NAME}"
+          if [ "$ONLY" = pypi ]; then
+            [[ "$PACKAGE" =~ ^codelaw(-[a-z0-9-]+)?$ ]] || { echo "::error::only=pypi needs -f package=<a codelaw PyPI project>, not '${PACKAGE}'"; exit 1; }
+            echo "PyPI only, one project: ${PACKAGE} from ${GITHUB_REF_NAME}"
+          else
+            echo "npm only: PyPI and the release checksums wait for the GitHub Release on ${GITHUB_REF_NAME}"
+          fi
       - id: ci
         name: ci.yml succeeded on this commit, on main
         env:
@@ -83,6 +97,14 @@ jobs:
           github-token: ${{ github.token }}
       - name: the release checks, again, on exactly what will be uploaded (SHA256SUMS included)
         run: python3 scripts/package.py check dist
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: fux-index
+          path: dist/fux-index/
+          run-id: ${{ steps.ci.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: the Fux index set's checks, again (B-063)
+        run: python3 scripts/fux-index.py check dist
       - id: verified
         name: every file is the one ci.yml built and attested, from this commit, on main (SR-PACKAGES decision 11)
         env:
@@ -105,8 +127,9 @@ jobs:
             echo "✓ $1"
           }
           export -f verify
-          printf '%s\n' dist/npm/* dist/pypi/* | xargs -P 8 -I{} bash -eo pipefail -c 'verify "$1"' _ {}
+          printf '%s\n' dist/npm/* dist/pypi/* dist/fux-index/npm/* dist/fux-index/pypi/* | xargs -P 8 -I{} bash -eo pipefail -c 'verify "$1"' _ {}
           echo "sums=$(sha256sum dist/SHA256SUMS | cut -c1-64)" >> "$GITHUB_OUTPUT"
+          echo "fuxsums=$(sha256sum dist/fux-index/SHA256SUMS | cut -c1-64)" >> "$GITHUB_OUTPUT"
       - name: the engine has its formatter, MCP server and LSP — L7 and L6 decision 3 forbid releasing without them
         run: python3 scripts/law-gate.py dist
 
@@ -134,6 +157,12 @@ jobs:
           path: dist/
           run-id: ${{ needs.gate.outputs.run }}
           github-token: ${{ github.token }}
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: fux-index
+          path: dist/fux-index/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
       - name: npm ${{ env.NPM_VERSION }} (trusted publishing needs ≥ 11.5.1; Node 22 ships npm 10)
         run: npm i -g "npm@$NPM_VERSION" --no-audit --no-fund --loglevel=error && npm --version
       - name: npm trusts this workflow for every package, before anything is published
@@ -153,7 +182,7 @@ jobs:
           }
           export -f trusted
           bad=0
-          printf '%s\n' ./dist/npm/*.tgz | xargs -P 8 -I{} bash -eo pipefail -c 'trusted "$1"' _ {} || bad=1
+          printf '%s\n' ./dist/npm/*.tgz ./dist/fux-index/npm/*.tgz | xargs -P 8 -I{} bash -eo pipefail -c 'trusted "$1"' _ {} || bad=1
           [ "$bad" = 0 ] || { echo "::error::Nothing was published. Run scripts/npm-trust.sh once (RELEASING.md), then re-run this workflow."; exit 1; }
 
   npm:
@@ -179,20 +208,33 @@ jobs:
           path: dist/
           run-id: ${{ needs.gate.outputs.run }}
           github-token: ${{ github.token }}
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: fux-index
+          path: dist/fux-index/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
       - name: npm ${{ env.NPM_VERSION }} (trusted publishing needs ≥ 11.5.1; Node 22 ships npm 10)
         run: npm i -g "npm@$NPM_VERSION" --no-audit --no-fund --loglevel=error && npm --version
-      - name: the download is the set the gate verified (SHA256SUMS, W-18)
+      - name: the download is the sets the gate verified (both SHA256SUMS, W-18)
         env:
           SUMS: ${{ needs.gate.outputs.sums }}
+          FUXSUMS: ${{ needs.gate.outputs.fuxsums }}
         run: |
           echo "$SUMS  dist/SHA256SUMS" | sha256sum --strict --quiet -c
           (cd dist && sha256sum --strict --quiet -c SHA256SUMS)
           [ "$(find dist/npm dist/pypi -type f | wc -l)" = "$(wc -l < dist/SHA256SUMS)" ] || { echo "::error::dist holds a file SHA256SUMS does not list"; exit 1; }
-      - name: publish — the eight binaries, the npm packs, codelaw, then @codelaw/skills
+          echo "$FUXSUMS  dist/fux-index/SHA256SUMS" | sha256sum --strict --quiet -c
+          (cd dist/fux-index && sha256sum --strict --quiet -c SHA256SUMS)
+          [ "$(find dist/fux-index/npm dist/fux-index/pypi -type f | wc -l)" = "$(wc -l < dist/fux-index/SHA256SUMS)" ] || { echo "::error::dist/fux-index holds a file its SHA256SUMS does not list"; exit 1; }
+      - name: publish — the eight binaries, the npm packs, codelaw, then @codelaw/skills and the dev-server plugins, then the Fux index packages
         # codelaw names the binaries as optionalDependencies, so it goes after them: a
         # failure before it leaves the previous codelaw as `latest`, intact.
-        # @codelaw/skills depends on codelaw at its exact version (W-77), so it
-        # goes after codelaw, never before the engine it needs.
+        # @codelaw/skills depends on codelaw at its exact version (W-77), and the
+        # dev-server plugins spawn it (W-150), so they go after codelaw, never
+        # before the engine they need. The Fux index packages last: optional data
+        # nothing depends on (B-063). `package.py check` refuses a tarball in
+        # dist/npm that none of these tiers names (W-150).
         # Each tier uploads eight at a time and the next starts only when every
         # one of it is on npm (W-126): parallel within a tier, never across tiers.
         # The dist-tag, one for the whole release:
@@ -231,13 +273,15 @@ jobs:
           tier ./dist/npm/codelaw-cli-*.tgz
           tier ./dist/npm/codelaw-rules-*.tgz
           tier ./dist/npm/codelaw-[0-9]*.tgz
-          tier ./dist/npm/codelaw-skills-*.tgz
+          tier ./dist/npm/codelaw-skills-*.tgz ./dist/npm/codelaw-vite-plugin-*.tgz ./dist/npm/codelaw-webpack-plugin-*.tgz ./dist/npm/codelaw-next-*.tgz
+          tier ./dist/fux-index/npm/*.tgz
 
   pypi:
-    # A Release uploads every wheel whose project exists; a run by hand is npm
-    # only (L6 decision 9).
+    # A Release uploads every wheel whose project exists, the Fux index wheels
+    # among them (B-063); a run by hand with only=pypi uploads one project's
+    # wheel from the tag's `dist` (W-134). L6 decision 9.
     needs: [gate, trust]
-    if: github.event_name == 'release'
+    if: ${{ !cancelled() && needs.gate.result == 'success' && (github.event_name == 'release' && needs.trust.result == 'success' || inputs.only == 'pypi') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -253,30 +297,48 @@ jobs:
           path: dist/
           run-id: ${{ needs.gate.outputs.run }}
           github-token: ${{ github.token }}
-      - name: the download is the set the gate verified (SHA256SUMS, W-18)
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: fux-index
+          path: dist/fux-index/
+          run-id: ${{ needs.gate.outputs.run }}
+          github-token: ${{ github.token }}
+      - name: the download is the sets the gate verified (both SHA256SUMS, W-18)
         env:
           SUMS: ${{ needs.gate.outputs.sums }}
+          FUXSUMS: ${{ needs.gate.outputs.fuxsums }}
         run: |
           echo "$SUMS  dist/SHA256SUMS" | sha256sum --strict --quiet -c
           (cd dist && sha256sum --strict --quiet -c SHA256SUMS)
           [ "$(find dist/npm dist/pypi -type f | wc -l)" = "$(wc -l < dist/SHA256SUMS)" ] || { echo "::error::dist holds a file SHA256SUMS does not list"; exit 1; }
+          echo "$FUXSUMS  dist/fux-index/SHA256SUMS" | sha256sum --strict --quiet -c
+          (cd dist/fux-index && sha256sum --strict --quiet -c SHA256SUMS)
+          [ "$(find dist/fux-index/npm dist/fux-index/pypi -type f | wc -l)" = "$(wc -l < dist/fux-index/SHA256SUMS)" ] || { echo "::error::dist/fux-index holds a file its SHA256SUMS does not list"; exit 1; }
       - id: exists
-        name: only wheels whose PyPI project exists, or is codelaw (its pending publisher creates it); the rest are named, not failed (L6 decision 9)
+        name: only wheels whose PyPI project exists, or holds a pending publisher (codelaw, codelaw-rules-deps); the rest are named, not failed (L6 decision 9)
+        env:
+          ONLY: ${{ inputs.only }}
+          PACKAGE: ${{ inputs.package }}
+        # PENDING: the projects CI may create, each through the pending publisher
+        # the decider added on pypi.org (L6 decision 9; codelaw since W-30,
+        # codelaw-rules-deps since W-134). Every other missing project is skipped.
         run: |
+          PENDING=" codelaw codelaw-rules-deps "
           mkdir -p upload
           {
             echo "### PyPI"
-            for w in dist/pypi/*.whl; do
+            for w in dist/pypi/*.whl dist/fux-index/pypi/*.whl; do
               proj="$(basename "$w" | cut -d- -f1 | tr '_' '-')"
+              if [ "$ONLY" = pypi ] && [ "$proj" != "$PACKAGE" ]; then continue; fi
               code="$(curl -s -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/$proj/json")"
-              if [ "$code" = 200 ] || [ "$proj" = codelaw ]; then
+              if [ "$code" = 200 ] || [[ "$PENDING" == *" $proj "* ]]; then
                 cp "$w" upload/; echo "- ✓ upload \`$proj\`"
               else
-                echo "- ⏭ skipped \`$proj\` — not on PyPI yet (HTTP $code); its first upload is by hand"
+                echo "- ⏭ skipped \`$proj\` — not on PyPI yet (HTTP $code) and no pending publisher"
               fi
             done
           } | tee -a "$GITHUB_STEP_SUMMARY"
-          [ -n "$(ls upload)" ] || { echo "::error::no wheel to upload"; exit 1; }
+          [ -n "$(ls upload)" ] || { echo "::error::no wheel to upload${PACKAGE:+ for $PACKAGE}"; exit 1; }
       - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           packages-dir: upload/
