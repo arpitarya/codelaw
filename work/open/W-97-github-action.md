@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-97 — A first-party GitHub Action
@@ -46,11 +46,17 @@ Why: Biome (`setup-biome`) and Ruff (`ruff-action`) ship one ([proposal](../prop
 - `action.yml`: `name: codelaw check`; the description shortened to 115 characters, keeping what the Action does (it checks and annotates; it does not fix). Written 2026-10-30 (Cowork). The repo path is unchanged, so `uses: arpitarya/codelaw@v0` still works.
 - v0.4.0 carries the old `action.yml`, so the listing waits for **the next release**.
 
+## Listed, 2026-10-30 (checked 10:15 IST, Cowork, in Chrome)
+
+- **Live:** <https://github.com/marketplace/actions/codelaw-check> — **codelaw check**, by arpitarya, release **v0.4.0** (*Latest*), the 115-character description. Arpit published it on v0.4.0 (the Release was edited 2026-10-30 04:00 UTC), not on a later release as planned: the listing takes its name and description from `main`'s `action.yml` (`af9de8a5`), while `v0.4.0`'s own file still says `name: codelaw`. So step 1 below is done.
+- **Found:** **no `v0` tag exists** (tags: `v0.2.0`, `v0.3.0`, `v0.4.0`) — `uses: arpitarya/codelaw@v0`, as USAGE and the ruling promise, fails today. `@v0.4.0` works (the listing's *Use latest version* button).
+- **Found:** the listing shows the repo README, which still says *"0.3.0 is on npm and PyPI"* and *"The editor extension's Marketplace listing comes later"* — W-95's install-docs step.
+
 ## Left (ruled 2026-10-27; step 1 moved by the 2026-10-30 ruling)
 
-1. **Arpit:** on **the first release after 0.4.0**, accept the Marketplace Developer Agreement and tick *Publish this Action to the GitHub Marketplace* (the inbox row).
-2. **Agent, after that release:** the DoD proof — `gh repo create arpitarya/codelaw-action-test --public --clone`, `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, one `debugger`, then the annotation and Security → Code scanning checked.
-3. **Agent, each release:** `git tag -f v0 v<x> && git push -f origin v0` (RELEASING.md).
+1. ~~**Arpit:** accept the Marketplace Developer Agreement and tick *Publish this Action to the GitHub Marketplace*.~~ ✅ done on v0.4.0 (2026-10-30).
+2. **Agent, now (0.4.0 has `--format github`):** the DoD proof — `gh repo create arpitarya/codelaw-action-test --public --clone`, `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, one `debugger`, then the annotation and Security → Code scanning checked.
+3. **Agent, each release:** `git tag -f v0 v<x> && git push -f origin v0` (RELEASING.md) — **never done yet: create `v0` at `v0.4.0` first.**
 4. **Offered, not ruled:** a clear error when `upload-sarif` is on and `gh` is absent (a self-hosted runner or slim image) — the plain check-and-annotate path needs no `gh`.
 
 ## Record affected

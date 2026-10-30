@@ -32,6 +32,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the first build read `findings` from the JSON report; it is `diagnostics` — caught before the run.
 - **Next:** three `perf` runs on `main` with `spell`, then decision 4's method to the decider.
 
+## 2026-10-30 — The Action's Marketplace listing checked  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"The marketplace publish happened. Check on it. You have the access to browser."*
+- **Done:** checked in Chrome: <https://github.com/marketplace/actions/codelaw-check> is live — **codelaw check**, v0.4.0 *Latest*, the shortened description. Inbox row removed; W-97 to the agent.
+- **Decided / left open:** found **no `v0` tag** (the moving tag W-97 promised); the listing shows a README that still says 0.3.0 (W-95). Both the agent's.
+- **Mistakes:** none.
+- **Next:** W-97 — create `v0` at `v0.4.0`, then the throwaway-repo proof.
+
 ## 2026-10-30 — The queue reviewed item by item; W-132 closed, W-149 filed  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"Review the open work file. Check the status on each and every work item. Update all of them to their latest status. Close the ones that are already built."*
