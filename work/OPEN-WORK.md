@@ -26,6 +26,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-102 itself | |
 | 🔴 **Open VSX — waiting on Open VSX** ([W-95](open/W-95-publish-vscode-extension.md), was W-117): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
 | ↳ **blocks:** W-95 (its Open VSX half) | |
+| 🔴 **Release v0.4.1** ([W-151](open/W-151-release-0-4-1.md)): `main` is green at 0.4.1 (`c4d519c7`). In order: (1) `scripts/npm-trust.sh --fux-index`; (2) `npm publish` `@codelaw/rules-deps` and `@codelaw/rules-deps-fux-index` 0.4.1 from `ci` 41007205048's artifacts (`gh run download 41007205048 -n dist` / `-n fux-index`), then `scripts/npm-trust.sh` for both; (3) `gh release create v0.4.1` with CHANGELOG's 0.4.1 section. `trust` stops the release if (1) or (2) is skipped. | 2026-10-30 |
+| ↳ **blocks:** W-151, and through it the proof of W-150's uploads and W-134's PyPI `deps` | |
 
 ---
 
@@ -33,7 +35,7 @@ here. Read that record before changing anything below it.
 
 ### build (12)
 
-🟢 **W-126** `agent` Five-minute pipeline built. Cached CI 4m25, 4m11 (✅); release 3m50; Rust/pack change 10m33 (`7604e4a6`, green): the rest done at 4m12, `perf` (10m29) the tail. Left: one cached, two of each change kind, two releases. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
+🟢 **W-126** `agent` Five-minute pipeline built. Cached CI 4m25, 4m11 (✅); release 3m50; Rust/pack change 10m33, 11m29, 18m44 (`perf` the tail, ~10–11 min; the last queued 7m26). Left: one cached run, two releases, then `perf` to Arpit. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
 🔴 **W-95** `arpit` VS Code extension: Marketplace live (0.4.0); Open VSX (was W-117) uploaded by hand, inactive until claim #14928 is approved — then the trusted publisher and a VSCodium check. Merged 10-30. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
@@ -55,7 +57,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-146** `agent` PR hygiene: `git/commit-message` (Conventional Commits, configurable), `git/branch-name`, `git/pr-size` (400 lines), `git/pr-description`; commit-msg hook, CI, agent hook; git use widened (SR-ARCHITECTURE 14). Filed by Arpit (Cowork). [detail](open/W-146-pr-hygiene.md)
 
-🟢 **W-151** `agent` Release v0.4.1 and all it needs (merged 10-30: W-150 uploads and W-134 PyPI `deps`, both built; W-135 npm `deps`). Next: `main` green on 0.4.1; then Arpit's npm trust, two `deps` names, the Release. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
+🔴 **W-151** `arpit` Release v0.4.1 and all it needs (merged 10-30: W-150, W-134, W-135). `main` green on 0.4.1 (`c4d519c7`, `ci` 41007205048). Next, Arpit: npm trust for the index names, the two `deps` names by hand, then the Release (inbox). Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
 
 ### testing (0)
 

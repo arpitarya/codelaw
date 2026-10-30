@@ -39,7 +39,8 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Decided / left open:** Arpit ruled *"Release v0.4.1 from CI"* for the lagging packages (19 npm, 11 PyPI); the 19 npm ones he then published by hand from v0.4.0's artifacts, so 0.4.1 carries PyPI's eleven and `deps`. W-97's throwaway repo: `gh repo create --public` refused twice by the permission check. Found: two BACKLOG rows share `B-063` (the second, W-102's experiment, should be renumbered — rule 11); the paid one is deleted here.
 - **Mistakes:** one scripted edit failed on a wrong anchor after three of its writes had landed; re-run from the failed one.
 - **Then:** W-149 closed (`main` green, `ci` 41005346138); W-126 measured the first green Rust/pack run (10m33, `perf` the tail); 0.4.1 bumped and CHANGELOG written (W-151 step 2).
-- **Next:** `main` green on the bump; then Arpit's `npm-trust.sh --fux-index`, W-135 and the Release.
+- **Then:** `main` green on 0.4.1 (`ci` 41007205048) and on W-150's wiring (41006814384, both attestation steps green); W-95's clean VS Code install checked; Cowork's consolidation landed as `db1c0c70`. Three stale handoff bundles (`handoff-20261030-043224`, `-044012`, `-050518`) hold nothing `main` lacks; `lockmaster abandon` was refused by the permission check — Arpit's to run.
+- **Next:** Arpit's three release steps (the inbox row); then W-151 step 5.
 
 ## 2026-10-30 — W-95's install docs, W-97's `v0` tag; W-149 left to the session already fixing it  ·  Claude Code (Opus 5.5)
 
