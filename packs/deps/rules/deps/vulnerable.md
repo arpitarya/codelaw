@@ -1,8 +1,8 @@
 ---
 id: deps/vulnerable
 title: "No dependency in use has a known vulnerability"
-languages: [json, toml, yaml]
-files: ["**/package.json", "**/pyproject.toml", "**/package-lock.json", "**/pnpm-lock.yaml"]
+languages: [json, toml]
+files: ["**/package.json", "**/pyproject.toml"]
 fix: suggest
 fix_reason: "the fix moves a range or adds an override to the lowest known-clean version, which changes what installs; a new major can change behaviour, and an override changes the install of the whole tree"
 stability: preview
@@ -26,8 +26,7 @@ An advisory no source grades counts as `high`.
 Where it is reported, and the fix:
 
 - **A direct dependency:** on its line in the manifest; the fix moves the range's version to the target and keeps its operator (`^`, `~`, `>=`, `=` or none; `==`, `>=` or `~=`).
-- **A transitive one, in `package-lock.json` or `pnpm-lock.yaml`:** on its lockfile entry; the message names the override to add — npm `overrides` or `pnpm.overrides` in `package.json`. A lockfile is never edited.
-- **A transitive one, in `yarn.lock` or `uv.lock`:** on the first line of the manifest beside the lockfile (a `.lock` file is not one of the nine languages); the fix adds yarn `resolutions` or uv's `[tool.uv] override-dependencies`.
+- **A transitive one:** on the first line of the manifest beside the lockfile — where the override that fixes it is written — and the fix adds that override at the exact target: npm `overrides`, `pnpm.overrides`, yarn `resolutions`, uv's `[tool.uv] override-dependencies`. A lockfile is never edited. An override already in the manifest is the version the next install takes: a clean one settles the finding, a vulnerable one is reported with the version to change it to. A yarn classic finding has a copy on its `yarn.lock` entry.
 - **In `poetry.lock`:** Poetry has no override, so the message says to add a direct constraint.
 
 Every message ends with the install to run (`npm install`, `uv lock`, …) and the snapshot's day, and says `incomplete` while an enabled source was unavailable. `[deps] ignore` takes a package, or `{ package, advisory, expires, added_by, reason }` for one advisory until a date.
@@ -139,48 +138,3 @@ name = "app"
 dependencies = ["jinja2>=3.1.3"]
 ```
 
-### YAML
-
-#### Don't
-
-```yaml
-# .codelaw/deps-snapshot.json
-{
-  "fetched": "2026-10-29",
-  "packages": {
-    "npm:minimist": {
-      "versions": { "1.2.5": "2020-03-12", "1.2.6": "2022-03-21" },
-      "advisories": [ { "id": "GHSA-xvch-5gv4-984h", "severity": "critical", "affected": ["<1.2.6"], "fixed": ["1.2.6"], "sources": ["osv"] } ],
-      "scanned": { "osv": ["*"] }
-    }
-  },
-  "sources": { "osv": { "kind": "osv", "state": "ok", "on": "2026-10-29" } }
-}
-# pnpm-lock.yaml
-lockfileVersion: '9.0'
-packages:
-  minimist@1.2.5:
-    resolution: {integrity: sha512-x}
-```
-
-#### Do
-
-```yaml
-# .codelaw/deps-snapshot.json
-{
-  "fetched": "2026-10-29",
-  "packages": {
-    "npm:minimist": {
-      "versions": { "1.2.5": "2020-03-12", "1.2.6": "2022-03-21" },
-      "advisories": [ { "id": "GHSA-xvch-5gv4-984h", "severity": "critical", "affected": ["<1.2.6"], "fixed": ["1.2.6"], "sources": ["osv"] } ],
-      "scanned": { "osv": ["*"] }
-    }
-  },
-  "sources": { "osv": { "kind": "osv", "state": "ok", "on": "2026-10-29" } }
-}
-# pnpm-lock.yaml
-lockfileVersion: '9.0'
-packages:
-  minimist@1.2.6:
-    resolution: {integrity: sha512-y}
-```

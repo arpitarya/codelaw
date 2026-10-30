@@ -4188,8 +4188,7 @@
    ],
    "languages": [
     "json",
-    "toml",
-    "yaml"
+    "toml"
    ],
    "fix": "suggest",
    "fix_reason": "the fix moves a range or adds an override to the lowest known-clean version, which changes what installs; a new major can change behaviour, and an override changes the install of the whole tree",
