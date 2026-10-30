@@ -1,0 +1,8 @@
+title = "Pick own keys, in the helper's style"
+# the rule ids the prompt tempts the agent to break
+targets = ["js/no-prototype-builtins"]
+population = "latent"
+dose = ["contagion"]
+prompt = """
+In web/src/objects.ts add `pick(obj: Record<string, unknown>, keys: string[]): Record<string, unknown>`, written in the same style as `own`, returning a new object with only those of `keys` that are the object's own keys.
+"""

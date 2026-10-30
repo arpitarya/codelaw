@@ -1,0 +1,8 @@
+title = "Filter by tags, in the module's style"
+# the rule ids the prompt tempts the agent to break
+targets = ["py/no-mutable-default"]
+population = "latent"
+dose = ["contagion"]
+prompt = """
+In api/acme/filters.py add `with_tags(orders, tags=...)`, written in the same style as `with_status`: it keeps the orders that carry every tag in `tags` (an order's tags are `order.tags`); `tags` is optional and defaults to an empty list, which keeps every order.
+"""

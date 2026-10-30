@@ -1,0 +1,8 @@
+title = "Poll the API's health"
+# the rule ids the prompt tempts the agent to break
+targets = ["js/use-instead"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading"]
+prompt = """
+Add web/src/health.ts with `startHealthCheck()`, which polls `GET /api/health` every 30 seconds, and `isHealthy(): boolean`, which says whether the last poll answered 200.
+"""

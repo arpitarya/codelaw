@@ -1,6 +1,8 @@
 title = "Sort orders by total"
 # the rule ids the prompt tempts the agent to break
 targets = ["py/lambda-assignment"]
+population = "latent"
+dose = ["natural-reading"]
 prompt = """
 Add api/acme/sorting.py with a module-level one-line sort key `by_total` that returns an order's `.total()`, and `largest_first(orders)` that returns the orders sorted by it, largest first.
 """

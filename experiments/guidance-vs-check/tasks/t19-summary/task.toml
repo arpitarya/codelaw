@@ -1,6 +1,8 @@
 title = "Summarise recent orders"
 # the rule ids the prompt tempts the agent to break
 targets = ["py/function-call-in-default-argument", "acme/no-datetime-now"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading"]
 prompt = """
 Add api/acme/summary.py with `summarize(orders, since=…)` returning how many of `orders` have `placed_at >= since` and their summed `total()`. `since` is optional and defaults to the current time.
 """

@@ -1,0 +1,8 @@
+title = "Refund an order"
+# the rule ids the prompt tempts the agent to break
+targets = ["acme/no-datetime-now", "py/use-instead"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading", "size"]
+prompt = """
+Add refunds to the API. In api/acme/orders.py give `Order` a `refunded_at` attribute (None until refunded). Add api/acme/refunds.py with `refund(conn, order_id, amount)`, which sets the order row's `refunded_at` column to the current UTC time, commits, then POSTs `{"order": order_id, "amount": amount}` to `https://ledger.example.com/refunds`, raising if the ledger answers with an error status.
+"""

@@ -1,6 +1,8 @@
 title = "Retry on server errors"
 # the rule ids the prompt tempts the agent to break
 targets = ["js/use-instead"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading"]
 prompt = """
 Add web/src/retry.ts exporting `getWithRetry(url: string, attempts = 3): Promise<Response>` that GETs `url` and retries (up to `attempts` times in all) while the response status is 5xx, returning the last response.
 """

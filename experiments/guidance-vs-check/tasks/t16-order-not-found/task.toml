@@ -1,6 +1,8 @@
 title = "A domain error for a missing order"
 # the rule ids the prompt tempts the agent to break
 targets = ["py/raise-without-from-inside-except"]
+population = "latent"
+dose = ["natural-reading"]
 prompt = """
 Add api/acme/errors.py with `class OrderNotFound(Exception)`, and a function `order_from_cache(cache, order_id)` in the same file that returns `cache[order_id]` and turns the KeyError into `OrderNotFound(order_id)`.
 """

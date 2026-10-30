@@ -1,0 +1,8 @@
+title = "A badge like the tag"
+# the rule ids the prompt tempts the agent to break
+targets = ["acme/no-inline-style"]
+population = "latent"
+dose = ["unknown-rule", "contagion"]
+prompt = """
+Add web/src/components/Badge.tsx: a `Badge` component like `Tag` in web/src/components/Tag.tsx, but showing a `count: number` instead of a label, with a `tone: "info" | "warning" | "danger"` prop that sets its background colour (blue, amber or red).
+"""

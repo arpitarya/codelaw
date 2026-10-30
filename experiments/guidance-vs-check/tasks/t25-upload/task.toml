@@ -1,0 +1,8 @@
+title = "Upload a receipt"
+# the rule ids the prompt tempts the agent to break
+targets = ["js/use-instead"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading"]
+prompt = """
+Add web/src/upload.ts exporting `uploadReceipt(orderId: string, file: File): Promise<void>`, which POSTs the file as multipart form data (field `file`) to `/api/orders/<orderId>/receipt` and throws if the response is not ok.
+"""

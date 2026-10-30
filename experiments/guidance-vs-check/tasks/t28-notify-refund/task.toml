@@ -1,0 +1,8 @@
+title = "Tell the warehouse about a refund"
+# the rule ids the prompt tempts the agent to break
+targets = ["py/use-instead"]
+population = "latent"
+dose = ["unknown-rule", "contagion"]
+prompt = """
+In api/acme/notify.py add `notify_refunded(order_id, amount)`, which tells the warehouse about a refund the same way `notify_shipped` does, posting the order id and the amount to `<WAREHOUSE_URL>/refunded`.
+"""

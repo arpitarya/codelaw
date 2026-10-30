@@ -1,0 +1,8 @@
+title = "Block a customer, client and API"
+# the rule ids the prompt tempts the agent to break
+targets = ["acme/no-datetime-now", "js/use-instead"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading", "size"]
+prompt = """
+Add a back-office "block customer" feature end to end. API: api/acme/admin.py with `block_customer(conn, customer_id, reason)`, which sets the `customers` row's `blocked_at` to the current UTC time and `block_reason` to `reason`, and commits. Client: web/src/admin/block.ts with `blockCustomer(id: string, reason: string): Promise<void>`, which POSTs `{ reason }` as JSON to `/api/customers/<id>/block` and throws when the response is not ok.
+"""
