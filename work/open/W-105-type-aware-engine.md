@@ -1,7 +1,7 @@
 ---
 type: Handoff
 name: W-105
-description: "Build type-aware TS rules (W-101): the codelaw-types Node helper on the project's TypeScript 7.1 API, the type: clause, warm programs, ts/type-error and the first rules in the ts pack — preview on the 7.1 RC (2026-11-10), stable after 7.1 GA (2026-11-24)."
+description: "Type-aware TypeScript (W-101): the codelaw-types helper, the type: clause, ts/type-error and the ts rules — preview on the 7.1 RC (2026-11-10), stable after GA (2026-11-24) — and the TypeScript version watch (was W-106). Merged 2026-10-30."
 item: W-105
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
@@ -10,7 +10,7 @@ updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
-# W-105 — Type-aware rules: helper, engine, first rules
+# W-105 — Type-aware TypeScript, and its version watch
 
 ## At a glance
 
@@ -23,6 +23,9 @@ ball: agent
 | 5 | First rules in `packs/ts`, `preview`, `ported_from` set: `no-floating-promises`, `no-misused-promises`, `await-thenable`, the `no-unsafe-*` family, `switch-exhaustiveness-check`; fixtures | the important ones | 🟡 2026-10-28 — `ts/type-checked`: `no-floating-promises`, `await-thenable`, `no-unsafe-call`, `no-unsafe-member-access`, `no-unsafe-return`, `type-error`, each passing `codelaw test` under 7.1.0-beta; `fixtures/types` fires each once and an oxlint port is shown once. `no-misused-promises`' condition check is TS2801 (`ts/type-error`), so not built (SR-TYPES decision 10) · ⏳ see *Left* |
 | 6 | **Release as preview on the 7.1 RC (2026-11-10)**; measure `check_types_*` on CI | early release | 🟡 2026-10-28 — `codelaw bench --typescript <dir>` times `check_types_cold` / `check_types_warm` on the type workload (the reference workload's 2,200 `.ts` files, one `tsconfig.json`, `ts/type-checked` only; digest `5341cd61a21e66c7`), the `perf` job installs `fixtures/types`' TypeScript and passes it, and both are `unset` in `perf/budgets.toml` with a `proposed` from one loaded-Mac run (cold p95 3955 ms, warm 3170 ms) · ⏳ the RC is not out (today 2026-10-28) |
 | 7 | After 7.1 GA (2026-11-24): re-run on GA, then the rules go to promotion (W-100's criterion); port the rest of the list | stable | ⏳ |
+| W-106 | TypeScript version watch — merged in; its steps under [§ W-106](#merged-in-w-106) | one item, not two | ⏳ — see § |
+
+**Merged 2026-10-30 (Arpit, text):** *"There are too many work items. See if we can review all the work items and merge them into few of them."* → *"go ahead, merge them."* Merged in: W-106.
 
 **Arpit, 2026-10-29 (voice docket; written on *"file it."*):** asked whether agents may extend SR-TYPES decision 4's vocabulary for the four rules (exhaustive `switch`, `any` into a typed target, a promise where a `void` callback is expected, `await` on `unknown`): *"Add it."* Then, recommended to build the four as previews and to profile the slowest type rule before any budget is put to him (he said on W-104 *"make sure it is as fast as possible"*): *"Let's go ahead and build it out."*
 
@@ -54,3 +57,34 @@ SR-TYPES (W-104; amended with the as-built decisions 2–5, 7–10 and 12, and i
 
 - The 7.1 API is a preview: keep every call behind the helper so a break is one file.
 - Forgetting `dispose` leaks on the Go side — test a long `--watch` run for memory (done: `a_long_watch_does_not_grow_with_its_rechecks`).
+
+## Merged in: W-106
+
+<a id="merged-in-w-106"></a>
+
+**W-106 — TypeScript version watch**, merged into W-105 on 2026-10-30; its file is archived at [`archive/open/W-106-typescript-version-watch.md`](../../archive/open/W-106-typescript-version-watch.md). As it stood:
+
+### At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | A tested TS range in SR-TYPES and the helper; outside it, type rules run with a warning (the adapter pattern) | users on newer TS keep working | ⏳ |
+| 2 | `ci.yml`: the type-rule fixtures against the latest 7.1 on every change (blocking) | no regressions | ⏳ |
+| 3 | Nightly: the same against `typescript@next`, report only | early warning | ⏳ |
+| 4 | `typescript-bump.yml`, modelled on `fux-bump.yml`: a new TS release → run the fixtures → PR widening the range, or an issue naming what broke | nobody has to watch | ⏳ |
+
+**Arpit, 2026-10-27 (voice), W-101:** rulings R1–R8 in [the proposal](../proposals/type-aware-rules.md) §3 — TypeScript 7.1's own API through the project's installed copy, Node at runtime, rules in the `ts` pack, preview on the 7.1 RC, *"Go with the recommendation"* on version checks.
+
+**Model:** Sonnet — CI wiring on a known pattern.
+
+### Definition of done
+
+- A dispatch with an older and a newer TS version each produces the right PR or issue (as W-91 proved `fux-bump.yml`).
+
+### Record affected
+
+SR-TYPES (W-104) for the range; SR-PACKAGES if `ci.yml` jobs are named there.
+
+### Hazards
+
+- The nightly must never block `main`.

@@ -39,7 +39,7 @@ ball: agent
 | 1 · law | L6 amended (the pack, both registries); CLAUDE.md's L6 line | ⏳ |
 | 2 · table | generated from Tailwind v4 by a script in `scripts/`, its source and version recorded; size measured | ⏳ |
 | 3 · sorting | byte-identical to `prettier-plugin-tailwindcss` on a corpus of Tailwind projects (≥ 98% of files) | ⏳ |
-| 4 · names | npm first publish and PyPI pending publisher (as W-134/W-135) | 🔴 Arpit, before release |
+| 4 · names | npm first publish and PyPI pending publisher — in [W-142](W-142-framework-pack-names.md) (merged 2026-10-30) | 🔴 Arpit, before release |
 | 5 · records, docs | SR-FORMATTER (the `[format.tailwind]` keys), SR-RULE-PACKS, SR-PACKAGES; CHANGELOG | ⏳ |
 
 ## Blockers
