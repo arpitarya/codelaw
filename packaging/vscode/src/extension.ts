@@ -1,6 +1,9 @@
 // The thin VS Code extension (SR-EDITOR decision 4): it finds a codelaw
 // binary, starts `codelaw lsp`, and adds commands and a status-bar item.
 // It holds no lint or format logic; every verdict comes from the server.
+// How a finding looks — badges, gutter glyphs, chips, the card's actions,
+// the sidebar, the counts — is drawn from the server's `data` (W-137,
+// SR-EDITOR decision 8; decorations.ts, sidebar.ts, status.ts, actions.ts).
 
 import * as fs from "node:fs";
 import { execFile, spawn } from "node:child_process";
@@ -8,6 +11,11 @@ import * as vscode from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions, State } from "vscode-languageclient/node";
 import { Found, Tried, traceBinary } from "./binary";
 import { fromClientLine, Level, LEVELS, parseLevel, renderDebugInfo, Ring } from "./logging";
+import { registerActions } from "./actions";
+import { decorateHover, Painter, restyle, settings, Store } from "./decorations";
+import { CardArgs } from "./findings";
+import { openManifests, Sidebar } from "./sidebar";
+import { Counts, Tabs } from "./status";
 
 const FIX_ALL = "source.fixAll.codelaw";
 const LANGUAGES = [
@@ -37,6 +45,8 @@ let status: vscode.StatusBarItem;
 let level: Level = "info";
 let tried: Tried[] = [];
 let serverVersion: string | undefined;
+const store = new Store();
+let painter: Painter | undefined;
 /** The last lines logged, for *Copy debug info*. */
 const recent = new Ring(200);
 /** The last lines the server wrote to stderr, for its exit report. */
@@ -127,6 +137,23 @@ async function start(context: vscode.ExtensionContext): Promise<void> {
     documentSelector: [...LANGUAGES.map((language) => ({ scheme: "file", language })), { scheme: "file", pattern: TEXT_CONFIG }],
     outputChannel: clientChannel(),
     initializationOptions: { logLevel: level },
+    middleware: {
+      // Keep each finding as published; a finding codelaw fixes on save,
+      // or one the baseline holds, loses its own squiggle for the
+      // extension's green or dotted grey line (decision 8).
+      handleDiagnostics: (uri, diagnostics, next) => {
+        store.set(uri, diagnostics);
+        next(uri, restyle(diagnostics));
+      },
+      provideHover: async (doc, pos, token, next) => {
+        const h = await next(doc, pos, token);
+        return h ? decorateHover(store, doc, pos, h) : h;
+      },
+      // The extension draws the server's badges itself, coloured.
+      provideInlayHints: () => [],
+      // A manifest's summary and bulk fixes: only while manifests show badges.
+      provideCodeLenses: (doc, token, next) => (settings().views.manifests === "badges" ? next(doc, token) : []),
+    },
     synchronize: {
       // `codelaw.logLevel` changes reach the server without a restart.
       configurationSection: "codelaw",
@@ -151,6 +178,20 @@ async function start(context: vscode.ExtensionContext): Promise<void> {
   status.text = "codelaw";
   status.tooltip = `${binary.path} (${binary.source})`;
   status.show();
+  // The workspace's manifests are always checked, so the sidebar lists
+  // their dependencies before one is opened.
+  void openManifests();
+}
+
+/** "latest" lines of a manifest: the server's inlay hints of kind `clean`. */
+async function cleanLines(doc: vscode.TextDocument): Promise<number[]> {
+  if (!client?.initializeResult?.capabilities.inlayHintProvider) return [];
+  const end = doc.lineAt(Math.max(doc.lineCount - 1, 0)).range.end;
+  const hints = (await client.sendRequest("textDocument/inlayHint", {
+    textDocument: { uri: doc.uri.toString() },
+    range: { start: { line: 0, character: 0 }, end: { line: end.line, character: end.character } },
+  })) as { position: { line: number }; data?: { kind?: string } }[] | null;
+  return (hints ?? []).filter((h) => h.data?.kind === "clean").map((h) => h.position.line);
 }
 
 function locateLookup(context: vscode.ExtensionContext) {
@@ -202,7 +243,9 @@ async function applyToActive(name: string, edits: (doc: vscode.TextDocument) => 
 }
 
 /** The rule under the cursor, or one typed in. */
-async function ruleToExplain(): Promise<string | undefined> {
+async function ruleToExplain(arg?: string | CardArgs): Promise<string | undefined> {
+  if (typeof arg === "string" && arg) return arg;
+  if (arg && typeof arg === "object" && arg.rule) return arg.rule;
   const editor = vscode.window.activeTextEditor;
   if (editor) {
     const at = editor.selection.active;
@@ -226,8 +269,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.commands.registerCommand("codelaw.format", () =>
       applyToActive("format", formatEdits, client?.initializeResult?.capabilities.documentFormattingProvider ? "codelaw: already formatted" : "codelaw: this codelaw does not format yet"),
     ),
-    vscode.commands.registerCommand("codelaw.explainRule", async () => {
-      const id = await ruleToExplain();
+    vscode.commands.registerCommand("codelaw.explainRule", async (arg?: string | CardArgs) => {
+      const id = await ruleToExplain(arg);
       if (!id) return;
       if (!binary) {
         log("error", `explain ${id}: there is no codelaw binary (see the candidates above)`);
@@ -248,7 +291,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.commands.registerCommand("codelaw.showOutput", () => output.show()),
     vscode.commands.registerCommand("codelaw.copyDebugInfo", async () => {
       const settings: Record<string, unknown> = {};
-      for (const k of ["enable", "path", "fixOnSave", "formatOnSave", "logLevel", "trace.server"]) settings[k] = config().get(k);
+      for (const k of ["enable", "path", "fixOnSave", "formatOnSave", "logLevel", "trace.server", "view.code", "view.manifests", "view.markers", "sidebar", "badges.clean"]) settings[k] = config().get(k);
       const text = renderDebugInfo({
         extension: String(context.extension.packageJSON.version),
         vscode: vscode.version,
@@ -281,7 +324,45 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       }
     }),
   );
+  activateLook(context);
   await start(context);
+}
+
+/** The look of W-137: decorations, the sidebar, the counts, the tabs, the card's actions. */
+function activateLook(context: vscode.ExtensionContext): void {
+  painter = new Painter(store, cleanLines);
+  const sidebar = new Sidebar(store);
+  const view = vscode.window.createTreeView("codelaw.findings", { treeDataProvider: sidebar, showCollapseAll: true });
+  sidebar.view = view;
+  const counts = new Counts(store);
+  const tabs = new Tabs(store);
+  const p = painter;
+  registerActions(context, () => binary?.path);
+  context.subscriptions.push(
+    store,
+    p,
+    view,
+    counts,
+    vscode.window.registerFileDecorationProvider(tabs),
+    store.onDidChange((uris) => {
+      p.paintUris(uris);
+      sidebar.refresh();
+      counts.update();
+      tabs.changed(uris);
+    }),
+    vscode.window.onDidChangeVisibleTextEditors(() => p.paintAll()),
+    vscode.workspace.onDidChangeTextDocument((e) => {
+      // A manifest's clean lines move with its text; the server's next
+      // publish repaints the rest.
+      if (e.contentChanges.length) p.forget(e.document.uri);
+    }),
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (["codelaw.view", "codelaw.badges", "codelaw.fixOnSave", "codelaw.sidebar"].some((k) => e.affectsConfiguration(k))) {
+        p.paintAll();
+        sidebar.refresh();
+      }
+    }),
+  );
 }
 
 export function deactivate(): Promise<void> {

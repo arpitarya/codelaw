@@ -2,7 +2,7 @@
 
 How the VS Code extension shows codelaw's findings, ruled by Arpit on
 2026-10-30 (Cowork) and built by
-[W-137](../../../work/open/W-137-editor-findings-look.md). **Build what this
+[W-137](../../../archive/open/W-137-editor-findings-look.md). **Build what this
 folder shows, and nothing it does not.** Where this README and an image
 disagree, this README wins; ask before resolving anything else.
 

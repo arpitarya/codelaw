@@ -95,7 +95,7 @@ pub fn kind_of(rule: &str, message: &str) -> &'static str {
         "deprecated"
     } else if has("engines") || has("runtime") || has("python-version") || has("node-version") {
         "runtime"
-    } else if has("flag") {
+    } else if has("flag-expir") {
         if m.contains("expired") { "flag-expired" } else { "flag" }
     } else if has("todo") || has("fixme") || (has("marker") && !has("flag")) {
         if m.contains(" expired") {

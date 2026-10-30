@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-137 closed: the editor's look  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement w-137 in parallel"* — *"Implement it and then close those out. Keep merging everything to main."*; W-137 as filed supersedes earlier drafts; the design of record is `docs/design/editor/`.
+- **Done:** 51551e7f42 — the server: `card.rs` (one `data` shape on every diagnostic, the hover card), `lens.rs` (inlay-hint badges, `latest` from the committed snapshot, a manifest's summary CodeLens, `codelaw.applyFixes` as one `workspace/applyEdit`). Then the extension: `findings.ts` (the mapping, unit-tested), `decorations.ts`, `sidebar.ts`, `status.ts`, `actions.ts`, the three view settings, 33 theme colours, the activity-bar icon (`vsix.py` packs `media/codelaw.svg`); SR-EDITOR decision 8, SR-PACKAGES decision 6; README with the design boards.
+- **Decided / left open:** a finding codelaw fixes on save, or one the baseline holds, becomes a hint so the extension's green or dotted line replaces its squiggle (it leaves the Problems panel); under `badges` the severity squiggle stays (the Problems panel keeps the finding); CodeLens on manifests only (board L over board D's code-file lens); flags are code (squiggles), not markers (board L); gutter glyphs carry fixed Dark+/Light+ colours (they are images); the sidebar lists open files plus the folders' manifests, opened unseen; "Ask agent" opens the editor's chat or copies the request. Not built, as ruled: the "Fix both" notification.
+- **Mistakes:** none landed; the shared target dir served another worktree's stale `codelaw-core` once (touch and rebuild).
+- **Next:** see it in a real VS Code window against the W-128/130/131/132 rules and take real screenshots for the README.
+
 ## 2026-10-30 — W-138 researched: every rule of nine linters, counted  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"Research work item 138, create a list … first have a count of all the rules for ESLint, Ruff, and all the linters … and then put a count."*
