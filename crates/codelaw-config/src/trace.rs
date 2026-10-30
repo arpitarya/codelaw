@@ -294,6 +294,26 @@ impl Config {
         grade!(deprecated, "error");
         grade!(yanked, "error");
         grade!(lockfile, "info");
+        grade!(critical, "error");
+        grade!(high, "error");
+        grade!(moderate, "warn");
+        grade!(low, "info");
+        macro_rules! agent {
+            ($g:ident) => {
+                let (v, s) = root_key(&["deps", "agent", stringify!($g)], |r| r.deps.agent.as_ref().and_then(|x| x.$g.as_ref()).map(|x| json!(x.0)), json!("inform"));
+                push(concat!("deps.agent.", stringify!($g)), v, s);
+            };
+        }
+        agent!(critical);
+        agent!(high);
+        agent!(moderate);
+        agent!(low);
+        let default_sources = json!([
+            { "name": "registry", "kind": "registry", "enabled": true },
+            { "name": "osv", "kind": "osv", "url": crate::raw::DEFAULT_OSV_URL, "enabled": true },
+        ]);
+        let (v, s) = root_key(&["deps", "advisory_sources"], |r| r.deps.advisory_sources.as_ref().and_then(|x| serde_json::to_value(x).ok()), default_sources);
+        push("deps.advisory_sources", v, s);
         let (v, s) = root_key(&["deps", "min_release_age"], |r| r.deps.min_release_age.map(|d| json!(d.0)), json!(0));
         push("deps.min_release_age", v, s);
         let (v, s) = root_key(&["deps", "prerelease"], |r| r.deps.prerelease.map(|x| json!(x)), json!(false));

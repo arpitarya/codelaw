@@ -149,6 +149,7 @@ fn presets(packs: &BTreeSet<&str>, languages: &BTreeSet<Language>) -> Vec<String
             "css-modules" => out.push("codelaw:css-modules/recommended".into()),
             "python" => out.push("codelaw:py/recommended".into()),
             "spell" => out.push("codelaw:spell/recommended".into()),
+            "deps" => out.push("codelaw:deps/recommended".into()),
             "data" => {
                 out.push("codelaw:data/recommended".into());
                 if languages.contains(&Language::Markdown) {
@@ -297,6 +298,10 @@ pub fn init(args: InitArgs) -> ExitCode {
     }
     let has_npm = package_json.is_some();
     let has_pypi = root.join("pyproject.toml").is_file();
+    // A manifest beside the config: its dependencies get the deps pack (W-128).
+    if has_npm || has_pypi {
+        wanted.insert("deps");
+    }
 
     // Which registry each pack comes from: `--registry`, else the one the
     // repo uses; a repo with both takes the Python pack from PyPI and the

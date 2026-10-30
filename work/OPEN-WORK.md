@@ -29,9 +29,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (21)
+## Open items (20)
 
-### build (18)
+### build (17)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -47,15 +47,13 @@ here. Read that record before changing anything below it.
 
 🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
 
-🟢 **W-128** `agent` The `deps` pack (nineteenth): `deps refresh` merges advisories from on/off sources (registry first, OSV), `deps/vulnerable` names the safe version, direct and transitive; agents told via MCP, hook (inform/block), `rules_for_path`, skills. Filed by Arpit (Cowork). [detail](open/W-128-deps-pack-and-vulnerabilities.md)
-
-🟡 **W-129** waits on **W-128** `agent` `deps/licence`, `deps/lockfile-sync`, `deps/version-drift`, `deps/runtime-agreement`. Filed by Arpit (Cowork). [detail](open/W-129-deps-hygiene-rules.md)
+🟢 **W-129** `agent` `deps/licence`, `deps/lockfile-sync`, `deps/version-drift`, `deps/runtime-agreement`. Filed by Arpit (Cowork). [detail](open/W-129-deps-hygiene-rules.md)
 
 🟢 **W-132** `agent` Complexity, nesting and React component limits; CODEOWNERS coverage. Filed by Arpit (Cowork). [detail](open/W-132-complexity-and-codeowners.md)
 
-🟡 **W-134** waits on **W-128** `arpit` PyPI pending trusted publishers for `codelaw-rules-deps` and its Fux index — Claude fills the form in Chrome, Arpit submits; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
+🟢 **W-134** `arpit` PyPI pending trusted publishers for `codelaw-rules-deps` and its Fux index — Claude fills the form in Chrome, Arpit submits; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
 
-🟡 **W-135** waits on **W-128** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
+🟢 **W-135** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
 
 🟢 **W-139** `agent` Ruled 10-30: build all — 1,690 ports + ESLint's 16 taste rules (opt-in) + Ruff's 39 framework rules as five PyPI packs = 1,745; tranche A on by default, the rest preview/opt-in. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
 

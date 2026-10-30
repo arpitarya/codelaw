@@ -7,7 +7,7 @@
       "commit": "d086db856be187255b8ec61ef409357393020f32",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE.txt",
-      "packs": ["python", "html", "data", "security-python", "security-html", "spell"]
+      "packs": ["python", "html", "data", "security-python", "security-html", "spell", "deps"]
     },
     {
       "name": "httpx",
@@ -15,7 +15,7 @@
       "commit": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
       "licence": "BSD-3-Clause",
       "licence_file": "LICENSE.md",
-      "packs": ["python", "css", "data", "spell"]
+      "packs": ["python", "css", "data", "spell", "deps"]
     },
     {
       "name": "starlette",
@@ -39,7 +39,7 @@
       "commit": "382d29c485e67018c06e75ec7235130d0968522c",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "data", "ts", "react", "node", "spell"]
+      "packs": ["js", "data", "ts", "react", "node", "spell", "deps"]
     },
     {
       "name": "jotai",
@@ -55,7 +55,7 @@
       "commit": "b1125d8839482cb7bbae603ddc6d0081bf87532e",
       "licence": "MIT",
       "licence_file": "LICENSE",
-      "packs": ["js", "python", "data", "ts", "react", "node", "tanstack-query", "security-python", "security-js", "security-ts", "spell"]
+      "packs": ["js", "python", "data", "ts", "react", "node", "tanstack-query", "security-python", "security-js", "security-ts", "spell", "deps"]
     },
     {
       "name": "html5-boilerplate",

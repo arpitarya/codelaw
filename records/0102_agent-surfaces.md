@@ -29,7 +29,7 @@ content_sha: ""
 | Kind | Job | Examples | Can it block? |
 |---|---|---|---|
 | **Instruct** | Tell the agent the rules before it writes | AGENTS.md, CLAUDE.md, Kiro steering, Copilot instructions, skills | Never |
-| **Query** | Let the agent ask for exactly the rules it needs | MCP server: `rules_for_path`, `brief_for_task`, `check_snippet`, `explain_rule` | Never |
+| **Query** | Let the agent ask for exactly the rules it needs | MCP server: `rules_for_path` (with the vulnerable or major-behind packages a file brings in, W-128), `brief_for_task`, `check_snippet`, `explain_rule`, `check_dependency` (W-128) | Never |
 | **Gate** | Refuse a write before it reaches disk | Pre-write hooks running `codelaw hook --pre` (decision 9) | Yes, only for an `error` the write adds — and never when codelaw itself fails: it fails open |
 | **Enforce** | Check and fix after the agent writes | Post-edit hooks running `codelaw hook` | Yes. Every engine rule is an exact match ([L5](0007_LAW-5-no-model-in-the-engine.md)), so a block is never a guess |
 
@@ -146,6 +146,7 @@ Each agent reads a different set of files from a different place. Maintaining th
   - **It never loads a cold type program** ([L8](0010_LAW-8-performance-budgets.md) decision 8; W-105): `hook` and `hook --pre` run the type rules ([SR-TYPES](0117_types.md)) only through a helper a warm process in the same run already holds, and otherwise skip them with a note.
   - **It judges with the `ci` profile** ([SR-CONFIG](0110_config.md) decision 10) whether or not `CI` is set, so an agent never leaves behind what CI would fail; `--profile <name>` or `CODELAW_PROFILE` picks another.
   - Nothing left: exit `0`, with the auto-fix notes on stdout. An error or warning left: exit `2`, with the fixes applied and up to 20 findings, each with its next step (a `suggest` diff to show, or the `manual` steps), on stderr. Exit 2 with stderr is how Claude Code and Codex hand a `PostToolUse` result back to the agent. A config or rule error is also exit `2`, as `error: …`.
+  - **Dependencies** (W-128): an edited lockfile (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `uv.lock`, `poetry.lock`) brings the manifest beside it into the run, so a vulnerable version is told in the `deps/vulnerable` message's words — the package, the version, the advisory and its severity, the version to change it to and the install to run. `[deps] agent` sets, per advisory severity, what the hooks do with it: `inform` (the default) — the post-edit hook reports it like any finding, and the Gate never refuses a write on its account (it rides along as context); `block` — the Gate refuses a write that adds it, and the post-edit hook ends with a line saying so and goes back to the agent, until the version is changed or a dated `[deps] ignore` holds it. It never changes `check`'s, CI's or `--format` output's severity ([SR-RULE-PACKS](0101_rule-packs.md) decision 15).
 - **`codelaw hook --pre`** is the same command's pre-write mode, the Gate of decision 9.
 
 #### 7. What `sync-agents` writes, file by file
@@ -240,7 +241,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 
 | Pri | Skill | Fires on (trigger summary) | What it does | Writes files? |
 |---|---|---|---|---|
-| **P1** | `codelaw-write` | Any create or edit of a JS/TS/Python/JSON/YAML/TOML/Markdown/CSS/HTML file in a repo with `codelaw.toml` | Calls `rules_for_path` first, writes code that complies, runs `codelaw check` on the changed files, and handles what comes back by fix class | Code only |
+| **P1** | `codelaw-write` | Any create or edit of a JS/TS/Python/JSON/YAML/TOML/Markdown/CSS/HTML file in a repo with `codelaw.toml` | Calls `rules_for_path` first, writes code that complies, runs `codelaw check` on the changed files, and handles what comes back by fix class | Code only; before adding or upgrading a dependency it calls `check_dependency` and uses the version it gives (W-128) |
 | **P1** | `codelaw-fix` | "fix lint errors", "codelaw is failing", a hook or CI reported violations | `codelaw fix`; shows `suggest` diffs and applies them on accept; works through `manual` steps (including writing the test `graph/untested-function` and `graph/function-coverage` ask for, and asking before any `.codelawignore` line); re-checks until clean | Code only |
 | **P1** | `codelaw-explain` | "why did this fire", "what does rule X want", "is this allowed" | `explain_rule` + the Do/Don't examples + which preset or pack enabled it (`rules --why`) | No |
 | **P1** | `codelaw-author-rule` | "make a rule that…", "enforce X", "we always do Y" | Turns a convention into a rule file:<br>1. Inspects the syntax tree of a real example.<br>2. Writes the matcher.<br>3. Picks the fix class ([L4](0006_LAW-4-every-rule-has-a-fix.md)).<br>4. Writes Do/Don't for every declared language ([L3](0005_LAW-3-languages.md)).<br>5. Runs `codelaw test` until green. | `.codelaw/rules/` |
@@ -277,6 +278,7 @@ Each agent reads a different set of files from a different place. Maintaining th
 - **The Cursor and Gemini CLI rows wait for their paths to be verified.**
 - **The Cowork plugin path and the Kiro hook schema (decision 7) are the least verified rows;** the veto check covers them first.
 - **The Gate refuses only what it can rebuild exactly** (decision 9): a write it cannot rebuild, and every shell write, reaches disk and meets the post-write hook. The Copilot, Kiro and Cursor pre-write payloads were unconfirmed on 2026-10-27, so their answers are built from the docs and `sync-agents` writes no pre-write hook for Copilot or Kiro until a fixture of each is captured.
+- **The always-on block, `codelaw-write` and `codelaw-fix` tell an agent to check a dependency before adding it** (W-128): MCP `check_dependency` or `codelaw deps check`, then the version it gives; `codelaw-fix` says how to act on `deps/vulnerable` — the edit or the override, the install the message names, never a lockfile edit, a dated ignore when no version is clean.
 - **Copilot ignores a `postToolUse` hook's output,** so on Copilot the hook applies `auto` fixes but cannot hand findings back; the always-on block's "run `codelaw check`" carries that.
 - **Evals cost CI time for each agent.**
 - **A consumer that runs `sync-agents` or `init --agents` installs one more package** (decision 8), and upgrades it with codelaw; a mismatch is refused, never silently served.

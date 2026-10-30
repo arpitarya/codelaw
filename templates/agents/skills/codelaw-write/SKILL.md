@@ -26,6 +26,21 @@ the most precise statement of what the rule wants.
 Do not inline the whole rule set into your plan; ask per path, and only open
 the detail you need.
 
+### Adding or upgrading a dependency
+
+Before you add a package to `package.json` or `pyproject.toml`, or change its
+version, ask codelaw about it — offline, from the committed snapshot:
+
+- **MCP:** `check_dependency` with `{"ecosystem": "npm" | "pypi", "name": "<package>", "version": "<the version you would use>"}`.
+- **CLI:** `codelaw deps check <npm|pypi> <package> [version] --format json`.
+
+When it says `vulnerable`, use its `target` — the lowest version every advisory
+leaves clean — instead; when `target` is null, tell the user and do not add it.
+Never run an install to find out: codelaw never runs installers, and neither do
+you until the version is settled. `rules_for_path` on a manifest, or on a file
+that imports a package, also lists the packages it brings in that are vulnerable
+or a major version behind, under `dependencies`.
+
 ## 2. Write code that complies
 
 Write the change so that it already follows every rule on the cards. When a

@@ -160,7 +160,7 @@ fn fresh(name: &str) -> PathBuf {
     fs::write(dir.join("package.json"), "{\"name\": \"x\"}\n").unwrap();
     fs::write(dir.join("docs/notes.md"), "# Notes\n\nWe deploy the service with kubectl and the frobnicator each morning before lunch.\nThe servise answers every request from the client before noon.\n").unwrap();
     #[cfg(unix)]
-    for pack in ["data", "spell"] {
+    for pack in ["data", "deps", "spell"] {
         std::os::unix::fs::symlink(root.join("packs").join(pack), dir.join("node_modules/@codelaw").join(format!("rules-{pack}"))).unwrap();
     }
     dir
@@ -175,7 +175,7 @@ fn init_adds_the_spell_pack_and_fills_the_words_file() {
     assert_eq!(code, 0, "{out}");
     let config = fs::read_to_string(a.join("codelaw.toml")).unwrap();
     assert!(config.contains("\"codelaw:spell/recommended\""), "{config}");
-    assert!(out.contains("npm install -D @codelaw/rules-data @codelaw/rules-spell"), "{out}");
+    assert!(out.contains("npm install -D @codelaw/rules-data @codelaw/rules-deps @codelaw/rules-spell"), "{out}");
     let words = fs::read_to_string(a.join(".codelaw/spell/words.txt")).unwrap();
     // `codelaw` is from the rules folder's README, which init wrote.
     assert_eq!(words, format!("{TEMPLATE}codelaw\nfrobnicator\nkubectl\n"), "the template, then the learned words, sorted");

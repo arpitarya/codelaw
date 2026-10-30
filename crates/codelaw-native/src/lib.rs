@@ -715,6 +715,8 @@ static REGISTRY: &[&dyn NativeRule] = &[
     &codeowners::CodeownersCoverage,
     &deps::OutdatedDependency,
     &deps::StaleDepsSnapshot,
+    &deps::Vulnerable,
+    &deps::IncompleteScan,
     &data_toml::NoDuplicateKeys,
     &data_toml::PyprojectRequiresPython,
     &typescript::NoDuplicateEnumValues,

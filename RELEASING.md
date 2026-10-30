@@ -153,7 +153,7 @@ SR-PACKAGES decision 6: `codelaw.codelaw-vscode` ships as eight platform `.vsix`
    listed at the end and the script exits 1.
    ([W-85](archive/open/W-85-npm-first-publish.md).)
 1. **Bump:** `python3 scripts/version.py --set 0.2.0` — Cargo.toml, Cargo.lock
-   and the eighteen pack manifests; every npm and PyPI manifest is generated from
+   and the nineteen pack manifests; every npm and PyPI manifest is generated from
    it — the skills package's and its `codelaw-skills.json` too (W-77). Commit and push to `main`.
 2. **Wait for `ci.yml` to go green on that commit, on `main`.** `publish.yml`
    refuses anything else.

@@ -80,10 +80,10 @@ fn init_writes_config_rules_folder_and_gitignore() {
     assert_eq!(code, 0, "{out}{err}");
     let config = fs::read_to_string(d.join("codelaw.toml")).unwrap();
     assert!(
-        config.contains(r#"extends = ["codelaw:data/recommended", "codelaw:js/recommended", "codelaw:js/typescript", "codelaw:py/recommended", "codelaw:react/recommended", "codelaw:spell/recommended", "codelaw:ts/recommended"]"#),
+        config.contains(r#"extends = ["codelaw:data/recommended", "codelaw:deps/recommended", "codelaw:js/recommended", "codelaw:js/typescript", "codelaw:py/recommended", "codelaw:react/recommended", "codelaw:spell/recommended", "codelaw:ts/recommended"]"#),
         "{config}"
     );
-    assert!(out.contains("pnpm add -D @codelaw/rules-data @codelaw/rules-js @codelaw/rules-react @codelaw/rules-spell @codelaw/rules-ts"), "{out}");
+    assert!(out.contains("pnpm add -D @codelaw/rules-data @codelaw/rules-deps @codelaw/rules-js @codelaw/rules-react @codelaw/rules-spell @codelaw/rules-ts"), "{out}");
     assert!(out.contains("uv add --dev codelaw-rules-python"), "{out}");
     assert_eq!(fs::read_to_string(d.join(".gitignore")).unwrap(), "dist/\n.codelaw/cache/\n");
     assert!(d.join(".codelaw/rules/README.md").is_file());
@@ -95,7 +95,7 @@ fn init_writes_config_rules_folder_and_gitignore() {
     // the npm-only TypeScript pack, saying so (L6 decision 11).
     fs::remove_file(d.join("codelaw.toml")).unwrap();
     let (_, out, _) = codelaw(&d, &["init", "--no-install", "--registry", "pypi"]);
-    assert!(out.contains("uv add --dev codelaw-rules-data codelaw-rules-js codelaw-rules-python codelaw-rules-react codelaw-rules-spell"), "{out}");
+    assert!(out.contains("uv add --dev codelaw-rules-data codelaw-rules-deps codelaw-rules-js codelaw-rules-python codelaw-rules-react codelaw-rules-spell"), "{out}");
     assert!(out.contains("note: @codelaw/rules-ts is published on npm only"), "{out}");
     let config = fs::read_to_string(d.join("codelaw.toml")).unwrap();
     assert!(!config.contains("codelaw:ts/"), "{config}");
@@ -357,6 +357,7 @@ fn init_agents_writes_the_layout_and_sync_keeps_it() {
     copy_dir(&packs.join("ts"), &d.join("node_modules/@codelaw/rules-ts"));
     copy_dir(&packs.join("data"), &d.join("node_modules/@codelaw/rules-data"));
     copy_dir(&packs.join("spell"), &d.join("node_modules/@codelaw/rules-spell"));
+    copy_dir(&packs.join("deps"), &d.join("node_modules/@codelaw/rules-deps"));
     // And the skills package beside them (W-77): the agent files are in it.
     skills_package(&d.join("node_modules/@codelaw/skills"), env!("CARGO_PKG_VERSION"));
     let before = tree(&d);

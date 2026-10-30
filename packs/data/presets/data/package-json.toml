@@ -1,8 +1,6 @@
 description = "Starter rules for package.json"
 
 [rules]
-"data/outdated-dependency" = "warn"
-"data/stale-deps-snapshot" = "info"
 "json/package-deps-sorted" = "warn"
 "json/package-engines" = "warn"
 "json/package-json-schema" = "error"

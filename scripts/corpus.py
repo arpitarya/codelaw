@@ -46,7 +46,7 @@ for _s in (sys.stdout, sys.stderr):
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "scripts" / "corpus.json"
-PACKS = ("css", "data", "html", "js", "node", "python", "react", "scss", "security-html", "security-js", "security-python", "security-ts", "spell", "stencil", "tanstack-query", "ts")  # FIRST_PARTY_PACKS since W-31; spell since W-103; tanstack-query since W-42; the security packs since W-53; scss since W-62 (css-modules waits on W-63)
+PACKS = ("css", "data", "deps", "html", "js", "node", "python", "react", "scss", "security-html", "security-js", "security-python", "security-ts", "spell", "stencil", "tanstack-query", "ts")  # FIRST_PARTY_PACKS since W-31; spell since W-103; deps since W-128; tanstack-query since W-42; the security packs since W-53; scss since W-62 (css-modules waits on W-63)
 
 # Each allowed licence (a subset of SR-LAW-2 decision 2's list) and phrases its
 # licence text must carry, all of them, whitespace-normalised.

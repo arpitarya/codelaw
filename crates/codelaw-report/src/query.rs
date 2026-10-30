@@ -43,6 +43,17 @@ pub fn rules_json(rows: &[RuleRow], for_file: Option<&str>) -> Value {
     envelope(json!({ "for": for_file, "rules": rules }))
 }
 
+/// `rules_json` with the packages the file brings in that are vulnerable
+/// or a major version behind (`Project::dependency_notes`, W-128): under
+/// `dependencies`, only when there are some, so every other answer keeps
+/// its bytes.
+pub fn with_dependencies(mut v: Value, notes: Vec<Value>) -> Value {
+    if !notes.is_empty() {
+        v["dependencies"] = Value::Array(notes);
+    }
+    v
+}
+
 /// `rules [--for <file>]` as text: one line per rule; a security rule's
 /// line names its CWE ids.
 pub fn rules_text(rows: &[RuleRow]) -> String {

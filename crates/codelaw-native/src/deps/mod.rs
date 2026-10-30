@@ -1,18 +1,23 @@
-//! Dependencies and their latest versions (SR-RULE-PACKS decision 15).
+//! The `deps` pack's rules (SR-RULE-PACKS decision 15): dependencies,
+//! their latest versions and their advisories.
 //!
 //! The manifests (`package.json`, `pyproject.toml`), their lockfiles, the
-//! committed registry snapshot and the version arithmetic. The rules
-//! `data/outdated-dependency` and `data/stale-deps-snapshot` read only
-//! files; `codelaw deps refresh` — outside the engine — is the one command
-//! that reads a registry and writes the snapshot (L5 decision 3).
+//! committed snapshot of registry and advisory facts, and the version
+//! arithmetic. `deps/vulnerable`, `deps/incomplete-scan`, `deps/outdated`
+//! and `deps/stale-snapshot` read only files; `codelaw deps refresh` —
+//! outside the engine — is the one command that reads the network and
+//! writes the snapshot (L5 decision 3).
 
+pub mod advisory;
 pub mod lock;
 pub mod npm;
 pub mod pep440;
 mod rules;
+mod vulnerable;
 pub mod snapshot;
 
 pub use rules::{OutdatedDependency, StaleDepsSnapshot};
+pub use vulnerable::{Assessment, IncompleteScan, Vulnerable, assess, check_dependency};
 
 use crate::data_json::{pairs, string_value, top_object};
 use crate::data_toml::{key_node, key_path, pair_value, string_text};

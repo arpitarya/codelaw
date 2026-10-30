@@ -1,5 +1,5 @@
 ---
-id: data/outdated-dependency
+id: deps/outdated
 title: "Dependencies are on their latest version"
 languages: [json, toml]
 files: ["**/package.json", "**/pyproject.toml"]
@@ -27,7 +27,7 @@ The fix moves the range's version to the latest and keeps its operator: `^`, `~`
 **Why:** A dependency left behind stops getting fixes and security patches, and the jump grows with every release; a deprecated or yanked version was withdrawn by its own maintainers.
 
 ```codelaw
-native: data/outdated-dependency
+native: deps/outdated
 ```
 
 ## How to fix

@@ -22,7 +22,7 @@ pub use brief::{Brief, brief, brief_json, brief_text};
 pub use hook::{HOOK_FINDINGS, hook_blocks, hook_text};
 
 pub use query::{
-    explain_engine_json, explain_engine_text, explain_json, explain_text, fix_skill, rules_json, rules_text, security_coverage_json, security_coverage_text,
+    explain_engine_json, explain_engine_text, explain_json, explain_text, fix_skill, rules_json, rules_text, with_dependencies, security_coverage_json, security_coverage_text,
     security_json, snippet_fix_json, tree_json, tree_text, why_json, why_text,
 };
 

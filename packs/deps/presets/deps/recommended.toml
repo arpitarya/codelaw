@@ -1,0 +1,7 @@
+description = "Vulnerable and outdated dependencies of package.json and pyproject.toml, from the committed snapshot `codelaw deps refresh` writes"
+
+[rules]
+"deps/incomplete-scan" = "warn"
+"deps/outdated" = "warn"
+"deps/stale-snapshot" = "info"
+"deps/vulnerable" = "error"

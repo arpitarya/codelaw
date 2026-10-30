@@ -235,11 +235,53 @@ fn order_scopes(raw: &mut RawConfig, home: Home, text: &str) {
     }
 }
 
+/// Rule ids a release renamed, and the id each is now: a config naming the
+/// old one still loads, its setting applied to the new id, with a warning
+/// that names the rename (SR-CONFIG decision 5). Kept for one minor
+/// release after the rename, like a renamed key (W-128: the `deps` pack).
+pub const RENAMED_RULES: &[(&str, &str, &str)] = &[
+    ("data/outdated-dependency", "deps/outdated", "the `deps` pack"),
+    ("data/stale-deps-snapshot", "deps/stale-snapshot", "the `deps` pack"),
+];
+
+/// Move each renamed rule id in one rule table to its new id; the names
+/// moved.
+fn rename_rules(rules: &mut BTreeMap<String, RuleSetting>, moved: &mut BTreeSet<&'static str>) {
+    for (old, new, _) in RENAMED_RULES {
+        if let Some(s) = rules.remove(*old) {
+            rules.entry((*new).to_owned()).or_insert(s);
+            moved.insert(old);
+        }
+    }
+}
+
+fn rename_all_rules(raw: &mut RawConfig) -> BTreeSet<&'static str> {
+    let mut moved = BTreeSet::new();
+    rename_rules(&mut raw.rules, &mut moved);
+    for (_, s) in raw.scope.0.iter_mut() {
+        rename_rules(&mut s.rules, &mut moved);
+    }
+    for o in raw.overrides.iter_mut() {
+        rename_rules(&mut o.rules, &mut moved);
+    }
+    for p in raw.profile.values_mut().chain(raw.profiles.values_mut()) {
+        rename_rules(&mut p.rules, &mut moved);
+        for (_, s) in p.scope.0.iter_mut() {
+            rename_rules(&mut s.rules, &mut moved);
+        }
+        for o in p.overrides.iter_mut() {
+            rename_rules(&mut o.rules, &mut moved);
+        }
+    }
+    moved
+}
+
 impl ConfigFile {
     fn new(path: PathBuf, home: Home, raw: RawConfig, text: String) -> Result<ConfigFile, ConfigError> {
         let dir = path.parent().map(Path::to_path_buf).unwrap_or_default();
         let mut raw = raw;
         order_scopes(&mut raw, home, &text);
+        let renamed = rename_all_rules(&mut raw);
         if let Some(langs) = &raw.languages {
             for name in langs {
                 if Language::from_name(name).is_none() {
@@ -303,6 +345,9 @@ impl ConfigFile {
         if !alias_profiles.is_empty() {
             deprecations.push(format!("{at}: `[profiles.<name>]` is deprecated and goes in the next minor release; write `[profile.<name>]`"));
         }
+        for (old, new, home) in RENAMED_RULES.iter().filter(|(o, _, _)| renamed.contains(o)) {
+            deprecations.push(format!("{at}: rule `{old}` is now `{new}`, in {home}; rename it in the config (it runs as `{new}` until the next minor release)"));
+        }
         for e in raw.deps.ignore.iter().flatten() {
             let p = e.package();
             let named = p.strip_prefix("npm:").or_else(|| p.strip_prefix("pypi:")).is_some_and(|n| !n.is_empty());
@@ -313,6 +358,25 @@ impl ConfigFile {
                 && let Some(x) = d.expires.as_deref().filter(|x| !is_date(x))
             {
                 return Err(ConfigError::new(Some(path), format!("`[deps] ignore`: `expires = \"{x}\"` is not a date; write it as YYYY-MM-DD")));
+            }
+        }
+        let mut source_names = BTreeSet::new();
+        for s in raw.deps.advisory_sources.iter().flatten() {
+            if !crate::raw::ADVISORY_KINDS.contains(&s.kind.as_str()) {
+                return Err(ConfigError::new(
+                    Some(path),
+                    format!("`[deps] advisory_sources`: `{}` has kind `{}`, which is not one of {}", s.name, s.kind, crate::raw::ADVISORY_KINDS.iter().map(|k| format!("`{k}`")).collect::<Vec<_>>().join(", ")),
+                ));
+            }
+            if s.name.is_empty() || !source_names.insert(s.name.clone()) {
+                return Err(ConfigError::new(Some(path), format!("`[deps] advisory_sources`: the name `{}` is empty or used twice; give each source its own name", s.name)));
+            }
+            let wrong = match s.kind.as_str() {
+                "osv" => s.npm_url.as_ref().map(|_| "npm_url").or(s.pypi_url.as_ref().map(|_| "pypi_url")),
+                _ => s.url.as_ref().map(|_| "url"),
+            };
+            if let Some(k) = wrong {
+                return Err(ConfigError::new(Some(path), format!("`[deps] advisory_sources`: `{}` is a `{}` source, which takes no `{k}`", s.name, s.kind)));
             }
         }
         if let Some(a) = raw.lint.ignore_aliases.iter().flatten().find(|a| !crate::raw::IGNORE_ALIASES.contains(&a.as_str())) {

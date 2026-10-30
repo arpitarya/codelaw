@@ -54,11 +54,12 @@ const fn pypi_only(short: &'static str, pypi: &'static str) -> FirstPartyPack {
     FirstPartyPack { short, manifest: pypi, npm: None, pypi: Some(pypi) }
 }
 
-/// The eighteen first-party packs: sixteen on npm, eleven on PyPI (the
+/// The nineteen first-party packs: seventeen on npm, twelve on PyPI (the
 /// decider's rulings of 2026-10-24: W-31's split, and W-32's two npm-only
 /// library packs; of 2026-10-25, W-53's four security packs; of
 /// 2026-10-26, W-62's `scss` pack on both registries and W-63's npm-only
-/// `css-modules` pack; and of 2026-10-27, W-103's `spell` pack on both).
+/// `css-modules` pack; of 2026-10-27, W-103's `spell` pack on both; and of
+/// 2026-10-29, W-128's `deps` pack on both).
 /// `scripts/package.py` reads this table, so it is the one list of what is
 /// published where.
 pub const FIRST_PARTY_PACKS: &[FirstPartyPack] = &[
@@ -80,12 +81,13 @@ pub const FIRST_PARTY_PACKS: &[FirstPartyPack] = &[
     both("security-html", "@codelaw/rules-security-html", "codelaw-rules-security-html"),
     pypi_only("security-python", "codelaw-rules-security-python"),
     both("spell", "@codelaw/rules-spell", "codelaw-rules-spell"),
+    both("deps", "@codelaw/rules-deps", "codelaw-rules-deps"),
 ];
 
 /// Every namespace a first-party pack owns, in [`namespace_pack`]'s order.
 pub const FIRST_PARTY_NAMESPACES: &[&str] = &[
     "js", "ts", "react", "node", "stencil", "html", "css", "scss", "css-modules", "py", "data", "md", "json", "yaml", "toml", "tanstack-query", "redux-toolkit",
-    "sec-js", "sec-ts", "sec-html", "sec-py", "spell",
+    "sec-js", "sec-ts", "sec-html", "sec-py", "spell", "deps",
 ];
 
 /// The fixed namespace-to-pack map (decision 4).
@@ -109,6 +111,7 @@ pub fn namespace_pack(namespace: &str) -> Option<&'static str> {
         "sec-html" => "security-html",
         "sec-py" => "security-python",
         "spell" => "spell",
+        "deps" => "deps",
         _ => return None,
     })
 }
@@ -578,17 +581,17 @@ mod tests {
     }
 
     #[test]
-    fn sixteen_packs_on_npm_and_eleven_on_pypi() {
-        // The decider's rulings of 2026-10-24 to 2026-10-27 (L6 decision 11;
-        // W-31, W-32, W-53, W-62, W-63, W-103).
+    fn seventeen_packs_on_npm_and_twelve_on_pypi() {
+        // The decider's rulings of 2026-10-24 to 2026-10-29 (L6 decision 11;
+        // W-31, W-32, W-53, W-62, W-63, W-103, W-128).
         let npm: Vec<&str> = FIRST_PARTY_PACKS.iter().filter(|p| p.npm.is_some()).map(|p| p.short).collect();
         let pypi: Vec<&str> = FIRST_PARTY_PACKS.iter().filter(|p| p.pypi.is_some()).map(|p| p.short).collect();
-        assert_eq!(FIRST_PARTY_PACKS.len(), 18);
+        assert_eq!(FIRST_PARTY_PACKS.len(), 19);
         assert_eq!(
             npm,
-            ["js", "ts", "react", "node", "stencil", "html", "css", "scss", "css-modules", "data", "tanstack-query", "redux-toolkit", "security-js", "security-ts", "security-html", "spell"]
+            ["js", "ts", "react", "node", "stencil", "html", "css", "scss", "css-modules", "data", "tanstack-query", "redux-toolkit", "security-js", "security-ts", "security-html", "spell", "deps"]
         );
-        assert_eq!(pypi, ["js", "react", "html", "css", "scss", "python", "data", "security-js", "security-html", "security-python", "spell"]);
+        assert_eq!(pypi, ["js", "react", "html", "css", "scss", "python", "data", "security-js", "security-html", "security-python", "spell", "deps"]);
         for p in FIRST_PARTY_PACKS {
             assert_eq!(Some(p.manifest), p.npm.or(p.pypi), "{}", p.short);
             if let Some(n) = p.npm {

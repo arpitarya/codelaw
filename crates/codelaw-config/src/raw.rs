@@ -448,6 +448,72 @@ pub struct RawDeps {
     pub ignore: Option<Vec<RawDepsIgnore>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_snapshot_age: Option<Days>,
+    /// The advisory sources `deps refresh` reads and merges, each on or
+    /// off (W-128); unset, `registry` then `osv`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub advisory_sources: Option<Vec<RawAdvisorySource>>,
+    /// What an agent's hook does with a vulnerable dependency, per
+    /// advisory severity: `inform` (the default) or `block`. Never changes
+    /// a CI verdict.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agent: Option<RawDepsAgent>,
+}
+
+/// The kinds of advisory source: the wire shape a source speaks.
+pub const ADVISORY_KINDS: &[&str] = &["registry", "osv"];
+
+/// The advisory sources when `[deps] advisory_sources` is not set.
+pub const DEFAULT_OSV_URL: &str = "https://api.osv.dev";
+
+/// One `[deps] advisory_sources` entry.
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawAdvisorySource {
+    pub name: String,
+    pub kind: String,
+    /// `osv`: the API's base URL (`https://api.osv.dev` when unset).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    /// `registry`: the npm registry to ask instead of the one `.npmrc` names.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub npm_url: Option<String>,
+    /// `registry`: the Python index to ask instead of the one the project resolves.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pypi_url: Option<String>,
+    #[serde(default = "yes")]
+    pub enabled: bool,
+}
+
+fn yes() -> bool {
+    true
+}
+
+/// `[deps] agent`: `inform` or `block`, per advisory severity.
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct RawDepsAgent {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub critical: Option<AgentAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub high: Option<AgentAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moderate: Option<AgentAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub low: Option<AgentAction>,
+}
+
+/// `inform` or `block`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct AgentAction(pub String);
+
+impl<'de> Deserialize<'de> for AgentAction {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(d)?;
+        if matches!(s.as_str(), "inform" | "block") {
+            return Ok(AgentAction(s));
+        }
+        Err(serde::de::Error::custom(format!("invalid agent action `{s}` (one of inform, block)")))
+    }
 }
 
 /// `[deps] severity`: a severity, or `off`, per kind of finding.
@@ -466,6 +532,15 @@ pub struct RawDepsSeverity {
     pub yanked: Option<GradeSeverity>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lockfile: Option<GradeSeverity>,
+    /// `deps/vulnerable`, by the advisory's severity (W-128).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub critical: Option<GradeSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub high: Option<GradeSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moderate: Option<GradeSeverity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub low: Option<GradeSeverity>,
 }
 
 /// `error`, `warn`, `info` or `off`.
@@ -494,6 +569,9 @@ pub enum RawDepsIgnore {
 #[serde(deny_unknown_fields)]
 pub struct RawDatedIgnore {
     pub package: String,
+    /// Only this advisory (an id or an alias) of the package (W-128).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub advisory: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

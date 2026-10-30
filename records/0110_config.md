@@ -58,7 +58,7 @@ remap = { error = "warn" }
 [fix]      # SR-ARCHITECTURE  [markdown] # SR-CONFIG (its one key is L3's)
 [deprecation] # SR-BASELINE (the policy of a symbol marked deprecated in code)
 [exceptions]  # SR-BASELINE (dated exceptions: require_expiry, warn_days)
-[deps]        # SR-RULE-PACKS (the dependency rules and their snapshot)
+[deps]        # SR-RULE-PACKS (the deps pack: its rules, snapshot, advisory sources and agent setting)
 [css]         # SR-PROJECT-GRAPH (CSS Modules: which stylesheets, and the bundler's class-name mapping)
 [coverage]    # SR-PROJECT-GRAPH (the test rules of new code; [coverage.ignore] is SR-BASELINE's)
 [spell]       # SR-SPELL (the spell pack's locale, accepted words and words file)
@@ -145,6 +145,7 @@ Configuration keys were scattered across six records. The decider asked for one 
    Rule sources resolve as in [SR-RULE-PACKS](0101_rule-packs.md) decision 14.
 5. **Validation is strict.**
    - An unknown key, a wrong type or an unknown rule id stops the run with exit 2, naming the file, the key and the nearest valid key ("did you mean `line_width`?").
+   - **A renamed rule id is not unknown for one minor release** (W-128): `RENAMED_RULES` in `crates/codelaw-config` maps it to its new id — today `data/outdated-dependency` → `deps/outdated` and `data/stale-deps-snapshot` → `deps/stale-snapshot` — in `[rules]`, every scope and every profile; the setting applies to the new id, and a warning names the file, both ids and the pack the rule is now in.
    - `requires = ">=0.4"` refuses to run with an older codelaw.
 6. **The schema ships with codelaw.** `codelaw.schema.json` is in the npm package and available as `codelaw config --schema`, so TOML and JSON editors offer completion and validation.
 7. **Traceable.** `codelaw config --print [--for <file>]` prints the resolved configuration for a file, with the source of each value (default, `.editorconfig`, file:line, scope name, env or flag); `codelaw config --scopes` lists every scope with its files and source, in precedence order.

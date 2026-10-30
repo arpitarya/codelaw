@@ -79,8 +79,8 @@ fn init_prints_the_index_package_lines_only_where_fux_is_in_use() {
     let (out, ran) = init(&with, &["--no-install"]);
     assert!(ran.is_empty(), "--no-install ran npm: {ran:?}");
     // the packs it chose are listed first, and each has its index package after
-    let packs = out.find("npm install -D @codelaw/rules-data @codelaw/rules-js @codelaw/rules-spell\n").expect(&out);
-    let index = out.find("npm install -D @codelaw/rules-data-fux-index @codelaw/rules-js-fux-index @codelaw/rules-spell-fux-index\n").expect(&out);
+    let packs = out.find("npm install -D @codelaw/rules-data @codelaw/rules-deps @codelaw/rules-js @codelaw/rules-spell\n").expect(&out);
+    let index = out.find("npm install -D @codelaw/rules-data-fux-index @codelaw/rules-deps-fux-index @codelaw/rules-js-fux-index @codelaw/rules-spell-fux-index\n").expect(&out);
     assert!(packs < index, "{out}");
     assert!(out.contains("fux setup --index"), "{out}");
     let _ = fs::remove_dir_all(&with);

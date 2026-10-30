@@ -121,6 +121,7 @@ fn checkable(paths: Vec<PathBuf>) -> (Vec<PathBuf>, Vec<PathBuf>) {
 /// the text for the agent and whether it must go back to it.
 pub fn run(paths: Vec<PathBuf>, payload: Option<&str>, profile: Option<String>) -> Result<Option<(String, bool)>, String> {
     let paths = if paths.is_empty() { payload.map(paths_from_payload).unwrap_or_default() } else { paths };
+    let paths = with_manifests(paths);
     let (paths, texts) = checkable(paths);
     let Some(first) = paths.first().or(texts.first()) else { return Ok(None) };
     let start = first.parent().map(Path::to_path_buf).filter(|p| !p.as_os_str().is_empty()).unwrap_or_else(|| PathBuf::from("."));
@@ -146,8 +147,37 @@ pub fn run(paths: Vec<PathBuf>, payload: Option<&str>, profile: Option<String>) 
         report.check.diagnostics.sort_by(|a, b| a.sort_key().cmp(&b.sort_key()));
         report.check.diagnostics.dedup();
     }
-    let text = codelaw_report::hook_text(&report.files, &report.check);
-    Ok(Some((text, codelaw_report::hook_blocks(&report.check))))
+    let mut text = codelaw_report::hook_text(&report.files, &report.check);
+    // `[deps] agent = block` on a vulnerable dependency (W-128): say that
+    // the next write leaving it is refused.
+    let deps = project.config.section_options("deps");
+    let blocked = report.check.diagnostics.iter().filter(|d| crate::pre::deps_agent_action(d, &deps) == Some("block")).count();
+    if blocked > 0 {
+        text.push_str(&format!(
+            "codelaw: {blocked} vulnerable dependenc{} that `[deps] agent` blocks: change each to the version named, or add a dated `[deps] ignore`; until then codelaw refuses a write that keeps it.\n",
+            if blocked == 1 { "y" } else { "ies" }
+        ));
+    }
+    Ok(Some((text, codelaw_report::hook_blocks(&report.check) || blocked > 0)))
+}
+
+/// An edited lockfile brings the manifest beside it: `deps/vulnerable`
+/// reports there and on the lockfile (W-128).
+fn with_manifests(paths: Vec<PathBuf>) -> Vec<PathBuf> {
+    let mut out = paths.clone();
+    for p in &paths {
+        let name = p.file_name().and_then(|n| n.to_str()).unwrap_or_default();
+        let manifest = match name {
+            "package-lock.json" | "pnpm-lock.yaml" | "yarn.lock" => "package.json",
+            "uv.lock" | "poetry.lock" => "pyproject.toml",
+            _ => continue,
+        };
+        let m = p.with_file_name(manifest);
+        if m.is_file() && !out.contains(&m) {
+            out.push(m);
+        }
+    }
+    out
 }
 
 /// `codelaw hook`: exit `0` when nothing is left (the auto-fix notes on
