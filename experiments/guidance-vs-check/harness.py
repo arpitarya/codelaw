@@ -515,7 +515,7 @@ def table(out):
         "# W-102 results — guidance vs the check",
         "",
         f"Agent `{meta.get('agent', '?')}` ({pins.get('claude', '?')}) · model `{meta.get('model', '?')}` · {meta.get('codelaw', '?')} (sha256 `{pins.get('codelaw_sha256', '?')[:16]}`) · "
-        f"`--as-of {meta.get('as_of', '?')}` · fux {pins.get('fux', '—')} · started {meta.get('started', '?')}.",
+        f"`--as-of {meta.get('as_of', '?')}` · {pins.get('fux') or 'no fux'} · started {meta.get('started', '?')}.",
         f"Task set sha256 `{pins.get('tasks_sha256', '?')[:16]}` · screen `{pins.get('screen_sha256', '—')[:16]}` · pre-registration `{pins.get('prereg', '—')}`.",
         "",
         "A run **broke a rule** when `codelaw check` after it has a new finding of a rule its task targets; **added a new error** counts every rule at `error`. "
@@ -592,7 +592,7 @@ def table(out):
     v = None
     if "C" in summary and summary["C"]["runs"]:
         text, v = verdict(summary["C"])
-        lines += ["", "## Step 4 — the README line", "", f"The \"rules it can't skip\" line {text}."]
+        lines += ["", "## Step 4 — the README line", "", f"The \"rules it can't skip\" line is {text}."]
         if "D" in summary and summary["D"]["runs"]:
             d = summary["D"]
             lines.append(f"With the check at write time (arm D): a new error in {rate(d['any_new_error'], d['runs'])} runs.")
