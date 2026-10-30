@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-140 built and closed: port any rule on demand  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement w-140 in parallel"* — and for the batch, *"Implement it and then close those out. Keep merging everything to main."*
+- **Done:** the skill `codelaw-port-rule` and its custom agent `codelaw-rule-porter`; `ported_from` on the `rules` JSON card, so the CLI and MCP `list_rules` find a port; `rule_request.yml`'s `ported_from` and `rule_file` fields and the skill's opt-in pre-filled issue; `scripts/ported-rule-demand.py` (stdlib, `gh`, `--format json`, `--from-json`, `--self-test`); three ports — ESLint `no-nested-ternary`, Pylint `global-statement`, stylelint `declaration-no-important` — green in `fixtures/port-rule/` under `tests/port_rule.rs`; SR-AGENT-SURFACES decision 11, SR-RULE-AUTHORING, SR-RULE-FORMAT, SR-CLI-MCP; USAGE, CONTRIBUTING; W-140 archived. Landed through lockmaster as `W-140`.
+- **Decided / left open:** no `find_rule` tool (the card field is the smaller change); the scaffold stays `codelaw new-rule`'s, no `--ported-from` flag; Pylint read from its docs page only, cases new (GPL-2.0). Left: the `ported-rule` label does not exist on GitHub yet — the script also counts `port:` titles.
+- **Mistakes:** the end-of-turn auto-land committed to the branch mid-work; the rebase onto main stopped on two timestamp-only conflicts and on the commit-msg guard (templates/README.md → SR-LAW-10), resolved by hand.
+- **Next:** none for W-140; W-139 takes the most-wanted ports into the packs.
+
 ## 2026-10-30 — W-137 closed: the editor's look  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement w-137 in parallel"* — *"Implement it and then close those out. Keep merging everything to main."*; W-137 as filed supersedes earlier drafts; the design of record is `docs/design/editor/`.

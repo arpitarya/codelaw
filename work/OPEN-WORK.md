@@ -65,8 +65,6 @@ here. Read that record before changing anything below it.
 
 🟢 **W-141** `agent` Formatter vs Prettier, measured on 1,279 files: CSS 42% and HTML 17% identical — a CSS comment/selector defect and void elements first, then each language to ≥ 98%. Filed by Arpit (Cowork). [detail](open/W-141-formatter-parity.md)
 
-🟢 **W-140** `agent` Port any rule on demand: a `codelaw-port-rule` skill writes a named ESLint/Pylint/any-tool rule into `.codelaw/rules/`, tested on its cases; an opt-in share issue and a code-search script count demand. Filed by Arpit (Cowork). [detail](open/W-140-port-rule-on-demand.md)
-
 ### testing (0)
 
 ### reporting and benchmarks (2)

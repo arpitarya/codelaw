@@ -10,7 +10,7 @@ Thanks for helping. **The most useful contribution is a false positive with a fi
 |---|---|
 | A finding that's wrong | [Open a false-positive issue](https://github.com/arpitarya/codelaw/issues/new?template=false_positive.yml). Include the smallest snippet that triggers it and the rule id. |
 | A crash or a wrong fix | [Open a bug report](https://github.com/arpitarya/codelaw/issues/new?template=bug_report.yml). Include `codelaw --version`, the command and the file. |
-| A rule you want | [Open a rule request](https://github.com/arpitarya/codelaw/issues/new?template=rule_request.yml). If it exists in ESLint, Ruff, stylelint, html-validate or markdownlint, link the original. |
+| A rule you want | [Open a rule request](https://github.com/arpitarya/codelaw/issues/new?template=rule_request.yml). If it exists in ESLint, Ruff, Pylint, stylelint, html-validate, markdownlint or any other tool, link the original; for a port, title it `port: <tool>/<rule>`. The `codelaw-port-rule` skill can write the rule into your project first and open this form pre-filled — only if you say yes. |
 | A fix of your own | Open a pull request (see below). |
 | A security issue | Don't open a public issue. See [SECURITY.md](SECURITY.md). |
 
@@ -45,6 +45,23 @@ python3 scripts/build-packs.py --verify target/release/codelaw   # the pack tarb
 - **Run it over real code.** Examples alone hide false positives, so check a few real repos before you open the PR.
 - **Ports say where they come from.** A rule ported from another linter sets `ported_from:` and lists any behaviour gap under `## Differences from the source`.
 - **Every rule has a fix**: `auto` where it's safe, otherwise `suggest` or `manual` ([L4](records/0006_LAW-4-every-rule-has-a-fix.md)).
+
+---
+
+## Which ports people want
+
+`scripts/ported-rule-demand.py` counts, for each source rule, the public repositories whose
+`.codelaw/rules/` carry a port of it (`ported_from:`, through `gh search code`) and the `port: <tool>/<rule>`
+or `ported-rule` issues on this repository; the most wanted are candidates for a first-party pack. A
+maintainer runs it with `gh` logged in; it is never in CI and no part of the engine.
+
+```bash
+python3 scripts/ported-rule-demand.py                      # one row per source rule: repos, issues, first seen
+python3 scripts/ported-rule-demand.py --format json        # the same, as data
+python3 scripts/ported-rule-demand.py --dates --save raw.json   # first commit per file; keep what gh returned
+python3 scripts/ported-rule-demand.py --from-json raw.json # offline, from a saved run
+python3 scripts/ported-rule-demand.py --self-test          # offline check of the parsing
+```
 
 ---
 
