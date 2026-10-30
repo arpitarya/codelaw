@@ -41,6 +41,12 @@ ball: arpit
 
 Every other name is at 0.4.0. v0.4.0's CI run (40932052080) holds the PyPI wheels at 0.4.0 until 2026-11-28, but no workflow may upload them at that version. **So this release now carries:** PyPI's eleven index wheels, the `deps` pack and its index (new), and everything else at 0.4.1.
 
+## Checked 2026-10-30 14:20 IST (Cowork, npmjs.com in Chrome) — the two `deps` npm names
+
+- **`@codelaw/rules-deps` and `@codelaw/rules-deps-fux-index` are on npm at 0.4.1**, published by hand ~14:15 IST (maintainer `aarya11`).
+- **Each has its trusted publisher:** `arpitarya/codelaw` · `publish.yml` · environment `npm`, permissions *npm publish* and *npm stage publish* — **status *Pending validation***: npm validates it on the first OIDC publish **before 2026-11-01 08:45 UTC** (rules-deps; 08:46 the index).
+- **Hazard:** the 0.4.1 Release skips both (0.4.1 already exists), so this release will not validate them. If no CI publish of these names happens before that time, the configuration lapses — re-run `scripts/npm-trust.sh` (and `--fux-index`) before the next release (RELEASING.md §Every release, step 0).
+
 ## Definition of done
 
 | DoD | what | state |
