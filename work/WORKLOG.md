@@ -24,6 +24,30 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — A `cleanup` section in the queue  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"create another section for cleanup."*
+- **Done:** SR-WORK-OPEN-QUEUE rule 37 gains `cleanup` (stale worktrees and branches, dead files, duplicate or settled backlog rows, abandoned registry versions), after `ci/cd`; no open item belongs there today.
+- **Decided / left open:** candidates named to Arpit, not filed.
+- **Mistakes:** none.
+- **Next:** Arpit's call on the candidates.
+
+## 2026-10-30 — A `ci/cd` section in the queue  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"In OpenWork, create another section for CI/CD. And reallocate the work items respectively."*
+- **Done:** SR-WORK-OPEN-QUEUE rule 37 gains `ci/cd` (pipelines, releases, publishing to registries and stores), after `build`; W-126, W-151, W-95, W-97 and W-142 moved there.
+- **Decided / left open:** W-103 stays in `reporting and benchmarks` (a budget), W-152 in `build` (a check script).
+- **Mistakes:** none.
+- **Next:** unchanged — Arpit's inbox.
+
+## 2026-10-30 — Every ball checked against its item; W-126 ruled; W-152 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** by voice, why W-97 and W-126 were green when only Arpit could move them; then *"file it and check on all the work items. Are they actually blocked or not? And correct their balls."*
+- **Done:** W-126's ruling written (*"split the operations across parallel machines. And not wait for it on pass or fail"*; release 3m50 *"is fine"*) with step 6 for the agent; W-97 → 🔴 `arpit` with an inbox row (two public repos); W-103 notes its three `perf` runs exist; W-152 filed (the check). All 15 items read: the other twelve balls were right.
+- **Decided / left open:** "not waited on" holds while every L8 budget is `unset` — said in W-126 for the agent to write into SR-LAW-8.
+- **Mistakes:** my merge (an hour earlier) copied W-97's green `agent` ball into a row whose text said it waited on Arpit.
+- **Next:** W-152, and Arpit's inbox: W-151's release, W-97's repos, W-102's choice.
+
 ## 2026-10-30 — The queue merged: 22 items into 14  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"There are too many work items. See if we can review all the work items and merge them into few of them."* → *"go ahead, merge them."*

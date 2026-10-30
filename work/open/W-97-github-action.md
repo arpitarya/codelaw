@@ -7,7 +7,7 @@ filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
 updated_by: "Claude Code (Opus 5.5)"
-ball: agent
+ball: arpit
 ---
 
 # W-97 — codelaw in other people's pipelines: the Action and pre-commit
@@ -20,6 +20,7 @@ ball: agent
 | 2 | Only ratified actions inside (D-30); pinned by SHA (W-18) | L11 | ✅ 2026-10-27 — it uses **no** action; the SARIF upload is the REST API via `gh` (ruled 2026-10-27: keep `gh`) |
 | 3 | `init --ci github` writes a workflow that uses it; docs in USAGE | adoption | ✅ 2026-10-27 |
 | W-64 | `codelaw-pre-commit`: the pre-commit framework installs codelaw by version — merged in; its steps under [§ W-64](#merged-in-w-64) | one item, not two | ⏳ — see § |
+| 🔴 | **Arpit:** allow Claude Code to run `gh repo create --public` (or create the repos yourself and name them): `arpitarya/codelaw-action-test` for the Action's proof, `arpitarya/codelaw-pre-commit` for the mirror (was W-64) | both halves can move | 🔴 Arpit |
 
 **Merged 2026-10-30 (Arpit, text):** *"There are too many work items. See if we can review all the work items and merge them into few of them."* → *"go ahead, merge them."* Merged in: W-64.
 
