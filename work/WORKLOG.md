@@ -24,6 +24,38 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — A `cleanup` section in the queue  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"create another section for cleanup."*
+- **Done:** SR-WORK-OPEN-QUEUE rule 37 gains `cleanup` (stale worktrees and branches, dead files, duplicate or settled backlog rows, abandoned registry versions), after `ci/cd`; no open item belongs there today.
+- **Decided / left open:** candidates named to Arpit, not filed.
+- **Mistakes:** none.
+- **Next:** Arpit's call on the candidates.
+
+## 2026-10-30 — A `ci/cd` section in the queue  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"In OpenWork, create another section for CI/CD. And reallocate the work items respectively."*
+- **Done:** SR-WORK-OPEN-QUEUE rule 37 gains `ci/cd` (pipelines, releases, publishing to registries and stores), after `build`; W-126, W-151, W-95, W-97 and W-142 moved there.
+- **Decided / left open:** W-103 stays in `reporting and benchmarks` (a budget), W-152 in `build` (a check script).
+- **Mistakes:** none.
+- **Next:** unchanged — Arpit's inbox.
+
+## 2026-10-30 — Every ball checked against its item; W-126 ruled; W-152 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** by voice, why W-97 and W-126 were green when only Arpit could move them; then *"file it and check on all the work items. Are they actually blocked or not? And correct their balls."*
+- **Done:** W-126's ruling written (*"split the operations across parallel machines. And not wait for it on pass or fail"*; release 3m50 *"is fine"*) with step 6 for the agent; W-97 → 🔴 `arpit` with an inbox row (two public repos); W-103 notes its three `perf` runs exist; W-152 filed (the check). All 15 items read: the other twelve balls were right.
+- **Decided / left open:** "not waited on" holds while every L8 budget is `unset` — said in W-126 for the agent to write into SR-LAW-8.
+- **Mistakes:** my merge (an hour earlier) copied W-97's green `agent` ball into a row whose text said it waited on Arpit.
+- **Next:** W-152, and Arpit's inbox: W-151's release, W-97's repos, W-102's choice.
+
+## 2026-10-30 — The queue merged: 22 items into 14  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"There are too many work items. See if we can review all the work items and merge them into few of them."* → *"go ahead, merge them."*
+- **Done:** six merges, each into the first item, the merged file archived byte for byte with an `archive/README.md` row naming its successor, its body copied under *Merged in: W-nn*, every link outside `archive/` repointed: **W-151** ← W-150, W-134, W-135 (the release) · **W-142** ← W-147 (+ W-145's names step) · **W-95** ← W-117 (both stores) · **W-97** ← W-64 (Action + pre-commit) · **W-105** ← W-106 (types + version watch) · **W-141** ← W-148 (formatter; its 38-rule promotion step to W-139 DoD 2d). Inbox: the stale Marketplace row removed; the Open VSX row now names W-95. Also added the missing archive rows for W-132 and W-144.
+- **Decided / left open:** W-126 kept separate (not asked); W-95 is 🔴 now (Open VSX is all that is left).
+- **Mistakes:** none kept — the repoint pass also rewrote each merged section's own archive link, caught and fixed before the checks.
+- **Next:** the other three sessions rebase onto this before their next landing.
+
 ## 2026-10-30 — every built package wired into `publish.yml`; v0.4.1 ruled; W-149 green  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *close out item 149, item 126, item 95, item 97. Make sure the pipeline is green completely. And publish the packages that haven't been upgraded to .4.0 version.*
@@ -31,7 +63,8 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Decided / left open:** Arpit ruled *"Release v0.4.1 from CI"* for the lagging packages (19 npm, 11 PyPI); the 19 npm ones he then published by hand from v0.4.0's artifacts, so 0.4.1 carries PyPI's eleven and `deps`. W-97's throwaway repo: `gh repo create --public` refused twice by the permission check. Found: two BACKLOG rows share `B-063` (the second, W-102's experiment, should be renumbered — rule 11); the paid one is deleted here.
 - **Mistakes:** one scripted edit failed on a wrong anchor after three of its writes had landed; re-run from the failed one.
 - **Then:** W-149 closed (`main` green, `ci` 41005346138); W-126 measured the first green Rust/pack run (10m33, `perf` the tail); 0.4.1 bumped and CHANGELOG written (W-151 step 2).
-- **Next:** `main` green on the bump; then Arpit's `npm-trust.sh --fux-index`, W-135 and the Release.
+- **Then:** `main` green on 0.4.1 (`ci` 41007205048) and on W-150's wiring (41006814384, both attestation steps green); W-95's clean VS Code install checked; Cowork's consolidation landed as `db1c0c70`. Three stale handoff bundles (`handoff-20261030-043224`, `-044012`, `-050518`) hold nothing `main` lacks; `lockmaster abandon` was refused by the permission check — Arpit's to run.
+- **Next:** Arpit's three release steps (the inbox row); then W-151 step 5.
 
 ## 2026-10-30 — W-95's install docs, W-97's `v0` tag; W-149 left to the session already fixing it  ·  Claude Code (Opus 5.5)
 

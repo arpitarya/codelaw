@@ -24,42 +24,26 @@ here. Read that record before changing anything below it.
 |---|---|
 | 🔴 **Guidance experiment — the screen came back null** ([W-102](open/W-102-guidance-vs-check-experiment.md)): arm 0 (no codelaw at all) broke a rule on only **7 of 38** candidate tasks (6 at 5/5, 31 at 0/5) — it uses `apiFetch`, `http_get` and the clock because it reads them in the code; what tempts is inline style, SQL column names and copied `== None` / `tags=[]`. Fewer than 12, so by the pre-registration no run. **Pick one:** (1) *recommended* — run the 7 at 9 runs each (63 per arm, the 5% bound holds; ~$65, ~$85 with the screen); (2) write ~10 more in the families that tempted, re-screen, then 12 × 5 (~$95 in all); (3) stop and close: the README line stays. | 2026-10-30 |
 | ↳ **blocks:** W-102 itself | |
-| 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): ruled 2026-10-30 — the listing refused `name: codelaw` (taken by a user or org) and the 138-character description; `action.yml` is now **`codelaw check`** with a 115-character description. **On the next release** (after 0.4.0): edit it → tick *Publish this Action to the GitHub Marketplace* → accept the agreement → category *Code quality* → *Update release*. | 2026-10-27 |
+| 🔴 **A public repo, twice** ([W-97](open/W-97-github-action.md)): the Action's proof needs a throwaway repo, and the pre-commit mirror its own. Claude Code's permission check refused `gh repo create --public`. **Allow it** when it asks, or create `arpitarya/codelaw-action-test` and `arpitarya/codelaw-pre-commit` yourself and say so. | 2026-10-30 |
 | ↳ **blocks:** W-97 itself | |
-| 🔴 **Open VSX — waiting on Open VSX** ([W-117](open/W-117-open-vsx-setup.md)): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
-| ↳ **blocks:** W-117 itself | |
+| 🔴 **Open VSX — waiting on Open VSX** ([W-95](open/W-95-publish-vscode-extension.md), was W-117): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
+| ↳ **blocks:** W-95 (its Open VSX half) | |
+| 🔴 **Release v0.4.1** ([W-151](open/W-151-release-0-4-1.md)): `main` is green at 0.4.1 (`c4d519c7`). In order: (1) `scripts/npm-trust.sh --fux-index`; (2) `npm publish` `@codelaw/rules-deps` and `@codelaw/rules-deps-fux-index` 0.4.1 from `ci` 41007205048's artifacts (`gh run download 41007205048 -n dist` / `-n fux-index`), then `scripts/npm-trust.sh` for both; (3) `gh release create v0.4.1` with CHANGELOG's 0.4.1 section. `trust` stops the release if (1) or (2) is skipped. | 2026-10-30 |
+| ↳ **blocks:** W-151, and through it the proof of W-150's uploads and W-134's PyPI `deps` | |
 
 ---
 
-## Open items (22)
+## Open items (15)
 
-### build (20)
+### build (8)
 
-🟢 **W-126** `agent` Five-minute pipeline built. Cached CI 4m25, 4m11 (✅); release 3m50; Rust/pack change 10m33 (`7604e4a6`, green): the rest done at 4m12, `perf` (10m29) the tail. Left: one cached, two of each change kind, two releases. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
-
-🟢 **W-95** `agent` VS Code extension live as `codelaw.codelaw-vscode` (0.4.0, eight platforms); install docs done 10-30 (README, USAGE). Left: Open VSX (W-117), then the DoD's clean-install check in VS Code and VSCodium. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
-
-🟢 **W-97** `agent` GitHub Action listed on the Marketplace as **codelaw check**; `v0` tag created at v0.4.0 (10-30). Left: the throwaway-repo proof — `gh repo create --public` was refused by Claude Code's permission check, so it needs Arpit's allow. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
-
-🟢 **W-105** `agent` Type-aware rules: five landed; ruled 10-29 — agents add the four type questions (SR-TYPES decision 4), the rules as previews; profile the slowest before budgets; corpus counts; the RC (11-10). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
-
-🟢 **W-64** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
-
-🔴 **W-117** `arpit` Open VSX: 0.3.0 and 0.4.0 uploaded by hand 10-30 (8 platforms each), **inactive** until claim #14928 is approved (no reply yet). Then: Arpit adds the trusted publisher; revoke the token pasted in chat. Filed by Arpit (Cowork). [detail](open/W-117-open-vsx-setup.md)
-
-🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
+🟢 **W-105** `agent` Type-aware TypeScript: five rules landed; the four type questions, previews, profiling, corpus counts, the RC (11-10); then the version watch (was W-106: tested range, CI, nightly, bump job). Merged 10-30. Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
 🟢 **W-129** `agent` `deps/licence`, `deps/lockfile-sync`, `deps/version-drift`, `deps/runtime-agreement` — unblocked: W-128 and W-136 built 10-30; nothing built yet. Filed by Arpit (Cowork). [detail](open/W-129-deps-hygiene-rules.md)
 
-🟡 **W-134** waits on **W-151** `agent` `codelaw-rules-deps`: `publish.yml` creates it through its pending publisher, `only=pypi` uploads one project (built 10-30, L6 d9 amended). Left: the release creates it; the index's pending publisher. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
-
-🟢 **W-135** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher — W-128 built 10-30; just before the next release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
-
 🟢 **W-139** `agent` Ruled 10-30: build all — both rounds, 2,572 rules: five PyPI framework packs, two npm packs (`testing`, `nextjs`); tranche A on by default, the rest preview/opt-in; SonarJS, Pylint, jsdoc opt-in; regexp, promise on. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
 
-🟢 **W-141** `agent` Formatter vs Prettier, measured on 1,279 files: CSS 42% and HTML 17% identical — a CSS comment/selector defect and void elements first, then each language to ≥ 98%. Filed by Arpit (Cowork). [detail](open/W-141-formatter-parity.md)
-
-🟡 **W-142** waits on **W-139** `arpit` PyPI pending publishers for the five framework packs and their Fux indexes (names free, checked 10-30) — Claude fills, Arpit submits. Filed by Arpit (Cowork). [detail](open/W-142-framework-pack-names.md)
+🟢 **W-141** `agent` Formatter vs Prettier (CSS 42%, HTML 17%): CSS comment defect and void elements first; Oxc's formatters (was W-148: CSS 88.6%, Markdown 97.3%) measured in codelaw, then L11 to Arpit. Merged 10-30. Filed by Arpit (Cowork). [detail](open/W-141-formatter-parity.md)
 
 🟡 **W-143** waits on **W-139** `agent` Vue, Svelte, Astro, GraphQL as codelaw languages (L3, L7; a parser and a formatter each, grammars ratified under L11) and Biome's 89 rules for them. Filed by Arpit (Cowork). [detail](open/W-143-vue-svelte-astro-graphql.md)
 
@@ -67,19 +51,27 @@ here. Read that record before changing anything below it.
 
 🟢 **W-146** `agent` PR hygiene: `git/commit-message` (Conventional Commits, configurable), `git/branch-name`, `git/pr-size` (400 lines), `git/pr-description`; commit-msg hook, CI, agent hook; git use widened (SR-ARCHITECTURE 14). Filed by Arpit (Cowork). [detail](open/W-146-pr-hygiene.md)
 
-🟡 **W-147** waits on **W-139** `arpit` npm first hand publish of `@codelaw/rules-testing`, `@codelaw/rules-nextjs` and their Fux indexes, then their trusted publisher; just before the release that carries them. Filed by Arpit (Cowork). [detail](open/W-147-testing-nextjs-npm-first-publish.md)
+🟢 **W-152** `agent` The queue checks refuse a ball that disagrees with its row — `agent` while the next step is Arpit's, or an unruled choice left green (W-97 and W-126 were). Filed by Arpit (Cowork). [detail](open/W-152-ball-matches-the-text.md)
 
-🟢 **W-148** `agent` From Oxlint: Oxc's native formatters measured on W-141's corpus (CSS 88.6% vs 41.8%, Markdown 97.3% vs 73.3%) and put to Arpit under L11; 18 Oxlint-only rules into W-139; 38 bug rules corpus-run for `recommended`. Filed by Arpit (Cowork). [detail](open/W-148-oxc-formatters-and-oxlint-rules.md)
+### ci/cd (5)
 
-🟡 **W-150** waits on **W-151** `agent` `publish.yml` uploads the dev-server plugins and the Fux index packages (B-063 promoted; ruled 10-30: once a name exists, CI publishes it) — built 10-30; npm caught up by hand. Left: a release proves it. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
+🟢 **W-126** `agent` Ruled 10-30: `perf` split across parallel jobs, nothing waits on its verdict (until a budget is set, L8); release 3m50 accepted. Cached CI 4m11–4m25 ✅. Next: the `perf` matrix, then the measurement runs. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
-🟢 **W-151** `agent` Release v0.4.1 from CI (ruled 10-30): PyPI's eleven Fux index wheels catch up and `deps` ships. Bumped to 0.4.1 10-30; next: `main` green on it, then Arpit's npm trust + W-135 and the Release. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
+🔴 **W-151** `arpit` Release v0.4.1 and all it needs (merged 10-30: W-150, W-134, W-135). `main` green on 0.4.1 (`c4d519c7`, `ci` 41007205048). Next, Arpit: npm trust for the index names, the two `deps` names by hand, then the Release (inbox). Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
+
+🔴 **W-95** `arpit` VS Code extension: Marketplace live (0.4.0); Open VSX (was W-117) uploaded by hand, inactive until claim #14928 is approved — then the trusted publisher and a VSCodium check. Merged 10-30. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
+
+🔴 **W-97** `arpit` The Action (listed as **codelaw check**, `v0` at v0.4.0) and the pre-commit mirror (was W-64) both need a public repo: allow `gh repo create` in Claude Code, or create them (inbox). Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
+
+🟡 **W-142** waits on **W-139** `arpit` New packs' registry names: five PyPI framework packs (pending publishers), npm `testing`/`nextjs` (was W-147) and Tailwind's, with Fux indexes; before their release. Merged 10-30. Filed by Arpit (Cowork). [detail](open/W-142-framework-pack-names.md)
+
+### cleanup (0)
 
 ### testing (0)
 
 ### reporting and benchmarks (2)
 
-🟢 **W-103** `agent` Spell pack: rules, fixtures, corpus done; the `spell` bench operation built 2026-10-30 (`unset`; local p95 584 ms). Next: three CI `perf` runs on `main`, then the budget to the decider. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
+🟢 **W-103** `agent` Spell pack done; the `spell` bench operation has its three CI `perf` runs on `main` (10-30: 41005346138, 41006814384, 41007205048). Next: read their p95s, then the budget to Arpit. Filed by Arpit (Cowork). [detail](open/W-103-spell-pack.md)
 
 🔴 **W-102** `arpit` Redesign built (six arms, 42 tasks, screen, PREREG); screened 10-30: only 7 of 38 tasks tempt an agent with no codelaw ($19.45) — the null outcome, no run. Left: run the 7, widen the screen, or stop (inbox). Filed by Arpit (Cowork). [detail](open/W-102-guidance-vs-check-experiment.md)
 
