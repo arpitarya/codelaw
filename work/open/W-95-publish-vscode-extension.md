@@ -124,6 +124,10 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 3. **Step 4:** README / USAGE install lines; the preview note's "Marketplace listing comes later" dropped.
 4. **DoD, by hand on the first listing:** install from each registry in a clean VS Code and a clean VSCodium; it finds the engine (bundled, and the project's own), shows diagnostics, and fixes on save.
 
+## Checked 2026-10-30 (Claude Code) — a clean VS Code
+
+VS Code 1.144.0 with an empty profile (`--user-data-dir`, `--extensions-dir` in a scratch folder): `code --install-extension codelaw.codelaw-vscode` installed **`codelaw.codelaw-vscode@0.4.0`, the `darwin-arm64` build**, from the Marketplace; its bundled `bin/codelaw` answers `codelaw 0.4.0` and, on the GitHub Action fixture (one `debugger`, one local rule), reports `src/app.js:2:3 fixture/no-debugger … fix: auto`, exit 1. **Not checked:** diagnostics drawn in the editor and fix-on-save (a person at the window) and VSCodium (Open VSX, the inbox row).
+
 ## Definition of done
 
 - The extension installs from both registries, finds the engine, and shows diagnostics and fix-on-save in a clean VS Code and VSCodium.
