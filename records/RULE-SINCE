@@ -72,4 +72,10 @@
 #   are not pushed but sit under later landings, so they are not reworded.
 #   64acbc3 is the first commit on main's first-parent line that holds all
 #   thirteen, so it is the baseline and every commit after it is judged.
-64acbc331425aec4878c920b1b17868b859582f6
+# - 2026-10-30, W-128-fix: 64acbc3 -> 3f9bf44. One commit since 64acbc3 fails
+#   the replay: c70c049 (W-128-fix), lockmaster's twin of 3f9bf44 — its
+#   message lacked the `no SR affected` line the landed commit carries, for
+#   the deps code and test (SR-RULE-PACKS decision 15, staged, specifies
+#   them). It is pushed, so it cannot be reworded; 3f9bf44 holds it, so it is
+#   the baseline.
+3f9bf4493ff30a7e2a17363af0d271bd9745b4d7
