@@ -17,7 +17,7 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Wait until W-128 is ready to release | the names are bound when they are needed | ✅ W-128 built and closed 2026-10-30; the next release (after 0.4.0) carries `deps` |
-| 2 | Claude, in Chrome: pypi.org → *Your account → Publishing → Add a pending publisher*, filled twice; Arpit checks and submits | `publish.yml` can create both projects | 🔴 Arpit submits |
+| 2 | Claude, in Chrome: pypi.org → *Your account → Publishing → Add a pending publisher*, filled twice; Arpit checks and submits | `publish.yml` can create both projects | 🔄 `codelaw-rules-deps` saved 2026-10-30 10:20 IST (Claude in Chrome, on Arpit's ask); the Fux index refused — *"A pending trusted publisher matching this configuration has already been registered for a different [project]"* — until the first project exists |
 
 **Arpit, 2026-10-30 (voice):** *"just before the deps release."* · *"I'm just talking about PyPI publishing and NPM publishing. Have those as two separate work items."*
 
@@ -32,6 +32,12 @@ ball: arpit
 | Repository | `codelaw` |
 | Workflow | `publish.yml` |
 | Environment | `pypi` |
+
+## Found 2026-10-30 (Cowork) — a pending publisher alone does not publish
+
+- **`publish.yml` skips a PyPI project that does not exist yet**, except `codelaw` (its `exists` step; RELEASING.md: *"its first upload is by hand"*). So the pending publisher only works if `publish.yml` also uploads `codelaw-rules-deps` (one line beside the `codelaw` exception), or its first version goes up by hand: `gh run download <ci-run-id> -R arpitarya/codelaw -n dist -D dist && twine upload dist/pypi/codelaw_rules_deps-<v>-py3-none-any.whl`.
+- **Not before the next release:** the `deps` rules are native and post-date `v0.4.0` (`7b855499` is not in it), and `main` still says 0.4.0 — a wheel published now would claim a version whose engine lacks its rules.
+- **All 24 existing codelaw PyPI projects already have an active trusted publisher** (checked on *Publishing*, 2026-10-30).
 
 ## Definition of done
 

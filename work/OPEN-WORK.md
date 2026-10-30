@@ -22,8 +22,6 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
-| 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): ruled 2026-10-30 — the listing refused `name: codelaw` (taken by a user or org) and the 138-character description; `action.yml` is now **`codelaw check`** with a 115-character description. **On the next release** (after 0.4.0): edit it → tick *Publish this Action to the GitHub Marketplace* → accept the agreement → category *Code quality* → *Update release*. | 2026-10-27 |
-| ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — waiting on Open VSX** ([W-117](open/W-117-open-vsx-setup.md)): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
 | ↳ **blocks:** W-117 itself | |
 
@@ -39,7 +37,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-95** `agent` VS Code extension live as `codelaw.codelaw-vscode`; 0.4.0 uploaded by `publish.yml` (10-30). Left: the install docs, now unblocked (README still says 0.3.0, USAGE says the listing comes later); Open VSX (W-117). Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
-🔴 **W-97** `arpit` GitHub Action built; SARIF via `gh`, a moving `v0`. Ruled 10-30: listed as **codelaw check** (the name `codelaw` is taken), description shortened. Left: the Marketplace tick on the next release (inbox), then Claude's throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
+🟢 **W-97** `agent` GitHub Action listed on the Marketplace as **codelaw check** (v0.4.0, checked 10-30). Left: the `v0` tag (never created — `@v0` fails today), then the throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
 🟢 **W-105** `agent` Type-aware rules: five landed; ruled 10-29 — agents add the four type questions (SR-TYPES decision 4), the rules as previews; profile the slowest before budgets; corpus counts; the RC (11-10). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 
