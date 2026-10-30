@@ -18,9 +18,9 @@ ball: arpit
 |---|---|---|---|
 | 1 | GitHub environment `vscode`, tag rule `v*` (as `npm`, `pypi`) | a place for the token that only release tags reach | ✅ 2026-10-29 — the environment `vscode` exists |
 | 2 | open-vsx.org → log in with GitHub → link an Eclipse account → sign the Publisher Agreement | the right to publish | ✅ 2026-10-29 — logged in; agreement signed |
-| 3 | An access token `codelaw-publish` → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` | CI can upload | 🔴 Arpit — the token is his to handle |
-| 4 | Create the namespace `codelaw`; claim its ownership (a public GitHub issue) — required for trusted publishing | `codelaw.codelaw` on Open VSX | 🔄 created 2026-10-29; ⏳ the ownership claim |
-| 5 | Agent: `publish.yml`'s Open VSX upload with `curl` (W-95's drafted job, its Open VSX half) | every release lands there | ⏳ after step 3 |
+| 3 | An access token `codelaw-publish` → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` | CI can upload | ~~🔴~~ dropped — ruled 2026-10-30: trusted publishing, no token (below) |
+| 4 | Create the namespace `codelaw`; claim its ownership (a public GitHub issue) — required for trusted publishing | `codelaw.codelaw` on Open VSX | 🔄 created 2026-10-29; ⏳ claim [#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928) still **open**, no reply from Open VSX (checked 2026-10-30 10:30 IST) |
+| 5 | Agent: `publish.yml`'s Open VSX upload with `curl` (W-95's drafted job, its Open VSX half) | every release lands there | ⏳ after the claim is approved and Arpit adds the trusted publisher |
 
 **Arpit, 2026-10-29 (voice docket):** on W-95, Open VSX now and the Marketplace by hand on release day: *"Yes."* Asked what Open VSX is (the Eclipse Foundation's store, used by Cursor, VSCodium, Windsurf and Gitpod) — then *"You have the access to the browser. We will go ahead and implement Open VSX You can go ahead and create the ID and everything."* and, the browser being out of reach of the voice call, *"That's okay. Let's put it as a work item and we'll work on it."*
 

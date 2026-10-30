@@ -24,6 +24,10 @@ entry.**
 
 ## 1 · State of play
 
+**Reviewed 2026-10-30 (Cowork): the queue, item by item.** `main` is red since the batch landing (W-149 🧨, first). W-132 was built and is now closed. W-129 is unblocked; W-95's install docs are unblocked; Open VSX still waits on claim #14928; W-134/W-135 wait only on the next release.
+
+**Researched and filed 2026-10-30 (Cowork): Oxlint → W-148, B-066.** Oxc's native formatters beat codelaw's on W-141's corpus (CSS 88.6% vs 41.8%, Markdown 97.3% vs 73.3%) — W-148 measures them in codelaw and brings an L11 entry to Arpit; 18 Oxlint-only rules join W-139 (2,590); 38 bug rules corpus-run for `recommended`. `migrate oxlint|oxfmt` is B-066.
+
 **Ruled 2026-10-30 (voice): W-144 closed — round 2 joins W-139.** A `testing` npm pack (182 rules, a preset per framework) and a `nextjs` npm pack (22, on when installed); SonarJS, Pylint and jsdoc opt-in presets; regexp and promise on by default (70 rules into `js/recommended`); TSLint's 6 built. W-139 now builds 2,572 rules; Tailwind's 8 are W-145's; W-147 binds the two npm names.
 
 **Researched 2026-10-30 (Cowork): W-144, round 2.** 1,211 more rules (SonarJS 295, Pylint 444, test plugins 249, jsdoc 78, regexp 82, Next.js 22, Tailwind 24, promise 17); 879 to port. Both rounds: 2,580 to port, codelaw 689 → ~3,270. R5–R8 put to the decider (ruled above).

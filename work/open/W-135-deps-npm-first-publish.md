@@ -16,7 +16,7 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Wait until W-128 is ready to release | the names are bound when they are needed | 🟡 waits on W-128 |
+| 1 | Wait until W-128 is ready to release | the names are bound when they are needed | ✅ W-128 built and closed 2026-10-30; the next release (after 0.4.0) carries `deps` |
 | 2 | Arpit publishes `@codelaw/rules-deps` and `@codelaw/rules-deps-fux-index` once by hand, as RELEASING.md does for a new pack | the names exist on npm | 🔴 Arpit |
 | 3 | Add `arpitarya/codelaw` · `publish.yml` · `npm` as each package's trusted publisher | every later release publishes them from CI | 🔴 Arpit |
 
@@ -33,7 +33,7 @@ ball: arpit
 
 ## Blockers
 
-🟡 W-128.
+None — W-128 closed 2026-10-30. Do it just before the next release.
 
 ## Record affected
 

@@ -16,7 +16,7 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Wait until W-128 is ready to release | the names are bound when they are needed | 🟡 waits on W-128 |
+| 1 | Wait until W-128 is ready to release | the names are bound when they are needed | ✅ W-128 built and closed 2026-10-30; the next release (after 0.4.0) carries `deps` |
 | 2 | Claude, in Chrome: pypi.org → *Your account → Publishing → Add a pending publisher*, filled twice; Arpit checks and submits | `publish.yml` can create both projects | 🔴 Arpit submits |
 
 **Arpit, 2026-10-30 (voice):** *"just before the deps release."* · *"I'm just talking about PyPI publishing and NPM publishing. Have those as two separate work items."*
@@ -42,7 +42,7 @@ ball: arpit
 
 ## Blockers
 
-🟡 W-128 (the pack must exist and be releasable).
+None — W-128 closed 2026-10-30. Do it just before the next release.
 
 ## Record affected
 
