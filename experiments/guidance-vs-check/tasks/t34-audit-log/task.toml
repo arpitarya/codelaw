@@ -1,0 +1,8 @@
+title = "Write an audit entry"
+# the rule ids the prompt tempts the agent to break
+targets = ["acme/no-datetime-now"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading"]
+prompt = """
+Add api/acme/audit.py with `record(conn, actor, action)`, which inserts a row into `audit_log(at, actor, action)` stamped with the current UTC time and commits.
+"""

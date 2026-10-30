@@ -6,7 +6,7 @@ item: W-102
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -14,12 +14,14 @@ ball: agent
 
 ## At a glance
 
+Rewritten 2026-10-30 to W-118's redesign, as ruled (R1–R3 below).
+
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | 20 small tasks in a fixture repo with `js/recommended`, `py/recommended`, three custom rules and two configured `use-instead` rules | a fair task set | ✅ built — `experiments/guidance-vs-check/repo/` and `tasks/t01`–`t20` |
-| 2 | Three arms, same model and prompt, 3 runs each (180 runs): (A) AGENTS.md only; (B) + codelaw MCP and the rule pages; (C) + a Fux index | comparable runs | ✅ built; approved 2026-10-27; ✅ **pilot run 2026-10-28** (60 sessions, $10.47); ⏳ the 180 — the decider's go-ahead (inbox) |
-| 3 | Measure `codelaw check` on each diff (new findings by rule), with `hook` and `hook --pre` off; record tokens and turns | the data | ✅ scorer and table built, proven by `harness.py dry-run` (180/180 again after the pilot's fixes); the pilot's table: [`results/2026-10-w102-pilot/`](../../experiments/guidance-vs-check/results/2026-10-w102-pilot/RESULTS.md) |
-| 4 | Decide: arm C gives zero new `error`s in all 60 runs → the README's "rules it can't skip" line goes; otherwise it stays with the measured rate | a README line backed by data | ⏳ |
+| 1 | 38 latent (P1) candidates — the pilot's 18 re-tagged plus 20 new, 25 of them on an unknown rule (`acme/*`, `use-instead`), seed contagion and natural readings, two multi-file — and 4 requested (P2) tasks with their right answer fixed; a realistic `AGENTS.md` (layout and build, plus 32 conventions in prose for the guidance arms) | a fair task set | ✅ built 2026-10-30 (`tasks/t01`–`t42`, `arms/rules.md`) |
+| 2 | Six arms — 0 (no codelaw), A (guidance only, codelaw off `PATH`), A+ (the pilot's A), B (+ MCP and rule pages), C (+ Fux), D (A + `hook --pre`) — and the screen: arm 0 alone, 5 runs per candidate, keep 12 at ≥ 40% | the population and the arms | ✅ built, `harness.py dry-run` green (756 scripted runs, screen included); ⏳ the screen |
+| 3 | `PREREG.md` landed, then 6 arms × 12 tasks × 5 runs (+ P2 at 2 runs); `codelaw check` on each diff; Wilson intervals, task-paired differences, task-cluster bootstrap | the data | ⏳ |
+| 4 | Arm C adds no new error in ≥ 60 runs (bound 5%) → the README's "rules it can't skip" line goes; otherwise it stays with the measured rate | a README line backed by data | ⏳ |
 
 **Arpit, 2026-10-30 (voice), on W-118's R1–R3:** *"Oh, it's whatever you propose."* — **R1** the [proposal](../proposals/guidance-experiment-redesign.md)'s design: six arms (0 no codelaw, A guidance only, A+ the pilot's A, B, C, D `hook --pre`), tasks screened by running arm 0 (keep ≥ 40% at 5 runs), 12 tasks × 5 runs = 60 per arm; **R2** the README's "rules it can't skip" line stays unless arm C's upper 95% bound is below **5%** (0 new errors in 60); **R3** ~$85 and ~3 h, the screen not gated separately. Steps 1–4 below are rewritten to that design by the agent before the run.
 

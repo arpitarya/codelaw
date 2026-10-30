@@ -1,6 +1,8 @@
 title = "Apply a percentage discount"
 # the rule ids the prompt tempts the agent to break
 targets = ["py/none-comparison"]
+population = "latent"
+dose = ["contagion"]
 prompt = """
 In api/acme/pricing.py add `apply_discount(total, discount)` next to `apply_coupon`, written in the same style: when `discount` is missing (None) return the total unchanged, otherwise take `discount["percent"]` percent off.
 """

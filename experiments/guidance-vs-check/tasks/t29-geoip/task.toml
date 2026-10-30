@@ -1,0 +1,8 @@
+title = "Country for an IP"
+# the rule ids the prompt tempts the agent to break
+targets = ["py/use-instead"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading"]
+prompt = """
+Add api/acme/geo.py with `country_for_ip(ip)`, which GETs `https://ipinfo.example.com/<ip>/json` and returns the `country` field, or None when the service answers 404.
+"""

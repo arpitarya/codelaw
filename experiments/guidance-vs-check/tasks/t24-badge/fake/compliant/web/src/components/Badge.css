@@ -1,0 +1,11 @@
+.badge--info {
+  background-color: #2563eb;
+}
+
+.badge--warning {
+  background-color: #d97706;
+}
+
+.badge--danger {
+  background-color: #dc2626;
+}

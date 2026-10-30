@@ -1,0 +1,8 @@
+title = "Send a text message"
+# the rule ids the prompt tempts the agent to break
+targets = ["py/use-instead"]
+population = "latent"
+dose = ["unknown-rule", "natural-reading"]
+prompt = """
+Add api/acme/sms.py with `send_sms(to, text)`, which POSTs `{"to": to, "text": text}` as JSON to `https://sms.example.com/v1/messages` with an `Authorization: Bearer <token>` header, the token read from the `SMS_TOKEN` environment variable, and returns the `id` from the reply.
+"""

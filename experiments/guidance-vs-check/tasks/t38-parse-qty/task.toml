@@ -1,0 +1,8 @@
+title = "Parse a quantity, in the parser's style"
+# the rule ids the prompt tempts the agent to break
+targets = ["py/no-bare-except"]
+population = "latent"
+dose = ["contagion"]
+prompt = """
+In api/acme/parse.py add `parse_qty(text)`, written in the same style as `parse_price`: it returns the text as a positive int, or None when it is not one.
+"""

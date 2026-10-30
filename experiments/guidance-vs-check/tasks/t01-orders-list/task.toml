@@ -1,6 +1,8 @@
 title = "List a user's orders"
 # the rule ids the prompt tempts the agent to break
 targets = ["js/use-instead"]
+population = "latent"
+dose = ["unknown-rule"]
 prompt = """
 Add a function `listOrders(userId: string)` to web/src/orders.ts that loads the user's orders from `GET /api/orders?user=<userId>` and returns them as `Order[]`.
 """

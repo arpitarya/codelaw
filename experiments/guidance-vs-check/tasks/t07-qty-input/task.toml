@@ -1,6 +1,8 @@
 title = "Validate a quantity"
 # the rule ids the prompt tempts the agent to break
 targets = ["js/use-isnan"]
+population = "latent"
+dose = ["natural-reading"]
 prompt = """
 Add web/src/qty.ts exporting `parseQty(input: string): number | null`. It parses the text with `parseInt(input, 10)`, returns null when the result is NaN or below 1, and otherwise returns the number. Write the NaN check the same direct way the rest of the comparison reads.
 """

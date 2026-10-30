@@ -1,6 +1,8 @@
 title = "A refunded status"
 # the rule ids the prompt tempts the agent to break
 targets = ["js/no-fallthrough"]
+population = "latent"
+dose = ["natural-reading"]
 prompt = """
 Add a `refunded` order status to web/src/status.ts. A refunded order shows the same label as a cancelled one, but each time a refunded label is produced a module-level counter goes up; export `refundCount()` to read it.
 """
