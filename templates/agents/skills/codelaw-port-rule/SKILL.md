@@ -106,7 +106,8 @@ returns only the result). The source fills the loop's inputs:
   ships a rule with the same `ported_from:`, turn that one on and delete this
   file.*
 - A known difference from the source (an option not carried, a form the
-  grammar does not parse) goes in the rule's summary, in one sentence.
+  grammar does not parse) goes under a last section, `## Differences from
+  the source`, as the first-party ports do.
 
 ## 6. Done means green
 

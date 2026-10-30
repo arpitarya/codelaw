@@ -12,8 +12,11 @@ owns:
   - crates/codelaw-cli/tests/promotion.rs
   - scripts/corpus.py
   - scripts/corpus.json
+  - scripts/ported-rule-demand.py
+  - fixtures/port-rule
+  - crates/codelaw-cli/tests/port_rule.rs
 laws: [L0, L3, L4, L5]
-timestamp: 2026-10-30T12:00:00Z
+timestamp: 2026-10-30T18:00:00Z
 content_sha: ""
 ---
 
@@ -69,6 +72,8 @@ The decider asked that rules can be written manually or by an AI agent with a sk
      6. Add edge cases.
      7. Run `codelaw test` until green.
    - The agent proposes; the test runner decides; a human merges. An agent never marks its own rule as passing ([L5](0007_LAW-5-no-model-in-the-engine.md) decision 6).
+   - **Ported from another tool** (W-140, 2026-10-30, on Arpit's ask of that day: *"this is a rule that is in ESLint, or this is a rule that is there in PyLint, and any tool, and I want it in code law. So write a rule for it."*). The `codelaw-port-rule` skill and its subagent `codelaw-rule-porter` ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 11) run this loop with the source rule as its input, after checking no rule's `ported_from:` already names it. The source's documentation and tests are **read, never run** ([L5](0007_LAW-5-no-model-in-the-engine.md)); its invalid cases become the Don'ts, its valid cases the Dos, its edge cases the `.cases.md` — **written fresh**, never pasted from a copyleft source such as Pylint (GPL-2.0, [L2](0004_LAW-2-foss-dependencies.md)); its autofix suggests `auto` or `suggest`, none means `manual`. The rule is a project rule (`codelaw new-rule`'s template, a project namespace), `ported_from: [<tool>/<rule>]`, `stability: preview`, and counts only when `codelaw test` is green; its `**Why:**` says to delete it once a first-party pack ships the same `ported_from:`. Three ports are kept green in CI as the loop's evidence: ESLint `no-nested-ternary`, Pylint `global-statement` and stylelint `declaration-no-important`, in `fixtures/port-rule/` (`crates/codelaw-cli/tests/port_rule.rs`).
+     - **Who wants which port** is counted by `scripts/ported-rule-demand.py`, maintainer-run with `gh`, never in CI or the engine: public `.codelaw/rules/` files by `ported_from:` (`gh search code`) and the issues the skill's opt-in share prompt opens on `arpitarya/codelaw` (title `port: <tool>/<rule>`, label `ported-rule`); one row per source rule with repositories, issues and first seen, `--format json` for the same as data, `--from-json` and `--self-test` offline. The most wanted are candidates for the first-party packs (W-139).
    - **From review comments** (W-133, 2026-10-30). The `codelaw-rules-from-reviews` skill ([SR-AGENT-SURFACES](0102_agent-surfaces.md) decision 10) hands each rule the decider approved to this loop, with the review evidence as its input: the reviewers' point, restated as one sentence, is the convention; the diff hunks they commented on are the first Don't examples, and the code as merged after the comment, where it changed, the first Do. The loop is unchanged: `codelaw test` green, `stability: preview`, then today's violations frozen with `codelaw baseline add --rule <id>` so only new code must obey. The rule file's `**Why:**` may link the pull requests; it names no reviewer.
 3. **Debuggable.** Every tool is available both in the CLI and over MCP:
 

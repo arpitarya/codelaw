@@ -10,8 +10,6 @@ since: 0.4.0
 ---
 
 No declaration ends in `!important`, wherever it is — in a rule, a nested rule, an at-rule's block.
-Known gap against the source rule: a `!` and `important` written apart (`! important`) does not parse as
-a declaration in codelaw's CSS grammar, so it is not reported here.
 
 **Why:** `!important` wins over every normal declaration whatever its selector, so the next change has to
 answer it with another `!important`. Ported from stylelint's `declaration-no-important` by the
@@ -72,3 +70,8 @@ message: "`!important` overrides the cascade: raise the selector's specificity o
   }
 }
 ```
+
+## Differences from the source
+
+stylelint also reports a `!` and `important` written apart (`! important`). codelaw's CSS grammar does
+not parse that as a declaration, so this rule does not see it.
