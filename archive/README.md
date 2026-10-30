@@ -191,6 +191,7 @@ B-043, B-044 and B-045 are live in [`work/BACKLOG.md`](../work/BACKLOG.md).
 | B-040 | 2026-10-20 | W-21: native rules' file context |
 | B-041 | 2026-10-20 | W-21: the in-tree tree-sitter-css fork |
 | B-042 | 2026-10-20 | W-16: `rulesFor`/`rules_for`, `format` and `codelaw.schema.json` in both APIs |
+| B-063 | 2026-10-30 | W-150 (promoted): `publish.yml` uploads the Fux index set |
 
 ## `records/`
 

@@ -20,6 +20,7 @@ build jobs in `.github/workflows/ci.yml`.
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import base64
 import concurrent.futures
 import gzip
@@ -443,6 +444,12 @@ def tar_files(t: pathlib.Path) -> dict[str, bytes]:
         return {m.name[len("package/"):]: tf.extractfile(m).read() for m in tf.getmembers() if m.isfile()}
 
 
+def publish_tiers() -> list[str]:
+    """The globs of publish.yml's npm `tier` lines: what a release uploads to npm."""
+    wf = (ROOT / ".github" / "workflows" / "publish.yml").read_text(encoding="utf-8")
+    return [g for line in re.findall(r"^\s*tier (.+)$", wf, re.M) for g in line.split()]
+
+
 def check(out: pathlib.Path) -> None:
     v = versionmod.read_version()
     pv = pep440(v)
@@ -592,6 +599,13 @@ def check(out: pathlib.Path) -> None:
         f = out / rel
         if f.is_file() and hashlib.sha256(f.read_bytes()).hexdigest() != digest:
             bad.append(f"{rel}: its sha256 is not the one SHA256SUMS lists")
+
+    # every npm tarball is one publish.yml's npm job uploads (W-150: the
+    # dev-server plugins were built into every release and uploaded by none)
+    tiers = publish_tiers()
+    for tgz in sorted((out / "npm").glob("*.tgz")):
+        if not any(fnmatch.fnmatchcase(f"./dist/npm/{tgz.name}", g) for g in tiers):
+            bad.append(f"{tgz.name}: no `tier` in .github/workflows/publish.yml uploads it (W-150)")
 
     if bad:
         fail(f"{len(bad)} release check(s) failed:\n  " + "\n  ".join(bad))
