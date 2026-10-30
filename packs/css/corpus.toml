@@ -72,5 +72,6 @@
 "css/shorthand-property-no-redundant-values" = 18
 "css/string-no-newline" = 0
 "css/syntax-string-no-invalid" = 0
+"css/todo-marker" = 0
 "css/value-no-vendor-prefix" = 114
 "graph/no-unused-css-classes" = 16001

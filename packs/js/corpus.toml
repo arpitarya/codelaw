@@ -40,6 +40,7 @@
 "js/no-ex-assign" = 0
 "js/no-extra-boolean-cast" = 0
 "js/no-fallthrough" = 0
+"js/no-focused-tests" = 0
 "js/no-func-assign" = 0
 "js/no-global-assign" = 0
 "js/no-import-assign" = 0
@@ -80,6 +81,8 @@
 "js/prefer-spread" = 0
 "js/preserve-caught-error" = 0
 "js/require-yield" = 0
+"js/skipped-test" = 0
+"js/todo-marker" = 21
 "js/use-instead" = 0
 "js/use-isnan" = 0
 "js/valid-typeof" = 0
