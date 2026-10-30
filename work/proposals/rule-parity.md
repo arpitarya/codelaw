@@ -1,14 +1,14 @@
 ---
 type: Proposal
 title: Rule parity — every rule of nine linters, counted and matched against codelaw
-description: "W-138's outcome: 3,431 upstream rules from 19 packages (ESLint, typescript-eslint, TSLint, Ruff, Biome, stylelint, html-validate, markdownlint and the ESLint plugins codelaw's packs answer to) and Prettier's 29 options, each matched against codelaw's 689 rules and classed; 1,690 worth porting, in five tranches; the formatter measured against Prettier and Ruff on 1,279 files."
+description: "W-138's and W-144's outcome (round 2: SonarJS, Jest, Vitest, Testing Library, Playwright, promise, jsdoc, regexp, Next.js, two Tailwind plugins, Pylint — 1,211 more rules, 879 more to port). Round 1: 3,431 upstream rules from 19 packages (ESLint, typescript-eslint, TSLint, Ruff, Biome, stylelint, html-validate, markdownlint and the ESLint plugins codelaw's packs answer to) and Prettier's 29 options, each matched against codelaw's 689 rules and classed; 1,690 worth porting, in five tranches; the formatter measured against Prettier and Ruff on 1,279 files."
 status: graduated
 timestamp: 2026-10-30T02:45:00+05:30
 ---
 
 # Rule parity — every rule, counted
 
-**Ruled 2026-10-30 (Arpit, voice):** build all — 1,690 + 16 taste (opt-in) + 39 framework rules in five new PyPI packs = **1,745** (W-139); tranche A on by default, the rest preview/opt-in; four Prettier keys (W-141); Vue/Svelte/Astro/GraphQL as languages (W-143); round 2 (W-144); Tailwind (W-145). W-138 closed. Researched 2026-10-30 (Cowork, Opus 5.5) for
+**Ruled 2026-10-30 (Arpit, voice):** build all — 1,690 + 16 taste (opt-in) + 39 framework rules in five new PyPI packs = **1,745** (W-139); tranche A on by default, the rest preview/opt-in; four Prettier keys (W-141); Vue/Svelte/Astro/GraphQL as languages (W-143); round 2 (W-144); Tailwind (W-145). W-138 closed. **Round 2 ruled 2026-10-30 (voice):** a `testing` and a `nextjs` npm pack; SonarJS, Pylint and jsdoc opt-in; regexp and promise on by default; TSLint's 6 built — W-139 (§11); W-144 closed. Researched 2026-10-30 (Cowork, Opus 5.5) for
 [W-138](../open/W-138-rule-parity-research.md); [W-139](../open/W-139-rule-parity-build.md)
 builds what is ruled. Every number here is computed by the scripts in
 [`rule-parity/method/`](rule-parity/method/) from each tool's own published
@@ -194,3 +194,81 @@ What the differences are, from the samples read:
 - `method/`: the scripts and their inputs, so the tables can be rebuilt on a newer release of any tool: `node extract.mjs <dir> up.jsonl`, `node rec.mjs <dir> recommended.json`, `python3 classify.py`, `python3 tables.py`.
 
 Licences: names, ids, counts and short notes only — no rule text, docs or test is copied (L2).
+
+
+## 11 · Round 2 (W-144, researched 2026-10-30)
+
+*"Research w-144"* — Arpit, 2026-10-30. Same method, same scripts (`method/`, extended; `pylint_rules.py` added). Each tool read from its own package:
+
+| tool | version | licence | rules | covered | port | types | layout | same-as | other | notes |
+|---|---|---|--:|--:|--:|--:|--:|--:|--:|---|
+| eslint-plugin-sonarjs | 4.2.2 | LGPL-3.0 | 295 | 15 | 201 | 59 | | 7 | 13 retired | 7 repackage ESLint/typescript-eslint/React/regexp rules; behaviour only (L2) |
+| eslint-plugin-jest | 29.17.0 | MIT | 71 | 2 | 64 | 4 | 1 | | | |
+| @vitest/eslint-plugin | 1.6.28 | MIT | 82 | 2 | 25 | | | 55 | | 55 share Jest's rule — counted there |
+| eslint-plugin-testing-library | 7.16.2 | MIT | 29 | | 29 | | | | | |
+| eslint-plugin-playwright | 2.12.1 | MIT | 67 | 2 | 64 | | 1 | | | |
+| eslint-plugin-promise | 7.3.0 | ISC | 17 | | 17 | | | | | |
+| eslint-plugin-jsdoc | 65.4.2 | BSD-3 | 78 | | 71 | | 7 | | | an opt-in preset, as pydocstyle |
+| eslint-plugin-regexp | 3.3.2 | MIT | 82 | | 80 | | 2 | | | |
+| @next/eslint-plugin-next | 16.4.3 | MIT | 22 | | 22 | | | | | a `nextjs` pack |
+| eslint-plugin-tailwindcss | 4.4.0 | MIT | 9 | | 4 | | 1 | 4 | | 4 the same checks as better-tailwindcss |
+| eslint-plugin-better-tailwindcss | 4.10.0 | MIT | 15 | | 4 | | 11 | | | 11 are class order and spacing — the formatter, W-145 |
+| Pylint (with its 51 extension messages) | 4.1.3 | GPL-2.0 | 444 | 14 | 298 | 30 | 8 | 80 | 14 skip | 80 already in Ruff; 30 need Python type inference codelaw has no route for; 14 are run messages; behaviour only (L2) |
+| **round 2** | | | **1,211** | **35** | **879** | **93** | **31** | **146** | **27** | |
+
+**TSLint's 30 without a mapped successor** (`tslint-recheck.csv`): 12 now have one elsewhere (counted there), 2 are covered, 5 are formatting, 5 need types, **6 are worth building** — `js/file-header` (licence/copyright header), `js/no-default-import`, `ts/no-mergeable-namespace`, `js/no-unnecessary-callback-wrapper` (suggest only), and `js/comment-type`, `js/switch-final-break` in the taste preset.
+
+**Biome, recounted:** 52 Biome rules whose source is now read (SonarJS, Jest, Vitest, regexp, jsdoc, promise, Next.js, Playwright, Tailwind) move from Biome's `port` to `same-as` — counted under their source. Round 1's 1,745 is now 1,693 under round-1 tools plus those 52 under round-2 tools.
+
+**The CSVs now carry the 2026-10-30 rulings:** ESLint's 16 taste rules are `port` (P3, the opt-in taste preset); Ruff's 39 framework rules are `port` in `django`, `fastapi`, `airflow`, `numpy`, `pandas`; Biome's 89 note W-143.
+
+### Both rounds, pack by pack
+
+| pack | codelaw today | + A | + B | + C | + D | + E | after all |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| airflow | 0 |  |  |  | 7 | 6 | 13 |
+| css | 73 |  |  | 81 |  | 5 | 159 |
+| css-modules | 5 |  |  |  |  |  | 5 |
+| data | 44 | 5 |  | 5 |  | 4 | 58 |
+| django | 0 |  |  |  | 7 |  | 7 |
+| fastapi | 0 |  |  |  | 3 |  | 3 |
+| html | 74 | 1 |  | 11 |  |  | 86 |
+| js | 84 | 296 | 365 | 271 |  | 34 | 1050 |
+| nextjs | 0 | 22 |  |  |  |  | 22 |
+| node | 10 | 1 |  | 29 |  |  | 40 |
+| numpy | 0 |  |  |  | 4 |  | 4 |
+| pandas | 0 |  |  |  | 12 |  | 12 |
+| python | 109 | 77 |  |  | 810 | 80 | 1076 |
+| react | 35 | 39 |  | 111 |  | 11 | 196 |
+| redux-toolkit | 12 |  |  |  |  |  | 12 |
+| scss | 16 | 7 |  | 33 |  |  | 56 |
+| security-html | 19 |  |  |  |  |  | 19 |
+| security-js | 66 | 2 |  |  |  |  | 68 |
+| security-python | 61 |  |  |  | 2 | 3 | 66 |
+| security-ts | 16 |  |  |  |  |  | 16 |
+| spell | 7 |  |  |  |  |  | 7 |
+| stencil | 18 |  |  |  |  |  | 18 |
+| tailwind | 0 | 6 |  | 2 |  |  | 8 |
+| tanstack-query | 13 |  |  | 1 |  |  | 14 |
+| testing | 0 | 76 |  | 106 |  |  | 182 |
+| ts | 27 | 3 |  | 32 |  | 4 | 66 |
+| **all** | **689** | **535** | **365** | **682** | **845** | **147** | **3263** |
+
+Tranches: **A** recommended upstream · **B** unicorn · **C** stable, not recommended · **D** Ruff's and Pylint's long tail · **E** preview upstream and the taste preset. **2,574 to port** (+6 from TSLint's recheck = **2,580**): 705 auto, 370 suggest, 1,499 manual. 44 codelaw rules do an upstream rule's job without naming it (`*` in the CSVs).
+
+### Round 2, for the decider
+
+- **R5 — a `testing` pack** (npm only: `@codelaw/rules-testing`): Jest, Vitest, Testing Library and Playwright, 182 rules, a preset per framework (`testing/jest`, `testing/vitest`, `testing/playwright`, `testing/testing-library`). Python's test rules stay in `python` (Ruff's `PT`). Alternative: four packs. L6 amended either way.
+- **R6 — a `nextjs` pack** (npm only: `@codelaw/rules-nextjs`), 22 rules, `nextjs/recommended` on when installed.
+- **R7 — where round 2 goes by default.** Recommended: each source becomes an **opt-in preset** mirroring its own recommended set (`js/sonarjs`, `js/jsdoc`, `js/regexp`, `js/promise`, `py/pylint`) — SonarJS alone recommends 230 rules, too many to switch on for everyone; `nextjs` and `tailwind` presets on when their pack is installed; nothing joins `js/recommended` or `py/recommended` without a corpus run.
+- **R8 — TSLint's 6.** Recommended: build them (4 in their packs, 2 in the taste preset).
+
+The ports join W-139's build (ruled 2026-10-30: *"built along with everything else"*) once R5–R7 say where they live.
+
+**Round 2 ruled 2026-10-30 (Arpit, voice; written on *"file it."*):**
+
+- **R5 — a `testing` pack** (*"The testing pack."* → *"Let's create it."*): one npm pack, `@codelaw/rules-testing`, 182 rules for Jest, Vitest, Testing Library and Playwright, with a preset per framework (`testing/jest`, `testing/vitest`, `testing/testing-library`, `testing/playwright`) so a project switches on only the frameworks it uses. Python's test rules stay in `python` (Ruff's `PT`). L6 amended.
+- **R6 — a `nextjs` pack** (*"The next JS pack. Let's create it."*): npm only, `@codelaw/rules-nextjs`, 22 rules; `nextjs/recommended` on when the pack is installed. L6 amended.
+- **R7 — what is on by default:** SonarJS and Pylint **off** (*"Off by default. For Sonar.js or Pylint."*), as opt-in presets inside their packs, not new packs (told so → *"Perfect."*): `js/sonarjs` (201) and `py/pylint` (298). jsdoc off too, `js/jsdoc` (71), as recommended. regexp and promise **on** (*"Yes."*): their 70 upstream-recommended rules (regexp 60, promise 10) join `js/recommended`; their other 27 land `preview`, as R2. Each opt-in preset mirrors its source's recommended set; the testing presets likewise; `nextjs` and `tailwind` on when their pack is installed.
+- **R8 — TSLint's 6, built** (no new package; *"Let's file all this."*): `js/file-header`, `js/no-default-import`, `js/no-unnecessary-callback-wrapper` (suggest only) in `js`; `ts/no-mergeable-namespace` in `ts`; `js/comment-type` and `js/switch-final-break` in the taste preset.
+- **Where it is built:** W-139, with round 1 — every `port` row in the CSVs except the `tailwind` pack's 8, which W-145 builds with the pack, plus `tslint-recheck.csv`'s 6: **2,572 rules**. The two npm names are [W-147](../open/W-147-testing-nextjs-npm-first-publish.md). W-144 closed.

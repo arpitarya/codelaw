@@ -24,6 +24,10 @@ entry.**
 
 ## 1 · State of play
 
+**Ruled 2026-10-30 (voice): W-144 closed — round 2 joins W-139.** A `testing` npm pack (182 rules, a preset per framework) and a `nextjs` npm pack (22, on when installed); SonarJS, Pylint and jsdoc opt-in presets; regexp and promise on by default (70 rules into `js/recommended`); TSLint's 6 built. W-139 now builds 2,572 rules; Tailwind's 8 are W-145's; W-147 binds the two npm names.
+
+**Researched 2026-10-30 (Cowork): W-144, round 2.** 1,211 more rules (SonarJS 295, Pylint 444, test plugins 249, jsdoc 78, regexp 82, Next.js 22, Tailwind 24, promise 17); 879 to port. Both rounds: 2,580 to port, codelaw 689 → ~3,270. R5–R8 put to the decider (ruled above).
+
 **Ruled 2026-10-30 (voice): W-138 closed — build everything.** W-139 builds 1,745 rules (1,690 + ESLint's 16 taste rules + Ruff's 39 framework rules in five PyPI packs: django, fastapi, airflow, numpy, pandas); tranche A on by default. Filed: W-142 (their names), W-143 (Vue/Svelte/Astro/GraphQL as languages), W-144 (round-2 research), W-145 (Tailwind pack + class sorting), W-146 (PR hygiene; SR-ARCHITECTURE decision 14 widened).
 
 **Researched 2026-10-30 (Cowork): W-138, rule parity.** [The proposal](proposals/rule-parity.md): the nine linters ship 3,431 rules; 2,438 apply to codelaw; codelaw covers 653 (27%) — all 64 of ESLint's recommended, 74% of html-validate, 77% of markdownlint, 20% of Ruff, 0% of unicorn and jsx-a11y. 1,690 to port, tranches A (84, recommended upstream) · B (unicorn 366) · C (513 stable) · D (Ruff long tail 591) · E (preview 136). Formatter vs Prettier measured: CSS 42%, HTML 17% → W-141. Inbox: R1–R4.

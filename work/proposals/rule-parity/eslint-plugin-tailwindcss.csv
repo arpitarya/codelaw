@@ -1,0 +1,10 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+classnames-order,layout,,,,,,,auto,yes,,"class order and spacing: the formatter, W-145"
+enforces-canonical-classname,port,,tailwind,tailwind/enforces-canonical-classname,auto,P1,A,auto,yes,,
+enforces-negative-arbitrary-values,port,,tailwind,tailwind/enforces-negative-arbitrary-values,auto,P1,A,auto,yes,,
+enforces-shorthand,same-as,,,,,,,auto,yes,,the same check as eslint-plugin-better-tailwindcss/enforce-shorthand-classes: counted there
+important-modifier-suffix,port,,tailwind,tailwind/important-modifier-suffix,auto,P1,A,auto,yes,,
+no-arbitrary-value,port,,tailwind,tailwind/no-arbitrary-value,manual,P2,C,none,,,
+no-contradicting-classname,same-as,,,,,,,suggest,yes,,the same check as eslint-plugin-better-tailwindcss/no-conflicting-classes: counted there
+no-custom-classname,same-as,,,,,,,suggest,yes,,the same check as eslint-plugin-better-tailwindcss/no-unknown-classes: counted there
+no-unnecessary-arbitrary-value,same-as,,,,,,,auto,yes,,the same check as eslint-plugin-better-tailwindcss/enforce-canonical-classes: counted there

@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ## Open items (20)
 
-### build (17)
+### build (18)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -55,7 +55,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-135** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
 
-🟢 **W-139** `agent` Ruled 10-30: build all — 1,690 ports + ESLint's 16 taste rules (opt-in) + Ruff's 39 framework rules as five PyPI packs = 1,745; tranche A on by default, the rest preview/opt-in. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
+🟢 **W-139** `agent` Ruled 10-30: build all — both rounds, 2,572 rules: five PyPI framework packs, two npm packs (`testing`, `nextjs`); tranche A on by default, the rest preview/opt-in; SonarJS, Pylint, jsdoc opt-in; regexp, promise on. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
 
 🟢 **W-141** `agent` Formatter vs Prettier, measured on 1,279 files: CSS 42% and HTML 17% identical — a CSS comment/selector defect and void elements first, then each language to ≥ 98%. Filed by Arpit (Cowork). [detail](open/W-141-formatter-parity.md)
 
@@ -67,6 +67,8 @@ here. Read that record before changing anything below it.
 
 🟢 **W-146** `agent` PR hygiene: `git/commit-message` (Conventional Commits, configurable), `git/branch-name`, `git/pr-size` (400 lines), `git/pr-description`; commit-msg hook, CI, agent hook; git use widened (SR-ARCHITECTURE 14). Filed by Arpit (Cowork). [detail](open/W-146-pr-hygiene.md)
 
+🟡 **W-147** waits on **W-139** `arpit` npm first hand publish of `@codelaw/rules-testing`, `@codelaw/rules-nextjs` and their Fux indexes, then their trusted publisher; just before the release that carries them. Filed by Arpit (Cowork). [detail](open/W-147-testing-nextjs-npm-first-publish.md)
+
 ### testing (0)
 
 ### reporting and benchmarks (2)
@@ -77,8 +79,6 @@ here. Read that record before changing anything below it.
 
 ### record update (0)
 
-### research (1)
-
-🟢 **W-144** `cowork` Research, round 2: sonarjs, Jest/Vitest/Testing Library/Playwright, promise, jsdoc, regexp, full Pylint, Next.js, Tailwind — counted, matched, classed, reimplemented fresh; TSLint's 30 rechecked. Filed by Arpit (Cowork). [detail](open/W-144-rule-parity-round-2.md)
+### research (0)
 
 ---

@@ -6,19 +6,19 @@ A003,port,,python,py/builtin-attribute-shadowing,manual,P2,D,none,,,flake8-built
 A004,port,,python,py/builtin-import-shadowing,manual,P2,D,none,,,flake8-builtins
 A005,port,,python,py/stdlib-module-shadowing,manual,P2,D,none,,,flake8-builtins
 A006,port,,python,py/builtin-lambda-argument-shadowing,manual,P2,D,none,,,flake8-builtins
-AIR001,out-of-scope,,,,,,,none,,,"Airflow, a framework with no codelaw pack"
-AIR002,out-of-scope,,,,,,,none,,,"Airflow, a framework with no codelaw pack"
-AIR003,out-of-scope,,,,,,,none,,,"Airflow, preview upstream, a framework with no codelaw pack"
-AIR004,out-of-scope,,,,,,,none,,,"Airflow, preview upstream, a framework with no codelaw pack"
-AIR201,out-of-scope,,,,,,,suggest,,,"Airflow, preview upstream, a framework with no codelaw pack"
-AIR202,out-of-scope,,,,,,,auto,,,"Airflow, preview upstream, a framework with no codelaw pack"
-AIR301,out-of-scope,,,,,,,suggest,,,"Airflow, a framework with no codelaw pack"
-AIR302,out-of-scope,,,,,,,suggest,,,"Airflow, a framework with no codelaw pack"
-AIR303,out-of-scope,,,,,,,none,,,"Airflow, a framework with no codelaw pack"
-AIR304,out-of-scope,,,,,,,none,,,"Airflow, preview upstream, a framework with no codelaw pack"
-AIR311,out-of-scope,,,,,,,suggest,,,"Airflow, a framework with no codelaw pack"
-AIR312,out-of-scope,,,,,,,suggest,,,"Airflow, a framework with no codelaw pack"
-AIR321,out-of-scope,,,,,,,suggest,,,"Airflow, preview upstream, a framework with no codelaw pack"
+AIR001,port,,airflow,airflow/airflow-variable-name-task-id-mismatch,manual,P2,D,none,,,"Airflow, its own pack (ruled 2026-10-30)"
+AIR002,port,,airflow,airflow/airflow-dag-no-schedule-argument,manual,P2,D,none,,,"Airflow, its own pack (ruled 2026-10-30)"
+AIR003,port,,airflow,airflow/airflow-variable-get-outside-task,manual,P3,E,none,,,"Airflow, preview upstream, its own pack (ruled 2026-10-30)"
+AIR004,port,,airflow,airflow/airflow-task-branch-as-short-circuit,manual,P3,E,none,,,"Airflow, preview upstream, its own pack (ruled 2026-10-30)"
+AIR201,port,,airflow,airflow/airflow-xcom-pull-in-template-string,suggest,P3,E,suggest,,,"Airflow, preview upstream, its own pack (ruled 2026-10-30)"
+AIR202,port,,airflow,airflow/airflow-task-implicit-multiple-outputs,auto,P3,E,auto,,,"Airflow, preview upstream, its own pack (ruled 2026-10-30)"
+AIR301,port,,airflow,airflow/airflow3-removal,suggest,P2,D,suggest,,,"Airflow, its own pack (ruled 2026-10-30)"
+AIR302,port,,airflow,airflow/airflow3-moved-to-provider,suggest,P2,D,suggest,,,"Airflow, its own pack (ruled 2026-10-30)"
+AIR303,port,,airflow,airflow/airflow3-incompatible-function-signature,manual,P2,D,none,,,"Airflow, its own pack (ruled 2026-10-30)"
+AIR304,port,,airflow,airflow/airflow3-dag-dynamic-value,manual,P3,E,none,,,"Airflow, preview upstream, its own pack (ruled 2026-10-30)"
+AIR311,port,,airflow,airflow/airflow3-suggested-update,suggest,P2,D,suggest,,,"Airflow, its own pack (ruled 2026-10-30)"
+AIR312,port,,airflow,airflow/airflow3-suggested-to-move-to-provider,suggest,P2,D,suggest,,,"Airflow, its own pack (ruled 2026-10-30)"
+AIR321,port,,airflow,airflow/airflow31-moved,suggest,P3,E,suggest,,,"Airflow, preview upstream, its own pack (ruled 2026-10-30)"
 ANN001,port,,python,py/missing-type-function-argument,manual,P2,D,none,,,flake8-annotations
 ANN002,port,,python,py/missing-type-args,manual,P2,D,none,,,flake8-annotations
 ANN003,port,,python,py/missing-type-kwargs,manual,P2,D,none,,,flake8-annotations
@@ -167,13 +167,13 @@ D418,port,,python,py/overload-with-docstring,manual,P2,D,none,,,pydocstyle
 D419,port,,python,py/empty-docstring,manual,P2,D,none,,,pydocstyle
 D420,port,,python,py/incorrect-section-order,manual,P3,E,none,,,"pydocstyle, preview upstream"
 D421,port,,python,py/property-docstring-starts-with-verb,manual,P3,E,none,,,"pydocstyle, preview upstream"
-DJ001,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
-DJ003,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
-DJ006,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
-DJ007,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
-DJ008,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
-DJ012,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
-DJ013,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
+DJ001,port,,django,django/django-nullable-model-string-field,manual,P2,D,none,,,"flake8-django, its own pack (ruled 2026-10-30)"
+DJ003,port,,django,django/django-locals-in-render-function,manual,P2,D,none,,,"flake8-django, its own pack (ruled 2026-10-30)"
+DJ006,port,,django,django/django-exclude-with-model-form,manual,P2,D,none,,,"flake8-django, its own pack (ruled 2026-10-30)"
+DJ007,port,,django,django/django-all-with-model-form,manual,P2,D,none,,,"flake8-django, its own pack (ruled 2026-10-30)"
+DJ008,port,,django,django/django-model-without-dunder-str,manual,P2,D,none,,,"flake8-django, its own pack (ruled 2026-10-30)"
+DJ012,port,,django,django/django-unordered-body-content-in-model,manual,P2,D,none,,,"flake8-django, its own pack (ruled 2026-10-30)"
+DJ013,port,,django,django/django-non-leading-receiver-decorator,manual,P2,D,none,,,"flake8-django, its own pack (ruled 2026-10-30)"
 DOC102,port,,python,py/docstring-extraneous-parameter,manual,P3,E,none,,,"pydoclint, preview upstream"
 DOC201,port,,python,py/docstring-missing-returns,manual,P3,E,none,,,"pydoclint, preview upstream"
 DOC202,port,,python,py/docstring-extraneous-returns,manual,P3,E,none,,,"pydoclint, preview upstream"
@@ -305,9 +305,9 @@ F842,covered,py/unused-annotation,,,,,,none,yes,,
 F901,covered,py/raise-not-implemented,,,,,,suggest,yes,,
 FA100,port,,python,py/future-rewritable-type-annotation,auto,P2,D,auto,,,flake8-future-annotations
 FA102,port,,python,py/future-required-type-annotation,auto,P2,D,auto,,,flake8-future-annotations
-FAST001,out-of-scope,,,,,,,auto,,,"FastAPI, a framework with no codelaw pack"
-FAST002,out-of-scope,,,,,,,suggest,,,"FastAPI, a framework with no codelaw pack"
-FAST003,out-of-scope,,,,,,,suggest,,,"FastAPI, a framework with no codelaw pack"
+FAST001,port,,fastapi,fastapi/fast-api-redundant-response-model,auto,P2,D,auto,,,"FastAPI, its own pack (ruled 2026-10-30)"
+FAST002,port,,fastapi,fastapi/fast-api-non-annotated-dependency,suggest,P2,D,suggest,,,"FastAPI, its own pack (ruled 2026-10-30)"
+FAST003,port,,fastapi,fastapi/fast-api-unused-path-parameter,suggest,P2,D,suggest,,,"FastAPI, its own pack (ruled 2026-10-30)"
 FBT001,port,,python,py/boolean-type-hint-positional-argument,manual,P2,D,none,,,flake8-boolean-trap
 FBT002,port,,python,py/boolean-default-value-positional-argument,manual,P2,D,none,,,flake8-boolean-trap
 FBT003,port,,python,py/boolean-positional-value-in-call,manual,P2,D,none,,,flake8-boolean-trap
@@ -396,23 +396,23 @@ N816,port,,python,py/mixed-case-variable-in-global-scope,manual,P2,D,none,,,pep8
 N817,port,,python,py/camelcase-imported-as-acronym,manual,P2,D,none,,,pep8-naming
 N818,port,,python,py/error-suffix-on-exception-name,manual,P2,D,none,,,pep8-naming
 N999,port,,python,py/invalid-module-name,manual,P2,D,none,,,pep8-naming
-NPY001,out-of-scope,,,,,,,suggest,,,"NumPy-specific rules, a framework with no codelaw pack"
-NPY002,out-of-scope,,,,,,,none,,,"NumPy-specific rules, a framework with no codelaw pack"
-NPY003,out-of-scope,,,,,,,suggest,,,"NumPy-specific rules, a framework with no codelaw pack"
-NPY201,out-of-scope,,,,,,,suggest,,,"NumPy-specific rules, a framework with no codelaw pack"
-PD002,out-of-scope,,,,,,,suggest,,,"pandas-vet, a framework with no codelaw pack"
-PD003,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD004,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD007,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD008,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD009,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD010,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD011,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD012,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD013,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD015,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD101,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
-PD901,retired,,,,,,,none,,yes,"pandas-vet, a framework with no codelaw pack"
+NPY001,port,,numpy,numpy/numpy-deprecated-type-alias,suggest,P2,D,suggest,,,"NumPy-specific rules, its own pack (ruled 2026-10-30)"
+NPY002,port,,numpy,numpy/numpy-legacy-random,manual,P2,D,none,,,"NumPy-specific rules, its own pack (ruled 2026-10-30)"
+NPY003,port,,numpy,numpy/numpy-deprecated-function,suggest,P2,D,suggest,,,"NumPy-specific rules, its own pack (ruled 2026-10-30)"
+NPY201,port,,numpy,numpy/numpy2-deprecation,suggest,P2,D,suggest,,,"NumPy-specific rules, its own pack (ruled 2026-10-30)"
+PD002,port,,pandas,pandas/pandas-use-of-inplace-argument,suggest,P2,D,suggest,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD003,port,,pandas,pandas/pandas-use-of-dot-is-null,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD004,port,,pandas,pandas/pandas-use-of-dot-not-null,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD007,port,,pandas,pandas/pandas-use-of-dot-ix,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD008,port,,pandas,pandas/pandas-use-of-dot-at,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD009,port,,pandas,pandas/pandas-use-of-dot-iat,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD010,port,,pandas,pandas/pandas-use-of-dot-pivot-or-unstack,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD011,port,,pandas,pandas/pandas-use-of-dot-values,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD012,port,,pandas,pandas/pandas-use-of-dot-read-table,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD013,port,,pandas,pandas/pandas-use-of-dot-stack,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD015,port,,pandas,pandas/pandas-use-of-pd-merge,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD101,port,,pandas,pandas/pandas-nunique-constant-series-check,manual,P2,D,none,,,"pandas-vet, its own pack (ruled 2026-10-30)"
+PD901,retired,,,,,,,none,,yes,"pandas-vet, its own pack (ruled 2026-10-30)"
 PERF101,port,,python,py/unnecessary-list-cast,auto,P2,D,auto,,,Perflint
 PERF102,port,,python,py/incorrect-dict-iterator,auto,P2,D,auto,,,Perflint
 PERF203,port,,python,py/try-except-in-loop,manual,P2,D,none,,,Perflint

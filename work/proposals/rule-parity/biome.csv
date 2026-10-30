@@ -47,14 +47,14 @@ complexity/noEmptyTypeParameters,port,,ts,ts/no-empty-type-parameters,manual,P1,
 complexity/noExcessiveCognitiveComplexity,covered,js/complexity,,,,,,none,,,"through its source: eslint-plugin-sonarjs/cognitive-complexity, eslint/complexity"
 complexity/noExcessiveLinesPerFunction,covered,js/max-lines-per-function,,,,,,none,,,through its source: eslint/max-lines-per-function
 complexity/noExcessiveNestedCallbacks,same-as,,,,,,,none,,,counted under eslint/max-nested-callbacks
-complexity/noExcessiveNestedTestSuites,port,,js,js/no-excessive-nested-test-suites,manual,P2,C,none,,,"source: eslint-plugin-jest/max-nested-describe, @vitest/eslint-plugin/max-nested-describe"
+complexity/noExcessiveNestedTestSuites,same-as,,,,,,,none,,,"counted under eslint-plugin-jest/max-nested-describe, @vitest/eslint-plugin/max-nested-describe"
 complexity/noExcessiveSelectorClasses,same-as,,,,,,,none,,,counted under stylelint/selector-max-class
 complexity/noExtraBooleanCast,covered,js/no-extra-boolean-cast,,,,,,auto,yes,,through its source: eslint/no-extra-boolean-cast
 complexity/noFlatMapIdentity,port,,js,js/no-flat-map-identity,suggest,P1,A,suggest,yes,,source: clippy/flat_map_identity
 complexity/noForEach,same-as,,,,,,,none,,,counted under eslint-plugin-unicorn/no-array-for-each
 complexity/noImplicitCoercions,same-as,,,,,,,suggest,,,counted under eslint/no-implicit-coercion
 complexity/noImportantStyles,covered,css/no-important*,,,,,,suggest,yes,,"through its source: stylelint/declaration-no-important, EslintCss/no-important"
-complexity/noPlaywrightUselessAwait,port,,js,js/no-playwright-useless-await,auto,P2,C,auto,,,source: eslint-plugin-playwright/no-useless-await
+complexity/noPlaywrightUselessAwait,same-as,,,,,,,auto,,,counted under eslint-plugin-playwright/no-useless-await
 complexity/noRedundantDefaultExport,port,,js,js/no-redundant-default-export,manual,P2,C,none,,,Biome only
 complexity/noStaticOnlyClass,same-as,,,,,,,none,yes,,"counted under typescript-eslint/no-extraneous-class, eslint-plugin-unicorn/no-static-only-class"
 complexity/noThisInStatic,port,,js,js/no-this-in-static,suggest,P1,A,suggest,yes,,source: eslint-plugin-mysticatea/no-this-in-static
@@ -95,20 +95,20 @@ complexity/useRegexLiterals,same-as,,,,,,,auto,yes,,counted under eslint/prefer-
 complexity/useRegexpTest,same-as,,,,,,,suggest,,,counted under eslint-plugin-unicorn/prefer-regexp-test
 complexity/useSimpleNumberKeys,port,,js,js/use-simple-number-keys,auto,P1,A,auto,yes,,Biome only
 complexity/useSimplifiedLogicExpression,port,,js,js/use-simplified-logic-expression,auto,P2,C,auto,,,Biome only
-complexity/useWhile,port,,js,js/use-while,auto,P2,C,auto,,,source: eslint-plugin-sonarjs/prefer-while
-correctness/noBeforeInteractiveScriptOutsideDocument,port,,react,react/no-before-interactive-script-outside-document,manual,P2,C,none,,,source: @next/eslint-plugin-next/no-before-interactive-script-outside-document
+complexity/useWhile,same-as,,,,,,,auto,,,counted under eslint-plugin-sonarjs/prefer-while
+correctness/noBeforeInteractiveScriptOutsideDocument,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/no-before-interactive-script-outside-document
 correctness/noChildrenProp,covered,react/no-children-prop,,,,,,none,,,"through its source: eslint-plugin-react/no-children-prop, EslintReactJsx/no-children-prop, @eslint-react/jsx-no-children-prop"
 correctness/noComponentHookFactories,same-as,,,,,,,none,,,counted under eslint-plugin-react-hooks/component-hook-factories
 correctness/noConstAssign,covered,js/no-const-assign,,,,,,suggest,yes,,through its source: eslint/no-const-assign
 correctness/noConstantCondition,covered,js/no-constant-condition,,,,,,none,yes,,"through its source: eslint/no-constant-condition, eslint-plugin-vue/no-constant-condition"
 correctness/noConstantMathMinMaxClamp,port,,js,js/no-constant-math-min-max-clamp,suggest,P1,A,suggest,yes,,source: clippy/min_max
 correctness/noConstructorReturn,same-as,,,,,,,none,yes,,counted under eslint/no-constructor-return
-correctness/noDuplicateArgumentNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql
+correctness/noDuplicateArgumentNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql — W-143
 correctness/noDuplicateAttributes,port,,html,html/no-duplicate-attributes,manual,P1,A,none,yes,,"source: @html-eslint/no-duplicate-attrs, eslint-plugin-vue/no-duplicate-attributes"
-correctness/noDuplicateEnumValueNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql
-correctness/noDuplicateFieldDefinitionNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql
-correctness/noDuplicateInputFieldNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql
-correctness/noDuplicateVariableNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql
+correctness/noDuplicateEnumValueNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql — W-143
+correctness/noDuplicateFieldDefinitionNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql — W-143
+correctness/noDuplicateInputFieldNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql — W-143
+correctness/noDuplicateVariableNames,out-of-scope,,,,,,,none,yes,,language outside L3: graphql — W-143
 correctness/noEmptyCharacterClassInRegex,covered,js/no-empty-character-class,,,,,,none,yes,,through its source: eslint/no-empty-character-class
 correctness/noEmptyPattern,covered,js/no-empty-pattern,,,,,,none,yes,,"through its source: eslint/no-empty-pattern, eslint-plugin-vue/no-empty-pattern"
 correctness/noGlobalDirnameFilename,same-as,,,,,,,auto,,,counted under eslint-plugin-unicorn/prefer-module
@@ -123,10 +123,10 @@ correctness/noInvalidUseBeforeDeclaration,same-as,,,,,,,none,yes,,"counted under
 correctness/noJsxNamespace,port,,react,react/no-jsx-namespace,manual,P2,C,none,,,"source: EslintReactJsx/no-namespace, @eslint-react/jsx-no-namespace"
 correctness/noMissingVarFunction,covered,css/custom-property-no-missing-var-function,,,,,,none,yes,,through its source: stylelint/custom-property-no-missing-var-function
 correctness/noNestedComponentDefinitions,covered,react/no-nested-components,,,,,,none,,,"through its source: @eslint-react/no-nested-component-definitions, @eslint-react/no-nested-component-definitions"
-correctness/noNextAsyncClientComponent,port,,react,react/no-next-async-client-component,manual,P2,C,none,,,source: @next/eslint-plugin-next/no-async-client-component
+correctness/noNextAsyncClientComponent,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/no-async-client-component
 correctness/noNodejsModules,same-as,,,,,,,none,,,counted under eslint-plugin-import/no-nodejs-modules
 correctness/noNonoctalDecimalEscape,covered,js/no-nonoctal-decimal-escape,,,,,,auto,yes,,through its source: eslint/no-nonoctal-decimal-escape
-correctness/noPlaywrightMissingAwait,port,,js,js/no-playwright-missing-await,suggest,P2,C,suggest,,,source: eslint-plugin-playwright/missing-playwright-await
+correctness/noPlaywrightMissingAwait,same-as,,,,,,,suggest,,,counted under eslint-plugin-playwright/missing-playwright-await
 correctness/noPrecisionLoss,covered,js/no-loss-of-precision,,,,,,none,yes,,"through its source: eslint/no-loss-of-precision, typescript-eslint/no-loss-of-precision, clippy/lossy_float_literal, eslint-plugin-vue/no-loss-of-precision"
 correctness/noPrivateImports,port,,js,js/no-private-imports,manual,P2,C,none,,,source: eslint-plugin-import-access/eslint-plugin-import-access
 correctness/noProcessGlobal,port,,js,js/no-process-global,auto,P2,C,auto,,,source: deno_lint/no-process-global
@@ -164,56 +164,56 @@ correctness/noUnusedVariables,covered,js/no-unused-vars ts/no-unused-vars,,,,,,s
 correctness/noVoidElementsWithChildren,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-react/void-dom-elements-no-children
 correctness/noVoidTypeReturn,port,,js,js/no-void-type-return,manual,P1,A,none,yes,,Biome only
 correctness/noVueDataObjectDeclaration,port,,js,js/no-vue-data-object-declaration,auto,P2,C,auto,,,"source: eslint-plugin-vue/no-deprecated-data-object-declaration, eslint-plugin-vue/no-shared-component-data"
-correctness/noVueDuplicateKeys,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/noVueImportCompilerMacros,out-of-scope,,,,,,,none,,,language outside L3: vue
+correctness/noVueDuplicateKeys,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/noVueImportCompilerMacros,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 correctness/noVueRefAsOperand,port,,js,js/no-vue-ref-as-operand,manual,P2,C,none,,,source: eslint-plugin-vue/no-ref-as-operand
-correctness/noVueReservedKeys,out-of-scope,,,,,,,none,,,language outside L3: vue
+correctness/noVueReservedKeys,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 correctness/noVueReservedProps,port,,js,js/no-vue-reserved-props,manual,P2,C,none,,,source: eslint-plugin-vue/no-reserved-props
 correctness/noVueSetupPropsReactivityLoss,port,,js,js/no-vue-setup-props-reactivity-loss,manual,P2,C,none,,,source: eslint-plugin-vue/no-setup-props-reactivity-loss
-correctness/noVueVIfWithVFor,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/noVueVOnNumberValues,out-of-scope,,,,,,,none,,,language outside L3: vue
+correctness/noVueVIfWithVFor,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/noVueVOnNumberValues,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 correctness/preset,port,,js,js/preset-biome,manual,P2,C,none,,,Biome only
 correctness/useExhaustiveDependencies,covered,react/exhaustive-deps,,,,,,suggest,,,"through its source: eslint-plugin-react-hooks/exhaustive-deps, @eslint-react/exhaustive-deps, @eslint-react/exhaustive-deps"
-correctness/useGraphqlNamedOperations,out-of-scope,,,,,,,suggest,yes,,language outside L3: graphql
+correctness/useGraphqlNamedOperations,out-of-scope,,,,,,,suggest,yes,,language outside L3: graphql — W-143
 correctness/useHookAtTopLevel,covered,react/rules-of-hooks,,,,,,none,,,through its source: eslint-plugin-react-hooks/rules-of-hooks
 correctness/useImageSize,port,,react,react/use-image-size,manual,P2,C,none,,,source: eslint-plugin-qwik/jsx-img
 correctness/useImportExtensions,same-as,,,,,,,auto,,,counted under eslint-plugin-import/extensions
-correctness/useInlineScriptId,port,,react,react/use-inline-script-id,manual,P2,C,none,,,source: @next/eslint-plugin-next/inline-script-id
+correctness/useInlineScriptId,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/inline-script-id
 correctness/useIsNan,covered,js/use-isnan,,,,,,suggest,yes,,through its source: eslint/use-isnan
 correctness/useJsonImportAttributes,port,,js,js/use-json-import-attributes,auto,P2,C,auto,,,Biome only
 correctness/useJsxKeyInIterable,covered,react/jsx-key,,,,,,none,,,"through its source: eslint-plugin-react/jsx-key, eslint-plugin-qwik/jsx-key, @eslint-react/no-missing-key, @eslint-react/no-missing-key"
-correctness/useLoneAnonymousOperation,out-of-scope,,,,,,,none,yes,,language outside L3: graphql
+correctness/useLoneAnonymousOperation,out-of-scope,,,,,,,none,yes,,language outside L3: graphql — W-143
 correctness/useParseIntRadix,same-as,,,,,,,suggest,yes,,counted under eslint/radix
-correctness/usePlaywrightValidDescribeCallback,port,,js,js/use-playwright-valid-describe-callback,manual,P2,C,none,,,source: eslint-plugin-playwright/valid-describe-callback
+correctness/usePlaywrightValidDescribeCallback,same-as,,,,,,,none,,,counted under eslint-plugin-playwright/valid-describe-callback
 correctness/useQwikClasslist,port,,react,react/use-qwik-classlist,manual,P2,C,none,,,source: eslint-plugin-qwik/prefer-classlist
 correctness/useQwikLoaderLocation,port,,react,react/use-qwik-loader-location,manual,P2,C,none,,,source: eslint-plugin-qwik/loader-location
 correctness/useQwikMethodUsage,port,,js,js/use-qwik-method-usage,manual,P2,C,none,,,source: eslint-plugin-qwik/use-method-usage
 correctness/useQwikValidLexicalScope,port,,js,js/use-qwik-valid-lexical-scope,manual,P2,C,none,,,source: eslint-plugin-qwik/valid-lexical-scope
 correctness/useReactAsyncServerFunction,same-as,,,,,,,suggest,,,counted under eslint-plugin-react/async-server-action
 correctness/useReactNativePlatformComponents,port,,react,react/use-react-native-platform-components,manual,P2,C,none,,,source: EslintReactNativeIntellicode/split-platform-components
-correctness/useSingleJsDocAsterisk,port,,js,js/use-single-js-doc-asterisk,suggest,P2,C,suggest,,,source: eslint-plugin-jsdoc/no-multi-asterisks
+correctness/useSingleJsDocAsterisk,same-as,,,,,,,suggest,,,counted under eslint-plugin-jsdoc/no-multi-asterisks
 correctness/useUniqueElementIds,port,,react,react/use-unique-element-ids,manual,P2,C,none,,,Biome only
 correctness/useValidForDirection,covered,js/for-direction,,,,,,none,yes,,through its source: eslint/for-direction
 correctness/useValidTypeof,covered,js/valid-typeof,,,,,,suggest,yes,,through its source: eslint/valid-typeof
-correctness/useVueVForKey,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/useVueValidTemplateRoot,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-correctness/useVueValidVBind,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/useVueValidVCloak,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-correctness/useVueValidVElse,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/useVueValidVElseIf,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/useVueValidVFor,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/useVueValidVHtml,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/useVueValidVIf,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/useVueValidVOn,out-of-scope,,,,,,,none,,,language outside L3: vue
-correctness/useVueValidVOnce,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-correctness/useVueValidVPre,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-correctness/useVueValidVText,out-of-scope,,,,,,,none,,,language outside L3: vue
+correctness/useVueVForKey,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/useVueValidTemplateRoot,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+correctness/useVueValidVBind,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/useVueValidVCloak,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+correctness/useVueValidVElse,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/useVueValidVElseIf,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/useVueValidVFor,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/useVueValidVHtml,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/useVueValidVIf,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/useVueValidVOn,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+correctness/useVueValidVOnce,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+correctness/useVueValidVPre,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+correctness/useVueValidVText,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 correctness/useYield,covered,js/require-yield,,,,,,none,yes,,through its source: eslint/require-yield
 nursery/noAccidentalBitwiseOperators,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/no-accidental-bitwise-operator
 nursery/noArgumentsCallerOrCallee,same-as,,,,,,,none,yes,,counted under eslint/no-caller
 nursery/noArraySortForMinMax,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/no-array-sort-for-min-max
-nursery/noAstroConflictingSetDirectives,out-of-scope,,,,,,,none,,,language outside L3: astro
-nursery/noAstroSetHtmlDirective,out-of-scope,,,,,,,none,,,language outside L3: astro
+nursery/noAstroConflictingSetDirectives,out-of-scope,,,,,,,none,,,language outside L3: astro — W-143
+nursery/noAstroSetHtmlDirective,out-of-scope,,,,,,,none,,,language outside L3: astro — W-143
 nursery/noBaseToString,same-as,,,,,,,none,,,counted under typescript-eslint/no-base-to-string
 nursery/noBooleanSortComparator,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/no-boolean-sort-comparator
 nursery/noBunModules,port,,js,js/no-bun-modules,manual,P3,E,none,,,nursery upstream; Biome only
@@ -237,8 +237,8 @@ nursery/noMisleadingReturnType,port,,ts,ts/no-misleading-return-type,manual,P3,E
 nursery/noMisplacedListElements,port,,react,react/no-misplaced-list-elements,manual,P3,E,none,yes,,nursery upstream; source: @html-eslint/require-li-container
 nursery/noMisusedPromises,same-as,,,,,,,suggest,,,counted under typescript-eslint/no-misused-promises
 nursery/noNegationInEqualityCheck,same-as,,,,,,,suggest,,,counted under eslint-plugin-unicorn/no-negation-in-equality-check
-nursery/noNestedSwitch,port,,js,js/no-nested-switch,manual,P3,E,none,,,nursery upstream; source: eslint-plugin-sonarjs/no-nested-switch
-nursery/noNestedTemplateLiterals,port,,js,js/no-nested-template-literals,manual,P3,E,none,,,nursery upstream; source: eslint-plugin-sonarjs/no-nested-template-literals
+nursery/noNestedSwitch,same-as,,,,,,,none,,,counted under eslint-plugin-sonarjs/no-nested-switch
+nursery/noNestedTemplateLiterals,same-as,,,,,,,none,,,counted under eslint-plugin-sonarjs/no-nested-template-literals
 nursery/noNewRequire,same-as,,,,,,,none,,,"counted under eslint/no-new-require, eslint-plugin-n/no-new-require"
 nursery/noNonScalableViewport,port,,react,react/no-non-scalable-viewport,manual,P3,E,none,,,nursery upstream; source: @html-eslint/no-non-scalable-viewport
 nursery/noNull,same-as,,,,,,,suggest,,,counted under eslint-plugin-unicorn/no-null
@@ -253,26 +253,26 @@ nursery/noPromiseExecutorReturn,same-as,,,,,,,suggest,,,counted under eslint/no-
 nursery/noReactObjectTypeAsDefaultProp,same-as,,,,,,,none,,,counted under eslint-plugin-react/no-object-type-as-default-prop
 nursery/noRestrictedDependencies,port,,js,js/no-restricted-dependencies,manual,P3,E,none,,,nursery upstream; source: @e18e/eslint-plugin/ban-dependencies
 nursery/noReturnArrayPush,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/no-return-array-push
-nursery/noReturnInFinally,port,,js,js/no-return-in-finally,manual,P3,E,none,yes,,nursery upstream; source: eslint-plugin-promise/no-return-in-finally
+nursery/noReturnInFinally,same-as,,,,,,,none,yes,,counted under eslint-plugin-promise/no-return-in-finally
 nursery/noSelfImport,same-as,,,,,,,none,,,counted under eslint-plugin-import/no-self-import
 nursery/noSelfNestedLayer,port,,css,css/no-self-nested-layer,manual,P3,E,none,,,nursery upstream; Biome only
 nursery/noShortTimeValues,same-as,,,,,,,none,,,counted under stylelint/time-min-milliseconds
-nursery/noSvelteAddEventListener,out-of-scope,,,,,,,suggest,,,language outside L3: svelte
-nursery/noSvelteAtDebugTags,out-of-scope,,,,,,,auto,,,language outside L3: svelte
-nursery/noSvelteAtHtmlTags,out-of-scope,,,,,,,none,,,language outside L3: svelte
-nursery/noSvelteClassDirective,out-of-scope,,,,,,,none,,,language outside L3: svelte
-nursery/noSvelteExportLet,out-of-scope,,,,,,,none,,,language outside L3: svelte
-nursery/noSvelteInspect,out-of-scope,,,,,,,none,,,language outside L3: svelte
+nursery/noSvelteAddEventListener,out-of-scope,,,,,,,suggest,,,language outside L3: svelte — W-143
+nursery/noSvelteAtDebugTags,out-of-scope,,,,,,,auto,,,language outside L3: svelte — W-143
+nursery/noSvelteAtHtmlTags,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
+nursery/noSvelteClassDirective,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
+nursery/noSvelteExportLet,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
+nursery/noSvelteInspect,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
 nursery/noSvelteInternal,port,,js,js/no-svelte-internal,manual,P3,E,none,,,nursery upstream; source: eslint-plugin-svelte/no-svelte-internal
-nursery/noSvelteLegacyConst,out-of-scope,,,,,,,none,,,language outside L3: svelte
-nursery/noSvelteObjectInTextMustaches,out-of-scope,,,,,,,none,,,language outside L3: svelte
-nursery/noSvelteUnnecessaryStateWrap,out-of-scope,,,,,,,suggest,,,language outside L3: svelte
-nursery/noSvelteUselessDerivedBy,out-of-scope,,,,,,,auto,,,language outside L3: svelte
-nursery/noTailwindArbitraryValue,port,,react,react/no-tailwind-arbitrary-value,manual,P3,E,none,,,"nursery upstream; source: EslintTailwindcss/no-arbitrary-value, EslintShadcn/no-arbitrary-values"
-nursery/noTailwindLegacyUtilities,port,,react,react/no-tailwind-legacy-utilities,auto,P3,E,auto,,,nursery upstream; source: EslintBetterTailwindcss/no-deprecated-classes
+nursery/noSvelteLegacyConst,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
+nursery/noSvelteObjectInTextMustaches,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
+nursery/noSvelteUnnecessaryStateWrap,out-of-scope,,,,,,,suggest,,,language outside L3: svelte — W-143
+nursery/noSvelteUselessDerivedBy,out-of-scope,,,,,,,auto,,,language outside L3: svelte — W-143
+nursery/noTailwindArbitraryValue,same-as,,,,,,,none,,,counted under EslintTailwindcss/no-arbitrary-value
+nursery/noTailwindLegacyUtilities,same-as,,,,,,,auto,,,counted under EslintBetterTailwindcss/no-deprecated-classes
 nursery/noTailwindRawColors,port,,react,react/no-tailwind-raw-colors,manual,P3,E,none,,,nursery upstream; source: EslintShadcn/no-raw-colors
 nursery/noTailwindRestyledComponents,port,,react,react/no-tailwind-restyled-components,manual,P3,E,none,,,nursery upstream; source: EslintShadcn/no-restyle
-nursery/noTanstackQueryRestDestructuring,port,,js,js/no-tanstack-query-rest-destructuring,manual,P3,E,none,,,nursery upstream; source: EslintTanstackQuery/no-rest-destructuring
+nursery/noTanstackQueryRestDestructuring,covered,tanstack-query/no-rest-destructuring,,,,,,none,,,through its source: EslintTanstackQuery/no-rest-destructuring
 nursery/noThisOutsideOfClass,same-as,,,,,,,none,,,counted under eslint-plugin-unicorn/no-this-outside-of-class
 nursery/noUndeclaredClasses,port,,js,js/no-undeclared-classes,manual,P3,E,none,,,nursery upstream; Biome only
 nursery/noUndeclaredCustomProperties,port,,react,react/no-undeclared-custom-properties,manual,P3,E,none,,,nursery upstream; Biome only
@@ -291,38 +291,38 @@ nursery/noUselessDateGetTime,same-as,,,,,,,suggest,yes,,counted under eslint-plu
 nursery/noUselessRecursion,same-as,,,,,,,none,,,counted under eslint-plugin-unicorn/no-useless-recursion
 nursery/noUselessSplice,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/no-unnecessary-splice
 nursery/noUselessTypeConversion,same-as,,,,,,,none,,,counted under typescript-eslint/no-unnecessary-type-conversion
-nursery/noVueBooleanDefault,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueComputedPropertiesInData,out-of-scope,,,,,,,none,,,language outside L3: vue
+nursery/noVueBooleanDefault,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueComputedPropertiesInData,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 nursery/noVueDeprecatedDeleteSet,retired,,,,,,,none,,yes,
 nursery/noVueDeprecatedListeners,retired,,,,,,,none,,yes,
 nursery/noVueDeprecatedRouterLinkTagProp,retired,,,,,,,none,,yes,
 nursery/noVueDeprecatedScopeAttribute,retired,,,,,,,none,,yes,
 nursery/noVueDeprecatedScopedSlots,retired,,,,,,,suggest,,yes,
-nursery/noVueLifecycleAfterAwait,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueMultipleSlotArgs,out-of-scope,,,,,,,none,,,language outside L3: vue
+nursery/noVueLifecycleAfterAwait,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueMultipleSlotArgs,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 nursery/noVueMutatingProps,port,,js,js/no-vue-mutating-props,manual,P3,E,none,,,nursery upstream; source: eslint-plugin-vue/no-mutating-props
-nursery/noVueRequiredPropWithDefault,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-nursery/noVueRootVIf,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueShadowNativeEvents,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueSideEffectsInComputed,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueUndeclaredDirectives,out-of-scope,,,,,,,none,,,language outside L3: vue
+nursery/noVueRequiredPropWithDefault,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+nursery/noVueRootVIf,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueShadowNativeEvents,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueSideEffectsInComputed,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueUndeclaredDirectives,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 nursery/noVueUnusedEmitDeclarations,port,,js,js/no-vue-unused-emit-declarations,manual,P3,E,none,,,nursery upstream; source: eslint-plugin-vue/no-unused-emit-declarations
-nursery/noVueUnusedRefs,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueVHtml,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueVText,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueVTextVHtmlOnComponent,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/noVueWatchAfterAwait,out-of-scope,,,,,,,none,,,language outside L3: vue
+nursery/noVueUnusedRefs,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueVHtml,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueVText,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueVTextVHtmlOnComponent,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/noVueWatchAfterAwait,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 nursery/noXorAsExponentiation,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/no-xor-as-exponentiation
 nursery/noYamlBooleanKeys,port,,js,js/no-yaml-boolean-keys,manual,P3,E,none,yes,,nursery upstream; Biome only
 nursery/noZeroFractions,same-as,,,,,,,auto,,,counted under eslint-plugin-unicorn/no-zero-fractions
 nursery/noZeroLengthUnit,covered,css/length-zero-no-unit,,,,,,suggest,yes,,through its source: stylelint/length-zero-no-unit
-nursery/useAstroClientOnlyDirectiveValue,out-of-scope,,,,,,,none,,,language outside L3: astro
+nursery/useAstroClientOnlyDirectiveValue,out-of-scope,,,,,,,none,,,language outside L3: astro — W-143
 nursery/useAwaitThenable,same-as,,,,,,,none,,,counted under typescript-eslint/use-await-thenable
 nursery/useBetterDomTraversing,same-as,,,,,,,suggest,,,counted under eslint-plugin-unicorn/better-dom-traversing
 nursery/useBigintLiterals,same-as,,,,,,,auto,yes,,counted under eslint-plugin-unicorn/prefer-bigint-literals
 nursery/useBlockStatementOverIife,same-as,,,,,,,auto,yes,,counted under eslint-plugin-unicorn/prefer-block-statement-over-iife
 nursery/useCapitalizedConstructors,same-as,,,,,,,none,yes,,counted under eslint/new-cap
-nursery/useConsistentBlockLang,out-of-scope,,,,,,,suggest,,,language outside L3: svelte vue
+nursery/useConsistentBlockLang,out-of-scope,,,,,,,suggest,,,language outside L3: svelte vue — W-143
 nursery/useConsistentFunctionStyle,same-as,,,,,,,none,,,counted under eslint/func-style
 nursery/useConsistentHeadingLevel,port,,js,js/use-consistent-heading-level,manual,P3,E,none,yes,,nursery upstream; Biome only
 nursery/useConsistentJsonFileRead,same-as,,,,,,,suggest,,,counted under eslint-plugin-unicorn/consistent-json-file-read
@@ -332,7 +332,7 @@ nursery/useConsistentUnicodeBom,same-as,,,,,,,auto,,,counted under eslint/unicod
 nursery/useControlLabel,same-as,,,,,,,none,,,counted under eslint-plugin-jsx-a11y/control-has-associated-label
 nursery/useDisposables,port,,ts,ts/use-disposables,suggest,P3,E,suggest,,,nursery upstream; Biome only
 nursery/useExhaustiveSwitchCases,same-as,,,,,,,suggest,,,counted under typescript-eslint/switch-exhaustiveness-check
-nursery/useExpectToContain,port,,js,js/use-expect-to-contain,suggest,P3,E,suggest,,,"nursery upstream; source: eslint-plugin-jest/prefer-to-contain, @vitest/eslint-plugin/prefer-to-contain, eslint-plugin-playwright/prefer-to-contain"
+nursery/useExpectToContain,same-as,,,,,,,suggest,,,"counted under eslint-plugin-jest/prefer-to-contain, @vitest/eslint-plugin/prefer-to-contain, eslint-plugin-playwright/prefer-to-contain"
 nursery/useExplicitReturnType,same-as,,,,,,,none,,,counted under typescript-eslint/explicit-function-return-type
 nursery/useExplicitType,same-as,,,,,,,none,,,"counted under typescript-eslint/explicit-function-return-type, typescript-eslint/explicit-module-boundary-types"
 nursery/useFencedCodeLanguage,port,,js,js/use-fenced-code-language,manual,P3,E,none,yes,,nursery upstream; Biome only
@@ -341,7 +341,7 @@ nursery/useIncludes,same-as,,,,,,,suggest,,,"counted under typescript-eslint/pre
 nursery/useIteratorZip,same-as,,,,,,,none,,,counted under eslint-plugin-unicorn/prefer-iterator-zip
 nursery/useLayeredStyles,port,,css,css/use-layered-styles,manual,P3,E,none,,,nursery upstream; source: EslintCss/use-layers
 nursery/useLogicalProperties,same-as,,,,,,,suggest,,,"counted under stylelint/csstools/use-logical, stylelint/liberty/use-logical-spec"
-nursery/useLowercaseTestTitle,port,,js,js/use-lowercase-test-title,suggest,P3,E,suggest,,,"nursery upstream; source: eslint-plugin-jest/prefer-lowercase-title, @vitest/eslint-plugin/prefer-lowercase-title, eslint-plugin-playwright/prefer-lowercase-title"
+nursery/useLowercaseTestTitle,same-as,,,,,,,suggest,,,"counted under eslint-plugin-jest/prefer-lowercase-title, @vitest/eslint-plugin/prefer-lowercase-title, eslint-plugin-playwright/prefer-lowercase-title"
 nursery/useMatchingFunctionName,same-as,,,,,,,none,,,counted under eslint/func-name-matching
 nursery/useMathAbs,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/prefer-math-abs
 nursery/useMathTrunc,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/prefer-math-trunc
@@ -356,60 +356,60 @@ nursery/useReactCompiler,port,,react,react/use-react-compiler,manual,P3,E,none,,
 nursery/useReactFunctionComponentDefinition,same-as,,,,,,,suggest,,,counted under eslint-plugin-react/function-component-definition
 nursery/useReactNamingConvention,port,,react,react/use-react-naming-convention,manual,P3,E,none,,,"nursery upstream; source: @eslint-react/naming-convention-context-name, EslintReactNamingConvention/context-name, @eslint-react/naming-convention-id-name, EslintReactNamingConvention/id-name, @eslint-react/naming-convention-ref-name, EslintReactNamingConvention/ref-name"
 nursery/useReactNativeValidPlatformColors,port,,js,js/use-react-native-valid-platform-colors,manual,P3,E,none,,,nursery upstream; source: EslintReactNative/platform-colors
-nursery/useRegexpExec,same-as,,,,,,,none,,,counted under typescript-eslint/prefer-regexp-exec
+nursery/useRegexpExec,same-as,,,,,,,none,,,"counted under typescript-eslint/prefer-regexp-exec, eslint-plugin-regexp/prefer-regexp-exec"
 nursery/useSimplifiedBooleanReturn,same-as,,,,,,,auto,yes,,counted under eslint-plugin-unicorn/prefer-boolean-return
 nursery/useSingleTopLevelHeading,port,,js,js/use-single-top-level-heading,manual,P3,E,none,yes,,nursery upstream; Biome only
 nursery/useStrictBooleanExpressions,same-as,,,,,,,none,,,counted under typescript-eslint/strict-boolean-expressions
 nursery/useStringStartsEndsWith,same-as,,,,,,,suggest,,,counted under typescript-eslint/prefer-string-starts-ends-with
-nursery/useSvelteEventDispatcherTypes,out-of-scope,,,,,,,none,,,language outside L3: svelte
+nursery/useSvelteEventDispatcherTypes,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
 nursery/useSvelteKitResolve,port,,js,js/use-svelte-kit-resolve,manual,P3,E,none,,,nursery upstream; source: eslint-plugin-svelte/no-navigation-without-resolve
 nursery/useSvelteKitRuneImports,port,,js,js/use-svelte-kit-rune-imports,manual,P3,E,none,,,nursery upstream; Biome only
-nursery/useSvelteReactiveClasses,out-of-scope,,,,,,,none,,,language outside L3: svelte
-nursery/useSvelteRequireEachKey,out-of-scope,,,,,,,none,,,language outside L3: svelte
-nursery/useSvelteShorthandDirective,out-of-scope,,,,,,,auto,,,language outside L3: svelte
-nursery/useTailwindShorthandClasses,port,,react,react/use-tailwind-shorthand-classes,suggest,P3,E,suggest,,,"nursery upstream; source: EslintBetterTailwindcss/enforce-shorthand-classes, EslintTailwindcss/enforces-shorthand"
-nursery/useTailwindSortedClasses,port,,react,react/use-tailwind-sorted-classes,suggest,P3,E,suggest,,,"nursery upstream; source: EslintBetterTailwindcss/enforce-consistent-class-order, EslintTailwindcss/classnames-order"
+nursery/useSvelteReactiveClasses,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
+nursery/useSvelteRequireEachKey,out-of-scope,,,,,,,none,,,language outside L3: svelte — W-143
+nursery/useSvelteShorthandDirective,out-of-scope,,,,,,,auto,,,language outside L3: svelte — W-143
+nursery/useTailwindShorthandClasses,same-as,,,,,,,suggest,,,"counted under EslintBetterTailwindcss/enforce-shorthand-classes, EslintTailwindcss/enforces-shorthand"
+nursery/useTailwindSortedClasses,same-as,,,,,,,suggest,,,"counted under EslintBetterTailwindcss/enforce-consistent-class-order, EslintTailwindcss/classnames-order"
 nursery/useTailwindStaticClassStrings,port,,react,react/use-tailwind-static-class-strings,manual,P3,E,none,,,nursery upstream; source: EslintShadcn/require-static-classes
 nursery/useTopLevelHeading,port,,js,js/use-top-level-heading,manual,P3,E,none,,,nursery upstream; Biome only
 nursery/useUnaryMinus,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/prefer-unary-minus
-nursery/useValidTestTitle,port,,js,js/use-valid-test-title,auto,P3,E,auto,,,"nursery upstream; source: eslint-plugin-jest/valid-title, @vitest/eslint-plugin/valid-title"
+nursery/useValidTestTitle,same-as,,,,,,,auto,,,"counted under eslint-plugin-jest/valid-title, @vitest/eslint-plugin/valid-title"
 nursery/useVueBaseImport,port,,js,js/use-vue-base-import,auto,P3,E,auto,,,nursery upstream; source: eslint-plugin-vue/prefer-import-from-vue
-nursery/useVueComponentIs,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueConsistentEventHyphenation,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-nursery/useVueDefineOptions,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueDefinePropsDestructuring,out-of-scope,,,,,,,none,,,language outside L3: vue
+nursery/useVueComponentIs,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueConsistentEventHyphenation,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+nursery/useVueDefineOptions,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueDefinePropsDestructuring,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 nursery/useVueMatchingComponentFileName,port,,js,js/use-vue-matching-component-file-name,suggest,P3,E,suggest,,,nursery upstream; Biome only
-nursery/useVueTemplateRef,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueToggleInsideTransition,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueTypedProps,out-of-scope,,,,,,,none,,,language outside L3: vue
+nursery/useVueTemplateRef,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueToggleInsideTransition,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueTypedProps,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 nursery/useVueTypedRef,port,,ts,ts/use-vue-typed-ref,manual,P3,E,none,,,nursery upstream; source: eslint-plugin-vue/require-typed-ref
-nursery/useVueVModel,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-nursery/useVueVOnExact,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueValidDefineEmits,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueValidDefineProps,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueValidVIs,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueValidVMemo,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueValidVModel,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueValidVShow,out-of-scope,,,,,,,none,,,language outside L3: vue
-nursery/useVueValidVSlot,out-of-scope,,,,,,,none,,,language outside L3: vue
+nursery/useVueVModel,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+nursery/useVueVOnExact,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueValidDefineEmits,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueValidDefineProps,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueValidVIs,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueValidVMemo,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueValidVModel,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueValidVShow,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+nursery/useVueValidVSlot,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 nursery/useWhileLoopCondition,same-as,,,,,,,auto,yes,,counted under eslint-plugin-unicorn/prefer-while-loop-condition
 performance/noAccumulatingSpread,port,,js,js/no-accumulating-spread,manual,P1,A,none,yes,,Biome only
 performance/noAwaitInLoops,same-as,,,,,,,none,,,counted under eslint/no-await-in-loop
 performance/noBarrelFile,port,,js,js/no-barrel-file,manual,P2,C,none,,,source: eslint-plugin-barrel-files/avoid-barrel-files
 performance/noDelete,covered,js/no-delete-var,,,,,,suggest,,,through its source: eslint/no-delete-var
 performance/noDynamicNamespaceImportAccess,port,,js,js/no-dynamic-namespace-import-access,manual,P1,A,none,yes,,Biome only
-performance/noImgElement,port,,react,react/no-img-element,manual,P2,C,none,,,source: @next/eslint-plugin-next/no-img-element
+performance/noImgElement,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/no-img-element
 performance/noJsxPropsBind,same-as,,,,,,,none,,,counted under eslint-plugin-react/jsx-no-bind
 performance/noNamespaceImport,port,,js,js/no-namespace-import,manual,P2,C,none,,,source: eslint-plugin-barrel-files/avoid-namespace-import
 performance/noReExportAll,port,,js,js/no-re-export-all,manual,P2,C,none,,,source: eslint-plugin-barrel-files/avoid-re-export-all
-performance/noSyncScripts,port,,react,react/no-sync-scripts,manual,P2,C,none,,,source: @next/eslint-plugin-next/no-sync-scripts
-performance/noUnwantedPolyfillio,port,,react,react/no-unwanted-polyfillio,manual,P2,C,none,,,source: @next/eslint-plugin-next/no-unwanted-polyfillio
+performance/noSyncScripts,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/no-sync-scripts
+performance/noUnwantedPolyfillio,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/no-unwanted-polyfillio
 performance/preset,port,,js,js/preset-biome,manual,P2,C,none,,,Biome only
 performance/useDomNodeTextContent,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/prefer-dom-node-text-content
-performance/useGoogleFontPreconnect,port,,react,react/use-google-font-preconnect,auto,P2,C,auto,,,source: @next/eslint-plugin-next/google-font-preconnect
+performance/useGoogleFontPreconnect,same-as,,,,,,,auto,,,counted under @next/eslint-plugin-next/google-font-preconnect
 performance/useSolidForComponent,port,,react,react/use-solid-for-component,manual,P2,C,none,,,source: eslint-plugin-solid/prefer-for
 performance/useTopLevelRegex,port,,js,js/use-top-level-regex,manual,P2,C,none,,,Biome only
-performance/useVueVapor,out-of-scope,,,,,,,suggest,,,language outside L3: vue
+performance/useVueVapor,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
 security/noBlankTarget,covered,react/jsx-no-target-blank,,,,,,auto,yes,,"through its source: eslint-plugin-react/jsx-no-target-blank, EslintReactDom/no-unsafe-target-blank, @eslint-react/dom-no-unsafe-target-blank, eslint-plugin-svelte/no-target-blank, eslint-plugin-vue/no-template-target-blank, @html-eslint/no-target-blank"
 security/noDangerouslySetInnerHtml,covered,sec-js/no-dangerously-set-inner-html*,,,,,,none,,,"through its source: eslint-plugin-react/no-danger, EslintReactDom/no-dangerously-set-innerhtml, @eslint-react/dom-no-dangerously-set-innerhtml"
 security/noDangerouslySetInnerHtmlWithChildren,covered,react/no-danger-with-children,,,,,,none,,,"through its source: eslint-plugin-react/no-danger-with-children, EslintReactDom/no-dangerously-set-innerhtml-with-children, @eslint-react/dom-no-dangerously-set-innerhtml-with-children"
@@ -422,12 +422,12 @@ style/noCommonJs,covered,ts/no-require-imports,,,,,,none,,,"through its source: 
 style/noContinue,same-as,,,,,,,none,,,counted under eslint/no-continue
 style/noDefaultExport,covered,js/no-default-export*,,,,,,none,,,through its source: eslint-plugin-import/no-default-export
 style/noDescendingSpecificity,covered,css/no-descending-specificity,,,,,,none,yes,,through its source: stylelint/no-descending-specificity
-style/noDoneCallback,port,,js,js/no-done-callback,manual,P2,C,none,,,"source: eslint-plugin-jest/no-done-callback, @vitest/eslint-plugin/no-done-callback"
+style/noDoneCallback,same-as,,,,,,,none,,,"counted under eslint-plugin-jest/no-done-callback, @vitest/eslint-plugin/no-done-callback"
 style/noEnum,port,,ts,ts/no-enum,manual,P2,C,none,,,Biome only
 style/noExcessiveClassesPerFile,same-as,,,,,,,none,,,counted under eslint/max-classes-per-file
 style/noExcessiveLinesPerFile,covered,js/max-lines,,,,,,none,,,through its source: eslint/max-lines
 style/noExportedImports,port,,js,js/no-exported-imports,manual,P2,C,none,,,Biome only
-style/noHeadElement,port,,react,react/no-head-element,manual,P2,C,none,,,source: @next/eslint-plugin-next/no-head-element
+style/noHeadElement,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/no-head-element
 style/noHexColors,same-as,,,,,,,none,,,counted under stylelint/color-no-hex
 style/noImplicitBoolean,same-as,,,,,,,auto,,,counted under eslint-plugin-react/jsx-boolean-value
 style/noIncrementDecrement,same-as,,,,,,,none,,,counted under eslint/no-plusplus
@@ -443,15 +443,15 @@ style/noNestedTernary,same-as,,,,,,,none,,,"counted under eslint/no-nested-terna
 style/noNonNullAssertion,same-as,,,,,,,suggest,yes,,counted under typescript-eslint/no-non-null-assertion
 style/noParameterAssign,same-as,,,,,,,none,,,counted under eslint/no-param-reassign
 style/noParameterProperties,same-as,,,,,,,none,,,counted under typescript-eslint/parameter-properties
-style/noPlaywrightElementHandle,port,,js,js/no-playwright-element-handle,suggest,P2,C,suggest,,,source: eslint-plugin-playwright/no-element-handle
-style/noPlaywrightEval,port,,js,js/no-playwright-eval,manual,P2,C,none,,,source: eslint-plugin-playwright/no-eval
-style/noPlaywrightWaitForSelector,port,,js,js/no-playwright-wait-for-selector,suggest,P2,C,suggest,,,source: eslint-plugin-playwright/no-wait-for-selector
+style/noPlaywrightElementHandle,same-as,,,,,,,suggest,,,counted under eslint-plugin-playwright/no-element-handle
+style/noPlaywrightEval,same-as,,,,,,,none,,,counted under eslint-plugin-playwright/no-eval
+style/noPlaywrightWaitForSelector,same-as,,,,,,,suggest,,,counted under eslint-plugin-playwright/no-wait-for-selector
 style/noProcessEnv,same-as,,,,,,,none,,,"counted under eslint-plugin-n/no-process-env, eslint/no-process-env"
 style/noReactNativeLiteralColors,port,,react,react/no-react-native-literal-colors,manual,P2,C,none,,,source: EslintReactNativeIntellicode/no-color-literals
 style/noRestrictedGlobals,covered,js/use-instead*,,,,,,none,,,through its source: eslint/no-restricted-globals
 style/noRestrictedImports,covered,js/use-instead*,,,,,,none,,,"through its source: eslint/no-restricted-imports, typescript-eslint/no-restricted-imports"
 style/noRestrictedTypes,same-as,,,,,,,auto,,,counted under typescript-eslint/no-restricted-types
-style/noRootType,out-of-scope,,,,,,,none,,,language outside L3: graphql
+style/noRootType,out-of-scope,,,,,,,none,,,language outside L3: graphql — W-143
 style/noShoutyConstants,port,,js,js/no-shouty-constants,suggest,P2,C,suggest,,,Biome only
 style/noSubstr,same-as,,,,,,,suggest,,,counted under eslint-plugin-unicorn/prefer-string-slice
 style/noTernary,same-as,,,,,,,none,,,counted under eslint/no-ternary
@@ -474,11 +474,11 @@ style/useConsistentArrowReturn,same-as,,,,,,,auto,,,counted under eslint/arrow-b
 style/useConsistentBuiltinInstantiation,covered,js/no-new-native-nonconstructor,,,,,,suggest,,,"through its source: eslint/no-new-wrappers, eslint/no-new-native-nonconstructor"
 style/useConsistentCurlyBraces,same-as,,,,,,,suggest,,,counted under eslint-plugin-react/jsx-curly-brace-presence
 style/useConsistentEnumValueType,same-as,,,,,,,none,,,counted under typescript-eslint/no-mixed-enums
-style/useConsistentGraphqlDescriptions,out-of-scope,,,,,,,none,,,language outside L3: graphql
+style/useConsistentGraphqlDescriptions,out-of-scope,,,,,,,none,,,language outside L3: graphql — W-143
 style/useConsistentMemberAccessibility,same-as,,,,,,,none,,,counted under typescript-eslint/explicit-member-accessibility
 style/useConsistentMethodSignatures,same-as,,,,,,,suggest,,,counted under typescript-eslint/method-signature-style
 style/useConsistentObjectDefinitions,same-as,,,,,,,auto,,,counted under eslint/object-shorthand
-style/useConsistentTestIt,port,,js,js/use-consistent-test-it,auto,P2,C,auto,,,"source: eslint-plugin-jest/consistent-test-it, @vitest/eslint-plugin/consistent-test-it"
+style/useConsistentTestIt,same-as,,,,,,,auto,,,"counted under eslint-plugin-jest/consistent-test-it, @vitest/eslint-plugin/consistent-test-it"
 style/useConsistentTypeDefinitions,same-as,,,,,,,suggest,,,counted under typescript-eslint/consistent-type-definitions
 style/useConst,covered,js/prefer-const,,,,,,auto,yes,,"through its source: eslint/prefer-const, eslint-plugin-svelte/prefer-const, deno_lint/prefer-const"
 style/useDefaultParameterLast,same-as,,,,,,,suggest,,,"counted under eslint/default-param-last, typescript-eslint/default-param-last"
@@ -496,13 +496,13 @@ style/useFilenamingConvention,same-as,,,,,,,none,,,counted under eslint-plugin-u
 style/useForOf,same-as,,,,,,,none,,,"counted under typescript-eslint/prefer-for-of, eslint-plugin-unicorn/no-for-loop"
 style/useFragmentSyntax,same-as,,,,,,,suggest,,,counted under eslint-plugin-react/jsx-fragments
 style/useGlobalThis,same-as,,,,,,,none,,,counted under eslint-plugin-unicorn/prefer-global-this
-style/useGraphqlNamingConvention,out-of-scope,,,,,,,none,,,language outside L3: graphql
+style/useGraphqlNamingConvention,out-of-scope,,,,,,,none,,,language outside L3: graphql — W-143
 style/useGroupedAccessorPairs,same-as,,,,,,,none,,,counted under eslint/grouped-accessor-pairs
 style/useImportType,covered,ts/type-only-imports*,,,,,,auto,yes,,through its source: typescript-eslint/consistent-type-imports
 style/useImportsFirst,same-as,,,,,,,none,,,counted under eslint-plugin-import/first
-style/useInputName,out-of-scope,,,,,,,none,,,language outside L3: graphql
+style/useInputName,out-of-scope,,,,,,,none,,,language outside L3: graphql — W-143
 style/useLiteralEnumMembers,same-as,,,,,,,none,yes,,counted under typescript-eslint/prefer-literal-enum-member
-style/useLoneExecutableDefinition,out-of-scope,,,,,,,none,,,language outside L3: graphql
+style/useLoneExecutableDefinition,out-of-scope,,,,,,,none,,,language outside L3: graphql — W-143
 style/useNamedCaptureGroup,same-as,,,,,,,none,,,counted under eslint/prefer-named-capture-group
 style/useNamingConvention,port,,react,react/use-naming-convention,auto,P2,C,auto,,,Biome only
 style/useNodeAssertStrict,port,,js,js/use-node-assert-strict,auto,P2,C,auto,,,Biome only
@@ -520,8 +520,8 @@ style/useSingleVarDeclarator,same-as,,,,,,,suggest,,,counted under eslint/one-va
 style/useSpreadOverApply,covered,js/prefer-spread,,,,,,suggest,,,"through its source: eslint/prefer-spread, @e18e/eslint-plugin/prefer-spread-syntax"
 style/useSymbolDescription,same-as,,,,,,,none,,,counted under eslint/symbol-description
 style/useTemplate,same-as,,,,,,,suggest,yes,,counted under eslint/prefer-template
-style/useTestHooksInOrder,port,,js,js/use-test-hooks-in-order,manual,P2,C,none,,,"source: eslint-plugin-jest/prefer-hooks-in-order, @vitest/eslint-plugin/prefer-hooks-in-order, eslint-plugin-playwright/prefer-hooks-in-order"
-style/useTestHooksOnTop,port,,js,js/use-test-hooks-on-top,manual,P2,C,none,,,"source: eslint-plugin-jest/prefer-hooks-on-top, @vitest/eslint-plugin/prefer-hooks-on-top, eslint-plugin-playwright/prefer-hooks-on-top"
+style/useTestHooksInOrder,same-as,,,,,,,none,,,"counted under eslint-plugin-jest/prefer-hooks-in-order, @vitest/eslint-plugin/prefer-hooks-in-order, eslint-plugin-playwright/prefer-hooks-in-order"
+style/useTestHooksOnTop,same-as,,,,,,,none,,,"counted under eslint-plugin-jest/prefer-hooks-on-top, @vitest/eslint-plugin/prefer-hooks-on-top, eslint-plugin-playwright/prefer-hooks-on-top"
 style/useThisInClassMethods,same-as,,,,,,,none,,,counted under eslint/class-methods-use-this
 style/useThrowNewError,same-as,,,,,,,suggest,,,counted under eslint-plugin-unicorn/throw-new-error
 style/useThrowOnlyError,same-as,,,,,,,none,,,"counted under eslint/no-throw-literal, typescript-eslint/only-throw-error"
@@ -529,13 +529,13 @@ style/useTrimStartEnd,same-as,,,,,,,auto,,,counted under eslint-plugin-unicorn/p
 style/useUnicodeRegex,same-as,,,,,,,auto,,,counted under eslint/require-unicode-regexp
 style/useUnifiedTypeSignatures,same-as,,,,,,,suggest,,,counted under typescript-eslint/unified-signatures
 style/useVarsOnTop,same-as,,,,,,,none,,,counted under eslint/vars-on-top
-style/useVueConsistentDefinePropsDeclaration,out-of-scope,,,,,,,none,,,language outside L3: vue
-style/useVueConsistentVBindStyle,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-style/useVueConsistentVOnStyle,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-style/useVueDefineMacrosOrder,out-of-scope,,,,,,,suggest,,,language outside L3: vue
-style/useVueHyphenatedAttributes,out-of-scope,,,,,,,suggest,,,language outside L3: vue
+style/useVueConsistentDefinePropsDeclaration,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
+style/useVueConsistentVBindStyle,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+style/useVueConsistentVOnStyle,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+style/useVueDefineMacrosOrder,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
+style/useVueHyphenatedAttributes,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
 style/useVueMultiWordComponentNames,port,,js,js/use-vue-multi-word-component-names,manual,P2,C,none,,,Biome only
-style/useVueNextTickPromise,out-of-scope,,,,,,,none,,,language outside L3: vue
+style/useVueNextTickPromise,out-of-scope,,,,,,,none,,,language outside L3: vue — W-143
 suspicious/noAlert,same-as,,,,,,,none,,,counted under eslint/no-alert
 suspicious/noApproximativeNumericConstant,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/prefer-math-constants
 suspicious/noArrayIndexKey,same-as,,,,,,,none,,,counted under eslint-plugin-react/no-array-index-key
@@ -547,7 +547,7 @@ suspicious/noCatchAssign,covered,js/no-ex-assign,,,,,,none,yes,,through its sour
 suspicious/noClassAssign,covered,js/no-class-assign,,,,,,none,yes,,through its source: eslint/no-class-assign
 suspicious/noCommentText,covered,react/jsx-no-comment-textnodes,,,,,,suggest,yes,,through its source: eslint-plugin-react/jsx-no-comment-textnodes
 suspicious/noCompareNegZero,covered,js/no-compare-neg-zero,,,,,,auto,yes,,through its source: eslint/no-compare-neg-zero
-suspicious/noConditionalExpect,port,,js,js/no-conditional-expect,manual,P2,C,none,,,"source: eslint-plugin-playwright/no-conditional-expect, eslint-plugin-jest/no-conditional-expect, @vitest/eslint-plugin/no-conditional-expect"
+suspicious/noConditionalExpect,same-as,,,,,,,none,,,"counted under eslint-plugin-playwright/no-conditional-expect, eslint-plugin-jest/no-conditional-expect, @vitest/eslint-plugin/no-conditional-expect"
 suspicious/noConfusingLabels,same-as,,,,,,,none,yes,,counted under eslint/no-labels
 suspicious/noConfusingVoidType,same-as,,,,,,,suggest,yes,,counted under typescript-eslint/no-invalid-void-type
 suspicious/noConsole,covered,js/no-console,,,,,,suggest,,,"through its source: eslint/no-console, eslint-plugin-vue/no-console, deno_lint/no-console"
@@ -558,7 +558,7 @@ suspicious/noDebugger,covered,js/no-debugger,,,,,,suggest,yes,,"through its sour
 suspicious/noDeprecatedImports,retired,,,,,,,none,,yes,
 suspicious/noDeprecatedMediaType,covered,css/media-type-no-deprecated,,,,,,none,yes,,through its source: stylelint/media-type-no-deprecated
 suspicious/noDocumentCookie,port,,js,js/no-document-cookie-biome,manual,P1,A,none,yes,,Biome only
-suspicious/noDocumentImportInPage,port,,react,react/no-document-import-in-page,manual,P2,C,none,,,source: @next/eslint-plugin-next/no-document-import-in-page
+suspicious/noDocumentImportInPage,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/no-document-import-in-page
 suspicious/noDoubleEquals,same-as,,,,,,,suggest,yes,,counted under eslint/eqeqeq
 suspicious/noDrizzleDeleteWithoutWhere,port,,js,js/no-drizzle-delete-without-where,manual,P2,C,none,,,source: eslint-plugin-drizzle/enforce-delete-with-where
 suspicious/noDrizzleUpdateWithoutWhere,port,,js,js/no-drizzle-update-without-where,manual,P2,C,none,,,Biome only
@@ -569,16 +569,16 @@ suspicious/noDuplicateCustomProperties,covered,css/declaration-block-no-duplicat
 suspicious/noDuplicateDependencies,port,,data,json/no-duplicate-dependencies,manual,P2,C,none,,,"source: eslint-plugin-package-json/unique-dependencies, EslintPackageJsonDependencies/duplicate-dependencies"
 suspicious/noDuplicateElseIf,covered,js/no-dupe-else-if,,,,,,none,yes,,through its source: eslint/no-dupe-else-if
 suspicious/noDuplicateEnumValues,covered,ts/no-duplicate-enum-values,,,,,,none,yes,,through its source: typescript-eslint/no-duplicate-enum-values
-suspicious/noDuplicateFields,out-of-scope,,,,,,,none,yes,,language outside L3: graphql
+suspicious/noDuplicateFields,out-of-scope,,,,,,,none,yes,,language outside L3: graphql — W-143
 suspicious/noDuplicateFontNames,covered,css/font-family-no-duplicate-names,,,,,,none,yes,,through its source: stylelint/font-family-no-duplicate-names
-suspicious/noDuplicateGraphqlOperationName,out-of-scope,,,,,,,none,,,language outside L3: graphql
+suspicious/noDuplicateGraphqlOperationName,out-of-scope,,,,,,,none,,,language outside L3: graphql — W-143
 suspicious/noDuplicateJsxProps,covered,react/jsx-no-duplicate-props,,,,,,none,yes,,through its source: eslint-plugin-react/jsx-no-duplicate-props
 suspicious/noDuplicateObjectKeys,covered,js/no-dupe-keys,,,,,,suggest,yes,,through its source: eslint/no-dupe-keys
 suspicious/noDuplicateParameters,covered,js/no-dupe-args,,,,,,none,yes,,through its source: eslint/no-dupe-args
 suspicious/noDuplicateProperties,covered,css/declaration-block-no-duplicate-properties,,,,,,none,yes,,through its source: stylelint/declaration-block-no-duplicate-properties
 suspicious/noDuplicateSelectors,covered,css/no-duplicate-selector,,,,,,none,,,through its source: stylelint/no-duplicate-selectors
 suspicious/noDuplicateSelectorsKeyframeBlock,covered,css/keyframe-block-no-duplicate-selectors,,,,,,none,yes,,"through its source: stylelint/keyframe-block-no-duplicate-selectors, EslintCss/no-duplicate-keyframe-selectors"
-suspicious/noDuplicateTestHooks,port,,js,js/no-duplicate-test-hooks,manual,P2,C,none,,,"source: eslint-plugin-jest/no-duplicate-hooks, @vitest/eslint-plugin/no-duplicate-hooks"
+suspicious/noDuplicateTestHooks,same-as,,,,,,,none,,,"counted under eslint-plugin-jest/no-duplicate-hooks, @vitest/eslint-plugin/no-duplicate-hooks"
 suspicious/noDuplicatedSpreadProps,same-as,,,,,,,none,,,counted under eslint-plugin-react/jsx-props-no-spread-multi
 suspicious/noEmptyBlock,covered,css/no-empty-block,,,,,,none,yes,,"through its source: stylelint/block-no-empty, EslintCss/no-empty-blocks"
 suspicious/noEmptyBlockStatements,covered,js/no-empty js/no-empty-static-block,,,,,,none,,,"through its source: eslint/no-empty, eslint/no-empty-static-block, eslint/no-empty-function, typescript-eslint/no-empty-function"
@@ -588,17 +588,17 @@ suspicious/noEmptySource,same-as,,,,,,,none,,,counted under eslint-plugin-unicor
 suspicious/noEqualsToNull,same-as,,,,,,,suggest,,,counted under eslint/no-eq-null
 suspicious/noEvolvingTypes,port,,ts,ts/no-evolving-types,manual,P2,C,none,,,Biome only
 suspicious/noExplicitAny,covered,ts/no-explicit-any,,,,,,none,yes,,through its source: typescript-eslint/no-explicit-any
-suspicious/noExportsInTest,port,,js,js/no-exports-in-test,manual,P2,C,none,,,source: eslint-plugin-jest/no-export
+suspicious/noExportsInTest,same-as,,,,,,,none,,,counted under eslint-plugin-jest/no-export
 suspicious/noExtraNonNullAssertion,covered,ts/no-extra-non-null-assertion,,,,,,auto,yes,,through its source: typescript-eslint/no-extra-non-null-assertion
 suspicious/noFallthroughSwitchClause,covered,js/no-fallthrough,,,,,,none,yes,,through its source: eslint/no-fallthrough
-suspicious/noFocusedTests,port,,js,js/no-focused-tests-biome,suggest,P2,C,suggest,,,"source: eslint-plugin-jest/no-focused-tests, @vitest/eslint-plugin/no-focused-tests, eslint-plugin-playwright/no-focused-test"
+suspicious/noFocusedTests,covered,js/no-focused-tests*,,,,,,suggest,,,"through its source: eslint-plugin-jest/no-focused-tests, @vitest/eslint-plugin/no-focused-tests, eslint-plugin-playwright/no-focused-test"
 suspicious/noForIn,same-as,,,,,,,none,,,counted under typescript-eslint/no-for-in-array
 suspicious/noFunctionAssign,covered,js/no-func-assign,,,,,,none,yes,,through its source: eslint/no-func-assign
 suspicious/noGlobalAssign,covered,js/no-global-assign,,,,,,none,yes,,"through its source: eslint/no-global-assign, eslint/no-native-reassign"
 suspicious/noGlobalIsFinite,port,,js,js/no-global-is-finite,suggest,P1,A,suggest,yes,,Biome only
 suspicious/noGlobalIsNan,port,,js,js/no-global-is-nan,suggest,P1,A,suggest,yes,,Biome only
-suspicious/noHeadImportInDocument,port,,react,react/no-head-import-in-document,manual,P2,C,none,,,source: @next/eslint-plugin-next/no-head-import-in-document
-suspicious/noIdenticalTestTitle,port,,js,js/no-identical-test-title,manual,P2,C,none,,,"source: eslint-plugin-jest/no-identical-title, @vitest/eslint-plugin/no-identical-title, eslint-plugin-playwright/no-identical-title"
+suspicious/noHeadImportInDocument,same-as,,,,,,,none,,,counted under @next/eslint-plugin-next/no-head-import-in-document
+suspicious/noIdenticalTestTitle,same-as,,,,,,,none,,,"counted under eslint-plugin-jest/no-identical-title, @vitest/eslint-plugin/no-identical-title, eslint-plugin-playwright/no-identical-title"
 suspicious/noImplicitAnyLet,port,,ts,ts/no-implicit-any-let,manual,P1,A,none,yes,,Biome only
 suspicious/noImportAssign,covered,js/no-import-assign,,,,,,none,yes,,through its source: eslint/no-import-assign
 suspicious/noImportCycles,same-as,,,,,,,none,,,counted under eslint-plugin-import/no-cycle
@@ -610,17 +610,17 @@ suspicious/noLeakedRender,same-as,,,,,,,none,,,counted under eslint-plugin-react
 suspicious/noLoopFunc,same-as,,,,,,,none,,,"counted under eslint/no-loop-func, typescript-eslint/no-loop-func"
 suspicious/noMisleadingCharacterClass,covered,js/no-misleading-character-class,,,,,,auto,yes,,through its source: eslint/no-misleading-character-class
 suspicious/noMisleadingInstantiator,covered,ts/no-misused-new,,,,,,none,yes,,through its source: typescript-eslint/no-misused-new
-suspicious/noMisplacedAssertion,port,,js,js/no-misplaced-assertion,manual,P2,C,none,,,"source: eslint-plugin-jest/no-standalone-expect, @vitest/eslint-plugin/no-standalone-expect"
+suspicious/noMisplacedAssertion,same-as,,,,,,,none,,,"counted under eslint-plugin-jest/no-standalone-expect, @vitest/eslint-plugin/no-standalone-expect"
 suspicious/noMisrefactoredShorthandAssign,port,,js,js/no-misrefactored-shorthand-assign,suggest,P1,A,suggest,yes,,source: clippy/misrefactored_assign_op
-suspicious/noNestedPromises,port,,js,js/no-nested-promises,manual,P2,C,none,,,source: eslint-plugin-promise/no-nesting
+suspicious/noNestedPromises,same-as,,,,,,,none,,,counted under eslint-plugin-promise/no-nesting
 suspicious/noNonNullAssertedOptionalChain,covered,ts/no-non-null-asserted-optional-chain,,,,,,none,yes,,through its source: typescript-eslint/no-non-null-asserted-optional-chain
 suspicious/noOctalEscape,same-as,,,,,,,auto,yes,,counted under eslint/no-octal-escape
 suspicious/noParametersOnlyUsedInRecursion,port,,js,js/no-parameters-only-used-in-recursion,suggest,P2,C,suggest,,,source: clippy/only_used_in_recursion
-suspicious/noPlaywrightForceOption,port,,js,js/no-playwright-force-option,manual,P2,C,none,,,source: eslint-plugin-playwright/no-force-option
-suspicious/noPlaywrightNetworkidle,port,,js,js/no-playwright-networkidle,manual,P2,C,none,,,source: eslint-plugin-playwright/no-networkidle
-suspicious/noPlaywrightPagePause,port,,js,js/no-playwright-page-pause,manual,P2,C,none,,,source: eslint-plugin-playwright/no-page-pause
-suspicious/noPlaywrightWaitForNavigation,port,,js,js/no-playwright-wait-for-navigation,manual,P2,C,none,,,source: eslint-plugin-playwright/no-wait-for-navigation
-suspicious/noPlaywrightWaitForTimeout,port,,js,js/no-playwright-wait-for-timeout,manual,P2,C,none,,,source: eslint-plugin-playwright/no-wait-for-timeout
+suspicious/noPlaywrightForceOption,same-as,,,,,,,none,,,counted under eslint-plugin-playwright/no-force-option
+suspicious/noPlaywrightNetworkidle,same-as,,,,,,,none,,,counted under eslint-plugin-playwright/no-networkidle
+suspicious/noPlaywrightPagePause,same-as,,,,,,,none,,,counted under eslint-plugin-playwright/no-page-pause
+suspicious/noPlaywrightWaitForNavigation,same-as,,,,,,,none,,,counted under eslint-plugin-playwright/no-wait-for-navigation
+suspicious/noPlaywrightWaitForTimeout,same-as,,,,,,,none,,,counted under eslint-plugin-playwright/no-wait-for-timeout
 suspicious/noProto,same-as,,,,,,,none,yes,,counted under eslint/no-proto
 suspicious/noPrototypeBuiltins,covered,js/no-prototype-builtins,,,,,,auto,yes,,"through its source: eslint/no-prototype-builtins, eslint/prefer-object-has-own, @e18e/eslint-plugin/prefer-object-has-own"
 suspicious/noQuickfixBiome,skip,,,,,,,auto,yes,,about Biome's own config or comments
@@ -635,7 +635,7 @@ suspicious/noSelfCompare,same-as,,,,,,,none,yes,,counted under eslint/no-self-co
 suspicious/noShadow,same-as,,,,,,,none,,,"counted under eslint/no-catch-shadow, eslint/no-shadow, typescript-eslint/no-shadow"
 suspicious/noShadowRestrictedNames,covered,js/no-shadow-restricted-names,,,,,,none,yes,,through its source: eslint/no-shadow-restricted-names
 suspicious/noShorthandPropertyOverrides,covered,css/declaration-block-no-shorthand-property-overrides,,,,,,none,yes,,through its source: stylelint/declaration-block-no-shorthand-property-overrides
-suspicious/noSkippedTests,port,,js,js/no-skipped-tests,suggest,P2,C,suggest,,,"source: eslint-plugin-jest/no-disabled-tests, @vitest/eslint-plugin/no-disabled-tests, eslint-plugin-playwright/no-skipped-test"
+suspicious/noSkippedTests,covered,js/skipped-test*,,,,,,suggest,,,"through its source: eslint-plugin-jest/no-disabled-tests, @vitest/eslint-plugin/no-disabled-tests, eslint-plugin-playwright/no-skipped-test"
 suspicious/noSparseArray,covered,js/no-sparse-arrays,,,,,,suggest,yes,,"through its source: deno_lint/no-sparse-arrays, eslint/no-sparse-arrays, eslint-plugin-vue/no-sparse-arrays"
 suspicious/noSuspiciousSemicolonInJsx,port,,react,react/no-suspicious-semicolon-in-jsx,manual,P1,A,none,yes,,Biome only
 suspicious/noTemplateCurlyInString,same-as,,,,,,,none,yes,,counted under eslint/no-template-curly-in-string
@@ -653,7 +653,7 @@ suspicious/noUnusedExpressions,covered,ts/no-unused-expressions,,,,,,none,,,thro
 suspicious/noUselessEscapeInString,port,,react,react/no-useless-escape-in-string,auto,P1,A,auto,yes,,Biome only
 suspicious/noUselessRegexBackrefs,covered,js/no-useless-backreference,,,,,,none,yes,,"through its source: eslint/no-useless-backreference, eslint-plugin-regexp/no-useless-backreference"
 suspicious/noVar,covered,js/no-var,,,,,,suggest,,,"through its source: eslint/no-var, deno_lint/no-var"
-suspicious/noVueArrowFuncInWatch,out-of-scope,,,,,,,suggest,,,language outside L3: vue
+suspicious/noVueArrowFuncInWatch,out-of-scope,,,,,,,suggest,,,language outside L3: vue — W-143
 suspicious/noWith,covered,js/no-with,,,,,,none,yes,,through its source: eslint/no-with
 suspicious/preset,port,,js,js/preset-biome,manual,P2,C,none,,,Biome only
 suspicious/useAdjacentOverloadSignatures,same-as,,,,,,,none,yes,,counted under typescript-eslint/adjacent-overload-signatures
@@ -664,15 +664,15 @@ suspicious/useBiomeIgnoreFolder,skip,,,,,,,auto,yes,,about Biome's own config or
 suspicious/useDefaultSwitchClauseLast,same-as,,,,,,,none,yes,,counted under eslint/default-case-last
 suspicious/useDeprecatedDate,retired,,,,,,,none,,yes,
 suspicious/useErrorMessage,same-as,,,,,,,none,,,counted under eslint-plugin-unicorn/error-message
-suspicious/useExpect,port,,js,js/use-expect,manual,P2,C,none,,,"source: eslint-plugin-playwright/expect-expect, eslint-plugin-jest/expect-expect, @vitest/eslint-plugin/expect-expect"
+suspicious/useExpect,same-as,,,,,,,none,,,"counted under eslint-plugin-playwright/expect-expect, eslint-plugin-jest/expect-expect, @vitest/eslint-plugin/expect-expect"
 suspicious/useGetterReturn,covered,js/getter-return,,,,,,none,yes,,through its source: eslint/getter-return
-suspicious/useGoogleFontDisplay,port,,react,react/use-google-font-display,manual,P1,A,none,yes,,source: @next/eslint-plugin-next/google-font-display
+suspicious/useGoogleFontDisplay,same-as,,,,,,,none,yes,,counted under @next/eslint-plugin-next/google-font-display
 suspicious/useGuardForIn,same-as,,,,,,,none,,,counted under eslint/guard-for-in
 suspicious/useIsArray,same-as,,,,,,,suggest,yes,,counted under eslint-plugin-unicorn/no-instanceof-array
 suspicious/useIterableCallbackReturn,same-as,,,,,,,none,yes,,counted under eslint/array-callback-return
 suspicious/useNamespaceKeyword,covered,ts/prefer-namespace-keyword,,,,,,auto,yes,,through its source: typescript-eslint/prefer-namespace-keyword
 suspicious/useNumberToFixedDigitsArgument,same-as,,,,,,,auto,,,counted under eslint-plugin-unicorn/require-number-to-fixed-digits-argument
 suspicious/useRequiredScripts,port,,data,json/use-required-scripts,manual,P2,C,none,,,Biome only
-suspicious/useScopedStyles,out-of-scope,,,,,,,suggest,,,language outside L3: astro vue
+suspicious/useScopedStyles,out-of-scope,,,,,,,suggest,,,language outside L3: astro vue — W-143
 suspicious/useStaticResponseMethods,port,,js,js/use-static-response-methods,suggest,P2,C,suggest,,,Biome only
 suspicious/useStrictMode,same-as,,,,,,,auto,,,counted under eslint/strict
