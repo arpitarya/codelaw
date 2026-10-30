@@ -28,8 +28,6 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — waiting on Open VSX** ([W-95](open/W-95-publish-vscode-extension.md), was W-117): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
 | ↳ **blocks:** W-95 (its Open VSX half) | |
-| 🔴 **Release v0.4.1** ([W-151](open/W-151-release-0-4-1.md)): `main` is green at 0.4.1 (`c4d519c7`). In order: (1) `scripts/npm-trust.sh --fux-index`; (2) `npm publish` `@codelaw/rules-deps` and `@codelaw/rules-deps-fux-index` 0.4.1 from `ci` 41007205048's artifacts (`gh run download 41007205048 -n dist` / `-n fux-index`), then `scripts/npm-trust.sh` for both; (3) `gh release create v0.4.1` with CHANGELOG's 0.4.1 section. `trust` stops the release if (1) or (2) is skipped. | 2026-10-30 |
-| ↳ **blocks:** W-151, and through it the proof of W-150's uploads and W-134's PyPI `deps` | |
 
 ---
 
@@ -57,7 +55,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-126** `agent` Ruled 10-30: `perf` split across parallel jobs, nothing waits on its verdict (until a budget is set, L8); release 3m50 accepted. Cached CI 4m11–4m25 ✅. Next: the `perf` matrix, then the measurement runs. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
-🔴 **W-151** `arpit` Release v0.4.1 and all it needs (merged 10-30: W-150, W-134, W-135). `main` green on 0.4.1 (`c4d519c7`, `ci` 41007205048). Next, Arpit: npm trust for the index names, the two `deps` names by hand, then the Release (inbox). Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
+🟢 **W-151** `agent` Release **v0.4.2** (ruled 10-30: *"upgrade all the packages to version 0.4.2 and publish them"*; 0.4.1 only reserved the two `deps` npm names). Bumped 10-30; next: `main` green, then the Release and its checks. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
 
 🔴 **W-95** `arpit` VS Code extension: Marketplace live (0.4.0); Open VSX (was W-117) uploaded by hand, inactive until claim #14928 is approved — then the trusted publisher and a VSCodium check. Merged 10-30. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 

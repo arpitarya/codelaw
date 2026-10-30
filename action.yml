@@ -21,7 +21,7 @@ branding:
 inputs:
   version:
     description: The codelaw version to install, exact. The default is the version of this Action's tag.
-    default: '0.4.1' # scripts/version.py writes this line
+    default: '0.4.2' # scripts/version.py writes this line
   registry:
     description: Where to install codelaw from — `npm` (needs Node, on every hosted runner) or `pypi` (into a venv of its own).
     default: npm

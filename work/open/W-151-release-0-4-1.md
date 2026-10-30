@@ -7,7 +7,7 @@ filed: 2026-10-30
 filed_by: "Arpit (Claude Code, Opus 5.5)"
 updated: 2026-10-30
 updated_by: "Claude Code (Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-151 — Release v0.4.1, and everything it needs
@@ -30,6 +30,15 @@ ball: arpit
 **Arpit, 2026-10-30 (Claude Code), asked how the packages behind 0.4.0 should catch up — CI cannot upload them at 0.4.0 (the `npm`/`pypi` environments take `v*` tags only; v0.4.0's own `publish.yml` has no tier for them) and this machine has no npm login:** *"Release v0.4.1 from CI"* — over *"You log in, I publish"* and *"Wire CI only, skip catch-up"*. Asked the same turn: *"close out item 149, item 126, item 95, item 97. Make sure the pipeline is green completely. And publish the packages that haven't been upgraded to .4.0 version."*
 
 **Model:** Sonnet (Claude Code) for steps 2 and 5; steps 3–4 are the decider's hand.
+
+**Arpit, 2026-10-30 14:2x IST (Claude Code), with the two `deps` names on npm at 0.4.1 by hand:** *"upgrade all the packages to version 0.4.2 and publish them."* — so the release is **v0.4.2**, every package from CI; 0.4.1 is never released (CHANGELOG says so). It also answers the hazard above: CI's 0.4.2 upload of `@codelaw/rules-deps` and its index is the OIDC publish that validates their *Pending validation* trusted publishers before 2026-11-01 08:45 UTC.
+
+| step | 0.4.2 | state |
+|---|---|---|
+| a | `version.py --set 0.4.2`; CHANGELOG's section renamed *0.4.2*, with the 0.4.1 note | ✅ 2026-10-30 |
+| b | `ci.yml` green on that commit, on `main` | ⏳ |
+| c | `gh release create v0.4.2` (agent, on Arpit's *"publish them"*) → `publish.yml` | ⏳ |
+| d | every name at 0.4.2 on npm and PyPI; `v0` → `v0.4.2`; the run timed (W-126) | ⏳ |
 
 ## Behind 0.4.0 (checked 2026-10-30 on both registries)
 

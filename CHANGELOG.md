@@ -4,7 +4,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
-## 0.4.1 — 2026-10-30
+## 0.4.2 — 2026-10-30
 
 **The `deps` pack, and every package on its registries.** A nineteenth
 pack checks your dependencies for known vulnerabilities and moves them to
@@ -14,9 +14,11 @@ published by it — the dev-server plugins and the optional Fux index
 packages included.
 
 ```bash
-npx codelaw@0.4.1 init     # a Node repo: installs the @codelaw/rules-* it needs
-uvx codelaw@0.4.1 init     # a Python repo: installs the codelaw-rules-* it needs
+npx codelaw@0.4.2 init     # a Node repo: installs the @codelaw/rules-* it needs
+uvx codelaw@0.4.2 init     # a Python repo: installs the codelaw-rules-* it needs
 ```
+
+0.4.1 was not released: only `@codelaw/rules-deps` and `@codelaw/rules-deps-fux-index` reached npm at 0.4.1, published by hand to create the two names. 0.4.2 is that release, every package from CI.
 
 ### Added
 
