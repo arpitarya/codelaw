@@ -395,6 +395,7 @@ pub fn judge(files: &[Rebuilt], profile: Option<String>) -> Result<Verdict, Stri
     // A hook never waits for a cold type program (L8 decision 8).
     let options = EngineOptions { touched_paths: touched, profile, profile_surface: Some(("ci", "codelaw hook --pre")), no_cold_types: true, ..EngineOptions::from_env() };
     let project = Project::load(&existing_dir(first), options).map_err(|e| e.to_string())?;
+    let deps = project.config.section_options("deps");
     let mut verdict = Verdict::default();
     for (path, f) in &files {
         let before = match &f.before {
@@ -404,6 +405,15 @@ pub fn judge(files: &[Rebuilt], profile: Option<String>) -> Result<Verdict, Stri
         let after = project.check_snippet(path, &f.after).map_err(|e| e.to_string())?.diagnostics;
         for d in added(&before, f.before.as_deref().unwrap_or_default(), &after, &f.after) {
             let a = Added { diagnostic: d, text: f.after.clone() };
+            // A vulnerable dependency goes by `[deps] agent`, not its CI
+            // severity: `block` refuses the write, `inform` rides along.
+            if let Some(action) = deps_agent_action(&a.diagnostic, &deps) {
+                match action {
+                    "block" => verdict.errors.push(a),
+                    _ => verdict.warnings.push(a),
+                }
+                continue;
+            }
             match a.diagnostic.severity {
                 Severity::Error => verdict.errors.push(a),
                 Severity::Warn => verdict.warnings.push(a),
@@ -412,6 +422,17 @@ pub fn judge(files: &[Rebuilt], profile: Option<String>) -> Result<Verdict, Stri
         }
     }
     Ok(verdict)
+}
+
+/// `[deps] agent`'s action for a `deps/vulnerable` finding, by the advisory
+/// severity its message names (`… is vulnerable — GHSA-x (high, …`):
+/// `inform` (the default) or `block` (W-128). `None` for any other rule.
+pub fn deps_agent_action<'o>(d: &Diagnostic, deps: &'o std::collections::BTreeMap<String, Value>) -> Option<&'o str> {
+    if d.rule != "deps/vulnerable" {
+        return None;
+    }
+    let grade = d.message.split_once(" is vulnerable — ").and_then(|(_, r)| r.split_once(" (")).and_then(|(_, r)| r.split([',', ')', ' ']).next()).unwrap_or("high");
+    Some(deps.get("agent").and_then(|a| a.get(grade)).and_then(Value::as_str).filter(|a| *a == "block").unwrap_or("inform"))
 }
 
 /// At most this many findings are spelled out.
@@ -618,6 +639,19 @@ mod tests {
         assert!(rebuild(&json!({ "tool_input": { "command": "ls" } })).is_err());
         assert!(rebuild(&json!({ "hook_event_name": "PreToolUse" })).is_err());
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn deps_agent_informs_unless_told_to_block() {
+        let mut d = diag("deps/vulnerable", 0, 1);
+        d.message = "`lodash` 4.17.15 is vulnerable — GHSA-35jh-r3h4-6jhm (high, CVE-2021-23337); upgrade to 4.17.21".into();
+        let none = std::collections::BTreeMap::new();
+        assert_eq!(deps_agent_action(&d, &none), Some("inform"), "the default");
+        let block: std::collections::BTreeMap<String, Value> = [("agent".to_owned(), json!({ "high": "block" }))].into();
+        assert_eq!(deps_agent_action(&d, &block), Some("block"));
+        let other: std::collections::BTreeMap<String, Value> = [("agent".to_owned(), json!({ "critical": "block" }))].into();
+        assert_eq!(deps_agent_action(&d, &other), Some("inform"), "only the severity named blocks");
+        assert_eq!(deps_agent_action(&diag("js/eqeqeq", 0, 1), &block), None);
     }
 
     #[test]

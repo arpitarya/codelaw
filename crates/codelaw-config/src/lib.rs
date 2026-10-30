@@ -10,8 +10,8 @@ mod resolve;
 mod scope;
 mod trace;
 
-pub use raw::{SPELL_WORDS_FILE, RawConfig, RawCoverage, RawCoverageIgnore, RawOverride, RawProfile, RawScope, RuleSetting, ScopeMap};
-pub use resolve::{Config, PresetScope, ScopeInfo, ConfigFile, DEFAULT_EXCLUDES, words_file_words, Home, Layer, Profile, ProfileChoice, Remap, RuleConfig, find_config, load_file};
+pub use raw::{DEFAULT_OSV_URL, SPELL_WORDS_FILE, RawConfig, RawCoverage, RawCoverageIgnore, RawOverride, RawProfile, RawScope, RuleSetting, ScopeMap};
+pub use resolve::{RENAMED_RULES, Config, PresetScope, ScopeInfo, ConfigFile, DEFAULT_EXCLUDES, words_file_words, Home, Layer, Profile, ProfileChoice, Remap, RuleConfig, find_config, load_file};
 pub use scope::check_scope_name;
 pub use trace::{TraceEnv, Traced};
 

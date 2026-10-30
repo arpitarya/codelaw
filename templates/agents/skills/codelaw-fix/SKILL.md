@@ -76,6 +76,16 @@ a test needs judgment, so codelaw never writes one.
 - Exempting a function is the user's call: a `.codelawignore` line needs a
   reason, and `expires=` with `on_touch=`, or `forever`. Ask before adding one.
 
+## A vulnerable dependency — `deps/vulnerable`
+
+The finding names the version to move to. Apply its edit (a `suggest` fix:
+show the diff first) or make the same change by hand: the range in the
+manifest, or the override the message names for a transitive package. Then run
+the install the message names (`npm install`, `uv lock`, …) so the lockfile
+follows; never edit a lockfile by hand. With no clean version, tell the user:
+replace the package, remove it, or add a dated `[deps] ignore` entry naming
+the advisory — never an undated one.
+
 ## 5. Re-check until clean
 
 Run the same check as in step 1. New findings can appear after a fix (a

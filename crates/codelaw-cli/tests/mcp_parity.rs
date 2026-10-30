@@ -142,7 +142,7 @@ fn parity(name: &str, languages: &[&str]) {
     let sources = tree_of(&root);
     let mut mcp = Mcp::start(&root);
     let tools = mcp.request("tools/list", json!({}));
-    assert_eq!(tools["result"]["tools"].as_array().unwrap().len(), 11);
+    assert_eq!(tools["result"]["tools"].as_array().unwrap().len(), 12);
 
     let checked = mcp.call("check_paths", json!({}));
     assert_eq!(checked, cli(&root, &["check", "--format", "json"]), "{name}: check_paths");

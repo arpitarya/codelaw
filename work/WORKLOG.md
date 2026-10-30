@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-128 built and closed: the deps pack and vulnerable dependencies  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Implement it and then close those out. Keep merging everything to main."* — W-128 as specified in its item and the proposal §2.1–2.4.
+- **Done:** the nineteenth pack `deps` (two rules moved from `data`, `deps/vulnerable` and `deps/incomplete-scan` new); `deps refresh` reads and merges the advisory sources, records unavailable ones, stores licences; `deps check`, MCP `check_dependency`, `rules_for_path`'s `dependencies`, `[deps] agent` in the hooks, the skills' instruction; records L5, L6, SR-RULE-PACKS 15, SR-CONFIG, SR-CLI-MCP, SR-AGENT-SURFACES, SR-PACKAGES, SR-RULE-FORMAT, the register and CLAUDE.md's L6 line; the yarn.lock copy on W-136's `elsewhere`.
+- **Decided / left open:** uv.lock and poetry.lock findings sit on pyproject.toml (`.lock` is no L3 extension); lockfile-located findings carry no edit (the message names the override); an ungraded advisory counts as high; overrides pin the exact target; `block` works through the pre-write Gate. The names wait on W-134/W-135.
+- **Mistakes:** the shared CARGO_TARGET_DIR let another worktree's build of the same crates stand in for this one's, so `init` tests panicked on a pack table without `deps` until the crates were touched and rebuilt; the first pack split's directory rename carried W-132's and W-130's new `data/` rules into `packs/deps` on rebase — redone with `merge.directoryRenames=false`, only the two dependency rules moved.
+- **Next:** W-129 (licence, lockfile sync, drift, runtime agreement) reads the snapshot's `licence`; W-134/W-135 before the release.
+
 ## 2026-10-30 — W-138 ruled and closed; W-142–W-146 filed  ·  Cowork (Opus 5.5)
 
 - **Asked:** (voice) W-138's blocker; then the rulings, more linters, Tailwind, PR hygiene; *"file it."*

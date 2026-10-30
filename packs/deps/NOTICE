@@ -1,0 +1,9 @@
+@codelaw/rules-deps / codelaw-rules-deps
+
+The rules and their documentation were written for codelaw. The pack holds no
+advisory data: `codelaw deps refresh` writes the consumer's own
+`.codelaw/deps-snapshot.json`, which keeps, of each advisory, only its ids and
+aliases, its affected ranges and fixed versions, its severity, its URL and the
+sources that reported it — never an advisory's text. Advisory data from OSV and
+the GitHub Advisory Database is licensed CC-BY 4.0 by its publishers; the
+snapshot's `sources` names where each record came from.

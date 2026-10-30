@@ -19,9 +19,9 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 |---|---|---|
 | `data/recommended` | 6 | correctness for JSON, YAML and TOML: keys defined twice in each, YAML aliases without an anchor, and the YAML scalars that YAML 1.1 and 1.2 read differently |
 | `md/recommended` | 17 | the non-layout rules of markdownlint 0.42.0's default set, and the starter rule `md/relative-links` |
-| `data/package-json` | 6 | `json/package-scripts-sorted`, `json/package-deps-sorted`, `json/package-engines`, `json/package-json-schema`, `data/outdated-dependency`, `data/stale-deps-snapshot` — `files: **/package.json` |
+| `data/package-json` | 4 | `json/package-scripts-sorted`, `json/package-deps-sorted`, `json/package-engines`, `json/package-json-schema` — `files: **/package.json` |
 | `data/tsconfig` | 2 | `json/tsconfig-strict`, `json/tsconfig-schema` — `files: **/tsconfig.json`, `**/tsconfig.*.json` |
-| `data/pyproject` | 5 | `toml/deps-sorted`, `toml/pyproject-requires-python`, `toml/pyproject-schema`, `data/outdated-dependency`, `data/stale-deps-snapshot` — `files: **/pyproject.toml` |
+| `data/pyproject` | 3 | `toml/deps-sorted`, `toml/pyproject-requires-python`, `toml/pyproject-schema` — `files: **/pyproject.toml` |
 | `data/github-actions` | 3 | `yaml/gha-pin-sha`, `yaml/gha-workflow-schema`, `yaml/gha-action-schema` — workflows and composite actions |
 | `data/conventions` | 2 | opt-in house style: `yaml/document-start`, `md/no-inline-html` |
 | `data/markers` | 3 | TODO comments with a ticket (and a date when asked) in YAML, TOML and Markdown; opt in (SR-CONFIG decision 11a) |
@@ -29,17 +29,17 @@ preview = true   # every rule is `preview` until a corpus run promotes it
 
 <!-- /docs-sync:presets -->
 
-44 rules: 9 `auto`, 6 `suggest`, 29 `manual`. Every rule is
+42 rules: 9 `auto`, 5 `suggest`, 28 `manual`. Every rule is
 **reimplemented**, not vendored: the checks, messages and docs are written
 fresh, and each ported rule's `ported_from:` names its source. Rules that need
 more than a pattern are native rules in `crates/codelaw-native/src/data_*.rs`;
 rules about a path in a JSON, YAML or TOML file are `target:` + `assert:` rules
 (SR-RULE-FORMAT decision 3e).
 
-The two `data/*` rules compare a manifest's dependencies with
-`.codelaw/deps-snapshot.json`, which `codelaw deps refresh` writes from npm and
-the Python index; the rules read only that file and the lockfiles, so `check`
-stays offline (SR-RULE-PACKS decision 15).
+The dependency rules — latest versions, vulnerable packages — are the `deps`
+pack's since W-128 (`deps/outdated` and `deps/stale-snapshot` were
+`data/outdated-dependency` and `data/stale-deps-snapshot`; SR-RULE-PACKS
+decision 15).
 
 The starter-catalogue rules are all here under their starter ids:
 `json/package-scripts-sorted`, `json/package-engines`, `json/tsconfig-strict`,

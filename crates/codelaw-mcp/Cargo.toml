@@ -8,6 +8,7 @@ publish.workspace = true
 [dependencies]
 codelaw-core.workspace = true
 codelaw-engine.workspace = true
+codelaw-native.workspace = true
 codelaw-report.workspace = true
 codelaw-rules.workspace = true
 serde_json.workspace = true

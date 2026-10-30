@@ -73,8 +73,10 @@ fn deps_repo(name: &str, port: u16) -> PathBuf {
     let pack = d.join("node_modules/@codelaw/rules-data");
     fs::create_dir_all(&pack).unwrap();
     copy_dir(&repo_root().join("packs/data"), &pack);
+    fs::create_dir_all(d.join("node_modules/@codelaw/rules-deps")).unwrap();
+    copy_dir(&repo_root().join("packs/deps"), &d.join("node_modules/@codelaw/rules-deps"));
     fs::create_dir_all(d.join(".codelaw")).unwrap();
-    fs::write(d.join("codelaw.toml"), "extends = [\"codelaw:data/package-json\", \"codelaw:data/pyproject\"]\npreview = true\n").unwrap();
+    fs::write(d.join("codelaw.toml"), "extends = [\"codelaw:data/package-json\", \"codelaw:data/pyproject\", \"codelaw:deps/recommended\"]\npreview = true\n").unwrap();
     fs::write(d.join("package.json"), "{\n  \"name\": \"app\",\n  \"dependencies\": {\n    \"react\": \"^18.3.1\",\n    \"left-pad\": \"1.3.0\",\n    \"lodash\": \"^4.17.20\"\n  }\n}\n").unwrap();
     fs::write(d.join("package-lock.json"), r#"{"packages":{"node_modules/react":{"version":"18.3.1"},"node_modules/lodash":{"version":"4.17.20"}}}"#).unwrap();
     fs::write(d.join("pyproject.toml"), "[project]\nname = \"app\"\ndependencies = [\"django~=4.2\", \"bad==1.0\"]\n").unwrap();
@@ -83,9 +85,12 @@ fn deps_repo(name: &str, port: u16) -> PathBuf {
         r#"{ "fetched": "2026-10-25", "packages": {
   "npm:react": { "latest": "19.2.0", "versions": { "18.3.1": "2024-04-26", "19.2.0": "2025-10-01" } },
   "npm:left-pad": { "latest": "1.3.0", "versions": { "1.3.0": "2018-04-09" }, "deprecated": { "1.3.0": "use padStart" } },
-  "npm:lodash": { "latest": "4.17.21", "versions": { "4.17.20": "2020-08-13", "4.17.21": "2021-02-20" } },
+  "npm:lodash": { "latest": "4.17.21", "versions": { "4.17.20": "2020-08-13", "4.17.21": "2021-02-20" },
+    "advisories": [ { "id": "GHSA-35jh-r3h4-6jhm", "aliases": ["CVE-2021-23337"], "severity": "high", "affected": ["<4.17.21"], "fixed": ["4.17.21"], "sources": ["osv"] } ],
+    "scanned": { "osv": ["*"] } },
   "pypi:django": { "latest": "5.1.2", "versions": { "4.2.0": "2023-04-03", "5.1.2": "2024-10-08" } },
-  "pypi:bad": { "latest": "1.1", "versions": { "1.0": "2020-01-01", "1.1": "2021-01-01" }, "yanked": { "1.0": "" } } } }
+  "pypi:bad": { "latest": "1.1", "versions": { "1.0": "2020-01-01", "1.1": "2021-01-01" }, "yanked": { "1.0": "" } } },
+  "sources": { "osv": { "kind": "osv", "state": "ok", "on": "2026-10-25" }, "registry": { "kind": "registry", "state": "unavailable", "on": "2026-10-25", "error": "HTTP 403" } } }
 "#,
     )
     .unwrap();
@@ -239,7 +244,7 @@ fn l5_the_dependency_rules_need_no_network_and_refresh_is_fenced() {
         assert_eq!(open, fenced, "`codelaw check --format {format}` differs with networking denied");
     }
     let (_, json, _) = output(&prefix, &repo, &["check", "--no-cache", "--as-of", "2026-11-30", "--format", "json"]);
-    for rule in ["data/outdated-dependency", "data/stale-deps-snapshot"] {
+    for rule in ["deps/outdated", "deps/stale-snapshot", "deps/vulnerable", "deps/incomplete-scan"] {
         assert!(json.contains(&format!("\"{rule}\"")), "{rule} reported nothing, so the comparison proves nothing: {json}");
     }
 
@@ -252,7 +257,8 @@ fn l5_the_dependency_rules_need_no_network_and_refresh_is_fenced() {
     for f in ["package.json", "pyproject.toml"] {
         assert_eq!(fs::read_to_string(a.join(f)).unwrap(), fs::read_to_string(b.join(f)).unwrap(), "fix wrote different bytes to {f} with networking denied");
     }
-    assert!(fs::read_to_string(a.join("package.json")).unwrap().contains("^19.2.0"), "the suggest fix did not apply, so the comparison proves nothing");
+    let fixed = fs::read_to_string(a.join("package.json")).unwrap();
+    assert!(fixed.contains("^19.2.0") && fixed.contains("^4.17.21"), "the suggest fixes did not apply, so the comparison proves nothing: {fixed}");
 
     // The one networked command fails inside the fence and writes nothing.
     let before = fs::read_to_string(repo.join(".codelaw/deps-snapshot.json")).unwrap();

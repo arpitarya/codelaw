@@ -5,6 +5,8 @@ finding carries its fix, and the verdict is always the engine's, never yours.
 
 - **Ask before you write.** Call the MCP tool `rules_for_path` (or run
   `{{cmd}} rules --for <path>`) for each file you create or edit, and write code that complies.
+- **Check a dependency before you add it.** Call the MCP tool `check_dependency` (or run
+  `{{cmd}} deps check <npm|pypi> <name> [version]`) and use the version it gives.
 - **Check what you changed.** Run `{{cmd}} check <files>` on every file you created or edited.
 - **Handle each finding by its fix class.** `auto`: `{{cmd}} fix <files>`. `suggest`: show the
   diff and apply it only once accepted. `manual`: follow the steps `{{cmd}} explain <rule>` prints.

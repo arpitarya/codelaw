@@ -2,7 +2,7 @@
 
 # Rule reference
 
-**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 688 rules in 18 packs, plus the engine's 23 own rules.
+**One page per rule: what it checks, every way to configure it, how to fix it, and its examples.** 690 rules in 19 packs, plus the engine's 23 own rules.
 
 ## Configuring any rule — the forms
 
@@ -44,13 +44,14 @@ remap = { error = "warn" }
 | [css](#css) | `@codelaw/rules-css` | `codelaw-rules-css` | 73 | 33 |
 | [scss](#scss) | `@codelaw/rules-scss` | `codelaw-rules-scss` | 16 | 6 |
 | [css-modules](#css-modules) | `@codelaw/rules-css-modules` | — | 5 | 1 |
-| [data](#data) | `@codelaw/rules-data` | `codelaw-rules-data` | 44 | 13 |
+| [data](#data) | `@codelaw/rules-data` | `codelaw-rules-data` | 42 | 13 |
 | [tanstack-query](#tanstack-query) | `@codelaw/rules-tanstack-query` | — | 13 | 1 |
 | [redux-toolkit](#redux-toolkit) | `@codelaw/rules-redux-toolkit` | — | 12 | 1 |
 | [security-js](#security-js) | `@codelaw/rules-security-js` | `codelaw-rules-security-js` | 66 | 4 |
 | [security-ts](#security-ts) | `@codelaw/rules-security-ts` | — | 16 | 3 |
 | [security-html](#security-html) | `@codelaw/rules-security-html` | `codelaw-rules-security-html` | 19 | 1 |
 | [spell](#spell) | `@codelaw/rules-spell` | `codelaw-rules-spell` | 7 | 1 |
+| [deps](#deps) | `@codelaw/rules-deps` | `codelaw-rules-deps` | 4 | 0 |
 | [python](#python) | — | `codelaw-rules-python` | 109 | 14 |
 | [security-python](#security-python) | — | `codelaw-rules-security-python` | 61 | 0 |
 | [engine](engine.md) | in `codelaw` | in `codelaw` | 23 | 0 |
@@ -468,8 +469,6 @@ Presets: `codelaw:data/recommended` · `codelaw:md/recommended` · `codelaw:data
 |---|---|---|---|---|
 | [`data/codeowners-coverage`](data/codeowners-coverage.md) | Every file has a code owner, and every CODEOWNERS pattern is live | `manual` | `path`, `allow_unowned`, `ignore` | `data/codeowners` |
 | [`data/flag-registry`](data/flag-registry.md) | The feature-flag registry is valid and holds only flags still read | `auto` | `presets`, `accessors`, `inline`, `warn_days` | *[rules] only* |
-| [`data/outdated-dependency`](data/outdated-dependency.md) | Dependencies are on their latest version | `suggest` | — | `data/package-json`, `data/pyproject` |
-| [`data/stale-deps-snapshot`](data/stale-deps-snapshot.md) | The dependency snapshot is recent | `manual` | — | `data/package-json`, `data/pyproject` |
 | [`json/no-duplicate-keys`](json/no-duplicate-keys.md) | No key twice in one JSON object | `manual` | — | `data/recommended` |
 | [`json/package-deps-sorted`](json/package-deps-sorted.md) | package.json dependency lists are sorted by name | `auto` | — | `data/package-json` |
 | [`json/package-engines`](json/package-engines.md) | package.json declares engines.node | `suggest` | `node` | `data/package-json` |
@@ -685,6 +684,17 @@ Presets: `codelaw:spell/recommended` · `codelaw:spell/strict`.
 | [`spell/locale-variant`](spell/locale-variant.md) | Prose is spelled in the project's locale | `auto` | `locale` | *[rules] only* |
 | [`spell/suspicious-word`](spell/suspicious-word.md) | No accepted word hides a typo | `manual` | — | `spell/strict` |
 | [`spell/unknown-word`](spell/unknown-word.md) | Every word of prose is in a word list | `suggest` | — | `spell/strict` |
+
+## deps
+
+Presets: `codelaw:deps/recommended`.
+
+| Rule | What it checks | Fix | Options | Turned on by |
+|---|---|---|---|---|
+| [`deps/incomplete-scan`](deps/incomplete-scan.md) | Every advisory source was read | `manual` | — | `deps/recommended` |
+| [`deps/outdated`](deps/outdated.md) | Dependencies are on their latest version | `suggest` | — | `deps/recommended` |
+| [`deps/stale-snapshot`](deps/stale-snapshot.md) | The dependency snapshot is recent | `manual` | — | `deps/recommended` |
+| [`deps/vulnerable`](deps/vulnerable.md) | No dependency in use has a known vulnerability | `suggest` | — | `deps/recommended` |
 
 ## python
 

@@ -11,6 +11,7 @@ mod debug_cmd;
 mod graph_cmd;
 mod config_cmd;
 mod deps_cmd;
+mod deps_sources;
 mod exceptions_cmd;
 mod flags_cmd;
 mod init;

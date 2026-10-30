@@ -21,7 +21,7 @@ use std::path::{Path, PathBuf};
 pub const PROTOCOL_VERSIONS: &[&str] = &["2025-06-18", "2025-03-26", "2024-11-05"];
 
 const INSTRUCTIONS: &str = "codelaw lints and fixes JS, TS, Python, JSON, YAML, TOML, Markdown, CSS and HTML against the rules this repo configures. \
-Before a task, call `brief_for_task` with the files it will touch: what is specific to this repo there. Before you write or edit a file, call `rules_for_path` and follow those rules. After you write, call `check_paths` on the files you changed \
+Before a task, call `brief_for_task` with the files it will touch: what is specific to this repo there. Before you write or edit a file, call `rules_for_path` and follow those rules. Before you add or upgrade a dependency, call `check_dependency` and use the version it gives. After you write, call `check_paths` on the files you changed \
 and handle each finding by its fix class: `auto` — call `fix_paths`; `suggest` — show the diff and apply it only once accepted; \
 `manual` — follow the steps exactly. Never disable or suppress a rule to make a check pass. Every verdict comes from these tools, never from judgment.";
 
@@ -179,6 +179,22 @@ which config layer sets it for `path`, whether it applies there, and what it rep
 `codelaw rules --why <id> --for <path> --format json`.",
         schema: || object(json!({ "id": string("The rule id."), "path": string("The file to trace it on.") }), &["id"]),
     },
+    Tool {
+        name: "check_dependency",
+        description: "Call BEFORE you add, upgrade or pin an npm or Python dependency: whether that version is vulnerable, its advisories, \
+the exact version to use instead (`target`), the latest, the licence and whether the scan was complete — offline, from the committed \
+`.codelaw/deps-snapshot.json`. Use the version it gives. Same JSON as `codelaw deps check <ecosystem> <name> [version] --format json`.",
+        schema: || {
+            object(
+                json!({
+                    "ecosystem": { "type": "string", "enum": ["npm", "pypi"], "description": "The registry: `npm` or `pypi`." },
+                    "name": string("The package's name."),
+                    "version": string("The version you would use; the snapshot's latest when not given."),
+                }),
+                &["ecosystem", "name"],
+            )
+        },
+    },
 ];
 
 /// The tool names, in SR-CLI-MCP decision 5's order.
@@ -260,7 +276,8 @@ pub fn call_tool(name: &str, args: &Map<String, Value>) -> Result<Value, String>
             let path = PathBuf::from(a.required("path")?);
             let p = project(std::slice::from_ref(&path), EngineOptions::from_env())?;
             let rows = p.rules_for(&path).map_err(err)?;
-            Ok(codelaw_report::rules_json(&rows, Some(&codelaw_core::normalize_path(&path))))
+            let v = codelaw_report::rules_json(&rows, Some(&codelaw_core::normalize_path(&path)));
+            Ok(codelaw_report::with_dependencies(v, p.dependency_notes(&path)))
         }
         "brief_for_task" => {
             let paths = a.paths()?;
@@ -333,6 +350,17 @@ pub fn call_tool(name: &str, args: &Map<String, Value>) -> Result<Value, String>
             let mut p = project(&[], options)?;
             let all = p.exceptions().map_err(err)?;
             Ok(build(&all, &filter, group_by)?.json())
+        }
+        "check_dependency" => {
+            let eco = match a.required("ecosystem")?.as_str() {
+                "npm" => codelaw_native::deps::Ecosystem::Npm,
+                "pypi" | "PyPI" => codelaw_native::deps::Ecosystem::Pypi,
+                other => return Err(format!("`ecosystem` is `npm` or `pypi`, not `{other}`")),
+            };
+            let name = a.required("name")?;
+            let version = a.str("version")?;
+            let p = project(&[], EngineOptions::from_env())?;
+            Ok(p.check_dependency(eco, &name, version.as_deref()))
         }
         "trace_rule" => {
             let id = a.required("id")?;
@@ -499,7 +527,7 @@ mod tests {
         let names: Vec<&str> = r["result"]["tools"].as_array().unwrap().iter().map(|t| t["name"].as_str().unwrap()).collect();
         assert_eq!(
             names,
-            ["rules_for_path", "brief_for_task", "explain_rule", "list_rules", "check_snippet", "check_paths", "fix_paths", "format_snippet", "dump_tree", "list_exceptions", "trace_rule"]
+            ["rules_for_path", "brief_for_task", "explain_rule", "list_rules", "check_snippet", "check_paths", "fix_paths", "format_snippet", "dump_tree", "list_exceptions", "trace_rule", "check_dependency"]
         );
         for t in r["result"]["tools"].as_array().unwrap() {
             assert_eq!(t["inputSchema"]["type"], "object", "{t}");

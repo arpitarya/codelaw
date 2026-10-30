@@ -1,5 +1,5 @@
 ---
-id: data/stale-deps-snapshot
+id: deps/stale-snapshot
 title: "The dependency snapshot is recent"
 languages: [json, toml]
 files: ["package.json", "pyproject.toml"]
@@ -10,12 +10,12 @@ stability: preview
 since: 0.3.0
 ---
 
-`.codelaw/deps-snapshot.json` — the registry facts `data/outdated-dependency` reads — was fetched no more than `[deps] max_snapshot_age` (14 days by default) before the as-of date, and can be read. The finding is on the root `package.json`, or the root `pyproject.toml` when there is no root `package.json`, so a project gets one. The age is judged on the as-of date (`--as-of`, `CODELAW_AS_OF`, else `HEAD`'s commit date), never the clock; with no as-of date, only an unreadable snapshot is reported.
+`.codelaw/deps-snapshot.json` — the registry facts `deps/outdated` reads — was fetched no more than `[deps] max_snapshot_age` (14 days by default) before the as-of date, and can be read. The finding is on the root `package.json`, or the root `pyproject.toml` when there is no root `package.json`, so a project gets one. The age is judged on the as-of date (`--as-of`, `CODELAW_AS_OF`, else `HEAD`'s commit date), never the clock; with no as-of date, only an unreadable snapshot is reported.
 
-**Why:** An old snapshot hides every release since it was written, so `data/outdated-dependency` says a dependency is current when it isn't.
+**Why:** An old snapshot hides every release since it was written, so `deps/outdated` says a dependency is current when it isn't.
 
 ```codelaw
-native: data/stale-deps-snapshot
+native: deps/stale-snapshot
 ```
 
 ## How to fix

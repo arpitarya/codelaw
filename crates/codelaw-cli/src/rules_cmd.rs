@@ -180,7 +180,9 @@ pub fn rules(args: RulesArgs) -> ExitCode {
         return ExitCode::SUCCESS;
     }
     if json {
-        return print_json(&codelaw_report::rules_json(&rows, args.for_path.as_deref().map(codelaw_core::normalize_path).as_deref()));
+        let v = codelaw_report::rules_json(&rows, args.for_path.as_deref().map(codelaw_core::normalize_path).as_deref());
+        let notes = args.for_path.as_deref().map(|p| project.dependency_notes(p)).unwrap_or_default();
+        return print_json(&codelaw_report::with_dependencies(v, notes));
     }
     print!("{}", codelaw_report::rules_text(&rows));
     ExitCode::SUCCESS

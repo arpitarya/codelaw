@@ -1,10 +1,13 @@
-//! `data/outdated-dependency` and `data/stale-deps-snapshot`: a manifest's
-//! dependencies against the committed registry snapshot. Neither reads a
-//! registry; both read only files (L5 decision 3).
+//! `deps/outdated` and `deps/stale-snapshot` (named `data/outdated-dependency`
+//! and `data/stale-deps-snapshot` until W-128): a manifest's dependencies
+//! against the committed registry snapshot. Neither reads a registry; both
+//! read only files (L5 decision 3). `deps/vulnerable` and
+//! `deps/incomplete-scan` are in `vulnerable.rs`.
 //!
-//! Both name `[deps]` as their config section, so its keys arrive as
-//! options: `severity`, `min_release_age`, `prerelease`, `ignore` and
-//! `max_snapshot_age` (SR-RULE-PACKS decision 15).
+//! Every `deps` rule names `[deps]` as its config section, so its keys
+//! arrive as options: `severity`, `min_release_age`, `prerelease`,
+//! `ignore`, `max_snapshot_age`, `advisory_sources` and `agent`
+//! (SR-RULE-PACKS decision 15).
 
 use super::npm::Range;
 use super::pep440::{Clause, Pep440, requirement};
@@ -17,22 +20,27 @@ use semver::Version;
 use serde_json::Value;
 use std::collections::BTreeMap;
 
-const MANIFESTS: &[Language] = &[Language::Json, Language::Toml];
+pub(super) const MANIFESTS: &[Language] = &[Language::Json, Language::Toml];
 
-type Options = BTreeMap<String, Value>;
+pub(super) type Options = BTreeMap<String, Value>;
 
-/// The kinds a finding is graded by, each `[deps] severity` key.
-const GRADES: [(&str, Option<Severity>); 6] = [
+/// The kinds a finding is graded by, each `[deps] severity` key: five
+/// for `deps/outdated`, four advisory severities for `deps/vulnerable`.
+const GRADES: [(&str, Option<Severity>); 10] = [
     ("major", Some(Severity::Warn)),
     ("minor", Some(Severity::Info)),
     ("patch", Some(Severity::Info)),
     ("deprecated", Some(Severity::Error)),
     ("yanked", Some(Severity::Error)),
     ("lockfile", Some(Severity::Info)),
+    ("critical", Some(Severity::Error)),
+    ("high", Some(Severity::Error)),
+    ("moderate", Some(Severity::Warn)),
+    ("low", Some(Severity::Info)),
 ];
 
 /// A grade's severity: `[deps] severity`'s, or the default; `None` is off.
-fn severity(options: &Options, grade: &str) -> Option<Severity> {
+pub(super) fn severity(options: &Options, grade: &str) -> Option<Severity> {
     let default = GRADES.iter().find(|(g, _)| *g == grade).and_then(|(_, s)| *s);
     match options.get("severity").and_then(|s| s.get(grade)).and_then(Value::as_str) {
         Some("off") => None,
@@ -47,13 +55,13 @@ fn grade_of(message: &str) -> Option<&str> {
     message[open + 2..].strip_suffix(')')
 }
 
-struct Settings {
-    min_release_age: i64,
-    prerelease: bool,
-    max_snapshot_age: i64,
+pub(super) struct Settings {
+    pub min_release_age: i64,
+    pub prerelease: bool,
+    pub max_snapshot_age: i64,
 }
 
-fn settings(options: &Options) -> Settings {
+pub(super) fn settings(options: &Options) -> Settings {
     Settings {
         min_release_age: options.get("min_release_age").and_then(parse_days).unwrap_or(0),
         prerelease: options.get("prerelease").and_then(Value::as_bool).unwrap_or(false),
@@ -63,19 +71,32 @@ fn settings(options: &Options) -> Settings {
 
 /// Whether `[deps] ignore` holds `key` on the as-of date: a string entry
 /// always, a table entry until its `expires` (the first day it no longer
-/// holds, as a dated exception's: SR-BASELINE decision 9).
-fn ignored(options: &Options, key: &str, as_of: &dyn Fn() -> Option<i64>) -> bool {
-    let Some(list) = options.get("ignore").and_then(Value::as_array) else { return false };
-    list.iter().any(|e| match e {
-        Value::String(s) => s == key,
+/// holds, as a dated exception's: SR-BASELINE decision 9). An entry naming
+/// an `advisory` holds only that advisory: see [`ignored_advisory`].
+pub(super) fn ignored(options: &Options, key: &str, as_of: &dyn Fn() -> Option<i64>) -> bool {
+    ignore_entries(options, key, as_of).any(|advisory| advisory.is_none())
+}
+
+/// Whether `[deps] ignore` holds this advisory of `key` (by any of its
+/// ids), or the whole package.
+pub(super) fn ignored_advisory(options: &Options, key: &str, ids: &[&str], as_of: &dyn Fn() -> Option<i64>) -> bool {
+    ignore_entries(options, key, as_of).any(|advisory| advisory.is_none_or(|a| ids.contains(&a)))
+}
+
+/// The entries that hold `key` on the as-of date: `None` for the whole
+/// package, else the advisory named.
+fn ignore_entries<'o>(options: &'o Options, key: &'o str, as_of: &'o dyn Fn() -> Option<i64>) -> impl Iterator<Item = Option<&'o str>> + 'o {
+    options.get("ignore").and_then(Value::as_array).into_iter().flatten().filter_map(move |e| match e {
+        Value::String(s) => (s == key).then_some(None),
         Value::Object(o) => {
-            o.get("package").and_then(Value::as_str) == Some(key)
+            let holds = o.get("package").and_then(Value::as_str) == Some(key)
                 && match o.get("expires").and_then(Value::as_str).and_then(days) {
                     Some(exp) => as_of().is_none_or(|today| today < exp),
                     None => true,
-                }
+                };
+            holds.then(|| o.get("advisory").and_then(Value::as_str))
         }
-        _ => false,
+        _ => None,
     })
 }
 
@@ -214,13 +235,13 @@ impl OutdatedDependency {
 }
 
 /// The as-of date in days, read only when a rule needs it.
-fn as_of_days(ctx: &NativeContext<'_>) -> Option<i64> {
+pub(super) fn as_of_days(ctx: &NativeContext<'_>) -> Option<i64> {
     ctx.file.as_of().as_deref().and_then(days)
 }
 
 impl NativeRule for OutdatedDependency {
     fn id(&self) -> &'static str {
-        "data/outdated-dependency"
+        "deps/outdated"
     }
     fn languages(&self) -> &'static [Language] {
         MANIFESTS
@@ -276,11 +297,21 @@ impl NativeRule for OutdatedDependency {
     }
 }
 
+/// The one file a per-project finding sits on: the root `package.json`,
+/// else the root `pyproject.toml`.
+pub(super) fn project_manifest(ctx: &NativeContext<'_>) -> bool {
+    match ctx.file.path() {
+        "package.json" => true,
+        "pyproject.toml" => !ctx.file.exists("package.json"),
+        _ => false,
+    }
+}
+
 pub struct StaleDepsSnapshot;
 
 impl NativeRule for StaleDepsSnapshot {
     fn id(&self) -> &'static str {
-        "data/stale-deps-snapshot"
+        "deps/stale-snapshot"
     }
     fn languages(&self) -> &'static [Language] {
         MANIFESTS
@@ -294,10 +325,8 @@ impl NativeRule for StaleDepsSnapshot {
     fn check(&self, _node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
         // One finding per project: on the root `package.json`, else the
         // root `pyproject.toml`.
-        match ctx.file.path() {
-            "package.json" => {}
-            "pyproject.toml" if !ctx.file.exists("package.json") => {}
-            _ => return,
+        if !project_manifest(ctx) {
+            return;
         }
         let Some(text) = ctx.file.read(SNAPSHOT_PATH) else { return };
         let end = ctx.source.find('\n').unwrap_or(ctx.source.len());

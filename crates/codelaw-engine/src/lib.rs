@@ -7,6 +7,7 @@ mod baseline;
 mod changed_functions;
 mod compile;
 mod debug;
+mod deps;
 mod discover;
 mod exceptions;
 mod files;

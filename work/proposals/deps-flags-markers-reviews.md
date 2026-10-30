@@ -9,7 +9,7 @@ timestamp: 2026-10-30T00:15:00+05:30
 # The deps pack, flags, markers, size, ownership and review-born rules
 
 **Ruled 2026-10-29 → 30** (the decider, by voice and chat, Cowork) → built by
-[W-128](../open/W-128-deps-pack-and-vulnerabilities.md) ·
+[W-128](../../archive/open/W-128-deps-pack-and-vulnerabilities.md) ·
 [W-129](../open/W-129-deps-hygiene-rules.md) ·
 [W-130](../../archive/open/W-130-feature-flag-expiry.md) ·
 [W-131](../../archive/open/W-131-todo-and-skipped-test-markers.md) ·

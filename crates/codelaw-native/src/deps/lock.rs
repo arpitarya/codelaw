@@ -142,6 +142,202 @@ fn toml_lock(text: &str) -> BTreeMap<String, String> {
     out
 }
 
+/// The lockfiles of each ecosystem, in the order [`installed`] reads them.
+pub const NPM_LOCKFILES: [&str; 3] = ["package-lock.json", "pnpm-lock.yaml", "yarn.lock"];
+pub const PYPI_LOCKFILES: [&str; 2] = ["uv.lock", "poetry.lock"];
+
+/// The lockfile `installed` reads for the manifest in `dir`: its path and
+/// text, nearest first.
+pub fn lockfile_for(eco: Ecosystem, dir: &str, read: &dyn Fn(&str) -> Option<String>) -> Option<(String, String)> {
+    let names: &[&str] = match eco {
+        Ecosystem::Npm => &NPM_LOCKFILES,
+        Ecosystem::Pypi => &PYPI_LOCKFILES,
+    };
+    for folder in folders(dir) {
+        for n in names {
+            let p = join(&folder, n);
+            if let Some(t) = read(&p) {
+                return Some((p, t));
+            }
+        }
+    }
+    None
+}
+
+/// One package version a lockfile installs.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Locked {
+    /// The registry's name: npm's, or PyPI's normalised.
+    pub name: String,
+    pub version: String,
+    /// Whether a manifest the lockfile covers names it directly at this
+    /// version (a root or workspace dependency).
+    pub direct: bool,
+}
+
+/// Every package version a lockfile installs, sorted, each once. `file`
+/// is the lockfile's name (`package-lock.json`, `pnpm-lock.yaml`,
+/// `yarn.lock`, `uv.lock`, `poetry.lock`).
+pub fn all_locked(file: &str, text: &str) -> Vec<Locked> {
+    let name = file.rsplit('/').next().unwrap_or(file);
+    let mut out: Vec<Locked> = match name {
+        "package-lock.json" => package_lock_all(text),
+        "pnpm-lock.yaml" => pnpm_lock_all(text),
+        "yarn.lock" => yarn_lock_all(text),
+        "uv.lock" | "poetry.lock" => toml_lock_all(text),
+        _ => Vec::new(),
+    };
+    out.sort();
+    // A pair both direct and not is direct.
+    out.dedup_by(|b, a| {
+        if a.name == b.name && a.version == b.version {
+            a.direct |= b.direct;
+            true
+        } else {
+            false
+        }
+    });
+    out
+}
+
+/// The package a `package-lock.json` key installs: the part after its last
+/// `node_modules/`; `None` for the root and workspace folders.
+pub fn package_lock_name(key: &str) -> Option<&str> {
+    let i = key.rfind("node_modules/")?;
+    Some(&key[i + "node_modules/".len()..])
+}
+
+fn package_lock_all(text: &str) -> Vec<Locked> {
+    let Ok(doc) = serde_json::from_str::<Value>(text) else { return Vec::new() };
+    let mut out = Vec::new();
+    if let Some(packages) = doc["packages"].as_object() {
+        // Direct: each root or workspace entry's dependency names, at the
+        // copy that entry resolves (its own `node_modules`, else the root's).
+        let mut direct: Vec<(String, String)> = Vec::new();
+        for (key, entry) in packages.iter().filter(|(k, _)| package_lock_name(k).is_none()) {
+            for group in ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"] {
+                for name in entry[group].as_object().into_iter().flat_map(|m| m.keys()) {
+                    let own = if key.is_empty() { format!("node_modules/{name}") } else { format!("{key}/node_modules/{name}") };
+                    let at = if packages.contains_key(&own) { own } else { format!("node_modules/{name}") };
+                    if let Some(v) = packages.get(&at).and_then(|e| e["version"].as_str()) {
+                        direct.push((name.clone(), v.to_owned()));
+                    }
+                }
+            }
+        }
+        for (key, entry) in packages {
+            let Some(name) = package_lock_name(key) else { continue };
+            if entry["link"].as_bool() == Some(true) {
+                continue;
+            }
+            let name = entry["name"].as_str().unwrap_or(name);
+            if let Some(v) = entry["version"].as_str() {
+                let d = direct.iter().any(|(n, dv)| n == name && dv == v);
+                out.push(Locked { name: name.to_owned(), version: v.to_owned(), direct: d });
+            }
+        }
+        return out;
+    }
+    // lockfileVersion 1: nested `dependencies`.
+    fn walk(deps: &Value, out: &mut Vec<Locked>) {
+        for (name, e) in deps.as_object().into_iter().flatten() {
+            if let Some(v) = e["version"].as_str().filter(|v| !v.contains(':')) {
+                out.push(Locked { name: name.clone(), version: v.to_owned(), direct: false });
+            }
+            walk(&e["dependencies"], out);
+        }
+    }
+    walk(&doc["dependencies"], &mut out);
+    out
+}
+
+/// A pnpm `packages` key's name and version: `/a@1.0.0` (v6), `a@1.0.0`
+/// (v9), `/a/1.0.0` (v5), each maybe with a peer suffix.
+pub fn pnpm_key(key: &str) -> Option<(String, String)> {
+    let k = key.trim_start_matches('/');
+    let k = k.split('(').next().unwrap_or(k);
+    // v5: `name/version` (`@scope/name/version`), the version maybe with `_peer@x`.
+    let slash = if k.starts_with('@') { k.find('/').and_then(|i| k[i + 1..].find('/').map(|j| i + 1 + j)) } else { k.find('/') };
+    let (name, version) = match slash.filter(|i| k[i + 1..].starts_with(|c: char| c.is_ascii_digit())) {
+        Some(i) => (&k[..i], k[i + 1..].split('_').next().unwrap_or("")),
+        None => {
+            let i = k.get(1..)?.find('@')? + 1;
+            (&k[..i], &k[i + 1..])
+        }
+    };
+    (!name.is_empty() && !version.is_empty()).then(|| (name.to_owned(), version.to_owned()))
+}
+
+fn pnpm_lock_all(text: &str) -> Vec<Locked> {
+    let Ok(doc) = serde_saphyr::from_str::<Value>(text) else { return Vec::new() };
+    let mut direct: Vec<(String, String)> = Vec::new();
+    let mut importer = |deps: &Value| {
+        for group in ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"] {
+            for (name, e) in deps[group].as_object().into_iter().flatten() {
+                if let Some(v) = e["version"].as_str().or(e.as_str()).filter(|v| !v.starts_with("link:")) {
+                    direct.push((name.clone(), pnpm_version(v)));
+                }
+            }
+        }
+    };
+    match doc["importers"].as_object() {
+        Some(imps) => imps.values().for_each(&mut importer),
+        None => importer(&doc),
+    }
+    let mut out = Vec::new();
+    for key in doc["packages"].as_object().into_iter().flat_map(|m| m.keys()) {
+        if let Some((name, version)) = pnpm_key(key) {
+            let d = direct.iter().any(|(n, v)| *n == name && *v == version);
+            out.push(Locked { name, version, direct: d });
+        }
+    }
+    out
+}
+
+/// A yarn descriptor's package name: `react@^18`, `@a/b@npm:^1`.
+fn yarn_name(descriptor: &str) -> Option<&str> {
+    let i = descriptor[1.min(descriptor.len())..].find('@')? + 1;
+    Some(&descriptor[..i])
+}
+
+fn yarn_lock_all(text: &str) -> Vec<Locked> {
+    let mut out = Vec::new();
+    let mut name: Option<String> = None;
+    for line in text.lines() {
+        if line.starts_with('#') || line.trim().is_empty() {
+            continue;
+        }
+        if !line.starts_with(' ') {
+            let first = line.trim_end_matches(':').split(", ").next().map(unquote).unwrap_or_default();
+            name = yarn_name(first).map(str::to_owned).filter(|n| n != "__metadata");
+            continue;
+        }
+        let t = line.trim();
+        let Some(v) = t.strip_prefix("version:").or_else(|| t.strip_prefix("version ")) else { continue };
+        if let Some(n) = name.take() {
+            let v = unquote(v);
+            // Berry's workspace entries are `0.0.0-use.local`.
+            if !v.contains("use.local") {
+                out.push(Locked { name: n, version: v.to_owned(), direct: false });
+            }
+        }
+    }
+    out
+}
+
+fn toml_lock_all(text: &str) -> Vec<Locked> {
+    let Ok(doc) = toml::from_str::<toml::Table>(text) else { return Vec::new() };
+    let mut out = Vec::new();
+    for p in doc.get("package").and_then(|p| p.as_array()).into_iter().flatten() {
+        // uv's own project is `source = { editable = "." }` or virtual.
+        let local = p.get("source").and_then(|s| s.as_table()).is_some_and(|s| s.contains_key("editable") || s.contains_key("virtual"));
+        if let (Some(n), Some(v), false) = (p.get("name").and_then(|n| n.as_str()), p.get("version").and_then(|v| v.as_str()), local) {
+            out.push(Locked { name: normalize(n), version: v.to_owned(), direct: false });
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -168,6 +364,24 @@ mod tests {
         }
         assert_eq!(installed(Ecosystem::Pypi, "e/sub", &BTreeMap::new(), &read).get("requests").map(String::as_str), Some("2.31.0"));
         assert!(installed(Ecosystem::Npm, "z", &s, &read).is_empty());
+    }
+
+    #[test]
+    fn every_lockfile_lists_what_it_installs() {
+        let pl = r#"{"lockfileVersion":3,"packages":{"":{"dependencies":{"a":"^1"}},"node_modules/a":{"version":"1.0.0"},"node_modules/b":{"version":"2.0.0"},"node_modules/a/node_modules/b":{"version":"1.5.0"},"packages/w":{"devDependencies":{"c":"^3"}},"packages/w/node_modules/c":{"version":"3.1.0"},"node_modules/w":{"link":true}}}"#;
+        let got: Vec<(String, String, bool)> = all_locked("package-lock.json", pl).into_iter().map(|l| (l.name, l.version, l.direct)).collect();
+        assert_eq!(got, [("a".into(), "1.0.0".into(), true), ("b".into(), "1.5.0".into(), false), ("b".into(), "2.0.0".into(), false), ("c".into(), "3.1.0".into(), true)]);
+        let pnpm = "lockfileVersion: '9.0'\nimporters:\n  .:\n    dependencies:\n      a:\n        specifier: ^1\n        version: 1.0.0\npackages:\n  a@1.0.0:\n    resolution: {integrity: x}\n  '@s/b@2.0.0':\n    resolution: {integrity: y}\n";
+        let got: Vec<(String, String, bool)> = all_locked("pnpm-lock.yaml", pnpm).into_iter().map(|l| (l.name, l.version, l.direct)).collect();
+        assert_eq!(got, [("@s/b".into(), "2.0.0".into(), false), ("a".into(), "1.0.0".into(), true)]);
+        assert_eq!(pnpm_key("/@s/b@2.0.0(react@18.0.0)"), Some(("@s/b".into(), "2.0.0".into())));
+        assert_eq!(pnpm_key("/a/1.0.0_react@18"), Some(("a".into(), "1.0.0".into())));
+        let yarn = "\"@s/b@^2\", \"@s/b@^2.0\":\n  version \"2.0.0\"\n\nminimist@^1.2.0:\n  version \"1.2.5\"\n";
+        let got: Vec<(String, String)> = all_locked("yarn.lock", yarn).into_iter().map(|l| (l.name, l.version)).collect();
+        assert_eq!(got, [("@s/b".into(), "2.0.0".into()), ("minimist".into(), "1.2.5".into())]);
+        let uv = "[[package]]\nname = \"app\"\nversion = \"0.1.0\"\nsource = { editable = \".\" }\n\n[[package]]\nname = \"Jinja2\"\nversion = \"3.1.2\"\n";
+        let got: Vec<(String, String)> = all_locked("uv.lock", uv).into_iter().map(|l| (l.name, l.version)).collect();
+        assert_eq!(got, [("jinja2".into(), "3.1.2".into())]);
     }
 
     #[test]

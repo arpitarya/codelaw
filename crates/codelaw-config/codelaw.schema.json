@@ -490,12 +490,12 @@
     },
     "deps": {
       "x-codelaw-record": "SR-RULE-PACKS",
-      "description": "The dependency rules, `data/outdated-dependency` and `data/stale-deps-snapshot`, read against `.codelaw/deps-snapshot.json`, which `codelaw deps refresh` writes (SR-RULE-PACKS decision 15). Root config only.",
+      "description": "The `deps` pack's rules — `deps/vulnerable`, `deps/incomplete-scan`, `deps/outdated` and `deps/stale-snapshot` — read against `.codelaw/deps-snapshot.json`, which `codelaw deps refresh` writes from the registries and the advisory sources (SR-RULE-PACKS decision 15). Root config only.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "severity": {
-          "description": "The severity of each kind of finding, or `off`: a major, minor or patch version behind, a deprecated (npm) or yanked (PyPI) version in use, a lockfile behind a range that allows the latest.",
+          "description": "The severity of each kind of finding, or `off`: a major, minor or patch version behind, a deprecated (npm) or yanked (PyPI) version in use, a lockfile behind a range that allows the latest; and a vulnerable dependency by its advisory's severity.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -504,7 +504,11 @@
             "patch": { "enum": ["error", "warn", "info", "off"], "default": "info" },
             "deprecated": { "enum": ["error", "warn", "info", "off"], "default": "error" },
             "yanked": { "enum": ["error", "warn", "info", "off"], "default": "error" },
-            "lockfile": { "enum": ["error", "warn", "info", "off"], "default": "info" }
+            "lockfile": { "enum": ["error", "warn", "info", "off"], "default": "info" },
+            "critical": { "enum": ["error", "warn", "info", "off"], "default": "error" },
+            "high": { "enum": ["error", "warn", "info", "off"], "default": "error" },
+            "moderate": { "enum": ["error", "warn", "info", "off"], "default": "warn" },
+            "low": { "enum": ["error", "warn", "info", "off"], "default": "info" }
           }
         },
         "min_release_age": {
@@ -518,7 +522,7 @@
           "default": false
         },
         "ignore": {
-          "description": "Packages never reported: `npm:<name>` or `pypi:<name>`, or a table with `package` and an `expires` date (the first day it no longer holds), `added_by` and `reason`.",
+          "description": "Packages never reported: `npm:<name>` or `pypi:<name>`, or a table with `package`, an optional `advisory` (then only that advisory, by id or alias, is ignored), an `expires` date (the first day it no longer holds), `added_by` and `reason`.",
           "type": "array",
           "items": {
             "oneOf": [
@@ -529,6 +533,7 @@
                 "required": ["package"],
                 "properties": {
                   "package": { "type": "string", "pattern": "^(npm|pypi):.+" },
+                  "advisory": { "type": "string" },
                   "expires": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
                   "added_by": { "type": "string" },
                   "reason": { "type": "string" }
@@ -538,9 +543,37 @@
           }
         },
         "max_snapshot_age": {
-          "description": "A snapshot older than this on the as-of date is `data/stale-deps-snapshot`: days, or a string like \"14d\".",
+          "description": "A snapshot older than this on the as-of date is `deps/stale-snapshot`: days, or a string like \"14d\".",
           "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "string", "pattern": "^\\s*[0-9]+\\s*[dw]$" }],
           "default": 14
+        },
+        "advisory_sources": {
+          "description": "The advisory sources `codelaw deps refresh` reads and merges, the safer answer winning; each on or off. Unset: `registry` (the npm registry and Python index the project already uses), then `osv` at https://api.osv.dev.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "kind"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "kind": { "enum": ["registry", "osv"] },
+              "url": { "type": "string", "description": "`osv`: the API's base URL." },
+              "npm_url": { "type": "string", "description": "`registry`: the npm registry to ask instead of the one `.npmrc` names." },
+              "pypi_url": { "type": "string", "description": "`registry`: the Python index to ask instead of the one the project resolves." },
+              "enabled": { "type": "boolean", "default": true }
+            }
+          }
+        },
+        "agent": {
+          "description": "What an agent's hooks do with a vulnerable dependency, per advisory severity: `inform` tells the agent the version to move to; `block` also refuses, before it reaches disk, a write that adds one. Never changes a `codelaw check` or CI verdict.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "critical": { "enum": ["inform", "block"], "default": "inform" },
+            "high": { "enum": ["inform", "block"], "default": "inform" },
+            "moderate": { "enum": ["inform", "block"], "default": "inform" },
+            "low": { "enum": ["inform", "block"], "default": "inform" }
+          }
         }
       }
     },

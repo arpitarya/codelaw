@@ -24,7 +24,7 @@ codelaw init --no-install
 # 3. Until the packs are published, link them from the clone:
 #    the npm packs into node_modules/, the PyPI-only ones where a Python install would put them
 mkdir -p node_modules/@codelaw .codelaw-packs
-for p in js ts react node stencil html css scss css-modules data tanstack-query redux-toolkit security-js security-ts security-html spell; do
+for p in js ts react node stencil html css scss css-modules data tanstack-query redux-toolkit security-js security-ts security-html spell deps; do
   ln -s "$OLDPWD/codelaw/packs/$p" "node_modules/@codelaw/rules-$p"
 done
 for p in python security-python; do
@@ -563,7 +563,7 @@ flowchart LR
     --warn-from 2026-10-25 --on-touch keep --reason "legacy context, grandfathered"
   ```
 
-- **Dependencies on their latest version:** `codelaw deps refresh` reads npm and the Python index for every dependency your `package.json` and `pyproject.toml` files name, and writes `.codelaw/deps-snapshot.json` — commit it. It is the only command that uses the network ([L5](records/0007_LAW-5-no-model-in-the-engine.md) decision 3). Then `check` reports each dependency behind its latest version from the snapshot, offline: a major version behind is a warning, a minor or patch one is info, a deprecated or yanked version in use is an error, and a lockfile behind a range that already allows the latest is info. `codelaw fix --unsafe` moves the range to the latest and keeps its `^`, `~`, `>=` or `==`. Turn the rules on with the `data/package-json` and `data/pyproject` presets (and `preview = true`), and tune them in `[deps]`:
+- **Dependencies on their latest version:** `codelaw deps refresh` reads npm and the Python index for every dependency your `package.json` and `pyproject.toml` files name, and writes `.codelaw/deps-snapshot.json` — commit it. It is the only command that uses the network ([L5](records/0007_LAW-5-no-model-in-the-engine.md) decision 3). Then `check` reports each dependency behind its latest version from the snapshot, offline: a major version behind is a warning, a minor or patch one is info, a deprecated or yanked version in use is an error, and a lockfile behind a range that already allows the latest is info. `codelaw fix --unsafe` moves the range to the latest and keeps its `^`, `~`, `>=` or `==`. Turn the rules on with the `deps` pack's `deps/recommended` preset (and `preview = true`; `codelaw init` adds it beside a manifest), and tune them in `[deps]`:
 
   ```toml
   [deps]
@@ -572,7 +572,23 @@ flowchart LR
   ignore          = ["npm:typescript"]    # or { package = "npm:react", expires = "2027-01-01" }
   ```
 
-  A private npm registry comes from `.npmrc` (`@acme:registry=…` and `//host/:_authToken=${NPM_TOKEN}`, the token read from the environment, never written); a private Python index from `PIP_INDEX_URL` or `[[tool.uv.index]]`. `data/stale-deps-snapshot` says when the snapshot is older than `[deps] max_snapshot_age` (14 days) on the as-of date ([SR-RULE-PACKS](records/0101_rule-packs.md) decision 15).
+  A private npm registry comes from `.npmrc` (`@acme:registry=…` and `//host/:_authToken=${NPM_TOKEN}`, the token read from the environment, never written); a private Python index from `PIP_INDEX_URL` or `[[tool.uv.index]]`. `deps/stale-snapshot` says when the snapshot is older than `[deps] max_snapshot_age` (14 days) on the as-of date ([SR-RULE-PACKS](records/0101_rule-packs.md) decision 15). The rules were `data/outdated-dependency` and `data/stale-deps-snapshot` until W-128; a config naming the old ids still loads, with a warning, until the next minor release.
+
+- **Vulnerable dependencies and the version to move to (W-128):** the same `deps refresh` asks every advisory source you enable which versions in use — direct and transitive, from the lockfiles — are vulnerable, merges what they say (the safer answer wins) and writes it into the snapshot. `deps/vulnerable` then names each one, its worst advisory and the **lowest known-clean version** to move to, inside the major you are on when there is one; `codelaw fix --unsafe` moves the range, or adds yarn `resolutions` / uv `override-dependencies` for a transitive package (for npm and pnpm the message names the `overrides` to add). Then run your install — codelaw never runs installers, and never edits a lockfile.
+
+  ```toml
+  [deps]
+  advisory_sources = [
+    { name = "registry", kind = "registry" },                          # the registry you install from: first
+    { name = "osv", kind = "osv", url = "https://api.osv.dev" },
+    { name = "mirror", kind = "osv", url = "https://osv.example.com", enabled = false },
+  ]
+  severity = { critical = "error", high = "error", moderate = "warn", low = "info" }
+  agent    = { critical = "block" }                                    # the agent hooks; never CI
+  ignore   = [{ package = "npm:lodash", advisory = "CVE-2021-23337", expires = "2027-01-01", reason = "not reachable" }]
+  ```
+
+  A source your network refuses is recorded `unavailable`, and `deps/incomplete-scan` says the scan was incomplete until a refresh reaches it or you set `enabled = false`. Agents ask before adding a package: MCP `check_dependency`, or `codelaw deps check npm lodash 4.17.15` (offline, from the snapshot).
 
 ### Bitbucket Pipelines
 
@@ -685,7 +701,8 @@ The rule packs come from the repository's own dependencies, so the step installs
 | `codelaw hook --pre [--agent <name>]` | Judge the write an agent proposes before it reaches disk; refuse it when it adds an error. Fails open |
 | `codelaw sync-agents` | Write every agent's instruction files from the rules and skills; `--check` reports drift |
 | `codelaw daemon start\|stop\|status` | An opt-in warm process that `--prefer-warm` runs use; the output is the same |
-| `codelaw deps refresh` | Read npm and the Python index for every dependency the manifests name and write `.codelaw/deps-snapshot.json`, which `data/outdated-dependency` reads offline; the only command that uses the network. `--as-of` sets the `fetched` day |
+| `codelaw deps refresh` | Read npm and the Python index for every dependency the manifests name and write `.codelaw/deps-snapshot.json`, and the advisory sources, which the `deps` pack reads offline; the only command that uses the network. `--as-of` sets the `fetched` day |
+| `codelaw deps check <npm\|pypi> <name> [version]` | What the snapshot says of one package, offline: its advisories, the version to move to, its latest and licence (`--format json`: MCP `check_dependency`'s object) |
 | `codelaw cache stats\|clean` | Inspect or clear the content-addressed cache in `.codelaw/cache/` |
 | `codelaw bench` | Time every performance-budgeted operation on a generated 10,000-file workload; `--budgets perf/budgets.toml` fails on a budget that's been set; `--typescript <dir>` (a `typescript` ≥ 7.1 package) adds the type-aware `check_types_cold` / `check_types_warm` ([L8](records/0010_LAW-8-performance-budgets.md)) |
 | `codelaw debug` | Inspect what the engine sees: `changed-functions` |
