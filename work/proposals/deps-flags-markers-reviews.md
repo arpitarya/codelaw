@@ -287,9 +287,9 @@ warn_days      = 14
   finding about one shows on the L3 file it concerns **and** on the text file's line:
   [W-136](../../archive/open/W-136-l3-findings-on-plain-text-config.md).
 - **Registry names for `deps`** — two items, *"just before the deps release"*:
-  [W-134](../open/W-134-deps-pypi-pending-publishers.md) (PyPI pending publishers,
+  [W-134](../open/W-151-release-0-4-1.md) (PyPI pending publishers,
   Claude fills the form in Chrome, Arpit submits) and
-  [W-135](../open/W-135-deps-npm-first-publish.md) (npm first hand publish).
+  [W-135](../open/W-151-release-0-4-1.md) (npm first hand publish).
 
 ## 9 · Laws touched
 

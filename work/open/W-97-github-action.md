@@ -1,7 +1,7 @@
 ---
 type: Handoff
 name: W-97
-description: "Arpit, 2026-10-27 (W-36 gap G3): a first-party GitHub Action for codelaw."
+description: "Arpit, 2026-10-27 (W-36 gap G3): codelaw installed into other people's pipelines — the GitHub Action (listed as codelaw check) and the codelaw-pre-commit mirror repo (was W-64). Merged 2026-10-30."
 item: W-97
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
@@ -10,7 +10,7 @@ updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
-# W-97 — A first-party GitHub Action
+# W-97 — codelaw in other people's pipelines: the Action and pre-commit
 
 ## At a glance
 
@@ -19,6 +19,9 @@ ball: agent
 | 1 | `action.yml` (composite) at this repo's root: install codelaw at a pinned version (npm or PyPI), run `check --format github`, optionally `--format sarif` + upload to code scanning, with `--changed-since` on pull requests | `uses: arpitarya/codelaw@v0.x` in one line | ✅ 2026-10-27 |
 | 2 | Only ratified actions inside (D-30); pinned by SHA (W-18) | L11 | ✅ 2026-10-27 — it uses **no** action; the SARIF upload is the REST API via `gh` (ruled 2026-10-27: keep `gh`) |
 | 3 | `init --ci github` writes a workflow that uses it; docs in USAGE | adoption | ✅ 2026-10-27 |
+| W-64 | `codelaw-pre-commit`: the pre-commit framework installs codelaw by version — merged in; its steps under [§ W-64](#merged-in-w-64) | one item, not two | ⏳ — see § |
+
+**Merged 2026-10-30 (Arpit, text):** *"There are too many work items. See if we can review all the work items and merge them into few of them."* → *"go ahead, merge them."* Merged in: W-64.
 
 **Arpit, 2026-10-27 (voice docket; written 2026-10-28):** *"Okay."* — to all three: (1) keep the SARIF upload on `gh`; (2) Claude runs the throwaway-repo proof after the next release tag; (3) publish to the GitHub Marketplace and keep a moving `v0` tag. Asked whether every CI has `gh` (GitHub-hosted runners do; self-hosted and slim images may not): *"Make sure it works with Bitbucket as well. I don't want any problems with it."* and *"File it as a work item and make it configurable. The serif part."* — filed as [W-109](../../archive/open/W-109-bitbucket-pipelines.md).
 
@@ -66,3 +69,53 @@ SR-PACKAGES (a new distribution surface) · SR-CLI-MCP (`init --ci`).
 ## Hazards
 
 - An Action in the main repo is versioned by the repo's tags — the release tags must stay the Action's contract.
+
+## Merged in: W-64
+
+<a id="merged-in-w-64"></a>
+
+**W-64 — `codelaw-pre-commit`: the pre-commit framework installs codelaw by version**, merged into W-97 on 2026-10-30; its file is archived at [`archive/open/W-64-codelaw-pre-commit-mirror.md`](../../archive/open/W-64-codelaw-pre-commit-mirror.md). As it stood:
+
+### At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Create the repo `codelaw-pre-commit` with a `.pre-commit-hooks.yaml`: hooks `codelaw-check`, `codelaw-fix`, `codelaw-format`, `language: python`, `additional_dependencies: ["codelaw==<version>"]` | `rev: v0.2.0` in a consumer's config installs the PyPI wheel — no Rust build, nothing on `PATH` | ⏳ |
+| 2 | Tag it per codelaw release; `publish.yml` (or a scheduled job) opens the bump | the mirror follows every release | ⏳ |
+| 3 | USAGE and W-50's recipes point to it; the `language: system` hooks stay for teams with codelaw already installed | both ways documented | ⏳ |
+
+**Arpit, 2026-10-26 (docket on W-50):** *"PATH now, mirror repo later"*.
+
+**Model:** Sonnet — a small repo after Ruff's pattern, with a test install.
+
+### Goal
+
+A consumer's `.pre-commit-config.yaml`:
+```yaml
+- repo: https://github.com/arpitarya/codelaw-pre-commit
+  rev: v0.2.0
+  hooks: [{ id: codelaw-check }]
+```
+
+### Definition of done
+
+| DoD | what | state |
+|---|---|---|
+| 1 · | `pre-commit run --all-files` in a fresh repo installs codelaw (0.4.0 today) from PyPI and runs it | ⏳ |
+| 2 · | a codelaw release produces a matching mirror tag | ⏳ |
+
+### Blockers
+
+W-38 is done: `codelaw` is on PyPI (checked 2026-10-29).
+
+### Record affected
+
+SR-CLI-MCP (`init --git-hooks` docs) · L6 is unaffected: the mirror publishes no package, it pins one.
+
+### Hazards
+
+- The mirror's version must equal codelaw's — a bump that lags gives users an old engine.
+
+### Reference
+
+[ruff-pre-commit](https://github.com/astral-sh/ruff-pre-commit) · [pre-commit: creating new hooks](https://pre-commit.com/#creating-new-hooks) · [W-50](W-50-git-hooks.md)

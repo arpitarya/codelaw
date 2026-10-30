@@ -271,7 +271,7 @@ The ports join W-139's build (ruled 2026-10-30: *"built along with everything el
 - **R6 — a `nextjs` pack** (*"The next JS pack. Let's create it."*): npm only, `@codelaw/rules-nextjs`, 22 rules; `nextjs/recommended` on when the pack is installed. L6 amended.
 - **R7 — what is on by default:** SonarJS and Pylint **off** (*"Off by default. For Sonar.js or Pylint."*), as opt-in presets inside their packs, not new packs (told so → *"Perfect."*): `js/sonarjs` (201) and `py/pylint` (298). jsdoc off too, `js/jsdoc` (71), as recommended. regexp and promise **on** (*"Yes."*): their 70 upstream-recommended rules (regexp 60, promise 10) join `js/recommended`; their other 27 land `preview`, as R2. Each opt-in preset mirrors its source's recommended set; the testing presets likewise; `nextjs` and `tailwind` on when their pack is installed.
 - **R8 — TSLint's 6, built** (no new package; *"Let's file all this."*): `js/file-header`, `js/no-default-import`, `js/no-unnecessary-callback-wrapper` (suggest only) in `js`; `ts/no-mergeable-namespace` in `ts`; `js/comment-type` and `js/switch-final-break` in the taste preset.
-- **Where it is built:** W-139, with round 1 — every `port` row in the CSVs except the `tailwind` pack's 8, which W-145 builds with the pack, plus `tslint-recheck.csv`'s 6: **2,572 rules**. The two npm names are [W-147](../open/W-147-testing-nextjs-npm-first-publish.md). W-144 closed.
+- **Where it is built:** W-139, with round 1 — every `port` row in the CSVs except the `tailwind` pack's 8, which W-145 builds with the pack, plus `tslint-recheck.csv`'s 6: **2,572 rules**. The two npm names are [W-147](../open/W-142-framework-pack-names.md). W-144 closed.
 
 ## 12 · Oxlint (researched 2026-10-30)
 
