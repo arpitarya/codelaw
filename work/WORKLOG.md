@@ -24,6 +24,22 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-144 ruled: round 2 joins W-139  ·  Cowork (Opus 5.5)
+
+- **Asked:** R5–R8 walked by voice, then *"file it."*
+- **Done:** rulings in proposal §11 (status `graduated`), W-139 (round 2 block, DoD 2c, 2,572 rules), W-145 (its 8 lint rules unblocked); W-144 closed to `archive/open/`; W-147 filed (npm first publish of `@codelaw/rules-testing`, `@codelaw/rules-nextjs` and their Fux indexes); inbox row and B-065 removed.
+- **Decided / left open:** `testing` and `nextjs` npm packs; SonarJS, Pylint, jsdoc opt-in presets; regexp and promise on by default; TSLint's 6 built. Left to W-139: L6's amendment text.
+- **Mistakes:** by voice I said four of TSLint's 6 go in the JavaScript pack — it is three in `js`, one in `ts`, two in the taste preset; filed correctly.
+- **Next:** W-139 is the agent's.
+
+## 2026-10-30 — W-144 researched: rule parity, round 2  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"research w-144"*.
+- **Done:** 12 more packages read from source (sonarjs 4.2.2, jest 29.17, vitest plugin 1.6.28, testing-library 7.16.2, playwright 2.12.1, promise 7.3, jsdoc 65.4.2, regexp 3.3.2, next 16.4.3, tailwindcss 4.4, better-tailwindcss 4.10, Pylint 4.1.3 with its extensions): 1,211 rules; 35 covered, 879 to port, 146 counted elsewhere. TSLint's 30 rechecked: 6 to build. Biome rescanned against its now-read sources (52 move to `same-as`). CSVs now carry the 10-30 rulings. Proposal §11; `method/` extended (`pylint_rules.py`), rebuilds byte-identically. Both rounds: 2,580 to port; codelaw 689 → about 3,270.
+- **Decided / left open:** R5 `testing` pack, R6 `nextjs` pack, R7 round 2 opt-in by default, R8 TSLint's 6 — Arpit's.
+- **Mistakes:** none kept — a scoped-source parse error in the Biome step and the recheck file breaking the tables were caught and fixed before writing.
+- **Next:** Arpit's R5–R8.
+
 ## 2026-10-30 — Eight items in parallel: W-128, W-130–W-133, W-136, W-137, W-140  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement 130 … 131 … 132 … 133 … 136 … 128 … in parallel if possible, close it as fast as possible … Keep merging everything to main. And keep doing the cleanup"*; then W-137 and W-140 the same way.

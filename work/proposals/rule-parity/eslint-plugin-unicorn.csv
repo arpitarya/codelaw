@@ -32,7 +32,7 @@ expiring-todo-comments,covered,js/todo-marker*,,,,,,none,yes,,
 explicit-length-check,port,,js,js/explicit-length-check,auto,P1,B,auto,yes,,
 explicit-timer-delay,port,,js,js/explicit-timer-delay,auto,P1,B,auto,yes,,
 filename-case,port,,js,js/filename-case,manual,P1,B,none,yes,,
-id-match,port,,js,js/id-match,manual,P2,B,none,,,
+id-match,port,,js,js/id-match-unicorn,manual,P2,B,none,,,
 import-style,port,,js,js/import-style,manual,P1,B,none,yes,,
 indent,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
 isolated-functions,port,,js,js/isolated-functions,manual,P1,B,none,yes,,
@@ -142,7 +142,7 @@ no-nested-ternary,port,,js,js/no-nested-ternary-unicorn,auto,P1,B,auto,yes,,
 no-nesting-with-mixed-specificity,retired,,,,,,,none,,yes,deprecated upstream
 no-new-array,port,,js,js/no-new-array,auto,P1,B,auto,yes,,
 no-new-buffer,port,,js,js/no-new-buffer,auto,P1,B,auto,yes,,
-no-non-function-verb-prefix,port,,js,js/no-non-function-verb-prefix,manual,P1,B,none,yes,,
+no-non-function-verb-prefix,types,,,,,,,none,yes,,needs type information: W-105
 no-nonstandard-builtin-properties,port,,js,js/no-nonstandard-builtin-properties,manual,P1,B,none,yes,,
 no-null,port,,js,js/no-null,auto,P1,B,auto,yes,,
 no-object-as-default-parameter,port,,js,js/no-object-as-default-parameter,manual,P1,B,none,yes,,

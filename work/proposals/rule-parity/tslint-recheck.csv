@@ -1,0 +1,31 @@
+upstream_id,class,codelaw_or_proposed,today
+ban,covered,js/use-instead*,eslint no-restricted-syntax / codelaw js/use-instead
+comment-format,layout,,@stylistic/spaced-comment
+comment-type,port,js/comment-type,taste: the opt-in taste preset
+completed-docs,same-as,,eslint-plugin-jsdoc/require-jsdoc
+encoding,layout,,codelaw reads and writes UTF-8 (SR-ARCHITECTURE); eslint unicode-bom is layout
+file-header,port,js/file-header,no successor in any tool read; a licence/copyright header check
+import-spacing,layout,,formatting
+invalid-void,same-as,,typescript-eslint/no-invalid-void-type
+match-default-export-name,types,,needs the imported module's export name
+no-default-import,port,js/no-default-import,no successor; the import-side twin of js/no-default-export
+no-inferred-empty-object-type,types,,needs inference
+no-mergeable-namespace,port,ts/no-mergeable-namespace,no successor; typescript-eslint no-unsafe-declaration-merging is a different check
+no-null-undefined-union,types,,needs types
+no-promise-as-boolean,same-as,,typescript-eslint/no-misused-promises
+no-restricted-globals,covered,js/use-instead*,eslint no-restricted-globals
+no-tautology-expression,same-as,,eslint/no-self-compare and sonarjs/no-identical-expressions
+no-unnecessary-callback-wrapper,port,js/no-unnecessary-callback-wrapper,no successor; suggest only — unwrapping can change this and arity
+no-unsafe-any,same-as,,typescript-eslint/no-unsafe-* (types)
+number-literal-format,layout,,formatting
+object-literal-sort-keys,same-as,,eslint/sort-keys (taste preset)
+prefer-method-signature,same-as,,typescript-eslint/method-signature-style
+prefer-while,same-as,,eslint-plugin-sonarjs/prefer-while
+return-undefined,types,,needs the function's return type
+static-this,same-as,,biome complexity/noThisInStatic
+strict-comparisons,types,,needs types
+strict-string-expressions,same-as,,typescript-eslint/restrict-template-expressions (types)
+strict-type-predicates,same-as,,typescript-eslint/no-unnecessary-condition (types)
+switch-final-break,port,js/switch-final-break,taste: the opt-in taste preset
+unnecessary-else,same-as,,eslint/no-else-return
+whitespace,layout,,formatting

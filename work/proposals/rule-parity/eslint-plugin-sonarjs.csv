@@ -1,0 +1,296 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+anchor-precedence,types,,,,,,,none,yes,,needs type information: W-105
+argument-type,types,,,,,,,none,yes,,needs type information: W-105
+arguments-order,types,,,,,,,none,yes,,needs type information: W-105
+arguments-usage,port,,js,js/arguments-usage,manual,P2,C,none,,,
+array-callback-without-return,types,,,,,,,none,yes,,needs type information: W-105
+array-constructor,port,,js,js/array-constructor,suggest,P2,C,suggest,,,
+arrow-function-convention,port,,js,js/arrow-function-convention,manual,P2,C,none,,,
+assertions-in-test-cases,port,,js,js/assertions-in-test-cases,manual,P1,A,none,yes,,
+assertions-in-tests,types,,,,,,,none,yes,,needs type information: W-105
+async-test-assertions,port,,js,js/async-test-assertions,manual,P1,A,none,yes,,
+avoid-mutating-nested-properties-of-shallow-clones,port,,js,js/avoid-mutating-nested-properties-of-shallow-clones,suggest,P1,A,suggest,yes,,
+aws-apigateway-public-api,port,,js,js/aws-apigateway-public-api,manual,P1,A,none,yes,,
+aws-ec2-rds-dms-public,port,,js,js/aws-ec2-rds-dms-public,manual,P1,A,none,yes,,
+aws-ec2-unencrypted-ebs-volume,port,,js,js/aws-ec2-unencrypted-ebs-volume,manual,P1,A,none,yes,,
+aws-efs-unencrypted,port,,js,js/aws-efs-unencrypted,manual,P1,A,none,yes,,
+aws-iam-all-privileges,port,,js,js/aws-iam-all-privileges,manual,P1,A,none,yes,,
+aws-iam-all-resources-accessible,port,,js,js/aws-iam-all-resources-accessible,manual,P2,C,none,,,
+aws-iam-privilege-escalation,port,,js,js/aws-iam-privilege-escalation,manual,P1,A,none,yes,,
+aws-iam-public-access,port,,js,js/aws-iam-public-access,manual,P1,A,none,yes,,
+aws-opensearchservice-domain,port,,js,js/aws-opensearchservice-domain,manual,P1,A,none,yes,,
+aws-rds-unencrypted-databases,port,,js,js/aws-rds-unencrypted-databases,manual,P1,A,none,yes,,
+aws-restricted-ip-admin-access,port,,js,js/aws-restricted-ip-admin-access,manual,P1,A,none,yes,,
+aws-s3-bucket-granted-access,port,,js,js/aws-s3-bucket-granted-access,manual,P1,A,none,yes,,
+aws-s3-bucket-insecure-http,port,,js,js/aws-s3-bucket-insecure-http,manual,P1,A,none,yes,,
+aws-s3-bucket-public-access,port,,js,js/aws-s3-bucket-public-access,manual,P1,A,none,yes,,
+aws-s3-bucket-versioning,port,,js,js/aws-s3-bucket-versioning,manual,P1,A,none,yes,,
+aws-sagemaker-unencrypted-notebook,port,,js,js/aws-sagemaker-unencrypted-notebook,manual,P1,A,none,yes,,
+aws-sns-unencrypted-topics,port,,js,js/aws-sns-unencrypted-topics,manual,P1,A,none,yes,,
+aws-sqs-unencrypted-queue,port,,js,js/aws-sqs-unencrypted-queue,manual,P1,A,none,yes,,
+bitwise-operators,types,,,,,,,none,yes,,needs type information: W-105
+block-scoped-var,same-as,,,,,,,none,yes,,SonarJS repackages eslint/block-scoped-var: counted there
+bool-param-default,port,,js,js/bool-param-default,manual,P2,C,none,,,
+call-argument-line,port,,js,js/call-argument-line,manual,P1,A,none,yes,,
+chai-determinate-assertion,port,,js,js/chai-determinate-assertion,manual,P1,A,none,yes,,
+class-name,port,,js,js/class-name,manual,P1,A,none,yes,,
+class-prototype,types,,,,,,,none,,,needs type information: W-105
+code-eval,port,,js,js/code-eval,manual,P1,A,none,yes,,
+cognitive-complexity,port,,js,js/cognitive-complexity,manual,P1,A,none,yes,,
+comma-or-logical-or-case,port,,js,js/comma-or-logical-or-case,manual,P1,A,none,yes,,
+comment-regex,port,,js,js/comment-regex,manual,P2,C,none,,,
+composite-assertions,port,,js,js/composite-assertions,manual,P2,C,none,,,
+concise-regex,types,,,,,,,none,yes,,needs type information: W-105
+conditional-indentation,retired,,,,,,,none,,yes,deprecated upstream
+confidential-information-logging,retired,,,,,,,none,,yes,deprecated upstream
+constructor-for-side-effects,port,,js,js/constructor-for-side-effects,manual,P1,A,none,yes,,
+content-length,port,,js,js/content-length,manual,P1,A,none,yes,,
+content-security-policy,port,,js,js/content-security-policy,manual,P1,A,none,yes,,
+cookie-no-httponly,port,,js,js/cookie-no-httponly,manual,P1,A,none,yes,,
+cors,port,,js,js/cors,manual,P1,A,none,yes,,
+csrf,port,,js,js/csrf,manual,P1,A,none,yes,,
+cyclomatic-complexity,covered,js/complexity*,,,,,,none,,,
+declarations-in-global-scope,port,,js,js/declarations-in-global-scope,manual,P2,C,none,,,
+deprecation,types,,,,,,,none,yes,,needs type information: W-105
+destructuring-assignment-syntax,port,,js,js/destructuring-assignment-syntax,manual,P2,C,none,,,
+different-types-comparison,types,,,,,,,suggest,yes,,needs type information: W-105
+disabled-auto-escaping,types,,,,,,,none,yes,,needs type information: W-105
+disabled-resource-integrity,types,,,,,,,none,yes,,needs type information: W-105
+disabled-timeout,port,,js,js/disabled-timeout,manual,P1,A,none,yes,,
+dompurify-unsafe-config,types,,,,,,,none,yes,,needs type information: W-105
+duplicates-in-character-class,types,,,,,,,none,yes,,needs type information: W-105
+dynamically-constructed-templates,port,,js,js/dynamically-constructed-templates,manual,P1,A,none,yes,,
+elseif-without-else,port,,js,js/elseif-without-else,manual,P2,C,none,,,
+empty-string-repetition,types,,,,,,,none,yes,,needs type information: W-105
+encryption-secure-mode,port,,js,js/encryption-secure-mode,manual,P1,A,none,yes,,
+existing-groups,types,,,,,,,none,yes,,needs type information: W-105
+explicit-test-skip,port,,js,js/explicit-test-skip,suggest,P1,A,suggest,yes,,
+expression-complexity,port,,js,js/expression-complexity,manual,P2,C,none,,,
+file-header,port,,js,js/file-header,manual,P2,C,none,,,
+file-name-differ-from-class,port,,js,js/file-name-differ-from-class,manual,P2,C,none,,,
+file-permissions,port,,js,js/file-permissions,manual,P1,A,none,yes,,
+file-uploads,port,,js,js/file-uploads,manual,P1,A,none,yes,,
+fixme-tag,covered,js/todo-marker*,,,,,,none,yes,,
+for-in,port,,js,js/for-in,manual,P2,C,none,,,
+for-loop-increment-sign,port,,js,js/for-loop-increment-sign,manual,P1,A,none,yes,,
+frame-ancestors,retired,,,,,,,none,,yes,deprecated upstream
+function-inside-loop,port,,js,js/function-inside-loop,manual,P1,A,none,yes,,
+function-name,port,,js,js/function-name,manual,P2,C,none,,,
+function-return-type,types,,,,,,,none,yes,,needs type information: W-105
+future-reserved-words,port,,js,js/future-reserved-words,manual,P1,A,none,yes,,
+generator-without-yield,port,,js,js/generator-without-yield,manual,P1,A,none,yes,,
+hardcoded-secret-signatures,port,,js,js/hardcoded-secret-signatures,manual,P1,A,none,yes,,
+hashing,port,,js,js/hashing,manual,P1,A,none,yes,,
+hidden-files,retired,,,,,,,none,,yes,deprecated upstream
+hooks-before-test-cases,port,,js,js/hooks-before-test-cases,manual,P1,A,none,yes,,
+in-operator-type-error,types,,,,,,,none,yes,,needs type information: W-105
+inconsistent-function-call,port,,js,js/inconsistent-function-call,manual,P1,A,none,yes,,
+index-of-compare-to-positive-number,types,,,,,,,none,yes,,needs type information: W-105
+insecure-cookie,port,,js,js/insecure-cookie,manual,P1,A,none,yes,,
+insecure-jwt-token,port,,js,js/insecure-jwt-token,manual,P1,A,none,yes,,
+inverted-assertion-arguments,port,,js,js/inverted-assertion-arguments,suggest,P1,A,suggest,yes,,
+jsx-no-leaked-render,same-as,,,,,,,suggest,yes,,SonarJS repackages eslint-plugin-react/jsx-no-leaked-render: counted there
+label-position,port,,js,js/label-position,manual,P1,A,none,yes,,
+link-with-target-blank,port,,js,js/link-with-target-blank,manual,P1,A,none,yes,,
+max-lines,covered,js/max-lines,,,,,,none,,,through eslint/max-lines
+max-lines-per-function,covered,js/max-lines-per-function,,,,,,none,,,through eslint/max-lines-per-function
+max-switch-cases,port,,js,js/max-switch-cases,manual,P1,A,none,yes,,
+max-union-size,port,,js,js/max-union-size,manual,P2,C,none,,,
+memoize-cache-key,port,,js,js/memoize-cache-key,manual,P1,A,none,yes,,
+misplaced-loop-counter,port,,js,js/misplaced-loop-counter,manual,P1,A,none,yes,,
+nested-control-flow,covered,js/max-depth*,,,,,,none,,,
+new-operator-misuse,types,,,,,,,none,yes,,needs type information: W-105
+no-all-duplicated-branches,port,,js,js/no-all-duplicated-branches,manual,P1,A,none,yes,,
+no-alphabetical-sort,types,,,,,,,suggest,yes,,needs type information: W-105
+no-angular-bypass-sanitization,port,,js,js/no-angular-bypass-sanitization,manual,P1,A,none,yes,,
+no-array-delete,same-as,,,,,,,none,yes,,SonarJS repackages typescript-eslint/no-array-delete: counted there
+no-associative-arrays,types,,,,,,,none,yes,,needs type information: W-105
+no-async-constructor,types,,,,,,,none,yes,,needs type information: W-105
+no-built-in-override,port,,js,js/no-built-in-override,manual,P2,C,none,,,
+no-case-label-in-switch,port,,js,js/no-case-label-in-switch,manual,P1,A,none,yes,,
+no-clear-text-protocols,port,,js,js/no-clear-text-protocols,manual,P1,A,none,yes,,
+no-code-after-done,port,,js,js/no-code-after-done,manual,P1,A,none,yes,,
+no-collapsible-if,port,,js,js/no-collapsible-if,manual,P2,C,none,,,
+no-collection-size-mischeck,types,,,,,,,suggest,yes,,needs type information: W-105
+no-commented-code,port,,js,js/no-commented-code,suggest,P2,C,suggest,,,
+no-control-regex,covered,js/no-control-regex,,,,,,none,yes,,through eslint/no-control-regex
+no-dead-store,port,,js,js/no-dead-store,manual,P1,A,none,yes,,
+no-debounce-throttle-in-render,port,,js,js/no-debounce-throttle-in-render,manual,P1,A,none,yes,,
+no-debug-commands-in-ui-tests,port,,js,js/no-debug-commands-in-ui-tests,auto,P1,A,auto,yes,,
+no-default-utility-imports,port,,js,js/no-default-utility-imports,manual,P1,A,none,yes,,
+no-delete-var,covered,js/no-delete-var,,,,,,none,yes,,through eslint/no-delete-var
+no-duplicate-in-composite,port,,js,js/no-duplicate-in-composite,suggest,P1,A,suggest,yes,,
+no-duplicate-parameterized-test-case,port,,js,js/no-duplicate-parameterized-test-case,auto,P1,A,auto,yes,,
+no-duplicate-string,port,,js,js/no-duplicate-string,manual,P2,C,none,,,
+no-duplicate-test-title,port,,js,js/no-duplicate-test-title,manual,P1,A,none,yes,,
+no-duplicated-branches,port,,js,js/no-duplicated-branches,manual,P1,A,none,yes,,
+no-element-overwrite,port,,js,js/no-element-overwrite,manual,P1,A,none,yes,,
+no-empty-after-reluctant,types,,,,,,,none,yes,,needs type information: W-105
+no-empty-alternatives,types,,,,,,,none,yes,,needs type information: W-105
+no-empty-character-class,covered,js/no-empty-character-class,,,,,,none,yes,,through eslint/no-empty-character-class
+no-empty-collection,port,,js,js/no-empty-collection,manual,P1,A,none,yes,,
+no-empty-group,same-as,,,,,,,none,yes,,SonarJS repackages eslint-plugin-regexp/no-empty-group: counted there
+no-empty-parameterized-test-dataset,port,,js,js/no-empty-parameterized-test-dataset,manual,P1,A,none,yes,,
+no-empty-test-file,port,,js,js/no-empty-test-file,manual,P1,A,none,yes,,
+no-empty-test-title,port,,js,js/no-empty-test-title,manual,P1,A,none,yes,,
+no-equals-in-for-termination,port,,js,js/no-equals-in-for-termination,manual,P1,A,none,yes,,
+no-exclusive-tests,port,,js,js/no-exclusive-tests,suggest,P1,A,suggest,yes,,
+no-extra-arguments,port,,js,js/no-extra-arguments,manual,P1,A,none,yes,,
+no-fallthrough,covered,js/no-fallthrough,,,,,,none,yes,,through eslint/no-fallthrough
+no-fixed-wait-in-tests,port,,js,js/no-fixed-wait-in-tests,manual,P1,A,none,yes,,
+no-floating-point-equality,port,,js,js/no-floating-point-equality,manual,P1,A,none,yes,,
+no-for-in-iterable,types,,,,,,,none,,,needs type information: W-105
+no-forced-browser-interaction,port,,js,js/no-forced-browser-interaction,manual,P1,A,none,yes,,
+no-function-declaration-in-block,port,,js,js/no-function-declaration-in-block,manual,P2,C,none,,,
+no-global-this,port,,js,js/no-global-this,suggest,P1,A,suggest,yes,,
+no-globals-shadowing,port,,js,js/no-globals-shadowing,manual,P1,A,none,yes,,
+no-gratuitous-expressions,port,,js,js/no-gratuitous-expressions,manual,P1,A,none,yes,,
+no-hardcoded-ip,port,,js,js/no-hardcoded-ip,manual,P1,A,none,yes,,
+no-hardcoded-passwords,port,,js,js/no-hardcoded-passwords,manual,P1,A,none,yes,,
+no-hardcoded-secrets,port,,js,js/no-hardcoded-secrets,manual,P1,A,none,yes,,
+no-hook-setter-in-body,port,,js,js/no-hook-setter-in-body,manual,P1,A,none,yes,,
+no-identical-conditions,port,,js,js/no-identical-conditions,manual,P1,A,none,yes,,
+no-identical-expressions,port,,js,js/no-identical-expressions,manual,P1,A,none,yes,,
+no-identical-functions,port,,js,js/no-identical-functions,manual,P1,A,none,yes,,
+no-ignored-exceptions,port,,js,js/no-ignored-exceptions,manual,P1,A,none,yes,,
+no-ignored-return,types,,,,,,,none,yes,,needs type information: W-105
+no-implicit-dependencies,port,,js,js/no-implicit-dependencies,manual,P2,C,none,,,
+no-implicit-global,port,,js,js/no-implicit-global,manual,P1,A,none,yes,,
+no-in-misuse,types,,,,,,,suggest,yes,,needs type information: W-105
+no-incompatible-assertion-types,types,,,,,,,none,yes,,needs type information: W-105
+no-incomplete-assertions,port,,js,js/no-incomplete-assertions,manual,P1,A,none,yes,,
+no-inconsistent-returns,types,,,,,,,none,,,needs type information: W-105
+no-incorrect-string-concat,types,,,,,,,none,,,needs type information: W-105
+no-internal-api-use,port,,js,js/no-internal-api-use,manual,P1,A,none,yes,,
+no-interpolation-in-inline-snapshots,port,,js,js/no-interpolation-in-inline-snapshots,manual,P1,A,none,yes,,
+no-intrusive-permissions,retired,,,,,,,none,,yes,deprecated upstream
+no-invalid-regexp,covered,js/no-invalid-regexp,,,,,,none,yes,,through eslint/no-invalid-regexp
+no-invariant-returns,port,,js,js/no-invariant-returns,manual,P1,A,none,yes,,
+no-inverted-boolean-check,port,,js,js/no-inverted-boolean-check,suggest,P1,A,suggest,yes,,
+no-ip-forward,retired,,,,,,,none,,yes,deprecated upstream
+no-labels,same-as,,,,,,,none,yes,,SonarJS repackages eslint/no-labels: counted there
+no-literal-call,port,,js,js/no-literal-call,manual,P1,A,none,yes,,
+no-mime-sniff,port,,js,js/no-mime-sniff,manual,P1,A,none,yes,,
+no-misleading-array-reverse,types,,,,,,,suggest,yes,,needs type information: W-105
+no-misleading-character-class,covered,js/no-misleading-character-class,,,,,,suggest,yes,,through eslint/no-misleading-character-class
+no-mixed-completion-style,port,,js,js/no-mixed-completion-style,manual,P2,C,none,,,
+no-mixed-content,retired,,,,,,,none,,yes,deprecated upstream
+no-mutate-reactive-state-in-updated-hook,port,,js,js/no-mutate-reactive-state-in-updated-hook,manual,P1,A,none,yes,,
+no-nested-assignment,port,,js,js/no-nested-assignment,manual,P1,A,none,yes,,
+no-nested-conditional,port,,js,js/no-nested-conditional,manual,P1,A,none,yes,,
+no-nested-functions,port,,js,js/no-nested-functions,manual,P1,A,none,yes,,
+no-nested-incdec,port,,js,js/no-nested-incdec,manual,P2,C,none,,,
+no-nested-switch,port,,js,js/no-nested-switch,manual,P2,C,none,,,
+no-nested-template-literals,port,,js,js/no-nested-template-literals,manual,P1,A,none,yes,,
+no-networkidle-wait,port,,js,js/no-networkidle-wait,manual,P2,C,none,,,
+no-os-command-from-path,port,,js,js/no-os-command-from-path,manual,P1,A,none,yes,,
+no-parameter-reassignment,port,,js,js/no-parameter-reassignment,manual,P1,A,none,yes,,
+no-primitive-wrappers,port,,js,js/no-primitive-wrappers,suggest,P1,A,suggest,yes,,
+no-redundant-assignments,port,,js,js/no-redundant-assignments,manual,P1,A,none,yes,,
+no-redundant-boolean,port,,js,js/no-redundant-boolean,suggest,P1,A,suggest,yes,,
+no-redundant-jump,port,,js,js/no-redundant-jump,suggest,P1,A,suggest,yes,,
+no-redundant-optional,types,,,,,,,suggest,yes,,needs type information: W-105
+no-redundant-parentheses,retired,,,,,,,suggest,,yes,deprecated upstream
+no-reference-error,port,,js,js/no-reference-error,manual,P2,C,none,,,
+no-referrer-policy,port,,js,js/no-referrer-policy,manual,P1,A,none,yes,,
+no-regex-spaces,covered,js/no-regex-spaces,,,,,,suggest,yes,,through eslint/no-regex-spaces
+no-require-or-define,types,,,,,,,none,,,needs type information: W-105
+no-return-type-any,types,,,,,,,none,,,needs type information: W-105
+no-same-argument-assert,port,,js,js/no-same-argument-assert,manual,P1,A,none,yes,,
+no-same-line-conditional,port,,js,js/no-same-line-conditional,suggest,P1,A,suggest,yes,,
+no-selector-parameter,types,,,,,,,none,yes,,needs type information: W-105
+no-session-cookies-on-static-assets,port,,js,js/no-session-cookies-on-static-assets,manual,P1,A,none,yes,,
+no-skipped-tests,port,,js,js/no-skipped-tests,manual,P1,A,none,yes,,
+no-small-switch,types,,,,,,,none,yes,,needs type information: W-105
+no-sonar-comments,port,,js,js/no-sonar-comments,manual,P2,C,none,,,
+no-tab,retired,,,,,,,none,,yes,deprecated upstream
+no-table-as-layout,port,,js,js/no-table-as-layout,manual,P1,A,none,yes,,
+no-trivial-assertions,port,,js,js/no-trivial-assertions,suggest,P1,A,suggest,yes,,
+no-try-promise,types,,,,,,,none,yes,,needs type information: W-105
+no-undefined-argument,types,,,,,,,suggest,yes,,needs type information: W-105
+no-undefined-assignment,port,,js,js/no-undefined-assignment,manual,P2,C,none,,,
+no-unenclosed-multiline-block,port,,js,js/no-unenclosed-multiline-block,manual,P1,A,none,yes,,
+no-uniq-key,port,,js,js/no-uniq-key,manual,P1,A,none,yes,,
+no-unsafe-unzip,retired,,,,,,,none,,yes,deprecated upstream
+no-unthrown-error,port,,js,js/no-unthrown-error,suggest,P1,A,suggest,yes,,
+no-unused-collection,port,,js,js/no-unused-collection,manual,P1,A,none,yes,,
+no-unused-function-argument,port,,js,js/no-unused-function-argument,suggest,P2,C,suggest,,,
+no-unused-vars,covered,js/no-unused-vars ts/no-unused-vars,,,,,,none,yes,,through eslint/no-unused-vars
+no-use-of-empty-return-value,port,,js,js/no-use-of-empty-return-value,manual,P1,A,none,yes,,
+no-useless-catch,covered,js/no-useless-catch,,,,,,none,yes,,through eslint/no-useless-catch
+no-useless-increment,port,,js,js/no-useless-increment,manual,P1,A,none,yes,,
+no-useless-intersection,types,,,,,,,none,yes,,needs type information: W-105
+no-useless-react-setstate,port,,js,js/no-useless-react-setstate,manual,P1,A,none,yes,,
+no-variable-usage-before-declaration,port,,js,js/no-variable-usage-before-declaration,manual,P2,C,none,,,
+no-vue-class-component,port,,js,js/no-vue-class-component,manual,P1,A,none,yes,,
+no-vue-mixins,port,,js,js/no-vue-mixins,manual,P1,A,none,yes,,
+no-weak-cipher,port,,js,js/no-weak-cipher,manual,P1,A,none,yes,,
+no-weak-keys,port,,js,js/no-weak-keys,manual,P1,A,none,yes,,
+no-wildcard-import,port,,js,js/no-wildcard-import,manual,P2,C,none,,,
+non-existent-operator,port,,js,js/non-existent-operator,suggest,P1,A,suggest,yes,,
+non-number-in-arithmetic-expression,types,,,,,,,none,,,needs type information: W-105
+null-dereference,types,,,,,,,none,yes,,needs type information: W-105
+object-alt-content,port,,js,js/object-alt-content,manual,P1,A,none,yes,,
+operation-returning-nan,types,,,,,,,none,,,needs type information: W-105
+os-command,retired,,,,,,,none,,yes,deprecated upstream
+parameterized-tests,port,,js,js/parameterized-tests,manual,P1,A,none,yes,,
+post-message,types,,,,,,,none,yes,,needs type information: W-105
+prefer-cypress-should,port,,js,js/prefer-cypress-should,suggest,P1,A,suggest,yes,,
+prefer-default-last,port,,js,js/prefer-default-last,manual,P1,A,none,yes,,
+prefer-immediate-return,types,,,,,,,auto,,,needs type information: W-105
+prefer-native-axios-alternative,port,,js,js/prefer-native-axios-alternative,suggest,P1,A,suggest,yes,,
+prefer-native-jquery-alternative,port,,js,js/prefer-native-jquery-alternative,manual,P1,A,none,yes,,
+prefer-native-lodash-alternative,port,,js,js/prefer-native-lodash-alternative,manual,P1,A,none,yes,,
+prefer-object-literal,port,,js,js/prefer-object-literal,manual,P2,C,none,,,
+prefer-promise-shorthand,port,,js,js/prefer-promise-shorthand,suggest,P1,A,suggest,yes,,
+prefer-read-only-props,same-as,,,,,,,suggest,yes,,SonarJS repackages eslint-plugin-react/prefer-read-only-props: counted there
+prefer-regexp-exec,same-as,,,,,,,suggest,yes,,SonarJS repackages typescript-eslint/prefer-regexp-exec: counted there
+prefer-single-boolean-return,port,,js,js/prefer-single-boolean-return,suggest,P1,A,suggest,yes,,
+prefer-specific-assertions,port,,js,js/prefer-specific-assertions,suggest,P1,A,suggest,yes,,
+prefer-type-guard,port,,js,js/prefer-type-guard,suggest,P1,A,suggest,yes,,
+prefer-while,port,,js,js/prefer-while,auto,P1,A,auto,yes,,
+production-debug,port,,js,js/production-debug,manual,P1,A,none,yes,,
+pseudo-random,port,,js,js/pseudo-random,manual,P1,A,none,yes,,
+public-static-readonly,port,,js,js/public-static-readonly,suggest,P1,A,suggest,yes,,
+publicly-writable-directories,port,,js,js/publicly-writable-directories,manual,P1,A,none,yes,,
+reduce-initial-value,types,,,,,,,none,yes,,needs type information: W-105
+redundant-type-aliases,port,,js,js/redundant-type-aliases,manual,P1,A,none,yes,,
+regex-complexity,types,,,,,,,none,yes,,needs type information: W-105
+review-blockchain-mnemonic,port,,js,js/review-blockchain-mnemonic,manual,P1,A,none,yes,,
+session-regeneration,port,,js,js/session-regeneration,manual,P1,A,none,yes,,
+shorthand-property-grouping,port,,js,js/shorthand-property-grouping,manual,P2,C,none,,,
+single-char-in-character-classes,types,,,,,,,none,yes,,needs type information: W-105
+single-character-alternation,types,,,,,,,none,yes,,needs type information: W-105
+slow-regex,types,,,,,,,none,yes,,needs type information: W-105
+sql-queries,types,,,,,,,none,yes,,needs type information: W-105
+stable-tests,port,,js,js/stable-tests,manual,P1,A,none,yes,,
+stateful-regex,port,,js,js/stateful-regex,manual,P1,A,none,yes,,
+strict-transport-security,port,,js,js/strict-transport-security,manual,P1,A,none,yes,,
+strings-comparison,types,,,,,,,none,,,needs type information: W-105
+super-linear-regex,port,,js,js/super-linear-regex,manual,P1,A,none,yes,,
+synchronous-exception-assertions,types,,,,,,,suggest,yes,,needs type information: W-105
+synchronous-suite-callback,port,,js,js/synchronous-suite-callback,suggest,P1,A,suggest,yes,,
+table-header,port,,js,js/table-header,manual,P1,A,none,yes,,
+table-header-reference,port,,js,js/table-header-reference,manual,P1,A,none,yes,,
+test-check-exception,port,,js,js/test-check-exception,manual,P1,A,none,yes,,
+testing-library-prefer-query-by-disappearance,port,,js,js/testing-library-prefer-query-by-disappearance,auto,P1,A,auto,yes,,
+testing-library-query-assertion,port,,js,js/testing-library-query-assertion,auto,P1,A,auto,yes,,
+todo-tag,covered,js/todo-marker*,,,,,,none,yes,,
+too-many-break-or-continue-in-loop,port,,js,js/too-many-break-or-continue-in-loop,manual,P2,C,none,,,
+unicode-aware-regex,types,,,,,,,none,,,needs type information: W-105
+unused-import,types,,,,,,,suggest,yes,,needs type information: W-105
+unused-named-groups,types,,,,,,,none,yes,,needs type information: W-105
+unverified-certificate,port,,js,js/unverified-certificate,manual,P1,A,none,yes,,
+unverified-hostname,port,,js,js/unverified-hostname,manual,P1,A,none,yes,,
+updated-const-var,port,,js,js/updated-const-var,manual,P1,A,none,yes,,
+updated-loop-counter,port,,js,js/updated-loop-counter,manual,P1,A,none,yes,,
+use-type-alias,port,,js,js/use-type-alias,manual,P1,A,none,yes,,
+useless-string-operation,retired,,,,,,,none,,yes,deprecated upstream
+values-not-convertible-to-numbers,types,,,,,,,none,,,needs type information: W-105
+variable-name,port,,js,js/variable-name,manual,P2,C,none,,,
+vitest-mock-at-module-scope,port,,js,js/vitest-mock-at-module-scope,manual,P1,A,none,yes,,
+void-use,types,,,,,,,none,yes,,needs type information: W-105
+weak-ssl,port,,js,js/weak-ssl,manual,P1,A,none,yes,,
+web-sql-database,retired,,,,,,,none,,yes,deprecated upstream
+x-powered-by,port,,js,js/x-powered-by,manual,P1,A,none,yes,,
+xml-parser-xxe,port,,js,js/xml-parser-xxe,manual,P1,A,none,yes,,

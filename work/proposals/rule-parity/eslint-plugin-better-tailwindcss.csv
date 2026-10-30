@@ -1,0 +1,16 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+enforce-canonical-classes,layout,,,,,,,auto,yes,,the formatter owns it (SR-FORMATTER decision 3)
+enforce-consistent-class-order,layout,,,,,,,auto,yes,,"class order and spacing: the formatter, W-145"
+enforce-consistent-important-position,layout,,,,,,,auto,,,"class order and spacing: the formatter, W-145"
+enforce-consistent-line-wrapping,layout,,,,,,,auto,yes,,"class order and spacing: the formatter, W-145"
+enforce-consistent-variable-syntax,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+enforce-consistent-variant-order,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+enforce-logical-properties,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+enforce-shorthand-classes,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+no-concatenated-classes,port,,tailwind,tailwind/no-concatenated-classes,manual,P1,A,none,yes,,
+no-conflicting-classes,port,,tailwind,tailwind/no-conflicting-classes,auto,P1,A,auto,yes,,
+no-deprecated-classes,layout,,,,,,,auto,yes,,the formatter owns it (SR-FORMATTER decision 3)
+no-duplicate-classes,layout,,,,,,,auto,yes,,the formatter owns it (SR-FORMATTER decision 3)
+no-restricted-classes,port,,tailwind,tailwind/no-restricted-classes,auto,P2,C,auto,,,
+no-unknown-classes,port,,tailwind,tailwind/no-unknown-classes,auto,P1,A,auto,yes,,
+no-unnecessary-whitespace,layout,,,,,,,auto,yes,,"class order and spacing: the formatter, W-145"

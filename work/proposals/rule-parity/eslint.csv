@@ -12,7 +12,7 @@ block-spacing,retired,,,,,,,auto,,yes,deprecated upstream
 brace-style,retired,,,,,,,auto,,yes,deprecated upstream
 callback-return,retired,,,,,,,none,,yes,deprecated upstream
 camelcase,port,,js,js/camelcase,manual,P2,C,none,,,
-capitalized-comments,skip,,,,,,,auto,,,"taste, no defect behind it; on demand through W-140"
+capitalized-comments,port,,js,js/capitalized-comments,auto,P3,E,auto,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 class-methods-use-this,port,,js,js/class-methods-use-this,manual,P2,C,none,,,
 comma-dangle,retired,,,,,,,auto,,yes,deprecated upstream
 comma-spacing,retired,,,,,,,auto,,yes,deprecated upstream
@@ -33,8 +33,8 @@ eqeqeq,port,,js,js/eqeqeq,auto,P2,C,auto,,,
 for-direction,covered,js/for-direction,,,,,,none,yes,,
 func-call-spacing,retired,,,,,,,auto,,yes,deprecated upstream
 func-name-matching,port,,js,js/func-name-matching,manual,P2,C,none,,,
-func-names,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
-func-style,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+func-names,port,,js,js/func-names,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
+func-style,port,,js,js/func-style,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 function-call-argument-newline,retired,,,,,,,auto,,yes,deprecated upstream
 function-paren-newline,retired,,,,,,,auto,,yes,deprecated upstream
 generator-star-spacing,retired,,,,,,,auto,,yes,deprecated upstream
@@ -44,13 +44,13 @@ grouped-accessor-pairs,port,,js,js/grouped-accessor-pairs,manual,P2,C,none,,,
 guard-for-in,port,,js,js/guard-for-in,manual,P2,C,none,,,
 handle-callback-err,retired,,,,,,,none,,yes,deprecated upstream
 id-blacklist,retired,,,,,,,none,,yes,deprecated upstream
-id-denylist,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
-id-length,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
-id-match,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+id-denylist,port,,js,js/id-denylist,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
+id-length,port,,js,js/id-length,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
+id-match,port,,js,js/id-match,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 implicit-arrow-linebreak,retired,,,,,,,auto,,yes,deprecated upstream
 indent,retired,,,,,,,auto,,yes,deprecated upstream
 indent-legacy,retired,,,,,,,auto,,yes,deprecated upstream
-init-declarations,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+init-declarations,port,,js,js/init-declarations,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 jsx-quotes,retired,,,,,,,auto,,yes,deprecated upstream
 key-spacing,retired,,,,,,,auto,,yes,deprecated upstream
 keyword-spacing,retired,,,,,,,auto,,yes,deprecated upstream
@@ -94,7 +94,7 @@ no-const-assign,covered,js/no-const-assign,,,,,,none,yes,,
 no-constant-binary-expression,covered,js/no-constant-binary-expression,,,,,,none,yes,,
 no-constant-condition,covered,js/no-constant-condition,,,,,,none,yes,,
 no-constructor-return,port,,js,js/no-constructor-return,manual,P2,C,none,,,
-no-continue,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-continue,port,,js,js/no-continue,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 no-control-regex,covered,js/no-control-regex,,,,,,none,yes,,
 no-debugger,covered,js/no-debugger,,,,,,none,yes,,
 no-delete-var,covered,js/no-delete-var,,,,,,none,yes,,
@@ -128,7 +128,7 @@ no-implicit-coercion,port,,js,js/no-implicit-coercion,auto,P2,C,auto,,,
 no-implicit-globals,port,,js,js/no-implicit-globals,manual,P2,C,none,,,
 no-implied-eval,port,,js,js/no-implied-eval,manual,P2,C,none,,,
 no-import-assign,covered,js/no-import-assign,,,,,,none,yes,,
-no-inline-comments,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-inline-comments,port,,js,js/no-inline-comments,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 no-inner-declarations,port,,js,js/no-inner-declarations,manual,P2,C,none,,,
 no-invalid-regexp,covered,js/no-invalid-regexp,,,,,,none,yes,,
 no-invalid-this,port,,js,js/no-invalid-this,manual,P2,C,none,,,
@@ -167,7 +167,7 @@ no-octal,covered,js/no-octal,,,,,,none,yes,,
 no-octal-escape,port,,js,js/no-octal-escape,manual,P2,C,none,,,
 no-param-reassign,port,,js,js/no-param-reassign,manual,P2,C,none,,,
 no-path-concat,retired,,,,,,,none,,yes,deprecated upstream
-no-plusplus,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-plusplus,port,,js,js/no-plusplus,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 no-process-env,retired,,,,,,,none,,yes,deprecated upstream
 no-process-exit,retired,,,,,,,none,,yes,deprecated upstream
 no-promise-executor-return,port,,js,js/no-promise-executor-return,suggest,P2,C,suggest,,,
@@ -195,14 +195,14 @@ no-sparse-arrays,covered,js/no-sparse-arrays,,,,,,none,yes,,
 no-sync,retired,,,,,,,none,,yes,deprecated upstream
 no-tabs,retired,,,,,,,none,,yes,deprecated upstream
 no-template-curly-in-string,port,,js,js/no-template-curly-in-string,manual,P2,C,none,,,
-no-ternary,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-ternary,port,,js,js/no-ternary,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 no-this-before-super,covered,js/no-this-before-super,,,,,,none,yes,,
 no-throw-literal,port,,js,js/no-throw-literal,manual,P2,C,none,,,
 no-trailing-spaces,retired,,,,,,,auto,,yes,deprecated upstream
 no-unassigned-vars,covered,js/no-unassigned-vars,,,,,,none,yes,,
 no-undef,covered,js/no-undef,,,,,,none,yes,,
 no-undef-init,port,,js,js/no-undef-init,auto,P2,C,auto,,,
-no-undefined,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-undefined,port,,js,js/no-undefined,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 no-underscore-dangle,port,,js,js/no-underscore-dangle,manual,P2,C,none,,,
 no-unexpected-multiline,covered,js/no-unexpected-multiline,,,,,,none,yes,,
 no-unmodified-loop-condition,port,,js,js/no-unmodified-loop-condition,manual,P2,C,none,,,
@@ -237,7 +237,7 @@ object-curly-newline,retired,,,,,,,auto,,yes,deprecated upstream
 object-curly-spacing,retired,,,,,,,auto,,yes,deprecated upstream
 object-property-newline,retired,,,,,,,auto,,yes,deprecated upstream
 object-shorthand,port,,js,js/object-shorthand,auto,P2,C,auto,,,
-one-var,skip,,,,,,,auto,,,"taste, no defect behind it; on demand through W-140"
+one-var,port,,js,js/one-var,auto,P3,E,auto,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 one-var-declaration-per-line,retired,,,,,,,auto,,yes,deprecated upstream
 operator-assignment,port,,js,js/operator-assignment,auto,P2,C,auto,,,
 operator-linebreak,retired,,,,,,,auto,,yes,deprecated upstream
@@ -270,8 +270,8 @@ semi,retired,,,,,,,auto,,yes,deprecated upstream
 semi-spacing,retired,,,,,,,auto,,yes,deprecated upstream
 semi-style,retired,,,,,,,auto,,yes,deprecated upstream
 sort-imports,port,,js,js/sort-imports,auto,P2,C,auto,,,
-sort-keys,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
-sort-vars,skip,,,,,,,auto,,,"taste, no defect behind it; on demand through W-140"
+sort-keys,port,,js,js/sort-keys,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
+sort-vars,port,,js,js/sort-vars,auto,P3,E,auto,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 space-before-blocks,retired,,,,,,,auto,,yes,deprecated upstream
 space-before-function-paren,retired,,,,,,,auto,,yes,deprecated upstream
 space-in-parens,retired,,,,,,,auto,,yes,deprecated upstream
@@ -286,7 +286,7 @@ template-tag-spacing,retired,,,,,,,auto,,yes,deprecated upstream
 unicode-bom,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
 use-isnan,covered,js/use-isnan,,,,,,suggest,yes,,
 valid-typeof,covered,js/valid-typeof,,,,,,suggest,yes,,
-vars-on-top,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+vars-on-top,port,,js,js/vars-on-top,manual,P3,E,none,,,"taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)"
 wrap-iife,retired,,,,,,,auto,,yes,deprecated upstream
 wrap-regex,retired,,,,,,,auto,,yes,deprecated upstream
 yield-star-spacing,retired,,,,,,,auto,,yes,deprecated upstream

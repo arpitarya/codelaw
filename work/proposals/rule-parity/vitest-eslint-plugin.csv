@@ -1,0 +1,83 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+consistent-each-for,port,,testing,test/consistent-each-for,manual,P2,C,none,,,
+consistent-test-filename,port,,testing,test/consistent-test-filename,manual,P2,C,none,,,
+consistent-test-it,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/consistent-test-it: counted there
+consistent-vitest-vi,port,,testing,test/consistent-vitest-vi,auto,P2,C,auto,,,
+expect-expect,same-as,,,,,,,none,yes,,the same rule as eslint-plugin-jest/expect-expect: counted there
+hoisted-apis-on-top,port,,testing,test/hoisted-apis-on-top,suggest,P2,C,suggest,,,
+max-expects,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/max-expects: counted there
+max-nested-describe,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/max-nested-describe: counted there
+no-alias-methods,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/no-alias-methods: counted there
+no-commented-out-tests,same-as,,,,,,,none,yes,,the same rule as eslint-plugin-jest/no-commented-out-tests: counted there
+no-conditional-expect,same-as,,,,,,,none,yes,,the same rule as eslint-plugin-jest/no-conditional-expect: counted there
+no-conditional-in-test,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/no-conditional-in-test: counted there
+no-conditional-tests,port,,testing,test/no-conditional-tests,manual,P2,C,none,,,
+no-disabled-tests,covered,js/skipped-test*,,,,,,none,yes,,through jest/no-disabled-tests
+no-done-callback,same-as,,,,,,,suggest,,yes,the same rule as eslint-plugin-jest/no-done-callback: counted there
+no-duplicate-hooks,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/no-duplicate-hooks: counted there
+no-focused-tests,covered,js/no-focused-tests*,,,,,,auto,yes,,through jest/no-focused-tests
+no-hooks,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/no-hooks: counted there
+no-identical-title,same-as,,,,,,,auto,yes,,the same rule as eslint-plugin-jest/no-identical-title: counted there
+no-import-node-test,port,,testing,test/no-import-node-test,auto,P1,A,auto,yes,,
+no-importing-vitest-globals,port,,testing,test/no-importing-vitest-globals,auto,P2,C,auto,,,
+no-interpolation-in-snapshots,same-as,,,,,,,auto,yes,,the same rule as eslint-plugin-jest/no-interpolation-in-snapshots: counted there
+no-large-snapshots,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/no-large-snapshots: counted there
+no-mocks-import,same-as,,,,,,,none,yes,,the same rule as eslint-plugin-jest/no-mocks-import: counted there
+no-restricted-matchers,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/no-restricted-matchers: counted there
+no-restricted-vi-methods,port,,testing,test/no-restricted-vi-methods,manual,P2,C,none,,,
+no-standalone-expect,same-as,,,,,,,none,yes,,the same rule as eslint-plugin-jest/no-standalone-expect: counted there
+no-test-prefixes,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/no-test-prefixes: counted there
+no-test-return-statement,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/no-test-return-statement: counted there
+no-unneeded-async-expect-function,same-as,,,,,,,auto,yes,,the same rule as eslint-plugin-jest/no-unneeded-async-expect-function: counted there
+padding-around-after-all-blocks,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/padding-around-after-all-blocks: counted there
+padding-around-after-each-blocks,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/padding-around-after-each-blocks: counted there
+padding-around-all,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/padding-around-all: counted there
+padding-around-before-all-blocks,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/padding-around-before-all-blocks: counted there
+padding-around-before-each-blocks,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/padding-around-before-each-blocks: counted there
+padding-around-describe-blocks,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/padding-around-describe-blocks: counted there
+padding-around-expect-groups,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/padding-around-expect-groups: counted there
+padding-around-test-blocks,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/padding-around-test-blocks: counted there
+prefer-called-exactly-once-with,port,,testing,test/prefer-called-exactly-once-with,auto,P1,A,auto,yes,,
+prefer-called-once,port,,testing,test/prefer-called-once,auto,P2,C,auto,,,
+prefer-called-times,port,,testing,test/prefer-called-times,auto,P2,C,auto,,,
+prefer-called-with,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-called-with: counted there
+prefer-comparison-matcher,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-comparison-matcher: counted there
+prefer-describe-function-title,port,,testing,test/prefer-describe-function-title,auto,P2,C,auto,,,
+prefer-each,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/prefer-each: counted there
+prefer-equality-matcher,same-as,,,,,,,suggest,,,the same rule as eslint-plugin-jest/prefer-equality-matcher: counted there
+prefer-expect-assertions,same-as,,,,,,,suggest,,,the same rule as eslint-plugin-jest/prefer-expect-assertions: counted there
+prefer-expect-resolves,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-expect-resolves: counted there
+prefer-expect-type-of,port,,testing,test/prefer-expect-type-of,auto,P2,C,auto,,,
+prefer-hooks-in-order,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/prefer-hooks-in-order: counted there
+prefer-hooks-on-top,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/prefer-hooks-on-top: counted there
+prefer-import-in-mock,port,,testing,test/prefer-import-in-mock,auto,P2,C,auto,,,
+prefer-importing-vitest-globals,port,,testing,test/prefer-importing-vitest-globals,auto,P2,C,auto,,,
+prefer-lowercase-title,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-lowercase-title: counted there
+prefer-mock-promise-shorthand,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-mock-promise-shorthand: counted there
+prefer-mock-return-shorthand,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-mock-return-shorthand: counted there
+prefer-snapshot-hint,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/prefer-snapshot-hint: counted there
+prefer-spy-on,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-spy-on: counted there
+prefer-strict-boolean-matchers,port,,testing,test/prefer-strict-boolean-matchers,auto,P2,C,auto,,,
+prefer-strict-equal,same-as,,,,,,,suggest,,,the same rule as eslint-plugin-jest/prefer-strict-equal: counted there
+prefer-to-be,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-to-be: counted there
+prefer-to-be-falsy,port,,testing,test/prefer-to-be-falsy,auto,P2,C,auto,,,
+prefer-to-be-object,port,,testing,test/prefer-to-be-object,auto,P2,C,auto,,,
+prefer-to-be-truthy,port,,testing,test/prefer-to-be-truthy,auto,P2,C,auto,,,
+prefer-to-contain,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-to-contain: counted there
+prefer-to-have-been-called-times,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-to-have-been-called-times: counted there
+prefer-to-have-length,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-to-have-length: counted there
+prefer-todo,same-as,,,,,,,auto,,,the same rule as eslint-plugin-jest/prefer-todo: counted there
+prefer-vi-mocked,port,,testing,test/prefer-vi-mocked,auto,P2,C,auto,,,
+require-awaited-expect-poll,port,,testing,test/require-awaited-expect-poll,manual,P2,C,none,,,
+require-hook,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/require-hook: counted there
+require-local-test-context-for-concurrent-snapshots,port,,testing,test/require-local-test-context-for-concurrent-snapshots,manual,P1,A,none,yes,,
+require-mock-type-parameters,port,,testing,test/require-mock-type-parameters,auto,P2,C,auto,,,
+require-test-timeout,port,,testing,test/require-test-timeout,manual,P2,C,none,,,
+require-to-throw-message,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/require-to-throw-message: counted there
+require-top-level-describe,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/require-top-level-describe: counted there
+unbound-method,same-as,,,,,,,none,,,the same rule as eslint-plugin-jest/unbound-method: counted there
+valid-describe-callback,same-as,,,,,,,none,yes,,the same rule as eslint-plugin-jest/valid-describe-callback: counted there
+valid-expect,same-as,,,,,,,auto,yes,,the same rule as eslint-plugin-jest/valid-expect: counted there
+valid-expect-in-promise,same-as,,,,,,,none,yes,,the same rule as eslint-plugin-jest/valid-expect-in-promise: counted there
+valid-title,same-as,,,,,,,auto,yes,,the same rule as eslint-plugin-jest/valid-title: counted there
+warn-todo,port,,testing,test/warn-todo,manual,P2,C,none,,,

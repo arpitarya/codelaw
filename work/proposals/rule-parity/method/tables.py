@@ -14,12 +14,12 @@ for t in sorted(s, key=lambda k:-s[k]['total']):
 print(f"| **all** | | **{T['total']}** | "+' | '.join(f"**{T[k]}**" for k in CL)+f" | **{T['app']}** | **{100*T['covered']/T['app']:.0f}%** |")
 allr=[]
 for f in sorted(os.listdir(P)):
-    if f.endswith('.csv') and f!='prettier.csv':
+    if f.endswith('.csv') and f not in ('prettier.csv','tslint-recheck.csv'):
         for r in csv.DictReader(open(P+f)): r['tool']=f[:-4]; allr.append(r)
 ports=[r for r in allr if r['class']=='port']
 def tranche(r):
     if r['priority']=='P3': return 'E'
-    if r['tool']=='ruff': return 'A' if r['priority']=='P1' else 'D'
+    if r['tool'] in ('ruff','pylint'): return 'A' if r['priority']=='P1' else 'D'
     if r['tool']=='eslint-plugin-unicorn': return 'B'
     return 'A' if r['priority']=='P1' else 'C'
 cl=json.load(open(M+'codelaw.json')); now=collections.Counter(r[0] for r in cl)
@@ -44,7 +44,7 @@ print('ALIST')
 for t in sorted({r['tool'] for r in A}): print(f"- **{t}** ({sum(1 for r in A if r['tool']==t)}): "+', '.join(f"`{r['upstream_id']}`" for r in A if r['tool']==t))
 # tranche column into the CSVs, so W-139 can filter on it
 for f in sorted(os.listdir(P)):
-    if not f.endswith('.csv') or f=='prettier.csv': continue
+    if not f.endswith('.csv') or f in ('prettier.csv','tslint-recheck.csv'): continue
     rs=list(csv.DictReader(open(P+f)))
     if not rs: continue
     cols=list(rs[0].keys())

@@ -1,0 +1,4524 @@
+[
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0103",
+"old_names": [],
+"symbol": "invalid-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0104",
+"old_names": [
+"blacklisted-name"
+],
+"symbol": "disallowed-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0105",
+"old_names": [],
+"symbol": "typevar-name-incorrect-variance",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0112",
+"old_names": [
+"old-empty-docstring"
+],
+"symbol": "empty-docstring",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0114",
+"old_names": [
+"missing-docstring"
+],
+"symbol": "missing-module-docstring",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0115",
+"old_names": [
+"missing-docstring"
+],
+"symbol": "missing-class-docstring",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0116",
+"old_names": [
+"missing-docstring"
+],
+"symbol": "missing-function-docstring",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C0117",
+"old_names": [
+"unneeded-not"
+],
+"symbol": "unnecessary-negation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0121",
+"old_names": [],
+"symbol": "singleton-comparison",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0123",
+"old_names": [
+"old-unidiomatic-typecheck"
+],
+"symbol": "unidiomatic-typecheck",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0131",
+"old_names": [],
+"symbol": "typevar-double-variance",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "basic",
+"extension": false,
+"id": "C0132",
+"old_names": [],
+"symbol": "typevar-name-mismatch",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "docstyle",
+"extension": true,
+"id": "C0198",
+"old_names": [],
+"symbol": "bad-docstring-quotes",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "docstyle",
+"extension": true,
+"id": "C0199",
+"old_names": [],
+"symbol": "docstring-first-line-empty",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C0200",
+"old_names": [],
+"symbol": "consider-using-enumerate",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C0201",
+"old_names": [],
+"symbol": "consider-iterating-dictionary",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "classes",
+"extension": false,
+"id": "C0202",
+"old_names": [],
+"symbol": "bad-classmethod-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "classes",
+"extension": false,
+"id": "C0203",
+"old_names": [],
+"symbol": "bad-mcs-method-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "classes",
+"extension": false,
+"id": "C0204",
+"old_names": [],
+"symbol": "bad-mcs-classmethod-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "classes",
+"extension": false,
+"id": "C0205",
+"old_names": [],
+"symbol": "single-string-used-for-slots",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C0206",
+"old_names": [],
+"symbol": "consider-using-dict-items",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C0207",
+"old_names": [],
+"symbol": "use-maxsplit-arg",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C0208",
+"old_names": [],
+"symbol": "use-sequence-for-iteration",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C0209",
+"old_names": [],
+"symbol": "consider-using-f-string",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0301",
+"old_names": [],
+"symbol": "line-too-long",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0302",
+"old_names": [],
+"symbol": "too-many-lines",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0303",
+"old_names": [],
+"symbol": "trailing-whitespace",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0304",
+"old_names": [],
+"symbol": "missing-final-newline",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0305",
+"old_names": [],
+"symbol": "trailing-newlines",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0321",
+"old_names": [],
+"symbol": "multiple-statements",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0325",
+"old_names": [],
+"symbol": "superfluous-parens",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0327",
+"old_names": [],
+"symbol": "mixed-line-endings",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "format",
+"extension": false,
+"id": "C0328",
+"old_names": [],
+"symbol": "unexpected-line-ending-format",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "spelling",
+"extension": false,
+"id": "C0401",
+"old_names": [],
+"symbol": "wrong-spelling-in-comment",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "spelling",
+"extension": false,
+"id": "C0402",
+"old_names": [],
+"symbol": "wrong-spelling-in-docstring",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "spelling",
+"extension": false,
+"id": "C0403",
+"old_names": [],
+"symbol": "invalid-characters-in-docstring",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "imports",
+"extension": false,
+"id": "C0410",
+"old_names": [],
+"symbol": "multiple-imports",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "imports",
+"extension": false,
+"id": "C0411",
+"old_names": [],
+"symbol": "wrong-import-order",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "imports",
+"extension": false,
+"id": "C0412",
+"old_names": [],
+"symbol": "ungrouped-imports",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "imports",
+"extension": false,
+"id": "C0413",
+"old_names": [],
+"symbol": "wrong-import-position",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "imports",
+"extension": false,
+"id": "C0414",
+"old_names": [],
+"symbol": "useless-import-alias",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "imports",
+"extension": false,
+"id": "C0415",
+"old_names": [],
+"symbol": "import-outside-toplevel",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "consider-using-any-or-all",
+"extension": true,
+"id": "C0501",
+"old_names": [],
+"symbol": "consider-using-any-or-all",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C1802",
+"old_names": [
+"len-as-condition"
+],
+"symbol": "use-implicit-booleaness-not-len",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C1803",
+"old_names": [],
+"symbol": "use-implicit-booleaness-not-comparison",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C1804",
+"old_names": [
+"compare-to-empty-string"
+],
+"symbol": "use-implicit-booleaness-not-comparison-to-string",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "refactoring",
+"extension": false,
+"id": "C1805",
+"old_names": [
+"compare-to-zero"
+],
+"symbol": "use-implicit-booleaness-not-comparison-to-zero",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "comparison-placement",
+"extension": true,
+"id": "C2201",
+"old_names": [
+"old-misplaced-comparison-constant"
+],
+"symbol": "misplaced-comparison-constant",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "nonascii-checker",
+"extension": false,
+"id": "C2401",
+"old_names": [
+"old-non-ascii-name"
+],
+"symbol": "non-ascii-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "nonascii-checker",
+"extension": false,
+"id": "C2403",
+"old_names": [],
+"symbol": "non-ascii-module-import",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "unicode_checker",
+"extension": false,
+"id": "C2503",
+"old_names": [],
+"symbol": "bad-file-encoding",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "import-private-name",
+"extension": true,
+"id": "C2701",
+"old_names": [],
+"symbol": "import-private-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "unnecessary-dunder-call",
+"extension": false,
+"id": "C2801",
+"old_names": [],
+"symbol": "unnecessary-dunder-call",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "lambda-expressions",
+"extension": false,
+"id": "C3001",
+"old_names": [],
+"symbol": "unnecessary-lambda-assignment",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "lambda-expressions",
+"extension": false,
+"id": "C3002",
+"old_names": [],
+"symbol": "unnecessary-direct-lambda-call",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "convention",
+"checker": "dict-init-mutate",
+"extension": true,
+"id": "C3401",
+"old_names": [],
+"symbol": "dict-init-mutate",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "main",
+"extension": false,
+"id": "E0001",
+"old_names": [],
+"symbol": "syntax-error",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "main",
+"extension": false,
+"id": "E0011",
+"old_names": [],
+"symbol": "unrecognized-inline-option",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "main",
+"extension": false,
+"id": "E0013",
+"old_names": [],
+"symbol": "bad-plugin-value",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "main",
+"extension": false,
+"id": "E0014",
+"old_names": [],
+"symbol": "bad-configuration-section",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "main",
+"extension": false,
+"id": "E0015",
+"old_names": [],
+"symbol": "unrecognized-option",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0100",
+"old_names": [],
+"symbol": "init-is-generator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0101",
+"old_names": [],
+"symbol": "return-in-init",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0102",
+"old_names": [],
+"symbol": "function-redefined",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0103",
+"old_names": [],
+"symbol": "not-in-loop",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0104",
+"old_names": [],
+"symbol": "return-outside-function",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0105",
+"old_names": [],
+"symbol": "yield-outside-function",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0106",
+"old_names": [],
+"symbol": "return-arg-in-generator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0107",
+"old_names": [],
+"symbol": "nonexistent-operator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0108",
+"old_names": [],
+"symbol": "duplicate-argument-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0110",
+"old_names": [],
+"symbol": "abstract-class-instantiated",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0111",
+"old_names": [],
+"symbol": "bad-reversed-sequence",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0112",
+"old_names": [],
+"symbol": "too-many-star-expressions",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0113",
+"old_names": [],
+"symbol": "invalid-star-assignment-target",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0114",
+"old_names": [],
+"symbol": "star-needs-assignment-target",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0115",
+"old_names": [],
+"symbol": "nonlocal-and-global",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0117",
+"old_names": [],
+"symbol": "nonlocal-without-binding",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0118",
+"old_names": [],
+"symbol": "used-prior-global-declaration",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "basic",
+"extension": false,
+"id": "E0119",
+"old_names": [],
+"symbol": "misplaced-format-function",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0202",
+"old_names": [],
+"symbol": "method-hidden",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0203",
+"old_names": [],
+"symbol": "access-member-before-definition",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0211",
+"old_names": [],
+"symbol": "no-method-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0213",
+"old_names": [],
+"symbol": "no-self-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0236",
+"old_names": [],
+"symbol": "invalid-slots-object",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0237",
+"old_names": [],
+"symbol": "assigning-non-slot",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0238",
+"old_names": [],
+"symbol": "invalid-slots",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0239",
+"old_names": [],
+"symbol": "inherit-non-class",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0240",
+"old_names": [],
+"symbol": "inconsistent-mro",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0241",
+"old_names": [],
+"symbol": "duplicate-bases",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0242",
+"old_names": [],
+"symbol": "class-variable-slots-conflict",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0243",
+"old_names": [],
+"symbol": "invalid-class-object",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0244",
+"old_names": [],
+"symbol": "invalid-enum-extension",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0245",
+"old_names": [],
+"symbol": "declare-non-slot",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0301",
+"old_names": [
+"old-non-iterator-returned-1",
+"old-non-iterator-returned-2"
+],
+"symbol": "non-iterator-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0302",
+"old_names": [
+"bad-context-manager"
+],
+"symbol": "unexpected-special-method-signature",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0303",
+"old_names": [],
+"symbol": "invalid-length-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0304",
+"old_names": [],
+"symbol": "invalid-bool-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0305",
+"old_names": [],
+"symbol": "invalid-index-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0306",
+"old_names": [],
+"symbol": "invalid-repr-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0307",
+"old_names": [],
+"symbol": "invalid-str-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0308",
+"old_names": [],
+"symbol": "invalid-bytes-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0309",
+"old_names": [],
+"symbol": "invalid-hash-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0310",
+"old_names": [],
+"symbol": "invalid-length-hint-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0311",
+"old_names": [],
+"symbol": "invalid-format-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0312",
+"old_names": [],
+"symbol": "invalid-getnewargs-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "classes",
+"extension": false,
+"id": "E0313",
+"old_names": [],
+"symbol": "invalid-getnewargs-ex-returned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "imports",
+"extension": false,
+"id": "E0401",
+"old_names": [
+"old-import-error"
+],
+"symbol": "import-error",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "imports",
+"extension": false,
+"id": "E0402",
+"old_names": [],
+"symbol": "relative-beyond-top-level",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0601",
+"old_names": [],
+"symbol": "used-before-assignment",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0602",
+"old_names": [],
+"symbol": "undefined-variable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0603",
+"old_names": [],
+"symbol": "undefined-all-variable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0604",
+"old_names": [],
+"symbol": "invalid-all-object",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0605",
+"old_names": [],
+"symbol": "invalid-all-format",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0606",
+"old_names": [],
+"symbol": "possibly-used-before-assignment",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0611",
+"old_names": [],
+"symbol": "no-name-in-module",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0633",
+"old_names": [
+"old-unpacking-non-sequence"
+],
+"symbol": "unpacking-non-sequence",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "variables",
+"extension": false,
+"id": "E0643",
+"old_names": [],
+"symbol": "potential-index-error",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "exceptions",
+"extension": false,
+"id": "E0701",
+"old_names": [],
+"symbol": "bad-except-order",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "exceptions",
+"extension": false,
+"id": "E0702",
+"old_names": [],
+"symbol": "raising-bad-type",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "exceptions",
+"extension": false,
+"id": "E0704",
+"old_names": [],
+"symbol": "misplaced-bare-raise",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "exceptions",
+"extension": false,
+"id": "E0705",
+"old_names": [
+"bad-exception-context"
+],
+"symbol": "bad-exception-cause",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "exceptions",
+"extension": false,
+"id": "E0710",
+"old_names": [],
+"symbol": "raising-non-exception",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "exceptions",
+"extension": false,
+"id": "E0711",
+"old_names": [],
+"symbol": "notimplemented-raised",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "exceptions",
+"extension": false,
+"id": "E0712",
+"old_names": [],
+"symbol": "catching-non-exception",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "newstyle",
+"extension": false,
+"id": "E1003",
+"old_names": [],
+"symbol": "bad-super-call",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1101",
+"old_names": [
+"maybe-no-member"
+],
+"symbol": "no-member",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1102",
+"old_names": [],
+"symbol": "not-callable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1111",
+"old_names": [],
+"symbol": "assignment-from-no-return",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1120",
+"old_names": [],
+"symbol": "no-value-for-parameter",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1121",
+"old_names": [],
+"symbol": "too-many-function-args",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1123",
+"old_names": [],
+"symbol": "unexpected-keyword-arg",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1124",
+"old_names": [],
+"symbol": "redundant-keyword-arg",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1125",
+"old_names": [],
+"symbol": "missing-kwoa",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1126",
+"old_names": [],
+"symbol": "invalid-sequence-index",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1127",
+"old_names": [],
+"symbol": "invalid-slice-index",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1128",
+"old_names": [
+"old-assignment-from-none"
+],
+"symbol": "assignment-from-none",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1129",
+"old_names": [],
+"symbol": "not-context-manager",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1130",
+"old_names": [],
+"symbol": "invalid-unary-operand-type",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1131",
+"old_names": [],
+"symbol": "unsupported-binary-operation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1132",
+"old_names": [],
+"symbol": "repeated-keyword",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1133",
+"old_names": [],
+"symbol": "not-an-iterable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1134",
+"old_names": [],
+"symbol": "not-a-mapping",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1135",
+"old_names": [],
+"symbol": "unsupported-membership-test",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1136",
+"old_names": [],
+"symbol": "unsubscriptable-object",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1137",
+"old_names": [],
+"symbol": "unsupported-assignment-operation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1138",
+"old_names": [],
+"symbol": "unsupported-delete-operation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1139",
+"old_names": [],
+"symbol": "invalid-metaclass",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1141",
+"old_names": [],
+"symbol": "dict-iter-missing-items",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1142",
+"old_names": [],
+"symbol": "await-outside-async",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1143",
+"old_names": [
+"unhashable-dict-key"
+],
+"symbol": "unhashable-member",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1144",
+"old_names": [],
+"symbol": "invalid-slice-step",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typecheck",
+"extension": false,
+"id": "E1145",
+"old_names": [],
+"symbol": "async-context-manager-with-regular-with",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "logging",
+"extension": false,
+"id": "E1200",
+"old_names": [],
+"symbol": "logging-unsupported-format",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "logging",
+"extension": false,
+"id": "E1201",
+"old_names": [],
+"symbol": "logging-format-truncated",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "logging",
+"extension": false,
+"id": "E1205",
+"old_names": [],
+"symbol": "logging-too-many-args",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "logging",
+"extension": false,
+"id": "E1206",
+"old_names": [],
+"symbol": "logging-too-few-args",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1300",
+"old_names": [],
+"symbol": "bad-format-character",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1301",
+"old_names": [],
+"symbol": "truncated-format-string",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1302",
+"old_names": [],
+"symbol": "mixed-format-string",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1303",
+"old_names": [],
+"symbol": "format-needs-mapping",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1304",
+"old_names": [],
+"symbol": "missing-format-string-key",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1305",
+"old_names": [],
+"symbol": "too-many-format-args",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1306",
+"old_names": [],
+"symbol": "too-few-format-args",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1307",
+"old_names": [],
+"symbol": "bad-string-format-type",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "string",
+"extension": false,
+"id": "E1310",
+"old_names": [],
+"symbol": "bad-str-strip-call",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "stdlib",
+"extension": false,
+"id": "E1507",
+"old_names": [],
+"symbol": "invalid-envvar-value",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "stdlib",
+"extension": false,
+"id": "E1519",
+"old_names": [],
+"symbol": "singledispatch-method",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "stdlib",
+"extension": false,
+"id": "E1520",
+"old_names": [],
+"symbol": "singledispatchmethod-function",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "async",
+"extension": false,
+"id": "E1700",
+"old_names": [],
+"symbol": "yield-inside-async-function",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "async",
+"extension": false,
+"id": "E1701",
+"old_names": [],
+"symbol": "not-async-context-manager",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "match_statements",
+"extension": false,
+"id": "E1901",
+"old_names": [],
+"symbol": "bare-name-capture-pattern",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "match_statements",
+"extension": false,
+"id": "E1902",
+"old_names": [],
+"symbol": "invalid-match-args-definition",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "match_statements",
+"extension": false,
+"id": "E1903",
+"old_names": [],
+"symbol": "too-many-positional-sub-patterns",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "match_statements",
+"extension": false,
+"id": "E1904",
+"old_names": [],
+"symbol": "multiple-class-sub-patterns",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "unicode_checker",
+"extension": false,
+"id": "E2501",
+"old_names": [],
+"symbol": "invalid-unicode-codec",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "unicode_checker",
+"extension": false,
+"id": "E2502",
+"old_names": [],
+"symbol": "bidirectional-unicode",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "unicode_checker",
+"extension": false,
+"id": "E2510",
+"old_names": [],
+"symbol": "invalid-character-backspace",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "unicode_checker",
+"extension": false,
+"id": "E2511",
+"old_names": [],
+"symbol": "invalid-character-carriage-return",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "unicode_checker",
+"extension": false,
+"id": "E2512",
+"old_names": [],
+"symbol": "invalid-character-sub",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "unicode_checker",
+"extension": false,
+"id": "E2513",
+"old_names": [],
+"symbol": "invalid-character-esc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "unicode_checker",
+"extension": false,
+"id": "E2514",
+"old_names": [],
+"symbol": "invalid-character-nul",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "unicode_checker",
+"extension": false,
+"id": "E2515",
+"old_names": [],
+"symbol": "invalid-character-zero-width-space",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "method_args",
+"extension": false,
+"id": "E3102",
+"old_names": [],
+"symbol": "positional-only-arguments-expected",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "dataclass",
+"extension": false,
+"id": "E3701",
+"old_names": [],
+"symbol": "invalid-field-call",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "modified_iteration",
+"extension": false,
+"id": "E4702",
+"old_names": [],
+"symbol": "modified-iterating-dict",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "modified_iteration",
+"extension": false,
+"id": "E4703",
+"old_names": [],
+"symbol": "modified-iterating-set",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typing",
+"extension": true,
+"id": "E6004",
+"old_names": [],
+"symbol": "broken-noreturn",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "error",
+"checker": "typing",
+"extension": true,
+"id": "E6005",
+"old_names": [],
+"symbol": "broken-collections-callable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "fatal",
+"checker": "main",
+"extension": false,
+"id": "F0001",
+"old_names": [],
+"symbol": "fatal",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "fatal",
+"checker": "main",
+"extension": false,
+"id": "F0002",
+"old_names": [],
+"symbol": "astroid-error",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "fatal",
+"checker": "main",
+"extension": false,
+"id": "F0010",
+"old_names": [],
+"symbol": "parse-error",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "fatal",
+"checker": "main",
+"extension": false,
+"id": "F0011",
+"old_names": [],
+"symbol": "config-parse-error",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "fatal",
+"checker": "classes",
+"extension": false,
+"id": "F0202",
+"old_names": [],
+"symbol": "method-check-failed",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "main",
+"extension": false,
+"id": "I0001",
+"old_names": [],
+"symbol": "raw-checker-failed",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "main",
+"extension": false,
+"id": "I0010",
+"old_names": [],
+"symbol": "bad-inline-option",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "main",
+"extension": false,
+"id": "I0011",
+"old_names": [],
+"symbol": "locally-disabled",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "main",
+"extension": false,
+"id": "I0013",
+"old_names": [],
+"symbol": "file-ignored",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "main",
+"extension": false,
+"id": "I0020",
+"old_names": [],
+"symbol": "suppressed-message",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "main",
+"extension": false,
+"id": "I0021",
+"old_names": [],
+"symbol": "useless-suppression",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "main",
+"extension": false,
+"id": "I0022",
+"old_names": [
+"deprecated-disable-all"
+],
+"symbol": "deprecated-pragma",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "miscellaneous",
+"extension": false,
+"id": "I0023",
+"old_names": [],
+"symbol": "use-symbolic-message-instead",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "info",
+"checker": "typecheck",
+"extension": false,
+"id": "I1101",
+"old_names": [],
+"symbol": "c-extension-no-member",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "main",
+"extension": false,
+"id": "R0022",
+"old_names": [
+"bad-option-value"
+],
+"symbol": "useless-option-value",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "basic",
+"extension": false,
+"id": "R0123",
+"old_names": [],
+"symbol": "literal-comparison",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "basic",
+"extension": false,
+"id": "R0124",
+"old_names": [],
+"symbol": "comparison-with-itself",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "basic",
+"extension": false,
+"id": "R0133",
+"old_names": [],
+"symbol": "comparison-of-constants",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "classes",
+"extension": false,
+"id": "R0202",
+"old_names": [],
+"symbol": "no-classmethod-decorator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "classes",
+"extension": false,
+"id": "R0203",
+"old_names": [],
+"symbol": "no-staticmethod-decorator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "multiple_types",
+"extension": true,
+"id": "R0204",
+"old_names": [],
+"symbol": "redefined-variable-type",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "classes",
+"extension": false,
+"id": "R0205",
+"old_names": [],
+"symbol": "useless-object-inheritance",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "classes",
+"extension": false,
+"id": "R0206",
+"old_names": [],
+"symbol": "property-with-parameters",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "imports",
+"extension": false,
+"id": "R0401",
+"old_names": [],
+"symbol": "cyclic-import",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "imports",
+"extension": false,
+"id": "R0402",
+"old_names": [],
+"symbol": "consider-using-from-import",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "similarities",
+"extension": false,
+"id": "R0801",
+"old_names": [],
+"symbol": "duplicate-code",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0901",
+"old_names": [],
+"symbol": "too-many-ancestors",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0902",
+"old_names": [],
+"symbol": "too-many-instance-attributes",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0903",
+"old_names": [],
+"symbol": "too-few-public-methods",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0904",
+"old_names": [],
+"symbol": "too-many-public-methods",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0911",
+"old_names": [],
+"symbol": "too-many-return-statements",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0912",
+"old_names": [],
+"symbol": "too-many-branches",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0913",
+"old_names": [],
+"symbol": "too-many-arguments",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0914",
+"old_names": [],
+"symbol": "too-many-locals",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0915",
+"old_names": [],
+"symbol": "too-many-statements",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0916",
+"old_names": [],
+"symbol": "too-many-boolean-expressions",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": false,
+"id": "R0917",
+"old_names": [],
+"symbol": "too-many-positional-arguments",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "design",
+"extension": true,
+"id": "R1260",
+"old_names": [],
+"symbol": "too-complex",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1701",
+"old_names": [],
+"symbol": "consider-merging-isinstance",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1702",
+"old_names": [
+"old-too-many-nested-blocks"
+],
+"symbol": "too-many-nested-blocks",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1703",
+"old_names": [
+"old-simplifiable-if-statement"
+],
+"symbol": "simplifiable-if-statement",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1704",
+"old_names": [],
+"symbol": "redefined-argument-from-local",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1705",
+"old_names": [],
+"symbol": "no-else-return",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1706",
+"old_names": [],
+"symbol": "consider-using-ternary",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1707",
+"old_names": [],
+"symbol": "trailing-comma-tuple",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1708",
+"old_names": [],
+"symbol": "stop-iteration-return",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1709",
+"old_names": [],
+"symbol": "simplify-boolean-expression",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1710",
+"old_names": [],
+"symbol": "inconsistent-return-statements",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1711",
+"old_names": [],
+"symbol": "useless-return",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1712",
+"old_names": [],
+"symbol": "consider-swap-variables",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1713",
+"old_names": [],
+"symbol": "consider-using-join",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1714",
+"old_names": [],
+"symbol": "consider-using-in",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1715",
+"old_names": [],
+"symbol": "consider-using-get",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1716",
+"old_names": [],
+"symbol": "chained-comparison",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1717",
+"old_names": [],
+"symbol": "consider-using-dict-comprehension",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1718",
+"old_names": [],
+"symbol": "consider-using-set-comprehension",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1719",
+"old_names": [],
+"symbol": "simplifiable-if-expression",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1720",
+"old_names": [],
+"symbol": "no-else-raise",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1721",
+"old_names": [],
+"symbol": "unnecessary-comprehension",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1722",
+"old_names": [],
+"symbol": "consider-using-sys-exit",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1723",
+"old_names": [],
+"symbol": "no-else-break",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1724",
+"old_names": [],
+"symbol": "no-else-continue",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1725",
+"old_names": [],
+"symbol": "super-with-arguments",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1726",
+"old_names": [],
+"symbol": "simplifiable-condition",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1727",
+"old_names": [],
+"symbol": "condition-evals-to-constant",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1728",
+"old_names": [],
+"symbol": "consider-using-generator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1729",
+"old_names": [],
+"symbol": "use-a-generator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1730",
+"old_names": [],
+"symbol": "consider-using-min-builtin",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1731",
+"old_names": [],
+"symbol": "consider-using-max-builtin",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1732",
+"old_names": [],
+"symbol": "consider-using-with",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1733",
+"old_names": [],
+"symbol": "unnecessary-dict-index-lookup",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1734",
+"old_names": [],
+"symbol": "use-list-literal",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1735",
+"old_names": [],
+"symbol": "use-dict-literal",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1736",
+"old_names": [],
+"symbol": "unnecessary-list-index-lookup",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1737",
+"old_names": [],
+"symbol": "use-yield-from",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1738",
+"old_names": [],
+"symbol": "chained-comparison-all-equal",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "refactoring",
+"extension": false,
+"id": "R1739",
+"old_names": [],
+"symbol": "impossible-comparison",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "match_statements",
+"extension": false,
+"id": "R1905",
+"old_names": [],
+"symbol": "match-class-bind-self",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "match_statements",
+"extension": false,
+"id": "R1906",
+"old_names": [],
+"symbol": "match-class-positional-attributes",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "magic-value",
+"extension": true,
+"id": "R2004",
+"old_names": [],
+"symbol": "magic-value-comparison",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "empty-comment",
+"extension": true,
+"id": "R2044",
+"old_names": [],
+"symbol": "empty-comment",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "consider_refactoring_into_while",
+"extension": true,
+"id": "R3501",
+"old_names": [],
+"symbol": "consider-refactoring-into-while-condition",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "else_if_used",
+"extension": true,
+"id": "R5501",
+"old_names": [],
+"symbol": "else-if-used",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "confusing_elif",
+"extension": true,
+"id": "R5601",
+"old_names": [],
+"symbol": "confusing-consecutive-elif",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "typing",
+"extension": true,
+"id": "R6002",
+"old_names": [],
+"symbol": "consider-using-alias",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "typing",
+"extension": true,
+"id": "R6003",
+"old_names": [],
+"symbol": "consider-alternative-union-syntax",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "typing",
+"extension": true,
+"id": "R6006",
+"old_names": [],
+"symbol": "redundant-typehint-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "typing",
+"extension": true,
+"id": "R6007",
+"old_names": [],
+"symbol": "unnecessary-default-type-args",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "code_style",
+"extension": true,
+"id": "R6101",
+"old_names": [],
+"symbol": "consider-using-namedtuple-or-dataclass",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "code_style",
+"extension": true,
+"id": "R6102",
+"old_names": [],
+"symbol": "consider-using-tuple",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "code_style",
+"extension": true,
+"id": "R6103",
+"old_names": [],
+"symbol": "consider-using-assignment-expr",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "code_style",
+"extension": true,
+"id": "R6104",
+"old_names": [],
+"symbol": "consider-using-augmented-assign",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "code_style",
+"extension": true,
+"id": "R6105",
+"old_names": [],
+"symbol": "prefer-typing-namedtuple",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "code_style",
+"extension": true,
+"id": "R6106",
+"old_names": [],
+"symbol": "consider-math-not-float",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "set_membership",
+"extension": true,
+"id": "R6201",
+"old_names": [],
+"symbol": "use-set-for-membership",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "refactor",
+"checker": "no_self_use",
+"extension": true,
+"id": "R6301",
+"old_names": [
+"old-no-self-use"
+],
+"symbol": "no-self-use",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "main",
+"extension": false,
+"id": "W0012",
+"old_names": [
+"bad-option-value"
+],
+"symbol": "unknown-option-value",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0101",
+"old_names": [],
+"symbol": "unreachable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0102",
+"old_names": [],
+"symbol": "dangerous-default-value",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0104",
+"old_names": [],
+"symbol": "pointless-statement",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0105",
+"old_names": [],
+"symbol": "pointless-string-statement",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0106",
+"old_names": [],
+"symbol": "expression-not-assigned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0107",
+"old_names": [],
+"symbol": "unnecessary-pass",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0108",
+"old_names": [],
+"symbol": "unnecessary-lambda",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0109",
+"old_names": [],
+"symbol": "duplicate-key",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0120",
+"old_names": [],
+"symbol": "useless-else-on-loop",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0122",
+"old_names": [],
+"symbol": "exec-used",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0123",
+"old_names": [],
+"symbol": "eval-used",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0124",
+"old_names": [],
+"symbol": "confusing-with-statement",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0125",
+"old_names": [],
+"symbol": "using-constant-test",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0126",
+"old_names": [],
+"symbol": "missing-parentheses-for-call-in-test",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0127",
+"old_names": [],
+"symbol": "self-assigning-variable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0128",
+"old_names": [],
+"symbol": "redeclared-assigned-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0129",
+"old_names": [],
+"symbol": "assert-on-string-literal",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0130",
+"old_names": [],
+"symbol": "duplicate-value",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0131",
+"old_names": [],
+"symbol": "named-expr-without-context",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0133",
+"old_names": [],
+"symbol": "pointless-exception-statement",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0134",
+"old_names": [],
+"symbol": "return-in-finally",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0135",
+"old_names": [],
+"symbol": "contextmanager-generator-missing-cleanup",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0136",
+"old_names": [],
+"symbol": "continue-in-finally",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0137",
+"old_names": [],
+"symbol": "break-in-finally",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "deprecated_builtins",
+"extension": true,
+"id": "W0141",
+"old_names": [],
+"symbol": "bad-builtin",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0143",
+"old_names": [],
+"symbol": "comparison-with-callable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "while_used",
+"extension": true,
+"id": "W0149",
+"old_names": [],
+"symbol": "while-used",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0150",
+"old_names": [],
+"symbol": "lost-exception",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "consider_ternary_expression",
+"extension": true,
+"id": "W0160",
+"old_names": [],
+"symbol": "consider-ternary-expression",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0177",
+"old_names": [],
+"symbol": "nan-comparison",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "basic",
+"extension": false,
+"id": "W0199",
+"old_names": [],
+"symbol": "assert-on-tuple",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0201",
+"old_names": [],
+"symbol": "attribute-defined-outside-init",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0211",
+"old_names": [],
+"symbol": "bad-staticmethod-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0212",
+"old_names": [],
+"symbol": "protected-access",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0213",
+"old_names": [],
+"symbol": "implicit-flag-alias",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0221",
+"old_names": [],
+"symbol": "arguments-differ",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0222",
+"old_names": [],
+"symbol": "signature-differs",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0223",
+"old_names": [],
+"symbol": "abstract-method",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0231",
+"old_names": [],
+"symbol": "super-init-not-called",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0233",
+"old_names": [],
+"symbol": "non-parent-init-called",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0236",
+"old_names": [],
+"symbol": "invalid-overridden-method",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0237",
+"old_names": [],
+"symbol": "arguments-renamed",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0238",
+"old_names": [],
+"symbol": "unused-private-member",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0239",
+"old_names": [],
+"symbol": "overridden-final-method",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0240",
+"old_names": [],
+"symbol": "subclassed-final-class",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0244",
+"old_names": [],
+"symbol": "redefined-slots-in-subclass",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0245",
+"old_names": [],
+"symbol": "super-without-brackets",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "classes",
+"extension": false,
+"id": "W0246",
+"old_names": [
+"useless-super-delegation"
+],
+"symbol": "useless-parent-delegation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "format",
+"extension": false,
+"id": "W0301",
+"old_names": [],
+"symbol": "unnecessary-semicolon",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "format",
+"extension": false,
+"id": "W0311",
+"old_names": [],
+"symbol": "bad-indentation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "imports",
+"extension": false,
+"id": "W0401",
+"old_names": [],
+"symbol": "wildcard-import",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "imports",
+"extension": false,
+"id": "W0404",
+"old_names": [],
+"symbol": "reimported",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "imports",
+"extension": false,
+"id": "W0406",
+"old_names": [],
+"symbol": "import-self",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "imports",
+"extension": false,
+"id": "W0407",
+"old_names": [],
+"symbol": "preferred-module",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "imports",
+"extension": false,
+"id": "W0410",
+"old_names": [],
+"symbol": "misplaced-future",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "imports",
+"extension": false,
+"id": "W0416",
+"old_names": [],
+"symbol": "shadowed-import",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "miscellaneous",
+"extension": false,
+"id": "W0511",
+"old_names": [],
+"symbol": "fixme",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0601",
+"old_names": [],
+"symbol": "global-variable-undefined",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0602",
+"old_names": [],
+"symbol": "global-variable-not-assigned",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0603",
+"old_names": [],
+"symbol": "global-statement",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0604",
+"old_names": [],
+"symbol": "global-at-module-level",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0611",
+"old_names": [],
+"symbol": "unused-import",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0612",
+"old_names": [],
+"symbol": "unused-variable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0613",
+"old_names": [],
+"symbol": "unused-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0614",
+"old_names": [],
+"symbol": "unused-wildcard-import",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0621",
+"old_names": [],
+"symbol": "redefined-outer-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0622",
+"old_names": [],
+"symbol": "redefined-builtin",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0631",
+"old_names": [],
+"symbol": "undefined-loop-variable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0632",
+"old_names": [
+"old-unbalanced-tuple-unpacking"
+],
+"symbol": "unbalanced-tuple-unpacking",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0640",
+"old_names": [],
+"symbol": "cell-var-from-loop",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0641",
+"old_names": [],
+"symbol": "possibly-unused-variable",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0642",
+"old_names": [],
+"symbol": "self-cls-assignment",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "variables",
+"extension": false,
+"id": "W0644",
+"old_names": [],
+"symbol": "unbalanced-dict-unpacking",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0702",
+"old_names": [],
+"symbol": "bare-except",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0705",
+"old_names": [],
+"symbol": "duplicate-except",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0706",
+"old_names": [],
+"symbol": "try-except-raise",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0707",
+"old_names": [],
+"symbol": "raise-missing-from",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0711",
+"old_names": [],
+"symbol": "binary-op-exception",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "overlap-except",
+"extension": true,
+"id": "W0714",
+"old_names": [],
+"symbol": "overlapping-except",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0715",
+"old_names": [],
+"symbol": "raising-format-tuple",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0716",
+"old_names": [],
+"symbol": "wrong-exception-operation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "broad_try_clause",
+"extension": true,
+"id": "W0717",
+"old_names": [],
+"symbol": "too-many-try-statements",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0718",
+"old_names": [
+"broad-except"
+],
+"symbol": "broad-exception-caught",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "exceptions",
+"extension": false,
+"id": "W0719",
+"old_names": [],
+"symbol": "broad-exception-raised",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "typecheck",
+"extension": false,
+"id": "W1113",
+"old_names": [],
+"symbol": "keyword-arg-before-vararg",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "typecheck",
+"extension": false,
+"id": "W1114",
+"old_names": [],
+"symbol": "arguments-out-of-order",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "typecheck",
+"extension": false,
+"id": "W1115",
+"old_names": [],
+"symbol": "non-str-assignment-to-dunder-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "typecheck",
+"extension": false,
+"id": "W1116",
+"old_names": [],
+"symbol": "isinstance-second-argument-not-valid-type",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "typecheck",
+"extension": false,
+"id": "W1117",
+"old_names": [],
+"symbol": "kwarg-superseded-by-positional-arg",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "logging",
+"extension": false,
+"id": "W1201",
+"old_names": [],
+"symbol": "logging-not-lazy",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "logging",
+"extension": false,
+"id": "W1202",
+"old_names": [],
+"symbol": "logging-format-interpolation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "logging",
+"extension": false,
+"id": "W1203",
+"old_names": [],
+"symbol": "logging-fstring-interpolation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1300",
+"old_names": [],
+"symbol": "bad-format-string-key",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1301",
+"old_names": [],
+"symbol": "unused-format-string-key",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1302",
+"old_names": [],
+"symbol": "bad-format-string",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1303",
+"old_names": [],
+"symbol": "missing-format-argument-key",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1304",
+"old_names": [],
+"symbol": "unused-format-string-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1305",
+"old_names": [],
+"symbol": "format-combined-specification",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1306",
+"old_names": [],
+"symbol": "missing-format-attribute",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1307",
+"old_names": [],
+"symbol": "invalid-format-index",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1308",
+"old_names": [],
+"symbol": "duplicate-string-formatting-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1309",
+"old_names": [],
+"symbol": "f-string-without-interpolation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1310",
+"old_names": [],
+"symbol": "format-string-without-interpolation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1401",
+"old_names": [],
+"symbol": "anomalous-backslash-in-string",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1402",
+"old_names": [],
+"symbol": "anomalous-unicode-escape-in-string",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1404",
+"old_names": [
+"implicit-str-concat-in-sequence"
+],
+"symbol": "implicit-str-concat",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1405",
+"old_names": [],
+"symbol": "inconsistent-quotes",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "string",
+"extension": false,
+"id": "W1406",
+"old_names": [],
+"symbol": "redundant-u-string-prefix",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1501",
+"old_names": [],
+"symbol": "bad-open-mode",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1502",
+"old_names": [],
+"symbol": "boolean-datetime",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1503",
+"old_names": [],
+"symbol": "redundant-unittest-assert",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1506",
+"old_names": [],
+"symbol": "bad-thread-instantiation",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1507",
+"old_names": [],
+"symbol": "shallow-copy-environ",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1508",
+"old_names": [],
+"symbol": "invalid-envvar-default",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1509",
+"old_names": [],
+"symbol": "subprocess-popen-preexec-fn",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1510",
+"old_names": [],
+"symbol": "subprocess-run-check",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1514",
+"old_names": [],
+"symbol": "unspecified-encoding",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1515",
+"old_names": [],
+"symbol": "forgotten-debug-statement",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W1518",
+"old_names": [
+"lru-cache-decorating-method",
+"cache-max-size-none"
+],
+"symbol": "method-cache-max-size-none",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "eq-without-hash",
+"extension": true,
+"id": "W1641",
+"old_names": [],
+"symbol": "eq-without-hash",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "threading",
+"extension": false,
+"id": "W2101",
+"old_names": [],
+"symbol": "useless-with-lock",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "unnecessary_ellipsis",
+"extension": false,
+"id": "W2301",
+"old_names": [],
+"symbol": "unnecessary-ellipsis",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "nonascii-checker",
+"extension": false,
+"id": "W2402",
+"old_names": [],
+"symbol": "non-ascii-file-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "unsupported_version",
+"extension": false,
+"id": "W2601",
+"old_names": [],
+"symbol": "using-f-string-in-unsupported-version",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "unsupported_version",
+"extension": false,
+"id": "W2602",
+"old_names": [],
+"symbol": "using-final-decorator-in-unsupported-version",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "unsupported_version",
+"extension": false,
+"id": "W2603",
+"old_names": [],
+"symbol": "using-exception-groups-in-unsupported-version",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "unsupported_version",
+"extension": false,
+"id": "W2604",
+"old_names": [],
+"symbol": "using-generic-type-syntax-in-unsupported-version",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "unsupported_version",
+"extension": false,
+"id": "W2605",
+"old_names": [],
+"symbol": "using-assignment-expression-in-unsupported-version",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "unsupported_version",
+"extension": false,
+"id": "W2606",
+"old_names": [],
+"symbol": "using-positional-only-args-in-unsupported-version",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "unsupported_version",
+"extension": false,
+"id": "W2607",
+"old_names": [],
+"symbol": "using-comprehension-unpacking-in-unsupported-version",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "redefined-loop-name",
+"extension": true,
+"id": "W2901",
+"old_names": [],
+"symbol": "redefined-loop-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "method_args",
+"extension": false,
+"id": "W3101",
+"old_names": [],
+"symbol": "missing-timeout",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "dunder",
+"extension": true,
+"id": "W3201",
+"old_names": [],
+"symbol": "bad-dunder-name",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "nested_min_max",
+"extension": false,
+"id": "W3301",
+"old_names": [],
+"symbol": "nested-min-max",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "bad-chained-comparison",
+"extension": false,
+"id": "W3601",
+"old_names": [],
+"symbol": "bad-chained-comparison",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "modified_iteration",
+"extension": false,
+"id": "W4701",
+"old_names": [],
+"symbol": "modified-iterating-list",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "looping-through-iterator",
+"extension": false,
+"id": "W4801",
+"old_names": [],
+"symbol": "looping-through-iterator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "imports",
+"extension": false,
+"id": "W4901",
+"old_names": [
+"old-deprecated-module"
+],
+"symbol": "deprecated-module",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W4902",
+"old_names": [
+"old-deprecated-method"
+],
+"symbol": "deprecated-method",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W4903",
+"old_names": [
+"old-deprecated-argument"
+],
+"symbol": "deprecated-argument",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W4904",
+"old_names": [
+"old-deprecated-class"
+],
+"symbol": "deprecated-class",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W4905",
+"old_names": [
+"old-deprecated-decorator"
+],
+"symbol": "deprecated-decorator",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "stdlib",
+"extension": false,
+"id": "W4906",
+"old_names": [],
+"symbol": "deprecated-attribute",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "typing",
+"extension": true,
+"id": "W6001",
+"old_names": [],
+"symbol": "deprecated-typing-alias",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9005",
+"old_names": [],
+"symbol": "multiple-constructor-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9006",
+"old_names": [],
+"symbol": "missing-raises-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9008",
+"old_names": [],
+"symbol": "redundant-returns-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9010",
+"old_names": [],
+"symbol": "redundant-yields-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9011",
+"old_names": [
+"old-missing-returns-doc"
+],
+"symbol": "missing-return-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9012",
+"old_names": [],
+"symbol": "missing-return-type-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9013",
+"old_names": [
+"old-missing-yields-doc"
+],
+"symbol": "missing-yield-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9014",
+"old_names": [],
+"symbol": "missing-yield-type-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9015",
+"old_names": [
+"old-missing-param-doc"
+],
+"symbol": "missing-param-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9016",
+"old_names": [
+"old-missing-type-doc"
+],
+"symbol": "missing-type-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9017",
+"old_names": [],
+"symbol": "differing-param-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9018",
+"old_names": [],
+"symbol": "differing-type-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9019",
+"old_names": [],
+"symbol": "useless-param-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9020",
+"old_names": [],
+"symbol": "useless-type-doc",
+"tool": "pylint",
+"version": "4.1.3"
+},
+{
+"category": "warning",
+"checker": "parameter_documentation",
+"extension": true,
+"id": "W9021",
+"old_names": [],
+"symbol": "missing-any-param-doc",
+"tool": "pylint",
+"version": "4.1.3"
+}
+]

@@ -1,0 +1,445 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+abstract-class-instantiated,port,,python,py/abstract-class-instantiated,manual,P1,A,none,yes,,"E0110, basic"
+abstract-method,port,,python,py/abstract-method,manual,P2,D,none,,,"W0223, classes"
+access-member-before-definition,port,,python,py/access-member-before-definition,manual,P1,A,none,yes,,"E0203, classes"
+anomalous-backslash-in-string,port,,python,py/anomalous-backslash-in-string,manual,P2,D,none,,,"W1401, string"
+anomalous-unicode-escape-in-string,port,,python,py/anomalous-unicode-escape-in-string,manual,P2,D,none,,,"W1402, string"
+arguments-differ,port,,python,py/arguments-differ,manual,P2,D,none,,,"W0221, classes"
+arguments-out-of-order,types,,,,,,,,,,W1114; needs Python type inference — codelaw has no route for Python yet
+arguments-renamed,port,,python,py/arguments-renamed,manual,P2,D,none,,,"W0237, classes"
+assert-on-string-literal,same-as,,,,,,,,,,W0129; the same rule as ruff/PLW0129: counted there
+assert-on-tuple,port,,python,py/assert-on-tuple,manual,P2,D,none,,,"W0199, basic"
+assigning-non-slot,port,,python,py/assigning-non-slot,manual,P1,A,none,yes,,"E0237, classes"
+assignment-from-no-return,types,,,,,,,,,,E1111; needs Python type inference — codelaw has no route for Python yet
+assignment-from-none,types,,,,,,,,,,E1128; needs Python type inference — codelaw has no route for Python yet
+astroid-error,skip,,,,,,,,,,"F0002; a Pylint run message, not a rule"
+async-context-manager-with-regular-with,types,,,,,,,,,,E1145; needs Python type inference — codelaw has no route for Python yet
+attribute-defined-outside-init,port,,python,py/attribute-defined-outside-init,manual,P2,D,none,,,"W0201, classes"
+await-outside-async,same-as,,,,,,,,,,E1142; the same rule as ruff/PLE1142: counted there
+bad-builtin,port,,python,py/bad-builtin,manual,P2,D,none,,,"W0141, deprecated_builtins, an optional Pylint extension"
+bad-chained-comparison,port,,python,py/bad-chained-comparison,manual,P2,D,none,,,"W3601, bad-chained-comparison"
+bad-classmethod-argument,port,,python,py/bad-classmethod-argument,manual,P2,D,none,,,"C0202, classes"
+bad-configuration-section,port,,python,py/bad-configuration-section,manual,P1,A,none,yes,,"E0014, main"
+bad-docstring-quotes,port,,python,py/bad-docstring-quotes,manual,P2,D,none,,,"C0198, docstyle, an optional Pylint extension"
+bad-dunder-name,port,,python,py/bad-dunder-name,manual,P2,D,none,,,"W3201, dunder, an optional Pylint extension"
+bad-except-order,port,,python,py/bad-except-order,manual,P1,A,none,yes,,"E0701, exceptions"
+bad-exception-cause,port,,python,py/bad-exception-cause,manual,P1,A,none,yes,,"E0705, exceptions"
+bad-file-encoding,port,,python,py/bad-file-encoding,manual,P2,D,none,,,"C2503, unicode_checker"
+bad-format-character,port,,python,py/bad-format-character,manual,P1,A,none,yes,,"E1300, string"
+bad-format-string,port,,python,py/bad-format-string,manual,P2,D,none,,,"W1302, string"
+bad-format-string-key,port,,python,py/bad-format-string-key,manual,P2,D,none,,,"W1300, string"
+bad-indentation,layout,,,,,,,,,,W0311; the formatter owns it
+bad-inline-option,skip,,,,,,,,,,"I0010; a Pylint run message, not a rule"
+bad-mcs-classmethod-argument,port,,python,py/bad-mcs-classmethod-argument,manual,P2,D,none,,,"C0204, classes"
+bad-mcs-method-argument,port,,python,py/bad-mcs-method-argument,manual,P2,D,none,,,"C0203, classes"
+bad-open-mode,same-as,,,,,,,,,,W1501; the same rule as ruff/PLW1501: counted there
+bad-plugin-value,port,,python,py/bad-plugin-value,manual,P1,A,none,yes,,"E0013, main"
+bad-reversed-sequence,port,,python,py/bad-reversed-sequence,manual,P1,A,none,yes,,"E0111, basic"
+bad-staticmethod-argument,same-as,,,,,,,,,,W0211; the same rule as ruff/PLW0211: counted there
+bad-str-strip-call,same-as,,,,,,,,,,E1310; the same rule as ruff/PLE1310: counted there
+bad-string-format-type,same-as,,,,,,,,,,E1307; the same rule as ruff/PLE1307: counted there
+bad-super-call,port,,python,py/bad-super-call,manual,P1,A,none,yes,,"E1003, newstyle"
+bad-thread-instantiation,port,,python,py/bad-thread-instantiation,manual,P2,D,none,,,"W1506, stdlib"
+bare-except,covered,py/no-bare-except,,,,,,,,,W0702; through ruff/E722
+bare-name-capture-pattern,port,,python,py/bare-name-capture-pattern,manual,P1,A,none,yes,,"E1901, match_statements"
+bidirectional-unicode,same-as,,,,,,,,,,E2502; the same rule as ruff/PLE2502: counted there
+binary-op-exception,same-as,,,,,,,,,,W0711; the same rule as ruff/PLW0711: counted there
+boolean-datetime,port,,python,py/boolean-datetime,manual,P2,D,none,,,"W1502, stdlib"
+break-in-finally,port,,python,py/break-in-finally,manual,P2,D,none,,,"W0137, basic"
+broad-exception-caught,port,,python,py/broad-exception-caught,manual,P2,D,none,,,"W0718, exceptions"
+broad-exception-raised,port,,python,py/broad-exception-raised,manual,P2,D,none,,,"W0719, exceptions"
+broken-collections-callable,port,,python,py/broken-collections-callable,manual,P2,D,none,,,"E6005, typing, an optional Pylint extension"
+broken-noreturn,port,,python,py/broken-noreturn,manual,P2,D,none,,,"E6004, typing, an optional Pylint extension"
+c-extension-no-member,skip,,,,,,,,,,"I1101; a Pylint run message, not a rule"
+catching-non-exception,port,,python,py/catching-non-exception,manual,P1,A,none,yes,,"E0712, exceptions"
+cell-var-from-loop,port,,python,py/cell-var-from-loop,manual,P2,D,none,,,"W0640, variables"
+chained-comparison,port,,python,py/chained-comparison,manual,P2,D,none,,,"R1716, refactoring"
+chained-comparison-all-equal,port,,python,py/chained-comparison-all-equal,manual,P2,D,none,,,"R1738, refactoring"
+class-variable-slots-conflict,port,,python,py/class-variable-slots-conflict,manual,P1,A,none,yes,,"E0242, classes"
+comparison-of-constants,port,,python,py/comparison-of-constants,manual,P2,D,none,,,"R0133, basic"
+comparison-with-callable,port,,python,py/comparison-with-callable,manual,P2,D,none,,,"W0143, basic"
+comparison-with-itself,same-as,,,,,,,,,,R0124; the same rule as ruff/PLR0124: counted there
+condition-evals-to-constant,port,,python,py/condition-evals-to-constant,manual,P2,D,none,,,"R1727, refactoring"
+config-parse-error,skip,,,,,,,,,,"F0011; a Pylint run message, not a rule"
+confusing-consecutive-elif,port,,python,py/confusing-consecutive-elif,manual,P2,D,none,,,"R5601, confusing_elif, an optional Pylint extension"
+confusing-with-statement,port,,python,py/confusing-with-statement,manual,P2,D,none,,,"W0124, basic"
+consider-alternative-union-syntax,port,,python,py/consider-alternative-union-syntax,manual,P2,D,none,,,"R6003, typing, an optional Pylint extension"
+consider-iterating-dictionary,port,,python,py/consider-iterating-dictionary,manual,P2,D,none,,,"C0201, refactoring"
+consider-math-not-float,port,,python,py/consider-math-not-float,manual,P2,D,none,,,"R6106, code_style, an optional Pylint extension"
+consider-merging-isinstance,port,,python,py/consider-merging-isinstance,manual,P2,D,none,,,"R1701, refactoring"
+consider-refactoring-into-while-condition,port,,python,py/consider-refactoring-into-while-condition,manual,P2,D,none,,,"R3501, consider_refactoring_into_while, an optional Pylint extension"
+consider-swap-variables,port,,python,py/consider-swap-variables,manual,P2,D,none,,,"R1712, refactoring"
+consider-ternary-expression,port,,python,py/consider-ternary-expression,manual,P2,D,none,,,"W0160, consider_ternary_expression, an optional Pylint extension"
+consider-using-alias,port,,python,py/consider-using-alias,manual,P2,D,none,,,"R6002, typing, an optional Pylint extension"
+consider-using-any-or-all,port,,python,py/consider-using-any-or-all,manual,P2,D,none,,,"C0501, consider-using-any-or-all, an optional Pylint extension"
+consider-using-assignment-expr,port,,python,py/consider-using-assignment-expr,manual,P2,D,none,,,"R6103, code_style, an optional Pylint extension"
+consider-using-augmented-assign,port,,python,py/consider-using-augmented-assign,manual,P2,D,none,,,"R6104, code_style, an optional Pylint extension"
+consider-using-dict-comprehension,port,,python,py/consider-using-dict-comprehension,manual,P2,D,none,,,"R1717, refactoring"
+consider-using-dict-items,port,,python,py/consider-using-dict-items,manual,P2,D,none,,,"C0206, refactoring"
+consider-using-enumerate,port,,python,py/consider-using-enumerate,manual,P2,D,none,,,"C0200, refactoring"
+consider-using-f-string,port,,python,py/consider-using-f-string,manual,P2,D,none,,,"C0209, refactoring"
+consider-using-from-import,port,,python,py/consider-using-from-import,manual,P2,D,none,,,"R0402, imports"
+consider-using-generator,port,,python,py/consider-using-generator,manual,P2,D,none,,,"R1728, refactoring"
+consider-using-get,port,,python,py/consider-using-get,manual,P2,D,none,,,"R1715, refactoring"
+consider-using-in,port,,python,py/consider-using-in,manual,P2,D,none,,,"R1714, refactoring"
+consider-using-join,port,,python,py/consider-using-join,manual,P2,D,none,,,"R1713, refactoring"
+consider-using-max-builtin,port,,python,py/consider-using-max-builtin,manual,P2,D,none,,,"R1731, refactoring"
+consider-using-min-builtin,port,,python,py/consider-using-min-builtin,manual,P2,D,none,,,"R1730, refactoring"
+consider-using-namedtuple-or-dataclass,port,,python,py/consider-using-namedtuple-or-dataclass,manual,P2,D,none,,,"R6101, code_style, an optional Pylint extension"
+consider-using-set-comprehension,port,,python,py/consider-using-set-comprehension,manual,P2,D,none,,,"R1718, refactoring"
+consider-using-sys-exit,port,,python,py/consider-using-sys-exit,manual,P2,D,none,,,"R1722, refactoring"
+consider-using-ternary,port,,python,py/consider-using-ternary,manual,P2,D,none,,,"R1706, refactoring"
+consider-using-tuple,port,,python,py/consider-using-tuple,manual,P2,D,none,,,"R6102, code_style, an optional Pylint extension"
+consider-using-with,port,,python,py/consider-using-with,manual,P2,D,none,,,"R1732, refactoring"
+contextmanager-generator-missing-cleanup,port,,python,py/contextmanager-generator-missing-cleanup,manual,P2,D,none,,,"W0135, basic"
+continue-in-finally,same-as,,,,,,,,,,W0136; the same rule as ruff/PLE0116: counted there
+cyclic-import,port,,python,py/cyclic-import,manual,P2,D,none,,,"R0401, imports"
+dangerous-default-value,port,,python,py/dangerous-default-value,manual,P2,D,none,,,"W0102, basic"
+declare-non-slot,port,,python,py/declare-non-slot,manual,P1,A,none,yes,,"E0245, classes"
+deprecated-argument,port,,python,py/deprecated-argument,manual,P2,D,none,,,"W4903, stdlib"
+deprecated-attribute,port,,python,py/deprecated-attribute,manual,P2,D,none,,,"W4906, stdlib"
+deprecated-class,port,,python,py/deprecated-class,manual,P2,D,none,,,"W4904, stdlib"
+deprecated-decorator,port,,python,py/deprecated-decorator,manual,P2,D,none,,,"W4905, stdlib"
+deprecated-method,port,,python,py/deprecated-method,manual,P2,D,none,,,"W4902, stdlib"
+deprecated-module,port,,python,py/deprecated-module,manual,P2,D,none,,,"W4901, imports"
+deprecated-pragma,skip,,,,,,,,,,"I0022; a Pylint run message, not a rule"
+deprecated-typing-alias,port,,python,py/deprecated-typing-alias,manual,P2,D,none,,,"W6001, typing, an optional Pylint extension"
+dict-init-mutate,port,,python,py/dict-init-mutate,manual,P2,D,none,,,"C3401, dict-init-mutate, an optional Pylint extension"
+dict-iter-missing-items,same-as,,,,,,,,,,E1141; the same rule as ruff/PLE1141: counted there
+differing-param-doc,port,,python,py/differing-param-doc,manual,P2,D,none,,,"W9017, parameter_documentation, an optional Pylint extension"
+differing-type-doc,port,,python,py/differing-type-doc,manual,P2,D,none,,,"W9018, parameter_documentation, an optional Pylint extension"
+disallowed-name,port,,python,py/disallowed-name,manual,P2,D,none,,,"C0104, basic"
+docstring-first-line-empty,port,,python,py/docstring-first-line-empty,manual,P2,D,none,,,"C0199, docstyle, an optional Pylint extension"
+duplicate-argument-name,port,,python,py/duplicate-argument-name,manual,P1,A,none,yes,,"E0108, basic"
+duplicate-bases,same-as,,,,,,,,,,E0241; the same rule as ruff/PLE0241: counted there
+duplicate-code,port,,python,py/duplicate-code,manual,P2,D,none,,,"R0801, similarities"
+duplicate-except,port,,python,py/duplicate-except,manual,P2,D,none,,,"W0705, exceptions"
+duplicate-key,port,,python,py/duplicate-key,manual,P2,D,none,,,"W0109, basic"
+duplicate-string-formatting-argument,port,,python,py/duplicate-string-formatting-argument,manual,P2,D,none,,,"W1308, string"
+duplicate-value,covered,py/duplicate-set-value,,,,,,,,,W0130; through ruff/B033
+else-if-used,port,,python,py/else-if-used,manual,P2,D,none,,,"R5501, else_if_used, an optional Pylint extension"
+empty-comment,same-as,,,,,,,,,,R2044; the same rule as ruff/PLR2044: counted there
+empty-docstring,same-as,,,,,,,,,,C0112; the same rule as ruff/D419: counted there
+eq-without-hash,same-as,,,,,,,,,,W1641; the same rule as ruff/PLW1641: counted there
+eval-used,port,,python,py/eval-used,manual,P2,D,none,,,"W0123, basic"
+exec-used,port,,python,py/exec-used,manual,P2,D,none,,,"W0122, basic"
+expression-not-assigned,port,,python,py/expression-not-assigned,manual,P2,D,none,,,"W0106, basic"
+f-string-without-interpolation,port,,python,py/f-string-without-interpolation,manual,P2,D,none,,,"W1309, string"
+fatal,skip,,,,,,,,,,"F0001; a Pylint run message, not a rule"
+file-ignored,skip,,,,,,,,,,"I0013; a Pylint run message, not a rule"
+fixme,covered,py/todo-marker*,,,,,,,,,W0511
+forgotten-debug-statement,port,,python,py/forgotten-debug-statement,manual,P2,D,none,,,"W1515, stdlib"
+format-combined-specification,port,,python,py/format-combined-specification,manual,P2,D,none,,,"W1305, string"
+format-needs-mapping,port,,python,py/format-needs-mapping,manual,P1,A,none,yes,,"E1303, string"
+format-string-without-interpolation,port,,python,py/format-string-without-interpolation,manual,P2,D,none,,,"W1310, string"
+function-redefined,port,,python,py/function-redefined,manual,P1,A,none,yes,,"E0102, basic"
+global-at-module-level,same-as,,,,,,,,,,W0604; the same rule as ruff/PLW0604: counted there
+global-statement,same-as,,,,,,,,,,W0603; the same rule as ruff/PLW0603: counted there
+global-variable-not-assigned,same-as,,,,,,,,,,W0602; the same rule as ruff/PLW0602: counted there
+global-variable-undefined,port,,python,py/global-variable-undefined,manual,P2,D,none,,,"W0601, variables"
+implicit-flag-alias,port,,python,py/implicit-flag-alias,manual,P2,D,none,,,"W0213, classes"
+implicit-str-concat,port,,python,py/implicit-str-concat,manual,P2,D,none,,,"W1404, string"
+import-error,port,,python,py/import-error,manual,P1,A,none,yes,,"E0401, imports"
+import-outside-toplevel,port,,python,py/import-outside-toplevel,manual,P2,D,none,,,"C0415, imports"
+import-private-name,same-as,,,,,,,,,,C2701; the same rule as ruff/PLC2701: counted there
+import-self,same-as,,,,,,,,,,W0406; the same rule as ruff/PLW0406: counted there
+impossible-comparison,port,,python,py/impossible-comparison,manual,P2,D,none,,,"R1739, refactoring"
+inconsistent-mro,port,,python,py/inconsistent-mro,manual,P1,A,none,yes,,"E0240, classes"
+inconsistent-quotes,port,,python,py/inconsistent-quotes,manual,P2,D,none,,,"W1405, string"
+inconsistent-return-statements,port,,python,py/inconsistent-return-statements,manual,P2,D,none,,,"R1710, refactoring"
+inherit-non-class,port,,python,py/inherit-non-class,manual,P1,A,none,yes,,"E0239, classes"
+init-is-generator,port,,python,py/init-is-generator,manual,P1,A,none,yes,,"E0100, basic"
+invalid-all-format,same-as,,,,,,,,,,E0605; the same rule as ruff/PLE0605: counted there
+invalid-all-object,same-as,,,,,,,,,,E0604; the same rule as ruff/PLE0604: counted there
+invalid-bool-returned,port,,python,py/invalid-bool-returned,manual,P1,A,none,yes,,"E0304, classes"
+invalid-bytes-returned,port,,python,py/invalid-bytes-returned,manual,P1,A,none,yes,,"E0308, classes"
+invalid-character-backspace,same-as,,,,,,,,,,E2510; the same rule as ruff/PLE2510: counted there
+invalid-character-carriage-return,port,,python,py/invalid-character-carriage-return,manual,P1,A,none,yes,,"E2511, unicode_checker"
+invalid-character-esc,same-as,,,,,,,,,,E2513; the same rule as ruff/PLE2513: counted there
+invalid-character-nul,same-as,,,,,,,,,,E2514; the same rule as ruff/PLE2514: counted there
+invalid-character-sub,same-as,,,,,,,,,,E2512; the same rule as ruff/PLE2512: counted there
+invalid-character-zero-width-space,same-as,,,,,,,,,,E2515; the same rule as ruff/PLE2515: counted there
+invalid-characters-in-docstring,port,,python,py/invalid-characters-in-docstring,manual,P2,D,none,,,"C0403, spelling"
+invalid-class-object,port,,python,py/invalid-class-object,manual,P1,A,none,yes,,"E0243, classes"
+invalid-enum-extension,port,,python,py/invalid-enum-extension,manual,P1,A,none,yes,,"E0244, classes"
+invalid-envvar-default,same-as,,,,,,,,,,W1508; the same rule as ruff/PLW1508: counted there
+invalid-envvar-value,same-as,,,,,,,,,,E1507; the same rule as ruff/PLE1507: counted there
+invalid-field-call,port,,python,py/invalid-field-call,manual,P1,A,none,yes,,"E3701, dataclass"
+invalid-format-index,port,,python,py/invalid-format-index,manual,P2,D,none,,,"W1307, string"
+invalid-format-returned,port,,python,py/invalid-format-returned,manual,P1,A,none,yes,,"E0311, classes"
+invalid-getnewargs-ex-returned,port,,python,py/invalid-getnewargs-ex-returned,manual,P1,A,none,yes,,"E0313, classes"
+invalid-getnewargs-returned,port,,python,py/invalid-getnewargs-returned,manual,P1,A,none,yes,,"E0312, classes"
+invalid-hash-returned,port,,python,py/invalid-hash-returned,manual,P1,A,none,yes,,"E0309, classes"
+invalid-index-returned,port,,python,py/invalid-index-returned,manual,P1,A,none,yes,,"E0305, classes"
+invalid-length-hint-returned,port,,python,py/invalid-length-hint-returned,manual,P1,A,none,yes,,"E0310, classes"
+invalid-length-returned,port,,python,py/invalid-length-returned,manual,P1,A,none,yes,,"E0303, classes"
+invalid-match-args-definition,port,,python,py/invalid-match-args-definition,manual,P1,A,none,yes,,"E1902, match_statements"
+invalid-metaclass,types,,,,,,,,,,E1139; needs Python type inference — codelaw has no route for Python yet
+invalid-name,port,,python,py/invalid-name,manual,P2,D,none,,,"C0103, basic"
+invalid-overridden-method,port,,python,py/invalid-overridden-method,manual,P2,D,none,,,"W0236, classes"
+invalid-repr-returned,port,,python,py/invalid-repr-returned,manual,P1,A,none,yes,,"E0306, classes"
+invalid-sequence-index,types,,,,,,,,,,E1126; needs Python type inference — codelaw has no route for Python yet
+invalid-slice-index,types,,,,,,,,,,E1127; needs Python type inference — codelaw has no route for Python yet
+invalid-slice-step,types,,,,,,,,,,E1144; needs Python type inference — codelaw has no route for Python yet
+invalid-slots,port,,python,py/invalid-slots,manual,P1,A,none,yes,,"E0238, classes"
+invalid-slots-object,port,,python,py/invalid-slots-object,manual,P1,A,none,yes,,"E0236, classes"
+invalid-star-assignment-target,port,,python,py/invalid-star-assignment-target,manual,P1,A,none,yes,,"E0113, basic"
+invalid-str-returned,port,,python,py/invalid-str-returned,manual,P1,A,none,yes,,"E0307, classes"
+invalid-unary-operand-type,types,,,,,,,,,,E1130; needs Python type inference — codelaw has no route for Python yet
+invalid-unicode-codec,port,,python,py/invalid-unicode-codec,manual,P1,A,none,yes,,"E2501, unicode_checker"
+isinstance-second-argument-not-valid-type,types,,,,,,,,,,W1116; needs Python type inference — codelaw has no route for Python yet
+keyword-arg-before-vararg,types,,,,,,,,,,W1113; needs Python type inference — codelaw has no route for Python yet
+kwarg-superseded-by-positional-arg,types,,,,,,,,,,W1117; needs Python type inference — codelaw has no route for Python yet
+line-too-long,same-as,,,,,,,,,,C0301; the same rule as ruff/E501: counted there
+literal-comparison,port,,python,py/literal-comparison,manual,P2,D,none,,,"R0123, basic"
+locally-disabled,skip,,,,,,,,,,"I0011; a Pylint run message, not a rule"
+logging-format-interpolation,port,,python,py/logging-format-interpolation,manual,P2,D,none,,,"W1202, logging"
+logging-format-truncated,port,,python,py/logging-format-truncated,manual,P1,A,none,yes,,"E1201, logging"
+logging-fstring-interpolation,port,,python,py/logging-fstring-interpolation,manual,P2,D,none,,,"W1203, logging"
+logging-not-lazy,port,,python,py/logging-not-lazy,manual,P2,D,none,,,"W1201, logging"
+logging-too-few-args,same-as,,,,,,,,,,E1206; the same rule as ruff/PLE1206: counted there
+logging-too-many-args,same-as,,,,,,,,,,E1205; the same rule as ruff/PLE1205: counted there
+logging-unsupported-format,port,,python,py/logging-unsupported-format,manual,P1,A,none,yes,,"E1200, logging"
+looping-through-iterator,port,,python,py/looping-through-iterator,manual,P2,D,none,,,"W4801, looping-through-iterator"
+lost-exception,port,,python,py/lost-exception,manual,P2,D,none,,,"W0150, basic"
+magic-value-comparison,same-as,,,,,,,,,,R2004; the same rule as ruff/PLR2004: counted there
+match-class-bind-self,port,,python,py/match-class-bind-self,manual,P2,D,none,,,"R1905, match_statements"
+match-class-positional-attributes,port,,python,py/match-class-positional-attributes,manual,P2,D,none,,,"R1906, match_statements"
+method-cache-max-size-none,port,,python,py/method-cache-max-size-none,manual,P2,D,none,,,"W1518, stdlib"
+method-check-failed,skip,,,,,,,,,,"F0202; a Pylint run message, not a rule"
+method-hidden,port,,python,py/method-hidden,manual,P1,A,none,yes,,"E0202, classes"
+misplaced-bare-raise,same-as,,,,,,,,,,E0704; the same rule as ruff/PLE0704: counted there
+misplaced-comparison-constant,port,,python,py/misplaced-comparison-constant,manual,P2,D,none,,,"C2201, comparison-placement, an optional Pylint extension"
+misplaced-format-function,port,,python,py/misplaced-format-function,manual,P1,A,none,yes,,"E0119, basic"
+misplaced-future,port,,python,py/misplaced-future,manual,P2,D,none,,,"W0410, imports"
+missing-any-param-doc,port,,python,py/missing-any-param-doc,manual,P2,D,none,,,"W9021, parameter_documentation, an optional Pylint extension"
+missing-class-docstring,port,,python,py/missing-class-docstring,manual,P2,D,none,,,"C0115, basic"
+missing-final-newline,layout,,,,,,,,,,C0304; the formatter owns it
+missing-format-argument-key,port,,python,py/missing-format-argument-key,manual,P2,D,none,,,"W1303, string"
+missing-format-attribute,port,,python,py/missing-format-attribute,manual,P2,D,none,,,"W1306, string"
+missing-format-string-key,port,,python,py/missing-format-string-key,manual,P1,A,none,yes,,"E1304, string"
+missing-function-docstring,port,,python,py/missing-function-docstring,manual,P2,D,none,,,"C0116, basic"
+missing-kwoa,types,,,,,,,,,,E1125; needs Python type inference — codelaw has no route for Python yet
+missing-module-docstring,port,,python,py/missing-module-docstring,manual,P2,D,none,,,"C0114, basic"
+missing-param-doc,port,,python,py/missing-param-doc,manual,P2,D,none,,,"W9015, parameter_documentation, an optional Pylint extension"
+missing-parentheses-for-call-in-test,port,,python,py/missing-parentheses-for-call-in-test,manual,P2,D,none,,,"W0126, basic"
+missing-raises-doc,port,,python,py/missing-raises-doc,manual,P2,D,none,,,"W9006, parameter_documentation, an optional Pylint extension"
+missing-return-doc,port,,python,py/missing-return-doc,manual,P2,D,none,,,"W9011, parameter_documentation, an optional Pylint extension"
+missing-return-type-doc,port,,python,py/missing-return-type-doc,manual,P2,D,none,,,"W9012, parameter_documentation, an optional Pylint extension"
+missing-timeout,port,,python,py/missing-timeout,manual,P2,D,none,,,"W3101, method_args"
+missing-type-doc,port,,python,py/missing-type-doc,manual,P2,D,none,,,"W9016, parameter_documentation, an optional Pylint extension"
+missing-yield-doc,port,,python,py/missing-yield-doc,manual,P2,D,none,,,"W9013, parameter_documentation, an optional Pylint extension"
+missing-yield-type-doc,port,,python,py/missing-yield-type-doc,manual,P2,D,none,,,"W9014, parameter_documentation, an optional Pylint extension"
+mixed-format-string,port,,python,py/mixed-format-string,manual,P1,A,none,yes,,"E1302, string"
+mixed-line-endings,layout,,,,,,,,,,C0327; the formatter owns it
+modified-iterating-dict,port,,python,py/modified-iterating-dict,manual,P1,A,none,yes,,"E4702, modified_iteration"
+modified-iterating-list,port,,python,py/modified-iterating-list,manual,P2,D,none,,,"W4701, modified_iteration"
+modified-iterating-set,same-as,,,,,,,,,,E4703; the same rule as ruff/PLE4703: counted there
+multiple-class-sub-patterns,port,,python,py/multiple-class-sub-patterns,manual,P1,A,none,yes,,"E1904, match_statements"
+multiple-constructor-doc,port,,python,py/multiple-constructor-doc,manual,P2,D,none,,,"W9005, parameter_documentation, an optional Pylint extension"
+multiple-imports,port,,python,py/multiple-imports,manual,P2,D,none,,,"C0410, imports"
+multiple-statements,layout,,,,,,,,,,C0321; the formatter owns it
+named-expr-without-context,same-as,,,,,,,,,,W0131; the same rule as ruff/PLW0131: counted there
+nan-comparison,same-as,,,,,,,,,,W0177; the same rule as ruff/PLW0177: counted there
+nested-min-max,same-as,,,,,,,,,,W3301; the same rule as ruff/PLW3301: counted there
+no-classmethod-decorator,same-as,,,,,,,,,,R0202; the same rule as ruff/PLR0202: counted there
+no-else-break,port,,python,py/no-else-break,manual,P2,D,none,,,"R1723, refactoring"
+no-else-continue,port,,python,py/no-else-continue,manual,P2,D,none,,,"R1724, refactoring"
+no-else-raise,port,,python,py/no-else-raise,manual,P2,D,none,,,"R1720, refactoring"
+no-else-return,port,,python,py/no-else-return,manual,P2,D,none,,,"R1705, refactoring"
+no-member,types,,,,,,,,,,E1101; needs Python type inference — codelaw has no route for Python yet
+no-method-argument,port,,python,py/no-method-argument,manual,P1,A,none,yes,,"E0211, classes"
+no-name-in-module,port,,python,py/no-name-in-module,manual,P1,A,none,yes,,"E0611, variables"
+no-self-argument,port,,python,py/no-self-argument,manual,P1,A,none,yes,,"E0213, classes"
+no-self-use,same-as,,,,,,,,,,R6301; the same rule as ruff/PLR6301: counted there
+no-staticmethod-decorator,same-as,,,,,,,,,,R0203; the same rule as ruff/PLR0203: counted there
+no-value-for-parameter,types,,,,,,,,,,E1120; needs Python type inference — codelaw has no route for Python yet
+non-ascii-file-name,port,,python,py/non-ascii-file-name,manual,P2,D,none,,,"W2402, nonascii-checker"
+non-ascii-module-import,port,,python,py/non-ascii-module-import,manual,P2,D,none,,,"C2403, nonascii-checker"
+non-ascii-name,same-as,,,,,,,,,,C2401; the same rule as ruff/PLC2401: counted there
+non-iterator-returned,port,,python,py/non-iterator-returned,manual,P1,A,none,yes,,"E0301, classes"
+non-parent-init-called,port,,python,py/non-parent-init-called,manual,P2,D,none,,,"W0233, classes"
+non-str-assignment-to-dunder-name,types,,,,,,,,,,W1115; needs Python type inference — codelaw has no route for Python yet
+nonexistent-operator,port,,python,py/nonexistent-operator,manual,P1,A,none,yes,,"E0107, basic"
+nonlocal-and-global,same-as,,,,,,,,,,E0115; the same rule as ruff/PLE0115: counted there
+nonlocal-without-binding,same-as,,,,,,,,,,E0117; the same rule as ruff/PLE0117: counted there
+not-a-mapping,types,,,,,,,,,,E1134; needs Python type inference — codelaw has no route for Python yet
+not-an-iterable,types,,,,,,,,,,E1133; needs Python type inference — codelaw has no route for Python yet
+not-async-context-manager,port,,python,py/not-async-context-manager,manual,P1,A,none,yes,,"E1701, async"
+not-callable,types,,,,,,,,,,E1102; needs Python type inference — codelaw has no route for Python yet
+not-context-manager,types,,,,,,,,,,E1129; needs Python type inference — codelaw has no route for Python yet
+not-in-loop,port,,python,py/not-in-loop,manual,P1,A,none,yes,,"E0103, basic"
+notimplemented-raised,port,,python,py/notimplemented-raised,manual,P1,A,none,yes,,"E0711, exceptions"
+overlapping-except,port,,python,py/overlapping-except,manual,P2,D,none,,,"W0714, overlap-except, an optional Pylint extension"
+overridden-final-method,port,,python,py/overridden-final-method,manual,P2,D,none,,,"W0239, classes"
+parse-error,skip,,,,,,,,,,"F0010; a Pylint run message, not a rule"
+pointless-exception-statement,port,,python,py/pointless-exception-statement,manual,P2,D,none,,,"W0133, basic"
+pointless-statement,port,,python,py/pointless-statement,manual,P2,D,none,,,"W0104, basic"
+pointless-string-statement,port,,python,py/pointless-string-statement,manual,P2,D,none,,,"W0105, basic"
+positional-only-arguments-expected,port,,python,py/positional-only-arguments-expected,manual,P1,A,none,yes,,"E3102, method_args"
+possibly-unused-variable,port,,python,py/possibly-unused-variable,manual,P2,D,none,,,"W0641, variables"
+possibly-used-before-assignment,port,,python,py/possibly-used-before-assignment,manual,P1,A,none,yes,,"E0606, variables"
+potential-index-error,same-as,,,,,,,,,,E0643; the same rule as ruff/PLE0643: counted there
+prefer-typing-namedtuple,port,,python,py/prefer-typing-namedtuple,manual,P2,D,none,,,"R6105, code_style, an optional Pylint extension"
+preferred-module,port,,python,py/preferred-module,manual,P2,D,none,,,"W0407, imports"
+property-with-parameters,same-as,,,,,,,,,,R0206; the same rule as ruff/PLR0206: counted there
+protected-access,port,,python,py/protected-access,manual,P2,D,none,,,"W0212, classes"
+raise-missing-from,port,,python,py/raise-missing-from,manual,P2,D,none,,,"W0707, exceptions"
+raising-bad-type,port,,python,py/raising-bad-type,manual,P1,A,none,yes,,"E0702, exceptions"
+raising-format-tuple,port,,python,py/raising-format-tuple,manual,P2,D,none,,,"W0715, exceptions"
+raising-non-exception,port,,python,py/raising-non-exception,manual,P1,A,none,yes,,"E0710, exceptions"
+raw-checker-failed,skip,,,,,,,,,,"I0001; a Pylint run message, not a rule"
+redeclared-assigned-name,same-as,,,,,,,,,,W0128; the same rule as ruff/PLW0128: counted there
+redefined-argument-from-local,same-as,,,,,,,,,,R1704; the same rule as ruff/PLR1704: counted there
+redefined-builtin,port,,python,py/redefined-builtin,manual,P2,D,none,,,"W0622, variables"
+redefined-loop-name,same-as,,,,,,,,,,W2901; the same rule as ruff/PLW2901: counted there
+redefined-outer-name,port,,python,py/redefined-outer-name,manual,P2,D,none,,,"W0621, variables"
+redefined-slots-in-subclass,same-as,,,,,,,,,,W0244; the same rule as ruff/PLW0244: counted there
+redefined-variable-type,port,,python,py/redefined-variable-type,manual,P2,D,none,,,"R0204, multiple_types, an optional Pylint extension"
+redundant-keyword-arg,types,,,,,,,,,,E1124; needs Python type inference — codelaw has no route for Python yet
+redundant-returns-doc,port,,python,py/redundant-returns-doc,manual,P2,D,none,,,"W9008, parameter_documentation, an optional Pylint extension"
+redundant-typehint-argument,port,,python,py/redundant-typehint-argument,manual,P2,D,none,,,"R6006, typing, an optional Pylint extension"
+redundant-u-string-prefix,port,,python,py/redundant-u-string-prefix,manual,P2,D,none,,,"W1406, string"
+redundant-unittest-assert,port,,python,py/redundant-unittest-assert,manual,P2,D,none,,,"W1503, stdlib"
+redundant-yields-doc,port,,python,py/redundant-yields-doc,manual,P2,D,none,,,"W9010, parameter_documentation, an optional Pylint extension"
+reimported,port,,python,py/reimported,manual,P2,D,none,,,"W0404, imports"
+relative-beyond-top-level,port,,python,py/relative-beyond-top-level,manual,P1,A,none,yes,,"E0402, imports"
+repeated-keyword,types,,,,,,,,,,E1132; needs Python type inference — codelaw has no route for Python yet
+return-arg-in-generator,port,,python,py/return-arg-in-generator,manual,P1,A,none,yes,,"E0106, basic"
+return-in-finally,port,,python,py/return-in-finally,manual,P2,D,none,,,"W0134, basic"
+return-in-init,same-as,,,,,,,,,,E0101; the same rule as ruff/PLE0101: counted there
+return-outside-function,covered,py/return-outside-function,,,,,,,,,E0104; through ruff/F706
+self-assigning-variable,same-as,,,,,,,,,,W0127; the same rule as ruff/PLW0127: counted there
+self-cls-assignment,port,,python,py/self-cls-assignment,manual,P2,D,none,,,"W0642, variables"
+shadowed-import,port,,python,py/shadowed-import,manual,P2,D,none,,,"W0416, imports"
+shallow-copy-environ,same-as,,,,,,,,,,W1507; the same rule as ruff/PLW1507: counted there
+signature-differs,port,,python,py/signature-differs,manual,P2,D,none,,,"W0222, classes"
+simplifiable-condition,port,,python,py/simplifiable-condition,manual,P2,D,none,,,"R1726, refactoring"
+simplifiable-if-expression,port,,python,py/simplifiable-if-expression,manual,P2,D,none,,,"R1719, refactoring"
+simplifiable-if-statement,port,,python,py/simplifiable-if-statement,manual,P2,D,none,,,"R1703, refactoring"
+simplify-boolean-expression,port,,python,py/simplify-boolean-expression,manual,P2,D,none,,,"R1709, refactoring"
+single-string-used-for-slots,port,,python,py/single-string-used-for-slots,manual,P2,D,none,,,"C0205, classes"
+singledispatch-method,same-as,,,,,,,,,,E1519; the same rule as ruff/PLE1519: counted there
+singledispatchmethod-function,same-as,,,,,,,,,,E1520; the same rule as ruff/PLE1520: counted there
+singleton-comparison,port,,python,py/singleton-comparison,manual,P2,D,none,,,"C0121, basic"
+star-needs-assignment-target,port,,python,py/star-needs-assignment-target,manual,P1,A,none,yes,,"E0114, basic"
+stop-iteration-return,same-as,,,,,,,,,,R1708; the same rule as ruff/PLR1708: counted there
+subclassed-final-class,port,,python,py/subclassed-final-class,manual,P2,D,none,,,"W0240, classes"
+subprocess-popen-preexec-fn,same-as,,,,,,,,,,W1509; the same rule as ruff/PLW1509: counted there
+subprocess-run-check,port,,python,py/subprocess-run-check,manual,P2,D,none,,,"W1510, stdlib"
+super-init-not-called,port,,python,py/super-init-not-called,manual,P2,D,none,,,"W0231, classes"
+super-with-arguments,port,,python,py/super-with-arguments,manual,P2,D,none,,,"R1725, refactoring"
+super-without-brackets,same-as,,,,,,,,,,W0245; the same rule as ruff/PLW0245: counted there
+superfluous-parens,layout,,,,,,,,,,C0325; the formatter owns it
+suppressed-message,skip,,,,,,,,,,"I0020; a Pylint run message, not a rule"
+syntax-error,same-as,,,,,,,,,,E0001; the same rule as ruff/E999: counted there
+too-complex,port,,python,py/too-complex,manual,P2,D,none,,,"R1260, design, an optional Pylint extension"
+too-few-format-args,port,,python,py/too-few-format-args,manual,P1,A,none,yes,,"E1306, string"
+too-few-public-methods,port,,python,py/too-few-public-methods,manual,P2,D,none,,,"R0903, design"
+too-many-ancestors,port,,python,py/too-many-ancestors,manual,P2,D,none,,,"R0901, design"
+too-many-arguments,covered,py/max-params,,,,,,,,,R0913
+too-many-boolean-expressions,same-as,,,,,,,,,,R0916; the same rule as ruff/PLR0916: counted there
+too-many-branches,covered,py/complexity,,,,,,,,,R0912
+too-many-format-args,port,,python,py/too-many-format-args,manual,P1,A,none,yes,,"E1305, string"
+too-many-function-args,types,,,,,,,,,,E1121; needs Python type inference — codelaw has no route for Python yet
+too-many-instance-attributes,port,,python,py/too-many-instance-attributes,manual,P2,D,none,,,"R0902, design"
+too-many-lines,covered,py/max-lines,,,,,,,,,C0302
+too-many-locals,same-as,,,,,,,,,,R0914; the same rule as ruff/PLR0914: counted there
+too-many-nested-blocks,covered,py/max-depth,,,,,,,,,R1702
+too-many-positional-arguments,covered,py/max-params,,,,,,,,,R0917; through ruff/PLR0917
+too-many-positional-sub-patterns,port,,python,py/too-many-positional-sub-patterns,manual,P1,A,none,yes,,"E1903, match_statements"
+too-many-public-methods,same-as,,,,,,,,,,R0904; the same rule as ruff/PLR0904: counted there
+too-many-return-statements,same-as,,,,,,,,,,R0911; the same rule as ruff/PLR0911: counted there
+too-many-star-expressions,port,,python,py/too-many-star-expressions,manual,P1,A,none,yes,,"E0112, basic"
+too-many-statements,same-as,,,,,,,,,,R0915; the same rule as ruff/PLR0915: counted there
+too-many-try-statements,port,,python,py/too-many-try-statements,manual,P2,D,none,,,"W0717, broad_try_clause, an optional Pylint extension"
+trailing-comma-tuple,port,,python,py/trailing-comma-tuple,manual,P2,D,none,,,"R1707, refactoring"
+trailing-newlines,layout,,,,,,,,,,C0305; the formatter owns it
+trailing-whitespace,same-as,,,,,,,,,,C0303; the same rule as ruff/W291: counted there
+truncated-format-string,port,,python,py/truncated-format-string,manual,P1,A,none,yes,,"E1301, string"
+try-except-raise,port,,python,py/try-except-raise,manual,P2,D,none,,,"W0706, exceptions"
+typevar-double-variance,port,,python,py/typevar-double-variance,manual,P2,D,none,,,"C0131, basic"
+typevar-name-incorrect-variance,port,,python,py/typevar-name-incorrect-variance,manual,P2,D,none,,,"C0105, basic"
+typevar-name-mismatch,port,,python,py/typevar-name-mismatch,manual,P2,D,none,,,"C0132, basic"
+unbalanced-dict-unpacking,port,,python,py/unbalanced-dict-unpacking,manual,P2,D,none,,,"W0644, variables"
+unbalanced-tuple-unpacking,port,,python,py/unbalanced-tuple-unpacking,manual,P2,D,none,,,"W0632, variables"
+undefined-all-variable,port,,python,py/undefined-all-variable,manual,P1,A,none,yes,,"E0603, variables"
+undefined-loop-variable,port,,python,py/undefined-loop-variable,manual,P2,D,none,,,"W0631, variables"
+undefined-variable,port,,python,py/undefined-variable,manual,P1,A,none,yes,,"E0602, variables"
+unexpected-keyword-arg,types,,,,,,,,,,E1123; needs Python type inference — codelaw has no route for Python yet
+unexpected-line-ending-format,layout,,,,,,,,,,C0328; the formatter owns it
+unexpected-special-method-signature,same-as,,,,,,,,,,E0302; the same rule as ruff/PLE0302: counted there
+ungrouped-imports,port,,python,py/ungrouped-imports,manual,P2,D,none,,,"C0412, imports"
+unhashable-member,types,,,,,,,,,,E1143; needs Python type inference — codelaw has no route for Python yet
+unidiomatic-typecheck,port,,python,py/unidiomatic-typecheck,manual,P2,D,none,,,"C0123, basic"
+unknown-option-value,port,,python,py/unknown-option-value,manual,P2,D,none,,,"W0012, main"
+unnecessary-comprehension,same-as,,,,,,,,,,R1721; the same rule as ruff/C416: counted there
+unnecessary-default-type-args,same-as,,,,,,,,,,R6007; the same rule as ruff/UP043: counted there
+unnecessary-dict-index-lookup,same-as,,,,,,,,,,R1733; the same rule as ruff/PLR1733: counted there
+unnecessary-direct-lambda-call,same-as,,,,,,,,,,C3002; the same rule as ruff/PLC3002: counted there
+unnecessary-dunder-call,same-as,,,,,,,,,,C2801; the same rule as ruff/PLC2801: counted there
+unnecessary-ellipsis,port,,python,py/unnecessary-ellipsis,manual,P2,D,none,,,"W2301, unnecessary_ellipsis"
+unnecessary-lambda,same-as,,,,,,,,,,W0108; the same rule as ruff/PLW0108: counted there
+unnecessary-lambda-assignment,port,,python,py/unnecessary-lambda-assignment,manual,P2,D,none,,,"C3001, lambda-expressions"
+unnecessary-list-index-lookup,same-as,,,,,,,,,,R1736; the same rule as ruff/PLR1736: counted there
+unnecessary-negation,port,,python,py/unnecessary-negation,manual,P2,D,none,,,"C0117, refactoring"
+unnecessary-pass,port,,python,py/unnecessary-pass,manual,P2,D,none,,,"W0107, basic"
+unnecessary-semicolon,layout,,,,,,,,,,W0301; the formatter owns it
+unpacking-non-sequence,port,,python,py/unpacking-non-sequence,manual,P1,A,none,yes,,"E0633, variables"
+unreachable,port,,python,py/unreachable,manual,P2,D,none,,,"W0101, basic"
+unrecognized-inline-option,port,,python,py/unrecognized-inline-option,manual,P1,A,none,yes,,"E0011, main"
+unrecognized-option,port,,python,py/unrecognized-option,manual,P1,A,none,yes,,"E0015, main"
+unspecified-encoding,same-as,,,,,,,,,,W1514; the same rule as ruff/PLW1514: counted there
+unsubscriptable-object,types,,,,,,,,,,E1136; needs Python type inference — codelaw has no route for Python yet
+unsupported-assignment-operation,types,,,,,,,,,,E1137; needs Python type inference — codelaw has no route for Python yet
+unsupported-binary-operation,types,,,,,,,,,,E1131; needs Python type inference — codelaw has no route for Python yet
+unsupported-delete-operation,types,,,,,,,,,,E1138; needs Python type inference — codelaw has no route for Python yet
+unsupported-membership-test,types,,,,,,,,,,E1135; needs Python type inference — codelaw has no route for Python yet
+unused-argument,port,,python,py/unused-argument,manual,P2,D,none,,,"W0613, variables"
+unused-format-string-argument,port,,python,py/unused-format-string-argument,manual,P2,D,none,,,"W1304, string"
+unused-format-string-key,port,,python,py/unused-format-string-key,manual,P2,D,none,,,"W1301, string"
+unused-import,covered,py/unused-import,,,,,,,,,W0611; through ruff/F401
+unused-private-member,port,,python,py/unused-private-member,manual,P2,D,none,,,"W0238, classes"
+unused-variable,covered,py/unused-variable,,,,,,,,,W0612; through ruff/F841
+unused-wildcard-import,port,,python,py/unused-wildcard-import,manual,P2,D,none,,,"W0614, variables"
+use-a-generator,port,,python,py/use-a-generator,manual,P2,D,none,,,"R1729, refactoring"
+use-dict-literal,port,,python,py/use-dict-literal,manual,P2,D,none,,,"R1735, refactoring"
+use-implicit-booleaness-not-comparison,port,,python,py/use-implicit-booleaness-not-comparison,manual,P2,D,none,,,"C1803, refactoring"
+use-implicit-booleaness-not-comparison-to-string,same-as,,,,,,,,,,C1804; the same rule as ruff/PLC1901: counted there
+use-implicit-booleaness-not-comparison-to-zero,port,,python,py/use-implicit-booleaness-not-comparison-to-zero,manual,P2,D,none,,,"C1805, refactoring"
+use-implicit-booleaness-not-len,port,,python,py/use-implicit-booleaness-not-len,manual,P2,D,none,,,"C1802, refactoring"
+use-list-literal,port,,python,py/use-list-literal,manual,P2,D,none,,,"R1734, refactoring"
+use-maxsplit-arg,port,,python,py/use-maxsplit-arg,manual,P2,D,none,,,"C0207, refactoring"
+use-sequence-for-iteration,port,,python,py/use-sequence-for-iteration,manual,P2,D,none,,,"C0208, refactoring"
+use-set-for-membership,port,,python,py/use-set-for-membership,manual,P2,D,none,,,"R6201, set_membership, an optional Pylint extension"
+use-symbolic-message-instead,skip,,,,,,,,,,"I0023; a Pylint run message, not a rule"
+use-yield-from,port,,python,py/use-yield-from,manual,P2,D,none,,,"R1737, refactoring"
+used-before-assignment,port,,python,py/used-before-assignment,manual,P1,A,none,yes,,"E0601, variables"
+used-prior-global-declaration,port,,python,py/used-prior-global-declaration,manual,P1,A,none,yes,,"E0118, basic"
+useless-else-on-loop,same-as,,,,,,,,,,W0120; the same rule as ruff/PLW0120: counted there
+useless-import-alias,same-as,,,,,,,,,,C0414; the same rule as ruff/PLC0414: counted there
+useless-object-inheritance,same-as,,,,,,,,,,R0205; the same rule as ruff/UP004: counted there
+useless-option-value,port,,python,py/useless-option-value,manual,P2,D,none,,,"R0022, main"
+useless-param-doc,port,,python,py/useless-param-doc,manual,P2,D,none,,,"W9019, parameter_documentation, an optional Pylint extension"
+useless-parent-delegation,port,,python,py/useless-parent-delegation,manual,P2,D,none,,,"W0246, classes"
+useless-return,same-as,,,,,,,,,,R1711; the same rule as ruff/PLR1711: counted there
+useless-suppression,skip,,,,,,,,,,"I0021; a Pylint run message, not a rule"
+useless-type-doc,port,,python,py/useless-type-doc,manual,P2,D,none,,,"W9020, parameter_documentation, an optional Pylint extension"
+useless-with-lock,same-as,,,,,,,,,,W2101; the same rule as ruff/PLW2101: counted there
+using-assignment-expression-in-unsupported-version,port,,python,py/using-assignment-expression-in-unsupported-version,manual,P2,D,none,,,"W2605, unsupported_version"
+using-comprehension-unpacking-in-unsupported-version,port,,python,py/using-comprehension-unpacking-in-unsupported-version,manual,P2,D,none,,,"W2607, unsupported_version"
+using-constant-test,port,,python,py/using-constant-test,manual,P2,D,none,,,"W0125, basic"
+using-exception-groups-in-unsupported-version,port,,python,py/using-exception-groups-in-unsupported-version,manual,P2,D,none,,,"W2603, unsupported_version"
+using-f-string-in-unsupported-version,port,,python,py/using-f-string-in-unsupported-version,manual,P2,D,none,,,"W2601, unsupported_version"
+using-final-decorator-in-unsupported-version,port,,python,py/using-final-decorator-in-unsupported-version,manual,P2,D,none,,,"W2602, unsupported_version"
+using-generic-type-syntax-in-unsupported-version,port,,python,py/using-generic-type-syntax-in-unsupported-version,manual,P2,D,none,,,"W2604, unsupported_version"
+using-positional-only-args-in-unsupported-version,port,,python,py/using-positional-only-args-in-unsupported-version,manual,P2,D,none,,,"W2606, unsupported_version"
+while-used,port,,python,py/while-used,manual,P2,D,none,,,"W0149, while_used, an optional Pylint extension"
+wildcard-import,port,,python,py/wildcard-import,manual,P2,D,none,,,"W0401, imports"
+wrong-exception-operation,port,,python,py/wrong-exception-operation,manual,P2,D,none,,,"W0716, exceptions"
+wrong-import-order,port,,python,py/wrong-import-order,manual,P2,D,none,,,"C0411, imports"
+wrong-import-position,port,,python,py/wrong-import-position,manual,P2,D,none,,,"C0413, imports"
+wrong-spelling-in-comment,covered,spell/unknown-word*,,,,,,,,,C0401
+wrong-spelling-in-docstring,covered,spell/unknown-word*,,,,,,,,,C0402
+yield-inside-async-function,port,,python,py/yield-inside-async-function,manual,P1,A,none,yes,,"E1700, async"
+yield-outside-function,covered,py/yield-outside-function,,,,,,,,,E0105; through ruff/F704

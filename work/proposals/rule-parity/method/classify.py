@@ -1,6 +1,6 @@
-"""W-138: match every upstream rule against codelaw and class each one.
-Inputs (all in this folder): up.jsonl, ruff-rules.json, biome.json, tslint-map.json, codelaw.json, biome-sources.json.
-Outputs: ../<tool>.csv, ../summary.json, ../ports.json. Deterministic: same inputs, same bytes."""
+"""W-138, W-144: match every upstream rule against codelaw and class each one.
+Inputs (all in this folder): up.jsonl, ruff.json, biome.json, tslint-map.json, codelaw.json, biome-sources.json.
+Outputs: out/<tool>.csv, out/summary.json. Deterministic: same inputs, same bytes."""
 import json, csv, re, os, sys, collections
 
 D = os.path.dirname(os.path.abspath(__file__))
@@ -9,7 +9,7 @@ J = lambda f: json.load(open(os.path.join(D, f)))
 
 up = [json.loads(l) for l in open(os.path.join(D, 'up.jsonl')) if l.strip()]
 REC = {k: set(v) for k, v in J('recommended.json').items()}
-ruff = J('ruff-rules.json'); biome = J('biome.json'); tsmap = J('tslint-map.json')
+ruff = J('ruff-rules.json'); pylint = J('pylint.json'); biome = J('biome.json'); tsmap = J('tslint-map.json')
 cl = J('codelaw.json'); bsrc = J('biome-sources.json')['sources']
 cl_ids = {r[1] for r in cl}
 
@@ -24,6 +24,7 @@ for pack, cid, fix, stab, pf in cl:
         if tool == 'bandit' and re.fullmatch(r'B\d+', rid):
             cov[('ruff', 'S' + rid[1:])].add(cid)
         elif tool == 'pylint':
+            cov[('pylint', rid)].add(cid)
             code = ruff_by_name.get(('Pylint', rid))
             if code: cov[('ruff', code)].add(cid)
         else:
@@ -43,6 +44,13 @@ UNLINKED = {
     ('biome', 'suspicious/noFocusedTests'): 'js/no-focused-tests', ('biome', 'suspicious/noSkippedTests'): 'js/skipped-test',
     ('eslint-plugin-unicorn', 'expiring-todo-comments'): 'js/todo-marker',
     ('eslint-plugin-security', 'detect-no-csrf-before-method-override'): 'sec-js/no-csrf-before-method-override',
+    # round 2 (W-144)
+    ('eslint-plugin-jest', 'no-focused-tests'): 'js/no-focused-tests', ('eslint-plugin-jest', 'no-disabled-tests'): 'js/skipped-test',
+    ('eslint-plugin-playwright', 'no-focused-test'): 'js/no-focused-tests', ('eslint-plugin-playwright', 'no-skipped-test'): 'js/skipped-test',
+    ('eslint-plugin-sonarjs', 'todo-tag'): 'js/todo-marker', ('eslint-plugin-sonarjs', 'fixme-tag'): 'js/todo-marker',
+    ('eslint-plugin-sonarjs', 'cyclomatic-complexity'): 'js/complexity', ('eslint-plugin-sonarjs', 'max-lines'): 'js/max-lines',
+    ('eslint-plugin-sonarjs', 'max-lines-per-function'): 'js/max-lines-per-function', ('eslint-plugin-sonarjs', 'nested-control-flow'): 'js/max-depth',
+    ('pylint', 'fixme'): 'py/todo-marker', ('pylint', 'wrong-spelling-in-comment'): 'spell/unknown-word', ('pylint', 'wrong-spelling-in-docstring'): 'spell/unknown-word',
 }
 def covered(tool, rid):
     c = sorted(cov.get((tool, rid), ()))
@@ -56,8 +64,20 @@ PACK = {  # tool -> (pack, namespace)
     'eslint-plugin-import': ('js', 'js'), 'eslint-plugin-n': ('node', 'node'), 'eslint-plugin-unicorn': ('js', 'js'),
     'eslint-plugin-security': ('security-js', 'sec-js'), '@tanstack/eslint-plugin-query': ('tanstack-query', 'tanstack-query'),
     'stylelint': ('css', 'css'), 'stylelint-scss': ('scss', 'scss'), 'html-validate': ('html', 'html'),
-    'markdownlint': ('data', 'md'), 'ruff': ('python', 'py'),
+    'markdownlint': ('data', 'md'), 'ruff': ('python', 'py'), 'pylint': ('python', 'py'),
+    # round 2 (W-144): new packs proposed — testing (npm), nextjs (npm), tailwind (both, W-145)
+    'eslint-plugin-sonarjs': ('js', 'js'), 'eslint-plugin-promise': ('js', 'js'), 'eslint-plugin-jsdoc': ('js', 'js'), 'eslint-plugin-regexp': ('js', 'js'),
+    'eslint-plugin-jest': ('testing', 'test'), '@vitest/eslint-plugin': ('testing', 'test'), 'eslint-plugin-testing-library': ('testing', 'test'),
+    'eslint-plugin-playwright': ('testing', 'test'), '@next/eslint-plugin-next': ('nextjs', 'next'),
+    'eslint-plugin-tailwindcss': ('tailwind', 'tailwind'), 'eslint-plugin-better-tailwindcss': ('tailwind', 'tailwind'),
 }
+PREFIX = {'eslint-plugin-promise': 'promise-', 'eslint-plugin-jsdoc': 'jsdoc-', 'eslint-plugin-regexp': 'regexp-',
+          'eslint-plugin-testing-library': 'testing-library-', 'eslint-plugin-playwright': 'playwright-', 'eslint-plugin-sonarjs': ''}
+TW_SAME = {'no-contradicting-classname': 'no-conflicting-classes', 'no-custom-classname': 'no-unknown-classes', 'enforces-shorthand': 'enforce-shorthand-classes',
+           'no-unnecessary-arbitrary-value': 'enforce-canonical-classes'}
+TW_LAYOUT = {'classnames-order', 'enforce-consistent-class-order', 'enforce-consistent-line-wrapping', 'no-unnecessary-whitespace', 'enforce-consistent-important-position'}
+FRAMEWORK = {'Airflow': ('airflow', 'airflow'), 'flake8-django': ('django', 'django'), 'FastAPI': ('fastapi', 'fastapi'),
+             'NumPy-specific rules': ('numpy', 'numpy'), 'pandas-vet': ('pandas', 'pandas')}  # ruled 2026-10-30: five PyPI packs
 PLANNED = {  # already filed elsewhere
     ('eslint', 'complexity'): 'W-132', ('eslint', 'max-depth'): 'W-132', 
     ('ruff', 'C901'): 'W-132', ('ruff', 'PLR1702'): 'W-132',
@@ -117,7 +137,7 @@ def plan(tool, version, rid, *, name=None, deprecated=False, ufix='none', rec=Fa
     if out: return emit(tool, version, rid, 'out-of-scope', ufix=ufix, rec=rec, note=note)
     if (tool, rid) in PLUMBING: return emit(tool, version, rid, 'skip', ufix=ufix, rec=rec, note=PLUMBING[(tool, rid)])
     if (tool, rid) in NEEDS_DATA: return emit(tool, version, rid, 'needs-data', ufix=ufix, rec=rec, note='needs runtime support data codelaw does not ship')
-    if rid in TASTE.get(tool, ()): return emit(tool, version, rid, 'skip', ufix=ufix, rec=rec, note='taste, no defect behind it; on demand through W-140')
+    if rid in TASTE.get(tool, ()): note = 'taste, no defect behind it: the opt-in taste preset (ruled 2026-10-30)'; preview = True
     prio = 'P1' if rec else ('P3' if preview else 'P2')
     nid = pid(ns, name or rid, tool.split('-')[-1])
     if nid in COLLIDE: note = (note + '; ' if note else '') + f'codelaw already has {COLLIDE[nid]}: check it is not the same rule'
@@ -143,8 +163,24 @@ for r in up:
         if any(x['tool'] == 'eslint-plugin-import' and x['id'] == rid for x in up):
             emit(t, v, rid, 'same-as', ufix=kw['ufix'], rec=kw['rec'], deprecated=kw['deprecated'], note=f'fork of eslint-plugin-import/{rid}: counted there'); continue
         plan(t, v, rid, name='import-' + rid, pack=('js', 'js'), **kw); continue
+    if t == '@vitest/eslint-plugin' and any(x['tool'] == 'eslint-plugin-jest' and x['id'] == rid for x in up):
+        c = covered('eslint-plugin-jest', rid)
+        if c: emit(t, v, rid, 'covered', ufix=kw['ufix'], rec=kw['rec'], cids=c, note='through jest/' + rid); continue
+        emit(t, v, rid, 'same-as', ufix=kw['ufix'], rec=kw['rec'], deprecated=kw['deprecated'], note=f'the same rule as eslint-plugin-jest/{rid}: counted there'); continue
+    if t == 'eslint-plugin-sonarjs':
+        orig = next((o for o in ('eslint', 'typescript-eslint', 'eslint-plugin-react', 'eslint-plugin-regexp') if any(x['tool'] == o and x['id'] == rid for x in up)), None)
+        if orig:
+            c = covered(orig, rid)
+            if c: emit(t, v, rid, 'covered', ufix=kw['ufix'], rec=kw['rec'], cids=c, note=f'through {orig}/{rid}'); continue
+            emit(t, v, rid, 'same-as', ufix=kw['ufix'], rec=kw['rec'], deprecated=kw['deprecated'], note=f'SonarJS repackages {orig}/{rid}: counted there'); continue
+    if t == 'eslint-plugin-tailwindcss' and rid in TW_SAME:
+        emit(t, v, rid, 'same-as', ufix=kw['ufix'], rec=kw['rec'], note=f'the same check as eslint-plugin-better-tailwindcss/{TW_SAME[rid]}: counted there'); continue
+    if t in ('eslint-plugin-tailwindcss', 'eslint-plugin-better-tailwindcss') and rid in TW_LAYOUT:
+        emit(t, v, rid, 'layout', ufix=kw['ufix'], rec=kw['rec'], note='class order and spacing: the formatter, W-145'); continue
     layout = r.get('kind') == 'layout'
-    name = rid.replace('/', '-')
+    name = PREFIX.get(t, '') + rid.replace('/', '-')
+    if r.get('types') and t not in ('typescript-eslint',):
+        plan(t, v, rid, name=name, types=True, **kw); continue
     if t == 'stylelint-scss':
         name = rid.split('/', 1)[1]
         layout = bool(re.search(r'(newline|space|empty-line|indentation|single-line|-line-before|-line-after)', name))
@@ -178,18 +214,23 @@ for r in ruff:
     ufix = {'Always': 'auto', 'Sometimes': 'suggest'}.get(r.get('fix_availability'), 'none')
     layout = (lin == 'pycodestyle' and (code[:2] in ('E1', 'E2', 'E3', 'W1', 'W2', 'W3') or code in ('E501', 'E701', 'E702', 'E703'))) \
         or lin == 'flake8-quotes' or code in ('COM812', 'COM819', 'ISC001', 'ISC002')
-    pack = ('security-python', 'sec-py') if lin == 'flake8-bandit' else None
+    pack = ('security-python', 'sec-py') if lin == 'flake8-bandit' else FRAMEWORK.get(lin)
     plan('ruff', '0.16.9', code, name=r['name'], deprecated=(st == 'Removed'), ufix=ufix, rec=(lin in ('Pyflakes',) or code[:2] in ('E4', 'E7', 'E9')),
-         layout=layout, out=(lin in RUFF_OUT), preview=(st == 'Preview'), pack=pack,
-         note=(f'{lin}' + (', preview upstream' if st == 'Preview' else '') + (', a framework with no codelaw pack' if lin in RUFF_OUT else '')))
+         layout=layout, preview=(st == 'Preview'), pack=pack,
+         note=(f'{lin}' + (', preview upstream' if st == 'Preview' else '') + (', its own pack (ruled 2026-10-30)' if lin in RUFF_OUT else '')))
 
 # ---------- Biome ----------
-EXTRACTED = {'@tanstack/eslint-plugin-query', 'stylelint-scss', 'eslint', 'typescript-eslint', 'eslint-plugin-react', 'eslint-plugin-react-hooks', 'eslint-plugin-jsx-a11y',
+EXTRACTED = {'eslint-plugin-sonarjs', 'eslint-plugin-jest', '@vitest/eslint-plugin', 'eslint-plugin-testing-library', 'eslint-plugin-playwright',
+             'eslint-plugin-promise', 'eslint-plugin-jsdoc', 'eslint-plugin-regexp', '@next/eslint-plugin-next', 'eslint-plugin-tailwindcss',
+             'eslint-plugin-better-tailwindcss', '@tanstack/eslint-plugin-query', 'stylelint-scss', 'eslint', 'typescript-eslint', 'eslint-plugin-react', 'eslint-plugin-react-hooks', 'eslint-plugin-jsx-a11y',
              'eslint-plugin-import', 'eslint-plugin-n', 'eslint-plugin-unicorn', 'eslint-plugin-security', 'stylelint'}
+RAW = {'EslintBetterTailwindcss': 'eslint-plugin-better-tailwindcss', 'EslintTailwindcss': 'eslint-plugin-tailwindcss', 'EslintTanstackQuery': '@tanstack/eslint-plugin-query'}
 def src_tool(s):
-    t, _, rid = s.partition('/')
-    t = {'typescript-eslint': 'typescript-eslint'}.get(t, t)
-    return t, rid
+    if s.startswith('@') and s.count('/') >= 2:
+        a, b, rid = s.split('/', 2); t = a + '/' + b
+    else:
+        t, _, rid = s.partition('/')
+    return RAW.get(t, t), rid
 for r in biome:
     n, v = r['name'], r['version']
     langs = set(r['langs'].split()) - {'json', 'jsonc'} or set(r['langs'].split())
@@ -205,12 +246,72 @@ for r in biome:
     if cids: emit('biome', v, r['id'], 'covered', ufix=r['fix'], rec=r['recommended'], cids=cids, note='through its source: ' + ', '.join(srcs)); continue
     if 'Biome' in n: emit('biome', v, r['id'], 'skip', ufix=r['fix'], rec=r['recommended'], note="about Biome's own config or comments"); continue
     if r['deprecated']: emit('biome', v, r['id'], 'retired', deprecated=True, ufix=r['fix'], rec=r['recommended']); continue
-    if out: emit('biome', v, r['id'], 'out-of-scope', ufix=r['fix'], rec=r['recommended'], note='language outside L3: ' + ' '.join(sorted(langs))); continue
+    if out: emit('biome', v, r['id'], 'out-of-scope', ufix=r['fix'], rec=r['recommended'], note='language outside L3: ' + ' '.join(sorted(langs)) + ' — W-143'); continue
     same = [s for s in srcs if src_tool(s)[0] in EXTRACTED]
     if same: emit('biome', v, r['id'], 'same-as', ufix=r['fix'], rec=r['recommended'], note='counted under ' + ', '.join(same)); continue
     emit('biome', v, r['id'], 'port', ufix=r['fix'], rec=r['recommended'], pack=pk[0], newid=pid(pk[1], kebab(n), 'biome'),
          nfix=FIX[r['fix']], prio=('P3' if r['group'] == 'nursery' else ('P1' if r['recommended'] else 'P2')),
          note=('nursery upstream; ' if r['group'] == 'nursery' else '') + (('source: ' + ', '.join(srcs)) if srcs else 'Biome only'))
+
+# ---------- Pylint (W-144): GPL-2.0 — behaviour only ----------
+ruff_names = {}
+for r in ruff:
+    if r['code']: ruff_names.setdefault(r['name'], r['code'])
+for m in pylint:
+    sym, v = m['symbol'], m['version']
+    ufix = 'none'
+    c = covered('pylint', sym)
+    if c: emit('pylint', v, sym, 'covered', cids=c, note=m['id']); continue
+    code = next((ruff_names[n] for n in [sym] + m['old_names'] if n in ruff_names), None)
+    if code:
+        rc = covered('ruff', code)
+        if rc: emit('pylint', v, sym, 'covered', cids=rc, note=f"{m['id']}; through ruff/{code}"); continue
+        emit('pylint', v, sym, 'same-as', note=f"{m['id']}; the same rule as ruff/{code}: counted there"); continue
+    if m['category'] in ('fatal', 'info'):
+        emit('pylint', v, sym, 'skip', note=f"{m['id']}; a Pylint run message, not a rule"); continue
+    if m['checker'] == 'format':
+        emit('pylint', v, sym, 'layout', note=f"{m['id']}; the formatter owns it"); continue
+    if m['checker'] in ('typecheck',):
+        emit('pylint', v, sym, 'types', note=f"{m['id']}; needs Python type inference — codelaw has no route for Python yet"); continue
+    plan('pylint', v, sym, name=sym, rec=(m['category'] == 'error' and not m['extension']),
+         note=f"{m['id']}, {m['checker']}" + (', an optional Pylint extension' if m['extension'] else ''))
+
+# ---------- TSLint's 30 without a mapped successor, rechecked by hand against today's rules (W-144) ----------
+TSLINT_RECHECK = {
+    'ban': ('covered', 'js/use-instead*', 'eslint no-restricted-syntax / codelaw js/use-instead'),
+    'comment-format': ('layout', '', '@stylistic/spaced-comment'),
+    'comment-type': ('port', 'js/comment-type', 'taste: the opt-in taste preset'),
+    'completed-docs': ('same-as', '', 'eslint-plugin-jsdoc/require-jsdoc'),
+    'encoding': ('layout', '', 'codelaw reads and writes UTF-8 (SR-ARCHITECTURE); eslint unicode-bom is layout'),
+    'file-header': ('port', 'js/file-header', 'no successor in any tool read; a licence/copyright header check'),
+    'import-spacing': ('layout', '', 'formatting'),
+    'invalid-void': ('same-as', '', 'typescript-eslint/no-invalid-void-type'),
+    'match-default-export-name': ('types', '', 'needs the imported module\'s export name'),
+    'no-default-import': ('port', 'js/no-default-import', 'no successor; the import-side twin of js/no-default-export'),
+    'no-inferred-empty-object-type': ('types', '', 'needs inference'),
+    'no-mergeable-namespace': ('port', 'ts/no-mergeable-namespace', 'no successor; typescript-eslint no-unsafe-declaration-merging is a different check'),
+    'no-null-undefined-union': ('types', '', 'needs types'),
+    'no-promise-as-boolean': ('same-as', '', 'typescript-eslint/no-misused-promises'),
+    'no-restricted-globals': ('covered', 'js/use-instead*', 'eslint no-restricted-globals'),
+    'no-tautology-expression': ('same-as', '', 'eslint/no-self-compare and sonarjs/no-identical-expressions'),
+    'no-unnecessary-callback-wrapper': ('port', 'js/no-unnecessary-callback-wrapper', 'no successor; suggest only — unwrapping can change this and arity'),
+    'no-unsafe-any': ('same-as', '', 'typescript-eslint/no-unsafe-* (types)'),
+    'number-literal-format': ('layout', '', 'formatting'),
+    'object-literal-sort-keys': ('same-as', '', 'eslint/sort-keys (taste preset)'),
+    'prefer-method-signature': ('same-as', '', 'typescript-eslint/method-signature-style'),
+    'prefer-while': ('same-as', '', 'eslint-plugin-sonarjs/prefer-while'),
+    'return-undefined': ('types', '', 'needs the function\'s return type'),
+    'static-this': ('same-as', '', 'biome complexity/noThisInStatic'),
+    'strict-comparisons': ('types', '', 'needs types'),
+    'strict-string-expressions': ('same-as', '', 'typescript-eslint/restrict-template-expressions (types)'),
+    'strict-type-predicates': ('same-as', '', 'typescript-eslint/no-unnecessary-condition (types)'),
+    'switch-final-break': ('port', 'js/switch-final-break', 'taste: the opt-in taste preset'),
+    'unnecessary-else': ('same-as', '', 'eslint/no-else-return'),
+    'whitespace': ('layout', '', 'formatting'),
+}
+with open(os.path.join(OUT, 'tslint-recheck.csv'), 'w', newline='') as f:
+    w = csv.writer(f, lineterminator='\n'); w.writerow(['upstream_id', 'class', 'codelaw_or_proposed', 'today'])
+    for k in sorted(TSLINT_RECHECK): w.writerow([k, *TSLINT_RECHECK[k]])
 
 # ---------- write ----------
 COLS = ['upstream_id', 'class_', 'codelaw', 'proposed_pack', 'proposed_id', 'proposed_fix', 'priority', 'upstream_fix', 'upstream_recommended', 'deprecated', 'note']
