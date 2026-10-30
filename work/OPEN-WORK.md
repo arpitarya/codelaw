@@ -28,12 +28,10 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — waiting on Open VSX** ([W-95](open/W-95-publish-vscode-extension.md), was W-117): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
 | ↳ **blocks:** W-95 (its Open VSX half) | |
-| 🔴 **Move `v0` to v0.4.3** ([W-154](open/W-154-release-0-4-3.md)): `git tag -f v0 v0.4.3 && git push -f origin v0` — Claude Code's permission check refused the force-push; `@v0` is v0.4.2 until then. | 2026-10-30 |
-| ↳ **blocks:** W-154's close | |
 
 ---
 
-## Open items (15)
+## Open items (14)
 
 ### build (8)
 
@@ -53,9 +51,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-152** `agent` The queue checks refuse a ball that disagrees with its row — `agent` while the next step is Arpit's, or an unruled choice left green (W-97 and W-126 were). Filed by Arpit (Cowork). [detail](open/W-152-ball-matches-the-text.md)
 
-### ci/cd (5)
-
-🔴 **W-154** `arpit` **v0.4.3 released 10-30** — every package on every registry: npm 47/47, PyPI 26/26, Marketplace 8/8; `ci`, `publish` green. Left: move `v0` to v0.4.3 (inbox). Filed by Arpit (Claude Code). [detail](open/W-154-release-0-4-3.md)
+### ci/cd (4)
 
 🟢 **W-126** `agent` Ruled 10-30: `perf` split across parallel jobs, nothing waits on its verdict (until a budget is set, L8); release 3m50 accepted. Cached CI 4m11–4m25 ✅. Next: the `perf` matrix, then the measurement runs. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
