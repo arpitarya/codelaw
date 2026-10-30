@@ -24,7 +24,7 @@ it, and do not read it top-down as a priority order.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-063 | `publish.yml` does not upload the Fux index packages (`dist/fux-index/`): they reach npm and PyPI only by hand. Moved here when W-34 closed into the PyPI days (Arpit, 2026-10-29) | [SR-PACKAGES](../records/0107_packages.md) decision 14 · [L6](../records/0008_LAW-6-python-and-node-packages.md) decision 12 · `archive/open/W-34-fux-index-packages.md` | `publish.yml` publishes `dist/fux-index/` on every release, each name trusted, a missing PyPI name skipped as W-116's rule |
+| B-066 | `codelaw migrate oxlint` and `codelaw migrate oxfmt`: read `.oxlintrc.json` / `.oxfmtrc.json` and map them as `migrate` does ESLint's (Oxlint's rule ids are `<plugin>/<rule>` with `typescript`, `jsx_a11y`, `react_perf`, `oxc` as plugin names). Arpit, 2026-10-30 (voice): *"The migrate command."* → *"Put it in backlog."* | [SR-CLI-MCP](../records/0115_cli-and-mcp.md) decision 15 · [proposal §12](proposals/rule-parity.md) | a W-item builds both sources, with fixtures in `fixtures/migrate/` |
 | B-043 | "Diagnostics: pull and push" and "Workspace diagnostics: for project rules" — the server pushes only, per open document | [SR-EDITOR](../records/0114_editor.md) decision 1 | `textDocument/diagnostic` and `workspace/diagnostic` served, with a server test; project rules wait on W-11 |
 | B-044 | the "Explain rule" and "Ignore here with reason" code actions | [SR-EDITOR](../records/0114_editor.md) §1 table, Quick fixes row | both offered as code actions, tested, writing nothing |
 | B-046 | the tree-sitter-css upstream PR: `grammar.patch`, a ready commit with `src/` regenerated (`0001-tree-sitter-css-modern.patch`) and `PR.md` in `crates/codelaw-lang/grammars/tree-sitter-css/upstream/`; not filed — **Arpit, 2026-10-24:** *"Then let's keep using the patch copy and put the PR in backlog."* | [SR-ARCHITECTURE](../records/0108_architecture.md) decision 3 · [W-21](../archive/open/W-21-pack-engine-gaps.md) | the PR is opened on tree-sitter/tree-sitter-css; the fork is dropped when a release carries it |
@@ -49,6 +49,7 @@ it, and do not read it top-down as a priority order.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
+| B-067 | W-132's seven rules (`js/`/`py/complexity`, `js/`/`py/max-depth`, three `react/size` rules) and `data/codeowners-coverage` landed with no L8 measurement; they sit in opt-in presets, so the default check is unchanged | [archive W-132](../archive/open/W-132-complexity-and-codeowners.md) · [L8](../records/0010_LAW-8-performance-budgets.md) | a bench run with `js/size`, `py/size`, `react/size` and `data/codeowners` on, recorded |
 | B-062 | The shared `perf` workload does not load the spell pack: the pack is measured as its own `spell` operation (Arpit, 2026-10-29: *"We can, but add an item in the backlog so that we can have a shared benchmark."*) | [SR-SPELL](../records/0116_spell.md) decision 9 · W-103 | the spell pack in the shared workload, every set budget re-measured and re-ruled by L8's method |
 | B-063 | W-102's guidance-vs-check experiment, redesigned: baseline arm 0, screened temptations, arm D in the run, a confidence bound as the README rule | [proposal](proposals/guidance-experiment-redesign.md) (W-118, 2026-10-29) | the decider rules R1–R3 in the proposal |
 
@@ -59,6 +60,7 @@ it, and do not read it top-down as a priority order.
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
+| B-068 | `react/max-jsx-depth` (6) finds 60 places in the corpus — keep 6, raise it, or keep `react/size` opt-in for good; named by W-132's build (WORKLOG 2026-10-30) | [archive W-132](../archive/open/W-132-complexity-and-codeowners.md) · [SR-RULE-PACKS](../records/0101_rule-packs.md) decision 15 | the decider rules before `react/size` joins any default preset |
 | B-051 | `deps refresh` and `data/outdated-dependency` do not read `requirements*.txt`: it is not one of L3's nine languages, so no rule can report on its lines | [L3](../records/0005_LAW-3-languages.md) · `archive/open/W-52-dependency-latest-versions.md` §As built | the decider amends L3, or rules that refresh reads it with findings elsewhere |
 | B-054 | Reading a project's `cspell.json` (`words`, `ignoreWords`, `flagWords`) into `[spell] words`, through `spell/suspicious-word`, so a CSpell user switches in one step | [SR-SPELL](../records/0116_spell.md) Consequences | the decider rules it into W-94's `codelaw migrate` (a `cspell` source) or out |
 | B-055 | The spell pack checks English only; another language needs a word list under a permissive licence and its own L11 row (many CSpell dictionaries are LGPL/GPL) | [SR-SPELL](../records/0116_spell.md) decision 10 | the decider names a language and ratifies a source for it, or rules English-only permanent |

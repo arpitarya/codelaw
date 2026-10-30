@@ -18,13 +18,20 @@ ball: arpit
 |---|---|---|---|
 | 1 | GitHub environment `vscode`, tag rule `v*` (as `npm`, `pypi`) | a place for the token that only release tags reach | ✅ 2026-10-29 — the environment `vscode` exists |
 | 2 | open-vsx.org → log in with GitHub → link an Eclipse account → sign the Publisher Agreement | the right to publish | ✅ 2026-10-29 — logged in; agreement signed |
-| 3 | An access token `codelaw-publish` → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` | CI can upload | 🔴 Arpit — the token is his to handle |
-| 4 | Create the namespace `codelaw`; claim its ownership (a public GitHub issue) — required for trusted publishing | `codelaw.codelaw` on Open VSX | 🔄 created 2026-10-29; ⏳ the ownership claim |
-| 5 | Agent: `publish.yml`'s Open VSX upload with `curl` (W-95's drafted job, its Open VSX half) | every release lands there | ⏳ after step 3 |
+| 3 | An access token `codelaw-publish` → `gh secret set OVSX_PAT --env vscode -R arpitarya/codelaw` | CI can upload | ~~🔴~~ dropped — ruled 2026-10-30: trusted publishing, no token (below) |
+| 4 | Create the namespace `codelaw`; claim its ownership (a public GitHub issue) — required for trusted publishing | `codelaw.codelaw` on Open VSX | 🔄 created 2026-10-29; ⏳ claim [#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928) still **open**, no reply from Open VSX (checked 2026-10-30 10:30 IST) |
+| 5 | Agent: `publish.yml`'s Open VSX upload with `curl` (W-95's drafted job, its Open VSX half) | every release lands there | ⏳ after the claim is approved and Arpit adds the trusted publisher |
 
 **Arpit, 2026-10-29 (voice docket):** on W-95, Open VSX now and the Marketplace by hand on release day: *"Yes."* Asked what Open VSX is (the Eclipse Foundation's store, used by Cursor, VSCodium, Windsurf and Gitpod) — then *"You have the access to the browser. We will go ahead and implement Open VSX You can go ahead and create the ID and everything."* and, the browser being out of reach of the voice call, *"That's okay. Let's put it as a work item and we'll work on it."*
 
 **Model:** Sonnet (step 5); steps 1–4 with Arpit in a text session, Claude in Chrome helping.
+
+## Uploaded by hand, 2026-10-30 (Arpit, from his Mac)
+
+- **`codelaw.codelaw-vscode` 0.3.0 and 0.4.0 are on Open VSX**, all eight platforms each (alpine-arm64, alpine-x64, darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-arm64, win32-x64), uploaded with an access token and `npx ovsx publish` from v0.4.0's `vscode` artifact (`ci` 40932052080). Seen on Arpit's *Settings → Extensions* page, 10:35 IST.
+- **Inactive:** every platform is struck through and the status reads *"Namespace not verified"* — Open VSX keeps them hidden until claim [#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928) is approved. Total downloads 0.
+- **This satisfies the wiki's "one version published with an access token first"** (finding below), so trusted publishing can follow approval directly.
+- The token was pasted into a chat on 2026-10-30: **Arpit revokes it** (*Settings → Access Tokens*).
 
 ## Ruled 2026-10-30 — trusted publishing, no token
 

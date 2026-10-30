@@ -24,6 +24,23 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — every built package wired into `publish.yml`; v0.4.1 ruled; W-149 green  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *close out item 149, item 126, item 95, item 97. Make sure the pipeline is green completely. And publish the packages that haven't been upgraded to .4.0 version.*
+- **Done:** W-150 steps 2–3, B-063 and W-134 steps 1–2b in one change: `publish.yml` uploads the dev-server plugins and the Fux index set and creates `codelaw-rules-deps` through its pending publisher; `ci.yml` attests the index set; `package.py check` refuses an untiered tarball (tested both ways on v0.4.0's real `dist`). W-151 filed. W-149's fix (`30b716a5`, session 85d8c064) is on `main`; CI run 41005346138 on `7604e4a6`.
+- **Decided / left open:** Arpit ruled *"Release v0.4.1 from CI"* for the lagging packages (19 npm, 11 PyPI); the 19 npm ones he then published by hand from v0.4.0's artifacts, so 0.4.1 carries PyPI's eleven and `deps`. W-97's throwaway repo: `gh repo create --public` refused twice by the permission check. Found: two BACKLOG rows share `B-063` (the second, W-102's experiment, should be renumbered — rule 11); the paid one is deleted here.
+- **Mistakes:** one scripted edit failed on a wrong anchor after three of its writes had landed; re-run from the failed one.
+- **Then:** W-149 closed (`main` green, `ci` 41005346138); W-126 measured the first green Rust/pack run (10m33, `perf` the tail); 0.4.1 bumped and CHANGELOG written (W-151 step 2).
+- **Next:** `main` green on the bump; then Arpit's `npm-trust.sh --fux-index`, W-135 and the Release.
+
+## 2026-10-30 — W-95's install docs, W-97's `v0` tag; W-149 left to the session already fixing it  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *implement W149, W126, W95.* — then *implement w-97 as well*
+- **Done:** W-95 step 4 — README (badge, preview note, install line, roadmap rows → 0.4.0 and the Marketplace listing) and USAGE's *Editor* line (`code --install-extension codelaw.codelaw-vscode`). W-97 — the moving `v0` tag created at `v0.4.0` (`d2a87c8`) and pushed. Landed Cowork's main-checkout queue edits as `744fded8` (standing approval).
+- **Decided / left open:** W-149 was not touched: session `85d8c064` holds `W-131-corpus` (the six `corpus.toml`) and was running `corpus.py run --pack python --update` at 10:14. W-126 needs that green `main` for its Rust- and pack-change runs, and Releases for its publish runs — no agent step today. W-97's throwaway-repo proof: `gh repo create --public` refused by Claude Code's permission check; it waits for Arpit.
+- **Mistakes:** none.
+- **Next:** W-97's proof once Arpit allows the public repo; W-126's measurements once W-149 lands.
+
 ## 2026-10-30 — W-103's `spell` bench operation; W-102's redesign handed to a parallel agent  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *implement 102 & 103*
@@ -31,6 +48,39 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Decided / left open:** the operation runs on the pinned repos (decision 2), not the shared workload — SR-SPELL decision 9's wording; one budgetable number, so the three repos are one project. The budget: three `perf` runs on `main`, then the decider.
 - **Mistakes:** the first build read `findings` from the JSON report; it is `diagnostics` — caught before the run.
 - **Next:** three `perf` runs on `main` with `spell`, then decision 4's method to the decider.
+
+## 2026-10-30 — Every package checked; npm catch-up published; PyPI deps pending publisher  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"What are the packages that aren't published? Check on all of them."*, then the PyPI trusted publishers in the browser and npm commands to run locally.
+- **Done:** 72 names checked on npm, PyPI, the VS Code Marketplace and Open VSX. PyPI: pending publisher for `codelaw-rules-deps` saved (the Fux index refused: one pending per config); every existing PyPI project already had a trusted publisher. Arpit published from v0.4.0's CI artifacts: the three dev-server plugins and 15 of 16 npm Fux indexes at 0.4.0 (verified on the registry; `rules-stencil-fux-index` missing despite npm's `+`). Filed W-150; W-134 ruled (CI creates the PyPI project; a one-package `only=pypi` trigger asked).
+- **Decided / left open:** `deps` waits on the next release (its rules post-date v0.4.0). Arpit pasted an Open VSX token in the chat — told to revoke it after use.
+- **Mistakes:** gave a placeholder command (`v<next-version>`) Arpit ran literally, then an example tag (`v0.5.0`) that does not exist; my voice glob for the `.vsix` names had the version before the platform.
+- **Next:** W-149, then W-134 and W-150, before 0.5.0.
+
+## 2026-10-30 — The Action's Marketplace listing checked  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"The marketplace publish happened. Check on it. You have the access to browser."*
+- **Done:** checked in Chrome: <https://github.com/marketplace/actions/codelaw-check> is live — **codelaw check**, v0.4.0 *Latest*, the shortened description. Inbox row removed; W-97 to the agent.
+- **Decided / left open:** found **no `v0` tag** (the moving tag W-97 promised); the listing shows a README that still says 0.3.0 (W-95). Both the agent's.
+- **Mistakes:** none.
+- **Next:** W-97 — create `v0` at `v0.4.0`, then the throwaway-repo proof.
+
+## 2026-10-30 — The queue reviewed item by item; W-132 closed, W-149 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Review the open work file. Check the status on each and every work item. Update all of them to their latest status. Close the ones that are already built."*
+- **Done:** all 21 items checked against the tree, `git log`, the GitHub Actions API and Open VSX's claim issue. **Closed:** W-132 — built in `cac70ed3`/`d7b7b612` but never updated or archived (its L8 gap → B-067, `react/max-jsx-depth`'s 60 corpus findings → B-068). **Filed:** W-149 🧨 — `main` red since `d6869dc`; `corpus` fails in exactly the six packs with marker rules. **Updated:** W-126 (cached 4m11 ✅; no clean change runs on a red `main`), W-95 (install docs unblocked), W-117 (claim #14928 still open), W-129 (unblocked), W-134/W-135 (W-128 built), W-64 (version).
+- **Unchanged, checked:** W-97 (waits on the next release), W-105 (no commit since 10-28; RC 11-10), W-106, W-139, W-141–W-143, W-145–W-148 (nothing built), W-102/W-103 (the other session's).
+- **Decided / left open:** W-149's cause is a reading (the pack list matches); its step 1 confirms it.
+- **Mistakes:** none.
+- **Next:** W-149 first — nothing else lands on a red `main`.
+
+## 2026-10-30 — Oxlint researched; W-148 and B-066 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Research auxlint and what can be used from that into code law."*; then by voice, *"Put it in backlog. Everything else, put it under a work."* and *"File it."*
+- **Done:** Oxlint 1.90.0's 872 rules read and classed (`rule-parity/oxlint.csv`, `method/oxlint-rules.jsonl`; `tables.py` skips the new CSV); oxfmt 0.75.0 run on W-141's corpus; proposal §12; W-148 (formatters to L11, 18 rules into W-139 — now 2,590 — and the 38-rule corpus run); B-066 (`migrate oxlint|oxfmt`); W-141's reference.
+- **Decided / left open:** "auxlint" read as Oxlint (no tool by that name; uxlint and alint named as the alternatives, not taken up). Left: Arpit's L11 sign-off after W-148's step 1.
+- **Mistakes:** none.
+- **Next:** W-148 step 1 is the agent's.
 
 ## 2026-10-30 — W-144 ruled: round 2 joins W-139  ·  Cowork (Opus 5.5)
 

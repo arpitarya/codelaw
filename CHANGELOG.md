@@ -4,6 +4,20 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+## 0.4.1 — 2026-10-30
+
+**The `deps` pack, and every package on its registries.** A nineteenth
+pack checks your dependencies for known vulnerabilities and moves them to
+a clean version; markers, feature-flag expiry, complexity limits and the
+editor's new look join it. Every package a release builds is now
+published by it — the dev-server plugins and the optional Fux index
+packages included.
+
+```bash
+npx codelaw@0.4.1 init     # a Node repo: installs the @codelaw/rules-* it needs
+uvx codelaw@0.4.1 init     # a Python repo: installs the codelaw-rules-* it needs
+```
+
 ### Added
 
 - **The guidance experiment, redesigned and screened (W-102):** `experiments/guidance-vs-check/` now has six arms (from no codelaw at all to `hook --pre`), 42 tasks, a screen that lets the agent pick which tasks tempt it, and a pre-registration. The first screen: an agent with no codelaw broke a rule on only 7 of 38 tasks — it follows conventions it can read in the code — so no full run yet; nothing in codelaw itself changes.
@@ -23,6 +37,7 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 - **Findings on plain-text config files (W-136):** a finding about `.nvmrc`, `.node-version`, `.python-version`, `.tool-versions`, a `Dockerfile`, `CODEOWNERS` or yarn classic's `yarn.lock` shows on the file it concerns (`package.json`, a workflow) **and** on the text file's line — in `check`'s every format, the editor (the extension now opens these files) and the post-edit hook. They are not linted or formatted, and `fix` never writes one (L3 amended).
 - **GitHub Action (W-97):** its Marketplace name is `codelaw check` (the name `codelaw` is taken) and its description is under the Marketplace's 125 characters; `uses: arpitarya/codelaw@v0` is unchanged.
+- **Every package a release builds is now published (W-150, B-063, W-134):** the dev-server plugins `@codelaw/vite-plugin`, `@codelaw/webpack-plugin` and `@codelaw/next` (left at 0.2.0 on npm) and the optional Fux index packages (0.2.0 and 0.3.0 on both registries) are uploaded by the release workflow with the rest, at the release version; a tarball no upload step names now fails the build. `codelaw-rules-deps` is created on PyPI by the release itself, through its pending publisher.
 
 ### Fixed
 

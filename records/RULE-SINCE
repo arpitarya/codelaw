@@ -78,4 +78,9 @@
 #   the deps code and test (SR-RULE-PACKS decision 15, staged, specifies
 #   them). It is pushed, so it cannot be reworded; 3f9bf44 holds it, so it is
 #   the baseline.
-3f9bf4493ff30a7e2a17363af0d271bd9745b4d7
+# - 2026-10-30, W-102: 3f9bf44 -> 75bcede. One commit since 3f9bf44 fails the
+#   replay: 0b9bcd7 (W-102), another session's end-of-turn auto-land of
+#   experiments/guidance-vs-check/ without its owning item file, which the
+#   next landing 0778284 carries. It is pushed-under, so it is not reworded;
+#   75bcede is the first commit on main's first-parent line that holds it.
+75bcedeae4ffd7b291101aa3f02ca6865c744137

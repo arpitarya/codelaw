@@ -29,10 +29,12 @@
 "md/relative-links" = 159
 "md/single-h1" = 10
 "md/table-column-count" = 0
+"md/todo-marker" = 0
 "toml/deps-sorted" = 3
 "toml/no-duplicate-keys" = 0
 "toml/pyproject-requires-python" = 3
 "toml/pyproject-schema" = 0
+"toml/todo-marker" = 0
 "yaml/document-start" = 62
 "yaml/gha-action-schema" = 0
 "yaml/gha-pin-sha" = 8
@@ -41,3 +43,4 @@
 "yaml/no-ambiguous-numbers" = 0
 "yaml/no-duplicate-keys" = 0
 "yaml/no-undeclared-alias" = 0
+"yaml/todo-marker" = 1

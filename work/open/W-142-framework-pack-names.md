@@ -55,7 +55,7 @@ Form values for each: owner `arpitarya` · repository `codelaw` · workflow `pub
 ## Hazards
 
 - A pending publisher reserves nothing; bind close to the release.
-- B-063: Fux-index packages are not uploaded by `publish.yml` yet.
+- [W-150](W-150-publish-dev-server-plugins.md) (was B-063): Fux-index packages are not uploaded by `publish.yml` yet.
 
 ## Reference
 

@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-26 (docket on W-50): a codelaw-pre-commit mirror re
 item: W-64
 filed: 2026-10-26
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-26
+updated: 2026-10-30
 updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
@@ -37,7 +37,7 @@ A consumer's `.pre-commit-config.yaml`:
 
 | DoD | what | state |
 |---|---|---|
-| 1 · | `pre-commit run --all-files` in a fresh repo installs codelaw 0.2.0 from PyPI and runs it | ⏳ |
+| 1 · | `pre-commit run --all-files` in a fresh repo installs codelaw (0.4.0 today) from PyPI and runs it | ⏳ |
 | 2 · | a codelaw release produces a matching mirror tag | ⏳ |
 
 ## Blockers

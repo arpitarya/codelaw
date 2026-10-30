@@ -20,7 +20,7 @@ ball: agent
 | 2 | Build `deps/lockfile-sync` | a manifest edited without its lockfile caught | ⏳ |
 | 3 | Build `deps/version-drift` | one version of a package across a monorepo | ⏳ |
 | 4 | Build `deps/runtime-agreement` | Node and Python versions agree everywhere they are named | ⏳ |
-| 5 | Report each text-file finding in both places, once W-136 amends L3 | the `.nvmrc` line and `package.json` both show it | 🟡 W-136 (ruled B, 2026-10-30) |
+| 5 | Report each text-file finding in both places, once W-136 amends L3 | the `.nvmrc` line and `package.json` both show it | ⏳ unblocked — W-136 built `NativeRule::elsewhere` 2026-10-30 |
 
 **Arpit, 2026-10-29:** *"The license check, I like it. The lock file sync, I like it. Version drift in monorepo, I like that one as well. The runtime version agreement, I like that as well."*
 
@@ -42,7 +42,7 @@ ball: agent
 
 ## Blockers
 
-🟡 waits on **W-128** (the pack, and licence metadata in the snapshot). The text-file location waits on **W-136**; the L3-file location does not.
+None — W-128 (the `deps` pack, licences in the snapshot) and W-136 (`elsewhere`) were built and closed 2026-10-30 (review 2026-10-30, Cowork).
 
 ## Record affected
 

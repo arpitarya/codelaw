@@ -19,7 +19,8 @@
 #   package   every npm tarball and wheel — the skills package (W-77) among them —
 #             and the release checks (SHA256SUMS included); on main, a build attestation of every file publish.yml uploads
 #   fux-index the optional Fux index packages (dist/fux-index/, W-34), beside `dist` and never in it:
-#             built by a pinned fux, twice, and checked; from packs/ alone, so it waits on no build (W-126)
+#             built by a pinned fux, twice, and checked; from packs/ alone, so it waits on no build (W-126);
+#             on main, attested like `dist`: publish.yml uploads it as a set of its own (B-063)
 #   vscode    W-95: the extension compiled and tested, then one .vsix per platform with that
 #             build's binary (scripts/vsix.py) and checked; the artifact `vscode`; nothing publishes it yet
 #   dev-servers ×5  W-70: vite, webpack, rspack (the webpack plugin unchanged), next, next on
@@ -545,13 +546,17 @@ jobs:
     # packs/ and package.py's builders alone — no binary — so this job waits
     # on no build and stays off `package`'s path (W-126). Fux is a build tool
     # of this job only; the version is scripts/fux-index.py's FUX_VERSION. The
-    # output is dist/fux-index/, beside the release set and never in it:
-    # publish.yml does not upload it until the decider has reserved the names
-    # (RELEASING.md), and `package`'s `package.py check` refuses any name in
-    # dist/npm or dist/pypi that is not the release set's.
+    # output is dist/fux-index/, beside the release set and never in it
+    # (`package`'s `package.py check` refuses any name in dist/npm or dist/pypi
+    # that is not the release set's); publish.yml uploads it as its own set,
+    # verified against this job's attestation (B-063).
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write # the build attestation's signing certificate (main only)
+      attestations: write
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
@@ -565,6 +570,11 @@ jobs:
           "$RUNNER_TEMP/fux/bin/pip" install --quiet "fux-engine==$(sed -n 's/^FUX_VERSION = "\([^"]*\)".*/\1/p' scripts/fux-index.py)"
           python3 scripts/fux-index.py assemble --out dist --fux "$RUNNER_TEMP/fux/bin/fux"
           python3 scripts/fux-index.py check dist
+      - name: attest every file publish.yml may upload (SR-PACKAGES decision 11) — main pushes only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-checksums: dist/fux-index/SHA256SUMS
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: fux-index

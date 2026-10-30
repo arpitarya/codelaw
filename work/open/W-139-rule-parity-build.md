@@ -39,13 +39,13 @@ ball: agent
 - **R6 — a `nextjs` pack** (*"The next JS pack. Let's create it."*): npm only, `@codelaw/rules-nextjs`, 22 rules; `nextjs/recommended` on when installed.
 - **R7 — defaults:** SonarJS and Pylint off (*"Off by default. For Sonar.js or Pylint."*): opt-in presets `js/sonarjs` (201) and `py/pylint` (298) inside their packs, not new packs (*"Perfect."*); jsdoc off, `js/jsdoc` (71), as recommended; regexp and promise on (*"Yes."*) — their 70 upstream-recommended rules join `js/recommended`, the other 27 `preview`. Each opt-in preset mirrors its source's recommended set; this overrides R2 for round 2's tranche A.
 - **R8 — TSLint's 6** (*"Let's file all this."*): `js/file-header`, `js/no-default-import`, `js/no-unnecessary-callback-wrapper` (suggest) in `js`; `ts/no-mergeable-namespace` in `ts`; `js/comment-type`, `js/switch-final-break` in the taste preset.
-- **The count:** every `port` row in the CSVs (2,574) less the `tailwind` pack's 8 (W-145 builds those with the pack), plus TSLint's 6 = **2,572**. Codelaw goes from 689 to about 3,260.
+- **The count:** every `port` row in the CSVs (2,574) less the `tailwind` pack's 8 (W-145 builds those with the pack), plus TSLint's 6 = **2,572**; plus Oxlint's 18 (W-148, 2026-10-30) = **2,590**. Codelaw goes from 689 to about 3,280.
 
 ## Definition of done
 
 | DoD | what | state |
 |---|---|---|
-| 1 · rules | every rule on the ruled port list (the CSVs in `work/proposals/rule-parity/` on `class = port`, `proposed_pack` not `tailwind`; plus `tslint-recheck.csv`'s 6), in its pack, with valid and invalid cases and its fix class | ⏳ |
+| 1 · rules | every rule on the ruled port list (the CSVs in `work/proposals/rule-parity/` on `class = port`, `proposed_pack` not `tailwind`; plus `tslint-recheck.csv`'s 6 and `oxlint.csv`'s 18 `port` rows, W-148), in its pack, with valid and invalid cases and its fix class | ⏳ |
 | 1b · links | the 29 equivalents marked `*` in the CSVs' `codelaw` column get their `ported_from:` line; the 3 id collisions the proposal names are checked first | ⏳ |
 | 2 · presets | tranche A in `recommended`; the rest `preview`, in `strict` or opt-in presets; `js/unicorn` and a taste preset opt-in; B-048's `js/strict`, `react/a11y`, `py/strict`, pydocstyle preset; round 2: `js/sonarjs`, `js/jsdoc`, `py/pylint` opt-in, regexp's and promise's tranche A in `js/recommended`, a `testing/*` preset per framework | ⏳ |
 | 2b · packs | five new PyPI packs `django`, `fastapi`, `airflow`, `numpy`, `pandas` for Ruff's 39 framework rules (`ruff.csv`, class `out-of-scope`); L6 amended; names W-142 | ⏳ |
@@ -69,4 +69,4 @@ None — W-138 and W-144 ruled 2026-10-30.
 
 ## Reference
 
-[W-138](../../archive/open/W-138-rule-parity-research.md) · [W-144](../../archive/open/W-144-rule-parity-round-2.md) · [W-145](W-145-tailwind-pack-and-class-sorting.md) · [W-142](W-142-framework-pack-names.md) · [W-147](W-147-testing-nextjs-npm-first-publish.md) · W-03 · W-105
+[W-138](../../archive/open/W-138-rule-parity-research.md) · [W-144](../../archive/open/W-144-rule-parity-round-2.md) · [W-145](W-145-tailwind-pack-and-class-sorting.md) · [W-142](W-142-framework-pack-names.md) · [W-147](W-147-testing-nextjs-npm-first-publish.md) · [W-148](W-148-oxc-formatters-and-oxlint-rules.md) · W-03 · W-105

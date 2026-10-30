@@ -272,3 +272,19 @@ The ports join W-139's build (ruled 2026-10-30: *"built along with everything el
 - **R7 — what is on by default:** SonarJS and Pylint **off** (*"Off by default. For Sonar.js or Pylint."*), as opt-in presets inside their packs, not new packs (told so → *"Perfect."*): `js/sonarjs` (201) and `py/pylint` (298). jsdoc off too, `js/jsdoc` (71), as recommended. regexp and promise **on** (*"Yes."*): their 70 upstream-recommended rules (regexp 60, promise 10) join `js/recommended`; their other 27 land `preview`, as R2. Each opt-in preset mirrors its source's recommended set; the testing presets likewise; `nextjs` and `tailwind` on when their pack is installed.
 - **R8 — TSLint's 6, built** (no new package; *"Let's file all this."*): `js/file-header`, `js/no-default-import`, `js/no-unnecessary-callback-wrapper` (suggest only) in `js`; `ts/no-mergeable-namespace` in `ts`; `js/comment-type` and `js/switch-final-break` in the taste preset.
 - **Where it is built:** W-139, with round 1 — every `port` row in the CSVs except the `tailwind` pack's 8, which W-145 builds with the pack, plus `tslint-recheck.csv`'s 6: **2,572 rules**. The two npm names are [W-147](../open/W-147-testing-nextjs-npm-first-publish.md). W-144 closed.
+
+## 12 · Oxlint (researched 2026-10-30)
+
+Asked as *"auxlint"* — no tool by that name; read as **Oxlint** (Oxc, MIT). Oxlint 1.90.0's `--rules --format=json` lists **872** rules (`method/oxlint-rules.jsonl`), classed in `oxlint.csv`:
+
+| class | rules | note |
+|---|--:|---|
+| `same-as` | 805 | 795 by name in a CSV above (535 of them `port`, 138 `covered`, 56 `types`), 10 by behaviour |
+| `port` | 18 | Oxlint-only: 11 `oxc` (bug checks, from DeepScan and Clippy), 4 `react` (react-refresh, @eslint-react), 3 `react_perf` |
+| `out-of-scope` | 46 | `vue` — W-143 |
+| `skip` | 3 | `no-async-await`, `no-optional-chaining`, `no-rest-spread-properties`: old-target restrictions |
+
+- **Its categories as a signal:** 38 of our tranche B/C ports are Oxlint `correctness` (outright bugs) — W-148 corpus-runs them for `recommended`.
+- **Its formatters (oxfmt 0.75.0) on W-141's corpus:** CSS 88.6% (codelaw 41.8%), Markdown 97.3% (73.3%), YAML 97.3% (88.7%), SCSS 88.0% (82.7%), JS 96.0% (94.7%), TS 94.0% (94.0%). Native Rust for these; HTML, Vue, Svelte and Astro go to Prettier itself. → W-148.
+- **Already in codelaw:** the `agent` format and agent detection (SR-CLI-MCP), `--timings`, unused-suppression reports, nested configs, the Oxlint adapter and its type-aware mode, the rival bench (L8). **Not taken:** tsgolint (SR-TYPES R1), JS plugins (packs hold data, not code).
+- **Ruled 2026-10-30 (Arpit, voice):** `migrate oxlint|oxfmt` to the backlog (B-066); the rest one work item, W-148 (*"File it."*).

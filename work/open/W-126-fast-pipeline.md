@@ -5,7 +5,7 @@ description: "Arpit, 2026-10-29 (voice): the whole CI/CD pipeline, push to publi
 item: W-126
 filed: 2026-10-29
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-29
+updated: 2026-10-30
 updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
@@ -19,7 +19,7 @@ ball: agent
 | 1 | Cut `ci.yml`'s critical path: Windows-ARM64 build and smoke, `package`'s Fux step, `test` | a source-change CI run near 5 min (11 min today) | 🟡 built: Fux job, smoke; build and `test` left (below) |
 | 2 | Take `corpus` off the critical path: one job per pack (matrix), reusing the release binary the build jobs made | a pack-change run near 5 min (16 min today) | ✅ built, not yet measured |
 | 3 | Cut `publish.yml`: verify attestations, trust and uploads in parallel, keeping npm's order (binaries → packs → `codelaw` last) | a release in ~3 min (9 min today) | ✅ built; the next release measures it |
-| 4 | Measure again on three runs of each kind; record the times beside L8's (context, not budgets) | proof, not hope | ⏳ needs `main` pushed |
+| 4 | Measure again on three runs of each kind; record the times beside L8's (context, not budgets) | proof, not hope | 🔄 cached 2 of 3 (4m25, 4m11 ✅); Rust/pack change 1 of 3 (10m33 — `perf` the tail, 4m12 without it); release 1 of 3 (3m50) |
 | 5 | The rulings below, if a step needs one | — | 🔴 only if asked |
 
 **Arpit, 2026-10-29 (voice):** *"I want the most optimized CI/CD pipeline. Can it be done under five minutes?"* — told publishing likely can, the eight Rust builds are the hard part — *"Yes, I want the overall, the whole CI/CD pipeline from start to end to be faster."* — then, in text, *"Research and file it."* Earlier the same call: *"We'll stick with it"* on keeping eight platform `.vsix` builds.
@@ -65,6 +65,26 @@ Recent cached runs on `main` take 4m51–6m30. Other long steps: `test` 2m49–3
 | `ci` 40927104004 (`7accdae`, 0.4.0) | Rust + packs changed | **13m38** | build darwin-arm64 (queued 5m01 for a macOS runner, built 4m57) → `package` 0m54 → smoke win32-x64 2m36 | `corpus` 16 jobs, all done 3m10 after `build`, python slowest (3m10; was 14m52 as one job); `fux-index` 0m47 at the start; smoke win32-arm64 2m12 (was 2m52–3m09); `lint` red on the guard replay only (RULE-SINCE moved) |
 
 **Found:** the pipeline's own work ended near 8m37; the other 5 min was `build darwin-arm64` waiting for a macOS runner (the account's macOS concurrency: two `macos-latest` builds plus the `macos-15-intel` smoke legs). Not a workflow change; a paid runner is out (L2). Two more runs of each kind still to measure.
+
+**Measured on review, 2026-10-30 10:30 IST (Cowork, GitHub Actions API):**
+
+| run | kind | wall | notes |
+|---|---|---|---|
+| `ci` 40934281846 (`7abbe20`) | cached | **4m11** | ≤ 5 min ✅ — the second clean cached run |
+| `ci` 40977728005 (`7abbe20`) | nightly schedule (full) | 14m45 | not one of the three kinds |
+| `ci` 40996512721 (`d6869dc`) | Rust + packs | 11m56 | ❌ red — every build's pack tests (`deps` example, fixed in `3f9bf44`) |
+| `ci` 41002263638 (`6b0b948`) | Rust + packs | 11m43 | ❌ red — lint (guard replay) and six `corpus <pack>` jobs |
+| `ci` 41002310815 (`c89f820`) | Rust + packs | ~13m | ❌ red — lint green now; `corpus` css, data, scss, html, python, js still red (W-149) |
+
+Left: one more cached run; three clean Rust-change and pack-change runs once W-149 makes `main` green; two more releases (the release goal of 3 min is missed by 50 s on the one run).
+
+**Measured 2026-10-30 (Claude Code), `main` green again (W-149 closed):**
+
+| run | kind | wall | critical path | notes |
+|---|---|---|---|---|
+| `ci` 41005346138 (`7604e4a6`) | Rust + packs changed (builds cached) | **10m33** | `perf` **10m29**: `cargo build --release` 3m09 + `codelaw bench` 6m53 | every other job done at **4m12** (smoke win32-arm64 last, 04:57:22); `corpus` all 16 done 3m17 after the start |
+
+**Found:** the tail of a Rust- or pack-change run is now **`perf`**, not the builds or `corpus`: it runs whenever `crates`, `packs`, `perf` or `ci.yml` change (W-24's skip), builds its own release binary (3m09) and benches every L8 operation — `spell` among them since W-103 (1.3 s p95 per run). In the 10-29 cached runs it was skipped (6–8 s). Levers, none taken here: reuse `build linux-x64-gnu`'s binary as `corpus` does (−3 min; it can still run on `ubuntu-24.04`, but that binary is built through maturin with `--zig` for manylinux2014, not `cargo build --release`, so L8 would measure a different build — a ruling), or fewer bench iterations (L8's p95 needs them). **To put to Arpit with the next measurement.**
 
 ## What cannot be bought
 
