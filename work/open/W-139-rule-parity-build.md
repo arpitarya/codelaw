@@ -50,6 +50,7 @@ ball: agent
 | 2 · presets | tranche A in `recommended`; the rest `preview`, in `strict` or opt-in presets; `js/unicorn` and a taste preset opt-in; B-048's `js/strict`, `react/a11y`, `py/strict`, pydocstyle preset; round 2: `js/sonarjs`, `js/jsdoc`, `py/pylint` opt-in, regexp's and promise's tranche A in `js/recommended`, a `testing/*` preset per framework | ⏳ |
 | 2b · packs | five new PyPI packs `django`, `fastapi`, `airflow`, `numpy`, `pandas` for Ruff's 39 framework rules (`ruff.csv`, class `out-of-scope`); L6 amended; names W-142 | ⏳ |
 | 2c · npm packs | `testing` and `nextjs`, npm only; L6 amended (decision 11's table, the counts, CLAUDE.md's L6 line); names W-147 | ⏳ |
+| 2d · defaults (from W-148) | the 38 tranche B/C ports Oxlint ranks `correctness` (`oxlint.csv`) corpus-run; those with no false positive proposed for `recommended` | ⏳ |
 | 3 · checks | `codelaw test` 0 failed on every pack; the layout check clean; corpus counts; L8 budgets measured, not loosened | ⏳ |
 | 4 · docs | `scripts/rule-docs.py` pages, `docs-sync.py` counts, CHANGELOG, the proposal's before/after table | ⏳ |
 
@@ -69,4 +70,4 @@ None — W-138 and W-144 ruled 2026-10-30.
 
 ## Reference
 
-[W-138](../../archive/open/W-138-rule-parity-research.md) · [W-144](../../archive/open/W-144-rule-parity-round-2.md) · [W-145](W-145-tailwind-pack-and-class-sorting.md) · [W-142](W-142-framework-pack-names.md) · [W-147](W-147-testing-nextjs-npm-first-publish.md) · [W-148](W-148-oxc-formatters-and-oxlint-rules.md) · W-03 · W-105
+[W-138](../../archive/open/W-138-rule-parity-research.md) · [W-144](../../archive/open/W-144-rule-parity-round-2.md) · [W-145](W-145-tailwind-pack-and-class-sorting.md) · [W-142](W-142-framework-pack-names.md) · [W-147](W-142-framework-pack-names.md) · [W-148](W-141-formatter-parity.md) · W-03 · W-105

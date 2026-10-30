@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — The queue merged: 22 items into 14  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"There are too many work items. See if we can review all the work items and merge them into few of them."* → *"go ahead, merge them."*
+- **Done:** six merges, each into the first item, the merged file archived byte for byte with an `archive/README.md` row naming its successor, its body copied under *Merged in: W-nn*, every link outside `archive/` repointed: **W-151** ← W-150, W-134, W-135 (the release) · **W-142** ← W-147 (+ W-145's names step) · **W-95** ← W-117 (both stores) · **W-97** ← W-64 (Action + pre-commit) · **W-105** ← W-106 (types + version watch) · **W-141** ← W-148 (formatter; its 38-rule promotion step to W-139 DoD 2d). Inbox: the stale Marketplace row removed; the Open VSX row now names W-95. Also added the missing archive rows for W-132 and W-144.
+- **Decided / left open:** W-126 kept separate (not asked); W-95 is 🔴 now (Open VSX is all that is left).
+- **Mistakes:** none kept — the repoint pass also rewrote each merged section's own archive link, caught and fixed before the checks.
+- **Next:** the other three sessions rebase onto this before their next landing.
+
 ## 2026-10-30 — every built package wired into `publish.yml`; v0.4.1 ruled; W-149 green  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *close out item 149, item 126, item 95, item 97. Make sure the pipeline is green completely. And publish the packages that haven't been upgraded to .4.0 version.*
