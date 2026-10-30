@@ -1,5 +1,5 @@
 name = "@codelaw/rules-spell"
-version = "0.4.2"
+version = "0.4.3"
 min_codelaw = "0.2.0"
 languages = ["javascript", "jsx", "typescript", "tsx", "python", "json", "yaml", "toml", "markdown", "css", "scss", "html"]
 presets = ["spell/recommended", "spell/strict"]

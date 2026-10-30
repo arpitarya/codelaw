@@ -4,9 +4,20 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+## 0.4.3 — 2026-10-30
+
+**The `deps` pack's Fux index on PyPI.** The same engine and rules as
+0.4.2; this release creates `codelaw-rules-deps-fux-index` on PyPI, the
+one package 0.4.2 could not, so every package is on both registries.
+
+```bash
+npx codelaw@0.4.3 init     # a Node repo: installs the @codelaw/rules-* it needs
+uvx codelaw@0.4.3 init     # a Python repo: installs the codelaw-rules-* it needs
+```
+
 ### Changed
 
-- **Release pipeline (W-151):** the next release creates `codelaw-rules-deps-fux-index` on PyPI through its pending publisher; `codelaw-rules-deps`, created by 0.4.2, is uploaded as any existing project.
+- **Release pipeline (W-151, W-154):** the next release creates `codelaw-rules-deps-fux-index` on PyPI through its pending publisher; `codelaw-rules-deps`, created by 0.4.2, is uploaded as any existing project.
 
 ## 0.4.2 — 2026-10-30
 

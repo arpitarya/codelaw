@@ -31,7 +31,7 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (14)
+## Open items (15)
 
 ### build (8)
 
@@ -51,7 +51,9 @@ here. Read that record before changing anything below it.
 
 🟢 **W-152** `agent` The queue checks refuse a ball that disagrees with its row — `agent` while the next step is Arpit's, or an unruled choice left green (W-97 and W-126 were). Filed by Arpit (Cowork). [detail](open/W-152-ball-matches-the-text.md)
 
-### ci/cd (4)
+### ci/cd (5)
+
+🟢 **W-154** `agent` Release v0.4.3 (ruled 10-30) so `publish.yml` creates `codelaw-rules-deps-fux-index` on PyPI through its pending publisher. Bumped 10-30; next: `main` green, the Release, its checks. Filed by Arpit (Claude Code). [detail](open/W-154-release-0-4-3.md)
 
 🟢 **W-126** `agent` Ruled 10-30: `perf` split across parallel jobs, nothing waits on its verdict (until a budget is set, L8); release 3m50 accepted. Cached CI 4m11–4m25 ✅. Next: the `perf` matrix, then the measurement runs. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
