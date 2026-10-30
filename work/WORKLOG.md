@@ -40,6 +40,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the first build read `findings` from the JSON report; it is `diagnostics` — caught before the run.
 - **Next:** three `perf` runs on `main` with `spell`, then decision 4's method to the decider.
 
+## 2026-10-30 — Every package checked; npm catch-up published; PyPI deps pending publisher  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"What are the packages that aren't published? Check on all of them."*, then the PyPI trusted publishers in the browser and npm commands to run locally.
+- **Done:** 72 names checked on npm, PyPI, the VS Code Marketplace and Open VSX. PyPI: pending publisher for `codelaw-rules-deps` saved (the Fux index refused: one pending per config); every existing PyPI project already had a trusted publisher. Arpit published from v0.4.0's CI artifacts: the three dev-server plugins and 15 of 16 npm Fux indexes at 0.4.0 (verified on the registry; `rules-stencil-fux-index` missing despite npm's `+`). Filed W-150; W-134 ruled (CI creates the PyPI project; a one-package `only=pypi` trigger asked).
+- **Decided / left open:** `deps` waits on the next release (its rules post-date v0.4.0). Arpit pasted an Open VSX token in the chat — told to revoke it after use.
+- **Mistakes:** gave a placeholder command (`v<next-version>`) Arpit ran literally, then an example tag (`v0.5.0`) that does not exist; my voice glob for the `.vsix` names had the version before the platform.
+- **Next:** W-149, then W-134 and W-150, before 0.5.0.
+
 ## 2026-10-30 — The Action's Marketplace listing checked  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"The marketplace publish happened. Check on it. You have the access to browser."*
