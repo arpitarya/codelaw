@@ -14,7 +14,7 @@ Rule: [SR-WORK-NOW](../records/0061_WORK-now.md).
 |---|---|---|---|
 | 85d8c064-c519-4fba-977e-7bb4f531e2e1 | Claude Code | 2026-10-30 00:24 | W-128, W-130–W-133, W-136: six agents in parallel, each landing via lockmaster |
 | 4c101f42-3fd2-49cb-8a33-c6fee08aff8a | Claude Code | 2026-10-30 08:04 | W-102: six-arm redesign, screen and run (background agent); W-103 landed, awaiting perf runs |
-| 3ae9bb46-993d-4181-bf61-71e189463e09 | Claude Code | 2026-10-30 10:09 |  |
+| 3ae9bb46-993d-4181-bf61-71e189463e09 | Claude Code | 2026-10-30 10:09 | W-95 install docs + W-97 `v0` tag (landing); W-149 left to 85d8c064; W-126 waits on it |
 
 ## Resources this session created
 
@@ -22,7 +22,7 @@ Rule: [SR-WORK-NOW](../records/0061_WORK-now.md).
 |---|---|---|---|---|
 | worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/W-102` | Arpits-MacBook | 4c101f42-3fd2-49cb-8a33-c6fee08aff8a | 2026-10-30 |
 | worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/handoff-20261030-043224` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/W-131-corpus` | Arpits-MacBook | 85d8c064-c519-4fba-977e-7bb4f531e2e1 | 2026-10-30 |
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/W-95` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
 | worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/handoff-20261030-044012` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
-| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/handoff-20261030-044726` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
+| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/W-150` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
+| worktree | `/Users/arpitarya/my_programs/codelaw/.claude/worktrees/handoff-20261030-050235` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |
+| worktree | `/Users/arpitarya/my_programs/codelaw/.git/lockmaster/landing/handoff-20261030-043224-1793336603473` | Arpits-MacBook | 3ae9bb46-993d-4181-bf61-71e189463e09 | 2026-10-30 |

@@ -1,7 +1,7 @@
 ---
 type: Handoff
 name: W-151
-description: "Arpit, 2026-10-30 (Claude Code): release v0.4.1 from CI, so every package behind 0.4.0 — the three dev-server plugins and the Fux index packages — catches up, and the deps pack ships."
+description: "Arpit, 2026-10-30 (Claude Code): release v0.4.1 from CI, so every package behind 0.4.0 — PyPI's eleven Fux index wheels, npm's having been published by hand — catches up, and the deps pack ships."
 item: W-151
 filed: 2026-10-30
 filed_by: "Arpit (Claude Code, Opus 5.5)"
@@ -28,13 +28,13 @@ ball: agent
 
 ## Behind 0.4.0 (checked 2026-10-30 on both registries)
 
-| registry | packages | at |
-|---|---|---|
-| npm | `@codelaw/vite-plugin`, `@codelaw/webpack-plugin`, `@codelaw/next` | 0.2.0 |
-| npm | `@codelaw/rules-<name>-fux-index` × 16 | 0.2.0; `spell`'s 0.3.0 |
-| PyPI | `codelaw-rules-<name>-fux-index` × 11 | 0.2.0; the security three and `spell`'s 0.3.0 |
+| registry | packages | at | since |
+|---|---|---|---|
+| npm | `@codelaw/vite-plugin`, `@codelaw/webpack-plugin`, `@codelaw/next` | 0.2.0 | ✅ 0.4.0 — Arpit, by hand, 10-30 10:30 IST (W-150 step 1) |
+| npm | `@codelaw/rules-<name>-fux-index` × 16 | 0.2.0; `spell`'s 0.3.0 | ✅ 0.4.0 — Arpit, by hand, 10-30 (all 16 on the registry, rechecked 10:40) |
+| PyPI | `codelaw-rules-<name>-fux-index` × 11 | 0.2.0; the security three and `spell`'s 0.3.0 | ⏳ this release |
 
-Every other name is at 0.4.0. v0.4.0's CI run (40932052080) holds all of them at 0.4.0 until 2026-11-28, but no workflow may upload them at that version.
+Every other name is at 0.4.0. v0.4.0's CI run (40932052080) holds the PyPI wheels at 0.4.0 until 2026-11-28, but no workflow may upload them at that version. **So this release now carries:** PyPI's eleven index wheels, the `deps` pack and its index (new), and everything else at 0.4.1.
 
 ## Definition of done
 

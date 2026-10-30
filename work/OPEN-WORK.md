@@ -69,7 +69,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-148** `agent` From Oxlint: Oxc's native formatters measured on W-141's corpus (CSS 88.6% vs 41.8%, Markdown 97.3% vs 73.3%) and put to Arpit under L11; 18 Oxlint-only rules into W-139; 38 bug rules corpus-run for `recommended`. Filed by Arpit (Cowork). [detail](open/W-148-oxc-formatters-and-oxlint-rules.md)
 
-🟡 **W-150** waits on **W-151** `agent` `publish.yml` uploads the dev-server plugins (a tier after `codelaw`) and `package.py check` refuses an untiered tarball — built 10-30. Left: the upload proven by v0.4.1. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
+🟡 **W-150** waits on **W-151** `agent` Dev-server plugins at 0.4.0 (Arpit, by hand, 10-30); `publish.yml`'s tier and `package.py check`'s untiered-tarball refusal built 10-30. Left: a release uploads them. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
 
 🟢 **W-151** `agent` Release v0.4.1 from CI (ruled 10-30): every package behind 0.4.0 catches up and `deps` ships. `publish.yml` wired 10-30 (W-150, B-063, W-134). Next: bump to 0.4.1, `main` green; then Arpit's npm trust + W-135 and the Release. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
 
