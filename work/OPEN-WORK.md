@@ -35,9 +35,9 @@ here. Read that record before changing anything below it.
 
 🟢 **W-126** `agent` Five-minute pipeline built. Measured: cached CI 4m25, 4m11 (✅ ≤ 5); release 3m50 (goal 3m); no clean Rust- or pack-change run since `main` went red (W-149). Left: one cached, three of each change kind, two releases. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
-🟢 **W-95** `agent` VS Code extension live as `codelaw.codelaw-vscode`; 0.4.0 uploaded by `publish.yml` (10-30). Left: the install docs, now unblocked (README still says 0.3.0, USAGE says the listing comes later); Open VSX (W-117). Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
+🟢 **W-95** `agent` VS Code extension live as `codelaw.codelaw-vscode` (0.4.0, eight platforms); install docs done 10-30 (README, USAGE). Left: Open VSX (W-117), then the DoD's clean-install check in VS Code and VSCodium. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
-🟢 **W-97** `agent` GitHub Action listed on the Marketplace as **codelaw check** (v0.4.0, checked 10-30). Left: the `v0` tag (never created — `@v0` fails today), then the throwaway-repo proof. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
+🟢 **W-97** `agent` GitHub Action listed on the Marketplace as **codelaw check**; `v0` tag created at v0.4.0 (10-30). Left: the throwaway-repo proof — `gh repo create --public` was refused by Claude Code's permission check, so it needs Arpit's allow. Filed by Arpit (Cowork). [detail](open/W-97-github-action.md)
 
 🟢 **W-105** `agent` Type-aware rules: five landed; ruled 10-29 — agents add the four type questions (SR-TYPES decision 4), the rules as previews; profile the slowest before budgets; corpus counts; the RC (11-10). Filed by Arpit (Cowork). [detail](open/W-105-type-aware-engine.md)
 

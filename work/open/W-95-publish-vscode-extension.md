@@ -6,7 +6,7 @@ item: W-95
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -19,7 +19,7 @@ ball: agent
 | 1 | Package `packaging/vscode` per platform with its bundled binary (or the npm binary lookup); `vsce package` / `ovsx` dry runs in CI | publishable artifacts | ✅ 2026-10-27 — eight `.vsix` built and checked in CI by `scripts/vsix.py`, without `vsce` (see below); no `vsce`/`ovsx` dry run: neither is ratified |
 | 2 | Arpit creates the Marketplace publisher and the Open VSX namespace, and stores the tokens (or a trusted-publishing equivalent) as GitHub secrets in the `vscode` environment | the right to publish | ✅ 2026-10-29 — publisher `codelaw`; a **Trusted Publishing** policy *codelaw publish.yml* (GitHub Actions · `arpitarya` #2118113 · `codelaw` #1424363292 · `publish.yml` · environment `vscode`), Active — no token, no Azure. Open VSX: W-117 |
 | 3 | `publish.yml` publishes the extension on a Release, after the engine | one release, every surface | ✅ wired 2026-10-29 — `publish.yml` `vscode` job, `curl` uploads (ruled 2026-10-27); Marketplace by trusted publishing, Open VSX once W-117 sets `OVSX_PAT`; the environment `vscode` exists. Proven by the v0.3.0 Release |
-| 4 | README / USAGE: install from the Marketplace; the preview note drops "the editor extension's Marketplace listing comes later" | users can install it | ⏳ **unblocked** — listed since 2026-10-29 (0.4.0 uploaded 10-30); README still says *0.3.0* and USAGE line 501 *"its Marketplace listing comes later"* (review 2026-10-30, Cowork) |
+| 4 | README / USAGE: install from the Marketplace; the preview note drops "the editor extension's Marketplace listing comes later" | users can install it | ✅ 2026-10-30 — README's badge and 0.3.0 lines → 0.4.0, the preview note and roadmap row point at the Marketplace listing; USAGE's *Editor* line names the extension and `code --install-extension codelaw.codelaw-vscode`; Open VSX "follows" (W-117) |
 
 **Arpit, 2026-10-29 (voice docket; written on *"file it."*):** recommended Open VSX now (a GitHub login, no Azure) and the Visual Studio Marketplace by hand on the v0.3.0 release day: *"Yes."* Asked to set Open VSX up in the browser, then: *"That's okay. Let's put it as a work item and we'll work on it."* — [W-117](W-117-open-vsx-setup.md). The Marketplace token and CI automation for it wait for a later ruling (global PATs end 2026-12-01).
 
@@ -110,6 +110,11 @@ Why: Biome, Ruff and oxc each ship first-party extensions (VS Code, Zed, JetBrai
 **Published by CI, 2026-10-30:** v0.4.0's `publish.yml` (40932853880) uploaded all eight `codelaw-vscode-<platform>-0.4.0.vsix` to the Marketplace by trusted publishing (✓ each); Open VSX skipped, no `OVSX_PAT` (W-117).
 
 ## Left
+
+**2026-10-30 (Claude Code):** step 4 done (README, USAGE). What remains is Open VSX (W-117, waiting on the namespace claim) and the DoD's by-hand install in a clean VS Code and VSCodium — VS Code can be checked now; VSCodium needs Open VSX.
+
+*The list below is the 2026-10-27 plan, kept as written; items 1–3 are done (steps 2–3 above).*
+
 
 1. **The decider (step 2, the inbox row):** the GitHub environment `vscode` with a `v*` tag rule; the Marketplace publisher `codelaw` and a PAT → secret `VSCE_PAT`; the Open VSX account, Eclipse publisher agreement, a token → secret `OVSX_PAT`, and the namespace `codelaw`; **and the ruling: (a) own `curl` uploads, no dependency (recommended), or (b) amend L2 and ratify `@vscode/vsce` 4.0.0 and `ovsx` 1.3.0, CI-only.**
 2. **Then an agent (step 3):** the job above into `publish.yml`, its upload verified on the first Release; `half-published` taught the extension; RELEASING.md's section turned from "built" to "published".
