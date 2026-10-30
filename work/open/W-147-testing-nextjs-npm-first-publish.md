@@ -50,7 +50,7 @@ ball: arpit
 
 ## Hazards
 
-- B-063: `publish.yml` does not upload Fux-index packages yet; the fux-index names are bound by hand regardless.
+- [W-150](W-150-publish-dev-server-plugins.md) (was B-063): `publish.yml` does not upload Fux-index packages yet; the fux-index names are bound by hand regardless.
 - Until both names have a trusted publisher, `publish.yml`'s trust check stops a release carrying the packs.
 
 ## Reference

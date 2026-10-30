@@ -22,7 +22,7 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
-| 🔴 **Open VSX — waiting on Open VSX** ([W-117](open/W-117-open-vsx-setup.md)): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
+| 🔴 **Open VSX — waiting on Open VSX** ([W-117](open/W-117-open-vsx-setup.md)): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** 0.3.0 and 0.4.0 were uploaded by hand on 10-30 and sit **inactive** (*Namespace not verified*) until it is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
 | ↳ **blocks:** W-117 itself | |
 
 ---
@@ -43,7 +43,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-64** `agent` `codelaw-pre-commit` mirror repo: the pre-commit framework installs codelaw from PyPI by version, as ruff-pre-commit does. Filed by Arpit (Cowork). [detail](open/W-64-codelaw-pre-commit-mirror.md)
 
-🔴 **W-117** `arpit` Open VSX: environment, login, agreement, namespace done 10-29; trusted publishing, no token (ruled 10-30). Claim #14928 still open, no reply (checked 10-30). Filed by Arpit (Cowork). [detail](open/W-117-open-vsx-setup.md)
+🔴 **W-117** `arpit` Open VSX: 0.3.0 and 0.4.0 uploaded by hand 10-30 (8 platforms each), **inactive** until claim #14928 is approved (no reply yet). Then: Arpit adds the trusted publisher; revoke the token pasted in chat. Filed by Arpit (Cowork). [detail](open/W-117-open-vsx-setup.md)
 
 🟡 **W-106** waits on **W-105** `agent` TypeScript version watch: tested range, CI (7.1 blocking, `typescript@next` nightly), a bump job that opens a PR or an issue. Filed by Arpit (Cowork). [detail](open/W-106-typescript-version-watch.md)
 
@@ -69,7 +69,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-148** `agent` From Oxlint: Oxc's native formatters measured on W-141's corpus (CSS 88.6% vs 41.8%, Markdown 97.3% vs 73.3%) and put to Arpit under L11; 18 Oxlint-only rules into W-139; 38 bug rules corpus-run for `recommended`. Filed by Arpit (Cowork). [detail](open/W-148-oxc-formatters-and-oxlint-rules.md)
 
-🟢 **W-150** `agent` Dev-server plugins: Arpit published 0.4.0 by hand 10-30 (were stuck at 0.2.0 — `publish.yml` never uploads them). Left: a tier in `publish.yml` and a check that every `dist/npm` tarball has one. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
+🟢 **W-150** `agent` `publish.yml` uploads the dev-server plugins and the Fux index packages (B-063 promoted); ruled 10-30 — once a name exists, CI publishes it. Plugins and 15 npm Fux indexes caught up by hand to 0.4.0. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
 
 ### testing (0)
 
