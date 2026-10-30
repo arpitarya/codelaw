@@ -62,4 +62,4 @@ None.
 
 ## Reference
 
-[Proposal](../proposals/rule-parity.md) §7 · `work/proposals/rule-parity/method/` · W-07 (the formatter) · B-045
+[Proposal](../proposals/rule-parity.md) §7 · `work/proposals/rule-parity/method/` · W-07 (the formatter) · B-045 · [W-148](W-148-oxc-formatters-and-oxlint-rules.md) (Oxc's formatters measured on this corpus: CSS 88.6%, Markdown 97.3%)

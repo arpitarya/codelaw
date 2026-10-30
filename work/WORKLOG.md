@@ -32,6 +32,23 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Mistakes:** the first build read `findings` from the JSON report; it is `diagnostics` — caught before the run.
 - **Next:** three `perf` runs on `main` with `spell`, then decision 4's method to the decider.
 
+## 2026-10-30 — The queue reviewed item by item; W-132 closed, W-149 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Review the open work file. Check the status on each and every work item. Update all of them to their latest status. Close the ones that are already built."*
+- **Done:** all 21 items checked against the tree, `git log`, the GitHub Actions API and Open VSX's claim issue. **Closed:** W-132 — built in `cac70ed3`/`d7b7b612` but never updated or archived (its L8 gap → B-067, `react/max-jsx-depth`'s 60 corpus findings → B-068). **Filed:** W-149 🧨 — `main` red since `d6869dc`; `corpus` fails in exactly the six packs with marker rules. **Updated:** W-126 (cached 4m11 ✅; no clean change runs on a red `main`), W-95 (install docs unblocked), W-117 (claim #14928 still open), W-129 (unblocked), W-134/W-135 (W-128 built), W-64 (version).
+- **Unchanged, checked:** W-97 (waits on the next release), W-105 (no commit since 10-28; RC 11-10), W-106, W-139, W-141–W-143, W-145–W-148 (nothing built), W-102/W-103 (the other session's).
+- **Decided / left open:** W-149's cause is a reading (the pack list matches); its step 1 confirms it.
+- **Mistakes:** none.
+- **Next:** W-149 first — nothing else lands on a red `main`.
+
+## 2026-10-30 — Oxlint researched; W-148 and B-066 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Research auxlint and what can be used from that into code law."*; then by voice, *"Put it in backlog. Everything else, put it under a work."* and *"File it."*
+- **Done:** Oxlint 1.90.0's 872 rules read and classed (`rule-parity/oxlint.csv`, `method/oxlint-rules.jsonl`; `tables.py` skips the new CSV); oxfmt 0.75.0 run on W-141's corpus; proposal §12; W-148 (formatters to L11, 18 rules into W-139 — now 2,590 — and the 38-rule corpus run); B-066 (`migrate oxlint|oxfmt`); W-141's reference.
+- **Decided / left open:** "auxlint" read as Oxlint (no tool by that name; uxlint and alint named as the alternatives, not taken up). Left: Arpit's L11 sign-off after W-148's step 1.
+- **Mistakes:** none.
+- **Next:** W-148 step 1 is the agent's.
+
 ## 2026-10-30 — W-144 ruled: round 2 joins W-139  ·  Cowork (Opus 5.5)
 
 - **Asked:** R5–R8 walked by voice, then *"file it."*
