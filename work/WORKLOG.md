@@ -66,7 +66,8 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Then:** `main` green on 0.4.1 (`ci` 41007205048) and on W-150's wiring (41006814384, both attestation steps green); W-95's clean VS Code install checked; Cowork's consolidation landed as `db1c0c70`. Three stale handoff bundles (`handoff-20261030-043224`, `-044012`, `-050518`) hold nothing `main` lacks; `lockmaster abandon` was refused by the permission check — Arpit's to run.
 - **Then:** Arpit published the two `deps` names by hand at 0.4.1 and ran `npm-trust.sh --fux-index`; then ruled *"upgrade all the packages to version 0.4.2 and publish them"* — bumped to 0.4.2 (W-151).
 - **Then:** v0.4.2 released (`64dd72ff`, `ci` 41029198387, `publish` 41031729649 — PyPI re-run after a Rekor 502); npm 47/47, PyPI 25/26, Marketplace 8/8 checked; README at 0.4.2. `v0` force-move refused by the permission check.
-- **Next:** Arpit moves `v0`; the `deps` index's PyPI pending publisher; W-151 closes.
+- **Then:** `v0` → v0.4.2 on Arpit's word; W-151 closed. *"publish the pending pypi package"* → ruled *"Release v0.4.3 now"* (W-154): released, every package on every registry (npm 47, PyPI 26, Marketplace 8). `v0` → v0.4.3 refused by the permission check.
+- **Next:** Arpit moves `v0` to v0.4.3; W-154 closes.
 
 ## 2026-10-30 — W-95's install docs, W-97's `v0` tag; W-149 left to the session already fixing it  ·  Claude Code (Opus 5.5)
 
