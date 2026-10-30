@@ -1,0 +1,9 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+exhaustive-deps,covered,tanstack-query/exhaustive-deps,,,,,,suggest,yes,,
+infinite-query-property-order,covered,tanstack-query/infinite-query-property-order,,,,,,auto,yes,,
+mutation-property-order,covered,tanstack-query/mutation-property-order,,,,,,auto,yes,,
+no-rest-destructuring,covered,tanstack-query/no-rest-destructuring,,,,,,none,yes,,
+no-unstable-deps,covered,tanstack-query/no-unstable-deps,,,,,,none,yes,,
+no-void-query-fn,covered,tanstack-query/no-void-query-fn,,,,,,none,yes,,
+prefer-query-options,port,,tanstack-query,tanstack-query/prefer-query-options,manual,P2,C,none,,,
+stable-query-client,covered,tanstack-query/stable-query-client,,,,,,auto,yes,,

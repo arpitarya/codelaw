@@ -1,0 +1,47 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+consistent-type-specifier-style,port,,js,js/import-consistent-type-specifier-style,auto,P2,C,auto,,,
+default,port,,js,js/import-default,manual,P1,A,none,yes,,needs the project graph (SR-PROJECT-GRAPH)
+dynamic-import-chunkname,port,,js,js/import-dynamic-import-chunkname,suggest,P2,C,suggest,,,
+enforce-node-protocol-usage,port,,js,js/import-enforce-node-protocol-usage,auto,P2,C,auto,,,
+export,port,,js,js/import-export,manual,P1,A,none,yes,,needs the project graph (SR-PROJECT-GRAPH)
+exports-last,covered,js/exports-at-end*,,,,,,none,,,
+extensions,port,,js,js/import-extensions,manual,P2,C,none,,,needs the project graph (SR-PROJECT-GRAPH)
+first,port,,js,js/import-first,auto,P2,C,auto,,,
+group-exports,port,,js,js/import-group-exports,manual,P2,C,none,,,
+imports-first,retired,,,,,,,auto,,yes,deprecated upstream
+max-dependencies,port,,js,js/import-max-dependencies,manual,P2,C,none,,,
+named,port,,js,js/import-named,manual,P1,A,none,yes,,needs the project graph (SR-PROJECT-GRAPH)
+namespace,port,,js,js/import-namespace,manual,P1,A,none,yes,,needs the project graph (SR-PROJECT-GRAPH)
+newline-after-import,port,,js,js/import-newline-after-import,auto,P2,C,auto,,,
+no-absolute-path,port,,js,js/import-no-absolute-path,auto,P2,C,auto,,,
+no-amd,port,,js,js/import-no-amd,manual,P2,C,none,,,
+no-anonymous-default-export,port,,js,js/import-no-anonymous-default-export,manual,P2,C,none,,,
+no-commonjs,port,,js,js/import-no-commonjs,manual,P2,C,none,,,
+no-cycle,port,,js,js/import-no-cycle,manual,P2,C,none,,,needs the project graph (SR-PROJECT-GRAPH)
+no-default-export,covered,js/no-default-export*,,,,,,none,,,
+no-deprecated,port,,js,js/import-no-deprecated,manual,P2,C,none,,,needs the project graph (SR-PROJECT-GRAPH)
+no-duplicates,port,,js,js/import-no-duplicates,auto,P1,A,auto,yes,,
+no-dynamic-require,port,,js,js/import-no-dynamic-require,manual,P2,C,none,,,
+no-empty-named-blocks,port,,js,js/import-no-empty-named-blocks,auto,P2,C,auto,,,
+no-extraneous-dependencies,port,,js,js/import-no-extraneous-dependencies,manual,P2,C,none,,,needs the project graph (SR-PROJECT-GRAPH)
+no-import-module-exports,port,,js,js/import-no-import-module-exports,auto,P2,C,auto,,,
+no-internal-modules,port,,js,js/import-no-internal-modules,manual,P2,C,none,,,needs the project graph (SR-PROJECT-GRAPH)
+no-mutable-exports,port,,js,js/import-no-mutable-exports,manual,P2,C,none,,,
+no-named-as-default,port,,js,js/import-no-named-as-default,manual,P1,A,none,yes,,needs the project graph (SR-PROJECT-GRAPH)
+no-named-as-default-member,port,,js,js/import-no-named-as-default-member,manual,P1,A,none,yes,,needs the project graph (SR-PROJECT-GRAPH)
+no-named-default,port,,js,js/import-no-named-default,manual,P2,C,none,,,
+no-named-export,port,,js,js/import-no-named-export,manual,P2,C,none,,,
+no-namespace,port,,js,js/import-no-namespace,auto,P2,C,auto,,,
+no-nodejs-modules,port,,js,js/import-no-nodejs-modules,manual,P2,C,none,,,
+no-relative-packages,port,,js,js/import-no-relative-packages,auto,P2,C,auto,,,needs the project graph (SR-PROJECT-GRAPH)
+no-relative-parent-imports,port,,js,js/import-no-relative-parent-imports,manual,P2,C,none,,,
+no-restricted-paths,port,,js,js/import-no-restricted-paths,manual,P2,C,none,,,needs the project graph (SR-PROJECT-GRAPH)
+no-self-import,port,,js,js/import-no-self-import,manual,P2,C,none,,,needs the project graph (SR-PROJECT-GRAPH)
+no-unassigned-import,port,,js,js/import-no-unassigned-import,manual,P2,C,none,,,
+no-unresolved,port,,js,js/import-no-unresolved,manual,P1,A,none,yes,,needs the project graph (SR-PROJECT-GRAPH)
+no-unused-modules,port,,js,js/import-no-unused-modules,manual,P2,C,none,,,needs the project graph (SR-PROJECT-GRAPH)
+no-useless-path-segments,port,,js,js/import-no-useless-path-segments,auto,P2,C,auto,,,needs the project graph (SR-PROJECT-GRAPH)
+no-webpack-loader-syntax,port,,js,js/import-no-webpack-loader-syntax,manual,P2,C,none,,,
+order,covered,js/import-groups*,,,,,,auto,,,
+prefer-default-export,port,,js,js/import-prefer-default-export,manual,P2,C,none,,,
+unambiguous,port,,js,js/import-unambiguous,manual,P2,C,none,,,

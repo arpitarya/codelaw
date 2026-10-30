@@ -1,0 +1,137 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+adjacent-overload-signatures,port,,ts,ts/adjacent-overload-signatures,manual,P2,C,none,,,
+array-type,port,,ts,ts/array-type,auto,P2,C,auto,,,
+await-thenable,covered,ts/await-thenable,,,,,,suggest,,,
+ban-ts-comment,covered,ts/ban-ts-comment,,,,,,suggest,yes,,
+ban-tslint-comment,port,,ts,ts/ban-tslint-comment,auto,P2,C,auto,,,
+class-literal-property-style,port,,ts,ts/class-literal-property-style,suggest,P2,C,suggest,,,
+class-methods-use-this,same-as,,,,,,,none,,,extends eslint/class-methods-use-this: counted there (codelaw js rules cover TypeScript)
+consistent-generic-constructors,port,,ts,ts/consistent-generic-constructors,auto,P2,C,auto,,,
+consistent-indexed-object-style,port,,ts,ts/consistent-indexed-object-style,auto,P2,C,auto,,,
+consistent-return,types,,,,,,,none,,,needs type information: W-105
+consistent-type-assertions,port,,ts,ts/consistent-type-assertions,auto,P2,C,auto,,,
+consistent-type-definitions,port,,ts,ts/consistent-type-definitions,auto,P2,C,auto,,,
+consistent-type-exports,types,,,,,,,auto,,,needs type information: W-105
+consistent-type-imports,covered,ts/type-only-imports*,,,,,,auto,,,
+default-param-last,same-as,,,,,,,none,,,extends eslint/default-param-last: counted there (codelaw js rules cover TypeScript)
+dot-notation,types,,,,,,,auto,,,needs type information: W-105
+explicit-function-return-type,port,,ts,ts/explicit-function-return-type,manual,P2,C,none,,,
+explicit-member-accessibility,port,,ts,ts/explicit-member-accessibility,auto,P2,C,auto,,,
+explicit-module-boundary-types,port,,ts,ts/explicit-module-boundary-types,manual,P2,C,none,,,
+init-declarations,same-as,,,,,,,none,,,extends eslint/init-declarations: counted there (codelaw js rules cover TypeScript)
+max-params,covered,js/max-params,,,,,,none,,,
+member-ordering,port,,ts,ts/member-ordering,manual,P2,C,none,,,
+method-signature-style,port,,ts,ts/method-signature-style,auto,P2,C,auto,,,
+naming-convention,types,,,,,,,none,,,needs type information: W-105
+no-array-constructor,covered,ts/no-array-constructor,,,,,,auto,yes,,
+no-array-delete,types,,,,,,,suggest,,,needs type information: W-105
+no-base-to-string,types,,,,,,,none,,,needs type information: W-105
+no-confusing-non-null-assertion,port,,ts,ts/no-confusing-non-null-assertion,suggest,P2,C,suggest,,,
+no-confusing-void-expression,types,,,,,,,auto,,,needs type information: W-105
+no-deprecated,types,,,,,,,none,,,needs type information: W-105
+no-dupe-class-members,covered,js/no-dupe-class-members,,,,,,none,,,"through its base, eslint/no-dupe-class-members"
+no-duplicate-enum-values,covered,ts/no-duplicate-enum-values,,,,,,none,yes,,
+no-duplicate-type-constituents,types,,,,,,,auto,,,needs type information: W-105
+no-dynamic-delete,port,,ts,ts/no-dynamic-delete,manual,P2,C,none,,,
+no-empty-function,same-as,,,,,,,suggest,,,extends eslint/no-empty-function: counted there (codelaw js rules cover TypeScript)
+no-empty-interface,retired,,,,,,,auto,,yes,deprecated upstream
+no-empty-object-type,covered,ts/no-empty-object-type,,,,,,suggest,yes,,
+no-explicit-any,covered,ts/no-explicit-any,,,,,,auto,yes,,
+no-extra-non-null-assertion,covered,ts/no-extra-non-null-assertion,,,,,,auto,yes,,
+no-extraneous-class,port,,ts,ts/no-extraneous-class,manual,P2,C,none,,,
+no-floating-promises,covered,ts/no-floating-promises,,,,,,suggest,,,
+no-for-in-array,types,,,,,,,none,,,needs type information: W-105
+no-generated-empty-object-type,types,,,,,,,none,,,needs type information: W-105
+no-implied-eval,types,,,,,,,none,,,needs type information: W-105
+no-import-type-side-effects,port,,ts,ts/no-import-type-side-effects,auto,P2,C,auto,,,
+no-inferrable-types,port,,ts,ts/no-inferrable-types,auto,P2,C,auto,,,
+no-invalid-this,same-as,,,,,,,none,,,extends eslint/no-invalid-this: counted there (codelaw js rules cover TypeScript)
+no-invalid-void-type,port,,ts,ts/no-invalid-void-type,manual,P2,C,none,,,
+no-loop-func,retired,,,,,,,none,,yes,deprecated upstream
+no-loss-of-precision,retired,,,,,,,none,,yes,deprecated upstream
+no-magic-numbers,same-as,,,,,,,none,,,extends eslint/no-magic-numbers: counted there (codelaw js rules cover TypeScript)
+no-meaningless-void-operator,types,,,,,,,auto,,,needs type information: W-105
+no-misused-new,covered,ts/no-misused-new,,,,,,none,yes,,
+no-misused-promises,types,,,,,,,none,,,needs type information: W-105
+no-misused-spread,types,,,,,,,suggest,,,needs type information: W-105
+no-mixed-enums,types,,,,,,,none,,,needs type information: W-105
+no-namespace,covered,ts/no-namespace,,,,,,none,yes,,
+no-non-null-asserted-nullish-coalescing,port,,ts,ts/no-non-null-asserted-nullish-coalescing,suggest,P2,C,suggest,,,
+no-non-null-asserted-optional-chain,covered,ts/no-non-null-asserted-optional-chain,,,,,,suggest,yes,,
+no-non-null-assertion,port,,ts,ts/no-non-null-assertion,suggest,P2,C,suggest,,,
+no-redeclare,covered,js/no-redeclare,,,,,,none,,,"through its base, eslint/no-redeclare"
+no-redundant-type-constituents,types,,,,,,,none,,,needs type information: W-105
+no-require-imports,covered,ts/no-require-imports,,,,,,none,yes,,
+no-restricted-imports,retired,,,,,,,none,,yes,deprecated upstream
+no-restricted-types,port,,ts,ts/no-restricted-types,auto,P2,C,auto,,,
+no-shadow,same-as,,,,,,,none,,,extends eslint/no-shadow: counted there (codelaw js rules cover TypeScript)
+no-this-alias,covered,ts/no-this-alias,,,,,,none,yes,,
+no-type-alias,retired,,,,,,,none,,yes,deprecated upstream
+no-unnecessary-boolean-literal-compare,types,,,,,,,auto,,,needs type information: W-105
+no-unnecessary-condition,types,,,,,,,suggest,,,needs type information: W-105
+no-unnecessary-parameter-property-assignment,port,,ts,ts/no-unnecessary-parameter-property-assignment,manual,P2,C,none,,,
+no-unnecessary-qualifier,types,,,,,,,auto,,,needs type information: W-105
+no-unnecessary-template-expression,types,,,,,,,auto,,,needs type information: W-105
+no-unnecessary-type-arguments,types,,,,,,,auto,,,needs type information: W-105
+no-unnecessary-type-assertion,types,,,,,,,auto,,,needs type information: W-105
+no-unnecessary-type-constraint,covered,ts/no-unnecessary-type-constraint,,,,,,suggest,yes,,
+no-unnecessary-type-conversion,types,,,,,,,suggest,,,needs type information: W-105
+no-unnecessary-type-parameters,types,,,,,,,suggest,,,needs type information: W-105
+no-unsafe-argument,types,,,,,,,none,,,needs type information: W-105
+no-unsafe-assignment,types,,,,,,,none,,,needs type information: W-105
+no-unsafe-call,covered,ts/no-unsafe-call,,,,,,none,,,
+no-unsafe-declaration-merging,covered,ts/no-unsafe-declaration-merging,,,,,,none,yes,,
+no-unsafe-enum-assignment,types,,,,,,,none,,,needs type information: W-105
+no-unsafe-enum-comparison,types,,,,,,,suggest,,,needs type information: W-105
+no-unsafe-function-type,covered,ts/no-unsafe-function-type,,,,,,none,yes,,
+no-unsafe-member-access,covered,ts/no-unsafe-member-access,,,,,,none,,,
+no-unsafe-return,covered,ts/no-unsafe-return,,,,,,none,,,
+no-unsafe-type-assertion,types,,,,,,,none,,,needs type information: W-105
+no-unsafe-unary-minus,types,,,,,,,none,,,needs type information: W-105
+no-unused-expressions,covered,ts/no-unused-expressions,,,,,,none,yes,,
+no-unused-private-class-members,covered,js/no-unused-private-class-members,,,,,,none,,,"through its base, eslint/no-unused-private-class-members"
+no-unused-vars,covered,ts/no-unused-vars,,,,,,auto,yes,,
+no-use-before-define,same-as,,,,,,,none,,,extends eslint/no-use-before-define: counted there (codelaw js rules cover TypeScript)
+no-useless-constructor,same-as,,,,,,,suggest,,,extends eslint/no-useless-constructor: counted there (codelaw js rules cover TypeScript)
+no-useless-default-assignment,types,,,,,,,suggest,,,needs type information: W-105
+no-useless-empty-export,port,,ts,ts/no-useless-empty-export,auto,P2,C,auto,,,
+no-var-requires,retired,,,,,,,none,,yes,deprecated upstream
+no-wrapper-object-types,covered,ts/no-wrapper-object-types,,,,,,auto,yes,,
+non-nullable-type-assertion-style,types,,,,,,,auto,,,needs type information: W-105
+only-throw-error,types,,,,,,,none,,,needs type information: W-105
+parameter-properties,port,,ts,ts/parameter-properties,manual,P2,C,none,,,
+prefer-as-const,covered,ts/prefer-as-const,,,,,,auto,yes,,
+prefer-destructuring,types,,,,,,,auto,,,needs type information: W-105
+prefer-enum-initializers,port,,ts,ts/prefer-enum-initializers,suggest,P2,C,suggest,,,
+prefer-find,types,,,,,,,suggest,,,needs type information: W-105
+prefer-for-of,port,,ts,ts/prefer-for-of,manual,P2,C,none,,,
+prefer-function-type,port,,ts,ts/prefer-function-type,auto,P2,C,auto,,,
+prefer-includes,types,,,,,,,auto,,,needs type information: W-105
+prefer-literal-enum-member,port,,ts,ts/prefer-literal-enum-member,manual,P2,C,none,,,
+prefer-namespace-keyword,covered,ts/prefer-namespace-keyword,,,,,,auto,yes,,
+prefer-nullish-coalescing,types,,,,,,,suggest,,,needs type information: W-105
+prefer-optional-chain,types,,,,,,,auto,,,needs type information: W-105
+prefer-promise-reject-errors,types,,,,,,,none,,,needs type information: W-105
+prefer-readonly,types,,,,,,,auto,,,needs type information: W-105
+prefer-readonly-parameter-types,types,,,,,,,none,,,needs type information: W-105
+prefer-reduce-type-parameter,types,,,,,,,auto,,,needs type information: W-105
+prefer-regexp-exec,types,,,,,,,auto,,,needs type information: W-105
+prefer-return-this-type,types,,,,,,,auto,,,needs type information: W-105
+prefer-string-starts-ends-with,types,,,,,,,auto,,,needs type information: W-105
+prefer-ts-expect-error,retired,,,,,,,auto,,yes,deprecated upstream
+promise-function-async,types,,,,,,,auto,,,needs type information: W-105
+related-getter-setter-pairs,types,,,,,,,none,,,needs type information: W-105
+require-array-sort-compare,types,,,,,,,none,,,needs type information: W-105
+require-await,types,,,,,,,suggest,,,needs type information: W-105
+restrict-plus-operands,types,,,,,,,none,,,needs type information: W-105
+restrict-template-expressions,types,,,,,,,none,,,needs type information: W-105
+return-await,types,,,,,,,auto,,,needs type information: W-105
+sort-type-constituents,retired,,,,,,,auto,,yes,deprecated upstream
+strict-boolean-expressions,types,,,,,,,suggest,,,needs type information: W-105
+strict-void-return,types,,,,,,,suggest,,,needs type information: W-105
+switch-exhaustiveness-check,types,,,,,,,suggest,,,needs type information: W-105
+triple-slash-reference,covered,ts/triple-slash-reference,,,,,,none,yes,,
+typedef,retired,,,,,,,none,,yes,deprecated upstream
+unbound-method,types,,,,,,,none,,,needs type information: W-105
+unified-signatures,port,,ts,ts/unified-signatures,manual,P2,C,none,,,
+use-unknown-in-catch-callback-variable,types,,,,,,,suggest,,,needs type information: W-105

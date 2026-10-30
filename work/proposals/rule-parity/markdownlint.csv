@@ -1,0 +1,54 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+MD001,covered,md/heading-increment,,,,,,none,yes,,
+MD003,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD004,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD005,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD007,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD009,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD010,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD011,covered,md/no-reversed-links,,,,,,none,yes,,
+MD012,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD013,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD014,covered,md/commands-show-output,,,,,,none,yes,,
+MD018,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD019,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD020,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD021,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD022,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD023,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD024,covered,md/no-duplicate-heading,,,,,,none,yes,,
+MD025,covered,md/single-h1,,,,,,none,yes,,
+MD026,port,,data,md/no-trailing-punctuation,manual,P1,A,none,yes,,
+MD027,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD028,port,,data,md/no-blanks-blockquote,manual,P1,A,none,yes,,
+MD029,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD030,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD031,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD032,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD033,covered,md/no-inline-html,,,,,,none,yes,,
+MD034,covered,md/no-bare-urls,,,,,,none,yes,,
+MD035,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD036,covered,md/no-emphasis-as-heading,,,,,,none,yes,,
+MD037,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD038,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD039,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD040,covered,md/fence-language,,,,,,none,yes,,
+MD041,covered,md/first-line-heading,,,,,,none,yes,,
+MD042,covered,md/no-empty-links,,,,,,none,yes,,
+MD043,port,,data,md/required-headings,manual,P1,A,none,yes,,
+MD044,port,,data,md/proper-names,manual,P1,A,none,yes,,
+MD045,covered,md/no-alt-text,,,,,,none,yes,,
+MD046,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD047,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD048,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD049,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD050,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD051,covered,md/link-fragments,,,,,,none,yes,,
+MD052,covered,md/reference-links-images,,,,,,none,yes,,
+MD053,covered,md/link-image-reference-definitions,,,,,,none,yes,,
+MD054,port,,data,md/link-image-style,manual,P1,A,none,yes,,
+MD055,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD056,covered,md/table-column-count,,,,,,none,yes,,
+MD058,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+MD059,covered,md/descriptive-link-text,,,,,,none,yes,,
+MD060,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)

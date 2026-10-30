@@ -1,0 +1,1012 @@
+{
+"adjacent-overload-signatures": [
+"@typescript-eslint/adjacent-overload-signatures"
+],
+"align": [
+"indent",
+"@typescript-eslint/indent"
+],
+"angular-whitespace": [],
+"array-type": [
+"@typescript-eslint/array-type"
+],
+"arrow-parens": [
+"arrow-parens"
+],
+"arrow-return-shorthand": [
+"arrow-body-style"
+],
+"await-promise": [
+"@typescript-eslint/await-thenable"
+],
+"ban-comma-operator": [
+"no-sequences"
+],
+"ban-ts-ignore": [
+"@typescript-eslint/ban-ts-comment"
+],
+"ban-types": [
+"@typescript-eslint/ban-types"
+],
+"binary-expression-operand-order": [
+"yoda"
+],
+"callable-types": [
+"@typescript-eslint/prefer-function-type"
+],
+"class-method-newlines": [
+"class-method-newlines/class-method-newlines"
+],
+"class-name": [
+"@typescript-eslint/naming-convention"
+],
+"cognitive-complexity": [
+"sonarjs/cognitive-complexity"
+],
+"comment-format": [],
+"component-class-suffix": [
+"@angular-eslint/component-class-suffix"
+],
+"component-max-inline-declarations": [
+"@angular-eslint/component-max-inline-declarations"
+],
+"component-selector": [
+"@angular-eslint/component-selector"
+],
+"consecutive-overloads": [
+"@typescript-eslint/adjacent-overload-signatures"
+],
+"contextual-decorator": [
+"@angular-eslint/contextual-decorator"
+],
+"contextual-lifecycle": [
+"@angular-eslint/contextual-lifecycle"
+],
+"convert-react-a11y-accessible-headings": [
+"jsx-a11y/heading-has-content"
+],
+"curly": [
+"curly"
+],
+"cyclomatic-complexity": [
+"complexity"
+],
+"deprecation": [
+"import/no-deprecated"
+],
+"directive-class-suffix": [
+"@angular-eslint/directive-class-suffix"
+],
+"directive-selector": [
+"@angular-eslint/directive-selector"
+],
+"eofline": [
+"eol-last"
+],
+"file-name-casing": [
+"unicorn/filename-case"
+],
+"forin": [
+"guard-for-in"
+],
+"function-constructor": [
+"no-new-func"
+],
+"import-blacklist": [
+"no-restricted-imports"
+],
+"import-destructuring-spacing": [],
+"increment-decrement": [
+"no-plusplus"
+],
+"indent": [
+"indent",
+"@typescript-eslint/indent"
+],
+"interface-name": [
+"@typescript-eslint/naming-convention"
+],
+"interface-over-type-literal": [
+"@typescript-eslint/consistent-type-definitions"
+],
+"jsdoc-format": [
+"jsdoc/check-alignment",
+"jsdoc/check-indentation",
+"jsdoc/newline-after-description"
+],
+"jsx-ban-props": [
+"react/forbid-component-props"
+],
+"jsx-boolean-value": [
+"react/jsx-boolean-value"
+],
+"jsx-curly-spacing": [
+"react/jsx-curly-spacing"
+],
+"jsx-equals-spacing": [
+"react/jsx-equals-spacing"
+],
+"jsx-key": [
+"react/jsx-key"
+],
+"jsx-no-bind": [
+"react/jsx-no-bind"
+],
+"jsx-no-lambda": [
+"react/jsx-no-bind"
+],
+"jsx-self-close": [
+"react/self-closing-comp"
+],
+"jsx-space-before-trailing-slash": [
+"react/jsx-tag-spacing"
+],
+"jsx-wrap-multiline": [
+"react/jsx-wrap-multilines"
+],
+"label-position": [
+"no-unused-labels"
+],
+"linebreak-style": [
+"linebreak-style"
+],
+"max-classes-per-file": [
+"max-classes-per-file"
+],
+"max-file-line-count": [
+"max-lines"
+],
+"max-func-body-length": [
+"max-statements"
+],
+"max-line-length": [
+"max-len"
+],
+"max-switch-cases": [
+"sonarjs/max-switch-cases"
+],
+"member-access": [
+"@typescript-eslint/explicit-member-accessibility"
+],
+"member-ordering": [
+"@typescript-eslint/member-ordering"
+],
+"mocha-avoid-only": [
+"jest/no-focused-tests"
+],
+"new-parens": [
+"new-parens"
+],
+"newline-before-return": [
+"padding-line-between-statements"
+],
+"newline-per-chained-call": [
+"newline-per-chained-call"
+],
+"ngrx-action-hygiene": [
+"ngrx/good-action-hygiene"
+],
+"ngrx-avoid-dispatching-multiple-actions-sequentially": [
+"ngrx/avoid-dispatching-multiple-actions-sequentially"
+],
+"ngrx-effect-creator-and-decorator": [
+"ngrx/no-effect-decorator-and-creator"
+],
+"ngrx-no-dispatch-in-effects": [
+"ngrx/no-dispatch-in-effects"
+],
+"ngrx-no-duplicate-action-types": [],
+"ngrx-no-effect-decorator": [
+"ngrx/no-effect-decorator"
+],
+"ngrx-no-effects-in-providers": [
+"ngrx/no-effects-in-providers"
+],
+"ngrx-no-multiple-actions-in-effects": [
+"ngrx/no-multiple-actions-in-effects"
+],
+"ngrx-no-reducer-in-key-names": [
+"ngrx/no-reducer-in-key-names"
+],
+"ngrx-no-typed-store": [
+"ngrx/no-typed-global-store"
+],
+"ngrx-on-reducer-explicit-return-type": [
+"ngrx/on-function-explicit-return-type"
+],
+"ngrx-selector-for-select": [
+"ngrx/use-selector-in-select"
+],
+"no-all-duplicated-branches": [
+"sonarjs/no-all-duplicated-branches"
+],
+"no-alphabetical-sort": [
+"@typescript-eslint/require-array-sort-compare"
+],
+"no-angle-bracket-type-assertion": [
+"@typescript-eslint/consistent-type-assertions"
+],
+"no-any": [
+"@typescript-eslint/no-explicit-any"
+],
+"no-arg": [
+"no-caller"
+],
+"no-async-without-await": [
+"require-await",
+"@typescript-eslint/require-await"
+],
+"no-attribute-decorator": [
+"@angular-eslint/no-attribute-decorator"
+],
+"no-banned-terms": [
+"no-caller",
+"no-eval"
+],
+"no-big-function": [
+"max-lines-per-function"
+],
+"no-bitwise": [
+"no-bitwise"
+],
+"no-boolean-literal-compare": [
+"@typescript-eslint/no-unnecessary-boolean-literal-compare"
+],
+"no-collapsible-if": [
+"sonarjs/no-collapsible-if"
+],
+"no-collection-size-mischeck": [
+"sonarjs/no-collection-size-mischeck"
+],
+"no-conditional-assignment": [
+"no-cond-assign"
+],
+"no-conflicting-lifecycle": [
+"@angular-eslint/no-conflicting-lifecycle"
+],
+"no-consecutive-blank-lines": [
+"no-multiple-empty-lines"
+],
+"no-console": [
+"no-console"
+],
+"no-constant-condition": [
+"no-constant-condition"
+],
+"no-construct": [
+"no-new-wrappers"
+],
+"no-control-regex": [
+"no-control-regex"
+],
+"no-cookies": [
+"no-restricted-syntax"
+],
+"no-debugger": [
+"no-debugger"
+],
+"no-default-export": [
+"import/no-default-export"
+],
+"no-delete-expression": [
+"@typescript-eslint/no-dynamic-delete"
+],
+"no-document-domain": [
+"no-restricted-syntax"
+],
+"no-document-write": [
+"no-restricted-syntax"
+],
+"no-duplicate-imports": [
+"no-duplicate-imports"
+],
+"no-duplicate-string": [
+"sonarjs/no-duplicate-string"
+],
+"no-duplicate-super": [
+"constructor-super"
+],
+"no-duplicate-switch-case": [
+"no-duplicate-case"
+],
+"no-duplicate-variable": [
+"no-redeclare"
+],
+"no-duplicated-branches": [
+"sonarjs/no-duplicated-branches"
+],
+"no-dynamic-delete": [
+"@typescript-eslint/no-dynamic-delete"
+],
+"no-element-overwrite": [
+"sonarjs/no-element-overwrite"
+],
+"no-empty": [
+"no-empty",
+"no-empty-function",
+"@typescript-eslint/no-empty-function"
+],
+"no-empty-destructuring": [
+"no-empty-pattern"
+],
+"no-empty-interface": [
+"@typescript-eslint/no-empty-interface"
+],
+"no-empty-line-after-opening-brace": [
+"padded-blocks"
+],
+"no-empty-nested-blocks": [
+"no-empty"
+],
+"no-eval": [
+"no-eval"
+],
+"no-exec-script": [
+"no-restricted-syntax"
+],
+"no-extra-semicolon": [
+"no-extra-semi",
+"@typescript-eslint/no-extra-semi"
+],
+"no-floating-promises": [
+"@typescript-eslint/no-floating-promises"
+],
+"no-for-in": [
+"no-restricted-syntax"
+],
+"no-for-in-array": [
+"@typescript-eslint/no-for-in-array"
+],
+"no-forward-ref": [
+"@angular-eslint/no-forward-ref"
+],
+"no-function-expression": [],
+"no-host-metadata-property": [
+"@angular-eslint/no-host-metadata-property"
+],
+"no-identical-conditions": [
+"sonarjs/no-identical-conditions"
+],
+"no-identical-expressions": [
+"sonarjs/no-identical-expressions"
+],
+"no-identical-functions": [
+"sonarjs/no-identical-functions"
+],
+"no-implicit-dependencies": [
+"import/no-extraneous-dependencies"
+],
+"no-import-side-effect": [
+"import/no-unassigned-import"
+],
+"no-in-misuse": [
+"@typescript-eslint/no-for-in-array"
+],
+"no-inferrable-types": [
+"@typescript-eslint/no-inferrable-types"
+],
+"no-input-prefix": [
+"@angular-eslint/no-input-prefix"
+],
+"no-input-rename": [
+"@angular-eslint/no-input-rename"
+],
+"no-inputs-metadata-property": [
+"@angular-eslint/no-inputs-metadata-property"
+],
+"no-internal-module": [
+"@typescript-eslint/prefer-namespace-keyword"
+],
+"no-invalid-await": [
+"@typescript-eslint/await-thenable"
+],
+"no-invalid-regexp": [
+"no-invalid-regexp"
+],
+"no-invalid-template-strings": [
+"no-template-curly-in-string"
+],
+"no-invalid-this": [
+"no-invalid-this"
+],
+"no-inverted-boolean-check": [
+"sonarjs/no-inverted-boolean-check"
+],
+"no-irregular-whitespace": [
+"no-irregular-whitespace"
+],
+"no-lifecycle-call": [
+"@angular-eslint/no-lifecycle-call"
+],
+"no-magic-numbers": [
+"no-magic-numbers"
+],
+"no-misused-new": [
+"@typescript-eslint/no-misused-new"
+],
+"no-multiline-string": [
+"no-multi-str"
+],
+"no-multiline-string-literals": [
+"no-multi-str"
+],
+"no-namespace": [
+"@typescript-eslint/no-namespace"
+],
+"no-non-null-assertion": [
+"@typescript-eslint/no-non-null-assertion"
+],
+"no-null-keyword": [
+"no-null/no-null"
+],
+"no-object-literal-type-assertion": [
+"@typescript-eslint/consistent-type-assertions"
+],
+"no-octal-literal": [
+"no-octal",
+"no-octal-escape"
+],
+"no-output-native": [
+"@angular-eslint/no-output-native"
+],
+"no-output-on-prefix": [
+"@angular-eslint/no-output-on-prefix"
+],
+"no-output-rename": [
+"@angular-eslint/no-output-rename"
+],
+"no-outputs-metadata-property": [
+"@angular-eslint/no-outputs-metadata-property"
+],
+"no-parameter-properties": [
+"@typescript-eslint/no-parameter-properties"
+],
+"no-parameter-reassignment": [
+"no-param-reassign"
+],
+"no-pipe-impure": [
+"@angular-eslint/no-pipe-impure"
+],
+"no-queries-metadata-property": [
+"@angular-eslint/no-queries-metadata-property"
+],
+"no-redundant-boolean": [
+"sonarjs/no-redundant-boolean"
+],
+"no-redundant-jsdoc": [
+"jsdoc/no-types"
+],
+"no-redundant-jump": [
+"sonarjs/no-redundant-jump"
+],
+"no-redundant-parentheses": [
+"no-extra-parens"
+],
+"no-reference": [
+"@typescript-eslint/triple-slash-reference"
+],
+"no-reference-import": [
+"@typescript-eslint/triple-slash-reference"
+],
+"no-regex-spaces": [
+"no-regex-spaces"
+],
+"no-require-imports": [
+"@typescript-eslint/no-require-imports"
+],
+"no-return-await": [
+"no-return-await"
+],
+"no-same-line-conditional": [
+"sonarjs/no-same-line-conditional"
+],
+"no-self-assignment": [
+"no-self-assign"
+],
+"no-shadowed-variable": [
+"no-shadow",
+"@typescript-eslint/no-shadow"
+],
+"no-small-switch": [
+"sonarjs/no-small-switch"
+],
+"no-sparse-arrays": [
+"no-sparse-arrays"
+],
+"no-string-literal": [
+"dot-notation",
+"@typescript-eslint/dot-notation"
+],
+"no-string-throw": [
+"no-throw-literal"
+],
+"no-submodule-imports": [
+"import/no-internal-modules"
+],
+"no-suspicious-comment": [
+"no-warning-comments"
+],
+"no-switch-case-fall-through": [
+"no-fallthrough"
+],
+"no-this-assignment": [
+"@typescript-eslint/no-this-alias"
+],
+"no-trailing-whitespace": [
+"no-trailing-spaces"
+],
+"no-unbound-method": [
+"@typescript-eslint/unbound-method"
+],
+"no-unconditional-jump": [
+"sonarjs/no-one-iteration-loop"
+],
+"no-unnecessary-class": [
+"@typescript-eslint/no-extraneous-class"
+],
+"no-unnecessary-field-initialization": [],
+"no-unnecessary-initializer": [
+"no-undef-init"
+],
+"no-unnecessary-qualifier": [
+"@typescript-eslint/no-unnecessary-qualifier"
+],
+"no-unnecessary-semicolons": [
+"no-extra-semi"
+],
+"no-unnecessary-type-assertion": [
+"@typescript-eslint/no-unnecessary-type-assertion"
+],
+"no-unsafe-finally": [
+"no-unsafe-finally"
+],
+"no-unused-array": [
+"sonarjs/no-unused-collection"
+],
+"no-unused-expression": [
+"no-unused-expressions",
+"@typescript-eslint/no-unused-expressions"
+],
+"no-unused-variable": [
+"no-unused-vars",
+"@typescript-eslint/no-unused-vars"
+],
+"no-use-before-declare": [
+"no-use-before-define",
+"@typescript-eslint/no-use-before-define"
+],
+"no-use-of-empty-return-value": [
+"sonarjs/no-use-of-empty-return-value"
+],
+"no-useless-cast": [
+"@typescript-eslint/no-unnecessary-type-assertion"
+],
+"no-useless-catch": [
+"sonarjs/no-useless-catch"
+],
+"no-var-keyword": [
+"no-var"
+],
+"no-var-requires": [
+"@typescript-eslint/no-var-requires"
+],
+"no-variable-usage-before-declaration": [
+"no-use-before-define",
+"@typescript-eslint/no-use-before-define"
+],
+"no-void-expression": [
+"no-void"
+],
+"no-with-statement": [
+"no-with"
+],
+"non-literal-fs-path": [
+"security/detect-non-literal-fs-filename"
+],
+"non-literal-require": [
+"security/detect-non-literal-require"
+],
+"object-literal-key-quotes": [
+"quote-props"
+],
+"object-literal-shorthand": [
+"object-shorthand"
+],
+"one-line": [
+"brace-style"
+],
+"one-variable-per-declaration": [
+"one-var"
+],
+"only-arrow-functions": [
+"prefer-arrow/prefer-arrow-functions"
+],
+"ordered-imports": [
+"import/order"
+],
+"parameters-max-number": [
+"max-params"
+],
+"pipe-prefix": [
+"@angular-eslint/pipe-prefix"
+],
+"possible-timing-attack": [
+"security/detect-possible-timing-attacks"
+],
+"prefer-array-literal": [
+"no-array-constructor",
+"@typescript-eslint/no-array-constructor"
+],
+"prefer-conditional-expression": [
+"unicorn/prefer-ternary"
+],
+"prefer-const": [
+"prefer-const"
+],
+"prefer-default-last": [
+"default-case-last"
+],
+"prefer-for-of": [
+"@typescript-eslint/prefer-for-of"
+],
+"prefer-function-over-method": [
+"class-methods-use-this"
+],
+"prefer-immediate-return": [
+"sonarjs/prefer-immediate-return"
+],
+"prefer-inline-decorator": [],
+"prefer-object-spread": [
+"prefer-object-spread"
+],
+"prefer-on-push-component-change-detection": [
+"@angular-eslint/prefer-on-push-component-change-detection"
+],
+"prefer-output-readonly": [
+"@angular-eslint/prefer-output-readonly"
+],
+"prefer-readonly": [
+"@typescript-eslint/prefer-readonly"
+],
+"prefer-switch": [
+"unicorn/prefer-switch"
+],
+"prefer-template": [
+"prefer-template"
+],
+"promise-function-async": [
+"@typescript-eslint/promise-function-async"
+],
+"quotemark": [
+"quotes",
+"@typescript-eslint/quotes"
+],
+"radix": [
+"radix"
+],
+"react-a11y-anchors": [
+"jsx-a11y/anchor-is-valid"
+],
+"react-a11y-aria-unsupported-elements": [
+"jsx-a11y/no-static-element-interactions"
+],
+"react-a11y-event-has-role": [
+"jsx-a11y/no-static-element-interactions"
+],
+"react-a11y-image-button-has-alt": [
+"jsx-a11y/alt-text"
+],
+"react-a11y-img-has-alt": [
+"jsx-a11y/alt-text"
+],
+"react-a11y-lang": [
+"jsx-a11y/lang"
+],
+"react-a11y-no-onchange": [],
+"react-a11y-props": [
+"jsx-a11y/aria-props"
+],
+"react-a11y-proptypes": [
+"jsx-a11y/aria-proptypes"
+],
+"react-a11y-role": [
+"jsx-a11y/aria-role"
+],
+"react-a11y-role-has-required-aria-props": [
+"jsx-a11y/role-has-required-aria-props"
+],
+"react-a11y-role-supports-aria-props": [
+"jsx-a11y/role-supports-aria-props"
+],
+"react-a11y-tabindex-no-positive": [
+"jsx-a11y/tabindex-no-positive"
+],
+"react-no-dangerous-html": [
+"react/no-danger"
+],
+"react-tsx-curly-spacing": [
+"react/jsx-curly-spacing"
+],
+"react-unused-props-and-state": [],
+"relative-url-prefix": [
+"@angular-eslint/relative-url-prefix"
+],
+"restrict-plus-operands": [
+"@typescript-eslint/restrict-plus-operands"
+],
+"rxjs-add": [],
+"rxjs-ban-observables": [
+"rxjs/ban-observables"
+],
+"rxjs-ban-operators": [
+"rxjs/ban-operators"
+],
+"rxjs-deep-operators": [],
+"rxjs-finnish": [
+"rxjs/finnish"
+],
+"rxjs-just": [
+"rxjs/just"
+],
+"rxjs-no-add": [],
+"rxjs-no-async-subscribe": [
+"rxjs/no-async-subscribe"
+],
+"rxjs-no-compat": [
+"rxjs/no-compat"
+],
+"rxjs-no-connectable": [
+"rxjs/no-connectable"
+],
+"rxjs-no-create": [
+"rxjs/no-create"
+],
+"rxjs-no-deep-operators": [],
+"rxjs-no-do": [
+"rxjs/ban-operators"
+],
+"rxjs-no-explicit-generics": [
+"rxjs/no-explicit-generics"
+],
+"rxjs-no-exposed-subjects": [
+"rxjs/no-exposed-subjects"
+],
+"rxjs-no-finnish": [
+"rxjs/no-finnish"
+],
+"rxjs-no-ignored-error": [
+"rxjs/no-ignored-error"
+],
+"rxjs-no-ignored-notifier": [
+"rxjs/no-ignored-notifier"
+],
+"rxjs-no-ignored-observable": [
+"rxjs/no-ignored-observable"
+],
+"rxjs-no-ignored-replay-buffer": [
+"rxjs/no-ignored-replay-buffer"
+],
+"rxjs-no-ignored-subscribe": [
+"rxjs/no-ignored-subscribe"
+],
+"rxjs-no-ignored-subscription": [
+"rxjs/no-ignored-subscription"
+],
+"rxjs-no-ignored-takewhile-value": [
+"rxjs/no-ignored-takewhile-value"
+],
+"rxjs-no-implicit-any-catch": [
+"rxjs/no-implicit-any-catch"
+],
+"rxjs-no-index": [
+"rxjs/no-index"
+],
+"rxjs-no-internal": [
+"rxjs/no-internal"
+],
+"rxjs-no-nested-subscribe": [
+"rxjs/no-nested-subscribe"
+],
+"rxjs-no-operator": [],
+"rxjs-no-patched": [],
+"rxjs-no-redundant-notify": [
+"rxjs/no-redundant-notify"
+],
+"rxjs-no-sharereplay": [
+"rxjs/no-sharereplay"
+],
+"rxjs-no-subclass": [
+"rxjs/no-subclass"
+],
+"rxjs-no-subject-unsubscribe": [
+"rxjs/no-subject-unsubscribe"
+],
+"rxjs-no-subject-value": [
+"rxjs/no-subject-value"
+],
+"rxjs-no-tap": [
+"rxjs/ban-operators"
+],
+"rxjs-no-topromise": [
+"rxjs/no-topromise"
+],
+"rxjs-no-unbound-methods": [
+"rxjs/no-unbound-methods"
+],
+"rxjs-no-unsafe-catch": [
+"rxjs/no-unsafe-catch"
+],
+"rxjs-no-unsafe-first": [
+"rxjs/no-unsafe-first"
+],
+"rxjs-no-unsafe-scope": [],
+"rxjs-no-unsafe-subject-next": [
+"rxjs/no-unsafe-subject-next"
+],
+"rxjs-no-unsafe-switchmap": [
+"rxjs/no-unsafe-switchmap"
+],
+"rxjs-no-unsafe-takeuntil": [
+"rxjs/no-unsafe-takeuntil"
+],
+"rxjs-no-unsafe-takewhile": [
+"rxjs/no-ignored-takewhile-value"
+],
+"rxjs-no-unused-add": [],
+"rxjs-no-wholesale": [],
+"rxjs-prefer-add": [],
+"rxjs-prefer-angular-async-pipe": [
+"prefer-async-pipe"
+],
+"rxjs-prefer-angular-composition": [
+"prefer-composition"
+],
+"rxjs-prefer-angular-takeuntil": [
+"prefer-takeuntil"
+],
+"rxjs-prefer-observer": [
+"rxjs/prefer-observer"
+],
+"rxjs-suffix-subjects": [
+"rxjs/suffix-subjects"
+],
+"rxjs-throw-error": [
+"rxjs/throw-error"
+],
+"semicolon": [
+"semi",
+"@typescript-eslint/semi",
+"@typescript-eslint/member-delimiter-style"
+],
+"space-before-function-paren": [
+"space-before-function-paren"
+],
+"space-within-parens": [
+"space-in-parens"
+],
+"strict-boolean-expressions": [
+"@typescript-eslint/strict-boolean-expressions"
+],
+"switch-default": [
+"default-case"
+],
+"template-accessibility-alt-text": [
+"@angular-eslint/template/accessibility-alt-text"
+],
+"template-accessibility-elements-content": [
+"@angular-eslint/template/accessibility-elements-content"
+],
+"template-accessibility-label-for": [
+"@angular-eslint/template/accessibility-label-has-associated-control"
+],
+"template-accessibility-tabindex-no-positive": [
+"@angular-eslint/template/no-positive-tabindex"
+],
+"template-accessibility-table-scope": [
+"@angular-eslint/template/accessibility-table-scope"
+],
+"template-accessibility-valid-aria": [
+"@angular-eslint/template/accessibility-valid-aria"
+],
+"template-banana-in-box": [
+"@angular-eslint/template/banana-in-box"
+],
+"template-click-events-have-key-events": [
+"@angular-eslint/template/click-events-have-key-events"
+],
+"template-conditional-complexity": [
+"@angular-eslint/template/conditional-complexity"
+],
+"template-cyclomatic-complexity": [
+"@angular-eslint/template/cyclomatic-complexity"
+],
+"template-i18n": [
+"@angular-eslint/template/i18n"
+],
+"template-mouse-events-have-key-events": [
+"@angular-eslint/template/mouse-events-have-key-events"
+],
+"template-no-any": [
+"@angular-eslint/template/no-any"
+],
+"template-no-autofocus": [
+"@angular-eslint/template/no-autofocus"
+],
+"template-no-call-expression": [
+"@angular-eslint/template/no-call-expression"
+],
+"template-no-distracting-elements": [
+"@angular-eslint/template/no-distracting-elements"
+],
+"template-no-negated-async": [
+"@angular-eslint/template/eqeqeq",
+"@angular-eslint/template/no-negated-async"
+],
+"template-use-track-by-function": [
+"@angular-eslint/template/use-track-by-function"
+],
+"trailing-comma": [
+"comma-dangle"
+],
+"triple-equals": [
+"eqeqeq"
+],
+"type-literal-delimiter": [
+"@typescript-eslint/member-delimiter-style"
+],
+"typedef": [
+"@typescript-eslint/typedef",
+"@typescript-eslint/explicit-function-return-type",
+"@typescript-eslint/explicit-module-boundary-types"
+],
+"typedef-whitespace": [
+"@typescript-eslint/type-annotation-spacing"
+],
+"typeof-compare": [
+"valid-typeof"
+],
+"underscore-consistent-invocation": [
+"lodash/chaining"
+],
+"unified-signatures": [
+"@typescript-eslint/unified-signatures"
+],
+"unnecessary-bind": [
+"no-extra-bind"
+],
+"unnecessary-constructor": [
+"no-useless-constructor"
+],
+"use-component-selector": [
+"@angular-eslint/use-component-selector"
+],
+"use-component-view-encapsulation": [
+"@angular-eslint/use-component-view-encapsulation"
+],
+"use-default-type-parameter": [
+"@typescript-eslint/no-unnecessary-type-arguments"
+],
+"use-injectable-provided-in": [
+"@angular-eslint/use-injectable-provided-in"
+],
+"use-isnan": [
+"use-isnan"
+],
+"use-lifecycle-interface": [
+"@angular-eslint/use-lifecycle-interface"
+],
+"use-pipe-decorator": [],
+"use-pipe-transform-interface": [
+"@angular-eslint/use-pipe-transform-interface"
+],
+"use-primitive-type": [
+"no-new-wrappers",
+"@typescript-eslint/ban-types"
+],
+"variable-name": [
+"@typescript-eslint/naming-convention",
+"no-underscore-dangle",
+"id-denylist",
+"id-match"
+]
+}

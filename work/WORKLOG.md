@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-138 researched: every rule of nine linters, counted  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Research work item 138, create a list … first have a count of all the rules for ESLint, Ruff, and all the linters … and then put a count."*
+- **Done:** 19 packages installed and read from source (ESLint 10.13, typescript-eslint 8.72.1, ten ESLint plugins, TSLint 6.1.3, Ruff 0.16.9, Biome 2.6.4 with sources from its own code, stylelint 17.16 + scss 7.4, html-validate 11.17, markdownlint 0.42, Prettier 3.9.10): 3,431 rules + 29 options. Matched against codelaw's 689 by `ported_from` plus 29 hand-checked equivalents: 653 covered (27% of the 2,438 that apply), 1,690 to port (tranches A 84, B 366, C 513, D 591, E 136). The formatter measured against Prettier/Ruff on 1,279 real files (JSON, Python 100%; CSS 42%, HTML 17%) → W-141 filed. `work/proposals/rule-parity.md`, per-tool CSVs, `method/` that rebuilds the tables byte-identically. B-064; W-138 to the inbox (R1–R4); W-139's DoD names the CSVs.
+- **Decided / left open:** R1–R4 are Arpit's. Classes added: `planned`, `same-as`. typescript-eslint 8.72 refuses TypeScript 7.0 — read with TS 6.
+- **Mistakes:** first passes miscounted stylelint-scss (an id prefix), Biome (codelaw's 172-entry source file; replaced by Biome's own 614 sources) and the priorities (meta flags, replaced by each tool's recommended preset) — each caught by spot checks before writing.
+- **Next:** Arpit's R1–R4; W-141 to Claude Code.
+
 ## 2026-10-30 — W-130 closed: feature-flag expiry  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Implement it and then close those out. Keep merging everything to main."* — W-130, one of six agents in parallel.

@@ -1,0 +1,171 @@
+{
+ "@stylistic/eslint-plugin": {
+  "file": "stylistic-eslint-plugin.csv",
+  "layout": 97,
+  "total": 97,
+  "version": "5.10.0"
+ },
+ "@tanstack/eslint-plugin-query": {
+  "covered": 7,
+  "file": "tanstack-eslint-plugin-query.csv",
+  "port": 1,
+  "total": 8,
+  "version": "5.105.0"
+ },
+ "biome": {
+  "covered": 135,
+  "file": "biome.csv",
+  "out-of-scope": 89,
+  "port": 178,
+  "retired": 8,
+  "same-as": 264,
+  "skip": 3,
+  "total": 677,
+  "version": "2.6.4"
+ },
+ "eslint": {
+  "covered": 81,
+  "file": "eslint.csv",
+  "layout": 1,
+  "port": 101,
+  "retired": 93,
+  "skip": 16,
+  "total": 292,
+  "version": "10.13.0"
+ },
+ "eslint-plugin-import": {
+  "covered": 3,
+  "file": "eslint-plugin-import.csv",
+  "port": 42,
+  "retired": 1,
+  "total": 46,
+  "version": "2.32.0"
+ },
+ "eslint-plugin-import-x": {
+  "file": "eslint-plugin-import-x.csv",
+  "port": 2,
+  "same-as": 45,
+  "total": 47,
+  "version": "4.17.1"
+ },
+ "eslint-plugin-jsx-a11y": {
+  "file": "eslint-plugin-jsx-a11y.csv",
+  "port": 36,
+  "retired": 3,
+  "total": 39,
+  "version": "6.10.2"
+ },
+ "eslint-plugin-n": {
+  "covered": 10,
+  "file": "eslint-plugin-n.csv",
+  "needs-data": 3,
+  "port": 30,
+  "retired": 2,
+  "total": 45,
+  "version": "18.5.0"
+ },
+ "eslint-plugin-react": {
+  "covered": 19,
+  "file": "eslint-plugin-react.csv",
+  "layout": 1,
+  "port": 78,
+  "retired": 2,
+  "skip": 3,
+  "total": 103,
+  "version": "7.37.5"
+ },
+ "eslint-plugin-react-hooks": {
+  "covered": 11,
+  "file": "eslint-plugin-react-hooks.csv",
+  "port": 15,
+  "retired": 1,
+  "skip": 2,
+  "total": 29,
+  "version": "7.1.1"
+ },
+ "eslint-plugin-security": {
+  "covered": 13,
+  "file": "eslint-plugin-security.csv",
+  "port": 2,
+  "total": 15,
+  "version": "4.2.0"
+ },
+ "eslint-plugin-unicorn": {
+  "covered": 1,
+  "file": "eslint-plugin-unicorn.csv",
+  "layout": 9,
+  "port": 366,
+  "retired": 20,
+  "total": 396,
+  "version": "79.0.0"
+ },
+ "html-validate": {
+  "covered": 70,
+  "file": "html-validate.csv",
+  "layout": 11,
+  "port": 11,
+  "skip": 2,
+  "total": 94,
+  "version": "11.17.0"
+ },
+ "markdownlint": {
+  "covered": 17,
+  "file": "markdownlint.csv",
+  "layout": 31,
+  "port": 5,
+  "total": 53,
+  "version": "0.42.0"
+ },
+ "prettier": {
+  "covered": 8,
+  "file": "prettier.csv",
+  "out-of-scope": 1,
+  "port": 11,
+  "skip": 9,
+  "total": 29,
+  "version": "3.9.10"
+ },
+ "ruff": {
+  "covered": 175,
+  "file": "ruff.csv",
+  "layout": 59,
+  "out-of-scope": 39,
+  "planned": 7,
+  "port": 674,
+  "retired": 15,
+  "skip": 1,
+  "total": 970,
+  "version": "0.16.9"
+ },
+ "stylelint": {
+  "covered": 71,
+  "file": "stylelint.csv",
+  "port": 79,
+  "total": 150,
+  "version": "17.16.0"
+ },
+ "stylelint-scss": {
+  "covered": 10,
+  "file": "stylelint-scss.csv",
+  "layout": 21,
+  "port": 40,
+  "total": 71,
+  "version": "7.4.0"
+ },
+ "tslint": {
+  "file": "tslint.csv",
+  "retired": 163,
+  "total": 163,
+  "version": "6.1.3"
+ },
+ "typescript-eslint": {
+  "covered": 30,
+  "file": "typescript-eslint.csv",
+  "port": 30,
+  "retired": 9,
+  "same-as": 9,
+  "total": 136,
+  "types": 58,
+  "version": "8.72.1"
+ }
+}
