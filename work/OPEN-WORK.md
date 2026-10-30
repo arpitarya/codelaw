@@ -31,9 +31,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (18)
+## Open items (17)
 
-### build (15)
+### build (14)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
