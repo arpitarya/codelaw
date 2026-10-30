@@ -84,10 +84,12 @@
 "py/return-outside-function" = 0
 "py/reuse-of-groupby-generator" = 0
 "py/setattr-with-constant" = 1
+"py/skipped-test" = 52
 "py/star-arg-unpacking-after-keyword-arg" = 0
 "py/star-import-usage" = 109
 "py/static-key-dict-comprehension" = 0
 "py/strip-with-multi-characters" = 0
+"py/todo-marker" = 15
 "py/too-many-expressions-in-star-assignment" = 0
 "py/true-false-comparison" = 20
 "py/type-comparison" = 1
