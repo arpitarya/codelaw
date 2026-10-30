@@ -7,7 +7,7 @@ filed: 2026-10-30
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-134 — PyPI: pending trusted publishers for the `deps` pack
@@ -32,6 +32,16 @@ ball: arpit
 | Repository | `codelaw` |
 | Workflow | `publish.yml` |
 | Environment | `pypi` |
+
+## Ruled 2026-10-30 — CI creates it, never a local upload
+
+**Arpit, 2026-10-30 (text):** *"I don't want to trigger the package from my local for PyPI. I'll trigger the pipeline, and that is going to publish the package."*
+
+**Agent, before the next release:**
+1. `publish.yml`'s PyPI `exists` step: upload a wheel whose project is missing when it is `codelaw` **or `codelaw-rules-deps`** (a named list beside the `codelaw` exception, each with its pending publisher); every other missing project is still skipped and named.
+2. Amend [L6](../../records/0008_LAW-6-python-and-node-packages.md) decision 9 (*"PyPI uploads only what exists"*: the exception becomes the projects holding a pending publisher, with this ruling quoted), SR-PACKAGES (*"No new-project path in CI"* and the first-publish consequence), RELEASING.md step 4; CLAUDE.md's L6 line if it names the rule.
+2b. **Asked the same day:** *"For the PyPy package, give me the GitHub command to trigger the pipeline just for that one package."* — no such trigger exists (`workflow_dispatch` takes `only: npm|vscode`; the PyPI job runs on a Release only). Add `only: pypi` with a `package` input, from a `v*` tag, uploading just that wheel from the tag's `dist`: `gh workflow run publish.yml -R arpitarya/codelaw --ref v<next> -f only=pypi -f package=codelaw-rules-deps`. W-125 removed a similar path (`only=pypi-new`); this is its narrower return, by this ruling — say so in SR-PACKAGES.
+3. After the release that creates `codelaw-rules-deps`: Claude adds the pending publisher for `codelaw-rules-deps-fux-index` (PyPI allows one at a time) — it is uploaded only once B-063 is done.
 
 ## Found 2026-10-30 (Cowork) — a pending publisher alone does not publish
 

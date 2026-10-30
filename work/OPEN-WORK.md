@@ -27,9 +27,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (21)
+## Open items (22)
 
-### build (19)
+### build (20)
 
 🟢🧨 **W-149** `agent` CI red on `main` since the 10-30 batch: `corpus` fails in exactly the six packs that gained the marker rules (css, data, scss, html, python, js); update and read the snapshots. Filed by Arpit (Cowork). [detail](open/W-149-ci-red-corpus-markers.md)
 
@@ -49,7 +49,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-129** `agent` `deps/licence`, `deps/lockfile-sync`, `deps/version-drift`, `deps/runtime-agreement` — unblocked: W-128 and W-136 built 10-30; nothing built yet. Filed by Arpit (Cowork). [detail](open/W-129-deps-hygiene-rules.md)
 
-🟢 **W-134** `arpit` PyPI pending trusted publishers for `codelaw-rules-deps` and its Fux index — W-128 built 10-30; Claude fills the form in Chrome, Arpit submits, just before the next release. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
+🟢 **W-134** `agent` `codelaw-rules-deps`: pending publisher saved 10-30; ruled the same day — CI creates it, never a local upload: `publish.yml` exception + L6 decision 9 amended, before the next release. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
 
 🟢 **W-135** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher — W-128 built 10-30; just before the next release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
 
@@ -68,6 +68,8 @@ here. Read that record before changing anything below it.
 🟡 **W-147** waits on **W-139** `arpit` npm first hand publish of `@codelaw/rules-testing`, `@codelaw/rules-nextjs` and their Fux indexes, then their trusted publisher; just before the release that carries them. Filed by Arpit (Cowork). [detail](open/W-147-testing-nextjs-npm-first-publish.md)
 
 🟢 **W-148** `agent` From Oxlint: Oxc's native formatters measured on W-141's corpus (CSS 88.6% vs 41.8%, Markdown 97.3% vs 73.3%) and put to Arpit under L11; 18 Oxlint-only rules into W-139; 38 bug rules corpus-run for `recommended`. Filed by Arpit (Cowork). [detail](open/W-148-oxc-formatters-and-oxlint-rules.md)
+
+🔴 **W-150** `arpit` Dev-server plugins stuck at 0.2.0 on npm: `publish.yml` never uploads them. Arpit publishes 0.4.0 by hand (commands given 10-30); then the agent adds the tier and a check. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
 
 ### testing (0)
 
