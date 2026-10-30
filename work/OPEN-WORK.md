@@ -22,8 +22,6 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
-| 🔴 **Rule parity — four rulings** ([W-138](open/W-138-rule-parity-research.md) → [proposal](proposals/rule-parity.md) §9): 3,431 upstream rules counted; codelaw covers 653 of the 2,438 that apply (27%); 1,690 to port. **R1** which tranches W-139 builds — recommended A (84) + C (513) now, D (Ruff, 591) by linter, B (unicorn, 366) only as an opt-in `js/strict`, E (preview, 136) later; **R2** tranche A into `recommended`, the rest `preview`/`strict`; **R3** Prettier's 11 missing options — keys for four, defaults for the rest; **R4** formatter gaps → W-141 (filed). | 2026-10-30 |
-| ↳ **blocks:** W-139 | |
 | 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): ruled 2026-10-30 — the listing refused `name: codelaw` (taken by a user or org) and the 138-character description; `action.yml` is now **`codelaw check`** with a 115-character description. **On the next release** (after 0.4.0): edit it → tick *Publish this Action to the GitHub Marketplace* → accept the agreement → category *Code quality* → *Update release*. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — waiting on Open VSX** ([W-117](open/W-117-open-vsx-setup.md)): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
@@ -31,9 +29,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (17)
+## Open items (21)
 
-### build (14)
+### build (18)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -55,15 +53,21 @@ here. Read that record before changing anything below it.
 
 🟢 **W-132** `agent` Complexity, nesting and React component limits; CODEOWNERS coverage. Filed by Arpit (Cowork). [detail](open/W-132-complexity-and-codeowners.md)
 
-
 🟡 **W-134** waits on **W-128** `arpit` PyPI pending trusted publishers for `codelaw-rules-deps` and its Fux index — Claude fills the form in Chrome, Arpit submits; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-134-deps-pypi-pending-publishers.md)
 
 🟡 **W-135** waits on **W-128** `arpit` npm first hand publish of `@codelaw/rules-deps` and its Fux index, then their trusted publisher; just before the deps release. Filed by Arpit (Cowork). [detail](open/W-135-deps-npm-first-publish.md)
 
-
-🟡 **W-139** waits on **W-138** `agent` Port every rule W-138 picks (as Arpit rules) into codelaw's packs — cases, fixes, docs, budgets. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
+🟢 **W-139** `agent` Ruled 10-30: build all — 1,690 ports + ESLint's 16 taste rules (opt-in) + Ruff's 39 framework rules as five PyPI packs = 1,745; tranche A on by default, the rest preview/opt-in. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
 
 🟢 **W-141** `agent` Formatter vs Prettier, measured on 1,279 files: CSS 42% and HTML 17% identical — a CSS comment/selector defect and void elements first, then each language to ≥ 98%. Filed by Arpit (Cowork). [detail](open/W-141-formatter-parity.md)
+
+🟡 **W-142** waits on **W-139** `arpit` PyPI pending publishers for the five framework packs and their Fux indexes (names free, checked 10-30) — Claude fills, Arpit submits. Filed by Arpit (Cowork). [detail](open/W-142-framework-pack-names.md)
+
+🟡 **W-143** waits on **W-139** `agent` Vue, Svelte, Astro, GraphQL as codelaw languages (L3, L7; a parser and a formatter each, grammars ratified under L11) and Biome's 89 rules for them. Filed by Arpit (Cowork). [detail](open/W-143-vue-svelte-astro-graphql.md)
+
+🟢 **W-145** `agent` A `tailwind` pack (both registries) with the class-order table as data; the formatter sorts classes when the project uses Tailwind, matching prettier-plugin-tailwindcss. Filed by Arpit (Cowork). [detail](open/W-145-tailwind-pack-and-class-sorting.md)
+
+🟢 **W-146** `agent` PR hygiene: `git/commit-message` (Conventional Commits, configurable), `git/branch-name`, `git/pr-size` (400 lines), `git/pr-description`; commit-msg hook, CI, agent hook; git use widened (SR-ARCHITECTURE 14). Filed by Arpit (Cowork). [detail](open/W-146-pr-hygiene.md)
 
 ### testing (0)
 
@@ -77,7 +81,6 @@ here. Read that record before changing anything below it.
 
 ### research (1)
 
-🔴 **W-138** `arpit` Research done 10-30: 3,431 rules from nine linters, matched against codelaw's 689 — 653 covered, 1,690 to port in tranches A–E; [proposal](proposals/rule-parity.md); R1–R4 in the inbox. Filed by Arpit (Cowork). [detail](open/W-138-rule-parity-research.md)
-
+🟢 **W-144** `cowork` Research, round 2: sonarjs, Jest/Vitest/Testing Library/Playwright, promise, jsdoc, regexp, full Pylint, Next.js, Tailwind — counted, matched, classed, reimplemented fresh; TSLint's 30 rechecked. Filed by Arpit (Cowork). [detail](open/W-144-rule-parity-round-2.md)
 
 ---

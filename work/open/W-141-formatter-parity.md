@@ -43,6 +43,7 @@ Seen in the samples:
 | 1 · CSS defect | the comment/selector join fixed, with a case | ⏳ |
 | 2 · HTML void | Prettier's ` />`, or a record ruling for codelaw's form | ⏳ |
 | 3 · the rest | Markdown, CSS, SCSS, YAML, JS, TS each ≥ 98% identical on the corpus, or the difference named in SR-FORMATTER | ⏳ |
+| 3b · Prettier keys | `[format]` keys for `arrowParens`, `bracketSpacing`, `jsxSingleQuote`, `quoteProps` (W-138 R3, ruled 2026-10-30); the other seven Prettier options stay at Prettier's default | ⏳ |
 | 4 · repeatable | the corpus (sources and licences listed, not vendored where large) and a script that prints the table — in `perf/` or `fixtures/`; not in CI unless cheap | ⏳ |
 
 ## Blockers

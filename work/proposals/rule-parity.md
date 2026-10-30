@@ -2,13 +2,13 @@
 type: Proposal
 title: Rule parity — every rule of nine linters, counted and matched against codelaw
 description: "W-138's outcome: 3,431 upstream rules from 19 packages (ESLint, typescript-eslint, TSLint, Ruff, Biome, stylelint, html-validate, markdownlint and the ESLint plugins codelaw's packs answer to) and Prettier's 29 options, each matched against codelaw's 689 rules and classed; 1,690 worth porting, in five tranches; the formatter measured against Prettier and Ruff on 1,279 files."
-status: proposed
+status: graduated
 timestamp: 2026-10-30T02:45:00+05:30
 ---
 
 # Rule parity — every rule, counted
 
-**For the decider to rule (§9).** Researched 2026-10-30 (Cowork, Opus 5.5) for
+**Ruled 2026-10-30 (Arpit, voice):** build all — 1,690 + 16 taste (opt-in) + 39 framework rules in five new PyPI packs = **1,745** (W-139); tranche A on by default, the rest preview/opt-in; four Prettier keys (W-141); Vue/Svelte/Astro/GraphQL as languages (W-143); round 2 (W-144); Tailwind (W-145). W-138 closed. Researched 2026-10-30 (Cowork, Opus 5.5) for
 [W-138](../open/W-138-rule-parity-research.md); [W-139](../open/W-139-rule-parity-build.md)
 builds what is ruled. Every number here is computed by the scripts in
 [`rule-parity/method/`](rule-parity/method/) from each tool's own published
