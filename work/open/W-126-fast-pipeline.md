@@ -20,7 +20,8 @@ ball: agent
 | 2 | Take `corpus` off the critical path: one job per pack (matrix), reusing the release binary the build jobs made | a pack-change run near 5 min (16 min today) | ✅ built, not yet measured |
 | 3 | Cut `publish.yml`: verify attestations, trust and uploads in parallel, keeping npm's order (binaries → packs → `codelaw` last) | a release in ~3 min (9 min today) | ✅ built; the next release measures it |
 | 4 | Measure again on three runs of each kind; record the times beside L8's (context, not budgets) | proof, not hope | 🔄 cached 2 of 3 (4m25, 4m11 ✅); Rust/pack change 1 of 3 (10m33 — `perf` the tail, 4m12 without it); release 1 of 3 (3m50) |
-| 5 | The rulings below, if a step needs one | — | 🔴 only if asked |
+| 5 | Ruled 2026-10-30 (below): `perf` split across parallel jobs, and nothing waits on its verdict | a Rust/pack-change run near the other jobs' ~4 min | ✅ ruled |
+| 6 | Agent: `perf` as a matrix, one job per L8 operation (or a few groups), each on the release binary `build linux-x64-gnu` made (not its own `cargo build --release`, 3m09); the run's verdict, `publish.yml`'s gate and branch protection do not wait on it | `perf` off the critical path | ⏳ |
 
 **Arpit, 2026-10-29 (voice):** *"I want the most optimized CI/CD pipeline. Can it be done under five minutes?"* — told publishing likely can, the eight Rust builds are the hard part — *"Yes, I want the overall, the whole CI/CD pipeline from start to end to be faster."* — then, in text, *"Research and file it."* Earlier the same call: *"We'll stick with it"* on keeping eight platform `.vsix` builds.
 
@@ -97,9 +98,17 @@ Left: one more cached run; three clean Rust-change and pack-change runs once W-1
 
 "Push to published in five minutes" is two waits, not one: `publish.yml` publishes only what `ci.yml` built and attested on the release commit (SR-PACKAGES decision 11), and a person creates the Release. With this plan: CI ~4–5 min (cached) and ~6–7 min (Rust or packs changed), then the release ~3 min. One workflow that builds and publishes in a single run would beat that, but drops the "publish only what CI attested on `main`" guarantee — a ruling, not an optimisation; ask before proposing it.
 
+## Ruled 2026-10-30 — `perf` in parallel, and not waited on
+
+**Arpit, 2026-10-30 (voice):** told the tail of a Rust- or pack-change run is `perf` (~10–11 min, the rest done by ~4 min) and offered three ways — fewer repetitions on branches, split the operations across parallel machines, not wait on its pass or fail — *"The second and the third item that is split the operations across parallel machines. And not wait for it on pass or fail."* On the release time: *"So release run 3 minute 50 is fine."*
+
+- **Split:** one `perf` job per operation (or per small group), in a matrix, each downloading `build linux-x64-gnu`'s binary instead of compiling its own; the same repetitions and method as today (L8 decision 7) — only the wall time changes.
+- **Not waited on:** `perf` reports, it does not hold the run's verdict, `publish.yml`'s gate or a merge. **L8 holds it to that only while every budget is `unset`:** once the decider sets a budget, L8 decision 7 makes a breach fail — write that limit into SR-LAW-8 and RELEASING.md with this ruling, and say it in the job's comment.
+- **The release goal moves to 3m50** (ruled fine); DoD below.
+
 ## Definition of done
 
-- Three `ci` runs of each kind (cached, Rust change, pack change) and three `publish` runs measured; cached CI ≤ 5 min, release ≤ 3 min; times recorded with the run ids.
+- Three `ci` runs of each kind (cached, Rust change, pack change) and three `publish` runs measured; cached CI ≤ 5 min, a Rust/pack-change run's verdict ≤ ~5 min with `perf` beside it, release ≤ 3m50 (ruled 2026-10-30); times recorded with the run ids.
 - Nothing the pipeline checks today is dropped or made optional.
 
 ## Record affected
