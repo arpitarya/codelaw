@@ -62,6 +62,12 @@ Every other name is at 0.4.0. v0.4.0's CI run (40932052080) holds the PyPI wheel
 - **Each has its trusted publisher:** `arpitarya/codelaw` · `publish.yml` · environment `npm`, permissions *npm publish* and *npm stage publish* — **status *Pending validation***: npm validates it on the first OIDC publish **before 2026-11-01 08:45 UTC** (rules-deps; 08:46 the index).
 - **Hazard:** the 0.4.1 Release skips both (0.4.1 already exists), so this release will not validate them. If no CI publish of these names happens before that time, the configuration lapses — re-run `scripts/npm-trust.sh` (and `--fux-index`) before the next release (RELEASING.md §Every release, step 0).
 
+## PyPI, 2026-10-30 14:58 IST (Cowork)
+
+- **v0.4.2's `pypi` job failed on attempt 1** — sigstore's Rekor answered *502 Bad Gateway* while attesting, so nothing was uploaded; Arpit re-ran the failed jobs and **attempt 2 is green**: `codelaw` and every PyPI pack at 0.4.2, and **`codelaw-rules-deps` created by CI** through its pending publisher (now an ordinary trusted publisher).
+- **Pending publisher for `codelaw-rules-deps-fux-index` saved** (Claude in Chrome, on Arpit's ask): `arpitarya/codelaw` · `publish.yml` · `pypi`.
+- **Left, agent:** add `codelaw-rules-deps-fux-index` to `publish.yml`'s `PENDING` list — without it the next release skips that wheel (the project does not exist yet); then remove both names from `PENDING` once they exist, as L6 decision 9 now reads.
+
 ## Definition of done
 
 | DoD | what | state |
