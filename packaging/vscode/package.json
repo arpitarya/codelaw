@@ -3,7 +3,7 @@
   "publisher": "codelaw",
   "displayName": "codelaw - Rules for AI Agents: Lint, Format, Spell",
   "description": "codelaw in the editor: diagnostics, quick fixes, fix-on-save and formatting for JS, TS, Python, JSON, YAML, TOML, Markdown, CSS, SCSS and HTML, from the project's own codelaw.",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "license": "MIT",
   "icon": "icon.png",
   "preview": true,
