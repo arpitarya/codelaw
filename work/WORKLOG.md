@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — Eight items in parallel: W-128, W-130–W-133, W-136, W-137, W-140  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement 130 … 131 … 132 … 133 … 136 … 128 … in parallel if possible, close it as fast as possible … Keep merging everything to main. And keep doing the cleanup"*; then W-137 and W-140 the same way.
+- **Done:** one sub-agent per item (Opus; Sonnet for W-131 and W-132), each in its lockmaster worktree; all eight landed and closed. The coordinator landed Cowork's handoffs as they blocked landings, told agents what landed under them (W-136's `elsewhere`, config and record collisions, W-128's pack split taking W-132's and W-130's `data` rules), resumed three agents after the usage limit, removed every merged worktree and branch. Wrap-up: SR-EDITOR cites SR-RULE-PACKS for `[deps] ignore` (the schema test W-137 left red); RULE-SINCE 2c7fee8 → 64acbc3 past thirteen guard-refused auto-land commits.
+- **Decided / left open:** the agents' calls are in each archived item (rule placements, `[reviews]` in codelaw.toml, `deps` decisions, the extension's view rules). Open for the decider: `requirements*.txt` on L3's list (B-051), the `ported-rule` label, `react/max-jsx-depth`'s 60 corpus findings before `react/size` joins a preset, a real-window look at W-137.
+- **Mistakes:** the shared CARGO_TARGET_DIR let parallel worktrees overwrite each other's builds (stale-crate failures, a 23 GB peak against a 5 GB budget, approved a GB at a time); the kit's end-of-turn auto-land commits what the commit-msg guard refused (thirteen commits) — a lockmaster kit fix.
+- **Next:** CI green on the push; W-129 (now unblocked); W-134/W-135 are Arpit's before the deps release.
+
 ## 2026-10-30 — W-128 built and closed: the deps pack and vulnerable dependencies  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Implement it and then close those out. Keep merging everything to main."* — W-128 as specified in its item and the proposal §2.1–2.4.
