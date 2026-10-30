@@ -4,6 +4,20 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+## 0.4.1 — 2026-10-30
+
+**The `deps` pack, and every package on its registries.** A nineteenth
+pack checks your dependencies for known vulnerabilities and moves them to
+a clean version; markers, feature-flag expiry, complexity limits and the
+editor's new look join it. Every package a release builds is now
+published by it — the dev-server plugins and the optional Fux index
+packages included.
+
+```bash
+npx codelaw@0.4.1 init     # a Node repo: installs the @codelaw/rules-* it needs
+uvx codelaw@0.4.1 init     # a Python repo: installs the codelaw-rules-* it needs
+```
+
 ### Added
 
 - **`codelaw bench` times the spell pack (W-103):** a `spell` operation — `check` with `spell/recommended` alone on the `--repo` folders as one project, empty cache — reported, not yet budgeted.

@@ -17,7 +17,7 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | `publish.yml` uploads every package a release builds: the dev-server plugins (W-150), the Fux index set (B-063), `codelaw-rules-deps` through its pending publisher (W-134) | nothing is left behind again | ✅ 2026-10-30 (W-150's change) |
-| 2 | Agent: `python3 scripts/version.py --set 0.4.1`; CHANGELOG's *Unreleased* becomes *0.4.1*; `ci.yml` green on that commit on `main` | a releasable commit | ⏳ |
+| 2 | Agent: `python3 scripts/version.py --set 0.4.1`; CHANGELOG's *Unreleased* becomes *0.4.1*; `ci.yml` green on that commit on `main` | a releasable commit | 🔄 bumped 2026-10-30 (`version.py --set 0.4.1`: Cargo, 19 packs, the extension, the Action); CHANGELOG *0.4.1 — 2026-10-30* written; `ci.yml` on it pending |
 | 3 | **Arpit:** `scripts/npm-trust.sh --fux-index` (W-85's *Pending validation* configurations lapse after ~2 days, and no CI publish ever validated the index names); then **W-135** — `npm publish` `@codelaw/rules-deps` and `@codelaw/rules-deps-fux-index` at 0.4.1 by hand from step 2's run, and `scripts/npm-trust.sh` for both | npm trusts every name, or `trust` stops the release before anything is written | 🔴 Arpit |
 | 4 | **Arpit:** `gh release create v0.4.1` with CHANGELOG's section as notes (RELEASING.md step 3) | every package at 0.4.1 on both registries | 🔴 Arpit |
 | 5 | Agent: every name checked at 0.4.1 on npm and PyPI; `v0` moved to `v0.4.1` (W-97); the run timed for W-126; W-134 step 3 | proof | ⏳ |

@@ -1,5 +1,5 @@
 name = "@codelaw/rules-ts"
-version = "0.4.0"
+version = "0.4.1"
 min_codelaw = "0.1.0"
 languages = ["typescript", "tsx"]
 presets = ["ts/recommended", "ts/conventions", "ts/type-checked"]

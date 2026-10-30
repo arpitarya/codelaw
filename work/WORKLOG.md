@@ -30,7 +30,8 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Done:** W-150 steps 2–3, B-063 and W-134 steps 1–2b in one change: `publish.yml` uploads the dev-server plugins and the Fux index set and creates `codelaw-rules-deps` through its pending publisher; `ci.yml` attests the index set; `package.py check` refuses an untiered tarball (tested both ways on v0.4.0's real `dist`). W-151 filed. W-149's fix (`30b716a5`, session 85d8c064) is on `main`; CI run 41005346138 on `7604e4a6`.
 - **Decided / left open:** Arpit ruled *"Release v0.4.1 from CI"* for the lagging packages (19 npm, 11 PyPI); the 19 npm ones he then published by hand from v0.4.0's artifacts, so 0.4.1 carries PyPI's eleven and `deps`. W-97's throwaway repo: `gh repo create --public` refused twice by the permission check. Found: two BACKLOG rows share `B-063` (the second, W-102's experiment, should be renumbered — rule 11); the paid one is deleted here.
 - **Mistakes:** one scripted edit failed on a wrong anchor after three of its writes had landed; re-run from the failed one.
-- **Next:** the 0.4.1 bump (W-151 step 2), then Arpit's npm trust, W-135 and the Release.
+- **Then:** W-149 closed (`main` green, `ci` 41005346138); W-126 measured the first green Rust/pack run (10m33, `perf` the tail); 0.4.1 bumped and CHANGELOG written (W-151 step 2).
+- **Next:** `main` green on the bump; then Arpit's `npm-trust.sh --fux-index`, W-135 and the Release.
 
 ## 2026-10-30 — W-95's install docs, W-97's `v0` tag; W-149 left to the session already fixing it  ·  Claude Code (Opus 5.5)
 

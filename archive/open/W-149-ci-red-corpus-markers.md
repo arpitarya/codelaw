@@ -6,8 +6,8 @@ item: W-149
 filed: 2026-10-30
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated_by: "Claude Code (Opus 5.5)"
+ball: none
 ---
 
 # W-149 — CI red on `main`: six packs' corpus snapshots
@@ -16,9 +16,9 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Run `scripts/corpus.py run --pack <p> --update` for css, data, scss, html, python, js; read each diff | the moved counts, named | ⏳ |
-| 2 | If the moves are the new marker rules' findings (`*/todo-marker`, `*/flag-marker`, `*/skipped-test` …), commit the snapshots; if any other count moved or an invariant broke, fix the rule instead | `corpus <pack>` green | ⏳ |
-| 3 | One clean `ci` run on `main`, its id here; W-126 then has its Rust- and pack-change runs to measure | `main` green | ⏳ |
+| 1 | Run `scripts/corpus.py run --pack <p> --update` for css, data, scss, html, python, js; read each diff | the moved counts, named | ✅ `30b716a5` (session 85d8c064, as W-131's follow-up) |
+| 2 | If the moves are the new marker rules' findings (`*/todo-marker`, `*/flag-marker`, `*/skipped-test` …), commit the snapshots; if any other count moved or an invariant broke, fix the rule instead | `corpus <pack>` green | ✅ only the eleven new rules' counts were added; no existing count moved |
+| 3 | One clean `ci` run on `main`, its id here; W-126 then has its Rust- and pack-change runs to measure | `main` green | ✅ `ci` 41005346138 on `7604e4a6`, green |
 
 **Asked 2026-10-30 (Arpit, text):** *"Review the open work file. Check the status on each and every work item. Update all of them to their latest status."* — found while checking W-126's runs.
 
@@ -40,8 +40,12 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · green | `ci` green on `main`, run id recorded | ⏳ |
-| 2 · counted | each new rule's corpus count in its pack's `corpus.toml`, any surprise (a count in the hundreds) named here | ⏳ |
+| 1 · green | `ci` green on `main`, run id recorded | ✅ 41005346138 (`7604e4a6`, 2026-10-30 04:53–05:03 UTC) |
+| 2 · counted | each new rule's corpus count in its pack's `corpus.toml`, any surprise (a count in the hundreds) named here | ✅ no surprise — `py/skipped-test` 52, `js/todo-marker` 21, `py/todo-marker` 15, `scss/todo-marker` 6, `yaml/todo-marker` 1, the other six 0 |
+
+## Closed 2026-10-30 (Claude Code)
+
+The fix landed as `30b716a5` (*"corpus counts for the eleven marker rules … their first corpus run; no existing count moved"*), made by session 85d8c064 in its `W-131-corpus` change while this item was open; this session left it alone rather than run the same updates twice. `main` green since `ci` 41005346138.
 
 ## Blockers
 

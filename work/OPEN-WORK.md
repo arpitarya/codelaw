@@ -27,13 +27,11 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (23)
+## Open items (22)
 
-### build (21)
+### build (20)
 
-🟢🧨 **W-149** `agent` CI red on `main` since the 10-30 batch: `corpus` fails in exactly the six packs that gained the marker rules (css, data, scss, html, python, js); update and read the snapshots. Filed by Arpit (Cowork). [detail](open/W-149-ci-red-corpus-markers.md)
-
-🟢 **W-126** `agent` Five-minute pipeline built. Measured: cached CI 4m25, 4m11 (✅ ≤ 5); release 3m50 (goal 3m); no clean Rust- or pack-change run since `main` went red (W-149). Left: one cached, three of each change kind, two releases. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
+🟢 **W-126** `agent` Five-minute pipeline built. Cached CI 4m25, 4m11 (✅); release 3m50; Rust/pack change 10m33 (`7604e4a6`, green): the rest done at 4m12, `perf` (10m29) the tail. Left: one cached, two of each change kind, two releases. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
 🟢 **W-95** `agent` VS Code extension live as `codelaw.codelaw-vscode` (0.4.0, eight platforms); install docs done 10-30 (README, USAGE). Left: Open VSX (W-117), then the DoD's clean-install check in VS Code and VSCodium. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
@@ -71,7 +69,7 @@ here. Read that record before changing anything below it.
 
 🟡 **W-150** waits on **W-151** `agent` `publish.yml` uploads the dev-server plugins and the Fux index packages (B-063 promoted; ruled 10-30: once a name exists, CI publishes it) — built 10-30; npm caught up by hand. Left: a release proves it. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
 
-🟢 **W-151** `agent` Release v0.4.1 from CI (ruled 10-30): every package behind 0.4.0 catches up and `deps` ships. `publish.yml` wired 10-30 (W-150, B-063, W-134). Next: bump to 0.4.1, `main` green; then Arpit's npm trust + W-135 and the Release. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
+🟢 **W-151** `agent` Release v0.4.1 from CI (ruled 10-30): PyPI's eleven Fux index wheels catch up and `deps` ships. Bumped to 0.4.1 10-30; next: `main` green on it, then Arpit's npm trust + W-135 and the Release. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
 
 ### testing (0)
 
