@@ -376,7 +376,7 @@ fn advisories_from_every_enabled_source_are_merged() {
         .collect();
     let want: Vec<(String, String, String)> = [
         ("deps/incomplete-scan", "package.json", "warn"),
-        ("deps/vulnerable", "package-lock.json", "error"),
+        ("deps/vulnerable", "package.json", "error"),
         ("deps/vulnerable", "package.json", "error"),
         ("deps/vulnerable", "pyproject.toml", "warn"),
     ]
@@ -410,6 +410,7 @@ fn advisories_from_every_enabled_source_are_merged() {
     assert!(fs::read_to_string(d.join("package.json")).unwrap().contains("\"lodash\": \"^4.17.21\""), "{err}");
     assert!(fs::read_to_string(d.join("pyproject.toml")).unwrap().contains("\"jinja2>=3.1.3\""), "{err}");
     assert!(fs::read_to_string(d.join("package-lock.json")).unwrap().contains("\"version\": \"1.2.5\""), "a lockfile is never edited");
+    assert!(fs::read_to_string(d.join("package.json")).unwrap().contains("\"overrides\": {\n    \"minimist\": \"1.2.6\"\n  }"), "the transitive one's override: {err}");
 
     // `deps check`, the CLI twin of MCP `check_dependency`.
     let (code, out, err) = codelaw(&d, &["deps", "check", "npm", "minimist", "1.2.5", "--format", "json"], &[], port);

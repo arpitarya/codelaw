@@ -130,16 +130,28 @@ fn a_dated_ignore_names_one_advisory() {
 }
 
 #[test]
-fn a_transitive_dependency_sits_on_its_lockfile_entry() {
-    let pkg = "{ \"dependencies\": { \"lodash\": \"^4.17.21\" } }";
+fn a_transitive_dependency_sits_on_the_manifest_with_its_override() {
+    let pkg = "{\n  \"name\": \"app\",\n  \"dependencies\": {\n    \"lodash\": \"^4.17.21\"\n  }\n}\n";
     let lock = "{\n  \"lockfileVersion\": 3,\n  \"packages\": {\n    \"\": { \"dependencies\": { \"lodash\": \"^4.17.21\" } },\n    \"node_modules/lodash\": { \"version\": \"4.17.21\" },\n    \"node_modules/minimist\": { \"version\": \"1.2.5\" }\n  }\n}\n";
     let files = [("package.json", pkg), ("package-lock.json", lock)];
-    assert!(run(&Vulnerable, "package.json", &files, json!({})).is_empty(), "the direct one is clean");
-    let got = run(&Vulnerable, "package-lock.json", &files, json!({}));
+    let got = run(&Vulnerable, "package.json", &files, json!({}));
     assert_eq!(got.len(), 1, "{got:?}");
-    assert!(got[0].0.starts_with("`minimist` 1.2.5 (installed through another package) is vulnerable — GHSA-xvch-5gv4-984h (critical)"), "{}", got[0].0);
-    assert!(got[0].0.contains("add `\"overrides\": { \"minimist\": \"1.2.6\" }` to package.json, then run `npm install` — an override changes the install of the whole tree"), "{}", got[0].0);
-    assert!(got[0].2.is_empty(), "a lockfile is never edited");
+    assert!(got[0].0.starts_with("`minimist` 1.2.5 (installed through another package, in package-lock.json) is vulnerable — GHSA-xvch-5gv4-984h (critical)"), "{}", got[0].0);
+    assert!(got[0].0.contains("through `overrides` in package.json, then run `npm install` — an override changes the install of the whole tree"), "{}", got[0].0);
+    assert!(got[0].2.contains("  \"overrides\": {\n    \"minimist\": \"1.2.6\"\n  }"), "{}", got[0].2);
+    assert!(run(&Vulnerable, "package-lock.json", &files, json!({})).is_empty(), "a lockfile carries no finding and is never edited");
+    // Once the override is written, the next install takes it: a fixpoint.
+    let fixed = got[0].2.clone();
+    assert!(run(&Vulnerable, "package.json", &[("package.json", &fixed), ("package-lock.json", lock)], json!({})).is_empty());
+    // A vulnerable override is reported, with no edit.
+    let bad = fixed.replace("\"1.2.6\"", "\"1.2.5\"");
+    let got = run(&Vulnerable, "package.json", &[("package.json", &bad), ("package-lock.json", lock)], json!({}));
+    assert!(got[0].0.contains("the override pins 1.2.5, which is still vulnerable: change it to 1.2.6") && got[0].2.is_empty(), "{got:?}");
+    // pnpm: `pnpm.overrides`, created level by level.
+    let pnpm = "lockfileVersion: '9.0'\nimporters:\n  .:\n    dependencies:\n      lodash:\n        specifier: ^4.17.21\n        version: 4.17.21\npackages:\n  lodash@4.17.21:\n    resolution: {integrity: x}\n  minimist@1.2.5:\n    resolution: {integrity: y}\n";
+    let got = run(&Vulnerable, "package.json", &[("package.json", pkg), ("pnpm-lock.yaml", pnpm)], json!({}));
+    assert!(got[0].2.contains("  \"pnpm\": {\n    \"overrides\": {\n      \"minimist\": \"1.2.6\"\n    }\n  }"), "{}", got[0].2);
+    assert!(serde_json::from_str::<Value>(&got[0].2).is_ok());
 }
 
 #[test]

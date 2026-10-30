@@ -4,15 +4,14 @@
 //!
 //! - A **direct** dependency's finding is on its manifest line, and its fix
 //!   moves the range to the target, keeping the operator.
-//! - A **transitive** one's is on its lockfile entry where the lockfile is
-//!   an L3 file (`package-lock.json`, `pnpm-lock.yaml`), naming the
-//!   override to add; where it is not (`yarn.lock`, `uv.lock`,
-//!   `poetry.lock`) it is on the manifest beside the lockfile, with the
-//!   override as its edit (yarn `resolutions`, uv
-//!   `override-dependencies`; Poetry has none).
+//! - A **transitive** one's is on the manifest beside the lockfile, where
+//!   the override that fixes it is written, with that override as its edit
+//!   (npm `overrides`, `pnpm.overrides`, yarn `resolutions`, uv
+//!   `override-dependencies`; Poetry has none). A lockfile is never edited;
+//!   an override already written is the version the next install takes.
 
 use super::advisory::{Target, TargetRules, Ver, affects, graded, severity_rank, target};
-use super::lock::{Locked, all_locked, lockfile_for, package_lock_name};
+use super::lock::{Locked, all_locked, lockfile_for};
 use super::npm::Range;
 use super::pep440::{Pep440, normalize, requirement};
 use super::rules::{MANIFESTS, Options, as_of_days, ignored, ignored_advisory, project_manifest, settings, severity};
@@ -26,7 +25,7 @@ use serde_json::{Value, json};
 
 use std::collections::BTreeMap;
 
-const LANGUAGES: &[Language] = &[Language::Json, Language::Toml, Language::Yaml];
+const LANGUAGES: &[Language] = &[Language::Json, Language::Toml];
 
 /// What a vulnerable version is, and where it can go.
 #[derive(Clone, Debug)]
@@ -148,29 +147,65 @@ fn direct_edit(dep: &Dep, t: &str) -> Option<TextEdit> {
     }
 }
 
-/// Insert `"name": "value"` into the top-level object `key` of a JSON
-/// document, creating it after the last member when missing.
-fn json_member_edit(doc: tree_sitter::Node<'_>, src: &str, key: &str, name: &str, value: &str) -> Option<TextEdit> {
-    let obj = top_object(doc)?;
-    let members = pairs(obj, src);
-    let pair = format!("\"{name}\": \"{value}\"");
-    if let Some((_, _, Some(v))) = members.iter().find(|(k, _, _)| k == key) {
-        if v.kind() != "object" {
-            return None;
-        }
-        let inner = pairs(*v, src);
-        return Some(match inner.last() {
-            Some((_, k, _)) => {
-                let end = k.parent().map(|p| p.end_byte()).unwrap_or(k.end_byte());
-                TextEdit::new(end, end, format!(",\n{}{pair}", indent_of(src, k.start_byte())))
+/// Insert `"name": "value"` into the object at `path` (`["overrides"]`,
+/// `["pnpm", "overrides"]`) of a JSON document, creating each missing level
+/// after the last member of its parent.
+fn json_member_edit(doc: tree_sitter::Node<'_>, src: &str, path: &[&str], name: &str, value: &str) -> Option<TextEdit> {
+    let mut obj = top_object(doc)?;
+    let mut rest = path;
+    while let Some((key, more)) = rest.split_first() {
+        match pairs(obj, src).into_iter().find(|(k, _, _)| k == key) {
+            Some((_, _, Some(v))) if v.kind() == "object" => {
+                obj = v;
+                rest = more;
             }
-            None => TextEdit::new(v.start_byte(), v.end_byte(), format!("{{ {pair} }}")),
-        });
+            Some(_) => return None,
+            None => break,
+        }
     }
-    let (_, k, _) = members.last()?;
-    let end = k.parent().map(|p| p.end_byte()).unwrap_or(k.end_byte());
-    let ind = indent_of(src, k.start_byte()).to_owned();
-    Some(TextEdit::new(end, end, format!(",\n{ind}\"{key}\": {{\n{ind}{ind}{pair}\n{ind}}}")))
+    let members = pairs(obj, src);
+    let Some((_, last, _)) = members.last() else {
+        // An empty object: write the rest inside it.
+        let mut text = format!("\"{name}\": \"{value}\"");
+        for key in rest.iter().rev() {
+            text = format!("\"{key}\": {{ {text} }}");
+        }
+        return Some(TextEdit::new(obj.start_byte(), obj.end_byte(), format!("{{ {text} }}")));
+    };
+    let end = last.parent().map(|p| p.end_byte()).unwrap_or(last.end_byte());
+    let ind = indent_of(src, last.start_byte()).to_owned();
+    let step = if ind.is_empty() { "  ".to_owned() } else { ind.clone() };
+    let mut text = String::new();
+    for (i, key) in rest.iter().enumerate() {
+        text.push_str(&format!("{ind}{}\"{key}\": {{\n", step.repeat(i)));
+    }
+    text.push_str(&format!("{ind}{}\"{name}\": \"{value}\"", step.repeat(rest.len())));
+    for i in (0..rest.len()).rev() {
+        text.push_str(&format!("\n{ind}{}}}", step.repeat(i)));
+    }
+    Some(TextEdit::new(end, end, format!(",\n{text}")))
+}
+
+/// The version a manifest's override already pins `name` to: npm
+/// `overrides`, pnpm `pnpm.overrides`, yarn `resolutions`, uv
+/// `[tool.uv] override-dependencies` (`name==v`).
+fn override_in(manifest_text: &str, lockfile: &str, name: &str) -> Option<String> {
+    match lockfile {
+        "uv.lock" => {
+            let doc: toml::Table = toml::from_str(manifest_text).ok()?;
+            let list = doc.get("tool")?.get("uv")?.get("override-dependencies")?.as_array()?;
+            list.iter().filter_map(|r| r.as_str()).filter_map(requirement).find(|r| r.normalized == normalize(name)).and_then(|r| r.clauses.iter().find(|c| matches!(c.op.as_str(), "==" | "===" | ">=")).map(|c| c.version.clone()))
+        }
+        _ => {
+            let doc: Value = serde_json::from_str(manifest_text).ok()?;
+            let v = match lockfile {
+                "pnpm-lock.yaml" => &doc["pnpm"]["overrides"][name],
+                "yarn.lock" => &doc["resolutions"][name],
+                _ => &doc["overrides"][name],
+            };
+            v.as_str().map(|s| s.trim_start_matches(['^', '~', '=', '>']).to_owned())
+        }
+    }
 }
 
 /// Add `requirement` to `[tool.uv] override-dependencies`: into the array
@@ -250,7 +285,9 @@ impl Vulnerable {
                 if severity(run.options, a.severity()).is_none() {
                     continue;
                 }
+                let settled = |t: &str| written_version(dep).and_then(|w| Ver::parse(eco, &w)).zip(Ver::parse(eco, t)).is_some_and(|(w, t)| w >= t);
                 let (fix, edits) = match &a.target {
+                    Target::Clean { version: t, .. } if settled(t) => (format!("; the range already starts there: run `{}` so the lockfile follows", install_command(lockfile.as_deref(), eco)), Vec::new()),
                     Target::Clean { version: t, .. } => match direct_edit(dep, t) {
                         Some(e) => (format!(", then run `{}`", install_command(lockfile.as_deref(), eco)), vec![e]),
                         None => (format!(": change the requirement by hand, then run `{}`", install_command(lockfile.as_deref(), eco)), Vec::new()),
@@ -285,8 +322,8 @@ impl Vulnerable {
     fn override_fix(&self, lockfile: &str, name: &str, t: &str) -> String {
         let manifest_note = " — an override changes the install of the whole tree";
         match lockfile.rsplit('/').next().unwrap_or(lockfile) {
-            "package-lock.json" => format!(": add `\"overrides\": {{ \"{name}\": \"{t}\" }}` to package.json, then run `npm install`{manifest_note}"),
-            "pnpm-lock.yaml" => format!(": add `\"pnpm\": {{ \"overrides\": {{ \"{name}\": \"{t}\" }} }}` to package.json, then run `pnpm install`{manifest_note}"),
+            "package-lock.json" => format!(" through `overrides` in package.json, then run `npm install`{manifest_note}"),
+            "pnpm-lock.yaml" => format!(" through `pnpm.overrides` in package.json, then run `pnpm install`{manifest_note}"),
             "yarn.lock" => format!(" through `resolutions` in package.json, then run `yarn install`{manifest_note}"),
             "uv.lock" => format!(" through `[tool.uv] override-dependencies`, then run `uv lock`{manifest_note}"),
             _ => format!(": Poetry has no override, so add `{name}>={t}` to the project's dependencies, then run `poetry lock`"),
@@ -311,50 +348,6 @@ fn written_version(dep: &Dep) -> Option<String> {
             req.clauses.iter().find(|c| matches!(c.op.as_str(), "==" | "===" | ">=" | "~=") && !c.wildcard).map(|c| c.version.clone())
         }
     }
-}
-
-/// Each `packages` entry of a `package-lock.json` with its `version`
-/// string's span: `(key, version, start, end)`.
-fn package_lock_spans(doc: tree_sitter::Node<'_>, src: &str) -> Vec<(String, String, usize, usize)> {
-    let mut out = Vec::new();
-    let Some(top) = top_object(doc) else { return out };
-    for (k, _, v) in pairs(top, src) {
-        if k != "packages" {
-            continue;
-        }
-        let Some(obj) = v.filter(|v| v.kind() == "object") else { continue };
-        for (key, _, entry) in pairs(obj, src) {
-            let Some(entry) = entry.filter(|e| e.kind() == "object") else { continue };
-            let Some(name) = package_lock_name(&key) else { continue };
-            let own = pairs(entry, src);
-            let name = own.iter().find(|(k, _, _)| k == "name").and_then(|(_, _, v)| *v).map(|v| crate::data_json::string_value(v, src)).unwrap_or_else(|| name.to_owned());
-            if let Some((_, _, Some(ver))) = own.iter().find(|(k, _, _)| k == "version") {
-                out.push((name, crate::data_json::string_value(*ver, src), ver.start_byte(), ver.end_byte()));
-            }
-        }
-    }
-    out
-}
-
-/// Each `packages:` key of a `pnpm-lock.yaml`, with its span.
-fn pnpm_spans(src: &str) -> Vec<(String, String, usize, usize)> {
-    let mut out = Vec::new();
-    let mut offset = 0;
-    let mut inside = false;
-    for line in src.split_inclusive('\n') {
-        let body = line.trim_end_matches(['\n', '\r']);
-        if !body.starts_with(' ') && !body.is_empty() {
-            inside = body == "packages:";
-        } else if inside && body.starts_with("  ") && !body[2..].starts_with(' ') && body.ends_with(':') {
-            let raw = &body[2..body.len() - 1];
-            let key = raw.trim_matches(['\'', '"']);
-            if let Some((name, version)) = super::lock::pnpm_key(key) {
-                out.push((name, version, offset + 2, offset + 2 + raw.len()));
-            }
-        }
-        offset += line.len();
-    }
-    out
 }
 
 impl NativeRule for Vulnerable {
@@ -401,9 +394,7 @@ impl NativeRule for Vulnerable {
     fn check(&self, node: SyntaxNode<'_>, ctx: &NativeContext<'_>, out: &mut Vec<NativeFinding>) {
         let path = ctx.file.path();
         let file = path.rsplit('/').next().unwrap_or(path);
-        let lockfile_here = matches!((ctx.language, file), (Language::Json, "package-lock.json") | (Language::Yaml, "pnpm-lock.yaml"));
-        let manifest = matches!((ctx.language, file), (Language::Json, "package.json") | (Language::Toml, "pyproject.toml"));
-        if !lockfile_here && !manifest {
+        if !matches!((ctx.language, file), (Language::Json, "package.json") | (Language::Toml, "pyproject.toml")) {
             return;
         }
         let Some(snap) = ctx.file.read(SNAPSHOT_PATH).and_then(|t| Snapshot::parse(&t)) else { return };
@@ -414,44 +405,43 @@ impl NativeRule for Vulnerable {
         let note = snapshot_note(&snap, ctx.options);
         let run = Run { snap, fetched, options: ctx.options, note };
         let doc = node.get_inner_node();
-        if lockfile_here {
-            let (eco, spans) = if file == "package-lock.json" { (Ecosystem::Npm, package_lock_spans(doc, ctx.source)) } else { (Ecosystem::Npm, pnpm_spans(ctx.source)) };
-            for (l, a) in self.transitive(ctx, &run, eco, file, ctx.source) {
-                let fix = match &a.target {
-                    Target::Clean { version, .. } => self.override_fix(file, &l.name, version),
-                    _ => String::new(),
-                };
-                let who = format!("`{}` {} (installed through another package)", l.name, l.version);
-                let message = self.message(&who, &a, &fix, &run.note);
-                for (_, _, start, end) in spans.iter().filter(|(n, v, _, _)| *n == l.name && *v == l.version) {
-                    out.push(NativeFinding { start: *start, end: *end, message: message.clone(), edits: Vec::new() });
-                }
-            }
-            return;
-        }
         let deps = manifest_deps(ctx.language, path, doc, ctx.source);
         self.direct(ctx, &run, &deps, out);
-        // A lockfile that is not an L3 file, in this manifest's own folder:
-        // its transitive findings sit here.
+        // The lockfile in this manifest's own folder: its transitive
+        // findings sit here, where the override that fixes them is written.
         let dir = folder_of(path);
         let eco = if file == "package.json" { Ecosystem::Npm } else { Ecosystem::Pypi };
         let read = |p: &str| ctx.file.read(p);
         let Some((lockfile, text)) = lockfile_for(eco, dir, &read) else { return };
-        let lock_file = lockfile.rsplit('/').next().unwrap_or(&lockfile);
-        if folder_of(&lockfile) != dir || matches!(lock_file, "package-lock.json" | "pnpm-lock.yaml") {
+        if folder_of(&lockfile) != dir {
             return;
         }
+        let lock_file = lockfile.rsplit('/').next().unwrap_or(&lockfile).to_owned();
         let line_end = ctx.source.find('\n').unwrap_or(ctx.source.len());
-        for (l, a) in self.transitive(ctx, &run, eco, lock_file, &text) {
-            let (fix, edits) = match &a.target {
-                Target::Clean { version, .. } => {
-                    let edit = match lock_file {
-                        "yarn.lock" => json_member_edit(doc, ctx.source, "resolutions", &l.name, version),
+        let as_of_cell = std::cell::OnceCell::new();
+        let as_of = || *as_of_cell.get_or_init(|| as_of_days(ctx));
+        for (l, a) in self.transitive(ctx, &run, eco, &lock_file, &text) {
+            // An override already written decides what the next install
+            // takes: a clean one settles it, a vulnerable one is reported.
+            let key = format!("{}:{}", eco.prefix(), l.name);
+            let pinned = override_in(ctx.source, &lock_file, &l.name);
+            if let Some(v) = &pinned
+                && run.snap.packages.get(&key).is_some_and(|pkg| assess(eco, &key, pkg, v, run.options, run.fetched, &as_of).is_none())
+            {
+                continue;
+            }
+            let (fix, edits) = match (&a.target, &pinned) {
+                (Target::Clean { version, .. }, None) => {
+                    let edit = match lock_file.as_str() {
+                        "package-lock.json" => json_member_edit(doc, ctx.source, &["overrides"], &l.name, version),
+                        "pnpm-lock.yaml" => json_member_edit(doc, ctx.source, &["pnpm", "overrides"], &l.name, version),
+                        "yarn.lock" => json_member_edit(doc, ctx.source, &["resolutions"], &l.name, version),
                         "uv.lock" => Some(uv_override_edit(ctx.source, &format!("{}=={version}", l.name))),
                         _ => None,
                     };
-                    (self.override_fix(lock_file, &l.name, version), edit.into_iter().collect())
+                    (self.override_fix(&lock_file, &l.name, version), edit.into_iter().collect())
                 }
+                (Target::Clean { version, .. }, Some(v)) => (format!("; the override pins {v}, which is still vulnerable: change it to {version}"), Vec::new()),
                 _ => (String::new(), Vec::new()),
             };
             let who = format!("`{}` {} (installed through another package, in {lock_file})", l.name, l.version);
