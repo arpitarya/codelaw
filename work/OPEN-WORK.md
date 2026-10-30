@@ -69,7 +69,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-148** `agent` From Oxlint: Oxc's native formatters measured on W-141's corpus (CSS 88.6% vs 41.8%, Markdown 97.3% vs 73.3%) and put to Arpit under L11; 18 Oxlint-only rules into W-139; 38 bug rules corpus-run for `recommended`. Filed by Arpit (Cowork). [detail](open/W-148-oxc-formatters-and-oxlint-rules.md)
 
-🔴 **W-150** `arpit` Dev-server plugins stuck at 0.2.0 on npm: `publish.yml` never uploads them. Arpit publishes 0.4.0 by hand (commands given 10-30); then the agent adds the tier and a check. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
+🟢 **W-150** `agent` Dev-server plugins: Arpit published 0.4.0 by hand 10-30 (were stuck at 0.2.0 — `publish.yml` never uploads them). Left: a tier in `publish.yml` and a check that every `dist/npm` tarball has one. Filed by Arpit (Cowork). [detail](open/W-150-publish-dev-server-plugins.md)
 
 ### testing (0)
 

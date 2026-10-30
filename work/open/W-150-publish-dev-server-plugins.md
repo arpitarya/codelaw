@@ -7,7 +7,7 @@ filed: 2026-10-30
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
 updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-150 — `publish.yml` uploads the dev-server plugins
@@ -16,7 +16,7 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Arpit publishes the three at 0.4.0 by hand from v0.4.0's `dist` (`ci` run 40932052080) | they catch up now | 🔴 Arpit — commands given 2026-10-30 |
+| 1 | Arpit publishes the three at 0.4.0 by hand from v0.4.0's `dist` (`ci` run 40932052080) | they catch up now | ✅ 2026-10-30 10:30 IST — Arpit, `npm publish` from v0.4.0's `dist` (`ci` 40932052080, checksums verified); all three at 0.4.0 on the registry |
 | 2 | `publish.yml`'s npm job: a tier for `codelaw-vite-plugin-*.tgz`, `codelaw-webpack-plugin-*.tgz`, `codelaw-next-*.tgz` (after `codelaw`, since they spawn it) | every release ships them | ⏳ |
 | 3 | `scripts/package.py check` (or the gate) fails when `dist/npm` holds a tarball no tier uploads | this cannot happen again | ⏳ |
 
