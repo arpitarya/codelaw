@@ -19,7 +19,7 @@ ball: agent
 | 1 | Amend L6: a `tailwind` pack | one package to install | ⏳ |
 | 2 | The class-order table as pack data, matching `prettier-plugin-tailwindcss`'s order | no churn for teams switching | ⏳ |
 | 3 | The formatter sorts `class`/`className` (and `clsx`/`cn`/`tw` calls, configurable) when the pack is installed and the project uses Tailwind | sorting with no extra tool | ⏳ |
-| 4 | The lint rules W-144 picks (conflicting classes, unknown classes) | bugs caught | 🟡 waits on W-144 |
+| 4 | The lint rules W-144 picked: the 8 `tailwind` rows in the two Tailwind CSVs (conflicting, unknown, concatenated classes …); `tailwind/recommended` on when the pack is installed | bugs caught | ⏳ ruled 2026-10-30 |
 
 **Arpit, 2026-10-30 (voice):** *"I want the class sorting in the formatter."* · on a linter package and a formatter package: told packs hold data, never code, and the formatter lives in the engine — *"But will the package size increase significantly?"* → no, tens to a few hundred kilobytes (estimate) → *"Okay. Then let's go for it."*
 
@@ -44,7 +44,7 @@ ball: agent
 
 ## Blockers
 
-None for sorting. The lint rules wait on W-144.
+None — W-144 ruled 2026-10-30.
 
 ## Record affected
 
@@ -57,4 +57,4 @@ SR-LAW-6 · [SR-FORMATTER](../../records/0105_formatter.md) · SR-RULE-PACKS · 
 
 ## Reference
 
-[W-144](W-144-rule-parity-round-2.md) · [W-141](W-141-formatter-parity.md) · prettier-plugin-tailwindcss (MIT)
+[W-144](../../archive/open/W-144-rule-parity-round-2.md) · [W-141](W-141-formatter-parity.md) · prettier-plugin-tailwindcss (MIT)
