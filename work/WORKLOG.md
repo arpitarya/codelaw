@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-95's install docs, W-97's `v0` tag; W-149 left to the session already fixing it  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *implement W149, W126, W95.* — then *implement w-97 as well*
+- **Done:** W-95 step 4 — README (badge, preview note, install line, roadmap rows → 0.4.0 and the Marketplace listing) and USAGE's *Editor* line (`code --install-extension codelaw.codelaw-vscode`). W-97 — the moving `v0` tag created at `v0.4.0` (`d2a87c8`) and pushed. Landed Cowork's main-checkout queue edits as `744fded8` (standing approval).
+- **Decided / left open:** W-149 was not touched: session `85d8c064` holds `W-131-corpus` (the six `corpus.toml`) and was running `corpus.py run --pack python --update` at 10:14. W-126 needs that green `main` for its Rust- and pack-change runs, and Releases for its publish runs — no agent step today. W-97's throwaway-repo proof: `gh repo create --public` refused by Claude Code's permission check; it waits for Arpit.
+- **Mistakes:** none.
+- **Next:** W-97's proof once Arpit allows the public repo; W-126's measurements once W-149 lands.
+
 ## 2026-10-30 — W-103's `spell` bench operation; W-102's redesign handed to a parallel agent  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *implement 102 & 103*

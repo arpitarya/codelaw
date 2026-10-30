@@ -6,7 +6,7 @@ item: W-97
 filed: 2026-10-27
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-30
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -55,8 +55,8 @@ Why: Biome (`setup-biome`) and Ruff (`ruff-action`) ship one ([proposal](../prop
 ## Left (ruled 2026-10-27; step 1 moved by the 2026-10-30 ruling)
 
 1. ~~**Arpit:** accept the Marketplace Developer Agreement and tick *Publish this Action to the GitHub Marketplace*.~~ ✅ done on v0.4.0 (2026-10-30).
-2. **Agent, now (0.4.0 has `--format github`):** the DoD proof — `gh repo create arpitarya/codelaw-action-test --public --clone`, `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, one `debugger`, then the annotation and Security → Code scanning checked.
-3. **Agent, each release:** `git tag -f v0 v<x> && git push -f origin v0` (RELEASING.md) — **never done yet: create `v0` at `v0.4.0` first.**
+2. **Agent, now (0.4.0 has `--format github`):** ⏳ **2026-10-30: Claude Code's permission check refused `gh repo create --public`** (a new public surface), so the proof waits for Arpit to allow it or create the repo. Prepared: the fixture's `codelaw.toml`, `src/app.js` and `.codelaw/rules/fixture/no-debugger.md`, and the template's workflow with `@v0`, `sarif: true` and `security-events: write`. The DoD proof — `gh repo create arpitarya/codelaw-action-test --public --clone`, `.github/workflows/codelaw.yml` from `codelaw init --ci github` with `sarif: true` and `permissions: security-events: write`, one `debugger`, then the annotation and Security → Code scanning checked.
+3. **Agent, each release:** `git tag -f v0 v<x> && git push -f origin v0` (RELEASING.md) — ✅ **`v0` created 2026-10-30 at `v0.4.0` (`d2a87c8`)**, pushed; a tag push triggers no workflow (`ci.yml` runs on branches, `publish.yml` on Releases).
 4. **Offered, not ruled:** a clear error when `upload-sarif` is on and `gh` is absent (a self-hosted runner or slim image) — the plain check-and-annotate path needs no `gh`.
 
 ## Record affected
