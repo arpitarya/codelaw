@@ -39,7 +39,7 @@ uvx codelaw@0.4.2 init     # a Python repo: installs the codelaw-rules-* it need
 
 - **Findings on plain-text config files (W-136):** a finding about `.nvmrc`, `.node-version`, `.python-version`, `.tool-versions`, a `Dockerfile`, `CODEOWNERS` or yarn classic's `yarn.lock` shows on the file it concerns (`package.json`, a workflow) **and** on the text file's line — in `check`'s every format, the editor (the extension now opens these files) and the post-edit hook. They are not linted or formatted, and `fix` never writes one (L3 amended).
 - **GitHub Action (W-97):** its Marketplace name is `codelaw check` (the name `codelaw` is taken) and its description is under the Marketplace's 125 characters; `uses: arpitarya/codelaw@v0` is unchanged.
-- **Every package a release builds is now published (W-150, B-063, W-134):** the dev-server plugins `@codelaw/vite-plugin`, `@codelaw/webpack-plugin` and `@codelaw/next` (left at 0.2.0 on npm) and the optional Fux index packages (0.2.0 and 0.3.0 on both registries) are uploaded by the release workflow with the rest, at the release version; a tarball no upload step names now fails the build. `codelaw-rules-deps` is created on PyPI by the release itself, through its pending publisher.
+- **Every package a release builds is now published (W-150, B-063, W-134, W-151):** the dev-server plugins `@codelaw/vite-plugin`, `@codelaw/webpack-plugin` and `@codelaw/next` (left at 0.2.0 on npm) and the optional Fux index packages (0.2.0 and 0.3.0 on both registries) are uploaded by the release workflow with the rest, at the release version; a tarball no upload step names now fails the build. `codelaw-rules-deps` is created on PyPI by the release itself, through its pending publisher.
 
 ### Fixed
 

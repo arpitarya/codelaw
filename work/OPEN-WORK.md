@@ -28,6 +28,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — waiting on Open VSX** ([W-95](open/W-95-publish-vscode-extension.md), was W-117): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
 | ↳ **blocks:** W-95 (its Open VSX half) | |
+| 🔴 **After v0.4.2** ([W-151](open/W-151-release-0-4-1.md)): (1) `git tag -f v0 v0.4.2 && git push -f origin v0` — Claude Code's permission check refused it; `@v0` is v0.4.0 until then. (2) pypi.org → *Publishing → Add a pending publisher*: `codelaw-rules-deps-fux-index` · `arpitarya` · `codelaw` · `publish.yml` · `pypi` (Cowork can fill it in Chrome); the next release creates it. | 2026-10-30 |
+| ↳ **blocks:** W-151's close | |
 
 ---
 
@@ -55,7 +57,7 @@ here. Read that record before changing anything below it.
 
 🟢 **W-126** `agent` Ruled 10-30: `perf` split across parallel jobs, nothing waits on its verdict (until a budget is set, L8); release 3m50 accepted. Cached CI 4m11–4m25 ✅. Next: the `perf` matrix, then the measurement runs. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
-🟢 **W-151** `agent` Release **v0.4.2** (ruled 10-30: *"upgrade all the packages to version 0.4.2 and publish them"*; 0.4.1 only reserved the two `deps` npm names). Bumped 10-30; next: `main` green, then the Release and its checks. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
+🔴 **W-151** `arpit` **v0.4.2 released 10-30**: npm 47/47, PyPI 25/26, Marketplace 8/8, CI and `publish` green. Left (inbox): move `v0` to v0.4.2; the PyPI pending publisher for `codelaw-rules-deps-fux-index`. Filed by Arpit (Claude Code). [detail](open/W-151-release-0-4-1.md)
 
 🔴 **W-95** `arpit` VS Code extension: Marketplace live (0.4.0); Open VSX (was W-117) uploaded by hand, inactive until claim #14928 is approved — then the trusted publisher and a VSCodium check. Merged 10-30. Filed by Arpit (Cowork). [detail](open/W-95-publish-vscode-extension.md)
 
