@@ -61,4 +61,15 @@
 #   without their records or a `no SR affected` line) — yet it landed; the
 #   resubmit 162a8f5 carries the line. It is pushed, so it cannot be reworded;
 #   it is the newest failing commit, so the baseline is that commit.
-2c7fee810772e3afb931e2a7a3b73cabdcdb9d6a
+# - 2026-10-30, the parallel batch (W-128, W-130–W-133, W-136, W-137, W-140):
+#   2c7fee8 -> 64acbc3. Thirteen commits since 2c7fee8 fail the replay:
+#   2d5808d (Cowork's inbox rulings, landed by pickup; action.yml without
+#   SR-PACKAGES — c735e27 carries it), bf384e4 (W-136), ba275c3, 68f659d and
+#   ab1cb84 (W-136-b), c58a092 (W-131), 8c8868d and bf5a6aa (W-137), 4dea33e,
+#   b79045a and ed7db75 (W-130), cbbb57f and 21ff005 (W-140). Each is the
+#   kit's end-of-turn auto-land committing a change the commit-msg guard had
+#   refused; every one's records came in the same item's later commits. They
+#   are not pushed but sit under later landings, so they are not reworded.
+#   64acbc3 is the first commit on main's first-parent line that holds all
+#   thirteen, so it is the baseline and every commit after it is judged.
+64acbc331425aec4878c920b1b17868b859582f6
