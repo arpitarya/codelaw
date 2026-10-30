@@ -41,7 +41,7 @@ ball: agent
 1. `publish.yml`'s PyPI `exists` step: upload a wheel whose project is missing when it is `codelaw` **or `codelaw-rules-deps`** (a named list beside the `codelaw` exception, each with its pending publisher); every other missing project is still skipped and named.
 2. Amend [L6](../../records/0008_LAW-6-python-and-node-packages.md) decision 9 (*"PyPI uploads only what exists"*: the exception becomes the projects holding a pending publisher, with this ruling quoted), SR-PACKAGES (*"No new-project path in CI"* and the first-publish consequence), RELEASING.md step 4; CLAUDE.md's L6 line if it names the rule.
 2b. **Asked the same day:** *"For the PyPy package, give me the GitHub command to trigger the pipeline just for that one package."* — no such trigger exists (`workflow_dispatch` takes `only: npm|vscode`; the PyPI job runs on a Release only). Add `only: pypi` with a `package` input, from a `v*` tag, uploading just that wheel from the tag's `dist`: `gh workflow run publish.yml -R arpitarya/codelaw --ref v<next> -f only=pypi -f package=codelaw-rules-deps`. W-125 removed a similar path (`only=pypi-new`); this is its narrower return, by this ruling — say so in SR-PACKAGES.
-3. After the release that creates `codelaw-rules-deps`: Claude adds the pending publisher for `codelaw-rules-deps-fux-index` (PyPI allows one at a time) — it is uploaded only once B-063 is done.
+3. After the release that creates `codelaw-rules-deps`: Claude adds the pending publisher for `codelaw-rules-deps-fux-index` (PyPI allows one at a time) — it is uploaded only once [W-150](W-150-publish-dev-server-plugins.md) (was B-063) is done.
 
 ## Built 2026-10-30 (Claude Code, in W-150's change)
 
@@ -74,7 +74,7 @@ None — W-128 closed 2026-10-30. Do it just before the next release.
 ## Hazards
 
 - A pending publisher reserves nothing: someone else can take the name first — do it close to the release, as ruled, but not after it.
-- B-063 landed 2026-10-30 (W-150): `publish.yml` uploads the Fux index wheels, so the second name is created by the release after its pending publisher is added.
+- [W-150](W-150-publish-dev-server-plugins.md) (was B-063) built 2026-10-30: `publish.yml` uploads the Fux index wheels, so the second name is created by the release after its pending publisher is added.
 
 ## Reference
 
