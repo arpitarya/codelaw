@@ -315,16 +315,16 @@ jobs:
           (cd dist/fux-index && sha256sum --strict --quiet -c SHA256SUMS)
           [ "$(find dist/fux-index/npm dist/fux-index/pypi -type f | wc -l)" = "$(wc -l < dist/fux-index/SHA256SUMS)" ] || { echo "::error::dist/fux-index holds a file its SHA256SUMS does not list"; exit 1; }
       - id: exists
-        name: only wheels whose PyPI project exists, or holds a pending publisher (codelaw, codelaw-rules-deps-fux-index); the rest are named, not failed (L6 decision 9)
+        name: only wheels whose PyPI project exists, or holds a pending publisher (codelaw); the rest are named, not failed (L6 decision 9)
         env:
           ONLY: ${{ inputs.only }}
           PACKAGE: ${{ inputs.package }}
         # PENDING: the projects CI may create, each through the pending publisher
         # the decider added on pypi.org (L6 decision 9; codelaw since W-30;
-        # codelaw-rules-deps since W-134, out once v0.4.2 created it;
-        # codelaw-rules-deps-fux-index since W-151). Every other missing project is skipped.
+        # codelaw-rules-deps (W-134) and codelaw-rules-deps-fux-index (W-151) were
+        # here until v0.4.2 and v0.4.3 created them). Every other missing project is skipped.
         run: |
-          PENDING=" codelaw codelaw-rules-deps-fux-index "
+          PENDING=" codelaw "
           mkdir -p upload
           {
             echo "### PyPI"

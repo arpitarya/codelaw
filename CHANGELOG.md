@@ -4,6 +4,10 @@ Every user-visible change, newest first. The format follows [Keep a Changelog](h
 
 ## Unreleased
 
+### Changed
+
+- **Release pipeline (W-154):** `publish.yml`'s list of PyPI projects CI may create is back to `codelaw` alone — 0.4.2 and 0.4.3 created the `deps` pack and its index.
+
 ## 0.4.3 — 2026-10-30
 
 **The `deps` pack's Fux index on PyPI.** The same engine and rules as
