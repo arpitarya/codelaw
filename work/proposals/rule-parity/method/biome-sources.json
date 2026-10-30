@@ -1,0 +1,2092 @@
+{
+"about": "Biome 2.6.4 rule sources, read from its declare_lint_rule! blocks (W-138)",
+"sources": {
+"Alice": [
+"typescript-eslint/naming-convention",
+"eslint/camelcase",
+"eslint-plugin-vue/camelcase"
+],
+"Foo": [
+"eslint-plugin-vue/multi-word-component-names"
+],
+"John": [
+"eslint-plugin-drizzle/enforce-update-with-where"
+],
+"MyButton": [
+"eslint-plugin-vue/match-component-file-name"
+],
+"MyComponent": [
+"eslint-plugin-vue/prefer-define-options"
+],
+"Submit": [
+"eslint-plugin-playwright/no-nth-methods"
+],
+"foo": [
+"eslint-plugin-unicorn/no-document-cookie"
+],
+"noAccessKey": [
+"eslint-plugin-jsx-a11y/no-access-key",
+"@html-eslint/no-accesskey-attrs",
+"EslintAstro/jsx-a11y/no-access-key"
+],
+"noAccidentalBitwiseOperators": [
+"eslint-plugin-unicorn/no-accidental-bitwise-operator"
+],
+"noAdjacentSpacesInRegex": [
+"eslint/no-regex-spaces"
+],
+"noAlert": [
+"eslint/no-alert"
+],
+"noAmbiguousAnchorText": [
+"eslint-plugin-jsx-a11y/anchor-ambiguous-text",
+"EslintAstro/jsx-a11y/anchor-ambiguous-text"
+],
+"noApproximativeNumericConstant": [
+"clippy/approx_constant",
+"eslint-plugin-unicorn/prefer-math-constants"
+],
+"noArguments": [
+"eslint/prefer-rest-params"
+],
+"noArgumentsCallerOrCallee": [
+"eslint/no-caller"
+],
+"noAriaHiddenOnFocusable": [
+"eslint-plugin-jsx-a11y/no-aria-hidden-on-focusable",
+"@html-eslint/no-aria-hidden-on-focusable",
+"EslintAstro/jsx-a11y/no-aria-hidden-on-focusable"
+],
+"noAriaUnsupportedElements": [
+"eslint-plugin-jsx-a11y/aria-unsupported-elements",
+"EslintAstro/jsx-a11y/aria-unsupported-elements"
+],
+"noArrayIndexKey": [
+"eslint-plugin-react/no-array-index-key",
+"@eslint-react/no-array-index-key",
+"@eslint-react/no-array-index-key"
+],
+"noArraySortForMinMax": [
+"eslint-plugin-unicorn/no-array-sort-for-min-max"
+],
+"noAssignInExpressions": [
+"eslint/no-cond-assign"
+],
+"noAstroConflictingSetDirectives": [
+"EslintAstro/no-conflict-set-directives"
+],
+"noAstroSetHtmlDirective": [
+"EslintAstro/no-set-html-directive"
+],
+"noAsyncPromiseExecutor": [
+"eslint/no-async-promise-executor"
+],
+"noAutofocus": [
+"eslint-plugin-jsx-a11y/no-autofocus",
+"EslintAstro/jsx-a11y/no-autofocus"
+],
+"noAwaitInLoops": [
+"eslint/no-await-in-loop"
+],
+"noBannedTypes": [
+"typescript-eslint/ban-types",
+"typescript-eslint/no-empty-object-type",
+"typescript-eslint/no-wrapper-object-types",
+"typescript-eslint/no-unsafe-function-type"
+],
+"noBarrelFile": [
+"eslint-plugin-barrel-files/avoid-barrel-files"
+],
+"noBaseToString": [
+"typescript-eslint/no-base-to-string"
+],
+"noBeforeInteractiveScriptOutsideDocument": [
+"@next/eslint-plugin-next/no-before-interactive-script-outside-document"
+],
+"noBitwiseOperators": [
+"eslint/no-bitwise"
+],
+"noBlankTarget": [
+"eslint-plugin-react/jsx-no-target-blank",
+"EslintReactDom/no-unsafe-target-blank",
+"@eslint-react/dom-no-unsafe-target-blank",
+"eslint-plugin-svelte/no-target-blank",
+"eslint-plugin-vue/no-template-target-blank",
+"@html-eslint/no-target-blank"
+],
+"noBooleanSortComparator": [
+"eslint-plugin-unicorn/no-boolean-sort-comparator"
+],
+"noCatchAssign": [
+"eslint/no-ex-assign"
+],
+"noChildrenProp": [
+"eslint-plugin-react/no-children-prop",
+"EslintReactJsx/no-children-prop",
+"@eslint-react/jsx-no-children-prop"
+],
+"noClassAssign": [
+"eslint/no-class-assign"
+],
+"noCommaOperator": [
+"eslint/no-sequences"
+],
+"noCommentText": [
+"eslint-plugin-react/jsx-no-comment-textnodes"
+],
+"noCommonJs": [
+"typescript-eslint/no-require-imports",
+"typescript-eslint/no-var-requires",
+"eslint-plugin-import/no-commonjs"
+],
+"noCompareNegZero": [
+"eslint/no-compare-neg-zero"
+],
+"noComponentHookFactories": [
+"eslint-plugin-react-hooks/component-hook-factories",
+"@eslint-react/component-hook-factories",
+"@eslint-react/component-hook-factories"
+],
+"noConditionalExpect": [
+"eslint-plugin-playwright/no-conditional-expect",
+"eslint-plugin-jest/no-conditional-expect",
+"@vitest/eslint-plugin/no-conditional-expect"
+],
+"noConfusingLabels": [
+"eslint/no-labels"
+],
+"noConfusingVoidType": [
+"typescript-eslint/no-invalid-void-type"
+],
+"noConsole": [
+"eslint/no-console",
+"eslint-plugin-vue/no-console",
+"deno_lint/no-console"
+],
+"noConsoleSpaces": [
+"eslint-plugin-unicorn/no-console-spaces"
+],
+"noConstAssign": [
+"eslint/no-const-assign"
+],
+"noConstantBinaryExpressions": [
+"eslint/no-constant-binary-expression"
+],
+"noConstantCondition": [
+"eslint/no-constant-condition",
+"eslint-plugin-vue/no-constant-condition"
+],
+"noConstantMathMinMaxClamp": [
+"clippy/min_max"
+],
+"noConstructorReturn": [
+"eslint/no-constructor-return"
+],
+"noContinue": [
+"eslint/no-continue"
+],
+"noControlCharactersInRegex": [
+"eslint/no-control-regex"
+],
+"noDangerouslySetInnerHtml": [
+"eslint-plugin-react/no-danger",
+"EslintReactDom/no-dangerously-set-innerhtml",
+"@eslint-react/dom-no-dangerously-set-innerhtml"
+],
+"noDangerouslySetInnerHtmlWithChildren": [
+"eslint-plugin-react/no-danger-with-children",
+"EslintReactDom/no-dangerously-set-innerhtml-with-children",
+"@eslint-react/dom-no-dangerously-set-innerhtml-with-children"
+],
+"noDanglingUnderscore": [
+"eslint/no-underscore-dangle"
+],
+"noDebugger": [
+"eslint/no-debugger",
+"deno_lint/no-debugger"
+],
+"noDefaultExport": [
+"eslint-plugin-import/no-default-export"
+],
+"noDelete": [
+"eslint/no-delete-var"
+],
+"noDeprecatedImports": [
+"typescript-eslint/no-deprecated",
+"eslint-plugin-import/no-deprecated"
+],
+"noDeprecatedMediaType": [
+"stylelint/media-type-no-deprecated"
+],
+"noDescendingSpecificity": [
+"stylelint/no-descending-specificity"
+],
+"noDistractingElements": [
+"eslint-plugin-jsx-a11y/no-distracting-elements",
+"EslintAstro/jsx-a11y/no-distracting-elements"
+],
+"noDivRegex": [
+"eslint/no-div-regex"
+],
+"noDocumentImportInPage": [
+"@next/eslint-plugin-next/no-document-import-in-page"
+],
+"noDoneCallback": [
+"eslint-plugin-jest/no-done-callback",
+"@vitest/eslint-plugin/no-done-callback"
+],
+"noDoubleComparison": [
+"eslint-plugin-unicorn/no-double-comparison"
+],
+"noDoubleEquals": [
+"eslint/eqeqeq",
+"eslint-plugin-vue/eqeqeq",
+"deno_lint/eqeqeq"
+],
+"noDrizzleDeleteWithoutWhere": [
+"eslint-plugin-drizzle/enforce-delete-with-where"
+],
+"noDuplicateArgumentNames": [
+"@graphql-eslint/unique-argument-names"
+],
+"noDuplicateAtImportRules": [
+"stylelint/no-duplicate-at-import-rules",
+"EslintCss/no-duplicate-imports"
+],
+"noDuplicateAttributes": [
+"@html-eslint/no-duplicate-attrs",
+"eslint-plugin-vue/no-duplicate-attributes"
+],
+"noDuplicateCase": [
+"eslint/no-duplicate-case"
+],
+"noDuplicateClassMembers": [
+"eslint/no-dupe-class-members",
+"typescript-eslint/no-dupe-class-members"
+],
+"noDuplicateCustomProperties": [
+"stylelint/declaration-block-no-duplicate-custom-properties"
+],
+"noDuplicateDependencies": [
+"eslint-plugin-package-json/unique-dependencies",
+"EslintPackageJsonDependencies/duplicate-dependencies"
+],
+"noDuplicateElseIf": [
+"eslint/no-dupe-else-if"
+],
+"noDuplicateEnumValueNames": [
+"@graphql-eslint/unique-enum-value-names"
+],
+"noDuplicateEnumValues": [
+"typescript-eslint/no-duplicate-enum-values"
+],
+"noDuplicateFieldDefinitionNames": [
+"@graphql-eslint/unique-field-definition-names"
+],
+"noDuplicateFields": [
+"@graphql-eslint/no-duplicate-fields"
+],
+"noDuplicateFontNames": [
+"stylelint/font-family-no-duplicate-names"
+],
+"noDuplicateGraphqlOperationName": [
+"@graphql-eslint/unique-operation-name"
+],
+"noDuplicateInputFieldNames": [
+"@graphql-eslint/unique-input-field-names"
+],
+"noDuplicateJsxProps": [
+"eslint-plugin-react/jsx-no-duplicate-props"
+],
+"noDuplicateObjectKeys": [
+"eslint/no-dupe-keys"
+],
+"noDuplicateParameters": [
+"eslint/no-dupe-args"
+],
+"noDuplicateProperties": [
+"stylelint/declaration-block-no-duplicate-properties"
+],
+"noDuplicateSelectors": [
+"stylelint/no-duplicate-selectors"
+],
+"noDuplicateSelectorsKeyframeBlock": [
+"stylelint/keyframe-block-no-duplicate-selectors",
+"EslintCss/no-duplicate-keyframe-selectors"
+],
+"noDuplicateTestHooks": [
+"eslint-plugin-jest/no-duplicate-hooks",
+"@vitest/eslint-plugin/no-duplicate-hooks"
+],
+"noDuplicateVariableNames": [
+"@graphql-eslint/unique-variable-names"
+],
+"noDuplicatedSpreadProps": [
+"eslint-plugin-react/jsx-props-no-spread-multi"
+],
+"noEagerArrayMethodsInLoops": [
+"eslint-plugin-unicorn/no-duplicate-loops"
+],
+"noEmptyBlock": [
+"stylelint/block-no-empty",
+"EslintCss/no-empty-blocks"
+],
+"noEmptyBlockStatements": [
+"eslint/no-empty",
+"eslint/no-empty-static-block",
+"eslint/no-empty-function",
+"typescript-eslint/no-empty-function"
+],
+"noEmptyCharacterClassInRegex": [
+"eslint/no-empty-character-class"
+],
+"noEmptyInterface": [
+"typescript-eslint/no-empty-interface"
+],
+"noEmptyObjectKeys": [
+"EslintJson/no-empty-keys"
+],
+"noEmptyPattern": [
+"eslint/no-empty-pattern",
+"eslint-plugin-vue/no-empty-pattern"
+],
+"noEmptySource": [
+"eslint-plugin-unicorn/no-empty-file"
+],
+"noEqualsToNull": [
+"eslint/no-eq-null"
+],
+"noExcessiveClassesPerFile": [
+"eslint/max-classes-per-file"
+],
+"noExcessiveCognitiveComplexity": [
+"eslint-plugin-sonarjs/cognitive-complexity",
+"eslint/complexity"
+],
+"noExcessiveLinesPerFile": [
+"eslint/max-lines"
+],
+"noExcessiveLinesPerFunction": [
+"eslint/max-lines-per-function"
+],
+"noExcessiveNestedCallbacks": [
+"eslint/max-nested-callbacks"
+],
+"noExcessiveNestedTestSuites": [
+"eslint-plugin-jest/max-nested-describe",
+"@vitest/eslint-plugin/max-nested-describe"
+],
+"noExcessiveSelectorClasses": [
+"stylelint/selector-max-class"
+],
+"noExcessiveStatementsPerFunction": [
+"eslint/max-statements"
+],
+"noExplicitAny": [
+"typescript-eslint/no-explicit-any"
+],
+"noExportsInTest": [
+"eslint-plugin-jest/no-export"
+],
+"noExtendNative": [
+"eslint/no-extend-native"
+],
+"noExtraBooleanCast": [
+"eslint/no-extra-boolean-cast"
+],
+"noExtraNonNullAssertion": [
+"typescript-eslint/no-extra-non-null-assertion"
+],
+"noFallthroughSwitchClause": [
+"eslint/no-fallthrough"
+],
+"noFlatMapIdentity": [
+"clippy/flat_map_identity"
+],
+"noFloatingPromises": [
+"typescript-eslint/no-floating-promises"
+],
+"noFocusedTests": [
+"eslint-plugin-jest/no-focused-tests",
+"@vitest/eslint-plugin/no-focused-tests",
+"eslint-plugin-playwright/no-focused-test"
+],
+"noForEach": [
+"eslint-plugin-unicorn/no-array-for-each",
+"clippy/needless_for_each"
+],
+"noForIn": [
+"typescript-eslint/no-for-in-array"
+],
+"noFunctionAssign": [
+"eslint/no-func-assign"
+],
+"noGlobalAssign": [
+"eslint/no-global-assign",
+"eslint/no-native-reassign"
+],
+"noGlobalDirnameFilename": [
+"eslint-plugin-unicorn/prefer-module"
+],
+"noGlobalEval": [
+"eslint/no-eval"
+],
+"noGlobalObjectCalls": [
+"eslint/no-obj-calls"
+],
+"noHeadElement": [
+"@next/eslint-plugin-next/no-head-element"
+],
+"noHeadImportInDocument": [
+"@next/eslint-plugin-next/no-head-import-in-document"
+],
+"noHeaderScope": [
+"eslint-plugin-jsx-a11y/scope",
+"EslintAstro/jsx-a11y/scope"
+],
+"noHexColors": [
+"stylelint/color-no-hex"
+],
+"noIdenticalTestTitle": [
+"eslint-plugin-jest/no-identical-title",
+"@vitest/eslint-plugin/no-identical-title",
+"eslint-plugin-playwright/no-identical-title"
+],
+"noImgElement": [
+"@next/eslint-plugin-next/no-img-element"
+],
+"noImplicitBoolean": [
+"eslint-plugin-react/jsx-boolean-value"
+],
+"noImplicitCoercions": [
+"eslint/no-implicit-coercion",
+"eslint-plugin-vue/no-implicit-coercion"
+],
+"noImpliedEval": [
+"eslint/no-implied-eval",
+"eslint/no-new-func",
+"typescript-eslint/no-implied-eval"
+],
+"noImportAssign": [
+"eslint/no-import-assign"
+],
+"noImportCycles": [
+"eslint-plugin-import/no-cycle"
+],
+"noImportantInKeyframe": [
+"stylelint/keyframe-declaration-no-important"
+],
+"noImportantStyles": [
+"stylelint/declaration-no-important",
+"EslintCss/no-important"
+],
+"noIncrementDecrement": [
+"eslint/no-plusplus"
+],
+"noInferrableTypes": [
+"typescript-eslint/no-inferrable-types"
+],
+"noInlineStyles": [
+"EslintReactNativeIntellicode/no-inline-styles",
+"EslintShadcn/no-inline-styles"
+],
+"noInnerDeclarations": [
+"eslint/no-inner-declarations"
+],
+"noInteractiveElementToNoninteractiveRole": [
+"eslint-plugin-jsx-a11y/no-interactive-element-to-noninteractive-role",
+"EslintAstro/jsx-a11y/no-interactive-element-to-noninteractive-role"
+],
+"noInvalidBuiltinInstantiation": [
+"eslint-plugin-unicorn/new-for-builtins",
+"eslint/no-new-native-nonconstructor",
+"eslint/no-new-symbol"
+],
+"noInvalidConstructorSuper": [
+"eslint/constructor-super"
+],
+"noInvalidDirectionInLinearGradient": [
+"stylelint/function-linear-gradient-no-nonstandard-direction"
+],
+"noInvalidFileInputAccept": [
+"eslint-plugin-unicorn/no-invalid-file-input-accept"
+],
+"noInvalidGridAreas": [
+"stylelint/named-grid-areas-no-invalid",
+"EslintCss/no-invalid-named-grid-areas"
+],
+"noInvalidPositionAtImportRule": [
+"stylelint/no-invalid-position-at-import-rule",
+"EslintCss/no-invalid-at-rule-placement"
+],
+"noInvalidThis": [
+"eslint/no-invalid-this"
+],
+"noInvalidUseBeforeDeclaration": [
+"eslint/no-use-before-define",
+"typescript-eslint/no-use-before-define"
+],
+"noIrregularWhitespace": [
+"eslint/no-irregular-whitespace",
+"eslint-plugin-vue/no-irregular-whitespace",
+"deno_lint/no-irregular-whitespace"
+],
+"noJsRestrictedProperties": [
+"eslint/no-restricted-properties"
+],
+"noJsonUnsafeValues": [
+"EslintJson/no-unsafe-values"
+],
+"noJsxLeakedDollar": [
+"EslintReactJsx/no-leaked-dollar",
+"@eslint-react/jsx-no-leaked-dollar"
+],
+"noJsxLiterals": [
+"eslint-plugin-react/jsx-no-literals"
+],
+"noJsxNamespace": [
+"EslintReactJsx/no-namespace",
+"@eslint-react/jsx-no-namespace"
+],
+"noJsxPropsBind": [
+"eslint-plugin-react/jsx-no-bind"
+],
+"noLabelVar": [
+"eslint/no-label-var"
+],
+"noLabelWithoutControl": [
+"eslint-plugin-jsx-a11y/label-has-associated-control",
+"EslintAstro/jsx-a11y/label-has-associated-control",
+"eslint-plugin-jsx-a11y/label-has-for"
+],
+"noLeakedRender": [
+"eslint-plugin-react/jsx-no-leaked-render"
+],
+"noLoopFunc": [
+"eslint/no-loop-func",
+"typescript-eslint/no-loop-func"
+],
+"noMagicArrayFlatDepth": [
+"eslint-plugin-unicorn/no-magic-array-flat-depth"
+],
+"noMagicNumbers": [
+"eslint/no-magic-numbers",
+"typescript-eslint/no-magic-numbers"
+],
+"noMeaninglessVoidOperator": [
+"typescript-eslint/no-meaningless-void-operator"
+],
+"noMisleadingCharacterClass": [
+"eslint/no-misleading-character-class"
+],
+"noMisleadingInstantiator": [
+"typescript-eslint/no-misused-new"
+],
+"noMisplacedAssertion": [
+"eslint-plugin-jest/no-standalone-expect",
+"@vitest/eslint-plugin/no-standalone-expect"
+],
+"noMisplacedListElements": [
+"@html-eslint/require-li-container"
+],
+"noMisrefactoredShorthandAssign": [
+"clippy/misrefactored_assign_op"
+],
+"noMissingVarFunction": [
+"stylelint/custom-property-no-missing-var-function"
+],
+"noMisusedPromises": [
+"typescript-eslint/no-misused-promises"
+],
+"noMultiAssign": [
+"eslint/no-multi-assign"
+],
+"noMultilineString": [
+"eslint/no-multi-str"
+],
+"noNamespace": [
+"typescript-eslint/no-namespace"
+],
+"noNamespaceImport": [
+"eslint-plugin-barrel-files/avoid-namespace-import"
+],
+"noNegationElse": [
+"eslint/no-negated-condition",
+"eslint-plugin-unicorn/no-negated-condition",
+"eslint-plugin-vue/no-negated-condition",
+"clippy/if_not_else"
+],
+"noNegationInEqualityCheck": [
+"eslint-plugin-unicorn/no-negation-in-equality-check"
+],
+"noNestedComponentDefinitions": [
+"@eslint-react/no-nested-component-definitions",
+"@eslint-react/no-nested-component-definitions"
+],
+"noNestedPromises": [
+"eslint-plugin-promise/no-nesting"
+],
+"noNestedSwitch": [
+"eslint-plugin-sonarjs/no-nested-switch"
+],
+"noNestedTemplateLiterals": [
+"eslint-plugin-sonarjs/no-nested-template-literals"
+],
+"noNestedTernary": [
+"eslint/no-nested-ternary",
+"eslint-plugin-unicorn/no-nested-ternary"
+],
+"noNewRequire": [
+"eslint/no-new-require",
+"eslint-plugin-n/no-new-require"
+],
+"noNextAsyncClientComponent": [
+"@next/eslint-plugin-next/no-async-client-component"
+],
+"noNodejsModules": [
+"eslint-plugin-import/no-nodejs-modules"
+],
+"noNonNullAssertedOptionalChain": [
+"typescript-eslint/no-non-null-asserted-optional-chain"
+],
+"noNonNullAssertion": [
+"typescript-eslint/no-non-null-assertion"
+],
+"noNonScalableViewport": [
+"@html-eslint/no-non-scalable-viewport"
+],
+"noNoninteractiveElementInteractions": [
+"eslint-plugin-jsx-a11y/no-noninteractive-element-interactions",
+"EslintAstro/jsx-a11y/no-noninteractive-element-interactions"
+],
+"noNoninteractiveElementToInteractiveRole": [
+"eslint-plugin-jsx-a11y/no-noninteractive-element-to-interactive-role",
+"EslintAstro/jsx-a11y/no-noninteractive-element-to-interactive-role"
+],
+"noNoninteractiveTabindex": [
+"eslint-plugin-jsx-a11y/no-noninteractive-tabindex",
+"EslintAstro/jsx-a11y/no-noninteractive-tabindex"
+],
+"noNonoctalDecimalEscape": [
+"eslint/no-nonoctal-decimal-escape"
+],
+"noNull": [
+"eslint-plugin-unicorn/no-null"
+],
+"noObjectConstructor": [
+"eslint/no-object-constructor",
+"eslint/no-new-object"
+],
+"noObsoleteAttributes": [
+"@html-eslint/no-obsolete-attrs"
+],
+"noObsoleteTags": [
+"@html-eslint/no-obsolete-tags"
+],
+"noOctal": [
+"eslint/no-octal",
+"deno_lint/no-octal"
+],
+"noOctalEscape": [
+"eslint/no-octal-escape"
+],
+"noParameterAssign": [
+"eslint/no-param-reassign"
+],
+"noParameterProperties": [
+"typescript-eslint/parameter-properties"
+],
+"noParametersOnlyUsedInRecursion": [
+"clippy/only_used_in_recursion"
+],
+"noPathConcat": [
+"eslint-plugin-n/no-path-concat"
+],
+"noPlaywrightElementHandle": [
+"eslint-plugin-playwright/no-element-handle"
+],
+"noPlaywrightEval": [
+"eslint-plugin-playwright/no-eval"
+],
+"noPlaywrightForceOption": [
+"eslint-plugin-playwright/no-force-option"
+],
+"noPlaywrightMissingAwait": [
+"eslint-plugin-playwright/missing-playwright-await"
+],
+"noPlaywrightNetworkidle": [
+"eslint-plugin-playwright/no-networkidle"
+],
+"noPlaywrightPagePause": [
+"eslint-plugin-playwright/no-page-pause"
+],
+"noPlaywrightUselessAwait": [
+"eslint-plugin-playwright/no-useless-await"
+],
+"noPlaywrightWaitForNavigation": [
+"eslint-plugin-playwright/no-wait-for-navigation"
+],
+"noPlaywrightWaitForSelector": [
+"eslint-plugin-playwright/no-wait-for-selector"
+],
+"noPlaywrightWaitForTimeout": [
+"eslint-plugin-playwright/no-wait-for-timeout"
+],
+"noPositiveTabindex": [
+"eslint-plugin-jsx-a11y/tabindex-no-positive",
+"@html-eslint/no-positive-tabindex",
+"EslintAstro/jsx-a11y/tabindex-no-positive"
+],
+"noPrecisionLoss": [
+"eslint/no-loss-of-precision",
+"typescript-eslint/no-loss-of-precision",
+"clippy/lossy_float_literal",
+"eslint-plugin-vue/no-loss-of-precision"
+],
+"noPrivateImports": [
+"eslint-plugin-import-access/eslint-plugin-import-access"
+],
+"noProcessEnv": [
+"eslint-plugin-n/no-process-env",
+"eslint/no-process-env"
+],
+"noProcessExit": [
+"eslint/no-process-exit",
+"eslint-plugin-n/no-process-exit",
+"eslint-plugin-unicorn/no-process-exit"
+],
+"noProcessGlobal": [
+"deno_lint/no-process-global"
+],
+"noPromiseExecutorReturn": [
+"eslint/no-promise-executor-return"
+],
+"noProto": [
+"eslint/no-proto"
+],
+"noPrototypeBuiltins": [
+"eslint/no-prototype-builtins",
+"eslint/prefer-object-has-own",
+"@e18e/eslint-plugin/prefer-object-has-own"
+],
+"noQwikUseVisibleTask": [
+"eslint-plugin-qwik/no-use-visible-task"
+],
+"noReExportAll": [
+"eslint-plugin-barrel-files/avoid-re-export-all"
+],
+"noReactForwardRef": [
+"@eslint-react/no-forward-ref",
+"@eslint-react/no-forward-ref"
+],
+"noReactNativeDeepImports": [
+"EslintReactNative/no-deep-imports"
+],
+"noReactNativeLiteralColors": [
+"EslintReactNativeIntellicode/no-color-literals"
+],
+"noReactNativeRawText": [
+"EslintReactNativeIntellicode/no-raw-text"
+],
+"noReactObjectTypeAsDefaultProp": [
+"eslint-plugin-react/no-object-type-as-default-prop"
+],
+"noReactPropAssignments": [
+"eslint-plugin-react-hooks/react-compiler"
+],
+"noReactSpecificProps": [
+"eslint-plugin-solid/no-react-specific-props",
+"eslint-plugin-qwik/no-react-props"
+],
+"noReactStringRefs": [
+"eslint-plugin-react/no-string-refs"
+],
+"noRedeclare": [
+"eslint/no-redeclare",
+"typescript-eslint/no-redeclare"
+],
+"noRedundantAlt": [
+"eslint-plugin-jsx-a11y/img-redundant-alt",
+"EslintAstro/jsx-a11y/img-redundant-alt"
+],
+"noRedundantRoles": [
+"eslint-plugin-jsx-a11y/no-redundant-roles",
+"@html-eslint/no-redundant-role",
+"EslintAstro/jsx-a11y/no-redundant-roles"
+],
+"noRenderReturnValue": [
+"eslint-plugin-react/no-render-return-value",
+"EslintReactDom/no-render-return-value",
+"@eslint-react/dom-no-render-return-value"
+],
+"noRestrictedDependencies": [
+"@e18e/eslint-plugin/ban-dependencies"
+],
+"noRestrictedElements": [
+"eslint-plugin-react/forbid-elements"
+],
+"noRestrictedGlobals": [
+"eslint/no-restricted-globals"
+],
+"noRestrictedImports": [
+"eslint/no-restricted-imports",
+"typescript-eslint/no-restricted-imports"
+],
+"noRestrictedTypes": [
+"typescript-eslint/no-restricted-types"
+],
+"noReturnArrayPush": [
+"eslint-plugin-unicorn/no-return-array-push"
+],
+"noReturnAssign": [
+"eslint/no-return-assign"
+],
+"noReturnInFinally": [
+"eslint-plugin-promise/no-return-in-finally"
+],
+"noRootType": [
+"@graphql-eslint/no-root-type"
+],
+"noScriptUrl": [
+"eslint/no-script-url",
+"eslint-plugin-react/jsx-no-script-url",
+"eslint-plugin-qwik/jsx-no-script-url",
+"eslint-plugin-solid/jsx-no-script-url",
+"EslintReactDom/no-script-url",
+"@eslint-react/dom-no-script-url"
+],
+"noSecrets": [
+"eslint-plugin-no-secrets/no-secrets"
+],
+"noSelfAssign": [
+"eslint/no-self-assign",
+"clippy/self_assignment"
+],
+"noSelfCompare": [
+"eslint/no-self-compare",
+"clippy/eq_op"
+],
+"noSelfImport": [
+"eslint-plugin-import/no-self-import"
+],
+"noSetterReturn": [
+"eslint/no-setter-return"
+],
+"noShadow": [
+"eslint/no-catch-shadow",
+"eslint/no-shadow",
+"typescript-eslint/no-shadow"
+],
+"noShadowRestrictedNames": [
+"eslint/no-shadow-restricted-names"
+],
+"noShortTimeValues": [
+"stylelint/time-min-milliseconds"
+],
+"noShorthandPropertyOverrides": [
+"stylelint/declaration-block-no-shorthand-property-overrides"
+],
+"noSkippedTests": [
+"eslint-plugin-jest/no-disabled-tests",
+"@vitest/eslint-plugin/no-disabled-tests",
+"eslint-plugin-playwright/no-skipped-test"
+],
+"noSolidDestructuredProps": [
+"eslint-plugin-solid/no-destructure"
+],
+"noSparseArray": [
+"deno_lint/no-sparse-arrays",
+"eslint/no-sparse-arrays",
+"eslint-plugin-vue/no-sparse-arrays"
+],
+"noStaticElementInteractions": [
+"eslint-plugin-jsx-a11y/no-static-element-interactions",
+"EslintAstro/jsx-a11y/no-static-element-interactions"
+],
+"noStaticOnlyClass": [
+"typescript-eslint/no-extraneous-class",
+"eslint-plugin-unicorn/no-static-only-class"
+],
+"noStringCaseMismatch": [
+"clippy/match_str_case_mismatch"
+],
+"noSubstr": [
+"eslint-plugin-unicorn/prefer-string-slice"
+],
+"noSvelteAddEventListener": [
+"eslint-plugin-svelte/no-add-event-listener"
+],
+"noSvelteAtDebugTags": [
+"eslint-plugin-svelte/no-at-debug-tags"
+],
+"noSvelteAtHtmlTags": [
+"eslint-plugin-svelte/no-at-html-tags"
+],
+"noSvelteInspect": [
+"eslint-plugin-svelte/no-inspect"
+],
+"noSvelteInternal": [
+"eslint-plugin-svelte/no-svelte-internal"
+],
+"noSvelteLegacyConst": [
+"eslint-plugin-svelte/no-at-const-tags"
+],
+"noSvelteObjectInTextMustaches": [
+"eslint-plugin-svelte/no-object-in-text-mustaches"
+],
+"noSvelteUnnecessaryStateWrap": [
+"eslint-plugin-svelte/no-unnecessary-state-wrap"
+],
+"noSvelteUselessDerivedBy": [
+"eslint-plugin-svelte/prefer-derived-over-derived-by"
+],
+"noSwitchDeclarations": [
+"eslint/no-case-declarations"
+],
+"noSyncScripts": [
+"@next/eslint-plugin-next/no-sync-scripts"
+],
+"noTailwindArbitraryValue": [
+"EslintTailwindcss/no-arbitrary-value",
+"EslintShadcn/no-arbitrary-values"
+],
+"noTailwindLegacyUtilities": [
+"EslintBetterTailwindcss/no-deprecated-classes"
+],
+"noTailwindRawColors": [
+"EslintShadcn/no-raw-colors"
+],
+"noTailwindRestyledComponents": [
+"EslintShadcn/no-restyle"
+],
+"noTanstackQueryRestDestructuring": [
+"EslintTanstackQuery/no-rest-destructuring"
+],
+"noTemplateCurlyInString": [
+"eslint/no-template-curly-in-string"
+],
+"noTernary": [
+"eslint/no-ternary"
+],
+"noThenProperty": [
+"eslint-plugin-unicorn/no-thenable"
+],
+"noThisInStatic": [
+"eslint-plugin-mysticatea/no-this-in-static"
+],
+"noThisOutsideOfClass": [
+"eslint-plugin-unicorn/no-this-outside-of-class"
+],
+"noTopLevelLiterals": [
+"EslintJson/top-level-interop"
+],
+"noTsIgnore": [
+"typescript-eslint/ban-ts-comment"
+],
+"noUnassignedVariables": [
+"eslint/no-unassigned-vars",
+"eslint/init-declarations"
+],
+"noUndeclaredDependencies": [
+"eslint-plugin-import/no-extraneous-dependencies"
+],
+"noUndeclaredEnvVars": [
+"eslint-plugin-turbo/no-undeclared-env-vars"
+],
+"noUndeclaredVariables": [
+"eslint/no-undef"
+],
+"noUnknownAtRules": [
+"stylelint/at-rule-no-unknown",
+"EslintCss/no-invalid-at-rules"
+],
+"noUnknownAttribute": [
+"eslint-plugin-react/no-unknown-property"
+],
+"noUnknownFunction": [
+"stylelint/function-no-unknown"
+],
+"noUnknownMediaFeatureName": [
+"stylelint/media-feature-name-no-unknown"
+],
+"noUnknownProperty": [
+"stylelint/property-no-unknown",
+"EslintCss/no-invalid-properties"
+],
+"noUnknownPseudoClass": [
+"stylelint/selector-pseudo-class-no-unknown"
+],
+"noUnknownPseudoElement": [
+"stylelint/selector-pseudo-element-no-unknown"
+],
+"noUnknownTypeSelector": [
+"stylelint/selector-type-no-unknown"
+],
+"noUnknownUnit": [
+"stylelint/unit-no-unknown"
+],
+"noUnmatchableAnbSelector": [
+"stylelint/selector-anb-no-unmatchable",
+"EslintCss/no-unmatchable-selectors"
+],
+"noUnmodifiedLoopCondition": [
+"eslint/no-unmodified-loop-condition"
+],
+"noUnnecessaryConditions": [
+"typescript-eslint/no-unnecessary-condition"
+],
+"noUnnecessaryTemplateExpression": [
+"typescript-eslint/no-unnecessary-template-expression"
+],
+"noUnreachable": [
+"eslint/no-unreachable"
+],
+"noUnreachableSuper": [
+"eslint/no-this-before-super"
+],
+"noUnreadableForOfExpression": [
+"eslint-plugin-unicorn/no-unreadable-for-of-expression"
+],
+"noUnreadableIife": [
+"eslint-plugin-unicorn/no-unreadable-iife"
+],
+"noUnresolvedImports": [
+"eslint-plugin-import/named"
+],
+"noUnsafeDeclarationMerging": [
+"typescript-eslint/no-unsafe-declaration-merging"
+],
+"noUnsafeFinally": [
+"eslint/no-unsafe-finally"
+],
+"noUnsafeIframeSandbox": [
+"EslintReactDom/no-unsafe-iframe-sandbox",
+"@eslint-react/dom-no-unsafe-iframe-sandbox"
+],
+"noUnsafeNegation": [
+"eslint/no-unsafe-negation",
+"eslint/no-negated-in-lhs"
+],
+"noUnsafeOptionalChaining": [
+"eslint/no-unsafe-optional-chaining"
+],
+"noUnsafePlusOperands": [
+"typescript-eslint/restrict-plus-operands"
+],
+"noUnsafeReturn": [
+"typescript-eslint/no-unsafe-return"
+],
+"noUnsafeUnaryMinus": [
+"typescript-eslint/no-unsafe-unary-minus"
+],
+"noUnusedExpressions": [
+"eslint/no-unused-expressions"
+],
+"noUnusedImports": [
+"eslint-plugin-unused-imports/no-unused-imports"
+],
+"noUnusedInstantiation": [
+"eslint/no-new"
+],
+"noUnusedLabels": [
+"eslint/no-unused-labels"
+],
+"noUnusedPrivateClassMembers": [
+"eslint/no-unused-private-class-members"
+],
+"noUnusedVariables": [
+"eslint/no-unused-vars",
+"typescript-eslint/no-unused-vars",
+"eslint-plugin-unused-imports/no-unused-vars",
+"eslint-plugin-vue/no-unused-vars",
+"deno_lint/no-unused-vars"
+],
+"noUnwantedPolyfillio": [
+"@next/eslint-plugin-next/no-unwanted-polyfillio"
+],
+"noUselessAssignment": [
+"eslint/no-useless-assignment"
+],
+"noUselessCall": [
+"eslint/no-useless-call"
+],
+"noUselessCatch": [
+"eslint/no-useless-catch"
+],
+"noUselessConstructor": [
+"eslint/no-useless-constructor",
+"typescript-eslint/no-useless-constructor"
+],
+"noUselessDateGetTime": [
+"eslint-plugin-unicorn/consistent-date-clone"
+],
+"noUselessElse": [
+"eslint/no-else-return",
+"clippy/redundant_else"
+],
+"noUselessEmptyExport": [
+"typescript-eslint/no-useless-empty-export"
+],
+"noUselessEscapeInRegex": [
+"eslint/no-useless-escape"
+],
+"noUselessFragments": [
+"eslint-plugin-react/jsx-no-useless-fragment",
+"EslintReactJsx/no-useless-fragment",
+"@eslint-react/jsx-no-useless-fragment"
+],
+"noUselessLabel": [
+"eslint/no-extra-label"
+],
+"noUselessLoneBlockStatements": [
+"eslint/no-lone-blocks"
+],
+"noUselessRecursion": [
+"eslint-plugin-unicorn/no-useless-recursion"
+],
+"noUselessRegexBackrefs": [
+"eslint/no-useless-backreference",
+"eslint-plugin-regexp/no-useless-backreference"
+],
+"noUselessRename": [
+"eslint/no-useless-rename"
+],
+"noUselessReturn": [
+"eslint/no-useless-return"
+],
+"noUselessSplice": [
+"eslint-plugin-unicorn/no-unnecessary-splice"
+],
+"noUselessStringConcat": [
+"eslint/no-useless-concat",
+"eslint-plugin-vue/no-useless-concat"
+],
+"noUselessSwitchCase": [
+"eslint-plugin-unicorn/no-useless-switch-case"
+],
+"noUselessTernary": [
+"eslint/no-unneeded-ternary"
+],
+"noUselessThisAlias": [
+"typescript-eslint/no-this-alias"
+],
+"noUselessTypeConstraint": [
+"typescript-eslint/no-unnecessary-type-constraint"
+],
+"noUselessTypeConversion": [
+"typescript-eslint/no-unnecessary-type-conversion"
+],
+"noUselessUndefined": [
+"eslint-plugin-unicorn/no-useless-undefined"
+],
+"noUselessUndefinedInitialization": [
+"eslint/no-undef-init"
+],
+"noVar": [
+"eslint/no-var",
+"deno_lint/no-var"
+],
+"noVoid": [
+"eslint/no-void"
+],
+"noVoidElementsWithChildren": [
+"eslint-plugin-react/void-dom-elements-no-children",
+"EslintReactDom/no-void-elements-with-children",
+"@eslint-react/dom-no-void-elements-with-children"
+],
+"noVueArrowFuncInWatch": [
+"eslint-plugin-vue/no-arrow-functions-in-watch"
+],
+"noVueBooleanDefault": [
+"eslint-plugin-vue/no-boolean-default"
+],
+"noVueComputedPropertiesInData": [
+"eslint-plugin-vue/no-computed-properties-in-data"
+],
+"noVueDataObjectDeclaration": [
+"eslint-plugin-vue/no-deprecated-data-object-declaration",
+"eslint-plugin-vue/no-shared-component-data"
+],
+"noVueDeprecatedDeleteSet": [
+"eslint-plugin-vue/no-deprecated-delete-set"
+],
+"noVueDeprecatedListeners": [
+"eslint-plugin-vue/no-deprecated-dollar-listeners-api"
+],
+"noVueDeprecatedRouterLinkTagProp": [
+"eslint-plugin-vue/no-deprecated-router-link-tag-prop"
+],
+"noVueDeprecatedScopeAttribute": [
+"eslint-plugin-vue/no-deprecated-scope-attribute"
+],
+"noVueDeprecatedScopedSlots": [
+"eslint-plugin-vue/no-deprecated-dollar-scopedslots-api"
+],
+"noVueDuplicateKeys": [
+"eslint-plugin-vue/no-dupe-keys"
+],
+"noVueImportCompilerMacros": [
+"eslint-plugin-vue/no-import-compiler-macros"
+],
+"noVueLifecycleAfterAwait": [
+"eslint-plugin-vue/no-lifecycle-after-await"
+],
+"noVueMultipleSlotArgs": [
+"eslint-plugin-vue/no-multiple-slot-args"
+],
+"noVueMutatingProps": [
+"eslint-plugin-vue/no-mutating-props"
+],
+"noVueOptionsApi": [
+"eslint-plugin-vue/component-api-style"
+],
+"noVueRefAsOperand": [
+"eslint-plugin-vue/no-ref-as-operand"
+],
+"noVueReservedKeys": [
+"eslint-plugin-vue/no-reserved-keys"
+],
+"noVueReservedProps": [
+"eslint-plugin-vue/no-reserved-props"
+],
+"noVueRootVIf": [
+"eslint-plugin-vue/no-root-v-if"
+],
+"noVueSetupPropsReactivityLoss": [
+"eslint-plugin-vue/no-setup-props-reactivity-loss"
+],
+"noVueShadowNativeEvents": [
+"eslint-plugin-vue/no-shadow-native-events"
+],
+"noVueSideEffectsInComputed": [
+"eslint-plugin-vue/no-side-effects-in-computed-properties"
+],
+"noVueUndeclaredDirectives": [
+"eslint-plugin-vue/no-undef-directives"
+],
+"noVueUnusedEmitDeclarations": [
+"eslint-plugin-vue/no-unused-emit-declarations"
+],
+"noVueUnusedRefs": [
+"eslint-plugin-vue/no-unused-refs"
+],
+"noVueVHtml": [
+"eslint-plugin-vue/no-v-html"
+],
+"noVueVIfWithVFor": [
+"eslint-plugin-vue/no-use-v-if-with-v-for",
+"eslint-plugin-vue/no-use-v-else-with-v-for"
+],
+"noVueVOnNumberValues": [
+"eslint-plugin-vue/no-deprecated-v-on-number-modifiers"
+],
+"noVueVText": [
+"eslint-plugin-vue/no-v-text"
+],
+"noVueVTextVHtmlOnComponent": [
+"eslint-plugin-vue/no-v-text-v-html-on-component"
+],
+"noVueWatchAfterAwait": [
+"eslint-plugin-vue/no-watch-after-await"
+],
+"noWith": [
+"eslint/no-with"
+],
+"noXorAsExponentiation": [
+"eslint-plugin-unicorn/no-xor-as-exponentiation"
+],
+"noYodaExpression": [
+"eslint/yoda"
+],
+"noZeroFractions": [
+"eslint-plugin-unicorn/no-zero-fractions"
+],
+"noZeroLengthUnit": [
+"stylelint/length-zero-no-unit"
+],
+"useAdjacentOverloadSignatures": [
+"typescript-eslint/adjacent-overload-signatures",
+"deno_lint/adjacent-overload-signatures"
+],
+"useAltText": [
+"eslint-plugin-jsx-a11y/alt-text",
+"@html-eslint/require-img-alt",
+"EslintAstro/jsx-a11y/alt-text"
+],
+"useAnchorContent": [
+"eslint-plugin-jsx-a11y/anchor-has-content",
+"EslintAstro/jsx-a11y/anchor-has-content"
+],
+"useAriaActivedescendantWithTabindex": [
+"eslint-plugin-jsx-a11y/aria-activedescendant-has-tabindex",
+"EslintAstro/jsx-a11y/aria-activedescendant-has-tabindex"
+],
+"useAriaPropsForRole": [
+"eslint-plugin-jsx-a11y/role-has-required-aria-props",
+"EslintAstro/jsx-a11y/role-has-required-aria-props"
+],
+"useAriaPropsSupportedByRole": [
+"eslint-plugin-jsx-a11y/role-supports-aria-props",
+"EslintAstro/jsx-a11y/role-supports-aria-props"
+],
+"useArrayFind": [
+"typescript-eslint/prefer-find"
+],
+"useArrayLiterals": [
+"eslint/no-array-constructor",
+"typescript-eslint/no-array-constructor"
+],
+"useArraySome": [
+"eslint-plugin-unicorn/prefer-array-some"
+],
+"useArraySortCompare": [
+"typescript-eslint/require-array-sort-compare"
+],
+"useArrowFunction": [
+"eslint/prefer-arrow-callback"
+],
+"useAsConstAssertion": [
+"typescript-eslint/prefer-as-const"
+],
+"useAstroClientOnlyDirectiveValue": [
+"EslintAstro/missing-client-only-directive-value"
+],
+"useAtIndex": [
+"eslint-plugin-unicorn/prefer-at",
+"@e18e/eslint-plugin/prefer-array-at"
+],
+"useAwait": [
+"eslint/require-await",
+"typescript-eslint/require-await"
+],
+"useAwaitThenable": [
+"typescript-eslint/use-await-thenable"
+],
+"useBaseline": [
+"EslintCss/use-baseline",
+"@html-eslint/use-baseline"
+],
+"useBetterDomTraversing": [
+"eslint-plugin-unicorn/better-dom-traversing"
+],
+"useBigintLiterals": [
+"eslint-plugin-unicorn/prefer-bigint-literals"
+],
+"useBlockStatementOverIife": [
+"eslint-plugin-unicorn/prefer-block-statement-over-iife"
+],
+"useBlockStatements": [
+"eslint/curly"
+],
+"useButtonType": [
+"eslint-plugin-react/button-has-type",
+"EslintReactDom/no-missing-button-type",
+"@eslint-react/dom-no-missing-button-type",
+"@html-eslint/require-button-type",
+"deno_lint/jsx-button-has-type"
+],
+"useCapitalizedConstructors": [
+"eslint/new-cap"
+],
+"useCollapsedElseIf": [
+"eslint/no-lonely-if",
+"clippy/collapsible_else_if"
+],
+"useCollapsedIf": [
+"eslint-plugin-unicorn/no-lonely-if",
+"clippy/collapsible_if"
+],
+"useComponentExportOnlyModules": [
+"eslint-plugin-react-refresh/only-export-components"
+],
+"useConsistentArrayType": [
+"typescript-eslint/array-type"
+],
+"useConsistentArrowReturn": [
+"eslint/arrow-body-style"
+],
+"useConsistentBlockLang": [
+"eslint-plugin-vue/block-lang",
+"eslint-plugin-svelte/block-lang"
+],
+"useConsistentBuiltinInstantiation": [
+"eslint/no-new-wrappers",
+"eslint/no-new-native-nonconstructor"
+],
+"useConsistentCurlyBraces": [
+"eslint-plugin-react/jsx-curly-brace-presence",
+"@stylistic/eslint-plugin/jsx-curly-brace-presence"
+],
+"useConsistentEnumValueType": [
+"typescript-eslint/no-mixed-enums"
+],
+"useConsistentFunctionStyle": [
+"eslint/func-style"
+],
+"useConsistentGraphqlDescriptions": [
+"@graphql-eslint/description-style"
+],
+"useConsistentJsonFileRead": [
+"eslint-plugin-unicorn/consistent-json-file-read"
+],
+"useConsistentLightnessNotation": [
+"stylelint/lightness-notation"
+],
+"useConsistentMemberAccessibility": [
+"typescript-eslint/explicit-member-accessibility"
+],
+"useConsistentMethodSignatures": [
+"typescript-eslint/method-signature-style"
+],
+"useConsistentObjectDefinitions": [
+"eslint/object-shorthand",
+"eslint-plugin-vue/object-shorthand"
+],
+"useConsistentObjectKeys": [
+"EslintJson/no-unnormalized-keys"
+],
+"useConsistentTestIt": [
+"eslint-plugin-jest/consistent-test-it",
+"@vitest/eslint-plugin/consistent-test-it"
+],
+"useConsistentTypeDefinitions": [
+"typescript-eslint/consistent-type-definitions"
+],
+"useConsistentUnicodeBom": [
+"eslint/unicode-bom"
+],
+"useConst": [
+"eslint/prefer-const",
+"eslint-plugin-svelte/prefer-const",
+"deno_lint/prefer-const"
+],
+"useControlLabel": [
+"eslint-plugin-jsx-a11y/control-has-associated-label",
+"EslintAstro/jsx-a11y/control-has-associated-label"
+],
+"useDateNow": [
+"eslint-plugin-unicorn/prefer-date-now",
+"@e18e/eslint-plugin/prefer-date-now"
+],
+"useDefaultParameterLast": [
+"eslint/default-param-last",
+"typescript-eslint/default-param-last"
+],
+"useDefaultSwitchClause": [
+"eslint/default-case"
+],
+"useDefaultSwitchClauseLast": [
+"eslint/default-case-last"
+],
+"useDeprecatedDate": [
+"@graphql-eslint/require-deprecation-date"
+],
+"useDeprecatedReason": [
+"@graphql-eslint/require-deprecation-reason"
+],
+"useDestructuring": [
+"eslint/prefer-destructuring"
+],
+"useDomNodeTextContent": [
+"eslint-plugin-unicorn/prefer-dom-node-text-content"
+],
+"useDomQuerySelector": [
+"eslint-plugin-unicorn/prefer-query-selector"
+],
+"useEnumInitializers": [
+"typescript-eslint/prefer-enum-initializers"
+],
+"useErrorCause": [
+"eslint/preserve-caught-error"
+],
+"useErrorMessage": [
+"eslint-plugin-unicorn/error-message"
+],
+"useExhaustiveDependencies": [
+"eslint-plugin-react-hooks/exhaustive-deps",
+"@eslint-react/exhaustive-deps",
+"@eslint-react/exhaustive-deps"
+],
+"useExhaustiveSwitchCases": [
+"typescript-eslint/switch-exhaustiveness-check"
+],
+"useExpect": [
+"eslint-plugin-playwright/expect-expect",
+"eslint-plugin-jest/expect-expect",
+"@vitest/eslint-plugin/expect-expect"
+],
+"useExpectToContain": [
+"eslint-plugin-jest/prefer-to-contain",
+"@vitest/eslint-plugin/prefer-to-contain",
+"eslint-plugin-playwright/prefer-to-contain"
+],
+"useExplicitLengthCheck": [
+"eslint-plugin-unicorn/explicit-length-check"
+],
+"useExplicitReturnType": [
+"typescript-eslint/explicit-function-return-type"
+],
+"useExplicitType": [
+"typescript-eslint/explicit-function-return-type",
+"typescript-eslint/explicit-module-boundary-types"
+],
+"useExponentiationOperator": [
+"eslint/prefer-exponentiation-operator",
+"@e18e/eslint-plugin/prefer-exponentiation-operator"
+],
+"useExportType": [
+"typescript-eslint/consistent-type-exports"
+],
+"useExportsLast": [
+"eslint-plugin-import/exports-last"
+],
+"useFilenamingConvention": [
+"eslint-plugin-unicorn/filename-case"
+],
+"useFlatMap": [
+"eslint-plugin-unicorn/prefer-array-flat-map",
+"clippy/map_flatten"
+],
+"useFlatMathMinMax": [
+"eslint-plugin-unicorn/prefer-flat-math-min-max"
+],
+"useFocusableInteractive": [
+"eslint-plugin-jsx-a11y/interactive-supports-focus",
+"EslintAstro/jsx-a11y/interactive-supports-focus"
+],
+"useForOf": [
+"typescript-eslint/prefer-for-of",
+"eslint-plugin-unicorn/no-for-loop",
+"eslint-plugin-mysticatea/prefer-for-of"
+],
+"useFragmentSyntax": [
+"eslint-plugin-react/jsx-fragments"
+],
+"useGenericFontNames": [
+"stylelint/font-family-no-missing-generic-family-keyword",
+"EslintCss/font-family-fallbacks"
+],
+"useGetterReturn": [
+"eslint/getter-return"
+],
+"useGlobalThis": [
+"eslint-plugin-unicorn/prefer-global-this"
+],
+"useGoogleFontDisplay": [
+"@next/eslint-plugin-next/google-font-display"
+],
+"useGoogleFontPreconnect": [
+"@next/eslint-plugin-next/google-font-preconnect"
+],
+"useGraphqlNamedOperations": [
+"@graphql-eslint/no-anonymous-operations"
+],
+"useGraphqlNamingConvention": [
+"graphql-schema-linter/enum-values-all-caps"
+],
+"useGroupedAccessorPairs": [
+"eslint/grouped-accessor-pairs"
+],
+"useGuardForIn": [
+"eslint/guard-for-in"
+],
+"useHeadingContent": [
+"eslint-plugin-jsx-a11y/heading-has-content",
+"@html-eslint/no-empty-headings",
+"EslintAstro/jsx-a11y/heading-has-content"
+],
+"useHookAtTopLevel": [
+"eslint-plugin-react-hooks/rules-of-hooks"
+],
+"useHtmlLang": [
+"eslint-plugin-jsx-a11y/html-has-lang",
+"@html-eslint/require-lang",
+"EslintAstro/jsx-a11y/html-has-lang"
+],
+"useIframeSandbox": [
+"EslintReactDom/no-missing-iframe-sandbox",
+"@eslint-react/dom-no-missing-iframe-sandbox",
+"eslint-plugin-react/iframe-missing-sandbox"
+],
+"useIframeTitle": [
+"eslint-plugin-jsx-a11y/iframe-has-title",
+"@html-eslint/require-frame-title",
+"EslintAstro/jsx-a11y/iframe-has-title"
+],
+"useImageSize": [
+"eslint-plugin-qwik/jsx-img"
+],
+"useImportExtensions": [
+"eslint-plugin-import/extensions"
+],
+"useImportType": [
+"typescript-eslint/consistent-type-imports"
+],
+"useImportsFirst": [
+"eslint-plugin-import/first"
+],
+"useIncludes": [
+"typescript-eslint/prefer-includes",
+"eslint-plugin-unicorn/prefer-includes",
+"@e18e/eslint-plugin/prefer-includes"
+],
+"useIndexOf": [
+"eslint-plugin-unicorn/prefer-array-index-of"
+],
+"useInlineScriptId": [
+"@next/eslint-plugin-next/inline-script-id"
+],
+"useInputName": [
+"@graphql-eslint/input-name"
+],
+"useIsArray": [
+"eslint-plugin-unicorn/no-instanceof-array"
+],
+"useIsNan": [
+"eslint/use-isnan"
+],
+"useIterableCallbackReturn": [
+"eslint/array-callback-return"
+],
+"useIteratorZip": [
+"eslint-plugin-unicorn/prefer-iterator-zip"
+],
+"useJsxKeyInIterable": [
+"eslint-plugin-react/jsx-key",
+"eslint-plugin-qwik/jsx-key",
+"@eslint-react/no-missing-key",
+"@eslint-react/no-missing-key"
+],
+"useKeyWithClickEvents": [
+"eslint-plugin-jsx-a11y/click-events-have-key-events",
+"EslintAstro/jsx-a11y/click-events-have-key-events"
+],
+"useKeyWithMouseEvents": [
+"eslint-plugin-jsx-a11y/mouse-events-have-key-events",
+"EslintAstro/jsx-a11y/mouse-events-have-key-events"
+],
+"useLayeredStyles": [
+"EslintCss/use-layers"
+],
+"useLiteralEnumMembers": [
+"typescript-eslint/prefer-literal-enum-member"
+],
+"useLiteralKeys": [
+"eslint/dot-notation",
+"eslint/no-useless-computed-key",
+"typescript-eslint/dot-notation",
+"eslint-plugin-vue/dot-notation"
+],
+"useLogicalProperties": [
+"stylelint/csstools/use-logical",
+"stylelint/liberty/use-logical-spec"
+],
+"useLoneAnonymousOperation": [
+"@graphql-eslint/lone-anonymous-operation"
+],
+"useLoneExecutableDefinition": [
+"@graphql-eslint/lone-executable-definition"
+],
+"useLowercaseTestTitle": [
+"eslint-plugin-jest/prefer-lowercase-title",
+"@vitest/eslint-plugin/prefer-lowercase-title",
+"eslint-plugin-playwright/prefer-lowercase-title"
+],
+"useMatchingFunctionName": [
+"eslint/func-name-matching"
+],
+"useMathAbs": [
+"eslint-plugin-unicorn/prefer-math-abs"
+],
+"useMathMinMax": [
+"eslint-plugin-unicorn/prefer-math-min-max"
+],
+"useMathTrunc": [
+"eslint-plugin-unicorn/prefer-math-trunc"
+],
+"useMaxParams": [
+"eslint/max-params",
+"clippy/too_many_arguments",
+"typescript-eslint/max-params"
+],
+"useMediaCaption": [
+"eslint-plugin-jsx-a11y/media-has-caption",
+"EslintAstro/jsx-a11y/media-has-caption"
+],
+"useModernMathApis": [
+"eslint-plugin-unicorn/prefer-modern-math-apis"
+],
+"useNamedCaptureGroup": [
+"eslint/prefer-named-capture-group"
+],
+"useNamedFunction": [
+"eslint/func-names"
+],
+"useNamedLayer": [
+"EslintCss/use-layers"
+],
+"useNamespaceKeyword": [
+"typescript-eslint/prefer-namespace-keyword"
+],
+"useNodejsImportProtocol": [
+"eslint-plugin-unicorn/prefer-node-protocol",
+"eslint-plugin-import/enforce-node-protocol-usage",
+"eslint-plugin-n/prefer-node-protocol"
+],
+"useNullishCoalescing": [
+"typescript-eslint/prefer-nullish-coalescing"
+],
+"useNumberNamespace": [
+"eslint-plugin-unicorn/prefer-number-properties"
+],
+"useNumberToFixedDigitsArgument": [
+"eslint-plugin-unicorn/require-number-to-fixed-digits-argument"
+],
+"useNumericLiterals": [
+"eslint/prefer-numeric-literals"
+],
+"useNumericSeparators": [
+"eslint-plugin-unicorn/numeric-separators-style",
+"clippy/unreadable_literal"
+],
+"useObjectSpread": [
+"eslint/prefer-object-spread",
+"@e18e/eslint-plugin/prefer-spread-syntax"
+],
+"useOptionalChain": [
+"typescript-eslint/prefer-optional-chain"
+],
+"usePackageJsonValidCpu": [
+"eslint-plugin-package-json/valid-cpu"
+],
+"usePackageJsonValidEngines": [
+"eslint-plugin-package-json/valid-engines"
+],
+"useParseIntRadix": [
+"eslint/radix"
+],
+"usePlaywrightValidDescribeCallback": [
+"eslint-plugin-playwright/valid-describe-callback"
+],
+"usePromiseRejectErrors": [
+"eslint/prefer-promise-reject-errors",
+"typescript-eslint/prefer-promise-reject-errors"
+],
+"useQwikClasslist": [
+"eslint-plugin-qwik/prefer-classlist"
+],
+"useQwikLoaderLocation": [
+"eslint-plugin-qwik/loader-location"
+],
+"useQwikMethodUsage": [
+"eslint-plugin-qwik/use-method-usage"
+],
+"useQwikValidLexicalScope": [
+"eslint-plugin-qwik/valid-lexical-scope"
+],
+"useReactAsyncServerFunction": [
+"eslint-plugin-react/async-server-action",
+"@eslint-react/rsc-function-definition",
+"EslintReactRsc/function-definition"
+],
+"useReactFunctionComponentDefinition": [
+"eslint-plugin-react/function-component-definition"
+],
+"useReactFunctionComponents": [
+"eslint-plugin-react-prefer-function-component/react-prefer-function-component",
+"eslint-plugin-react-prefer-function-component/prefer-function-component"
+],
+"useReactNamingConvention": [
+"@eslint-react/naming-convention-context-name",
+"EslintReactNamingConvention/context-name",
+"@eslint-react/naming-convention-id-name",
+"EslintReactNamingConvention/id-name",
+"@eslint-react/naming-convention-ref-name",
+"EslintReactNamingConvention/ref-name"
+],
+"useReactNativePlatformComponents": [
+"EslintReactNativeIntellicode/split-platform-components"
+],
+"useReactNativeValidPlatformColors": [
+"EslintReactNative/platform-colors"
+],
+"useReadonlyClassProperties": [
+"typescript-eslint/prefer-readonly"
+],
+"useReduceTypeParameter": [
+"typescript-eslint/prefer-reduce-type-parameter"
+],
+"useRegexLiterals": [
+"eslint/prefer-regex-literals"
+],
+"useRegexpExec": [
+"typescript-eslint/prefer-regexp-exec",
+"eslint-plugin-regexp/prefer-regexp-exec"
+],
+"useRegexpTest": [
+"eslint-plugin-unicorn/prefer-regexp-test"
+],
+"useScopedStyles": [
+"eslint-plugin-vue/enforce-style-attribute"
+],
+"useSelfClosingElements": [
+"eslint-plugin-react/self-closing-comp",
+"@stylistic/eslint-plugin/jsx-self-closing-comp"
+],
+"useSemanticElements": [
+"eslint-plugin-jsx-a11y/prefer-tag-over-role",
+"EslintAstro/jsx-a11y/prefer-tag-over-role"
+],
+"useShorthandAssign": [
+"eslint/operator-assignment"
+],
+"useShorthandFunctionType": [
+"typescript-eslint/prefer-function-type"
+],
+"useSimplifiedBooleanReturn": [
+"eslint-plugin-unicorn/prefer-boolean-return"
+],
+"useSingleJsDocAsterisk": [
+"eslint-plugin-jsdoc/no-multi-asterisks"
+],
+"useSingleVarDeclarator": [
+"eslint/one-var"
+],
+"useSolidForComponent": [
+"eslint-plugin-solid/prefer-for"
+],
+"useSpreadOverApply": [
+"eslint/prefer-spread",
+"@e18e/eslint-plugin/prefer-spread-syntax"
+],
+"useStrictBooleanExpressions": [
+"typescript-eslint/strict-boolean-expressions"
+],
+"useStrictMode": [
+"eslint/strict"
+],
+"useStringStartsEndsWith": [
+"typescript-eslint/prefer-string-starts-ends-with"
+],
+"useSvelteEventDispatcherTypes": [
+"eslint-plugin-svelte/require-event-dispatcher-types"
+],
+"useSvelteKitResolve": [
+"eslint-plugin-svelte/no-navigation-without-resolve"
+],
+"useSvelteReactiveClasses": [
+"eslint-plugin-svelte/prefer-svelte-reactivity"
+],
+"useSvelteRequireEachKey": [
+"eslint-plugin-svelte/require-each-key"
+],
+"useSvelteShorthandDirective": [
+"eslint-plugin-svelte/shorthand-directive"
+],
+"useSymbolDescription": [
+"eslint/symbol-description"
+],
+"useTailwindShorthandClasses": [
+"EslintBetterTailwindcss/enforce-shorthand-classes",
+"EslintTailwindcss/enforces-shorthand"
+],
+"useTailwindSortedClasses": [
+"EslintBetterTailwindcss/enforce-consistent-class-order",
+"EslintTailwindcss/classnames-order"
+],
+"useTailwindStaticClassStrings": [
+"EslintShadcn/require-static-classes"
+],
+"useTemplate": [
+"eslint/prefer-template"
+],
+"useTestHooksInOrder": [
+"eslint-plugin-jest/prefer-hooks-in-order",
+"@vitest/eslint-plugin/prefer-hooks-in-order",
+"eslint-plugin-playwright/prefer-hooks-in-order"
+],
+"useTestHooksOnTop": [
+"eslint-plugin-jest/prefer-hooks-on-top",
+"@vitest/eslint-plugin/prefer-hooks-on-top",
+"eslint-plugin-playwright/prefer-hooks-on-top"
+],
+"useThisInClassMethods": [
+"eslint/class-methods-use-this"
+],
+"useThrowNewError": [
+"eslint-plugin-unicorn/throw-new-error"
+],
+"useThrowOnlyError": [
+"eslint/no-throw-literal",
+"typescript-eslint/only-throw-error"
+],
+"useTrimStartEnd": [
+"eslint-plugin-unicorn/prefer-string-trim-start-end"
+],
+"useUnaryMinus": [
+"eslint-plugin-unicorn/prefer-unary-minus"
+],
+"useUnicodeRegex": [
+"eslint/require-unicode-regexp"
+],
+"useUnifiedTypeSignatures": [
+"typescript-eslint/unified-signatures"
+],
+"useValidAnchor": [
+"eslint-plugin-jsx-a11y/anchor-is-valid",
+"eslint-plugin-qwik/jsx-a",
+"EslintAstro/jsx-a11y/anchor-is-valid"
+],
+"useValidAriaProps": [
+"eslint-plugin-jsx-a11y/aria-props",
+"EslintAstro/jsx-a11y/aria-props"
+],
+"useValidAriaRole": [
+"eslint-plugin-jsx-a11y/aria-role",
+"@html-eslint/no-invalid-role",
+"EslintAstro/jsx-a11y/aria-role"
+],
+"useValidAriaValues": [
+"eslint-plugin-jsx-a11y/aria-proptypes",
+"EslintAstro/jsx-a11y/aria-proptypes"
+],
+"useValidAutocomplete": [
+"eslint-plugin-jsx-a11y/autocomplete-valid",
+"EslintAstro/jsx-a11y/autocomplete-valid"
+],
+"useValidForDirection": [
+"eslint/for-direction"
+],
+"useValidLang": [
+"eslint-plugin-jsx-a11y/lang",
+"EslintAstro/jsx-a11y/lang"
+],
+"useValidTestTitle": [
+"eslint-plugin-jest/valid-title",
+"@vitest/eslint-plugin/valid-title"
+],
+"useValidTypeof": [
+"eslint/valid-typeof"
+],
+"useVarsOnTop": [
+"eslint/vars-on-top"
+],
+"useVueBaseImport": [
+"eslint-plugin-vue/prefer-import-from-vue"
+],
+"useVueComponentIs": [
+"eslint-plugin-vue/require-component-is"
+],
+"useVueConsistentDefinePropsDeclaration": [
+"eslint-plugin-vue/define-props-declaration"
+],
+"useVueConsistentEventHyphenation": [
+"eslint-plugin-vue/v-on-event-hyphenation"
+],
+"useVueConsistentVBindStyle": [
+"eslint-plugin-vue/v-bind-style"
+],
+"useVueConsistentVOnStyle": [
+"eslint-plugin-vue/v-on-style"
+],
+"useVueDefineMacrosOrder": [
+"eslint-plugin-vue/define-macros-order"
+],
+"useVueDefinePropsDestructuring": [
+"eslint-plugin-vue/define-props-destructuring"
+],
+"useVueHyphenatedAttributes": [
+"eslint-plugin-vue/attribute-hyphenation"
+],
+"useVueNextTickPromise": [
+"eslint-plugin-vue/next-tick-style"
+],
+"useVueTemplateRef": [
+"eslint-plugin-vue/prefer-use-template-ref"
+],
+"useVueToggleInsideTransition": [
+"eslint-plugin-vue/require-toggle-inside-transition"
+],
+"useVueTypedProps": [
+"eslint-plugin-vue/require-prop-types"
+],
+"useVueTypedRef": [
+"eslint-plugin-vue/require-typed-ref"
+],
+"useVueVForKey": [
+"eslint-plugin-vue/require-v-for-key"
+],
+"useVueVModel": [
+"eslint-plugin-vue/prefer-v-model"
+],
+"useVueVOnExact": [
+"eslint-plugin-vue/use-v-on-exact"
+],
+"useVueValidDefineEmits": [
+"eslint-plugin-vue/valid-define-emits"
+],
+"useVueValidDefineProps": [
+"eslint-plugin-vue/valid-define-props"
+],
+"useVueValidTemplateRoot": [
+"eslint-plugin-vue/valid-template-root"
+],
+"useVueValidVBind": [
+"eslint-plugin-vue/valid-v-bind"
+],
+"useVueValidVCloak": [
+"eslint-plugin-vue/valid-v-cloak"
+],
+"useVueValidVElse": [
+"eslint-plugin-vue/valid-v-else"
+],
+"useVueValidVElseIf": [
+"eslint-plugin-vue/valid-v-else-if"
+],
+"useVueValidVFor": [
+"eslint-plugin-vue/valid-v-for"
+],
+"useVueValidVHtml": [
+"eslint-plugin-vue/valid-v-html"
+],
+"useVueValidVIf": [
+"eslint-plugin-vue/valid-v-if"
+],
+"useVueValidVIs": [
+"eslint-plugin-vue/valid-v-is"
+],
+"useVueValidVMemo": [
+"eslint-plugin-vue/valid-v-memo"
+],
+"useVueValidVModel": [
+"eslint-plugin-vue/valid-v-model"
+],
+"useVueValidVOn": [
+"eslint-plugin-vue/valid-v-on"
+],
+"useVueValidVOnce": [
+"eslint-plugin-vue/valid-v-once"
+],
+"useVueValidVPre": [
+"eslint-plugin-vue/valid-v-pre"
+],
+"useVueValidVShow": [
+"eslint-plugin-vue/valid-v-show"
+],
+"useVueValidVSlot": [
+"eslint-plugin-vue/valid-v-slot"
+],
+"useVueValidVText": [
+"eslint-plugin-vue/valid-v-text"
+],
+"useWhile": [
+"eslint-plugin-sonarjs/prefer-while"
+],
+"useWhileLoopCondition": [
+"eslint-plugin-unicorn/prefer-while-loop-condition"
+],
+"useYield": [
+"eslint/require-yield"
+]
+}
+}

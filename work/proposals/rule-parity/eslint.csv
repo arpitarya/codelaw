@@ -1,0 +1,293 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+accessor-pairs,port,,js,js/accessor-pairs,manual,P2,C,none,,,
+array-bracket-newline,retired,,,,,,,auto,,yes,deprecated upstream
+array-bracket-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+array-callback-return,port,,js,js/array-callback-return,suggest,P2,C,suggest,,,
+array-element-newline,retired,,,,,,,auto,,yes,deprecated upstream
+arrow-body-style,port,,js,js/arrow-body-style,auto,P2,C,auto,,,
+arrow-parens,retired,,,,,,,auto,,yes,deprecated upstream
+arrow-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+block-scoped-var,port,,js,js/block-scoped-var,manual,P2,C,none,,,
+block-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+brace-style,retired,,,,,,,auto,,yes,deprecated upstream
+callback-return,retired,,,,,,,none,,yes,deprecated upstream
+camelcase,port,,js,js/camelcase,manual,P2,C,none,,,
+capitalized-comments,skip,,,,,,,auto,,,"taste, no defect behind it; on demand through W-140"
+class-methods-use-this,port,,js,js/class-methods-use-this,manual,P2,C,none,,,
+comma-dangle,retired,,,,,,,auto,,yes,deprecated upstream
+comma-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+comma-style,retired,,,,,,,auto,,yes,deprecated upstream
+complexity,covered,js/complexity,,,,,,none,,,
+computed-property-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+consistent-return,port,,js,js/consistent-return,manual,P2,C,none,,,
+consistent-this,port,,js,js/consistent-this,manual,P2,C,none,,,
+constructor-super,covered,js/constructor-super,,,,,,none,yes,,
+curly,port,,js,js/curly,auto,P2,C,auto,,,
+default-case,port,,js,js/default-case,manual,P2,C,none,,,
+default-case-last,port,,js,js/default-case-last,manual,P2,C,none,,,
+default-param-last,port,,js,js/default-param-last,manual,P2,C,none,,,
+dot-location,retired,,,,,,,auto,,yes,deprecated upstream
+dot-notation,port,,js,js/dot-notation,auto,P2,C,auto,,,
+eol-last,retired,,,,,,,auto,,yes,deprecated upstream
+eqeqeq,port,,js,js/eqeqeq,auto,P2,C,auto,,,
+for-direction,covered,js/for-direction,,,,,,none,yes,,
+func-call-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+func-name-matching,port,,js,js/func-name-matching,manual,P2,C,none,,,
+func-names,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+func-style,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+function-call-argument-newline,retired,,,,,,,auto,,yes,deprecated upstream
+function-paren-newline,retired,,,,,,,auto,,yes,deprecated upstream
+generator-star-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+getter-return,covered,js/getter-return,,,,,,none,yes,,
+global-require,retired,,,,,,,none,,yes,deprecated upstream
+grouped-accessor-pairs,port,,js,js/grouped-accessor-pairs,manual,P2,C,none,,,
+guard-for-in,port,,js,js/guard-for-in,manual,P2,C,none,,,
+handle-callback-err,retired,,,,,,,none,,yes,deprecated upstream
+id-blacklist,retired,,,,,,,none,,yes,deprecated upstream
+id-denylist,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+id-length,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+id-match,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+implicit-arrow-linebreak,retired,,,,,,,auto,,yes,deprecated upstream
+indent,retired,,,,,,,auto,,yes,deprecated upstream
+indent-legacy,retired,,,,,,,auto,,yes,deprecated upstream
+init-declarations,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+jsx-quotes,retired,,,,,,,auto,,yes,deprecated upstream
+key-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+keyword-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+line-comment-position,retired,,,,,,,none,,yes,deprecated upstream
+linebreak-style,retired,,,,,,,auto,,yes,deprecated upstream
+lines-around-comment,retired,,,,,,,auto,,yes,deprecated upstream
+lines-around-directive,retired,,,,,,,auto,,yes,deprecated upstream
+lines-between-class-members,retired,,,,,,,auto,,yes,deprecated upstream
+logical-assignment-operators,port,,js,js/logical-assignment-operators,auto,P2,C,auto,,,
+max-classes-per-file,port,,js,js/max-classes-per-file,manual,P2,C,none,,,
+max-depth,covered,js/max-depth,,,,,,none,,,
+max-len,retired,,,,,,,none,,yes,deprecated upstream
+max-lines,covered,js/max-lines,,,,,,none,,,
+max-lines-per-function,covered,js/max-lines-per-function,,,,,,none,,,
+max-nested-callbacks,port,,js,js/max-nested-callbacks,manual,P2,C,none,,,
+max-params,covered,js/max-params,,,,,,none,,,
+max-statements,port,,js,js/max-statements,manual,P2,C,none,,,
+max-statements-per-line,retired,,,,,,,none,,yes,deprecated upstream
+multiline-comment-style,retired,,,,,,,auto,,yes,deprecated upstream
+multiline-ternary,retired,,,,,,,auto,,yes,deprecated upstream
+new-cap,port,,js,js/new-cap,manual,P2,C,none,,,
+new-parens,retired,,,,,,,auto,,yes,deprecated upstream
+newline-after-var,retired,,,,,,,auto,,yes,deprecated upstream
+newline-before-return,retired,,,,,,,auto,,yes,deprecated upstream
+newline-per-chained-call,retired,,,,,,,auto,,yes,deprecated upstream
+no-alert,port,,js,js/no-alert,manual,P2,C,none,,,
+no-array-constructor,covered,ts/no-array-constructor,,,,,,auto,,,
+no-async-promise-executor,covered,js/no-async-promise-executor,,,,,,none,yes,,
+no-await-in-loop,port,,js,js/no-await-in-loop,manual,P2,C,none,,,
+no-bitwise,port,,js,js/no-bitwise,manual,P2,C,none,,,
+no-buffer-constructor,retired,,,,,,,none,,yes,deprecated upstream
+no-caller,port,,js,js/no-caller,manual,P2,C,none,,,
+no-case-declarations,covered,js/no-case-declarations,,,,,,suggest,yes,,
+no-catch-shadow,retired,,,,,,,none,,yes,deprecated upstream
+no-class-assign,covered,js/no-class-assign,,,,,,none,yes,,
+no-compare-neg-zero,covered,js/no-compare-neg-zero,,,,,,suggest,yes,,
+no-cond-assign,covered,js/no-cond-assign,,,,,,none,yes,,
+no-confusing-arrow,retired,,,,,,,auto,,yes,deprecated upstream
+no-console,covered,js/no-console,,,,,,suggest,,,
+no-const-assign,covered,js/no-const-assign,,,,,,none,yes,,
+no-constant-binary-expression,covered,js/no-constant-binary-expression,,,,,,none,yes,,
+no-constant-condition,covered,js/no-constant-condition,,,,,,none,yes,,
+no-constructor-return,port,,js,js/no-constructor-return,manual,P2,C,none,,,
+no-continue,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-control-regex,covered,js/no-control-regex,,,,,,none,yes,,
+no-debugger,covered,js/no-debugger,,,,,,none,yes,,
+no-delete-var,covered,js/no-delete-var,,,,,,none,yes,,
+no-div-regex,port,,js,js/no-div-regex,auto,P2,C,auto,,,
+no-dupe-args,covered,js/no-dupe-args,,,,,,none,yes,,
+no-dupe-class-members,covered,js/no-dupe-class-members,,,,,,none,yes,,
+no-dupe-else-if,covered,js/no-dupe-else-if,,,,,,none,yes,,
+no-dupe-keys,covered,js/no-dupe-keys,,,,,,none,yes,,
+no-duplicate-case,covered,js/no-duplicate-case,,,,,,none,yes,,
+no-duplicate-imports,port,,js,js/no-duplicate-imports,manual,P2,C,none,,,
+no-else-return,port,,js,js/no-else-return,auto,P2,C,auto,,,
+no-empty,covered,js/no-empty,,,,,,suggest,yes,,
+no-empty-character-class,covered,js/no-empty-character-class,,,,,,none,yes,,
+no-empty-function,port,,js,js/no-empty-function,suggest,P2,C,suggest,,,
+no-empty-pattern,covered,js/no-empty-pattern,,,,,,none,yes,,
+no-empty-static-block,covered,js/no-empty-static-block,,,,,,suggest,yes,,
+no-eq-null,port,,js,js/no-eq-null,manual,P2,C,none,,,
+no-eval,port,,js,js/no-eval,manual,P2,C,none,,,
+no-ex-assign,covered,js/no-ex-assign,,,,,,none,yes,,
+no-extend-native,port,,js,js/no-extend-native,manual,P2,C,none,,,
+no-extra-bind,port,,js,js/no-extra-bind,auto,P2,C,auto,,,
+no-extra-boolean-cast,covered,js/no-extra-boolean-cast,,,,,,auto,yes,,
+no-extra-label,port,,js,js/no-extra-label,auto,P2,C,auto,,,
+no-extra-parens,retired,,,,,,,auto,,yes,deprecated upstream
+no-extra-semi,retired,,,,,,,auto,,yes,deprecated upstream
+no-fallthrough,covered,js/no-fallthrough,,,,,,none,yes,,
+no-floating-decimal,retired,,,,,,,auto,,yes,deprecated upstream
+no-func-assign,covered,js/no-func-assign,,,,,,none,yes,,
+no-global-assign,covered,js/no-global-assign,,,,,,none,yes,,
+no-implicit-coercion,port,,js,js/no-implicit-coercion,auto,P2,C,auto,,,
+no-implicit-globals,port,,js,js/no-implicit-globals,manual,P2,C,none,,,
+no-implied-eval,port,,js,js/no-implied-eval,manual,P2,C,none,,,
+no-import-assign,covered,js/no-import-assign,,,,,,none,yes,,
+no-inline-comments,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-inner-declarations,port,,js,js/no-inner-declarations,manual,P2,C,none,,,
+no-invalid-regexp,covered,js/no-invalid-regexp,,,,,,none,yes,,
+no-invalid-this,port,,js,js/no-invalid-this,manual,P2,C,none,,,
+no-irregular-whitespace,covered,js/no-irregular-whitespace,,,,,,none,yes,,
+no-iterator,port,,js,js/no-iterator,manual,P2,C,none,,,
+no-label-var,port,,js,js/no-label-var,manual,P2,C,none,,,
+no-labels,port,,js,js/no-labels,manual,P2,C,none,,,
+no-lone-blocks,port,,js,js/no-lone-blocks,manual,P2,C,none,,,
+no-lonely-if,port,,js,js/no-lonely-if,auto,P2,C,auto,,,
+no-loop-func,port,,js,js/no-loop-func,manual,P2,C,none,,,
+no-loss-of-precision,covered,js/no-loss-of-precision,,,,,,none,yes,,
+no-magic-numbers,port,,js,js/no-magic-numbers,manual,P2,C,none,,,
+no-misleading-character-class,covered,js/no-misleading-character-class,,,,,,suggest,yes,,
+no-mixed-operators,retired,,,,,,,none,,yes,deprecated upstream
+no-mixed-requires,retired,,,,,,,none,,yes,deprecated upstream
+no-mixed-spaces-and-tabs,retired,,,,,,,none,,yes,deprecated upstream
+no-multi-assign,port,,js,js/no-multi-assign,manual,P2,C,none,,,
+no-multi-spaces,retired,,,,,,,auto,,yes,deprecated upstream
+no-multi-str,port,,js,js/no-multi-str,manual,P2,C,none,,,
+no-multiple-empty-lines,retired,,,,,,,auto,,yes,deprecated upstream
+no-native-reassign,retired,,,,,,,none,,yes,deprecated upstream
+no-negated-condition,port,,js,js/no-negated-condition,manual,P2,C,none,,,
+no-negated-in-lhs,retired,,,,,,,none,,yes,deprecated upstream
+no-nested-ternary,port,,js,js/no-nested-ternary,manual,P2,C,none,,,
+no-new,port,,js,js/no-new,manual,P2,C,none,,,
+no-new-func,port,,js,js/no-new-func,manual,P2,C,none,,,
+no-new-native-nonconstructor,covered,js/no-new-native-nonconstructor,,,,,,none,yes,,
+no-new-object,retired,,,,,,,none,,yes,deprecated upstream
+no-new-require,retired,,,,,,,none,,yes,deprecated upstream
+no-new-symbol,retired,,,,,,,none,,yes,deprecated upstream
+no-new-wrappers,port,,js,js/no-new-wrappers,manual,P2,C,none,,,
+no-nonoctal-decimal-escape,covered,js/no-nonoctal-decimal-escape,,,,,,suggest,yes,,
+no-obj-calls,covered,js/no-obj-calls,,,,,,none,yes,,
+no-object-constructor,port,,js,js/no-object-constructor,suggest,P2,C,suggest,,,
+no-octal,covered,js/no-octal,,,,,,none,yes,,
+no-octal-escape,port,,js,js/no-octal-escape,manual,P2,C,none,,,
+no-param-reassign,port,,js,js/no-param-reassign,manual,P2,C,none,,,
+no-path-concat,retired,,,,,,,none,,yes,deprecated upstream
+no-plusplus,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-process-env,retired,,,,,,,none,,yes,deprecated upstream
+no-process-exit,retired,,,,,,,none,,yes,deprecated upstream
+no-promise-executor-return,port,,js,js/no-promise-executor-return,suggest,P2,C,suggest,,,
+no-proto,port,,js,js/no-proto,manual,P2,C,none,,,
+no-prototype-builtins,covered,js/no-prototype-builtins,,,,,,suggest,yes,,
+no-redeclare,covered,js/no-redeclare,,,,,,none,yes,,
+no-regex-spaces,covered,js/no-regex-spaces,,,,,,auto,yes,,
+no-restricted-exports,port,,js,js/no-restricted-exports,manual,P2,C,none,,,
+no-restricted-globals,covered,js/use-instead*,,,,,,none,,,
+no-restricted-imports,covered,js/use-instead*,,,,,,none,,,
+no-restricted-modules,retired,,,,,,,none,,yes,deprecated upstream
+no-restricted-properties,covered,js/use-instead*,,,,,,none,,,
+no-restricted-syntax,port,,js,js/no-restricted-syntax,manual,P2,C,none,,,
+no-return-assign,port,,js,js/no-return-assign,manual,P2,C,none,,,
+no-return-await,retired,,,,,,,suggest,,yes,deprecated upstream
+no-script-url,covered,sec-js/no-javascript-url,,,,,,none,,,
+no-self-assign,covered,js/no-self-assign,,,,,,none,yes,,
+no-self-compare,port,,js,js/no-self-compare,manual,P2,C,none,,,
+no-sequences,port,,js,js/no-sequences,manual,P2,C,none,,,
+no-setter-return,covered,js/no-setter-return,,,,,,none,yes,,
+no-shadow,port,,js,js/no-shadow,manual,P2,C,none,,,
+no-shadow-restricted-names,covered,js/no-shadow-restricted-names,,,,,,none,yes,,
+no-spaced-func,retired,,,,,,,auto,,yes,deprecated upstream
+no-sparse-arrays,covered,js/no-sparse-arrays,,,,,,none,yes,,
+no-sync,retired,,,,,,,none,,yes,deprecated upstream
+no-tabs,retired,,,,,,,none,,yes,deprecated upstream
+no-template-curly-in-string,port,,js,js/no-template-curly-in-string,manual,P2,C,none,,,
+no-ternary,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-this-before-super,covered,js/no-this-before-super,,,,,,none,yes,,
+no-throw-literal,port,,js,js/no-throw-literal,manual,P2,C,none,,,
+no-trailing-spaces,retired,,,,,,,auto,,yes,deprecated upstream
+no-unassigned-vars,covered,js/no-unassigned-vars,,,,,,none,yes,,
+no-undef,covered,js/no-undef,,,,,,none,yes,,
+no-undef-init,port,,js,js/no-undef-init,auto,P2,C,auto,,,
+no-undefined,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+no-underscore-dangle,port,,js,js/no-underscore-dangle,manual,P2,C,none,,,
+no-unexpected-multiline,covered,js/no-unexpected-multiline,,,,,,none,yes,,
+no-unmodified-loop-condition,port,,js,js/no-unmodified-loop-condition,manual,P2,C,none,,,
+no-unneeded-ternary,port,,js,js/no-unneeded-ternary,auto,P2,C,auto,,,
+no-unreachable,covered,js/no-unreachable,,,,,,none,yes,,
+no-unreachable-loop,port,,js,js/no-unreachable-loop,manual,P2,C,none,,,
+no-unsafe-finally,covered,js/no-unsafe-finally,,,,,,none,yes,,
+no-unsafe-negation,covered,js/no-unsafe-negation,,,,,,suggest,yes,,
+no-unsafe-optional-chaining,covered,js/no-unsafe-optional-chaining,,,,,,none,yes,,
+no-unused-expressions,covered,ts/no-unused-expressions,,,,,,none,,,
+no-unused-labels,covered,js/no-unused-labels,,,,,,auto,yes,,
+no-unused-private-class-members,covered,js/no-unused-private-class-members,,,,,,suggest,yes,,
+no-unused-vars,covered,js/no-unused-vars ts/no-unused-vars,,,,,,suggest,yes,,
+no-use-before-define,port,,js,js/no-use-before-define,manual,P2,C,none,,,
+no-useless-assignment,covered,js/no-useless-assignment,,,,,,none,yes,,
+no-useless-backreference,covered,js/no-useless-backreference,,,,,,none,yes,,
+no-useless-call,port,,js,js/no-useless-call,manual,P2,C,none,,,
+no-useless-catch,covered,js/no-useless-catch,,,,,,none,yes,,
+no-useless-computed-key,port,,js,js/no-useless-computed-key,auto,P2,C,auto,,,
+no-useless-concat,port,,js,js/no-useless-concat,manual,P2,C,none,,,
+no-useless-constructor,port,,js,js/no-useless-constructor,suggest,P2,C,suggest,,,
+no-useless-escape,covered,js/no-useless-escape,,,,,,suggest,yes,,
+no-useless-rename,port,,js,js/no-useless-rename,auto,P2,C,auto,,,
+no-useless-return,port,,js,js/no-useless-return,auto,P2,C,auto,,,
+no-var,covered,js/no-var,,,,,,auto,,,
+no-void,port,,js,js/no-void,manual,P2,C,none,,,
+no-warning-comments,covered,js/todo-marker*,,,,,,none,,,
+no-whitespace-before-property,retired,,,,,,,auto,,yes,deprecated upstream
+no-with,covered,js/no-with,,,,,,none,yes,,
+nonblock-statement-body-position,retired,,,,,,,auto,,yes,deprecated upstream
+object-curly-newline,retired,,,,,,,auto,,yes,deprecated upstream
+object-curly-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+object-property-newline,retired,,,,,,,auto,,yes,deprecated upstream
+object-shorthand,port,,js,js/object-shorthand,auto,P2,C,auto,,,
+one-var,skip,,,,,,,auto,,,"taste, no defect behind it; on demand through W-140"
+one-var-declaration-per-line,retired,,,,,,,auto,,yes,deprecated upstream
+operator-assignment,port,,js,js/operator-assignment,auto,P2,C,auto,,,
+operator-linebreak,retired,,,,,,,auto,,yes,deprecated upstream
+padded-blocks,retired,,,,,,,auto,,yes,deprecated upstream
+padding-line-between-statements,retired,,,,,,,auto,,yes,deprecated upstream
+prefer-arrow-callback,port,,js,js/prefer-arrow-callback,auto,P2,C,auto,,,
+prefer-const,covered,js/prefer-const,,,,,,auto,,,
+prefer-destructuring,port,,js,js/prefer-destructuring,auto,P2,C,auto,,,
+prefer-exponentiation-operator,port,,js,js/prefer-exponentiation-operator,auto,P2,C,auto,,,
+prefer-named-capture-group,port,,js,js/prefer-named-capture-group,suggest,P2,C,suggest,,,
+prefer-numeric-literals,port,,js,js/prefer-numeric-literals,auto,P2,C,auto,,,
+prefer-object-has-own,port,,js,js/prefer-object-has-own,auto,P2,C,auto,,,
+prefer-object-spread,port,,js,js/prefer-object-spread,auto,P2,C,auto,,,
+prefer-promise-reject-errors,port,,js,js/prefer-promise-reject-errors,manual,P2,C,none,,,
+prefer-reflect,retired,,,,,,,none,,yes,deprecated upstream
+prefer-regex-literals,port,,js,js/prefer-regex-literals,suggest,P2,C,suggest,,,
+prefer-rest-params,covered,js/prefer-rest-params,,,,,,none,,,
+prefer-spread,covered,js/prefer-spread,,,,,,none,,,
+prefer-template,port,,js,js/prefer-template,auto,P2,C,auto,,,
+preserve-caught-error,covered,js/preserve-caught-error,,,,,,suggest,yes,,
+quote-props,retired,,,,,,,auto,,yes,deprecated upstream
+quotes,retired,,,,,,,auto,,yes,deprecated upstream
+radix,port,,js,js/radix,suggest,P2,C,suggest,,,
+require-atomic-updates,port,,js,js/require-atomic-updates,manual,P2,C,none,,,
+require-await,port,,js,js/require-await,suggest,P2,C,suggest,,,
+require-unicode-regexp,port,,js,js/require-unicode-regexp,suggest,P2,C,suggest,,,
+require-yield,covered,js/require-yield,,,,,,none,yes,,
+rest-spread-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+semi,retired,,,,,,,auto,,yes,deprecated upstream
+semi-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+semi-style,retired,,,,,,,auto,,yes,deprecated upstream
+sort-imports,port,,js,js/sort-imports,auto,P2,C,auto,,,
+sort-keys,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+sort-vars,skip,,,,,,,auto,,,"taste, no defect behind it; on demand through W-140"
+space-before-blocks,retired,,,,,,,auto,,yes,deprecated upstream
+space-before-function-paren,retired,,,,,,,auto,,yes,deprecated upstream
+space-in-parens,retired,,,,,,,auto,,yes,deprecated upstream
+space-infix-ops,retired,,,,,,,auto,,yes,deprecated upstream
+space-unary-ops,retired,,,,,,,auto,,yes,deprecated upstream
+spaced-comment,retired,,,,,,,auto,,yes,deprecated upstream
+strict,port,,js,js/strict,auto,P2,C,auto,,,
+switch-colon-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+symbol-description,port,,js,js/symbol-description,manual,P2,C,none,,,
+template-curly-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+template-tag-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+unicode-bom,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+use-isnan,covered,js/use-isnan,,,,,,suggest,yes,,
+valid-typeof,covered,js/valid-typeof,,,,,,suggest,yes,,
+vars-on-top,skip,,,,,,,none,,,"taste, no defect behind it; on demand through W-140"
+wrap-iife,retired,,,,,,,auto,,yes,deprecated upstream
+wrap-regex,retired,,,,,,,auto,,yes,deprecated upstream
+yield-star-spacing,retired,,,,,,,auto,,yes,deprecated upstream
+yoda,port,,js,js/yoda,auto,P2,C,auto,,,

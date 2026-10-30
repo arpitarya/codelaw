@@ -22,6 +22,8 @@ here. Read that record before changing anything below it.
 
 | what the decider decides | filed |
 |---|---|
+| 🔴 **Rule parity — four rulings** ([W-138](open/W-138-rule-parity-research.md) → [proposal](proposals/rule-parity.md) §9): 3,431 upstream rules counted; codelaw covers 653 of the 2,438 that apply (27%); 1,690 to port. **R1** which tranches W-139 builds — recommended A (84) + C (513) now, D (Ruff, 591) by linter, B (unicorn, 366) only as an opt-in `js/strict`, E (preview, 136) later; **R2** tranche A into `recommended`, the rest `preview`/`strict`; **R3** Prettier's 11 missing options — keys for four, defaults for the rest; **R4** formatter gaps → W-141 (filed). | 2026-10-30 |
+| ↳ **blocks:** W-139 | |
 | 🔴 **GitHub Action — the Marketplace listing** ([W-97](open/W-97-github-action.md)): ruled 2026-10-30 — the listing refused `name: codelaw` (taken by a user or org) and the 138-character description; `action.yml` is now **`codelaw check`** with a 115-character description. **On the next release** (after 0.4.0): edit it → tick *Publish this Action to the GitHub Marketplace* → accept the agreement → category *Code quality* → *Update release*. | 2026-10-27 |
 | ↳ **blocks:** W-97 itself | |
 | 🔴 **Open VSX — waiting on Open VSX** ([W-117](open/W-117-open-vsx-setup.md)): the ownership claim is [EclipseFdn/open-vsx.org#14928](https://github.com/EclipseFdn/open-vsx.org/issues/14928), open. Ruled 2026-10-30: **no token — trusted publishing.** Nothing to do until the claim is approved; then you add the trusted publisher (`arpitarya` · `codelaw` · `publish.yml` · `vscode`). | 2026-10-29 |
@@ -29,9 +31,9 @@ here. Read that record before changing anything below it.
 
 ---
 
-## Open items (18)
+## Open items (19)
 
-### build (15)
+### build (16)
 
 🟢 **W-126** `agent` A five-minute pipeline: built and running — cached CI 4m25, Rust+packs 12m30–13m38 (a macOS runner queue), release 3m50 (was 9m). Left: more runs of each kind measured. Filed by Arpit (Cowork). [detail](open/W-126-fast-pipeline.md)
 
@@ -62,6 +64,8 @@ here. Read that record before changing anything below it.
 
 🟡 **W-139** waits on **W-138** `agent` Port every rule W-138 picks (as Arpit rules) into codelaw's packs — cases, fixes, docs, budgets. Filed by Arpit (Cowork). [detail](open/W-139-rule-parity-build.md)
 
+🟢 **W-141** `agent` Formatter vs Prettier, measured on 1,279 files: CSS 42% and HTML 17% identical — a CSS comment/selector defect and void elements first, then each language to ≥ 98%. Filed by Arpit (Cowork). [detail](open/W-141-formatter-parity.md)
+
 🟢 **W-140** `agent` Port any rule on demand: a `codelaw-port-rule` skill writes a named ESLint/Pylint/any-tool rule into `.codelaw/rules/`, tested on its cases; an opt-in share issue and a code-search script count demand. Filed by Arpit (Cowork). [detail](open/W-140-port-rule-on-demand.md)
 
 ### testing (0)
@@ -76,7 +80,7 @@ here. Read that record before changing anything below it.
 
 ### research (1)
 
-🟢 **W-138** `cowork` Research: every rule of ESLint, typescript-eslint, TSLint, Ruff, Prettier, Biome, stylelint, html-validate and markdownlint matched against codelaw's 665, each gap classed; Arpit reviews the port list. Filed by Arpit (Cowork). [detail](open/W-138-rule-parity-research.md)
+🔴 **W-138** `arpit` Research done 10-30: 3,431 rules from nine linters, matched against codelaw's 689 — 653 covered, 1,690 to port in tranches A–E; [proposal](proposals/rule-parity.md); R1–R4 in the inbox. Filed by Arpit (Cowork). [detail](open/W-138-rule-parity-research.md)
 
 
 ---

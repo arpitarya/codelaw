@@ -29,7 +29,8 @@ ball: agent
 
 | DoD | what | state |
 |---|---|---|
-| 1 · rules | every rule on the ruled port list, in its pack, with valid and invalid cases and its fix class | ⏳ |
+| 1 · rules | every rule on the ruled port list (filter the CSVs in `work/proposals/rule-parity/` on `class = port` and the ruled `tranche`), in its pack, with valid and invalid cases and its fix class | ⏳ |
+| 1b · links | the 29 equivalents marked `*` in the CSVs' `codelaw` column get their `ported_from:` line; the 3 id collisions the proposal names are checked first | ⏳ |
 | 2 · presets | each new rule placed in a preset (or off by default), as the ruling says; B-048's presets if ruled in | ⏳ |
 | 3 · checks | `codelaw test` 0 failed on every pack; the layout check clean; corpus counts; L8 budgets measured, not loosened | ⏳ |
 | 4 · docs | `scripts/rule-docs.py` pages, `docs-sync.py` counts, CHANGELOG, the proposal's before/after table | ⏳ |

@@ -1,0 +1,30 @@
+option,class,codelaw,category,note
+arrowParens,port,,JavaScript,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+bracketSameLine,port,,Common,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+bracketSpacing,port,,Common,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+checkIgnorePragma,skip,,Special,codelaw has its own ignore markers (SR-FORMATTER decision 6)
+cursorOffset,skip,,Special,"an API or CLI argument, not a style"
+embeddedLanguageFormatting,covered,[format.markdown] format_code_blocks (Markdown only),Global,
+endOfLine,covered,end_of_line,Global,
+experimentalOperatorPosition,port,,JavaScript,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+experimentalTernaries,port,,JavaScript,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+filepath,skip,,Special,"an API or CLI argument, not a style"
+htmlWhitespaceSensitivity,port,,HTML,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+insertPragma,skip,,Special,codelaw has its own ignore markers (SR-FORMATTER decision 6)
+jsxSingleQuote,port,,JavaScript,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+objectWrap,port,,Common,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+parser,skip,,Global,"an API or CLI argument, not a style"
+plugins,skip,,Global,"an API or CLI argument, not a style"
+printWidth,covered,line_width,Global,
+proseWrap,port,,Common,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+quoteProps,port,,JavaScript,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+rangeEnd,skip,,Special,"an API or CLI argument, not a style"
+rangeStart,skip,,Special,"an API or CLI argument, not a style"
+requirePragma,skip,,Special,codelaw has its own ignore markers (SR-FORMATTER decision 6)
+semi,covered,semicolons,JavaScript,
+singleAttributePerLine,port,,Common,"a style option codelaw has no key for: add a [format] key, or rule that it stays at Prettier's default"
+singleQuote,covered,quote_style,Common,
+tabWidth,covered,indent_width,Global,
+trailingComma,covered,trailing_commas,JavaScript,
+useTabs,covered,indent_style,Global,
+vueIndentScriptAndStyle,out-of-scope,,HTML,Vue is outside L3

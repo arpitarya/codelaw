@@ -1,0 +1,72 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+scss/at-each-key-value-single-line,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-else-closing-brace-newline-after,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-else-closing-brace-space-after,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-else-empty-line-before,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-else-if-parentheses-space-before,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-extend-no-missing-placeholder,covered,scss/at-extend-no-missing-placeholder,,,,,,none,yes,,
+scss/at-function-named-arguments,port,,scss,scss/at-function-named-arguments,manual,P2,C,none,,,
+scss/at-function-parentheses-space-before,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-function-pattern,port,,scss,scss/at-function-pattern,manual,P2,C,none,,,
+scss/at-if-closing-brace-newline-after,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-if-closing-brace-space-after,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-if-no-null,covered,scss/at-if-no-null,,,,,,none,yes,,
+scss/at-import-partial-extension-allowed-list,port,,scss,scss/at-import-partial-extension-allowed-list,manual,P2,C,none,,,
+scss/at-import-partial-extension-disallowed-list,port,,scss,scss/at-import-partial-extension-disallowed-list,manual,P2,C,none,,,
+scss/at-mixin-argumentless-call-parentheses,port,,scss,scss/at-mixin-argumentless-call-parentheses,auto,P2,C,auto,,,
+scss/at-mixin-named-arguments,port,,scss,scss/at-mixin-named-arguments,manual,P2,C,none,,,
+scss/at-mixin-no-risky-nesting-selector,port,,scss,scss/at-mixin-no-risky-nesting-selector,manual,P2,C,none,,,
+scss/at-mixin-parentheses-space-before,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/at-mixin-pattern,covered,scss/at-mixin-pattern,,,,,,none,,,
+scss/at-root-no-redundant,port,,scss,scss/at-root-no-redundant,auto,P2,C,auto,,,
+scss/at-rule-conditional-no-parentheses,port,,scss,scss/at-rule-conditional-no-parentheses,auto,P2,C,auto,,,
+scss/at-rule-no-unknown,covered,scss/at-rule-no-unknown,,,,,,none,yes,,
+scss/at-use-no-redundant-alias,port,,scss,scss/at-use-no-redundant-alias,auto,P2,C,auto,,,
+scss/at-use-no-unnamespaced,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/block-no-redundant-nesting,port,,scss,scss/block-no-redundant-nesting,auto,P2,C,auto,,,
+scss/comment-no-empty,port,,scss,scss/comment-no-empty,manual,P1,A,none,yes,,
+scss/comment-no-loud,port,,scss,scss/comment-no-loud,manual,P2,C,none,,,
+scss/declaration-nested-properties,port,,scss,scss/declaration-nested-properties,manual,P2,C,none,,,
+scss/declaration-nested-properties-no-divided-groups,port,,scss,scss/declaration-nested-properties-no-divided-groups,manual,P1,A,none,yes,,
+scss/declaration-property-value-no-unknown,port,,scss,scss/declaration-property-value-no-unknown,manual,P2,C,none,,,
+scss/dimension-no-non-numeric-values,port,,scss,scss/dimension-no-non-numeric-values,manual,P2,C,none,,,
+scss/dollar-variable-colon-newline-after,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/dollar-variable-colon-space-after,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/dollar-variable-colon-space-before,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/dollar-variable-default,port,,scss,scss/dollar-variable-default,manual,P2,C,none,,,
+scss/dollar-variable-empty-line-after,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/dollar-variable-empty-line-before,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/dollar-variable-first-in-block,port,,scss,scss/dollar-variable-first-in-block,manual,P2,C,none,,,
+scss/dollar-variable-no-missing-interpolation,port,,scss,scss/dollar-variable-no-missing-interpolation,auto,P1,A,auto,yes,,
+scss/dollar-variable-no-namespaced-assignment,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/dollar-variable-pattern,covered,scss/dollar-variable-pattern,,,,,,none,,,
+scss/double-slash-comment-empty-line-before,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/double-slash-comment-inline,port,,scss,scss/double-slash-comment-inline,manual,P2,C,none,,,
+scss/double-slash-comment-whitespace-inside,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+scss/function-calculation-no-interpolation,port,,scss,scss/function-calculation-no-interpolation,manual,P2,C,none,,,
+scss/function-color-channel,port,,scss,scss/function-color-channel,manual,P2,C,none,,,
+scss/function-color-relative,port,,scss,scss/function-color-relative,manual,P2,C,none,,,
+scss/function-disallowed-list,port,,scss,scss/function-disallowed-list,manual,P2,C,none,,,
+scss/function-no-unknown,covered,scss/function-no-unknown,,,,,,none,,,
+scss/function-quote-no-quoted-strings-inside,port,,scss,scss/function-quote-no-quoted-strings-inside,auto,P1,A,auto,yes,,
+scss/function-unquote-no-unquoted-strings-inside,port,,scss,scss/function-unquote-no-unquoted-strings-inside,auto,P1,A,auto,yes,,
+scss/load-no-partial-leading-underscore,port,,scss,scss/load-no-partial-leading-underscore-scss,manual,P1,A,none,yes,,codelaw already has scss/load-no-partial-leading-underscore: check it is not the same rule
+scss/load-partial-extension,port,,scss,scss/load-partial-extension,auto,P1,A,auto,yes,,
+scss/map-keys-quotes,port,,scss,scss/map-keys-quotes,manual,P2,C,none,,,
+scss/media-feature-value-dollar-variable,port,,scss,scss/media-feature-value-dollar-variable,manual,P2,C,none,,,
+scss/no-dollar-variables,port,,scss,scss/no-dollar-variables,manual,P2,C,none,,,
+scss/no-duplicate-dollar-variables,covered,scss/no-duplicate-dollar-variables,,,,,,none,,,
+scss/no-duplicate-load-rules,port,,scss,scss/no-duplicate-load-rules,manual,P2,C,none,,,
+scss/no-duplicate-mixins,covered,scss/no-duplicate-mixins,,,,,,none,yes,,
+scss/no-global-function-names,covered,scss/no-global-function-names,,,,,,none,yes,,
+scss/no-unused-private-members,port,,scss,scss/no-unused-private-members,manual,P2,C,none,,,
+scss/operator-no-newline-after,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+scss/operator-no-newline-before,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+scss/operator-no-unspaced,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+scss/partial-no-import,port,,scss,scss/partial-no-import,manual,P2,C,none,,,
+scss/percent-placeholder-pattern,covered,scss/percent-placeholder-pattern,,,,,,none,,,
+scss/property-no-unknown,port,,scss,scss/property-no-unknown,manual,P2,C,none,,,
+scss/selector-class-pattern,port,,scss,scss/selector-class-pattern,manual,P2,C,none,,,
+scss/selector-nest-combinators,port,,scss,scss/selector-nest-combinators,manual,P2,C,none,,,
+scss/selector-no-redundant-nesting-selector,port,,scss,scss/selector-no-redundant-nesting-selector,manual,P2,C,none,,,
+scss/selector-no-union-class-name,port,,scss,scss/selector-no-union-class-name,manual,P2,C,none,,,

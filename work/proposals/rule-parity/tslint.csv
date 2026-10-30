@@ -1,0 +1,164 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+adjacent-overload-signatures,retired,,,,,,,none,,yes,successor: @typescript-eslint/adjacent-overload-signatures
+align,retired,,,,,,,auto,,yes,"successor: indent, @typescript-eslint/indent"
+array-type,retired,,,,,,,auto,,yes,successor: @typescript-eslint/array-type
+arrow-parens,retired,,,,,,,auto,,yes,successor: arrow-parens
+arrow-return-shorthand,retired,,,,,,,auto,,yes,successor: arrow-body-style
+await-promise,retired,ts/await-thenable,,,,,,none,,yes,successor: @typescript-eslint/await-thenable; successor covered
+ban,retired,,,,,,,none,,yes,no ESLint successor
+ban-comma-operator,retired,,,,,,,none,,yes,successor: no-sequences
+ban-ts-ignore,retired,ts/ban-ts-comment,,,,,,none,,yes,successor: @typescript-eslint/ban-ts-comment; successor covered
+ban-types,retired,,,,,,,none,,yes,successor: @typescript-eslint/ban-types
+binary-expression-operand-order,retired,,,,,,,none,,yes,successor: yoda
+callable-types,retired,,,,,,,auto,,yes,successor: @typescript-eslint/prefer-function-type
+class-name,retired,,,,,,,none,,yes,successor: @typescript-eslint/naming-convention
+comment-format,retired,,,,,,,auto,,yes,no ESLint successor
+comment-type,retired,,,,,,,none,,yes,no ESLint successor
+completed-docs,retired,,,,,,,none,,yes,no ESLint successor
+curly,retired,,,,,,,auto,,yes,successor: curly
+cyclomatic-complexity,retired,js/complexity,,,,,,none,,yes,successor: complexity; successor covered
+deprecation,retired,,,,,,,none,,yes,successor: import/no-deprecated
+encoding,retired,,,,,,,none,,yes,no ESLint successor
+eofline,retired,,,,,,,auto,,yes,successor: eol-last
+file-header,retired,,,,,,,auto,,yes,no ESLint successor
+file-name-casing,retired,,,,,,,none,,yes,successor: unicorn/filename-case
+forin,retired,,,,,,,none,,yes,successor: guard-for-in
+function-constructor,retired,,,,,,,none,,yes,successor: no-new-func
+import-blacklist,retired,js/use-instead*,,,,,,none,,yes,successor: no-restricted-imports; successor covered
+import-spacing,retired,,,,,,,none,,yes,no ESLint successor
+increment-decrement,retired,,,,,,,none,,yes,successor: no-plusplus
+indent,retired,,,,,,,auto,,yes,"successor: indent, @typescript-eslint/indent"
+interface-name,retired,,,,,,,none,,yes,successor: @typescript-eslint/naming-convention
+interface-over-type-literal,retired,,,,,,,auto,,yes,successor: @typescript-eslint/consistent-type-definitions
+invalid-void,retired,,,,,,,none,,yes,no ESLint successor
+jsdoc-format,retired,,,,,,,none,,yes,"successor: jsdoc/check-alignment, jsdoc/check-indentation, jsdoc/newline-after-description"
+label-position,retired,js/no-unused-labels,,,,,,none,,yes,successor: no-unused-labels; successor covered
+linebreak-style,retired,,,,,,,auto,,yes,successor: linebreak-style
+match-default-export-name,retired,,,,,,,none,,yes,no ESLint successor
+max-classes-per-file,retired,,,,,,,none,,yes,successor: max-classes-per-file
+max-file-line-count,retired,js/max-lines,,,,,,none,,yes,successor: max-lines; successor covered
+max-line-length,retired,,,,,,,none,,yes,successor: max-len
+member-access,retired,,,,,,,auto,,yes,successor: @typescript-eslint/explicit-member-accessibility
+member-ordering,retired,,,,,,,auto,,yes,successor: @typescript-eslint/member-ordering
+new-parens,retired,,,,,,,none,,yes,successor: new-parens
+newline-before-return,retired,,,,,,,auto,,yes,successor: padding-line-between-statements
+newline-per-chained-call,retired,,,,,,,none,,yes,successor: newline-per-chained-call
+no-angle-bracket-type-assertion,retired,,,,,,,auto,,yes,successor: @typescript-eslint/consistent-type-assertions
+no-any,retired,ts/no-explicit-any,,,,,,none,,yes,successor: @typescript-eslint/no-explicit-any; successor covered
+no-arg,retired,,,,,,,none,,yes,successor: no-caller
+no-async-without-await,retired,,,,,,,none,,yes,"successor: require-await, @typescript-eslint/require-await"
+no-bitwise,retired,,,,,,,none,,yes,successor: no-bitwise
+no-boolean-literal-compare,retired,,,,,,,auto,,yes,successor: @typescript-eslint/no-unnecessary-boolean-literal-compare
+no-conditional-assignment,retired,js/no-cond-assign,,,,,,none,,yes,successor: no-cond-assign; successor covered
+no-consecutive-blank-lines,retired,,,,,,,auto,,yes,successor: no-multiple-empty-lines
+no-console,retired,js/no-console,,,,,,none,,yes,successor: no-console; successor covered
+no-construct,retired,,,,,,,none,,yes,successor: no-new-wrappers
+no-debugger,retired,js/no-debugger,,,,,,none,,yes,successor: no-debugger; successor covered
+no-default-export,retired,js/no-default-export*,,,,,,none,,yes,successor: import/no-default-export; successor covered
+no-default-import,retired,,,,,,,none,,yes,no ESLint successor
+no-duplicate-imports,retired,,,,,,,none,,yes,successor: no-duplicate-imports
+no-duplicate-super,retired,js/constructor-super,,,,,,none,,yes,successor: constructor-super; successor covered
+no-duplicate-switch-case,retired,js/no-duplicate-case,,,,,,none,,yes,successor: no-duplicate-case; successor covered
+no-duplicate-variable,retired,js/no-redeclare,,,,,,none,,yes,successor: no-redeclare; successor covered
+no-dynamic-delete,retired,,,,,,,none,,yes,successor: @typescript-eslint/no-dynamic-delete
+no-empty,retired,js/no-empty,,,,,,none,,yes,"successor: no-empty, no-empty-function, @typescript-eslint/no-empty-function; successor covered"
+no-empty-interface,retired,,,,,,,none,,yes,successor: @typescript-eslint/no-empty-interface
+no-eval,retired,,,,,,,none,,yes,successor: no-eval
+no-floating-promises,retired,ts/no-floating-promises,,,,,,none,,yes,successor: @typescript-eslint/no-floating-promises; successor covered
+no-for-in,retired,,,,,,,none,,yes,successor: no-restricted-syntax
+no-for-in-array,retired,,,,,,,none,,yes,successor: @typescript-eslint/no-for-in-array
+no-implicit-dependencies,retired,,,,,,,none,,yes,successor: import/no-extraneous-dependencies
+no-import-side-effect,retired,,,,,,,none,,yes,successor: import/no-unassigned-import
+no-inferrable-types,retired,,,,,,,auto,,yes,successor: @typescript-eslint/no-inferrable-types
+no-inferred-empty-object-type,retired,,,,,,,none,,yes,no ESLint successor
+no-internal-module,retired,ts/prefer-namespace-keyword,,,,,,auto,,yes,successor: @typescript-eslint/prefer-namespace-keyword; successor covered
+no-invalid-template-strings,retired,,,,,,,none,,yes,successor: no-template-curly-in-string
+no-invalid-this,retired,,,,,,,none,,yes,successor: no-invalid-this
+no-irregular-whitespace,retired,js/no-irregular-whitespace,,,,,,auto,,yes,successor: no-irregular-whitespace; successor covered
+no-magic-numbers,retired,,,,,,,none,,yes,successor: no-magic-numbers
+no-mergeable-namespace,retired,,,,,,,none,,yes,no ESLint successor
+no-misused-new,retired,ts/no-misused-new,,,,,,none,,yes,successor: @typescript-eslint/no-misused-new; successor covered
+no-namespace,retired,ts/no-namespace,,,,,,none,,yes,successor: @typescript-eslint/no-namespace; successor covered
+no-non-null-assertion,retired,,,,,,,none,,yes,successor: @typescript-eslint/no-non-null-assertion
+no-null-keyword,retired,,,,,,,auto,,yes,successor: no-null/no-null
+no-null-undefined-union,retired,,,,,,,none,,yes,no ESLint successor
+no-object-literal-type-assertion,retired,,,,,,,none,,yes,successor: @typescript-eslint/consistent-type-assertions
+no-parameter-properties,retired,,,,,,,none,,yes,successor: @typescript-eslint/no-parameter-properties
+no-parameter-reassignment,retired,,,,,,,none,,yes,successor: no-param-reassign
+no-promise-as-boolean,retired,,,,,,,none,,yes,no ESLint successor
+no-redundant-jsdoc,retired,,,,,,,none,,yes,successor: jsdoc/no-types
+no-reference,retired,ts/triple-slash-reference,,,,,,none,,yes,successor: @typescript-eslint/triple-slash-reference; successor covered
+no-reference-import,retired,ts/triple-slash-reference,,,,,,none,,yes,successor: @typescript-eslint/triple-slash-reference; successor covered
+no-require-imports,retired,ts/no-require-imports,,,,,,none,,yes,successor: @typescript-eslint/no-require-imports; successor covered
+no-restricted-globals,retired,,,,,,,none,,yes,no ESLint successor
+no-return-await,retired,,,,,,,auto,,yes,successor: no-return-await
+no-shadowed-variable,retired,,,,,,,none,,yes,"successor: no-shadow, @typescript-eslint/no-shadow"
+no-sparse-arrays,retired,js/no-sparse-arrays,,,,,,none,,yes,successor: no-sparse-arrays; successor covered
+no-string-literal,retired,,,,,,,auto,,yes,"successor: dot-notation, @typescript-eslint/dot-notation"
+no-string-throw,retired,,,,,,,auto,,yes,successor: no-throw-literal
+no-submodule-imports,retired,,,,,,,none,,yes,successor: import/no-internal-modules
+no-switch-case-fall-through,retired,js/no-fallthrough,,,,,,none,,yes,successor: no-fallthrough; successor covered
+no-tautology-expression,retired,,,,,,,none,,yes,no ESLint successor
+no-this-assignment,retired,ts/no-this-alias,,,,,,none,,yes,successor: @typescript-eslint/no-this-alias; successor covered
+no-trailing-whitespace,retired,,,,,,,auto,,yes,successor: no-trailing-spaces
+no-unbound-method,retired,,,,,,,none,,yes,successor: @typescript-eslint/unbound-method
+no-unnecessary-callback-wrapper,retired,,,,,,,none,,yes,no ESLint successor
+no-unnecessary-class,retired,,,,,,,none,,yes,successor: @typescript-eslint/no-extraneous-class
+no-unnecessary-initializer,retired,,,,,,,auto,,yes,successor: no-undef-init
+no-unnecessary-qualifier,retired,,,,,,,auto,,yes,successor: @typescript-eslint/no-unnecessary-qualifier
+no-unnecessary-type-assertion,retired,,,,,,,auto,,yes,successor: @typescript-eslint/no-unnecessary-type-assertion
+no-unsafe-any,retired,,,,,,,none,,yes,no ESLint successor
+no-unsafe-finally,retired,js/no-unsafe-finally,,,,,,none,,yes,successor: no-unsafe-finally; successor covered
+no-unused-expression,retired,ts/no-unused-expressions,,,,,,none,,yes,"successor: no-unused-expressions, @typescript-eslint/no-unused-expressions; successor covered"
+no-unused-variable,retired,js/no-unused-vars ts/no-unused-vars,,,,,,auto,,yes,"successor: no-unused-vars, @typescript-eslint/no-unused-vars; successor covered"
+no-use-before-declare,retired,,,,,,,none,,yes,"successor: no-use-before-define, @typescript-eslint/no-use-before-define"
+no-var-keyword,retired,js/no-var,,,,,,auto,,yes,successor: no-var; successor covered
+no-var-requires,retired,,,,,,,none,,yes,successor: @typescript-eslint/no-var-requires
+no-void-expression,retired,,,,,,,none,,yes,successor: no-void
+number-literal-format,retired,,,,,,,auto,,yes,no ESLint successor
+object-literal-key-quotes,retired,,,,,,,auto,,yes,successor: quote-props
+object-literal-shorthand,retired,,,,,,,auto,,yes,successor: object-shorthand
+object-literal-sort-keys,retired,,,,,,,none,,yes,no ESLint successor
+one-line,retired,,,,,,,auto,,yes,successor: brace-style
+one-variable-per-declaration,retired,,,,,,,none,,yes,successor: one-var
+only-arrow-functions,retired,,,,,,,none,,yes,successor: prefer-arrow/prefer-arrow-functions
+ordered-imports,retired,js/import-groups*,,,,,,auto,,yes,successor: import/order; successor covered
+prefer-conditional-expression,retired,,,,,,,none,,yes,successor: unicorn/prefer-ternary
+prefer-const,retired,js/prefer-const,,,,,,auto,,yes,successor: prefer-const; successor covered
+prefer-for-of,retired,,,,,,,none,,yes,successor: @typescript-eslint/prefer-for-of
+prefer-function-over-method,retired,,,,,,,none,,yes,successor: class-methods-use-this
+prefer-method-signature,retired,,,,,,,auto,,yes,no ESLint successor
+prefer-object-spread,retired,,,,,,,auto,,yes,successor: prefer-object-spread
+prefer-readonly,retired,,,,,,,none,,yes,successor: @typescript-eslint/prefer-readonly
+prefer-switch,retired,,,,,,,none,,yes,successor: unicorn/prefer-switch
+prefer-template,retired,,,,,,,none,,yes,successor: prefer-template
+prefer-while,retired,,,,,,,auto,,yes,no ESLint successor
+promise-function-async,retired,,,,,,,none,,yes,successor: @typescript-eslint/promise-function-async
+quotemark,retired,,,,,,,auto,,yes,"successor: quotes, @typescript-eslint/quotes"
+radix,retired,,,,,,,none,,yes,successor: radix
+restrict-plus-operands,retired,,,,,,,none,,yes,successor: @typescript-eslint/restrict-plus-operands
+return-undefined,retired,,,,,,,none,,yes,no ESLint successor
+semicolon,retired,,,,,,,auto,,yes,"successor: semi, @typescript-eslint/semi, @typescript-eslint/member-delimiter-style"
+space-before-function-paren,retired,,,,,,,auto,,yes,successor: space-before-function-paren
+space-within-parens,retired,,,,,,,auto,,yes,successor: space-in-parens
+static-this,retired,,,,,,,auto,,yes,no ESLint successor
+strict-boolean-expressions,retired,,,,,,,none,,yes,successor: @typescript-eslint/strict-boolean-expressions
+strict-comparisons,retired,,,,,,,none,,yes,no ESLint successor
+strict-string-expressions,retired,,,,,,,auto,,yes,no ESLint successor
+strict-type-predicates,retired,,,,,,,none,,yes,no ESLint successor
+switch-default,retired,,,,,,,none,,yes,successor: default-case
+switch-final-break,retired,,,,,,,auto,,yes,no ESLint successor
+trailing-comma,retired,,,,,,,auto,,yes,successor: comma-dangle
+triple-equals,retired,,,,,,,none,,yes,successor: eqeqeq
+type-literal-delimiter,retired,,,,,,,auto,,yes,successor: @typescript-eslint/member-delimiter-style
+typedef,retired,,,,,,,none,,yes,"successor: @typescript-eslint/typedef, @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types"
+typedef-whitespace,retired,,,,,,,auto,,yes,successor: @typescript-eslint/type-annotation-spacing
+typeof-compare,retired,js/valid-typeof,,,,,,none,,yes,successor: valid-typeof; successor covered
+unified-signatures,retired,,,,,,,none,,yes,successor: @typescript-eslint/unified-signatures
+unnecessary-bind,retired,,,,,,,none,,yes,successor: no-extra-bind
+unnecessary-constructor,retired,,,,,,,none,,yes,successor: no-useless-constructor
+unnecessary-else,retired,,,,,,,none,,yes,no ESLint successor
+use-default-type-parameter,retired,,,,,,,none,,yes,successor: @typescript-eslint/no-unnecessary-type-arguments
+use-isnan,retired,js/use-isnan,,,,,,none,,yes,successor: use-isnan; successor covered
+variable-name,retired,,,,,,,none,,yes,"successor: @typescript-eslint/naming-convention, no-underscore-dangle, id-denylist, id-match"
+whitespace,retired,,,,,,,auto,,yes,no ESLint successor

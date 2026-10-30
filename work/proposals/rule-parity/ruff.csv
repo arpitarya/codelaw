@@ -1,0 +1,971 @@
+upstream_id,class,codelaw,proposed_pack,proposed_id,proposed_fix,priority,tranche,upstream_fix,upstream_recommended,deprecated,note
+(no code) pytest-fixture-autouse,port,,python,py/pytest-fixture-autouse,manual,P3,E,none,,,", preview upstream"
+A001,port,,python,py/builtin-variable-shadowing,manual,P2,D,none,,,flake8-builtins
+A002,port,,python,py/builtin-argument-shadowing,manual,P2,D,none,,,flake8-builtins
+A003,port,,python,py/builtin-attribute-shadowing,manual,P2,D,none,,,flake8-builtins
+A004,port,,python,py/builtin-import-shadowing,manual,P2,D,none,,,flake8-builtins
+A005,port,,python,py/stdlib-module-shadowing,manual,P2,D,none,,,flake8-builtins
+A006,port,,python,py/builtin-lambda-argument-shadowing,manual,P2,D,none,,,flake8-builtins
+AIR001,out-of-scope,,,,,,,none,,,"Airflow, a framework with no codelaw pack"
+AIR002,out-of-scope,,,,,,,none,,,"Airflow, a framework with no codelaw pack"
+AIR003,out-of-scope,,,,,,,none,,,"Airflow, preview upstream, a framework with no codelaw pack"
+AIR004,out-of-scope,,,,,,,none,,,"Airflow, preview upstream, a framework with no codelaw pack"
+AIR201,out-of-scope,,,,,,,suggest,,,"Airflow, preview upstream, a framework with no codelaw pack"
+AIR202,out-of-scope,,,,,,,auto,,,"Airflow, preview upstream, a framework with no codelaw pack"
+AIR301,out-of-scope,,,,,,,suggest,,,"Airflow, a framework with no codelaw pack"
+AIR302,out-of-scope,,,,,,,suggest,,,"Airflow, a framework with no codelaw pack"
+AIR303,out-of-scope,,,,,,,none,,,"Airflow, a framework with no codelaw pack"
+AIR304,out-of-scope,,,,,,,none,,,"Airflow, preview upstream, a framework with no codelaw pack"
+AIR311,out-of-scope,,,,,,,suggest,,,"Airflow, a framework with no codelaw pack"
+AIR312,out-of-scope,,,,,,,suggest,,,"Airflow, a framework with no codelaw pack"
+AIR321,out-of-scope,,,,,,,suggest,,,"Airflow, preview upstream, a framework with no codelaw pack"
+ANN001,port,,python,py/missing-type-function-argument,manual,P2,D,none,,,flake8-annotations
+ANN002,port,,python,py/missing-type-args,manual,P2,D,none,,,flake8-annotations
+ANN003,port,,python,py/missing-type-kwargs,manual,P2,D,none,,,flake8-annotations
+ANN101,retired,,,,,,,none,,yes,flake8-annotations
+ANN102,retired,,,,,,,none,,yes,flake8-annotations
+ANN201,port,,python,py/missing-return-type-undocumented-public-function,suggest,P2,D,suggest,,,flake8-annotations
+ANN202,port,,python,py/missing-return-type-private-function,suggest,P2,D,suggest,,,flake8-annotations
+ANN204,port,,python,py/missing-return-type-special-method,suggest,P2,D,suggest,,,flake8-annotations
+ANN205,port,,python,py/missing-return-type-static-method,suggest,P2,D,suggest,,,flake8-annotations
+ANN206,port,,python,py/missing-return-type-class-method,suggest,P2,D,suggest,,,flake8-annotations
+ANN401,port,,python,py/any-type,manual,P2,D,none,,,flake8-annotations
+ARG001,port,,python,py/unused-function-argument,manual,P2,D,none,,,flake8-unused-arguments
+ARG002,port,,python,py/unused-method-argument,manual,P2,D,none,,,flake8-unused-arguments
+ARG003,port,,python,py/unused-class-method-argument,manual,P2,D,none,,,flake8-unused-arguments
+ARG004,port,,python,py/unused-static-method-argument,manual,P2,D,none,,,flake8-unused-arguments
+ARG005,port,,python,py/unused-lambda-argument,manual,P2,D,none,,,flake8-unused-arguments
+ASYNC100,port,,python,py/cancel-scope-no-checkpoint,manual,P2,D,none,,,flake8-async
+ASYNC105,port,,python,py/trio-sync-call,suggest,P2,D,suggest,,,flake8-async
+ASYNC109,port,,python,py/async-function-with-timeout,manual,P2,D,none,,,flake8-async
+ASYNC110,port,,python,py/async-busy-wait,manual,P2,D,none,,,flake8-async
+ASYNC115,port,,python,py/async-zero-sleep,auto,P2,D,auto,,,flake8-async
+ASYNC116,port,,python,py/long-sleep-not-forever,suggest,P2,D,suggest,,,flake8-async
+ASYNC119,port,,python,py/yield-in-context-manager-in-async-generator,manual,P3,E,none,,,"flake8-async, preview upstream"
+ASYNC210,port,,python,py/blocking-http-call-in-async-function,manual,P2,D,none,,,flake8-async
+ASYNC212,port,,python,py/blocking-http-call-httpx-in-async-function,manual,P2,D,none,,,flake8-async
+ASYNC220,port,,python,py/create-subprocess-in-async-function,manual,P2,D,none,,,flake8-async
+ASYNC221,port,,python,py/run-process-in-async-function,manual,P2,D,none,,,flake8-async
+ASYNC222,port,,python,py/wait-for-process-in-async-function,manual,P2,D,none,,,flake8-async
+ASYNC230,port,,python,py/blocking-open-call-in-async-function,manual,P2,D,none,,,flake8-async
+ASYNC240,port,,python,py/blocking-path-method-in-async-function,manual,P2,D,none,,,flake8-async
+ASYNC250,port,,python,py/blocking-input-in-async-function,manual,P2,D,none,,,flake8-async
+ASYNC251,port,,python,py/blocking-sleep-in-async-function,manual,P2,D,none,,,flake8-async
+B002,covered,py/unary-prefix-increment,,,,,,none,,,
+B003,covered,py/assignment-to-os-environ,,,,,,none,,,
+B004,covered,py/unreliable-callable-check,,,,,,suggest,,,
+B005,covered,py/strip-with-multi-characters,,,,,,none,,,
+B006,covered,py/no-mutable-default,,,,,,suggest,,,
+B007,covered,py/unused-loop-control-variable,,,,,,suggest,,,
+B008,covered,py/function-call-in-default-argument,,,,,,none,,,
+B009,covered,py/getattr-with-constant,,,,,,auto,,,
+B010,covered,py/setattr-with-constant,,,,,,auto,,,
+B011,covered,py/assert-false,,,,,,auto,,,
+B012,covered,py/jump-statement-in-finally,,,,,,none,,,
+B013,covered,py/redundant-tuple-in-exception-handler,,,,,,auto,,,
+B014,covered,py/duplicate-handler-exception,,,,,,auto,,,
+B015,covered,py/useless-comparison,,,,,,none,,,
+B016,covered,py/raise-literal,,,,,,none,,,
+B017,covered,py/assert-raises-exception,,,,,,none,,,
+B018,covered,py/useless-expression,,,,,,none,,,
+B019,covered,py/cached-instance-method,,,,,,none,,,
+B020,covered,py/loop-variable-overrides-iterator,,,,,,none,,,
+B021,covered,py/f-string-docstring,,,,,,none,,,
+B022,covered,py/useless-contextlib-suppress,,,,,,none,,,
+B023,covered,py/function-uses-loop-variable,,,,,,none,,,
+B024,covered,py/abstract-base-class-without-abstract-method,,,,,,none,,,
+B025,covered,py/duplicate-try-block-exception,,,,,,none,,,
+B026,covered,py/star-arg-unpacking-after-keyword-arg,,,,,,none,,,
+B027,covered,py/empty-method-without-abstract-decorator,,,,,,none,,,
+B028,covered,py/no-explicit-stacklevel,,,,,,auto,,,
+B029,covered,py/except-with-empty-tuple,,,,,,none,,,
+B030,covered,py/except-with-non-exception-classes,,,,,,none,,,
+B031,covered,py/reuse-of-groupby-generator,,,,,,none,,,
+B032,covered,py/unintentional-type-annotation,,,,,,none,,,
+B033,covered,py/duplicate-set-value,,,,,,suggest,,,
+B034,covered,py/re-sub-positional-args,,,,,,none,,,
+B035,covered,py/static-key-dict-comprehension,,,,,,none,,,
+B039,covered,py/mutable-contextvar-default,,,,,,none,,,
+B043,port,,python,py/del-attr-with-constant,auto,P3,E,auto,,,"flake8-bugbear, preview upstream"
+B901,port,,python,py/return-in-generator,manual,P3,E,none,,,"flake8-bugbear, preview upstream"
+B903,port,,python,py/class-as-data-structure,manual,P3,E,none,,,"flake8-bugbear, preview upstream"
+B904,covered,py/raise-without-from-inside-except,,,,,,none,,,
+B905,covered,py/zip-without-explicit-strict,,,,,,auto,,,
+B909,port,,python,py/loop-iterator-mutation,manual,P3,E,none,,,"flake8-bugbear, preview upstream"
+B911,covered,py/batched-without-explicit-strict,,,,,,none,,,
+B912,covered,py/map-without-explicit-strict,,,,,,auto,,,
+BLE001,port,,python,py/blind-except,manual,P2,D,none,,,flake8-blind-except
+C400,port,,python,py/unnecessary-generator-list,auto,P2,D,auto,,,flake8-comprehensions
+C401,port,,python,py/unnecessary-generator-set,auto,P2,D,auto,,,flake8-comprehensions
+C402,port,,python,py/unnecessary-generator-dict,auto,P2,D,auto,,,flake8-comprehensions
+C403,port,,python,py/unnecessary-list-comprehension-set,auto,P2,D,auto,,,flake8-comprehensions
+C404,port,,python,py/unnecessary-list-comprehension-dict,auto,P2,D,auto,,,flake8-comprehensions
+C405,port,,python,py/unnecessary-literal-set,auto,P2,D,auto,,,flake8-comprehensions
+C406,port,,python,py/unnecessary-literal-dict,auto,P2,D,auto,,,flake8-comprehensions
+C408,port,,python,py/unnecessary-collection-call,auto,P2,D,auto,,,flake8-comprehensions
+C409,port,,python,py/unnecessary-literal-within-tuple-call,suggest,P2,D,suggest,,,flake8-comprehensions
+C410,port,,python,py/unnecessary-literal-within-list-call,auto,P2,D,auto,,,flake8-comprehensions
+C411,port,,python,py/unnecessary-list-call,suggest,P2,D,suggest,,,flake8-comprehensions
+C413,port,,python,py/unnecessary-call-around-sorted,auto,P2,D,auto,,,flake8-comprehensions
+C414,port,,python,py/unnecessary-double-cast-or-process,auto,P2,D,auto,,,flake8-comprehensions
+C415,port,,python,py/unnecessary-subscript-reversal,manual,P2,D,none,,,flake8-comprehensions
+C416,port,,python,py/unnecessary-comprehension,auto,P2,D,auto,,,flake8-comprehensions
+C417,port,,python,py/unnecessary-map,suggest,P2,D,suggest,,,flake8-comprehensions
+C418,port,,python,py/unnecessary-literal-within-dict-call,suggest,P2,D,suggest,,,flake8-comprehensions
+C419,port,,python,py/unnecessary-comprehension-in-call,suggest,P2,D,suggest,,,flake8-comprehensions
+C420,port,,python,py/unnecessary-dict-comprehension-for-iterable,suggest,P2,D,suggest,,,flake8-comprehensions
+C901,covered,py/complexity,,,,,,none,,,
+COM812,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+COM818,port,,python,py/trailing-comma-on-bare-tuple,manual,P2,D,none,,,flake8-commas
+COM819,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+CPY001,port,,python,py/missing-copyright-notice,manual,P2,D,none,,,flake8-copyright
+D100,port,,python,py/undocumented-public-module,manual,P2,D,none,,,pydocstyle
+D101,port,,python,py/undocumented-public-class,manual,P2,D,none,,,pydocstyle
+D102,port,,python,py/undocumented-public-method,manual,P2,D,none,,,pydocstyle
+D103,port,,python,py/undocumented-public-function,manual,P2,D,none,,,pydocstyle
+D104,port,,python,py/undocumented-public-package,manual,P2,D,none,,,pydocstyle
+D105,port,,python,py/undocumented-magic-method,manual,P2,D,none,,,pydocstyle
+D106,port,,python,py/undocumented-public-nested-class,manual,P2,D,none,,,pydocstyle
+D107,port,,python,py/undocumented-public-init,manual,P2,D,none,,,pydocstyle
+D200,port,,python,py/unnecessary-multiline-docstring,suggest,P2,D,suggest,,,pydocstyle
+D201,port,,python,py/blank-line-before-function,suggest,P2,D,suggest,,,pydocstyle
+D202,port,,python,py/blank-line-after-function,suggest,P2,D,suggest,,,pydocstyle
+D203,port,,python,py/incorrect-blank-line-before-class,auto,P2,D,auto,,,pydocstyle
+D204,port,,python,py/incorrect-blank-line-after-class,auto,P2,D,auto,,,pydocstyle
+D205,port,,python,py/missing-blank-line-after-summary,suggest,P2,D,suggest,,,pydocstyle
+D206,port,,python,py/docstring-tab-indentation,manual,P2,D,none,,,pydocstyle
+D207,port,,python,py/under-indentation,auto,P2,D,auto,,,pydocstyle
+D208,port,,python,py/over-indentation,auto,P2,D,auto,,,pydocstyle
+D209,port,,python,py/new-line-after-last-paragraph,auto,P2,D,auto,,,pydocstyle
+D210,port,,python,py/surrounding-whitespace,suggest,P2,D,suggest,,,pydocstyle
+D211,port,,python,py/blank-line-before-class,auto,P2,D,auto,,,pydocstyle
+D212,port,,python,py/multi-line-summary-first-line,auto,P2,D,auto,,,pydocstyle
+D213,port,,python,py/multi-line-summary-second-line,auto,P2,D,auto,,,pydocstyle
+D214,port,,python,py/overindented-section,auto,P2,D,auto,,,pydocstyle
+D215,port,,python,py/overindented-section-underline,auto,P2,D,auto,,,pydocstyle
+D300,port,,python,py/triple-single-quotes,suggest,P2,D,suggest,,,pydocstyle
+D301,port,,python,py/escape-sequence-in-docstring,suggest,P2,D,suggest,,,pydocstyle
+D400,port,,python,py/missing-trailing-period,suggest,P2,D,suggest,,,pydocstyle
+D401,port,,python,py/non-imperative-mood,manual,P2,D,none,,,pydocstyle
+D402,port,,python,py/signature-in-docstring,manual,P2,D,none,,,pydocstyle
+D403,port,,python,py/first-word-uncapitalized,auto,P2,D,auto,,,pydocstyle
+D404,port,,python,py/docstring-starts-with-this,manual,P2,D,none,,,pydocstyle
+D405,port,,python,py/non-capitalized-section-name,auto,P2,D,auto,,,pydocstyle
+D406,port,,python,py/missing-new-line-after-section-name,auto,P2,D,auto,,,pydocstyle
+D407,port,,python,py/missing-dashed-underline-after-section,auto,P2,D,auto,,,pydocstyle
+D408,port,,python,py/missing-section-underline-after-name,auto,P2,D,auto,,,pydocstyle
+D409,port,,python,py/mismatched-section-underline-length,auto,P2,D,auto,,,pydocstyle
+D410,port,,python,py/no-blank-line-after-section,auto,P2,D,auto,,,pydocstyle
+D411,port,,python,py/no-blank-line-before-section,auto,P2,D,auto,,,pydocstyle
+D412,port,,python,py/blank-lines-between-header-and-content,auto,P2,D,auto,,,pydocstyle
+D413,port,,python,py/missing-blank-line-after-last-section,auto,P2,D,auto,,,pydocstyle
+D414,port,,python,py/empty-docstring-section,manual,P2,D,none,,,pydocstyle
+D415,port,,python,py/missing-terminal-punctuation,suggest,P2,D,suggest,,,pydocstyle
+D416,port,,python,py/missing-section-name-colon,auto,P2,D,auto,,,pydocstyle
+D417,port,,python,py/undocumented-param,manual,P2,D,none,,,pydocstyle
+D418,port,,python,py/overload-with-docstring,manual,P2,D,none,,,pydocstyle
+D419,port,,python,py/empty-docstring,manual,P2,D,none,,,pydocstyle
+D420,port,,python,py/incorrect-section-order,manual,P3,E,none,,,"pydocstyle, preview upstream"
+D421,port,,python,py/property-docstring-starts-with-verb,manual,P3,E,none,,,"pydocstyle, preview upstream"
+DJ001,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
+DJ003,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
+DJ006,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
+DJ007,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
+DJ008,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
+DJ012,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
+DJ013,out-of-scope,,,,,,,none,,,"flake8-django, a framework with no codelaw pack"
+DOC102,port,,python,py/docstring-extraneous-parameter,manual,P3,E,none,,,"pydoclint, preview upstream"
+DOC201,port,,python,py/docstring-missing-returns,manual,P3,E,none,,,"pydoclint, preview upstream"
+DOC202,port,,python,py/docstring-extraneous-returns,manual,P3,E,none,,,"pydoclint, preview upstream"
+DOC402,port,,python,py/docstring-missing-yields,manual,P3,E,none,,,"pydoclint, preview upstream"
+DOC403,port,,python,py/docstring-extraneous-yields,manual,P3,E,none,,,"pydoclint, preview upstream"
+DOC501,port,,python,py/docstring-missing-exception,manual,P3,E,none,,,"pydoclint, preview upstream"
+DOC502,port,,python,py/docstring-extraneous-exception,manual,P3,E,none,,,"pydoclint, preview upstream"
+DTZ001,port,,python,py/call-datetime-without-tzinfo,manual,P2,D,none,,,flake8-datetimez
+DTZ002,port,,python,py/call-datetime-today,manual,P2,D,none,,,flake8-datetimez
+DTZ003,port,,python,py/call-datetime-utcnow,manual,P2,D,none,,,flake8-datetimez
+DTZ004,port,,python,py/call-datetime-utcfromtimestamp,manual,P2,D,none,,,flake8-datetimez
+DTZ005,port,,python,py/call-datetime-now-without-tzinfo,manual,P2,D,none,,,flake8-datetimez
+DTZ006,port,,python,py/call-datetime-fromtimestamp,manual,P2,D,none,,,flake8-datetimez
+DTZ007,port,,python,py/call-datetime-strptime-without-zone,manual,P2,D,none,,,flake8-datetimez
+DTZ011,port,,python,py/call-date-today,manual,P2,D,none,,,flake8-datetimez
+DTZ012,port,,python,py/call-date-fromtimestamp,manual,P2,D,none,,,flake8-datetimez
+DTZ901,port,,python,py/datetime-min-max,manual,P2,D,none,,,flake8-datetimez
+E101,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E111,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E112,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E113,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E114,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E115,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E116,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E117,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E201,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E202,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E203,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E204,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E211,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E221,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E222,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E223,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E224,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E225,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E226,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E227,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E228,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E231,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E241,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E242,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E251,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E252,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E261,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E262,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E265,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E266,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E271,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E272,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E273,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E274,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E275,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E301,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E302,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E303,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E304,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E305,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E306,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+E401,covered,py/multiple-imports-on-one-line,,,,,,auto,yes,,
+E402,covered,py/module-import-not-at-top,,,,,,suggest,yes,,
+E501,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+E502,port,,python,py/redundant-backslash,auto,P3,E,auto,,,"pycodestyle, preview upstream"
+E701,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+E702,layout,,,,,,,none,yes,,the formatter owns it (SR-FORMATTER decision 3)
+E703,layout,,,,,,,auto,yes,,the formatter owns it (SR-FORMATTER decision 3)
+E711,covered,py/none-comparison,,,,,,auto,yes,,
+E712,covered,py/true-false-comparison,,,,,,auto,yes,,
+E713,covered,py/not-in-test,,,,,,auto,yes,,
+E714,covered,py/not-is-test,,,,,,auto,yes,,
+E721,covered,py/type-comparison,,,,,,none,yes,,
+E722,covered,py/no-bare-except,,,,,,none,yes,,
+E731,covered,py/lambda-assignment,,,,,,suggest,yes,,
+E741,covered,py/ambiguous-variable-name,,,,,,none,yes,,
+E742,covered,py/ambiguous-class-name,,,,,,none,yes,,
+E743,covered,py/ambiguous-function-name,,,,,,none,yes,,
+E902,skip,,,,,,,none,yes,,"a file Ruff cannot read: a tool error, not a rule"
+E999,retired,,,,,,,none,yes,yes,pycodestyle
+EM101,port,,python,py/raw-string-in-exception,suggest,P2,D,suggest,,,flake8-errmsg
+EM102,port,,python,py/f-string-in-exception,suggest,P2,D,suggest,,,flake8-errmsg
+EM103,port,,python,py/dot-format-in-exception,suggest,P2,D,suggest,,,flake8-errmsg
+ERA001,port,,python,py/commented-out-code,manual,P2,D,none,,,eradicate
+EXE001,port,,python,py/shebang-not-executable,manual,P2,D,none,,,flake8-executable
+EXE002,port,,python,py/shebang-missing-executable-file,manual,P2,D,none,,,flake8-executable
+EXE003,port,,python,py/shebang-missing-python,manual,P2,D,none,,,flake8-executable
+EXE004,port,,python,py/shebang-leading-whitespace,auto,P2,D,auto,,,flake8-executable
+EXE005,port,,python,py/shebang-not-first-line,manual,P2,D,none,,,flake8-executable
+F401,covered,py/unused-import,,,,,,suggest,yes,,
+F402,covered,py/import-shadowed-by-loop-var,,,,,,none,yes,,
+F403,covered,py/no-star-import,,,,,,none,yes,,
+F404,covered,py/late-future-import,,,,,,none,yes,,
+F405,covered,py/star-import-usage,,,,,,none,yes,,
+F406,covered,py/nested-star-import,,,,,,none,yes,,
+F407,covered,py/undefined-future-feature,,,,,,none,yes,,
+F501,covered,py/percent-format-invalid,,,,,,none,yes,,
+F502,covered,py/percent-format-expected-mapping,,,,,,none,yes,,
+F503,covered,py/percent-format-expected-sequence,,,,,,none,yes,,
+F504,covered,py/percent-format-unused-named-argument,,,,,,auto,yes,,
+F505,covered,py/percent-format-missing-argument,,,,,,none,yes,,
+F506,covered,py/percent-format-mixed-placeholders,,,,,,none,yes,,
+F507,covered,py/percent-format-count-mismatch,,,,,,none,yes,,
+F508,covered,py/percent-format-star-requires-sequence,,,,,,none,yes,,
+F509,covered,py/percent-format-unsupported-character,,,,,,none,yes,,
+F521,covered,py/format-invalid,,,,,,none,yes,,
+F522,covered,py/format-unused-named-argument,,,,,,suggest,yes,,
+F523,covered,py/format-unused-positional-argument,,,,,,suggest,yes,,
+F524,covered,py/format-missing-argument,,,,,,none,yes,,
+F525,covered,py/format-mixed-numbering,,,,,,none,yes,,
+F541,covered,py/f-string-missing-placeholders,,,,,,auto,yes,,
+F601,covered,py/duplicate-dict-key,,,,,,suggest,yes,,
+F602,covered,py/duplicate-dict-key-variable,,,,,,suggest,yes,,
+F621,covered,py/too-many-expressions-in-star-assignment,,,,,,none,yes,,
+F622,covered,py/multiple-starred-expressions,,,,,,none,yes,,
+F631,covered,py/assert-tuple,,,,,,none,yes,,
+F632,covered,py/is-literal,,,,,,auto,yes,,
+F633,covered,py/invalid-print-syntax,,,,,,none,yes,,
+F634,covered,py/if-tuple,,,,,,none,yes,,
+F701,covered,py/break-outside-loop,,,,,,none,yes,,
+F702,covered,py/continue-outside-loop,,,,,,none,yes,,
+F704,covered,py/yield-outside-function,,,,,,none,yes,,
+F706,covered,py/return-outside-function,,,,,,none,yes,,
+F707,covered,py/default-except-not-last,,,,,,none,yes,,
+F722,covered,py/forward-annotation-syntax-error,,,,,,none,yes,,
+F811,covered,py/redefined-while-unused,,,,,,suggest,yes,,
+F821,covered,py/undefined-name,,,,,,none,yes,,
+F822,covered,py/undefined-export,,,,,,none,yes,,
+F823,covered,py/undefined-local,,,,,,none,yes,,
+F841,covered,py/unused-variable,,,,,,suggest,yes,,
+F842,covered,py/unused-annotation,,,,,,none,yes,,
+F901,covered,py/raise-not-implemented,,,,,,suggest,yes,,
+FA100,port,,python,py/future-rewritable-type-annotation,auto,P2,D,auto,,,flake8-future-annotations
+FA102,port,,python,py/future-required-type-annotation,auto,P2,D,auto,,,flake8-future-annotations
+FAST001,out-of-scope,,,,,,,auto,,,"FastAPI, a framework with no codelaw pack"
+FAST002,out-of-scope,,,,,,,suggest,,,"FastAPI, a framework with no codelaw pack"
+FAST003,out-of-scope,,,,,,,suggest,,,"FastAPI, a framework with no codelaw pack"
+FBT001,port,,python,py/boolean-type-hint-positional-argument,manual,P2,D,none,,,flake8-boolean-trap
+FBT002,port,,python,py/boolean-default-value-positional-argument,manual,P2,D,none,,,flake8-boolean-trap
+FBT003,port,,python,py/boolean-positional-value-in-call,manual,P2,D,none,,,flake8-boolean-trap
+FIX001,covered,py/todo-marker*,,,,,,none,,,
+FIX002,covered,py/todo-marker*,,,,,,none,,,
+FIX003,covered,py/todo-marker*,,,,,,none,,,
+FIX004,covered,py/todo-marker*,,,,,,none,,,
+FLY002,port,,python,py/static-join-to-f-string,auto,P2,D,auto,,,flynt
+FURB101,port,,python,py/read-whole-file,suggest,P3,E,suggest,,,"refurb, preview upstream"
+FURB103,port,,python,py/write-whole-file,suggest,P3,E,suggest,,,"refurb, preview upstream"
+FURB105,port,,python,py/print-empty-string,auto,P2,D,auto,,,refurb
+FURB110,port,,python,py/if-exp-instead-of-or-operator,auto,P2,D,auto,,,refurb
+FURB113,port,,python,py/repeated-append,suggest,P3,E,suggest,,,"refurb, preview upstream"
+FURB116,port,,python,py/f-string-number-format,suggest,P2,D,suggest,,,refurb
+FURB118,port,,python,py/reimplemented-operator,suggest,P3,E,suggest,,,"refurb, preview upstream"
+FURB122,port,,python,py/for-loop-writes,auto,P2,D,auto,,,refurb
+FURB129,port,,python,py/readlines-in-for,auto,P2,D,auto,,,refurb
+FURB131,port,,python,py/delete-full-slice,suggest,P3,E,suggest,,,"refurb, preview upstream"
+FURB132,port,,python,py/check-and-remove-from-set,auto,P2,D,auto,,,refurb
+FURB136,port,,python,py/if-expr-min-max,suggest,P2,D,suggest,,,refurb
+FURB140,port,,python,py/reimplemented-starmap,suggest,P3,E,suggest,,,"refurb, preview upstream"
+FURB142,port,,python,py/for-loop-set-mutations,auto,P3,E,auto,,,"refurb, preview upstream"
+FURB145,port,,python,py/slice-copy,auto,P3,E,auto,,,"refurb, preview upstream"
+FURB148,port,,python,py/unnecessary-enumerate,suggest,P3,E,suggest,,,"refurb, preview upstream"
+FURB152,port,,python,py/math-constant,suggest,P3,E,suggest,,,"refurb, preview upstream"
+FURB154,port,,python,py/repeated-global,auto,P3,E,auto,,,"refurb, preview upstream"
+FURB156,port,,python,py/hardcoded-string-charset,auto,P3,E,auto,,,"refurb, preview upstream"
+FURB157,port,,python,py/verbose-decimal-constructor,auto,P2,D,auto,,,refurb
+FURB161,port,,python,py/bit-count,auto,P2,D,auto,,,refurb
+FURB162,port,,python,py/fromisoformat-replace-z,auto,P2,D,auto,,,refurb
+FURB163,port,,python,py/redundant-log-base,suggest,P2,D,suggest,,,refurb
+FURB164,port,,python,py/unnecessary-from-float,suggest,P2,D,suggest,,,refurb
+FURB166,port,,python,py/int-on-sliced-str,auto,P2,D,auto,,,refurb
+FURB167,port,,python,py/regex-flag-alias,auto,P2,D,auto,,,refurb
+FURB168,port,,python,py/isinstance-type-none,auto,P2,D,auto,,,refurb
+FURB169,port,,python,py/type-none-comparison,auto,P2,D,auto,,,refurb
+FURB171,port,,python,py/single-item-membership-test,auto,P2,D,auto,,,refurb
+FURB177,port,,python,py/implicit-cwd,suggest,P2,D,suggest,,,refurb
+FURB180,port,,python,py/meta-class-abc-meta,auto,P3,E,auto,,,"refurb, preview upstream"
+FURB181,port,,python,py/hashlib-digest-hex,suggest,P2,D,suggest,,,refurb
+FURB187,port,,python,py/list-reverse-copy,auto,P2,D,auto,,,refurb
+FURB188,port,,python,py/slice-to-remove-prefix-or-suffix,auto,P2,D,auto,,,refurb
+FURB189,port,,python,py/subclass-builtin,auto,P3,E,auto,,,"refurb, preview upstream"
+FURB192,port,,python,py/sorted-min-max,suggest,P2,D,suggest,,,refurb
+G001,port,,python,py/logging-string-format,manual,P2,D,none,,,flake8-logging-format
+G002,port,,python,py/logging-percent-format,manual,P2,D,none,,,flake8-logging-format
+G003,port,,python,py/logging-string-concat,manual,P2,D,none,,,flake8-logging-format
+G004,port,,python,py/logging-f-string,suggest,P2,D,suggest,,,flake8-logging-format
+G010,port,,python,py/logging-warn,auto,P2,D,auto,,,flake8-logging-format
+G101,port,,python,py/logging-extra-attr-clash,manual,P2,D,none,,,flake8-logging-format
+G201,port,,python,py/logging-exc-info,manual,P2,D,none,,,flake8-logging-format
+G202,port,,python,py/logging-redundant-exc-info,manual,P2,D,none,,,flake8-logging-format
+I001,covered,py/unsorted-imports,,,,,,suggest,,,
+I002,port,,python,py/missing-required-import,auto,P2,D,auto,,,isort
+ICN001,port,,python,py/unconventional-import-alias,suggest,P2,D,suggest,,,flake8-import-conventions
+ICN002,port,,python,py/banned-import-alias,manual,P2,D,none,,,flake8-import-conventions
+ICN003,port,,python,py/banned-import-from,manual,P2,D,none,,,flake8-import-conventions
+INP001,port,,python,py/implicit-namespace-package,manual,P2,D,none,,,flake8-no-pep420
+INT001,port,,python,py/f-string-in-get-text-func-call,manual,P2,D,none,,,flake8-gettext
+INT002,port,,python,py/format-in-get-text-func-call,manual,P2,D,none,,,flake8-gettext
+INT003,port,,python,py/printf-in-get-text-func-call,manual,P2,D,none,,,flake8-gettext
+ISC001,layout,,,,,,,suggest,,,the formatter owns it (SR-FORMATTER decision 3)
+ISC002,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+ISC003,port,,python,py/explicit-string-concatenation,suggest,P2,D,suggest,,,flake8-implicit-str-concat
+ISC004,port,,python,py/implicit-string-concatenation-in-collection-literal,auto,P2,D,auto,,,flake8-implicit-str-concat
+LOG001,port,,python,py/direct-logger-instantiation,suggest,P2,D,suggest,,,flake8-logging
+LOG002,port,,python,py/invalid-get-logger-argument,suggest,P2,D,suggest,,,flake8-logging
+LOG004,port,,python,py/log-exception-outside-except-handler,suggest,P2,D,suggest,,,flake8-logging
+LOG007,port,,python,py/exception-without-exc-info,manual,P2,D,none,,,flake8-logging
+LOG009,port,,python,py/undocumented-warn,suggest,P2,D,suggest,,,flake8-logging
+LOG014,port,,python,py/exc-info-outside-except-handler,suggest,P2,D,suggest,,,flake8-logging
+LOG015,port,,python,py/root-logger-call,manual,P2,D,none,,,flake8-logging
+N801,port,,python,py/invalid-class-name,manual,P2,D,none,,,pep8-naming
+N802,port,,python,py/invalid-function-name,manual,P2,D,none,,,pep8-naming
+N803,port,,python,py/invalid-argument-name,manual,P2,D,none,,,pep8-naming
+N804,port,,python,py/invalid-first-argument-name-for-class-method,suggest,P2,D,suggest,,,pep8-naming
+N805,port,,python,py/invalid-first-argument-name-for-method,suggest,P2,D,suggest,,,pep8-naming
+N806,port,,python,py/non-lowercase-variable-in-function,manual,P2,D,none,,,pep8-naming
+N807,port,,python,py/dunder-function-name,manual,P2,D,none,,,pep8-naming
+N811,port,,python,py/constant-imported-as-non-constant,manual,P2,D,none,,,pep8-naming
+N812,port,,python,py/lowercase-imported-as-non-lowercase,manual,P2,D,none,,,pep8-naming
+N813,port,,python,py/camelcase-imported-as-lowercase,manual,P2,D,none,,,pep8-naming
+N814,port,,python,py/camelcase-imported-as-constant,manual,P2,D,none,,,pep8-naming
+N815,port,,python,py/mixed-case-variable-in-class-scope,manual,P2,D,none,,,pep8-naming
+N816,port,,python,py/mixed-case-variable-in-global-scope,manual,P2,D,none,,,pep8-naming
+N817,port,,python,py/camelcase-imported-as-acronym,manual,P2,D,none,,,pep8-naming
+N818,port,,python,py/error-suffix-on-exception-name,manual,P2,D,none,,,pep8-naming
+N999,port,,python,py/invalid-module-name,manual,P2,D,none,,,pep8-naming
+NPY001,out-of-scope,,,,,,,suggest,,,"NumPy-specific rules, a framework with no codelaw pack"
+NPY002,out-of-scope,,,,,,,none,,,"NumPy-specific rules, a framework with no codelaw pack"
+NPY003,out-of-scope,,,,,,,suggest,,,"NumPy-specific rules, a framework with no codelaw pack"
+NPY201,out-of-scope,,,,,,,suggest,,,"NumPy-specific rules, a framework with no codelaw pack"
+PD002,out-of-scope,,,,,,,suggest,,,"pandas-vet, a framework with no codelaw pack"
+PD003,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD004,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD007,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD008,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD009,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD010,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD011,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD012,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD013,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD015,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD101,out-of-scope,,,,,,,none,,,"pandas-vet, a framework with no codelaw pack"
+PD901,retired,,,,,,,none,,yes,"pandas-vet, a framework with no codelaw pack"
+PERF101,port,,python,py/unnecessary-list-cast,auto,P2,D,auto,,,Perflint
+PERF102,port,,python,py/incorrect-dict-iterator,auto,P2,D,auto,,,Perflint
+PERF203,port,,python,py/try-except-in-loop,manual,P2,D,none,,,Perflint
+PERF401,port,,python,py/manual-list-comprehension,suggest,P2,D,suggest,,,Perflint
+PERF402,port,,python,py/manual-list-copy,manual,P2,D,none,,,Perflint
+PERF403,port,,python,py/manual-dict-comprehension,suggest,P2,D,suggest,,,Perflint
+PGH001,retired,,,,,,,none,,yes,pygrep-hooks
+PGH002,retired,,,,,,,suggest,,yes,pygrep-hooks
+PGH003,port,,python,py/blanket-type-ignore,manual,P2,D,none,,,pygrep-hooks
+PGH004,port,,python,py/blanket-noqa,suggest,P2,D,suggest,,,pygrep-hooks
+PGH005,port,,python,py/invalid-mock-access,manual,P2,D,none,,,pygrep-hooks
+PIE790,port,,python,py/unnecessary-placeholder,auto,P2,D,auto,,,flake8-pie
+PIE794,port,,python,py/duplicate-class-field-definition,auto,P2,D,auto,,,flake8-pie
+PIE796,port,,python,py/non-unique-enums,manual,P2,D,none,,,flake8-pie
+PIE800,port,,python,py/unnecessary-spread,suggest,P2,D,suggest,,,flake8-pie
+PIE804,port,,python,py/unnecessary-dict-kwargs,suggest,P2,D,suggest,,,flake8-pie
+PIE807,port,,python,py/reimplemented-container-builtin,suggest,P2,D,suggest,,,flake8-pie
+PIE808,port,,python,py/unnecessary-range-start,auto,P2,D,auto,,,flake8-pie
+PIE810,port,,python,py/multiple-starts-ends-with,auto,P2,D,auto,,,flake8-pie
+PLC0105,port,,python,py/type-name-incorrect-variance,manual,P2,D,none,,,Pylint
+PLC0131,port,,python,py/type-bivariance,manual,P2,D,none,,,Pylint
+PLC0132,port,,python,py/type-param-name-mismatch,manual,P2,D,none,,,Pylint
+PLC0205,port,,python,py/single-string-slots,manual,P2,D,none,,,Pylint
+PLC0206,port,,python,py/dict-index-missing-items,manual,P2,D,none,,,Pylint
+PLC0207,port,,python,py/missing-maxsplit-arg,auto,P2,D,auto,,,Pylint
+PLC0208,port,,python,py/iteration-over-set,auto,P2,D,auto,,,Pylint
+PLC0414,port,,python,py/useless-import-alias,suggest,P2,D,suggest,,,Pylint
+PLC0415,port,,python,py/import-outside-top-level,manual,P2,D,none,,,Pylint
+PLC1802,port,,python,py/len-test,auto,P2,D,auto,,,Pylint
+PLC1901,port,,python,py/compare-to-empty-string,manual,P3,E,none,,,"Pylint, preview upstream"
+PLC2401,port,,python,py/non-ascii-name,manual,P2,D,none,,,Pylint
+PLC2403,port,,python,py/non-ascii-import-name,manual,P2,D,none,,,Pylint
+PLC2701,port,,python,py/import-private-name,manual,P3,E,none,,,"Pylint, preview upstream"
+PLC2801,port,,python,py/unnecessary-dunder-call,suggest,P3,E,suggest,,,"Pylint, preview upstream"
+PLC3002,port,,python,py/unnecessary-direct-lambda-call,manual,P2,D,none,,,Pylint
+PLE0100,port,,python,py/yield-in-init,manual,P2,D,none,,,Pylint
+PLE0101,port,,python,py/return-in-init,manual,P2,D,none,,,Pylint
+PLE0115,port,,python,py/nonlocal-and-global,manual,P2,D,none,,,Pylint
+PLE0116,port,,python,py/continue-in-finally,manual,P2,D,none,,,Pylint
+PLE0117,port,,python,py/nonlocal-without-binding,manual,P2,D,none,,,Pylint
+PLE0118,port,,python,py/load-before-global-declaration,manual,P2,D,none,,,Pylint
+PLE0237,port,,python,py/non-slot-assignment,manual,P2,D,none,,,Pylint
+PLE0241,port,,python,py/duplicate-bases,suggest,P2,D,suggest,,,Pylint
+PLE0302,port,,python,py/unexpected-special-method-signature,manual,P2,D,none,,,Pylint
+PLE0303,port,,python,py/invalid-length-return-type,manual,P2,D,none,,,Pylint
+PLE0304,port,,python,py/invalid-bool-return-type,manual,P2,D,none,,,Pylint
+PLE0305,port,,python,py/invalid-index-return-type,manual,P2,D,none,,,Pylint
+PLE0307,port,,python,py/invalid-str-return-type,manual,P2,D,none,,,Pylint
+PLE0308,port,,python,py/invalid-bytes-return-type,manual,P2,D,none,,,Pylint
+PLE0309,port,,python,py/invalid-hash-return-type,manual,P2,D,none,,,Pylint
+PLE0604,port,,python,py/invalid-all-object,manual,P2,D,none,,,Pylint
+PLE0605,port,,python,py/invalid-all-format,manual,P2,D,none,,,Pylint
+PLE0643,port,,python,py/potential-index-error,manual,P2,D,none,,,Pylint
+PLE0704,port,,python,py/misplaced-bare-raise,manual,P2,D,none,,,Pylint
+PLE1132,port,,python,py/repeated-keyword-argument,manual,P2,D,none,,,Pylint
+PLE1141,port,,python,py/dict-iter-missing-items,auto,P3,E,auto,,,"Pylint, preview upstream"
+PLE1142,port,,python,py/await-outside-async,manual,P2,D,none,,,Pylint
+PLE1205,port,,python,py/logging-too-many-args,manual,P2,D,none,,,Pylint
+PLE1206,port,,python,py/logging-too-few-args,manual,P2,D,none,,,Pylint
+PLE1300,port,,python,py/bad-string-format-character,manual,P2,D,none,,,Pylint
+PLE1307,port,,python,py/bad-string-format-type,manual,P2,D,none,,,Pylint
+PLE1310,port,,python,py/bad-str-strip-call,manual,P2,D,none,,,Pylint
+PLE1507,port,,python,py/invalid-envvar-value,manual,P2,D,none,,,Pylint
+PLE1519,port,,python,py/singledispatch-method,suggest,P2,D,suggest,,,Pylint
+PLE1520,port,,python,py/singledispatchmethod-function,suggest,P2,D,suggest,,,Pylint
+PLE1700,port,,python,py/yield-from-in-async-function,manual,P2,D,none,,,Pylint
+PLE2502,port,,python,py/bidirectional-unicode,manual,P2,D,none,,,Pylint
+PLE2510,port,,python,py/invalid-character-backspace,suggest,P2,D,suggest,,,Pylint
+PLE2512,port,,python,py/invalid-character-sub,suggest,P2,D,suggest,,,Pylint
+PLE2513,port,,python,py/invalid-character-esc,suggest,P2,D,suggest,,,Pylint
+PLE2514,port,,python,py/invalid-character-nul,suggest,P2,D,suggest,,,Pylint
+PLE2515,port,,python,py/invalid-character-zero-width-space,suggest,P2,D,suggest,,,Pylint
+PLE4703,port,,python,py/modified-iterating-set,auto,P3,E,auto,,,"Pylint, preview upstream"
+PLR0124,port,,python,py/comparison-with-itself,manual,P2,D,none,,,Pylint
+PLR0133,port,,python,py/comparison-of-constant,manual,P2,D,none,,,Pylint
+PLR0202,port,,python,py/no-classmethod-decorator,auto,P3,E,auto,,,"Pylint, preview upstream"
+PLR0203,port,,python,py/no-staticmethod-decorator,auto,P3,E,auto,,,"Pylint, preview upstream"
+PLR0206,port,,python,py/property-with-parameters,manual,P2,D,none,,,Pylint
+PLR0402,port,,python,py/manual-from-import,suggest,P2,D,suggest,,,Pylint
+PLR0904,port,,python,py/too-many-public-methods,manual,P3,E,none,,,"Pylint, preview upstream"
+PLR0911,port,,python,py/too-many-return-statements,manual,P2,D,none,,,Pylint
+PLR0912,covered,py/complexity,,,,,,none,,,
+PLR0913,covered,py/max-params,,,,,,none,,,
+PLR0914,port,,python,py/too-many-locals,manual,P3,E,none,,,"Pylint, preview upstream"
+PLR0915,port,,python,py/too-many-statements,manual,P2,D,none,,,Pylint
+PLR0916,port,,python,py/too-many-boolean-expressions,manual,P3,E,none,,,"Pylint, preview upstream"
+PLR0917,covered,py/max-params,,,,,,none,,,
+PLR1701,retired,,,,,,,auto,,yes,Pylint
+PLR1702,covered,py/max-depth,,,,,,none,,,
+PLR1704,port,,python,py/redefined-argument-from-local,manual,P2,D,none,,,Pylint
+PLR1706,retired,,,,,,,none,,yes,Pylint
+PLR1708,port,,python,py/stop-iteration-return,manual,P2,D,none,,,Pylint
+PLR1711,port,,python,py/useless-return,auto,P2,D,auto,,,Pylint
+PLR1712,port,,python,py/swap-with-temporary-variable,suggest,P3,E,suggest,,,"Pylint, preview upstream"
+PLR1714,port,,python,py/repeated-equality-comparison,auto,P2,D,auto,,,Pylint
+PLR1716,port,,python,py/boolean-chained-comparison,auto,P2,D,auto,,,Pylint
+PLR1722,port,,python,py/sys-exit-alias,suggest,P2,D,suggest,,,Pylint
+PLR1730,port,,python,py/if-stmt-min-max,suggest,P2,D,suggest,,,Pylint
+PLR1733,port,,python,py/unnecessary-dict-index-lookup,auto,P2,D,auto,,,Pylint
+PLR1736,port,,python,py/unnecessary-list-index-lookup,auto,P2,D,auto,,,Pylint
+PLR2004,port,,python,py/magic-value-comparison,manual,P2,D,none,,,Pylint
+PLR2044,port,,python,py/empty-comment,auto,P2,D,auto,,,Pylint
+PLR5501,port,,python,py/collapsible-else-if,suggest,P2,D,suggest,,,Pylint
+PLR6104,port,,python,py/non-augmented-assignment,auto,P3,E,auto,,,"Pylint, preview upstream"
+PLR6201,port,,python,py/literal-membership,auto,P3,E,auto,,,"Pylint, preview upstream"
+PLR6301,port,,python,py/no-self-use,manual,P3,E,none,,,"Pylint, preview upstream"
+PLW0108,port,,python,py/unnecessary-lambda,suggest,P2,D,suggest,,,Pylint
+PLW0120,port,,python,py/useless-else-on-loop,suggest,P2,D,suggest,,,Pylint
+PLW0127,port,,python,py/self-assigning-variable,manual,P2,D,none,,,Pylint
+PLW0128,port,,python,py/redeclared-assigned-name,manual,P2,D,none,,,Pylint
+PLW0129,port,,python,py/assert-on-string-literal,manual,P2,D,none,,,Pylint
+PLW0131,port,,python,py/named-expr-without-context,manual,P2,D,none,,,Pylint
+PLW0133,port,,python,py/useless-exception-statement,suggest,P2,D,suggest,,,Pylint
+PLW0177,port,,python,py/nan-comparison,manual,P2,D,none,,,Pylint
+PLW0211,port,,python,py/bad-staticmethod-argument,manual,P2,D,none,,,Pylint
+PLW0244,port,,python,py/redefined-slots-in-subclass,manual,P3,E,none,,,"Pylint, preview upstream"
+PLW0245,port,,python,py/super-without-brackets,auto,P2,D,auto,,,Pylint
+PLW0406,port,,python,py/import-self,manual,P2,D,none,,,Pylint
+PLW0602,port,,python,py/global-variable-not-assigned,manual,P2,D,none,,,Pylint
+PLW0603,port,,python,py/global-statement,manual,P2,D,none,,,Pylint
+PLW0604,port,,python,py/global-at-module-level,manual,P2,D,none,,,Pylint
+PLW0642,port,,python,py/self-or-cls-assignment,manual,P2,D,none,,,Pylint
+PLW0711,port,,python,py/binary-op-exception,manual,P2,D,none,,,Pylint
+PLW0717,port,,python,py/too-many-statements-in-try-clause,manual,P3,E,none,,,"Pylint, preview upstream"
+PLW1501,port,,python,py/bad-open-mode,manual,P2,D,none,,,Pylint
+PLW1507,port,,python,py/shallow-copy-environ,auto,P2,D,auto,,,Pylint
+PLW1508,port,,python,py/invalid-envvar-default,manual,P2,D,none,,,Pylint
+PLW1509,port,,python,py/subprocess-popen-preexec-fn,manual,P2,D,none,,,Pylint
+PLW1510,port,,python,py/subprocess-run-without-check,suggest,P2,D,suggest,,,Pylint
+PLW1514,port,,python,py/unspecified-encoding,auto,P3,E,auto,,,"Pylint, preview upstream"
+PLW1641,port,,python,py/eq-without-hash,manual,P2,D,none,,,Pylint
+PLW2101,port,,python,py/useless-with-lock,manual,P2,D,none,,,Pylint
+PLW2901,port,,python,py/redefined-loop-name,manual,P2,D,none,,,Pylint
+PLW3201,port,,python,py/bad-dunder-method-name,manual,P3,E,none,,,"Pylint, preview upstream"
+PLW3301,port,,python,py/nested-min-max,suggest,P2,D,suggest,,,Pylint
+PT001,port,,python,py/pytest-fixture-incorrect-parentheses-style,auto,P2,D,auto,,,flake8-pytest-style
+PT002,port,,python,py/pytest-fixture-positional-args,manual,P2,D,none,,,flake8-pytest-style
+PT003,port,,python,py/pytest-extraneous-scope-function,auto,P2,D,auto,,,flake8-pytest-style
+PT004,retired,,,,,,,none,,yes,flake8-pytest-style
+PT005,retired,,,,,,,none,,yes,flake8-pytest-style
+PT006,port,,python,py/pytest-parametrize-names-wrong-type,suggest,P2,D,suggest,,,flake8-pytest-style
+PT007,port,,python,py/pytest-parametrize-values-wrong-type,auto,P2,D,auto,,,flake8-pytest-style
+PT008,port,,python,py/pytest-patch-with-lambda,manual,P2,D,none,,,flake8-pytest-style
+PT009,port,,python,py/pytest-unittest-assertion,suggest,P2,D,suggest,,,flake8-pytest-style
+PT010,port,,python,py/pytest-raises-without-exception,manual,P2,D,none,,,flake8-pytest-style
+PT011,port,,python,py/pytest-raises-too-broad,manual,P2,D,none,,,flake8-pytest-style
+PT012,port,,python,py/pytest-raises-with-multiple-statements,manual,P2,D,none,,,flake8-pytest-style
+PT013,port,,python,py/pytest-incorrect-pytest-import,manual,P2,D,none,,,flake8-pytest-style
+PT014,port,,python,py/pytest-duplicate-parametrize-test-cases,suggest,P2,D,suggest,,,flake8-pytest-style
+PT015,port,,python,py/pytest-assert-always-false,manual,P2,D,none,,,flake8-pytest-style
+PT016,port,,python,py/pytest-fail-without-message,manual,P2,D,none,,,flake8-pytest-style
+PT017,port,,python,py/pytest-assert-in-except,manual,P2,D,none,,,flake8-pytest-style
+PT018,port,,python,py/pytest-composite-assertion,suggest,P2,D,suggest,,,flake8-pytest-style
+PT019,port,,python,py/pytest-fixture-param-without-value,manual,P2,D,none,,,flake8-pytest-style
+PT020,port,,python,py/pytest-deprecated-yield-fixture,suggest,P2,D,suggest,,,flake8-pytest-style
+PT021,port,,python,py/pytest-fixture-finalizer-callback,manual,P2,D,none,,,flake8-pytest-style
+PT022,port,,python,py/pytest-useless-yield-fixture,auto,P2,D,auto,,,flake8-pytest-style
+PT023,port,,python,py/pytest-incorrect-mark-parentheses-style,auto,P2,D,auto,,,flake8-pytest-style
+PT024,port,,python,py/pytest-unnecessary-asyncio-mark-on-fixture,auto,P2,D,auto,,,flake8-pytest-style
+PT025,port,,python,py/pytest-erroneous-use-fixtures-on-fixture,auto,P2,D,auto,,,flake8-pytest-style
+PT026,port,,python,py/pytest-use-fixtures-without-parameters,auto,P2,D,auto,,,flake8-pytest-style
+PT027,port,,python,py/pytest-unittest-raises-assertion,suggest,P2,D,suggest,,,flake8-pytest-style
+PT028,port,,python,py/pytest-parameter-with-default-argument,manual,P2,D,none,,,flake8-pytest-style
+PT029,port,,python,py/pytest-warns-without-warning,manual,P3,E,none,,,"flake8-pytest-style, preview upstream"
+PT030,port,,python,py/pytest-warns-too-broad,manual,P2,D,none,,,flake8-pytest-style
+PT031,port,,python,py/pytest-warns-with-multiple-statements,manual,P2,D,none,,,flake8-pytest-style
+PTH100,port,,python,py/os-path-abspath,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH101,port,,python,py/os-chmod,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH102,port,,python,py/os-mkdir,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH103,port,,python,py/os-makedirs,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH104,port,,python,py/os-rename,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH105,port,,python,py/os-replace,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH106,port,,python,py/os-rmdir,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH107,port,,python,py/os-remove,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH108,port,,python,py/os-unlink,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH109,port,,python,py/os-getcwd,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH110,port,,python,py/os-path-exists,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH111,port,,python,py/os-path-expanduser,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH112,port,,python,py/os-path-isdir,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH113,port,,python,py/os-path-isfile,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH114,port,,python,py/os-path-islink,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH115,port,,python,py/os-readlink,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH116,port,,python,py/os-stat,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH117,port,,python,py/os-path-isabs,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH118,port,,python,py/os-path-join,manual,P2,D,none,,,flake8-use-pathlib
+PTH119,port,,python,py/os-path-basename,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH120,port,,python,py/os-path-dirname,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH121,port,,python,py/os-path-samefile,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH122,port,,python,py/os-path-splitext,manual,P2,D,none,,,flake8-use-pathlib
+PTH123,port,,python,py/builtin-open,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH124,port,,python,py/py-path,manual,P2,D,none,,,flake8-use-pathlib
+PTH201,port,,python,py/path-constructor-current-directory,auto,P2,D,auto,,,flake8-use-pathlib
+PTH202,port,,python,py/os-path-getsize,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH203,port,,python,py/os-path-getatime,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH204,port,,python,py/os-path-getmtime,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH205,port,,python,py/os-path-getctime,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH206,port,,python,py/os-sep-split,manual,P2,D,none,,,flake8-use-pathlib
+PTH207,port,,python,py/glob,manual,P2,D,none,,,flake8-use-pathlib
+PTH208,port,,python,py/os-listdir,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH210,port,,python,py/invalid-pathlib-with-suffix,suggest,P2,D,suggest,,,flake8-use-pathlib
+PTH211,port,,python,py/os-symlink,suggest,P2,D,suggest,,,flake8-use-pathlib
+PYI001,port,,python,py/unprefixed-type-param,manual,P2,D,none,,,flake8-pyi
+PYI002,port,,python,py/complex-if-statement-in-stub,manual,P2,D,none,,,flake8-pyi
+PYI003,port,,python,py/unrecognized-version-info-check,manual,P2,D,none,,,flake8-pyi
+PYI004,port,,python,py/patch-version-comparison,manual,P2,D,none,,,flake8-pyi
+PYI005,port,,python,py/wrong-tuple-length-version-comparison,manual,P2,D,none,,,flake8-pyi
+PYI006,port,,python,py/bad-version-info-comparison,manual,P2,D,none,,,flake8-pyi
+PYI007,port,,python,py/unrecognized-platform-check,manual,P2,D,none,,,flake8-pyi
+PYI008,port,,python,py/unrecognized-platform-name,manual,P2,D,none,,,flake8-pyi
+PYI009,port,,python,py/pass-statement-stub-body,auto,P2,D,auto,,,flake8-pyi
+PYI010,port,,python,py/non-empty-stub-body,auto,P2,D,auto,,,flake8-pyi
+PYI011,port,,python,py/typed-argument-default-in-stub,auto,P2,D,auto,,,flake8-pyi
+PYI012,port,,python,py/pass-in-class-body,auto,P2,D,auto,,,flake8-pyi
+PYI013,port,,python,py/ellipsis-in-non-empty-class-body,auto,P2,D,auto,,,flake8-pyi
+PYI014,port,,python,py/argument-default-in-stub,auto,P2,D,auto,,,flake8-pyi
+PYI015,port,,python,py/assignment-default-in-stub,auto,P2,D,auto,,,flake8-pyi
+PYI016,port,,python,py/duplicate-union-member,suggest,P2,D,suggest,,,flake8-pyi
+PYI017,port,,python,py/complex-assignment-in-stub,manual,P2,D,none,,,flake8-pyi
+PYI018,port,,python,py/unused-private-type-var,auto,P2,D,auto,,,flake8-pyi
+PYI019,port,,python,py/custom-type-var-for-self,suggest,P2,D,suggest,,,flake8-pyi
+PYI020,port,,python,py/quoted-annotation-in-stub,auto,P2,D,auto,,,flake8-pyi
+PYI021,port,,python,py/docstring-in-stub,auto,P2,D,auto,,,flake8-pyi
+PYI024,port,,python,py/collections-named-tuple,manual,P2,D,none,,,flake8-pyi
+PYI025,port,,python,py/unaliased-collections-abc-set-import,suggest,P2,D,suggest,,,flake8-pyi
+PYI026,port,,python,py/type-alias-without-annotation,auto,P2,D,auto,,,flake8-pyi
+PYI029,port,,python,py/str-or-repr-defined-in-stub,auto,P2,D,auto,,,flake8-pyi
+PYI030,port,,python,py/unnecessary-literal-union,auto,P2,D,auto,,,flake8-pyi
+PYI032,port,,python,py/any-eq-ne-annotation,auto,P2,D,auto,,,flake8-pyi
+PYI033,port,,python,py/legacy-type-comment,manual,P2,D,none,,,flake8-pyi
+PYI034,port,,python,py/non-self-return-type,suggest,P2,D,suggest,,,flake8-pyi
+PYI035,port,,python,py/unassigned-special-variable-in-stub,manual,P2,D,none,,,flake8-pyi
+PYI036,port,,python,py/bad-exit-annotation,suggest,P2,D,suggest,,,flake8-pyi
+PYI041,port,,python,py/redundant-numeric-union,suggest,P2,D,suggest,,,flake8-pyi
+PYI042,port,,python,py/snake-case-type-alias,manual,P2,D,none,,,flake8-pyi
+PYI043,port,,python,py/t-suffixed-type-alias,manual,P2,D,none,,,flake8-pyi
+PYI044,port,,python,py/future-annotations-in-stub,suggest,P2,D,suggest,,,flake8-pyi
+PYI045,port,,python,py/iter-method-return-iterable,manual,P2,D,none,,,flake8-pyi
+PYI046,port,,python,py/unused-private-protocol,manual,P2,D,none,,,flake8-pyi
+PYI047,port,,python,py/unused-private-type-alias,manual,P2,D,none,,,flake8-pyi
+PYI048,port,,python,py/stub-body-multiple-statements,manual,P2,D,none,,,flake8-pyi
+PYI049,port,,python,py/unused-private-typed-dict,manual,P2,D,none,,,flake8-pyi
+PYI050,port,,python,py/no-return-argument-annotation-in-stub,manual,P2,D,none,,,flake8-pyi
+PYI051,port,,python,py/redundant-literal-union,manual,P2,D,none,,,flake8-pyi
+PYI052,port,,python,py/unannotated-assignment-in-stub,manual,P2,D,none,,,flake8-pyi
+PYI053,port,,python,py/string-or-bytes-too-long,auto,P2,D,auto,,,flake8-pyi
+PYI054,port,,python,py/numeric-literal-too-long,auto,P2,D,auto,,,flake8-pyi
+PYI055,port,,python,py/unnecessary-type-union,suggest,P2,D,suggest,,,flake8-pyi
+PYI056,port,,python,py/unsupported-method-call-on-all,manual,P2,D,none,,,flake8-pyi
+PYI057,port,,python,py/byte-string-usage,manual,P2,D,none,,,flake8-pyi
+PYI058,port,,python,py/generator-return-from-iter-method,suggest,P2,D,suggest,,,flake8-pyi
+PYI059,port,,python,py/generic-not-last-base-class,suggest,P2,D,suggest,,,flake8-pyi
+PYI061,port,,python,py/redundant-none-literal,suggest,P2,D,suggest,,,flake8-pyi
+PYI062,port,,python,py/duplicate-literal-member,auto,P2,D,auto,,,flake8-pyi
+PYI063,port,,python,py/pep484-style-positional-only-parameter,manual,P2,D,none,,,flake8-pyi
+PYI064,port,,python,py/redundant-final-literal,suggest,P2,D,suggest,,,flake8-pyi
+PYI066,port,,python,py/bad-version-info-order,manual,P2,D,none,,,flake8-pyi
+Q000,layout,,,,,,,suggest,,,the formatter owns it (SR-FORMATTER decision 3)
+Q001,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+Q002,layout,,,,,,,suggest,,,the formatter owns it (SR-FORMATTER decision 3)
+Q003,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+Q004,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+RET501,port,,python,py/unnecessary-return-none,auto,P2,D,auto,,,flake8-return
+RET502,port,,python,py/implicit-return-value,auto,P2,D,auto,,,flake8-return
+RET503,port,,python,py/implicit-return,auto,P2,D,auto,,,flake8-return
+RET504,port,,python,py/unnecessary-assign,auto,P2,D,auto,,,flake8-return
+RET505,port,,python,py/superfluous-else-return,suggest,P2,D,suggest,,,flake8-return
+RET506,port,,python,py/superfluous-else-raise,suggest,P2,D,suggest,,,flake8-return
+RET507,port,,python,py/superfluous-else-continue,suggest,P2,D,suggest,,,flake8-return
+RET508,port,,python,py/superfluous-else-break,suggest,P2,D,suggest,,,flake8-return
+RSE102,port,,python,py/unnecessary-paren-on-raise-exception,auto,P2,D,auto,,,flake8-raise
+RUF001,port,,python,py/ambiguous-unicode-character-string,manual,P2,D,none,,,Ruff-specific rules
+RUF002,port,,python,py/ambiguous-unicode-character-docstring,manual,P2,D,none,,,Ruff-specific rules
+RUF003,port,,python,py/ambiguous-unicode-character-comment,manual,P2,D,none,,,Ruff-specific rules
+RUF005,port,,python,py/collection-literal-concatenation,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF006,port,,python,py/asyncio-dangling-task,manual,P2,D,none,,,Ruff-specific rules
+RUF007,port,,python,py/zip-instead-of-pairwise,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF008,port,,python,py/mutable-dataclass-default,manual,P2,D,none,,,Ruff-specific rules
+RUF009,port,,python,py/function-call-in-dataclass-default-argument,manual,P2,D,none,,,Ruff-specific rules
+RUF010,port,,python,py/explicit-f-string-type-conversion,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF011,retired,,,,,,,none,,yes,Ruff-specific rules
+RUF012,port,,python,py/mutable-class-default,manual,P2,D,none,,,Ruff-specific rules
+RUF013,port,,python,py/implicit-optional,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF015,port,,python,py/unnecessary-iterable-allocation-for-first-element,auto,P2,D,auto,,,Ruff-specific rules
+RUF016,port,,python,py/invalid-index-type,manual,P2,D,none,,,Ruff-specific rules
+RUF017,port,,python,py/quadratic-list-summation,auto,P2,D,auto,,,Ruff-specific rules
+RUF018,port,,python,py/assignment-in-assert,manual,P2,D,none,,,Ruff-specific rules
+RUF019,port,,python,py/unnecessary-key-check,auto,P2,D,auto,,,Ruff-specific rules
+RUF020,port,,python,py/never-union,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF021,port,,python,py/parenthesize-chained-operators,auto,P2,D,auto,,,Ruff-specific rules
+RUF022,covered,py/all-sorted,,,,,,suggest,,,
+RUF023,port,,python,py/unsorted-dunder-slots,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF024,port,,python,py/mutable-fromkeys-value,auto,P2,D,auto,,,Ruff-specific rules
+RUF026,port,,python,py/default-factory-kwarg,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF027,port,,python,py/missing-f-string-syntax,auto,P3,E,auto,,,"Ruff-specific rules, preview upstream"
+RUF028,port,,python,py/invalid-formatter-suppression-comment,auto,P2,D,auto,,,Ruff-specific rules
+RUF029,port,,python,py/unused-async,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF030,port,,python,py/assert-with-print-message,auto,P2,D,auto,,,Ruff-specific rules
+RUF031,port,,python,py/incorrectly-parenthesized-tuple-in-subscript,auto,P3,E,auto,,,"Ruff-specific rules, preview upstream"
+RUF032,port,,python,py/decimal-from-float-literal,auto,P2,D,auto,,,Ruff-specific rules
+RUF033,port,,python,py/post-init-default,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF034,port,,python,py/useless-if-else,manual,P2,D,none,,,Ruff-specific rules
+RUF035,retired,,,,,,,none,,yes,Ruff-specific rules
+RUF036,port,,python,py/none-not-at-end-of-union,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF037,port,,python,py/unnecessary-empty-iterable-within-deque-call,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF038,port,,python,py/redundant-bool-literal,suggest,P3,E,suggest,,,"Ruff-specific rules, preview upstream"
+RUF039,port,,python,py/unraw-re-pattern,suggest,P3,E,suggest,,,"Ruff-specific rules, preview upstream"
+RUF040,port,,python,py/invalid-assert-message-literal-argument,manual,P2,D,none,,,Ruff-specific rules
+RUF041,port,,python,py/unnecessary-nested-literal,auto,P2,D,auto,,,Ruff-specific rules
+RUF043,port,,python,py/pytest-raises-ambiguous-pattern,manual,P2,D,none,,,Ruff-specific rules
+RUF045,port,,python,py/implicit-class-var-in-dataclass,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF046,port,,python,py/unnecessary-cast-to-int,auto,P2,D,auto,,,Ruff-specific rules
+RUF047,port,,python,py/needless-else,auto,P3,E,auto,,,"Ruff-specific rules, preview upstream"
+RUF048,port,,python,py/map-int-version-parsing,manual,P2,D,none,,,Ruff-specific rules
+RUF049,port,,python,py/dataclass-enum,manual,P2,D,none,,,Ruff-specific rules
+RUF050,port,,python,py/unnecessary-if,auto,P3,E,auto,,,"Ruff-specific rules, preview upstream"
+RUF051,port,,python,py/if-key-in-dict-del,auto,P2,D,auto,,,Ruff-specific rules
+RUF052,port,,python,py/used-dummy-variable,suggest,P3,E,suggest,,,"Ruff-specific rules, preview upstream"
+RUF053,port,,python,py/class-with-mixed-type-vars,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF054,port,,python,py/indented-form-feed,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF055,port,,python,py/unnecessary-regular-expression,suggest,P3,E,suggest,,,"Ruff-specific rules, preview upstream"
+RUF056,port,,python,py/falsy-dict-get-fallback,suggest,P3,E,suggest,,,"Ruff-specific rules, preview upstream"
+RUF057,port,,python,py/unnecessary-round,auto,P2,D,auto,,,Ruff-specific rules
+RUF058,port,,python,py/starmap-zip,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF059,port,,python,py/unused-unpacked-variable,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF060,port,,python,py/in-empty-collection,manual,P2,D,none,,,Ruff-specific rules
+RUF061,port,,python,py/legacy-form-pytest-raises,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF063,port,,python,py/access-annotations-from-class-dict,manual,P2,D,none,,,Ruff-specific rules
+RUF064,port,,python,py/non-octal-permissions,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF065,port,,python,py/logging-eager-conversion,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF066,port,,python,py/property-without-return,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF067,port,,python,py/non-empty-init-module,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF068,port,,python,py/duplicate-entry-in-dunder-all,suggest,P2,D,suggest,,,Ruff-specific rules
+RUF069,port,,python,py/float-equality-comparison,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF070,port,,python,py/unnecessary-assign-before-yield,auto,P3,E,auto,,,"Ruff-specific rules, preview upstream"
+RUF071,port,,python,py/os-path-commonprefix,suggest,P3,E,suggest,,,"Ruff-specific rules, preview upstream"
+RUF072,port,,python,py/useless-finally,suggest,P3,E,suggest,,,"Ruff-specific rules, preview upstream"
+RUF073,port,,python,py/f-string-percent-format,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF074,port,,python,py/incorrect-decorator-order,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF075,port,,python,py/fallible-context-manager,manual,P3,E,none,,,"Ruff-specific rules, preview upstream"
+RUF077,port,,python,py/method-receiver-default,auto,P3,E,auto,,,"Ruff-specific rules, preview upstream"
+RUF100,port,,python,py/unused-noqa,auto,P2,D,auto,,,Ruff-specific rules
+RUF101,port,,python,py/redirected-noqa,auto,P2,D,auto,,,Ruff-specific rules
+RUF102,port,,python,py/invalid-rule-code,auto,P2,D,auto,,,Ruff-specific rules
+RUF103,port,,python,py/invalid-suppression-comment,auto,P2,D,auto,,,Ruff-specific rules
+RUF104,port,,python,py/unmatched-suppression-comment,manual,P2,D,none,,,Ruff-specific rules
+RUF105,port,,python,py/noqa-comments,suggest,P3,E,suggest,,,"Ruff-specific rules, preview upstream"
+RUF106,port,,python,py/rule-codes-in-suppression-comments,auto,P3,E,auto,,,"Ruff-specific rules, preview upstream"
+RUF200,port,,python,py/invalid-pyproject-toml,manual,P2,D,none,,,Ruff-specific rules
+RUF201,port,,python,py/rule-codes-in-selectors,auto,P3,E,auto,,,"Ruff-specific rules, preview upstream"
+S101,covered,sec-py/no-assert-for-auth,,,,,,none,,,
+S102,covered,sec-py/no-exec-eval,,,,,,none,,,
+S103,covered,sec-py/no-world-writable,,,,,,none,,,
+S104,covered,sec-py/no-bind-all-interfaces,,,,,,none,,,
+S105,covered,sec-js/no-hardcoded-secret sec-py/django-settings sec-py/no-hardcoded-secret,,,,,,none,,,
+S106,covered,sec-py/no-hardcoded-secret,,,,,,none,,,
+S107,covered,sec-py/no-hardcoded-secret,,,,,,none,,,
+S108,covered,sec-py/no-insecure-tempfile,,,,,,none,,,
+S110,covered,sec-py/no-silent-except,,,,,,none,,,
+S112,covered,sec-py/no-silent-except,,,,,,none,,,
+S113,covered,sec-py/requests-timeout,,,,,,none,,,
+S201,covered,sec-py/flask-debug,,,,,,none,,,
+S202,covered,sec-js/no-archive-slip sec-py/tarfile-filter,,,,,,none,,,
+S301,covered,sec-py/no-unsafe-deserialize,,,,,,none,,,
+S302,covered,sec-py/no-unsafe-deserialize,,,,,,none,,,
+S303,covered,sec-py/no-weak-hash,,,,,,none,,,
+S304,covered,sec-js/no-weak-cipher sec-py/no-weak-cipher,,,,,,none,,,
+S305,covered,sec-py/no-weak-cipher,,,,,,none,,,
+S306,covered,sec-py/no-insecure-tempfile,,,,,,none,,,
+S307,covered,sec-js/no-eval sec-py/no-exec-eval,,,,,,none,,,
+S308,covered,sec-py/no-mark-safe,,,,,,none,,,
+S310,covered,sec-js/no-cleartext-http sec-js/no-ssrf sec-py/urlopen-scheme,,,,,,none,,,
+S311,covered,sec-js/no-insecure-random sec-py/no-insecure-random,,,,,,none,,,
+S312,covered,sec-py/no-insecure-protocol,,,,,,none,,,
+S313,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S314,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S315,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S316,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S317,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S318,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S319,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S320,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,yes,
+S321,covered,sec-py/no-insecure-protocol,,,,,,none,,,
+S323,covered,sec-py/no-tls-bypass,,,,,,none,,,
+S324,covered,sec-js/no-weak-hash sec-py/no-weak-hash,,,,,,none,,,
+S401,covered,sec-py/no-insecure-protocol,,,,,,none,,,
+S402,covered,sec-py/no-insecure-protocol,,,,,,none,,,
+S403,covered,sec-py/no-unsafe-deserialize,,,,,,none,,,
+S404,port,,security-python,sec-py/suspicious-subprocess-import,manual,P3,E,none,,,"flake8-bandit, preview upstream"
+S405,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S406,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S407,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S408,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S409,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,,
+S410,covered,sec-py/no-xml-unsafe-parser,,,,,,none,,yes,
+S411,covered,sec-py/no-xmlrpc,,,,,,none,,,
+S412,port,,security-python,sec-py/suspicious-httpoxy-import,manual,P3,E,none,,,"flake8-bandit, preview upstream"
+S413,covered,sec-py/no-pycrypto,,,,,,none,,,
+S415,port,,security-python,sec-py/suspicious-pyghmi-import,manual,P3,E,none,,,"flake8-bandit, preview upstream"
+S501,covered,sec-js/no-tls-bypass sec-py/no-tls-bypass,,,,,,none,,,
+S502,covered,sec-py/no-tls-bypass,,,,,,none,,,
+S503,covered,sec-py/no-tls-bypass,,,,,,none,,,
+S504,covered,sec-py/no-tls-bypass,,,,,,none,,,
+S505,covered,sec-js/no-weak-key-size sec-py/weak-key-size,,,,,,none,,,
+S506,covered,sec-js/no-unsafe-deserialize sec-py/yaml-safe-load,,,,,,none,,,
+S507,covered,sec-py/paramiko-host-key,,,,,,none,,,
+S508,covered,sec-py/no-insecure-protocol,,,,,,none,,,
+S509,covered,sec-py/no-insecure-protocol,,,,,,none,,,
+S601,port,,security-python,sec-py/paramiko-call,manual,P2,D,none,,,flake8-bandit
+S602,covered,sec-js/no-child-process-shell sec-py/no-shell,,,,,,none,,,
+S603,covered,sec-py/no-shell,,,,,,none,,,
+S604,covered,sec-py/no-shell,,,,,,none,,,
+S605,covered,sec-py/no-shell,,,,,,none,,,
+S606,port,,security-python,sec-py/start-process-with-no-shell,manual,P2,D,none,,,flake8-bandit
+S607,covered,sec-py/no-partial-path,,,,,,none,,,
+S608,covered,sec-js/no-sql-template sec-py/no-sql-string sec-ts/no-typeorm-string-query,,,,,,none,,,
+S609,covered,sec-py/no-shell sec-py/no-wildcard-injection,,,,,,none,,,
+S610,covered,sec-py/no-sql-string,,,,,,none,,,
+S611,covered,sec-py/no-sql-string,,,,,,none,,,
+S612,covered,sec-py/logging-listen,,,,,,none,,,
+S701,covered,sec-py/jinja-autoescape,,,,,,none,,,
+S702,covered,sec-py/no-mako,,,,,,none,,,
+S704,covered,sec-py/no-mark-safe,,,,,,none,,,
+SIM101,port,,python,py/duplicate-isinstance-call,suggest,P2,D,suggest,,,flake8-simplify
+SIM102,port,,python,py/collapsible-if,suggest,P2,D,suggest,,,flake8-simplify
+SIM103,port,,python,py/needless-bool,suggest,P2,D,suggest,,,flake8-simplify
+SIM105,port,,python,py/suppressible-exception,suggest,P2,D,suggest,,,flake8-simplify
+SIM107,port,,python,py/return-in-try-except-finally,manual,P2,D,none,,,flake8-simplify
+SIM108,port,,python,py/if-else-block-instead-of-if-exp,suggest,P2,D,suggest,,,flake8-simplify
+SIM109,port,,python,py/compare-with-tuple,auto,P2,D,auto,,,flake8-simplify
+SIM110,port,,python,py/reimplemented-builtin,suggest,P2,D,suggest,,,flake8-simplify
+SIM112,port,,python,py/uncapitalized-environment-variables,suggest,P2,D,suggest,,,flake8-simplify
+SIM113,port,,python,py/enumerate-for-loop,manual,P2,D,none,,,flake8-simplify
+SIM114,port,,python,py/if-with-same-arms,suggest,P2,D,suggest,,,flake8-simplify
+SIM115,port,,python,py/open-file-with-context-handler,manual,P2,D,none,,,flake8-simplify
+SIM116,port,,python,py/if-else-block-instead-of-dict-lookup,manual,P2,D,none,,,flake8-simplify
+SIM117,port,,python,py/multiple-with-statements,suggest,P2,D,suggest,,,flake8-simplify
+SIM118,port,,python,py/in-dict-keys,auto,P2,D,auto,,,flake8-simplify
+SIM201,port,,python,py/negate-equal-op,auto,P2,D,auto,,,flake8-simplify
+SIM202,port,,python,py/negate-not-equal-op,auto,P2,D,auto,,,flake8-simplify
+SIM208,port,,python,py/double-negation,auto,P2,D,auto,,,flake8-simplify
+SIM210,port,,python,py/if-expr-with-true-false,suggest,P2,D,suggest,,,flake8-simplify
+SIM211,port,,python,py/if-expr-with-false-true,auto,P2,D,auto,,,flake8-simplify
+SIM212,port,,python,py/if-expr-with-twisted-arms,auto,P2,D,auto,,,flake8-simplify
+SIM220,port,,python,py/expr-and-not-expr,auto,P2,D,auto,,,flake8-simplify
+SIM221,port,,python,py/expr-or-not-expr,auto,P2,D,auto,,,flake8-simplify
+SIM222,port,,python,py/expr-or-true,auto,P2,D,auto,,,flake8-simplify
+SIM223,port,,python,py/expr-and-false,auto,P2,D,auto,,,flake8-simplify
+SIM300,port,,python,py/yoda-conditions,suggest,P2,D,suggest,,,flake8-simplify
+SIM401,port,,python,py/if-else-block-instead-of-dict-get,suggest,P2,D,suggest,,,flake8-simplify
+SIM905,port,,python,py/split-static-string,suggest,P2,D,suggest,,,flake8-simplify
+SIM910,port,,python,py/dict-get-with-none-default,auto,P2,D,auto,,,flake8-simplify
+SIM911,port,,python,py/zip-dict-keys-and-values,auto,P2,D,auto,,,flake8-simplify
+SLF001,port,,python,py/private-member-access,manual,P2,D,none,,,flake8-self
+SLOT000,port,,python,py/no-slots-in-str-subclass,manual,P2,D,none,,,flake8-slots
+SLOT001,port,,python,py/no-slots-in-tuple-subclass,manual,P2,D,none,,,flake8-slots
+SLOT002,port,,python,py/no-slots-in-namedtuple-subclass,manual,P2,D,none,,,flake8-slots
+T100,port,,python,py/debugger,manual,P2,D,none,,,flake8-debugger
+T201,covered,py/no-print*,,,,,,suggest,,,
+T203,port,,python,py/p-print,suggest,P2,D,suggest,,,flake8-print
+TC001,port,,python,py/typing-only-first-party-import,suggest,P2,D,suggest,,,flake8-type-checking
+TC002,port,,python,py/typing-only-third-party-import,suggest,P2,D,suggest,,,flake8-type-checking
+TC003,port,,python,py/typing-only-standard-library-import,suggest,P2,D,suggest,,,flake8-type-checking
+TC004,port,,python,py/runtime-import-in-type-checking-block,suggest,P2,D,suggest,,,flake8-type-checking
+TC005,port,,python,py/empty-type-checking-block,auto,P2,D,auto,,,flake8-type-checking
+TC006,port,,python,py/runtime-cast-value,auto,P2,D,auto,,,flake8-type-checking
+TC007,port,,python,py/unquoted-type-alias,auto,P2,D,auto,,,flake8-type-checking
+TC008,port,,python,py/quoted-type-alias,auto,P3,E,auto,,,"flake8-type-checking, preview upstream"
+TC010,port,,python,py/runtime-string-union,manual,P2,D,none,,,flake8-type-checking
+TD001,planned,,,,,,,none,,,filed as W-131
+TD002,planned,,,,,,,none,,,filed as W-131
+TD003,planned,,,,,,,none,,,filed as W-131
+TD004,planned,,,,,,,none,,,filed as W-131
+TD005,planned,,,,,,,none,,,filed as W-131
+TD006,planned,,,,,,,auto,,,filed as W-131
+TD007,planned,,,,,,,none,,,filed as W-131
+TID251,covered,py/use-instead*,,,,,,none,,,
+TID252,port,,python,py/relative-imports,suggest,P2,D,suggest,,,flake8-tidy-imports
+TID253,port,,python,py/banned-module-level-imports,manual,P2,D,none,,,flake8-tidy-imports
+TID254,port,,python,py/lazy-import-mismatch,suggest,P3,E,suggest,,,"flake8-tidy-imports, preview upstream"
+TID255,port,,python,py/lazy-import-immediately-resolved,suggest,P3,E,suggest,,,"flake8-tidy-imports, preview upstream"
+TRY002,port,,python,py/raise-vanilla-class,manual,P2,D,none,,,tryceratops
+TRY003,port,,python,py/raise-vanilla-args,manual,P2,D,none,,,tryceratops
+TRY004,port,,python,py/type-check-without-type-error,manual,P2,D,none,,,tryceratops
+TRY200,retired,,,,,,,none,,yes,tryceratops
+TRY201,port,,python,py/verbose-raise,auto,P2,D,auto,,,tryceratops
+TRY203,port,,python,py/useless-try-except,manual,P2,D,none,,,tryceratops
+TRY300,port,,python,py/try-consider-else,manual,P2,D,none,,,tryceratops
+TRY301,port,,python,py/raise-within-try,manual,P2,D,none,,,tryceratops
+TRY400,port,,python,py/error-instead-of-exception,suggest,P2,D,suggest,,,tryceratops
+TRY401,port,,python,py/verbose-log-message,manual,P2,D,none,,,tryceratops
+UP001,port,,python,py/useless-metaclass-type,auto,P2,D,auto,,,pyupgrade
+UP003,port,,python,py/type-of-primitive,suggest,P2,D,suggest,,,pyupgrade
+UP004,port,,python,py/useless-object-inheritance,auto,P2,D,auto,,,pyupgrade
+UP005,port,,python,py/deprecated-unittest-alias,auto,P2,D,auto,,,pyupgrade
+UP006,port,,python,py/non-pep585-annotation,suggest,P2,D,suggest,,,pyupgrade
+UP007,port,,python,py/non-pep604-annotation-union,suggest,P2,D,suggest,,,pyupgrade
+UP008,port,,python,py/super-call-with-parameters,suggest,P2,D,suggest,,,pyupgrade
+UP009,port,,python,py/utf8-encoding-declaration,auto,P2,D,auto,,,pyupgrade
+UP010,port,,python,py/unnecessary-future-import,auto,P2,D,auto,,,pyupgrade
+UP011,port,,python,py/lru-cache-without-parameters,auto,P2,D,auto,,,pyupgrade
+UP012,port,,python,py/unnecessary-encode-utf8,auto,P2,D,auto,,,pyupgrade
+UP013,port,,python,py/convert-typed-dict-functional-to-class,suggest,P2,D,suggest,,,pyupgrade
+UP014,port,,python,py/convert-named-tuple-functional-to-class,suggest,P2,D,suggest,,,pyupgrade
+UP015,port,,python,py/redundant-open-modes,auto,P2,D,auto,,,pyupgrade
+UP017,port,,python,py/datetime-timezone-utc,suggest,P2,D,suggest,,,pyupgrade
+UP018,port,,python,py/native-literals,auto,P2,D,auto,,,pyupgrade
+UP019,port,,python,py/typing-text-str-alias,suggest,P2,D,suggest,,,pyupgrade
+UP020,port,,python,py/open-alias,suggest,P2,D,suggest,,,pyupgrade
+UP021,port,,python,py/replace-universal-newlines,auto,P2,D,auto,,,pyupgrade
+UP022,port,,python,py/replace-stdout-stderr,suggest,P2,D,suggest,,,pyupgrade
+UP023,port,,python,py/deprecated-c-element-tree,suggest,P2,D,suggest,,,pyupgrade
+UP024,port,,python,py/os-error-alias,auto,P2,D,auto,,,pyupgrade
+UP025,port,,python,py/unicode-kind-prefix,auto,P2,D,auto,,,pyupgrade
+UP026,port,,python,py/deprecated-mock-import,suggest,P2,D,suggest,,,pyupgrade
+UP027,retired,,,,,,,none,,yes,pyupgrade
+UP028,port,,python,py/yield-in-for-loop,suggest,P2,D,suggest,,,pyupgrade
+UP029,port,,python,py/unnecessary-builtin-import,auto,P2,D,auto,,,pyupgrade
+UP030,port,,python,py/format-literals,suggest,P2,D,suggest,,,pyupgrade
+UP031,port,,python,py/printf-string-formatting,suggest,P2,D,suggest,,,pyupgrade
+UP032,port,,python,py/f-string,suggest,P2,D,suggest,,,pyupgrade
+UP033,port,,python,py/lru-cache-with-maxsize-none,auto,P2,D,auto,,,pyupgrade
+UP034,port,,python,py/extraneous-parentheses,auto,P2,D,auto,,,pyupgrade
+UP035,port,,python,py/deprecated-import,suggest,P2,D,suggest,,,pyupgrade
+UP036,port,,python,py/outdated-version-block,suggest,P2,D,suggest,,,pyupgrade
+UP037,port,,python,py/quoted-annotation,auto,P2,D,auto,,,pyupgrade
+UP038,retired,,,,,,,auto,,yes,pyupgrade
+UP039,port,,python,py/unnecessary-class-parentheses,auto,P2,D,auto,,,pyupgrade
+UP040,port,,python,py/non-pep695-type-alias,auto,P2,D,auto,,,pyupgrade
+UP041,port,,python,py/timeout-error-alias,auto,P2,D,auto,,,pyupgrade
+UP042,port,,python,py/replace-str-enum,suggest,P2,D,suggest,,,pyupgrade
+UP043,port,,python,py/unnecessary-default-type-args,auto,P2,D,auto,,,pyupgrade
+UP044,port,,python,py/non-pep646-unpack,auto,P2,D,auto,,,pyupgrade
+UP045,port,,python,py/non-pep604-annotation-optional,suggest,P2,D,suggest,,,pyupgrade
+UP046,port,,python,py/non-pep695-generic-class,suggest,P2,D,suggest,,,pyupgrade
+UP047,port,,python,py/non-pep695-generic-function,auto,P2,D,auto,,,pyupgrade
+UP048,port,,python,py/while-one,auto,P3,E,auto,,,"pyupgrade, preview upstream"
+UP049,port,,python,py/private-type-parameter,suggest,P2,D,suggest,,,pyupgrade
+UP050,port,,python,py/useless-class-metaclass-type,suggest,P2,D,suggest,,,pyupgrade
+UP051,port,,python,py/deprecated-abc-decorator,auto,P3,E,auto,,,"pyupgrade, preview upstream"
+W191,layout,,,,,,,none,,,the formatter owns it (SR-FORMATTER decision 3)
+W291,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+W292,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+W293,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+W391,layout,,,,,,,auto,,,the formatter owns it (SR-FORMATTER decision 3)
+W505,port,,python,py/doc-line-too-long,manual,P2,D,none,,,pycodestyle
+W605,port,,python,py/invalid-escape-sequence,auto,P2,D,auto,,,pycodestyle
+YTT101,port,,python,py/sys-version-slice3,manual,P2,D,none,,,flake8-2020
+YTT102,port,,python,py/sys-version2,manual,P2,D,none,,,flake8-2020
+YTT103,port,,python,py/sys-version-cmp-str3,manual,P2,D,none,,,flake8-2020
+YTT201,port,,python,py/sys-version-info0-eq3,manual,P2,D,none,,,flake8-2020
+YTT202,port,,python,py/six-py3,manual,P2,D,none,,,flake8-2020
+YTT203,port,,python,py/sys-version-info1-cmp-int,manual,P2,D,none,,,flake8-2020
+YTT204,port,,python,py/sys-version-info-minor-cmp-int,manual,P2,D,none,,,flake8-2020
+YTT301,port,,python,py/sys-version0,manual,P2,D,none,,,flake8-2020
+YTT302,port,,python,py/sys-version-cmp-str10,manual,P2,D,none,,,flake8-2020
+YTT303,port,,python,py/sys-version-slice1,manual,P2,D,none,,,flake8-2020
