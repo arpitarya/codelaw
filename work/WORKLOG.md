@@ -24,6 +24,14 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 ---
 
+## 2026-10-30 — W-138 ruled and closed; W-142–W-146 filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** (voice) W-138's blocker; then the rulings, more linters, Tailwind, PR hygiene; *"file it."*
+- **Done:** W-138's R1–R4 written and the item archived (build all: 1,690 + ESLint's 16 taste rules + Ruff's 39 framework rules in five packs = 1,745; tranche A on by default; four Prettier keys into W-141). W-139 to 🟢. Filed W-142 (framework pack names, PyPI — all seven candidate names free, checked), W-143 (Vue/Svelte/Astro/GraphQL as languages), W-144 (round-2 research: sonarjs, test plugins, promise, jsdoc, regexp, Pylint, Next.js, Tailwind, TSLint's 30), W-145 (Tailwind pack + class sorting in the formatter), W-146 (PR hygiene: commits, branches, size, description). B-064 removed; the proposal graduated.
+- **Decided / left open:** the framework packs filed PyPI-only (L6 ships `python` there alone) though named by voice for npm too — Arpit to say if npm is wanted. Agent's defaults in W-146: ticket checks off, branch and description checks off until configured.
+- **Mistakes:** said by voice that git is allowed for three things; SR-ARCHITECTURE decision 14 says six — corrected in W-146.
+- **Next:** W-139, W-141, W-145, W-146 to Claude Code; W-144 in Cowork.
+
 ## 2026-10-30 — W-140 built and closed: port any rule on demand  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement w-140 in parallel"* — and for the batch, *"Implement it and then close those out. Keep merging everything to main."*
